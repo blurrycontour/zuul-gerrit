@@ -142,6 +142,78 @@ class TestGerritCircularDependencies(ZuulTestCase):
             "org/project", "org/project1", "org/project2"
         )
 
+    def test_enqueue_order(self):
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        B = self.fake_gerrit.addFakeChange("org/project1", "master", "B")
+        C = self.fake_gerrit.addFakeChange("org/project2", "master", "C")
+
+        # A <-> B and A -> C (via commit-depends)
+        A.data[
+            "commitMessage"
+        ] = "{}\n\nDepends-On: {}\nDepends-On: {}\n".format(
+            A.subject, B.data["url"], C.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertEqual(len(C.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["value"], "1")
+
+        # We're about to add approvals to changes without adding the
+        # triggering events to Zuul, so that we can be sure that it is
+        # enqueuing the changes based on dependencies, not because of
+        # triggering events.  Since it will have the changes cached
+        # already (without approvals), we need to clear the cache
+        # first.
+        for connection in self.scheds.first.connections.connections.values():
+            connection.maintainCache([], max_age=0)
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        C.addApproval("Code-Review", 2)
+        B.addApproval("Approved", 1)
+        C.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 3)
+        self.assertEqual(B.reported, 3)
+        self.assertEqual(C.reported, 3)
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "MERGED")
+        self.assertEqual(C.data["status"], "MERGED")
+
+        self.assertHistory([
+            # Change A (check + gate)
+            dict(name="project1-job", result="SUCCESS", changes="3,1 1,1 2,1"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes="3,1 1,1 2,1"),
+            dict(name="project1-job", result="SUCCESS", changes="3,1 1,1 2,1"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes="3,1 1,1 2,1"),
+            # Change B (check + gate)
+            dict(name="project-job", result="SUCCESS", changes="3,1 2,1 1,1"),
+            dict(name="project-job", result="SUCCESS", changes="3,1 1,1 2,1"),
+            # Change C (check + gate)
+            dict(name="project2-job", result="SUCCESS", changes="3,1"),
+            dict(name="project2-job", result="SUCCESS", changes="3,1"),
+        ], ordered=False)
+
     def test_forbidden_cycle(self):
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
         B = self.fake_gerrit.addFakeChange("org/project3", "master", "B")
@@ -1554,6 +1626,17 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(C.data['status'], 'MERGED')
 
     def _test_job_deduplication(self):
+        # We make a second scheduler here so that the first scheduler
+        # can freeze the jobs for the first item, and the second
+        # scheduler freeze jobs for the second.  This forces the
+        # scheduler to compare a desiralized FrozenJob with a newly
+        # created one and therefore show difference-in-serialization
+        # issues.
+        self.hold_merge_jobs_in_queue = True
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
 
@@ -1568,10 +1651,18 @@ class TestGerritCircularDependencies(ZuulTestCase):
         A.addApproval('Code-Review', 2)
         B.addApproval('Code-Review', 2)
 
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        with app.sched.run_handler_lock:
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+            self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+            self.waitUntilSettled(matcher=[self.scheds.first])
+            self.merger_api.release(self.merger_api.queued()[0])
+            self.waitUntilSettled(matcher=[self.scheds.first])
 
-        self.waitUntilSettled()
+        # Hold the lock on the first scheduler so that only the second
+        # will act.
+        with self.scheds.first.sched.run_handler_lock:
+            self.merger_api.release()
+            self.waitUntilSettled(matcher=[app])
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
@@ -2246,6 +2337,70 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data["status"], "MERGED")
 
     @simple_layout('layouts/deps-by-topic.yaml')
+    def test_deps_by_topic_git_needs(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
+                                           topic='test-topic')
+        C = self.fake_gerrit.addFakeChange('org/project2', "master", "C",
+                                           topic='other-topic')
+        D = self.fake_gerrit.addFakeChange('org/project1', "master", "D",
+                                           topic='other-topic')
+
+        # Git level dependency between B and C
+        B.setDependsOn(C, 1)
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertEqual(len(C.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(C.patchsets[-1]["approvals"][0]["value"], "1")
+
+        self.assertEqual(len(D.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(D.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(D.patchsets[-1]["approvals"][0]["value"], "1")
+
+        # We're about to add approvals to changes without adding the
+        # triggering events to Zuul, so that we can be sure that it is
+        # enqueing the changes based on dependencies, not because of
+        # triggering events.  Since it will have the changes cached
+        # already (without approvals), we need to clear the cache
+        # first.
+        for connection in self.scheds.first.connections.connections.values():
+            connection.maintainCache([], max_age=0)
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        C.addApproval("Code-Review", 2)
+        D.addApproval("Code-Review", 2)
+        A.addApproval("Approved", 1)
+        C.addApproval("Approved", 1)
+        D.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 3)
+        self.assertEqual(B.reported, 3)
+        self.assertEqual(C.reported, 3)
+        self.assertEqual(D.reported, 3)
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "MERGED")
+        self.assertEqual(C.data["status"], "MERGED")
+        self.assertEqual(D.data["status"], "MERGED")
+
+    @simple_layout('layouts/deps-by-topic.yaml')
     def test_deps_by_topic_new_patchset(self):
         # Make sure that we correctly update the change cache on new
         # patchsets.
@@ -2267,8 +2422,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
 
         self.assertHistory([
-            dict(name="test-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="test-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="check-job", result="SUCCESS", changes="1,1 2,1"),
         ], ordered=False)
 
         A.addPatchset()
@@ -2277,10 +2432,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertHistory([
             # Original check run
-            dict(name="test-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="test-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="check-job", result="SUCCESS", changes="1,1 2,1"),
             # Second check run
-            dict(name="test-job", result="SUCCESS", changes="2,1 1,2"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,2"),
         ], ordered=False)
 
     def test_deps_by_topic_multi_tenant(self):
@@ -2368,14 +2523,83 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
-        # A quirk: at the end of this process, the first change in
-        # Gerrit has a complete run because the process of updating it
-        # involves a new patchset that is enqueued.  Compare to the
-        # same test in GitHub.
         self.assertHistory([
             dict(name="project-job", result="ABORTED", changes="1,1"),
             dict(name="project-job", result="ABORTED", changes="1,1 2,1"),
+            dict(name="project-job", result="SUCCESS", changes="1,2 2,1"),
             dict(name="project-job", result="SUCCESS", changes="2,1 1,2"),
+        ], ordered=False)
+
+    @simple_layout('layouts/deps-by-topic.yaml')
+    def test_dependency_refresh_by_topic_check(self):
+        # Test that when two changes are put into a cycle, the
+        # dependencies are refreshed and items already in pipelines
+        # are updated.
+        self.executor_server.hold_jobs_in_build = True
+
+        # This simulates the typical workflow where a developer
+        # uploads changes one at a time.
+        # The first change:
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Now that it has been uploaded, upload the second change
+        # in the same topic.
+        B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
+                                           topic='test-topic')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name="check-job", result="ABORTED", changes="1,1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="check-job", result="SUCCESS", changes="1,1 2,1"),
+        ], ordered=False)
+
+    @simple_layout('layouts/deps-by-topic.yaml')
+    def test_dependency_refresh_by_topic_gate(self):
+        # Test that when two changes are put into a cycle, the
+        # dependencies are refreshed and items already in pipelines
+        # are updated.
+        self.executor_server.hold_jobs_in_build = True
+
+        # This simulates a workflow where a developer adds a change to
+        # a cycle already in gate.
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
+                                           topic='test-topic')
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        A.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        # Add a new change to the cycle.
+        C = self.fake_gerrit.addFakeChange('org/project1', "master", "C",
+                                           topic='test-topic')
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # At the end of this process, the gate jobs should be aborted
+        # because the new dpendency showed up.
+        self.assertEqual(A.data["status"], "NEW")
+        self.assertEqual(B.data["status"], "NEW")
+        self.assertEqual(C.data["status"], "NEW")
+        self.assertHistory([
+            dict(name="gate-job", result="ABORTED", changes="1,1 2,1"),
+            dict(name="gate-job", result="ABORTED", changes="1,1 2,1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1 3,1"),
         ], ordered=False)
 
 
@@ -2607,13 +2831,11 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
-        # A quirk: at the end of this process, the second PR in GitHub
-        # has a complete run because the process of updating the first
-        # change is not disruptive to the second.  Compare to the same
-        # test in Gerrit.
         self.assertHistory([
             dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha}"),
             dict(name="project-job", result="SUCCESS",
                  changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
+            dict(name="project-job", result="SUCCESS",
+                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
         ], ordered=False)

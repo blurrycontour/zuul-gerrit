@@ -856,7 +856,7 @@ class TestWeb(BaseTestWeb):
                                        'path': 'zuul.yaml',
                                        'project': 'common-config'},
                     'templates': [],
-                    'default_branch': 'master',
+                    'default_branch': None,
                     'queue_name': 'integrated',
                     'merge_mode': None,
                     'pipelines': [{

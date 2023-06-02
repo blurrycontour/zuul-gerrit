@@ -126,6 +126,27 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertTrue(A.approved)
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_merge_request_opened_imcomplete(self):
+
+        now = time.monotonic()
+        complete_at = now + 3
+        with self.fake_gitlab.enable_delayed_complete_mr(complete_at):
+            description = "This is the\nMR description."
+            A = self.fake_gitlab.openFakeMergeRequest(
+                'org/project', 'master', 'A', description=description)
+            self.fake_gitlab.emitEvent(
+                A.getMergeRequestOpenedEvent(), project='org/project')
+            self.waitUntilSettled()
+
+            self.assertEqual('SUCCESS',
+                             self.getJobFromHistory('project-test1').result)
+
+            self.assertEqual('SUCCESS',
+                             self.getJobFromHistory('project-test2').result)
+
+        self.assertTrue(self.fake_gitlab._test_web_server.stats["get_mr"] > 2)
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_updated(self):
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
@@ -407,7 +428,7 @@ class TestGitlabDriver(ZuulTestCase):
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_pull_request_with_dyn_reconf(self):
-
+        path = os.path.join(self.upstream_root, 'org/project')
         zuul_yaml = [
             {'job': {
                 'name': 'project-test3',
@@ -424,11 +445,13 @@ class TestGitlabDriver(ZuulTestCase):
         playbook = "- hosts: all\n  tasks: []"
 
         A = self.fake_gitlab.openFakeMergeRequest(
-            'org/project', 'master', 'A')
+            'org/project', 'master', 'A',
+            base_sha=git.Repo(path).head.object.hexsha)
         A.addCommit(
             {'.zuul.yaml': yaml.dump(zuul_yaml),
              'job.yaml': playbook}
         )
+        A.addCommit({"dummy.file": ""})
         self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
         self.waitUntilSettled()
 
@@ -438,6 +461,40 @@ class TestGitlabDriver(ZuulTestCase):
                          self.getJobFromHistory('project-test2').result)
         self.assertEqual('SUCCESS',
                          self.getJobFromHistory('project-test3').result)
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_pull_request_with_dyn_reconf_alt(self):
+        with self.fake_gitlab.enable_uncomplete_mr():
+            zuul_yaml = [
+                {'job': {
+                    'name': 'project-test3',
+                    'run': 'job.yaml'
+                }},
+                {'project': {
+                    'check': {
+                        'jobs': [
+                            'project-test3'
+                        ]
+                    }
+                }}
+            ]
+            playbook = "- hosts: all\n  tasks: []"
+            A = self.fake_gitlab.openFakeMergeRequest(
+                'org/project', 'master', 'A')
+            A.addCommit(
+                {'.zuul.yaml': yaml.dump(zuul_yaml),
+                 'job.yaml': playbook}
+            )
+            A.addCommit({"dummy.file": ""})
+            self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+            self.waitUntilSettled()
+
+            self.assertEqual('SUCCESS',
+                             self.getJobFromHistory('project-test1').result)
+            self.assertEqual('SUCCESS',
+                             self.getJobFromHistory('project-test2').result)
+            self.assertEqual('SUCCESS',
+                             self.getJobFromHistory('project-test3').result)
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_ref_updated_and_tenant_reconfigure(self):

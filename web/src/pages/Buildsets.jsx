@@ -32,6 +32,7 @@ class BuildsetsPage extends React.Component {
     tenant: PropTypes.object,
     location: PropTypes.object,
     history: PropTypes.object,
+    preferences: PropTypes.object,
   }
 
   constructor(props) {
@@ -148,6 +149,28 @@ class BuildsetsPage extends React.Component {
     }
   }
 
+  filterInputValidation = (filterKey, filterValue) => {
+    // Input value should not be empty for all cases
+    if (!filterValue) {
+      return {
+        success: false,
+        message: 'Input should not be empty'
+      }
+    }
+
+    // For change filter, it must be an integer
+    if (filterKey === 'change' && isNaN(filterValue)) {
+      return {
+        success: false,
+        message: 'Change must be an integer (do not include revision)'
+      }
+    }
+
+    return {
+      success: true
+    }
+  }
+
   handleFilterChange = (newFilters) => {
     const { location, history } = this.props
     const { filters, itemCount } = this.state
@@ -208,11 +231,12 @@ class BuildsetsPage extends React.Component {
     const { buildsets, fetching, filters, resultsPerPage, currentPage, itemCount } = this.state
 
     return (
-      <PageSection variant={PageSectionVariants.light}>
+      <PageSection variant={this.props.preferences.darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <FilterToolbar
           filterCategories={this.filterCategories}
           onFilterChange={this.handleFilterChange}
           filters={filters}
+          filterInputValidation={this.filterInputValidation}
         />
         <Pagination
           toggleTemplate={({ firstIndex, lastIndex, itemCount }) => (
@@ -245,4 +269,7 @@ class BuildsetsPage extends React.Component {
   }
 }
 
-export default connect((state) => ({ tenant: state.tenant }))(BuildsetsPage)
+export default connect((state) => ({
+  tenant: state.tenant,
+  preferences: state.preferences,
+}))(BuildsetsPage)

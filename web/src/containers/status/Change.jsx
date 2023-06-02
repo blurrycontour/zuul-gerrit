@@ -48,7 +48,8 @@ class Change extends React.Component {
     pipeline: PropTypes.object,
     tenant: PropTypes.object,
     user: PropTypes.object,
-    dispatch: PropTypes.func
+    dispatch: PropTypes.func,
+    preferences: PropTypes.object
   }
 
   state = {
@@ -268,7 +269,11 @@ class Change extends React.Component {
     for (i = 0; i < queue._tree_columns; i++) {
       let className = ''
       if (i < change._tree.length && change._tree[i] !== null) {
-        className = ' zuul-change-row-line'
+        if (this.props.preferences.darkMode) {
+          className = ' zuul-change-row-line-dark'
+        } else {
+          className = ' zuul-change-row-line'
+        }
       }
       row.push(
         <td key={i} className={'zuul-change-row' + className}>
@@ -313,4 +318,5 @@ class Change extends React.Component {
 export default connect(state => ({
   tenant: state.tenant,
   user: state.user,
+  preferences: state.preferences,
 }))(Change)

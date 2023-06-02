@@ -293,6 +293,33 @@ class TestModelUpgrade(ZuulTestCase):
                  result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    @model_version(12)
+    def test_model_12_13(self):
+        # Initially queue items will still have the full trigger event
+        # stored in Zookeeper. The trigger event will be converted to
+        # an event info object after the model API update.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 13
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
 
 class TestGithubModelUpgrade(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'

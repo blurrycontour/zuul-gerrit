@@ -1338,8 +1338,8 @@ class AnsibleJob(object):
                         result=None,
                         error_detail=f'Failed to update project '
                                      f'{task.project_name}')
-                    self.job.sendWorkComplete(
-                        json.dumps(result, sort_keys=True))
+                    self.executor_server.completeBuild(
+                        self.build_request, result)
                     return
 
                 raise ExecutorError(
@@ -1931,6 +1931,7 @@ class AnsibleJob(object):
                         region=node.region,
                         host_id=node.host_id,
                         external_id=getattr(node, 'external_id', None),
+                        slot=node.slot,
                         interface_ip=node.interface_ip,
                         public_ipv4=node.public_ipv4,
                         private_ipv4=node.private_ipv4,
@@ -3632,6 +3633,10 @@ class ExecutorServer(BaseMergeServer):
             log.exception('Process pool got broken')
             self.resetProcessPool()
             task.transient_error = True
+        except IOError:
+            log.exception('Got I/O error while updating repo %s/%s',
+                          task.connection_name, task.project_name)
+            task.transient_error = True
         except Exception:
             log.exception('Got exception while updating repo %s/%s',
                           task.connection_name, task.project_name)
@@ -4070,7 +4075,12 @@ class ExecutorServer(BaseMergeServer):
             # result.
             if result.get("result") is None:
                 attempts = params["zuul"]["attempts"]
-                max_attempts = params["max_attempts"]
+                try:
+                    max_attempts = params["zuul"]["max_attempts"]
+                except KeyError:
+                    # TODO (swestphahl):
+                    # Remove backward compatibility handling
+                    max_attempts = params["max_attempts"]
                 if attempts >= max_attempts:
                     result["result"] = "RETRY_LIMIT"
 

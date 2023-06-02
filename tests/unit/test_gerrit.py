@@ -827,6 +827,14 @@ class TestGerritFake(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
     tenant_config_file = "config/circular-dependencies/main.yaml"
 
+    def _make_tuple(self, data):
+        ret = []
+        for c in data:
+            dep_change = c['number']
+            dep_ps = c['currentPatchSet']['number']
+            ret.append((int(dep_change), int(dep_ps)))
+        return sorted(ret)
+
     def _get_tuple(self, change_number):
         ret = []
         data = self.fake_gerrit.get(
@@ -903,6 +911,11 @@ class TestGerritFake(ZuulTestCase):
         ret = self.fake_gerrit._getSubmittedTogether(C1, None)
         self.assertEqual(ret, [(4, 1)])
 
+        # Test also the query used by the GerritConnection:
+        ret = self.fake_gerrit._simpleQuery('status:open topic:test-topic')
+        ret = self._make_tuple(ret)
+        self.assertEqual(ret, [(3, 1), (4, 1)])
+
 
 class TestGerritConnection(ZuulTestCase):
     config_file = 'zuul-gerrit-web.conf'
@@ -957,6 +970,92 @@ class TestGerritConnection(ZuulTestCase):
         self.assertEqual(B.queried, 2)
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
+
+    def test_submit_requirements(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        # Set an unsatisfied submit requirement
+        A.setSubmitRequirements([
+            {
+                "name": "Code-Review",
+                "description": "Disallow self-review",
+                "status": "UNSATISFIED",
+                "is_legacy": False,
+                "submittability_expression_result": {
+                    "expression": "label:Code-Review=MAX,user=non_uploader "
+                        "AND -label:Code-Review=MIN",
+                    "fulfilled": False,
+                    "passing_atoms": [],
+                    "failing_atoms": [
+                        "label:Code-Review=MAX,user=non_uploader",
+                        "label:Code-Review=MIN"
+                    ]
+                }
+            },
+            {
+                "name": "Verified",
+                "status": "UNSATISFIED",
+                "is_legacy": True,
+                "submittability_expression_result": {
+                    "expression": "label:Verified=MAX -label:Verified=MIN",
+                    "fulfilled": False,
+                    "passing_atoms": [],
+                    "failing_atoms": [
+                        "label:Verified=MAX",
+                        "-label:Verified=MIN"
+                    ]
+                }
+            },
+        ])
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertHistory([])
+        self.assertEqual(A.queried, 1)
+        self.assertEqual(A.data['status'], 'NEW')
+
+        # Mark the requirement satisfied
+        A.setSubmitRequirements([
+            {
+                "name": "Code-Review",
+                "description": "Disallow self-review",
+                "status": "SATISFIED",
+                "is_legacy": False,
+                "submittability_expression_result": {
+                    "expression": "label:Code-Review=MAX,user=non_uploader "
+                        "AND -label:Code-Review=MIN",
+                    "fulfilled": False,
+                    "passing_atoms": [
+                        "label:Code-Review=MAX,user=non_uploader",
+                    ],
+                    "failing_atoms": [
+                        "label:Code-Review=MIN"
+                    ]
+                }
+            },
+            {
+                "name": "Verified",
+                "status": "UNSATISFIED",
+                "is_legacy": True,
+                "submittability_expression_result": {
+                    "expression": "label:Verified=MAX -label:Verified=MIN",
+                    "fulfilled": False,
+                    "passing_atoms": [],
+                    "failing_atoms": [
+                        "label:Verified=MAX",
+                        "-label:Verified=MIN"
+                    ]
+                }
+            },
+        ])
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name="project-merge", result="SUCCESS", changes="1,1"),
+            dict(name="project-test1", result="SUCCESS", changes="1,1"),
+            dict(name="project-test2", result="SUCCESS", changes="1,1"),
+        ], ordered=False)
+        self.assertEqual(A.queried, 3)
+        self.assertEqual(A.data['status'], 'MERGED')
 
 
 class TestGerritUnicodeRefs(ZuulTestCase):

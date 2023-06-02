@@ -79,6 +79,9 @@ class ConfigurationSyntaxError(Exception):
 
 
 class NodeFromGroupNotFoundError(Exception):
+    zuul_error_name = 'Node From Group Not Found'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self, nodeset, node, group):
         message = textwrap.dedent("""\
         In {nodeset} the group "{group}" contains a
@@ -89,6 +92,9 @@ class NodeFromGroupNotFoundError(Exception):
 
 
 class DuplicateNodeError(Exception):
+    zuul_error_name = 'Duplicate Node'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self, nodeset, node):
         message = textwrap.dedent("""\
         In nodeset "{nodeset}" the node "{node}" appears multiple times.
@@ -99,6 +105,9 @@ class DuplicateNodeError(Exception):
 
 
 class UnknownConnection(Exception):
+    zuul_error_name = 'Unknown Connection'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self, connection_name):
         message = textwrap.dedent("""\
         Unknown connection named "{connection}".""")
@@ -107,6 +116,9 @@ class UnknownConnection(Exception):
 
 
 class LabelForbiddenError(Exception):
+    zuul_error_name = 'Label Forbidden'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self, label, allowed_labels, disallowed_labels):
         message = textwrap.dedent("""\
         Label named "{label}" is not part of the allowed
@@ -126,6 +138,9 @@ class LabelForbiddenError(Exception):
 
 
 class MaxTimeoutError(Exception):
+    zuul_error_name = 'Max Timeout Exceeded'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self, job, tenant):
         message = textwrap.dedent("""\
         The job "{job}" exceeds tenant max-job-timeout {maxtimeout}.""")
@@ -135,6 +150,9 @@ class MaxTimeoutError(Exception):
 
 
 class DuplicateGroupError(Exception):
+    zuul_error_name = 'Duplicate Nodeset Group'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self, nodeset, group):
         message = textwrap.dedent("""\
         In {nodeset} the group "{group}" appears multiple times.
@@ -145,6 +163,9 @@ class DuplicateGroupError(Exception):
 
 
 class ProjectNotFoundError(Exception):
+    zuul_error_name = 'Project Not Found'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self, project):
         message = textwrap.dedent("""\
         The project "{project}" was not found.  All projects
@@ -156,6 +177,9 @@ class ProjectNotFoundError(Exception):
 
 
 class TemplateNotFoundError(Exception):
+    zuul_error_name = 'Template Not Found'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self, template):
         message = textwrap.dedent("""\
         The project template "{template}" was not found.
@@ -165,6 +189,9 @@ class TemplateNotFoundError(Exception):
 
 
 class NodesetNotFoundError(Exception):
+    zuul_error_name = 'Nodeset Not Found'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self, nodeset):
         message = textwrap.dedent("""\
         The nodeset "{nodeset}" was not found.
@@ -174,6 +201,9 @@ class NodesetNotFoundError(Exception):
 
 
 class PipelineNotPermittedError(Exception):
+    zuul_error_name = 'Pipeline Forbidden'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self):
         message = textwrap.dedent("""\
         Pipelines may not be defined in untrusted repos,
@@ -183,6 +213,9 @@ class PipelineNotPermittedError(Exception):
 
 
 class ProjectNotPermittedError(Exception):
+    zuul_error_name = 'Project Forbidden'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self):
         message = textwrap.dedent("""\
         Within an untrusted project, the only project definition
@@ -192,6 +225,9 @@ class ProjectNotPermittedError(Exception):
 
 
 class GlobalSemaphoreNotFoundError(Exception):
+    zuul_error_name = 'Global Semaphore Not Found'
+    zuul_error_severity = model.SEVERITY_ERROR
+
     def __init__(self, semaphore):
         message = textwrap.dedent("""\
         The global semaphore "{semaphore}" was not found.  All
@@ -261,15 +297,18 @@ def project_configuration_exceptions(context, accumulator):
 
         m = m.format(intro=intro,
                      error=indent(str(e)))
-        accumulator.addError(context, None, m)
+        accumulator.addError(
+            context, None, m,
+            short_error=str(e),
+            severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
+            name=getattr(e, 'zuul_error_name', 'Unknown'))
 
 
 @contextmanager
-def early_configuration_exceptions(context):
+def early_configuration_exceptions(context, accumulator):
     try:
         yield
-    except ConfigurationSyntaxError:
-        raise
+    # Note: we catch ConfigurationSyntaxErrors here.
     except Exception as e:
         intro = textwrap.fill(textwrap.dedent("""\
         Zuul encountered a syntax error while parsing its configuration in the
@@ -285,7 +324,11 @@ def early_configuration_exceptions(context):
 
         m = m.format(intro=intro,
                      error=indent(str(e)))
-        raise ConfigurationSyntaxError(m)
+        accumulator.addError(
+            context, None, m,
+            short_error=str(e),
+            severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
+            name=getattr(e, 'zuul_error_name', 'Unknown'))
 
 
 @contextmanager
@@ -322,7 +365,11 @@ def configuration_exceptions(stanza, conf, accumulator):
                      content=indent(start_mark.snippet.rstrip()),
                      start_mark=str(start_mark))
 
-        accumulator.addError(context, start_mark, m, str(e))
+        accumulator.addError(
+            context, start_mark, m,
+            short_error=str(e),
+            severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
+            name=getattr(e, 'zuul_error_name', 'Unknown'))
 
 
 @contextmanager
@@ -358,7 +405,11 @@ def reference_exceptions(stanza, obj, accumulator):
                      content=indent(start_mark.snippet.rstrip()),
                      start_mark=str(start_mark))
 
-        accumulator.addError(context, start_mark, m, str(e))
+        accumulator.addError(
+            context, start_mark, m,
+            short_error=str(e),
+            severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
+            name=getattr(e, 'zuul_error_name', 'Unknown'))
 
 
 class ZuulSafeLoader(yaml.EncryptedLoader):
@@ -1253,7 +1304,7 @@ class ProjectParser(object):
         if mode is not None:
             project_config.merge_mode = model.MERGER_MAP[mode]
 
-        default_branch = conf.get('default-branch', 'master')
+        default_branch = conf.get('default-branch')
         project_config.default_branch = default_branch
 
         project_config.queue_name = conf.get('queue', None)
@@ -2151,21 +2202,26 @@ class TenantParser(object):
         for future in futures:
             future.result()
 
-        try:
-            self._processCatJobs(abide, tenant, loading_errors, jobs,
-                                 min_ltimes)
-        except Exception:
-            self.log.exception("Error processing cat jobs, canceling")
-            for job in jobs:
+        for i, job in enumerate(jobs, start=1):
+            try:
                 try:
-                    self.log.debug("Canceling cat job %s", job)
+                    self._processCatJob(abide, tenant, loading_errors, job,
+                                        min_ltimes)
+                except TimeoutError:
                     self.merger.cancel(job)
-                except Exception:
-                    self.log.exception("Unable to cancel job %s", job)
-                    if not ignore_cat_exception:
-                        raise
-            if not ignore_cat_exception:
-                raise
+                    raise
+            except Exception:
+                self.log.exception("Error processing cat job")
+                if not ignore_cat_exception:
+                    # Cancel remaining jobs
+                    for cancel_job in jobs[i:]:
+                        self.log.debug("Canceling cat job %s", cancel_job)
+                        try:
+                            self.merger.cancel(cancel_job)
+                        except Exception:
+                            self.log.exception(
+                                "Unable to cancel job %s", cancel_job)
+                    raise
 
     def _cacheTenantYAMLBranch(self, abide, tenant, loading_errors, min_ltimes,
                                tpc, project, branch, jobs):
@@ -2234,49 +2290,48 @@ class TenantParser(object):
         job.source_context = source_context
         jobs.append(job)
 
-    def _processCatJobs(self, abide, tenant, loading_errors, jobs, min_ltimes):
+    def _processCatJob(self, abide, tenant, loading_errors, job, min_ltimes):
         # Called at the end of _cacheTenantYAML after all cat jobs
         # have been submitted
-        for job in jobs:
-            self.log.debug("Waiting for cat job %s" % (job,))
-            res = job.wait(self.merger.git_timeout)
-            if not res:
-                # We timed out
-                raise Exception("Cat job %s timed out; consider setting "
-                                "merger.git_timeout in zuul.conf" % (job,))
-            if not job.updated:
-                raise Exception("Cat job %s failed" % (job,))
-            self.log.debug("Cat job %s got files %s" %
-                           (job, job.files.keys()))
+        self.log.debug("Waiting for cat job %s" % (job,))
+        res = job.wait(self.merger.git_timeout)
+        if not res:
+            # We timed out
+            raise TimeoutError(f"Cat job {job} timed out; consider setting "
+                               "merger.git_timeout in zuul.conf")
+        if not job.updated:
+            raise Exception("Cat job %s failed" % (job,))
+        self.log.debug("Cat job %s got files %s" %
+                       (job, job.files.keys()))
 
-            self._updateUnparsedBranchCache(abide, tenant, job.source_context,
-                                            job.files, loading_errors,
-                                            job.ltime, min_ltimes)
+        self._updateUnparsedBranchCache(abide, tenant, job.source_context,
+                                        job.files, loading_errors,
+                                        job.ltime, min_ltimes)
 
-            # Save all config files in Zookeeper (not just for the current tpc)
-            files_cache = self.unparsed_config_cache.getFilesCache(
-                job.source_context.project_canonical_name,
-                job.source_context.branch)
-            with self.unparsed_config_cache.writeLock(
-                    job.source_context.project_canonical_name):
-                # Prevent files cache ltime from going backward
-                if files_cache.ltime >= job.ltime:
-                    self.log.info(
-                        "Discarding job %s result since the files cache was "
-                        "updated in the meantime", job)
-                    continue
-                # Since the cat job returns all required config files
-                # for ALL tenants the project is a part of, we can
-                # clear the whole cache and then populate it with the
-                # updated content.
-                files_cache.clear()
-                for fn, content in job.files.items():
-                    # Cache file in Zookeeper
-                    if content is not None:
-                        files_cache[fn] = content
-                files_cache.setValidFor(job.extra_config_files,
-                                        job.extra_config_dirs,
-                                        job.ltime)
+        # Save all config files in Zookeeper (not just for the current tpc)
+        files_cache = self.unparsed_config_cache.getFilesCache(
+            job.source_context.project_canonical_name,
+            job.source_context.branch)
+        with self.unparsed_config_cache.writeLock(
+                job.source_context.project_canonical_name):
+            # Prevent files cache ltime from going backward
+            if files_cache.ltime >= job.ltime:
+                self.log.info(
+                    "Discarding job %s result since the files cache was "
+                    "updated in the meantime", job)
+                return
+            # Since the cat job returns all required config files
+            # for ALL tenants the project is a part of, we can
+            # clear the whole cache and then populate it with the
+            # updated content.
+            files_cache.clear()
+            for fn, content in job.files.items():
+                # Cache file in Zookeeper
+                if content is not None:
+                    files_cache[fn] = content
+            files_cache.setValidFor(job.extra_config_files,
+                                    job.extra_config_dirs,
+                                    job.ltime)
 
     def _updateUnparsedBranchCache(self, abide, tenant, source_context, files,
                                    loading_errors, ltime, min_ltimes):
@@ -2355,12 +2410,9 @@ class TenantParser(object):
 
     def loadProjectYAML(self, data, source_context, loading_errors):
         config = model.UnparsedConfig()
-        try:
-            with early_configuration_exceptions(source_context):
-                r = safe_load_yaml(data, source_context)
-                config.extend(r)
-        except ConfigurationSyntaxError as e:
-            loading_errors.addError(source_context, None, e)
+        with early_configuration_exceptions(source_context, loading_errors):
+            r = safe_load_yaml(data, source_context)
+            config.extend(r)
         return config
 
     def filterConfigProjectYAML(self, data):
@@ -2385,12 +2437,9 @@ class TenantParser(object):
         # Handle pragma items first since they modify the source context
         # used by other classes.
         for config_pragma in unparsed_config.pragmas:
-            try:
+            with configuration_exceptions('pragma',
+                                          config_pragma, loading_errors):
                 pcontext.pragma_parser.fromYaml(config_pragma)
-            except ConfigurationSyntaxError as e:
-                loading_errors.addError(
-                    config_pragma['_source_context'],
-                    config_pragma['_start_mark'], e)
 
         for config_pipeline in unparsed_config.pipelines:
             classes = self._getLoadClasses(tenant, config_pipeline)
@@ -2648,8 +2697,11 @@ class TenantParser(object):
                     if project_metadata.merge_mode not in tpc.merge_modes:
                         mode = model.get_merge_mode_name(
                             project_metadata.merge_mode)
+                        allowed_modes = list(map(model.get_merge_mode_name,
+                                                 tpc.merge_modes))
                         raise Exception(f'Merge mode {mode} not supported '
-                                        f'by project {project_name}')
+                                        f'by project {project_name}. '
+                                        f'Supported modes: {allowed_modes}.')
 
     def _parseLayout(self, tenant, data, loading_errors, layout_uuid=None):
         # Don't call this method from dynamic reconfiguration because

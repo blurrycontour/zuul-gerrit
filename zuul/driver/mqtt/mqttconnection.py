@@ -64,6 +64,12 @@ class MQTTConnection(BaseConnection):
 
     def onLoad(self, zk_client, component_registry):
         self.log.debug("Starting MQTT Connection")
+
+        # If the connection was not loaded by a scheduler, but by e.g.
+        # zuul-web, we want to stop here.
+        if not self.sched:
+            return
+
         try:
             self.client.connect(
                 self.connection_config.get('server', 'localhost'),
@@ -76,10 +82,11 @@ class MQTTConnection(BaseConnection):
         self.client.loop_start()
 
     def onStop(self):
-        self.log.debug("Stopping MQTT Connection")
-        self.client.loop_stop()
-        self.client.disconnect()
-        self.connected = False
+        if self.connected:
+            self.log.debug("Stopping MQTT Connection")
+            self.client.loop_stop()
+            self.client.disconnect()
+            self.connected = False
 
     def publish(self, topic, message, qos, zuul_event_id):
         log = get_annotated_logger(self.log, zuul_event_id)

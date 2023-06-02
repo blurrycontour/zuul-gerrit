@@ -18,15 +18,16 @@ import {
   TreeView,
 } from 'patternfly-react'
 import ReactJson from 'react-json-view'
-
+import { connect } from 'react-redux'
 
 class Artifact extends React.Component {
   static propTypes = {
-    artifact: PropTypes.object.isRequired
+    artifact: PropTypes.object.isRequired,
+    preferences: PropTypes.object,
   }
 
   render() {
-    const { artifact } = this.props
+    const { artifact, preferences } = this.props
     return (
       <table className="table table-striped table-bordered" style={{width:'50%'}}>
         <tbody>
@@ -41,7 +42,8 @@ class Artifact extends React.Component {
                    collapsed={true}
                    sortKeys={true}
                    enableClipboard={false}
-                   displayDataTypes={false}/>
+                   displayDataTypes={false}
+                   theme={preferences.darkMode ? 'tomorrow' : 'rjv-default'}/>
                  :artifact.metadata[key].toString()}
               </td>
             </tr>
@@ -54,17 +56,18 @@ class Artifact extends React.Component {
 
 class ArtifactList extends React.Component {
   static propTypes = {
-    artifacts: PropTypes.array.isRequired
+    artifacts: PropTypes.array.isRequired,
+    preferences: PropTypes.object,
   }
 
   render() {
-    const { artifacts } = this.props
+    const { artifacts, preferences } = this.props
 
     const nodes = artifacts.map((artifact, index) => {
       const node = {text: <a href={artifact.url}>{artifact.name}</a>,
         icon: null}
       if (artifact.metadata) {
-        node['nodes']= [{text: <Artifact key={index} artifact={artifact}/>,
+        node['nodes']= [{text: <Artifact key={index} artifact={artifact} preferences={preferences}/>,
           icon: ''}]
       }
       return node
@@ -83,4 +86,10 @@ class ArtifactList extends React.Component {
   }
 }
 
-export default ArtifactList
+function mapStateToProps(state) {
+  return {
+    preferences: state.preferences,
+  }
+}
+
+export default connect(mapStateToProps)(ArtifactList)

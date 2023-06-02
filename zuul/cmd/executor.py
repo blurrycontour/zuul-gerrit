@@ -82,7 +82,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
     def run(self):
         self.handleCommands()
 
-        self.configure_connections(source_only=True)
+        self.configure_connections(source_only=True, check_bwrap=True)
 
         if self.config.has_option('executor', 'job_dir'):
             self.job_dir = os.path.expanduser(

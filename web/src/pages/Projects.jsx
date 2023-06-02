@@ -16,8 +16,18 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import {
+  Table,
+  TableVariant,
+  TableHeader,
+  TableBody,
+} from '@patternfly/react-table'
+import {
+  CubeIcon,
+  ConnectedIcon,
+} from '@patternfly/react-icons'
+import { IconProperty } from '../Misc'
 
 import { fetchProjectsIfNeeded } from '../actions/projects'
 import { Fetchable, Fetching } from '../containers/Fetching'
@@ -59,42 +69,35 @@ class ProjectsPage extends React.Component {
       return <Fetching />
     }
 
-    const headerFormat = value => <Table.Heading>{value}</Table.Heading>
-    const cellFormat = (value) => (
-      <Table.Cell>{value}</Table.Cell>)
-    const cellProjectFormat = (value, row) => (
-      <Table.Cell>
-        <Link to={this.props.tenant.linkPrefix + '/project/' + row.rowData.canonical_name}>
-          {value}
-        </Link>
-      </Table.Cell>)
-    const cellBuildFormat = (value) => (
-      <Table.Cell>
-        <Link to={this.props.tenant.linkPrefix + '/builds?project=' + value}>
-          builds
-        </Link>
-      </Table.Cell>)
-    const columns = []
-    const myColumns = ['name', 'connection', 'type', 'last builds']
-    myColumns.forEach(column => {
-      let formatter = cellFormat
-      let prop = column
-      if (column === 'name') {
-        formatter = cellProjectFormat
+    const columns = [
+      {
+        title: <IconProperty icon={<CubeIcon />} value="Name" />,
+        dataLabel: 'name',
+      },
+      {
+        title: <IconProperty icon={<ConnectedIcon />} value="Connection" />,
+        dataLabel: 'connection',
+      },
+      {
+        title: 'Type',
+        dataLabel: 'type',
+      },
+      {
+        title: 'Last builds',
+        dataLabel: 'last-builds',
       }
-      if (column === 'connection') {
-        prop = 'connection_name'
+    ]
+    let rows = []
+    projects.forEach((project) => {
+      let r = {
+        cells: [
+          {title: <Link to={this.props.tenant.linkPrefix + '/project/' + project.canonical_name}>{project.name}</Link>, props: {column: 'Name'}},
+          {title: project.connection_name, props: {column: 'Connection'}},
+          {title: project.type, props: {column: 'Type'}},
+          {title: <Link to={this.props.tenant.linkPrefix + '/builds?project=' + project.name}>Builds</Link>, props: {column: 'Last builds'}},
+        ]
       }
-      if (column === 'last builds') {
-        prop = 'name'
-        formatter = cellBuildFormat
-      }
-      columns.push({
-        header: {label: column,
-          formatters: [headerFormat]},
-        property: prop,
-        cell: {formatters: [formatter]}
-      })
+      rows.push(r)
     })
     return (
       <PageSection variant={PageSectionVariants.light}>
@@ -104,18 +107,16 @@ class ProjectsPage extends React.Component {
             fetchCallback={this.updateData}
           />
         </PageSection>
-        <Table.PfProvider
-          striped
-          bordered
-          hover
-          columns={columns}
+        <Table
+          aria-label="Projects Table"
+          variant={TableVariant.compact}
+          cells={columns}
+          rows={rows}
+          className="zuul-table"
         >
-          <Table.Header/>
-          <Table.Body
-            rows={projects}
-            rowKey="name"
-          />
-        </Table.PfProvider>
+          <TableHeader />
+          <TableBody />
+        </Table>
       </PageSection>
     )
   }

@@ -193,13 +193,13 @@ class GithubReporter(BaseReporter):
             self.log.warning('Merge mode %s not supported by Github', mode)
             raise MergeFailure('Merge mode %s not supported by Github' % mode)
 
-        merge_mode = self.merge_modes[merge_mode]
         project = item.change.project.name
         pr_number = item.change.number
         sha = item.change.patchset
         log.debug('Reporting change %s, params %s, merging via API',
                   item.change, self.config)
-        message = self._formatMergeMessage(item.change)
+        message = self._formatMergeMessage(item.change, merge_mode)
+        merge_mode = self.merge_modes[merge_mode]
 
         for i in [1, 2]:
             try:
@@ -319,10 +319,13 @@ class GithubReporter(BaseReporter):
             self.connection.unlabelPull(project, pr_number, label,
                                         zuul_event_id=item.event)
 
-    def _formatMergeMessage(self, change):
+    def _formatMergeMessage(self, change, merge_mode):
         message = []
-        if change.title:
-            message.append(change.title)
+        # For squash merges we don't need to add the title to the body
+        # as it will already be set as the commit subject.
+        if merge_mode != model.MERGER_SQUASH_MERGE:
+            if change.title:
+                message.append(change.title)
         if change.body_text:
             message.append(change.body_text)
         merge_message = "\n\n".join(message)

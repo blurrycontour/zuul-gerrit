@@ -730,7 +730,7 @@ class FakeGithubSession(object):
                     'message': 'Merge not allowed because of fake reason',
                 }
                 return FakeResponse(data, 405, 'Method not allowed')
-            pr.setMerged(json["commit_message"])
+            pr.setMerged(json.get("commit_message", ""))
             return FakeResponse({"merged": True}, 200)
 
         return FakeResponse(None, 404)

@@ -1318,6 +1318,18 @@ class TestCentralJobs(ZuulTestCase):
         self._test_central_template_on_branch('stable', 'master')
 
 
+class TestEmptyConfigFile(ZuulTestCase):
+    tenant_config_file = 'config/empty-config-file/main.yaml'
+
+    def test_empty_config_file(self):
+        # Tests that a config file with only comments does not cause
+        # an error.
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 0,
+            "No error should have been accumulated")
+
+
 class TestInRepoConfig(ZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
@@ -3365,6 +3377,42 @@ class TestExtraConfigInDependent(ZuulTestCase):
                  changes='2,1'),
             dict(name='project-test1', result='SUCCESS',
                  changes='2,1 1,1'),
+        ], ordered=False)
+
+    def test_extra_config_in_bundle_change(self):
+        # Test that jobs defined in a extra-config-paths in a repo should be
+        # loaded in a bundle with changes from different repos.
+
+        # Add an empty zuul.yaml here so we are triggering dynamic layout load
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files={'zuul.yaml': ''})
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B',
+                                           files={'zuul.yaml': ''})
+        C = self.fake_gerrit.addFakeChange('org/project3', 'master', 'C',
+                                           files={'zuul.yaml': ''})
+        # A B form a bundle, and A depends on C
+        A.data['commitMessage'] = '%s\n\nDepends-On: %s\nDepends-On: %s\n' % (
+            A.subject, B.data['url'], C.data['url'])
+        B.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
+            B.subject, A.data['url'])
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Jobs in both changes should be success
+        self.assertHistory([
+            dict(name='project2-private-extra-file', result='SUCCESS',
+                 changes='3,1 1,1 2,1'),
+            dict(name='project2-private-extra-dir', result='SUCCESS',
+                 changes='3,1 1,1 2,1'),
+            dict(name='project-test1', result='SUCCESS',
+                 changes='3,1 2,1 1,1'),
+            dict(name='project3-private-extra-file', result='SUCCESS',
+                 changes='3,1'),
+            dict(name='project3-private-extra-dir', result='SUCCESS',
+                 changes='3,1'),
         ], ordered=False)
 
 

@@ -1,7 +1,5 @@
 - hosts: all
   roles:
     - ensure-pip
-    - name: ensure-docker
-      use_upstream_docker: false
-      docker_compose_install: true
+    - ensure-podman
     - use-buildset-registry

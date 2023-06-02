@@ -352,7 +352,7 @@ class TestConnectionRegistry(ConnectionRegistry):
         self.registerDriver(SMTPDriver())
         self.registerDriver(TimerDriver())
         self.registerDriver(SQLDriver())
-        self.registerDriver(BubblewrapDriver())
+        self.registerDriver(BubblewrapDriver(check_bwrap=True))
         self.registerDriver(NullwrapDriver())
         self.registerDriver(MQTTDriver())
         self.registerDriver(PagureDriverMock(
@@ -384,7 +384,7 @@ class FakeGerritChange(object):
     def __init__(self, gerrit, number, project, branch, subject,
                  status='NEW', upstream_root=None, files={},
                  parent=None, merge_parents=None, merge_files=None,
-                 topic=None):
+                 topic=None, empty=False):
         self.gerrit = gerrit
         self.source = gerrit
         self.reported = 0
@@ -403,6 +403,7 @@ class FakeGerritChange(object):
         self.comments = []
         self.checks = {}
         self.checks_history = []
+        self.submit_requirements = []
         self.data = {
             'branch': branch,
             'comments': self.comments,
@@ -429,7 +430,7 @@ class FakeGerritChange(object):
             self.addMergePatchset(parents=merge_parents,
                                   merge_files=merge_files)
         else:
-            self.addPatchset(files=files, parent=parent)
+            self.addPatchset(files=files, parent=parent, empty=empty)
         if merge_parents:
             self.data['parents'] = merge_parents
         elif parent:
@@ -503,9 +504,11 @@ class FakeGerritChange(object):
         repo.heads['master'].checkout()
         return r
 
-    def addPatchset(self, files=None, large=False, parent=None):
+    def addPatchset(self, files=None, large=False, parent=None, empty=False):
         self.latest_patchset += 1
-        if not files:
+        if empty:
+            files = {}
+        elif not files:
             fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
             data = ("test %s %s %s\n" %
                     (self.branch, self.number, self.latest_patchset))
@@ -786,6 +789,12 @@ class FakeGerritChange(object):
         return [{'status': 'NOT_READY',
                  'labels': labels}]
 
+    def getSubmitRequirements(self):
+        return self.submit_requirements
+
+    def setSubmitRequirements(self, reqs):
+        self.submit_requirements = reqs
+
     def setDependsOn(self, other, patchset):
         self.depends_on_change = other
         self.depends_on_patchset = patchset
@@ -892,6 +901,7 @@ class FakeGerritChange(object):
             data['parents'] = self.data['parents']
         if 'topic' in self.data:
             data['topic'] = self.data['topic']
+        data['submit_requirements'] = self.getSubmitRequirements()
         return json.loads(json.dumps(data))
 
     def queryRevisionHTTP(self, revision):
@@ -940,6 +950,7 @@ class FakeGerritChange(object):
         if self.fail_merge:
             return
         self.data['status'] = 'MERGED'
+        self.data['open'] = False
         self.open = False
 
         path = os.path.join(self.upstream_root, self.project)
@@ -1330,7 +1341,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
 
     def addFakeChange(self, project, branch, subject, status='NEW',
                       files=None, parent=None, merge_parents=None,
-                      merge_files=None, topic=None):
+                      merge_files=None, topic=None, empty=False):
         """Add a change to the fake Gerrit."""
         self.change_number += 1
         c = FakeGerritChange(self, self.change_number, project, branch,
@@ -1338,7 +1349,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                              status=status, files=files, parent=parent,
                              merge_parents=merge_parents,
                              merge_files=merge_files,
-                             topic=topic)
+                             topic=topic, empty=empty)
         self.changes[self.change_number] = c
         return c
 
@@ -1494,8 +1505,9 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                 msg = msg[1:-1]
             l = [queryMethod(change) for change in self.changes.values()
                  if msg in change.data['commitMessage']]
-        elif query.startswith("status:"):
+        else:
             cut_off_time = 0
+            l = list(self.changes.values())
             parts = query.split(" ")
             for part in parts:
                 if part.startswith("-age"):
@@ -1503,17 +1515,18 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                     cut_off_time = (
                         datetime.datetime.now().timestamp() - float(age[:-1])
                     )
-            l = [
-                queryMethod(change) for change in self.changes.values()
-                if change.data["lastUpdated"] >= cut_off_time
-            ]
-        elif query.startswith('topic:'):
-            topic = query[len('topic:'):].strip()
-            l = [queryMethod(change) for change in self.changes.values()
-                 if topic in change.data.get('topic', '')]
-        else:
-            # Query all open changes
-            l = [queryMethod(change) for change in self.changes.values()]
+                    l = [
+                        change for change in l
+                        if change.data["lastUpdated"] >= cut_off_time
+                    ]
+                if part.startswith('topic:'):
+                    topic = part[len('topic:'):].strip()
+                    l = [
+                        change for change in l
+                        if 'topic' in change.data
+                        and topic in change.data['topic']
+                    ]
+            l = [queryMethod(change) for change in l]
         return l
 
     def simpleQuerySSH(self, query, event=None):
@@ -2117,6 +2130,21 @@ class FakeGitlabConnection(gitlabconnection.GitlabConnection):
         self._test_web_server.options['community_edition'] = True
         yield
         self._test_web_server.options['community_edition'] = False
+
+    @contextmanager
+    def enable_delayed_complete_mr(self, complete_at):
+        self._test_web_server.options['delayed_complete_mr'] = complete_at
+        yield
+        self._test_web_server.options['delayed_complete_mr'] = 0
+
+    @contextmanager
+    def enable_uncomplete_mr(self):
+        self._test_web_server.options['uncomplete_mr'] = True
+        orig = self.gl_client.get_mr_wait_factor
+        self.gl_client.get_mr_wait_factor = 0.1
+        yield
+        self.gl_client.get_mr_wait_factor = orig
+        self._test_web_server.options['uncomplete_mr'] = False
 
 
 class GitlabChangeReference(git.Reference):
@@ -5916,8 +5944,8 @@ class ZuulTestCase(BaseTestCase):
                             unseen.remove(unseen_item)
                             break
                     if not found:
-                        raise Exception("No match found for element %i "
-                                        "in history" % (i,))
+                        raise Exception("No match found for element %i %s "
+                                        "in history" % (i, d))
                 if unseen:
                     raise Exception("Unexpected items in history")
         except Exception:

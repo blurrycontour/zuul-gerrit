@@ -13,6 +13,7 @@
 // under the License.
 
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
   Button,
@@ -32,12 +33,14 @@ import {
 } from '@patternfly/react-core'
 import { FilterIcon, SearchIcon } from '@patternfly/react-icons'
 
+import { addNotification } from '../actions/notifications'
 import { FilterSelect } from './filters/Select'
 import { FilterTernarySelect } from './filters/TernarySelect'
 import { FilterCheckbox } from './filters/Checkbox'
 
 
 function FilterToolbar(props) {
+  const dispatch = useDispatch()
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false)
   const [currentCategory, setCurrentCategory] = useState(
     props.filterCategories[0].title
@@ -58,15 +61,22 @@ function FilterToolbar(props) {
   }
 
   function handleInputSend(event, category) {
-    const { onFilterChange, filters } = props
+    const { onFilterChange, filters, filterInputValidation } = props
 
     // In case the event comes from a key press, only accept "Enter"
     if (event.key && event.key !== 'Enter') {
       return
     }
 
-    // Ignore empty values
-    if (!inputValue) {
+    const validationResult = filterInputValidation(category.key, inputValue)
+    if (!validationResult.success) {
+      dispatch(addNotification(
+        {
+          text: validationResult.message,
+          type: 'error',
+          status: '',
+          url: '',
+        }))
       return
     }
 
@@ -250,6 +260,7 @@ FilterToolbar.propTypes = {
   onFilterChange: PropTypes.func.isRequired,
   filters: PropTypes.object.isRequired,
   filterCategories: PropTypes.array.isRequired,
+  filterInputValidation: PropTypes.func.isRequired,
 }
 
 function getChipsFromFilters(filters, category) {

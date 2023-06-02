@@ -13,6 +13,7 @@
 # under the License.
 
 import logging
+import re
 import time
 from urllib.parse import quote_plus
 
@@ -27,11 +28,28 @@ import sqlalchemy.pool
 from zuul.connection import BaseConnection
 from zuul.zk.locks import CONNECTION_LOCK_ROOT, locked, SessionAwareLock
 
+
 BUILDSET_TABLE = 'zuul_buildset'
 BUILD_TABLE = 'zuul_build'
 BUILD_EVENTS_TABLE = 'zuul_build_event'
 ARTIFACT_TABLE = 'zuul_artifact'
 PROVIDES_TABLE = 'zuul_provides'
+
+STATEMENT_TIMEOUT_RE = re.compile(r'/\* statement_timeout=(\d+) \*/')
+
+
+# In Postgres we can set a per-transaction (which for us is
+# effectively per-query) execution timeout by executing "SET LOCAL
+# statement_timeout" before our query.  There isn't a great way to do
+# this using the SQLAlchemy query API, so instead, we add a comment as
+# a hint, and here we parse that comment and execute the "SET".  The
+# comment remains in the query sent to the server, but that's okay --
+# it may even help an operator in debugging.
+@sa.event.listens_for(sa.Engine, "before_cursor_execute")
+def _set_timeout(conn, cursor, stmt, params, context, executemany):
+    match = STATEMENT_TIMEOUT_RE.search(stmt)
+    if match:
+        cursor.execute("SET LOCAL statement_timeout=%s" % match.groups())
 
 
 class DatabaseSession(object):
@@ -76,7 +94,7 @@ class DatabaseSession(object):
                   result=None, provides=None, final=None, held=None,
                   complete=None, sort_by_buildset=False, limit=50,
                   offset=0, idx_min=None, idx_max=None,
-                  exclude_result=None):
+                  exclude_result=None, query_timeout=None):
 
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
@@ -103,6 +121,17 @@ class DatabaseSession(object):
         # the more common case).
         if not (project or change or uuid):
             q = q.with_hint(build_table, 'USE INDEX (PRIMARY)', 'mysql')
+
+        if query_timeout:
+            # For MySQL, we can add a query hint directly.
+            q = q.prefix_with(
+                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
+                dialect='mysql')
+            # For Postgres, we add a comment that we parse in our
+            # event handler.
+            q = q.with_statement_hint(
+                f'/* statement_timeout={query_timeout} */',
+                dialect_name='postgresql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilter(q, buildset_table.c.project, project)
@@ -185,7 +214,8 @@ class DatabaseSession(object):
                      change=None, branch=None, patchset=None, ref=None,
                      newrev=None, uuid=None, result=None, complete=None,
                      updated_max=None,
-                     limit=50, offset=0, idx_min=None, idx_max=None):
+                     limit=50, offset=0, idx_min=None, idx_max=None,
+                     query_timeout=None):
 
         buildset_table = self.connection.zuul_buildset_table
 
@@ -193,6 +223,17 @@ class DatabaseSession(object):
         q = self.session().query(self.connection.buildSetModel)
         if not (project or change or uuid):
             q = q.with_hint(buildset_table, 'USE INDEX (PRIMARY)', 'mysql')
+
+        if query_timeout:
+            # For MySQL, we can add a query hint directly.
+            q = q.prefix_with(
+                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
+                dialect='mysql')
+            # For Postgres, we add a comment that we parse in our
+            # event handler.
+            q = q.with_statement_hint(
+                f'/* statement_timeout={query_timeout} */',
+                dialect_name='postgresql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilter(q, buildset_table.c.project, project)
@@ -247,12 +288,25 @@ class DatabaseSession(object):
         except sqlalchemy.orm.exc.MultipleResultsFound:
             raise Exception("Multiple buildset found with uuid %s", uuid)
 
-    def deleteBuildsets(self, cutoff):
+    def deleteBuildsets(self, cutoff, batch_size):
         """Delete buildsets before the cutoff"""
 
         # delete buildsets updated before the cutoff
-        for buildset in self.getBuildsets(updated_max=cutoff):
-            self.session().delete(buildset)
+        deleted = True
+        while deleted:
+            deleted = False
+            oldest = None
+            for buildset in self.getBuildsets(
+                    updated_max=cutoff, limit=batch_size):
+                deleted = True
+                if oldest is None:
+                    oldest = buildset.updated
+                else:
+                    oldest = min(oldest, buildset.updated)
+                self.session().delete(buildset)
+            self.session().commit()
+            if deleted:
+                self.log.info("Deleted from %s to %s", oldest, cutoff)
 
 
 class SQLConnection(BaseConnection):
@@ -409,7 +463,10 @@ class SQLConnection(BaseConnection):
             final = sa.Column(sa.Boolean)
             held = sa.Column(sa.Boolean)
             nodeset = sa.Column(sa.String(255))
-            buildset = orm.relationship(BuildSetModel, backref="builds")
+            buildset = orm.relationship(BuildSetModel,
+                                        backref=orm.backref(
+                                            "builds",
+                                            cascade="all, delete-orphan"))
 
             sa.Index(self.table_prefix + 'job_name_buildset_id_idx',
                      job_name, buildset_id)
@@ -468,7 +525,10 @@ class SQLConnection(BaseConnection):
             name = sa.Column(sa.String(255))
             url = sa.Column(sa.TEXT())
             meta = sa.Column('metadata', sa.TEXT())
-            build = orm.relationship(BuildModel, backref="artifacts")
+            build = orm.relationship(BuildModel,
+                                     backref=orm.backref(
+                                         "artifacts",
+                                         cascade="all, delete-orphan"))
 
         class ProvidesModel(Base):
             __tablename__ = self.table_prefix + PROVIDES_TABLE
@@ -476,7 +536,10 @@ class SQLConnection(BaseConnection):
             build_id = sa.Column(sa.Integer, sa.ForeignKey(
                 self.table_prefix + BUILD_TABLE + ".id"))
             name = sa.Column(sa.String(255))
-            build = orm.relationship(BuildModel, backref="provides")
+            build = orm.relationship(BuildModel,
+                                     backref=orm.backref(
+                                         "provides",
+                                         cascade="all, delete-orphan"))
 
         class BuildEventModel(Base):
             __tablename__ = self.table_prefix + BUILD_EVENTS_TABLE
@@ -486,7 +549,10 @@ class SQLConnection(BaseConnection):
             event_time = sa.Column(sa.DateTime)
             event_type = sa.Column(sa.String(255))
             description = sa.Column(sa.TEXT())
-            build = orm.relationship(BuildModel, backref="build_events")
+            build = orm.relationship(BuildModel,
+                                     backref=orm.backref(
+                                         "build_events",
+                                         cascade="all, delete-orphan"))
 
         self.buildEventModel = BuildEventModel
         self.zuul_build_event_table = self.buildEventModel.__table__
