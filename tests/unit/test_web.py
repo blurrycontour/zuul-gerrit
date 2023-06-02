@@ -855,6 +855,7 @@ class TestWeb(BaseTestWeb):
                     'source_context': {'branch': 'master',
                                        'path': 'zuul.yaml',
                                        'project': 'common-config'},
+                    'is_template': False,
                     'templates': [],
                     'default_branch': None,
                     'queue_name': 'integrated',
