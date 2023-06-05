@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b1115c0_cc46b958",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-06-05T17:37:03Z",
+      "side": 1,
+      "message": "+2 despite my comment since the old code wasn\u0027t especially graceful either. A followup to do stronger error checking here may be a good idea though.",
+      "revId": "eb550597b014257f08fe1534362e6a8e95fd7718",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "868a1449_2924da08",
