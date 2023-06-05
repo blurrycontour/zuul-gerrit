@@ -85,8 +85,9 @@ class BubblewrapExecutionContext(BaseExecutionContext):
         # invocation ends up in its own PAG.
         # http://asa.scripts.mit.edu/trac/attachment/ticket/145/setpag.txt#L315
         if os.path.exists("/proc/fs/openafs/afs_ioctl"):
-            fcntl.ioctl(open("/proc/fs/openafs/afs_ioctl"), 0x40084301,
-                        struct.pack("lllll", 0, 0, 0, 0, 21))
+            f = os.open("/proc/fs/openafs/afs_ioctl", os.O_RDONLY)
+            fcntl.ioctl(f, 0x40084301, struct.pack("lllll", 0, 0, 0, 0, 21))
+            os.close(f)
 
     def getPopen(self, **kwargs):
         self.setpag()
