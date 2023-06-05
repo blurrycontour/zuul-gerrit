@@ -50,6 +50,24 @@
       "message": "I think this is already is exactly what we want: it either all works, or python will throw some exception.  We don\u0027t need to mask the exception which is what the proposed code will do.",
       "revId": "eb550597b014257f08fe1534362e6a8e95fd7718",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "853dcf11_201304ef",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-06-05T17:39:22Z",
+      "side": 1,
+      "message": "Nevermind trying to operate on fd -1 raises `OSError: [Errno 9] Bad file descriptor` which will cause this to crash and do sufficient error handling.",
+      "parentUuid": "868a1449_2924da08",
+      "revId": "eb550597b014257f08fe1534362e6a8e95fd7718",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
