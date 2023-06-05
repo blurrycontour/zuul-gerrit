@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "868a1449_2924da08",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-06-05T17:35:22Z",
+      "side": 1,
+      "message": "I think we need to do some error checking here. Something like:\n\n```\nf \u003d os.open()\nif f !\u003d -1:\n    try:\n        fcntl.ioctl()\n    finally:\n        os.close(f)\nelse:\n    raise SomeException()\n```",
+      "revId": "eb550597b014257f08fe1534362e6a8e95fd7718",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
