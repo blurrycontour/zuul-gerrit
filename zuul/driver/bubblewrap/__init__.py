@@ -86,6 +86,11 @@ class BubblewrapExecutionContext(BaseExecutionContext):
         # http://asa.scripts.mit.edu/trac/attachment/ticket/145/setpag.txt#L315
         if os.path.exists("/proc/fs/openafs/afs_ioctl"):
             f = os.open("/proc/fs/openafs/afs_ioctl", os.O_RDONLY)
+            # 0x40084301 is the result of _IOW('C', 1, void *) which originates
+            # from OpenAFS' VIOC_SYSCALL defined at:
+            # https://github.com/openafs/openafs/blob/
+            # 630d423897e5fffed1873aa9d12c4e74a8481041/
+            # src/config/afs_args.h#L258
             fcntl.ioctl(f, 0x40084301, struct.pack("lllll", 0, 0, 0, 0, 21))
             os.close(f)
 
