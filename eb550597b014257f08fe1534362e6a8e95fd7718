@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c04623d8_0a7573ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-06-05T17:40:12Z",
+      "side": 1,
+      "message": "I don\u0027t think we should add any more error handling.  The current code will exit with an appropriate error in the case of a problem.  We don\u0027t want to mask that error with a try/except handler.  And we do not want the program to continue.",
+      "parentUuid": "1b1115c0_cc46b958",
+      "revId": "eb550597b014257f08fe1534362e6a8e95fd7718",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "868a1449_2924da08",
