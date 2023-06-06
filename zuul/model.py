@@ -134,6 +134,14 @@ def get_merge_mode_name(merge_mode):
             return k
 
 
+def filter_severity(error_list, errors=True, warnings=True):
+    return [e for e in error_list
+            if (
+                (errors and e.severity == SEVERITY_ERROR) or
+                (warnings and e.severity == SEVERITY_WARNING)
+            )]
+
+
 class ZuulMark:
     # The yaml mark class differs between the C and python versions.
     # The C version does not provide a snippet, and also appears to
@@ -5188,9 +5196,10 @@ class QueueItem(zkobject.ZKObject):
     def didMergerFail(self):
         return self.current_build_set.unable_to_merge
 
-    def getConfigErrors(self):
+    def getConfigErrors(self, errors=True, warnings=True):
         if self.current_build_set.config_errors:
-            return self.current_build_set.config_errors.errors
+            return filter_severity(self.current_build_set.config_errors.errors,
+                                   errors=errors, warnings=warnings)
         return []
 
     def wasDequeuedNeedingChange(self):
@@ -5782,7 +5791,8 @@ class QueueItem(zkobject.ZKObject):
             with self.current_build_set.activeContext(
                     self.pipeline.manager.current_context):
                 self.current_build_set.setConfigErrors(errors)
-        self._setAllJobsSkipped('Buildset configuration error')
+        if [x for x in errors if x.severity == SEVERITY_ERROR]:
+            self._setAllJobsSkipped('Buildset configuration error')
 
     def _setAllJobsSkipped(self, msg):
         for job in self.getJobs():

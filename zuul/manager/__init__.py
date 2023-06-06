@@ -26,6 +26,7 @@ from zuul.lib.tarjan import strongly_connected_components
 import zuul.lib.tracing as tracing
 from zuul.model import (
     Change, DequeueEvent, PipelineState, PipelineChangeList, QueueItem,
+    filter_severity
 )
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.components import COMPONENT_REGISTRY
@@ -1085,13 +1086,16 @@ class PipelineManager(metaclass=ABCMeta):
         # fixes one, then they may not realize their work is
         # incomplete.
         relevant_errors = []
+        severity_error = False
         for err in layout.loading_errors.errors:
             econtext = err.key.context
             if ((err.key not in parent_error_keys) or
                 (econtext.project_name == item.change.project.name and
                  econtext.branch == item.change.branch)):
                 relevant_errors.append(err)
-        return relevant_errors
+                if err.severity == model.SEVERITY_ERROR:
+                    severity_error = True
+        return relevant_errors, severity_error
 
     def _loadDynamicLayout(self, item):
         log = get_annotated_logger(self.log, item.event)
@@ -1123,7 +1127,9 @@ class PipelineManager(metaclass=ABCMeta):
                     self.sched.ansible_manager,
                     include_config_projects=True,
                     zuul_event_id=None)
-                trusted_errors = len(trusted_layout.loading_errors) > 0
+                trusted_errors = len(filter_severity(
+                    trusted_layout.loading_errors.errors,
+                    errors=True, warnings=False)) > 0
 
             # Then create the config a second time but without changes
             # to config repos so that we actually use this config.
@@ -1135,7 +1141,9 @@ class PipelineManager(metaclass=ABCMeta):
                     self.sched.ansible_manager,
                     include_config_projects=False,
                     zuul_event_id=None)
-                untrusted_errors = len(untrusted_layout.loading_errors) > 0
+                untrusted_errors = len(filter_severity(
+                    untrusted_layout.loading_errors.errors,
+                    errors=True, warnings=False)) > 0
 
             # Configuration state handling switchboard. Intentionally verbose
             # and repetetive to be exceptionally clear that we handle all
@@ -1183,10 +1191,11 @@ class PipelineManager(metaclass=ABCMeta):
                 # Find a layout loading error that match
                 # the current item.change and only report
                 # if one is found.
-                relevant_errors = self._findRelevantErrors(item,
-                                                           untrusted_layout)
+                relevant_errors, severity_error = self._findRelevantErrors(
+                    item, untrusted_layout)
                 if relevant_errors:
                     item.setConfigErrors(relevant_errors)
+                if severity_error:
                     return None
                 log.info(
                     "Configuration syntax error not related to "
@@ -1197,10 +1206,11 @@ class PipelineManager(metaclass=ABCMeta):
                 # Find a layout loading error that match
                 # the current item.change and only report
                 # if one is found.
-                relevant_errors = self._findRelevantErrors(item,
-                                                           trusted_layout)
+                relevant_errors, severity_error = self._findRelevantErrors(
+                    item, trusted_layout)
                 if relevant_errors:
                     item.setConfigErrors(relevant_errors)
+                if severity_error:
                     return None
                 log.info(
                     "Configuration syntax error not related to "
