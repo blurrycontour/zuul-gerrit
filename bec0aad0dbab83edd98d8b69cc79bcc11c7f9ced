@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2888888_e878d235",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1284,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-06-06T20:09:36Z",
+      "side": 1,
+      "message": "Because projects and project-templates are basically the same, we re-use the project template parsing method here.  So we\u0027re going to end up with is_template always set to true from this call.  I think an explicit set to False here would probably do the trick.",
+      "revId": "bec0aad0dbab83edd98d8b69cc79bcc11c7f9ced",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
