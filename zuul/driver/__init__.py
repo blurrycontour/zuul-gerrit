@@ -129,7 +129,7 @@ class TriggerInterface(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def getTrigger(self, connection, config=None):
+    def getTrigger(self, connection, config=None, loading_errors=None):
         """Create and return a new trigger object.
 
         This method is required by the interface.
@@ -142,6 +142,8 @@ class TriggerInterface(object, metaclass=abc.ABCMeta):
             or None.
         :arg dict config: The configuration information supplied along
             with the trigger in the layout.
+        :arg dict loading_errors: A LoadingErrors instance to accumulate
+            errors or warnings.
 
         :returns: A new trigger object.
         :rtype: :py:class:`~zuul.trigger.BaseTrigger`
