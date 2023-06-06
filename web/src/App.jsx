@@ -35,17 +35,10 @@ import {
   DropdownToggle,
   DropdownSeparator,
   KebabToggle,
-  Modal,
   Nav,
   NavItem,
   NavList,
   NotificationBadge,
-  NotificationDrawer,
-  NotificationDrawerBody,
-  NotificationDrawerList,
-  NotificationDrawerListItem,
-  NotificationDrawerListItemBody,
-  NotificationDrawerListItemHeader,
   Page,
   PageHeader,
   PageHeaderTools,
@@ -97,7 +90,6 @@ class App extends React.Component {
   }
 
   state = {
-    showErrors: false,
     isTenantDropdownOpen: false,
   }
 
@@ -275,12 +267,6 @@ class App extends React.Component {
     history.push(tenant.defaultRoute)
   }
 
-  handleModalClose = () => {
-    this.setState({
-      showErrors: false
-    })
-  }
-
   renderNotifications = (notifications) => {
     return (
       <ToastNotificationList>
@@ -310,68 +296,6 @@ class App extends React.Component {
         }
         )}
       </ToastNotificationList>
-    )
-  }
-
-  renderConfigErrors = (configErrors) => {
-    const { history } = this.props
-    const { showErrors } = this.state
-    const errors = []
-    configErrors.forEach((item, idx) => {
-      let error = item.error
-      let cookie = error.indexOf('The error was:')
-      if (cookie !== -1) {
-        error = error.slice(cookie + 18).split('\n')[0]
-      }
-      let ctxPath = item.source_context.path
-      if (item.source_context.branch !== 'master') {
-        ctxPath += ' (' + item.source_context.branch + ')'
-      }
-      errors.push(
-        <NotificationDrawerListItem
-          key={idx}
-          variant="danger"
-          onClick={() => {
-            history.push(this.props.tenant.linkPrefix + '/config-errors')
-            this.setState({ showErrors: false })
-          }}
-        >
-          <NotificationDrawerListItemHeader
-            title={item.source_context.project + ' | ' + ctxPath}
-            variant="danger" />
-          <NotificationDrawerListItemBody>
-            <pre style={{ whiteSpace: 'pre-wrap' }}>
-              {error}
-            </pre>
-          </NotificationDrawerListItemBody>
-        </NotificationDrawerListItem>
-      )
-    })
-
-    return (
-      <Modal
-        isOpen={showErrors}
-        onClose={this.handleModalClose}
-        aria-label="Config Errors"
-        header={
-          <>
-            <span className="zuul-config-errors-title">
-              Config Errors
-            </span>
-            <span className="zuul-config-errors-count">
-              {errors.length} error(s)
-            </span>
-          </>
-        }
-      >
-        <NotificationDrawer>
-          <NotificationDrawerBody>
-            <NotificationDrawerList>
-              {errors.map(item => (item))}
-            </NotificationDrawerList>
-          </NotificationDrawerBody>
-        </NotificationDrawer>
-      </Modal>
     )
   }
 
@@ -557,12 +481,11 @@ class App extends React.Component {
           <NotificationBadge
             isRead={false}
             aria-label="Notifications"
-            onClick={(e) => {
-              e.preventDefault()
-              this.setState({ showErrors: !this.state.showErrors })
-            }}
           >
-            <BellIcon />
+            <Link to={this.props.tenant.linkPrefix + '/config-errors'}
+                  style={{color: 'white'}}>
+              <BellIcon />
+            </Link>
           </NotificationBadge>
         }
         <SelectTz />
@@ -586,7 +509,6 @@ class App extends React.Component {
     return (
       <React.Fragment>
         {notifications.length > 0 && this.renderNotifications(notifications)}
-        {this.renderConfigErrors(configErrors)}
         <Page className="zuul-page" header={pageHeader} tertiaryNav={nav}>
           <ErrorBoundary>
             {this.renderContent()}
