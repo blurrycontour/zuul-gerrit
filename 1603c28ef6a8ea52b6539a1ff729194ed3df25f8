@@ -33,6 +33,24 @@
       "message": "Shouldn\u0027t this be https://zuul-ci.org/docs/zuul-jobs/general-roles.html#role-add-build-sshkey ?",
       "revId": "1603c28ef6a8ea52b6539a1ff729194ed3df25f8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "114195e8_65788a8e",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2023-06-06T07:30:23Z",
+      "side": 1,
+      "message": "Done, thanks.",
+      "parentUuid": "1b90b311_56db54d1",
+      "revId": "1603c28ef6a8ea52b6539a1ff729194ed3df25f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
