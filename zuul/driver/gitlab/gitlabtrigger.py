@@ -23,7 +23,8 @@ class GitlabTrigger(BaseTrigger):
     name = 'gitlab'
     log = logging.getLogger("zuul.trigger.GitlabTrigger")
 
-    def getEventFilters(self, connection_name, trigger_config):
+    def getEventFilters(self, connection_name, trigger_config,
+                        error_accumulator):
         efilters = []
         for trigger in to_list(trigger_config):
             f = GitlabEventFilter(
