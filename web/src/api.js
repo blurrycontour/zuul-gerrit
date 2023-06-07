@@ -20,12 +20,12 @@ export function setAuthToken(token) {
   authToken = token
 }
 
-function getHomepageUrl(url) {
+function getHomepageUrl() {
   //
   // Discover serving location from href.
   //
-  // This is only needed for sub-directory serving.
-  // Serving the application from '/' may simply default to '/'
+  // This is only needed for sub-directory serving. Serving the application
+  // from 'scheme://domain/' may simply default to 'scheme://domain/'
   //
   // Note that this is not enough for sub-directory serving,
   // The static files location also needs to be adapted with the 'homepage'
@@ -33,49 +33,15 @@ function getHomepageUrl(url) {
   //
   // This homepage url is used for the Router and Link resolution logic
   //
-  let baseUrl
-  if (url) {
-    baseUrl = url
+  let url = new URL(window.location.href)
+
+  if ('PUBLIC_URL' in process.env) {
+    url.pathname = process.env.PUBLIC_URL
   } else {
-    baseUrl = window.location.href
-  }
-  // Get dirname of the current url
-  baseUrl = baseUrl.replace(/\\/g, '/').replace(/\/[^/]*$/, '/')
-
-  // Remove any query strings
-  if (baseUrl.includes('?')) {
-    baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('?'))
-  }
-  // Remove any hash anchor
-  if (baseUrl.includes('/#')) {
-    baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('/#') + 1)
+    url.pathname = ''
   }
 
-  // Remove known sub-path
-  const subDir = [
-    '/autohold/',
-    '/build/',
-    '/buildset/',
-    '/job/',
-    '/project/',
-    '/stream/',
-    '/status/',
-  ]
-  subDir.forEach(path => {
-    if (baseUrl.includes(path)) {
-      baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf(path) + 1)
-    }
-  })
-
-  // Remove tenant scope
-  if (baseUrl.includes('/t/')) {
-    baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('/t/') + 1)
-  }
-  if (!baseUrl.endsWith('/')) {
-    baseUrl = baseUrl + '/'
-  }
-  // console.log('Homepage url is ', baseUrl)
-  return baseUrl
+  return url.origin + url.pathname
 }
 
 function getZuulUrl() {
