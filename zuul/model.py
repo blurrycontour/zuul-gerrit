@@ -3138,7 +3138,14 @@ class Job(ConfigObject):
         self._files = files
         matchers = []
         for fn in files:
-            matchers.append(change_matcher.FileMatcher(fn))
+            # may be str | dict(name=str) | dict(name=[str,..])
+            if isinstance(fn, dict) and ('name' in fn):
+                _name = fn['name']
+                _names = [_name] if isinstance(_name, str) else _name
+                for _fn in _names:
+                    matchers.append(change_matcher.FileMatcher(_fn))
+            else:
+                matchers.append(change_matcher.FileMatcher(fn))
         self.file_matcher = change_matcher.MatchAnyFiles(matchers)
 
     def setIrrelevantFileMatcher(self, irrelevant_files):
@@ -3146,7 +3153,14 @@ class Job(ConfigObject):
         self._irrelevant_files = irrelevant_files
         matchers = []
         for fn in irrelevant_files:
-            matchers.append(change_matcher.FileMatcher(fn))
+            # may be str | dict(name=str) | dict(name=[str,..])
+            if isinstance(fn, dict) and ('name' in fn):
+                _name = fn['name']
+                _names = [_name] if isinstance(_name, str) else _name
+                for _fn in _names:
+                    matchers.append(change_matcher.FileMatcher(_fn))
+            else:
+                matchers.append(change_matcher.FileMatcher(fn))
         self.irrelevant_file_matcher = change_matcher.MatchAllFiles(matchers)
 
     def updateVariables(self, other_vars, other_extra_vars, other_host_vars,

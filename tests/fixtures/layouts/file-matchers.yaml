@@ -22,7 +22,10 @@
 
 - job:
     name: parent-override-job
-    files: parent2.txt
+    files:
+      - 'a_string.txt'
+      - { name: 'parent2.txt' }
+      - { name: ['list/of', 'names'] }
 
 - job:
     name: child-job
@@ -43,6 +46,8 @@
       - tests/.*
     irrelevant-files:
       - README
+      - { name: 'a/irrelevant/file.txt' }
+      - { name: ['list', 'of', 'irrelevant'] }
 
 - job:
     name: irr-override-job

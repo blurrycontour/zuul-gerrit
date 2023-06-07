@@ -1043,8 +1043,20 @@ Here is an example of two job definitions:
       This indicates that the job should only run on changes where the
       specified files are modified.  Unlike **branches**, this value
       is subject to inheritance and overriding, so only the final
-      value is used to determine if the job should run. This is a
-      :ref:`regular expression <regex>` or list of regular expressions.
+      value is used to determine if the job should run.
+
+      This may either be a string, list of strings, or a dictionary
+      with key "name" that is a string or list of strings.  All
+      strings are a :ref:`regular expression <regex>`.
+
+      .. code-block:: yaml
+
+        - job:
+            name: common
+            files:
+              - dir/path/.*.txt
+              - { name : 'dir/path/.*.doc' }
+              - { name : ['dir/path/foo', 'dir/path/bar'] }
 
       .. warning::
 
@@ -1054,14 +1066,16 @@ Here is an example of two job definitions:
          ``git commit --allow-empty`` (which can be used in order to
          run all jobs).
 
+
    .. attr:: irrelevant-files
 
       This is a negative complement of **files**.  It indicates that
       the job should run unless *all* of the files changed match this
       list.  In other words, if the regular expression ``docs/.*`` is
       supplied, then this job will not run if the only files changed
-      are in the docs directory.  A :ref:`regular expression <regex>`
-      or list of regular expressions.
+      are in the docs directory.  Follows the same format as
+      :attr:`job.files`.  Strings are a :ref:`regular expression
+      <regex>`.
 
       .. warning::
 
