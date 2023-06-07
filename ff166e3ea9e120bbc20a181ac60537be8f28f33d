@@ -16,6 +16,23 @@
       "message": "recheck adding comments shouldn\u0027t cause a unittest to fail",
       "revId": "ff166e3ea9e120bbc20a181ac60537be8f28f33d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ab26a0b_2b79b918",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-06-07T16:20:24Z",
+      "side": 1,
+      "message": "recheck this is only a comment change",
+      "revId": "ff166e3ea9e120bbc20a181ac60537be8f28f33d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
