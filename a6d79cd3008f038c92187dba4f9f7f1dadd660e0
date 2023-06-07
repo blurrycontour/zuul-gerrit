@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19f06f7b_3f04ec59",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-06-07T12:17:58Z",
+      "side": 1,
+      "message": "I\u0027m aware of the `URL` type but I would rather migrate to it in a separate change as this one is focused on fixing the current issue. Happy to be convinced otherwhise if other folks agree with doing a refactor here 😊",
+      "parentUuid": "c533ba96_3814dd0d",
+      "revId": "a6d79cd3008f038c92187dba4f9f7f1dadd660e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ed22387_b11fa0cc",
