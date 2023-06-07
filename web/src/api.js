@@ -47,8 +47,8 @@ function getHomepageUrl(url) {
     baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('?'))
   }
   // Remove any hash anchor
-  if (baseUrl.includes('/#')) {
-    baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('/#') + 1)
+  if (baseUrl.includes('#')) {
+    baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('#') + 1)
   }
 
   // Remove known sub-path
