@@ -884,8 +884,8 @@ Here is an example of two job definitions:
 
       A list of other jobs upon which this job depends.  Zuul will not
       start executing this job until all of its dependencies have
-      completed successfully, and if one or more of them fail, this
-      job will not be run.
+      completed successfully or have been paused, and if one or more of
+      them fail, this job will not be run.
 
       The format for this attribute is either a list of strings or
       dictionaries.  Strings are interpreted as job names,
