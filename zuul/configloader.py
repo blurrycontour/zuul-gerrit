@@ -697,6 +697,8 @@ class JobParser(object):
 
     role = vs.Any(zuul_role, galaxy_role)
 
+    file_dict = { vs.Required('files'): [str] }
+
     job_project = {vs.Required('name'): str,
                    'override-branch': str,
                    'override-checkout': str}
@@ -736,7 +738,7 @@ class JobParser(object):
                       'semaphores': to_list(vs.Any(semaphore, str)),
                       'tags': to_list(str),
                       'branches': to_list(str),
-                      'files': to_list(str),
+                      'files': to_list(vs.Any(file_dict, str)),
                       'secrets': to_list(vs.Any(secret, str)),
                       'irrelevant-files': to_list(str),
                       # validation happens in NodeSetParser

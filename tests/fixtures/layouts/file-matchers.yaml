@@ -22,7 +22,8 @@
 
 - job:
     name: parent-override-job
-    files: parent2.txt
+    files:
+      - { files: ['parent2.txt', 'foo.txt'] }
 
 - job:
     name: child-job
