@@ -1054,6 +1054,24 @@ Here is an example of two job definitions:
          ``git commit --allow-empty`` (which can be used in order to
          run all jobs).
 
+      This may either be a string or a list, where each list object is
+      either a regex string or a dictionary with one key `path` which
+      has a value of a list of regex strings (this allows for merging
+      of keys; see example below).
+
+      .. code-block:: yaml
+
+        - job:
+            name: common
+            files:
+              - &COMMON_FILES { files: ['path1', 'path2'] }
+
+        - job:
+            name: child
+            files:
+              - << : *COMMON_FILES
+              - path3
+
    .. attr:: irrelevant-files
 
       This is a negative complement of **files**.  It indicates that

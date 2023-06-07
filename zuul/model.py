@@ -3138,7 +3138,13 @@ class Job(ConfigObject):
         self._files = files
         matchers = []
         for fn in files:
-            matchers.append(change_matcher.FileMatcher(fn))
+            # This is to enable YAML merging of common files
+            if (isinstance(fn, dict) and ('files' in fn) and
+                isinstance(fn['files'], list)):
+                for _fn in fn['files']:
+                    matchers.append(change_matcher.FileMatcher(_fn))
+            else:
+                matchers.append(change_matcher.FileMatcher(fn))
         self.file_matcher = change_matcher.MatchAnyFiles(matchers)
 
     def setIrrelevantFileMatcher(self, irrelevant_files):
