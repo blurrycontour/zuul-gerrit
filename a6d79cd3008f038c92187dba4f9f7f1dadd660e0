@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c533ba96_3814dd0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 30491
+      },
+      "writtenOn": "2023-06-07T11:05:09Z",
+      "side": 1,
+      "message": "To properly fix this once and for all, we should use the dedicated APIs instead of re-inventing the wheel in a quirky way: https://developer.mozilla.org/en-US/docs/Web/API/URL",
+      "revId": "a6d79cd3008f038c92187dba4f9f7f1dadd660e0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ed22387_b11fa0cc",
