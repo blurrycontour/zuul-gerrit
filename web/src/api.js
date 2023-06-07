@@ -35,47 +35,12 @@ function getHomepageUrl(url) {
   //
   let baseUrl
   if (url) {
-    baseUrl = url
+    baseUrl = new URL(url)
   } else {
-    baseUrl = window.location.href
-  }
-  // Get dirname of the current url
-  baseUrl = baseUrl.replace(/\\/g, '/').replace(/\/[^/]*$/, '/')
-
-  // Remove any query strings
-  if (baseUrl.includes('?')) {
-    baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('?'))
-  }
-  // Remove any hash anchor
-  if (baseUrl.includes('/#')) {
-    baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('/#') + 1)
+    baseUrl = new URL(window.location.href)
   }
 
-  // Remove known sub-path
-  const subDir = [
-    '/autohold/',
-    '/build/',
-    '/buildset/',
-    '/job/',
-    '/project/',
-    '/stream/',
-    '/status/',
-  ]
-  subDir.forEach(path => {
-    if (baseUrl.includes(path)) {
-      baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf(path) + 1)
-    }
-  })
-
-  // Remove tenant scope
-  if (baseUrl.includes('/t/')) {
-    baseUrl = baseUrl.slice(0, baseUrl.lastIndexOf('/t/') + 1)
-  }
-  if (!baseUrl.endsWith('/')) {
-    baseUrl = baseUrl + '/'
-  }
-  // console.log('Homepage url is ', baseUrl)
-  return baseUrl
+  return baseUrl.origin + '/'
 }
 
 function getZuulUrl() {
