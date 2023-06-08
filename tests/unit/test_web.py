@@ -2220,14 +2220,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
             headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(403, resp.status_code)
 
-    def test_autohold(self):
-        """Test that autohold can be set through the admin web interface"""
-        args = {"reason": "some reason",
-                "count": 1,
-                'job': 'project-test2',
-                'change': None,
-                'ref': None,
-                'node_hold_expiration': None}
+    def _test_autohold(self, args, code=200):
         authz = {'iss': 'zuul_operator',
                  'aud': 'zuul.example.com',
                  'sub': 'testuser',
@@ -2241,7 +2234,9 @@ class TestTenantScopedWebApi(BaseTestWeb):
             'api/tenant/tenant-one/project/org/project/autohold',
             headers={'Authorization': 'Bearer %s' % token},
             json=args)
-        self.assertEqual(200, req.status_code, req.text)
+        self.assertEqual(code, req.status_code, req.text)
+        if code != 200:
+            return
         data = req.json()
         self.assertEqual(True, data)
 
@@ -2253,6 +2248,18 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertNotEqual([], autohold_requests)
         self.assertEqual(1, len(autohold_requests))
         request = autohold_requests[0]
+        return request
+
+    def test_autohold_default_ref(self):
+        """Test that autohold can be set through the admin web interface
+        with default ref values"""
+        args = {"reason": "some reason",
+                "count": 1,
+                'job': 'project-test2',
+                'change': None,
+                'ref': None,
+                'node_hold_expiration': None}
+        request = self._test_autohold(args)
         self.assertEqual('tenant-one', request['tenant'])
         # The matcher expects a canonical project name
         self.assertEqual('review.example.com/org/project', request['project'])
@@ -2260,6 +2267,53 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(".*", request['ref_filter'])
         self.assertEqual("some reason", request['reason'])
         self.assertEqual(1, request['max_count'])
+
+    def test_autohold_change(self):
+        """Test that autohold can be set through the admin web interface
+        with a change supplied"""
+        args = {"reason": "some reason",
+                "count": 1,
+                'job': 'project-test2',
+                'change': '1',
+                'ref': None,
+                'node_hold_expiration': None}
+        request = self._test_autohold(args)
+        self.assertEqual('tenant-one', request['tenant'])
+        # The matcher expects a canonical project name
+        self.assertEqual('review.example.com/org/project', request['project'])
+        self.assertEqual('project-test2', request['job'])
+        self.assertEqual("refs/changes/01/1/.*", request['ref_filter'])
+        self.assertEqual("some reason", request['reason'])
+        self.assertEqual(1, request['max_count'])
+
+    def test_autohold_ref(self):
+        """Test that autohold can be set through the admin web interface
+        with a change supplied"""
+        args = {"reason": "some reason",
+                "count": 1,
+                'job': 'project-test2',
+                'change': None,
+                'ref': 'refs/tags/foo',
+                'node_hold_expiration': None}
+        request = self._test_autohold(args)
+        self.assertEqual('tenant-one', request['tenant'])
+        # The matcher expects a canonical project name
+        self.assertEqual('review.example.com/org/project', request['project'])
+        self.assertEqual('project-test2', request['job'])
+        self.assertEqual("refs/tags/foo", request['ref_filter'])
+        self.assertEqual("some reason", request['reason'])
+        self.assertEqual(1, request['max_count'])
+
+    def test_autohold_change_and_ref(self):
+        """Test that autohold can be set through the admin web interface
+        with a change supplied"""
+        args = {"reason": "some reason",
+                "count": 1,
+                'job': 'project-test2',
+                'change': '1',
+                'ref': 'refs/tags/foo',
+                'node_hold_expiration': None}
+        self._test_autohold(args, code=400)
 
     def _init_autohold_delete(self, authz):
         token = jwt.encode(authz, key='NoDanaOnlyZuul',

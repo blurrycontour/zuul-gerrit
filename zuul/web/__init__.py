@@ -684,7 +684,7 @@ class ZuulWebAPI(object):
 
         if jbody['change']:
             ref_filter = project.source.getRefForChange(jbody['change'])
-        if jbody['ref']:
+        elif jbody['ref']:
             ref_filter = str(jbody['ref'])
         else:
             ref_filter = ".*"
