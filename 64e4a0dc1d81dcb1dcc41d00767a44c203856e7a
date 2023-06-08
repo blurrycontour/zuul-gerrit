@@ -16,6 +16,24 @@
       "message": "This might have an orthogonal flexibility that !inherit type tags wouldn\u0027t have, which is the ability to make multiple \"groups\" of regexes that you could opt-into without a strict inheritance structure?  \n\ne.g.\n\n  files:\n    - \u0026GROUPA { files: [ \u0027a\u0027, \u0027b\u0027 ] }\n    - \u0026GROUPB { files: [ \u0027c\u0027, \u0027d\u0027 ] }\n    \nPerhaps \"files\" is a bad name.  Maybe \"name\" or \"regex\" as a key, and making this be either a string *or* list might make this feel more natural?  i.e. you could have\n\n  files:\n    - a/matcher/*\n    - { name: \u0027another/matcher/* }\n    - { name: [ \u0027a/list\u0027, \u0027of/matchers\u0027 ] }\n    \nAnd perhaps the documentation doesn\u0027t have to go into the details of merging keys to avoid overwhelming anyone starting out, but leaves flexibility for those that know a bit more about things?\n\nI don\u0027t see this as conflicting with any tag-based inheritance scheme, but providing a bit more general flexibility.",
       "revId": "64e4a0dc1d81dcb1dcc41d00767a44c203856e7a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da376712_7a6ac1c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2023-06-08T03:00:17Z",
+      "side": 1,
+      "message": "PS3 is more or less ^.  While it\u0027s functionally the same (but also handling irrelevant-files), I think it expresses what I was really thinking about this a bit better and is a slightly different frame on the discussion.",
+      "parentUuid": "f28330df_c7b8e438",
+      "revId": "64e4a0dc1d81dcb1dcc41d00767a44c203856e7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
