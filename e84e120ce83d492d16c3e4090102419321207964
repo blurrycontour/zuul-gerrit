@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d080703_65edeaba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-06-08T09:45:32Z",
+      "side": 1,
+      "message": "A-ha, I see! Thanks a lot for the explanation. Will close this patch then",
+      "revId": "e84e120ce83d492d16c3e4090102419321207964",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
