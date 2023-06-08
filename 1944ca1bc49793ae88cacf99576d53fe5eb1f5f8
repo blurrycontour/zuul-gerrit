@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fc1a63b_0e217607",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2023-06-08T22:53:25Z",
+      "side": 1,
+      "message": "No rush 😊\n\nTo the first point, I don\u0027t think it makes any difference, as this is more or less just using YAML as a macro expansion.  So anything that was or wasn\u0027t valid as a matcher remains the same.\n\nI had a look at the fileset spec [1].  In some ways, yes, this allows for a similar expansion to be done by the nature of it being a mapping that can be merged; e.g.\n\n - job:\n   fileset: \u0026FILESET\n     includes: \n       - \u0027A/.*\u0027\n     excludes:\n       - \u0027.*\\.py$\u0027\n\n - job:\n   fileset:\n    \u003c\u003c: *FILESET\n\nwould be correct without any Zuul interaction.  I guess that files/irreleveant-files is not going to disappear even if that were implemented; so from that POV it would still be a nice-to-have to be able to macro-ize your file matcher in the same way with something like this change.\n\n\n[1] https://review.opendev.org/c/zuul/zuul/+/839550/8/doc/source/developer/specs/job-fileset.rst",
+      "revId": "1944ca1bc49793ae88cacf99576d53fe5eb1f5f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
