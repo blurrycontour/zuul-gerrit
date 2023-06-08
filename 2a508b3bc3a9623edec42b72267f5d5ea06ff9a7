@@ -16,6 +16,24 @@
       "message": "I don\u0027t remember the detail of the previous implementation, but it seems like this change no longer match the above documentation. That is, this function always discards the sub-directory and returns `scheme://domain/`.\n\nMoreover, looking at the callsites, it appears that the `url` parameter is never set, so we might as well remove it from the definition.",
       "revId": "2a508b3bc3a9623edec42b72267f5d5ea06ff9a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40c04f7c_b12bd947",
+        "filename": "web/src/api.js",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-06-08T11:56:53Z",
+      "side": 1,
+      "message": "I will update the docs as I think they were updated before. Using `window.location.href` returns `scheme://entire-href\u0027, and that\u0027s what was returned previously as well (AFAICT).\n\nWhere did you see the `callsites` ? (Sorry, not a JS expert 😊 ). Happy to remove the param if there are no calls to this function passing it.",
+      "parentUuid": "d30e6f14_2fd106b3",
+      "revId": "2a508b3bc3a9623edec42b72267f5d5ea06ff9a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
