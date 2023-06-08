@@ -33,6 +33,23 @@
       "message": "recheck this is only a comment change",
       "revId": "ff166e3ea9e120bbc20a181ac60537be8f28f33d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48a0de52_24e7c448",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2023-06-08T03:01:45Z",
+      "side": 1,
+      "message": "definitely helpful!",
+      "revId": "ff166e3ea9e120bbc20a181ac60537be8f28f33d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
