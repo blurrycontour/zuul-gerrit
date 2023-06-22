@@ -1695,9 +1695,9 @@ class Scheduler(threading.Thread):
                                 item, last_head, old_item_ahead,
                                 item_ahead_valid=item_ahead_valid)
                         except Exception:
-                            self.log.exception(
-                                "Exception while re-enqueing item %s",
-                                item)
+                            log = get_annotated_logger(self.log, item.event)
+                            log.exception(
+                                "Exception while re-enqueing item %s", item)
                 if reenqueued:
                     for build in item.current_build_set.getBuilds():
                         new_job = item.getJob(build.job.name)
@@ -1722,8 +1722,8 @@ class Scheduler(threading.Thread):
                                         new_queue.window_floor))
             new_pipeline.state.removeOldQueue(context, shared_queue)
         for item in items_to_remove:
-            self.log.info(
-                "Removing item %s during reconfiguration" % (item,))
+            log = get_annotated_logger(self.log, item.event)
+            log.info("Removing item %s during reconfiguration", item)
             for build in item.current_build_set.getBuilds():
                 builds_to_cancel.append(build)
             for request_job, request in \
@@ -1740,7 +1740,7 @@ class Scheduler(threading.Thread):
                     item.current_build_set, 'dequeue',
                     final=False, result='DEQUEUED')
             except Exception:
-                self.log.exception(
+                log.exception(
                     "Error reporting buildset completion to DB:")
 
         for build in builds_to_cancel:
@@ -2073,7 +2073,8 @@ class Scheduler(threading.Thread):
                      and item.change.number == change.number
                      and item.change.patchset == change.patchset
                     ) or (item.change.ref == change.ref)):
-                    self.log.info("Item %s is superceded, dequeuing", item)
+                    log = get_annotated_logger(self.log, item.event)
+                    log.info("Item %s is superceded, dequeuing", item)
                     pipeline.manager.removeItem(item)
                     return
 
