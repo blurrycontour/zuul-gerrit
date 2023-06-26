@@ -425,10 +425,16 @@ class GithubEventProcessor(object):
         for event in events:
             # Note we limit parallel requests per installation id to avoid
             # triggering abuse detection.
+            lock_start = time.perf_counter()
             with self.connection.get_request_lock(installation_id):
+                lock_elapsed = int((time.perf_counter() - lock_start) / 1000)
+                event.project_hostname = self.connection.canonical_hostname
                 event.delivery = self.delivery
                 event.zuul_event_id = self.delivery
                 event.timestamp = self.ts
+                self.log.debug("Post-processing event %s, "
+                               "lock wait time for installation id %s: %sms",
+                               event, installation_id, lock_elapsed)
                 project = self.connection.source.getProject(event.project_name)
                 change = None
                 if event.change_number:
@@ -455,8 +461,9 @@ class GithubEventProcessor(object):
                         protected = change.branch_protected
                     self.connection.checkBranchCache(project.name, event,
                                                      protected=protected)
+                    self.log.debug("Checked branch cache")
 
-            event.project_hostname = self.connection.canonical_hostname
+            self.log.debug("Finished post-processing event %s", event)
         self.events = events
 
     def _event_push(self):
