@@ -69,6 +69,24 @@
       "parentUuid": "32fe743a_7efb62e3",
       "revId": "ec6798678c2ad823050d60d6657af1fb411862c3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f48a544a_3142779f",
+        "filename": "zuul/driver/auth/jwt.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-06-26T22:41:50Z",
+      "side": 1,
+      "message": "We don\u0027t want that argument, that will indefinitely cache the signing keys.   We just want cache_jwk_set which understands expiration times and defaults to true.",
+      "parentUuid": "32fe743a_7efb62e3",
+      "revId": "ec6798678c2ad823050d60d6657af1fb411862c3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
