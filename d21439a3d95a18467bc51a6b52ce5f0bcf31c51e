@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "13a7b2ad_7acd5166",
+        "filename": "tests/fixtures/config/early-failure/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-06-27T21:01:29Z",
+      "side": 1,
+      "message": "Agree, and it was broken.",
+      "parentUuid": "06c939a5_9a6333ea",
+      "revId": "d21439a3d95a18467bc51a6b52ce5f0bcf31c51e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d899e35_3adfb472",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d16e871_78200ec7",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-06-27T21:01:29Z",
+      "side": 1,
+      "message": "This was in the original design for Zuul v3, it just never really got implemented:\n\nhttps://opendev.org/zuul/zuul/src/commit/c4345214ac942f22fa1c4afd121c207f696750e7/zuul/ansible/logconfig.py#L27\n\nIf you git-blame that, you\u0027ll see the commit is 6 years old, and the comment on line 37 about it being used to pass information back to the executor was in there too.\n\nI\u0027m pretty stoked we finally get to do this.  :)",
+      "parentUuid": "1d899e35_3adfb472",
+      "revId": "d21439a3d95a18467bc51a6b52ce5f0bcf31c51e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "afcfccb3_ed7fabac",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-06-27T18:46:35Z",
       "side": 1,
       "message": "This short circuits before checking the RETRY state below. Will that break retries for pre failures or network related failures? I\u0027ve made a note that we should explicitly test that either way as well.",
+      "revId": "d21439a3d95a18467bc51a6b52ce5f0bcf31c51e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34df928d_93094877",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4005,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-06-27T21:01:29Z",
+      "side": 1,
+      "message": "Yeah, though strictly speaking it\u0027s the \"self.result\" check that\u0027s at issue.  Adding RETRY here just lets us re-use this for the log url code below.  At all the times where it matters, result\u003dNone means \"retry the job\".\n\nBut we are short-circuiting that which breaks the retry logic for gate pipelines.  We do still retry, but we *also* early fail, which means that we restart the change behind.  Definitely not what we want.\n\nBecause we\u0027re sending the pre_fail bit before we send the build result, we can\u0027t actually know at this point whether the pre_fail should be honored or ignored (because it\u0027s due to a pre-run playbook).  I think the solution is to leave this code the way it is and adjust the executor to only send pre_fail during the run or post-run phases.",
+      "parentUuid": "afcfccb3_ed7fabac",
       "revId": "d21439a3d95a18467bc51a6b52ce5f0bcf31c51e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
