@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06c939a5_9a6333ea",
+        "filename": "tests/fixtures/config/early-failure/git/common-config/zuul.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-06-27T18:46:35Z",
+      "side": 1,
+      "message": "We should probably have a test that fails in pre to check that this doesn\u0027t break retry logic.",
+      "revId": "d21439a3d95a18467bc51a6b52ce5f0bcf31c51e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d899e35_3adfb472",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-06-27T18:46:35Z",
+      "side": 1,
+      "message": "Is this somehow prefixing the log line with RESULT which is what we look for in the executor? If so I\u0027m not seeing how that happens. ^F in this file for RESULT doesn\u0027t produce any results.",
+      "revId": "d21439a3d95a18467bc51a6b52ce5f0bcf31c51e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afcfccb3_ed7fabac",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4005,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-06-27T18:46:35Z",
+      "side": 1,
+      "message": "This short circuits before checking the RETRY state below. Will that break retries for pre failures or network related failures? I\u0027ve made a note that we should explicitly test that either way as well.",
+      "revId": "d21439a3d95a18467bc51a6b52ce5f0bcf31c51e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
