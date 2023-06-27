@@ -15,6 +15,7 @@
 
 import logging
 import math
+import threading
 import time
 import jwt
 import requests
@@ -214,24 +215,36 @@ class OpenIDConnectAuthenticator(JWTAuthenticator):
         self.scope = conf.get('scope', 'openid profile')
         self.load_user_info = any_to_bool(
             conf.get('load_user_info', True))
+        self._init_lock = threading.Lock()
+        self._client = None
+
+    def get_client(self):
+        if self._client is not None:
+            return self._client
+        with self._init_lock:
+            if self._client is not None:
+                return self._client
+            keys_url = self.keys_url
+            if keys_url is None:
+                well_known = self.get_well_known_config()
+                keys_url = well_known.get('jwks_uri', None)
+            if keys_url is None:
+                msg = 'Invalid OpenID configuration: "jwks_uri" not found'
+                logger.error(msg)
+                raise exceptions.JWKSException(
+                    realm=self.realm,
+                    msg=msg)
+            self._client = jwt.PyJWKClient(keys_url)
+            return self._client
 
     def get_key(self, key_id):
-        keys_url = self.keys_url
-        if keys_url is None:
-            well_known = self.get_well_known_config()
-            keys_url = well_known.get('jwks_uri', None)
-        if keys_url is None:
-            msg = 'Invalid OpenID configuration: "jwks_uri" not found'
-            logger.error(msg)
-            raise exceptions.JWKSException(
-                realm=self.realm,
-                msg=msg)
-        jwks_client = jwt.PyJWKClient(keys_url)
+        # This has its own exception handler
+        client = self.get_client()
         try:
-            signing_key = jwks_client.get_signing_key(kid=key_id)
+            signing_key = client.get_signing_key(kid=key_id)
         except Exception as e:
             msg = 'Could not fetch Identity Provider keys at %s: %s'
-            logger.error(msg % (keys_url, e))
+            logger.error(msg % (client.uri, e))
             raise exceptions.JWKSException(
                 realm=self.realm,
                 msg='There was an error while fetching '
