@@ -2808,7 +2808,22 @@ class AnsibleJob(object):
             # Use manual idx instead of enumerate so that RESULT lines
             # don't count towards BUFFER_LINES_FOR_SYNTAX
             idx = 0
+            first = True
             for line in iter(self.proc.stdout.readline, b''):
+                if first:
+                    # When we receive our first log line, bwrap should
+                    # have started Ansible and it should still be
+                    # running.  This is our best opportunity to list
+                    # the process ids in the namespace.
+                    try:
+                        ns, pids = context.getNamespacePids(self.proc)
+                        if ns is not None:
+                            self.log.debug("Process ids in namespace %s: %s",
+                                           ns, pids)
+                    except Exception:
+                        self.log.exception("Unable to list namespace pids")
+                    first = False
+
                 if line.startswith(b'RESULT'):
                     # TODO(mordred) Process result commands if sent
                     continue
