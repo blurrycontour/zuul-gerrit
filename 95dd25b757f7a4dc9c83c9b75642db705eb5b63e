@@ -16,6 +16,23 @@
       "message": "Can we ignore the case where PIDNS is \"-\" (which will fail the `int()` conversion) as we are only interested in the namespaced processes?",
       "revId": "95dd25b757f7a4dc9c83c9b75642db705eb5b63e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e910b98_270c96c8",
+        "filename": "zuul/execution_context/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-06-28T13:23:53Z",
+      "side": 1,
+      "message": "Should that be `tuble(int, list[int])` ?",
+      "revId": "95dd25b757f7a4dc9c83c9b75642db705eb5b63e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
