@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57a52d19_85ff7e18",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-06-28T07:17:39Z",
+      "side": 1,
+      "message": "Do we have to pay attention how pre-fail interacts with the fail-fast option? I\u0027m wondering if we might see cases where we report an early failure and the scheduler then cancels all (inc. the pre-failed) builds and we loose the information about the build result as the scheduler might set it to `CANCELED`.",
+      "revId": "95bdcae3d8098ea4fafb14c25e1a41843cf9b77e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
