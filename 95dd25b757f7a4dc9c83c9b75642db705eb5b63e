@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d82a772_4238b37d",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-06-28T06:40:05Z",
+      "side": 1,
+      "message": "Can we ignore the case where PIDNS is \"-\" (which will fail the `int()` conversion) as we are only interested in the namespaced processes?",
+      "revId": "95dd25b757f7a4dc9c83c9b75642db705eb5b63e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
