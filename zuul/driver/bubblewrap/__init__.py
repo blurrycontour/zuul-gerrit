@@ -69,6 +69,29 @@ class BubblewrapExecutionContext(BaseExecutionContext):
         self.mounts_map = {'ro': ro_paths, 'rw': rw_paths}
         self.secrets = secrets
 
+    def getNamespacePids(self, proc):
+        # Given a Popen object (proc), return the namespace and a list
+        # of host-side process ids in proc's namespace.
+        ps = subprocess.Popen(
+            ['ps', '-axo', 'pidns,pid,ppid'],
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        pid_to_child_list = {}
+        ns_to_pid_list = {}
+        pid_to_ns_map = {}
+        for line in ps.stdout:
+            try:
+                (pidns, pid, ppid) = map(int, line.rstrip().split())
+            except ValueError:
+                continue
+            pid_to_child_list.setdefault(ppid, []).append(pid)
+            ns_to_pid_list.setdefault(pidns, []).append(pid)
+            pid_to_ns_map[pid] = pidns
+        for child in pid_to_child_list.get(proc.pid):
+            ns = pid_to_ns_map.get(child)
+            if ns is not None:
+                return ns, ns_to_pid_list.get(ns)
+        return None, []
+
     def startPipeWriter(self, pipe, data):
         # In case we have a large amount of data to write through a
         # pipe, spawn a thread to handle the writes.
