@@ -6105,6 +6105,48 @@ class TestPragmaMultibranch(ZuulTestCase):
         ], ordered=False)
 
 
+class TestTenantImpliedBranchMatchers(ZuulTestCase):
+    tenant_config_file = 'config/tenant-implied-branch-matchers/main.yaml'
+
+    def test_tenant_implied_branch_matchers(self):
+        # Test that we can force implied branch matchers in the tenant
+        # config even in the case where a project only has one branch.
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        jobs = tenant.layout.getJobs('test-job')
+        self.assertEqual(len(jobs), 1)
+        for job in tenant.layout.getJobs('test-job'):
+            self.assertIsNotNone(job.branch_matcher)
+
+    def test_pragma_overrides_tenant_implied_branch_matchers(self):
+        # Test that we can force implied branch matchers off with a pragma
+        # even if the tenant config has it set on.
+        config = textwrap.dedent(
+            """
+            - job:
+                name: test-job
+            - pragma:
+                implied-branch-matchers: False
+            """)
+        file_dict = {'zuul.yaml': config}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        self.create_branch('org/project', 'stable/pike')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable/pike'))
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        jobs = tenant.layout.getJobs('test-job')
+        self.assertEqual(len(jobs), 2)
+        for job in tenant.layout.getJobs('test-job'):
+            self.assertIsNone(job.branch_matcher)
+
+
 class TestBaseJobs(ZuulTestCase):
     tenant_config_file = 'config/base-jobs/main.yaml'
 

@@ -1690,7 +1690,7 @@ class ParseContext(object):
 
     def getImpliedBranches(self, source_context):
         # If the user has set a pragma directive for this, use the
-        # value (if unset, the value is None).
+        # value (ixf unset, the value is None).
         if source_context.implied_branch_matchers is True:
             if source_context.implied_branches is not None:
                 return source_context.implied_branches
@@ -1742,6 +1742,7 @@ class TenantParser(object):
         'exclude-branches': to_list(str),
         'always-dynamic-branches': to_list(str),
         'allow-circular-dependencies': bool,
+        'implied-branch-matchers': bool,
     }}
 
     project = vs.Any(str, project_dict)
@@ -1985,6 +1986,7 @@ class TenantParser(object):
             project_exclude_branches = None
             project_always_dynamic_branches = None
             project_load_branch = None
+            project_implied_branch_matchers = None
         else:
             project_name = list(conf.keys())[0]
             project = source.getProject(project_name)
@@ -2039,6 +2041,8 @@ class TenantParser(object):
                                            if x.endswith('/')])
             project_load_branch = conf[project_name].get(
                 'load-branch', None)
+            project_implied_branch_matchers = conf[project_name].get(
+                'implied-branch-matchers', None)
 
         tenant_project_config = model.TenantProjectConfig(project)
         tenant_project_config.load_classes = frozenset(project_include)
@@ -2052,6 +2056,8 @@ class TenantParser(object):
         tenant_project_config.extra_config_files = extra_config_files
         tenant_project_config.extra_config_dirs = extra_config_dirs
         tenant_project_config.load_branch = project_load_branch
+        tenant_project_config.implied_branch_matchers = \
+            project_implied_branch_matchers
 
         return tenant_project_config
 
@@ -2231,7 +2237,8 @@ class TenantParser(object):
         # accumulates a list of all merger jobs submitted.
         source_context = model.SourceContext(
             project.canonical_name, project.name,
-            project.connection_name, branch, '', False)
+            project.connection_name, branch, '', False,
+            tpc.implied_branch_matchers)
         if min_ltimes is not None:
             files_cache = self.unparsed_config_cache.getFilesCache(
                 project.canonical_name, branch)
@@ -2966,7 +2973,8 @@ class ConfigLoader(object):
                 if data:
                     source_context = model.SourceContext(
                         project.canonical_name, project.name,
-                        project.connection_name, branch, fn, trusted)
+                        project.connection_name, branch, fn, trusted,
+                        tpc.implied_branch_matchers)
                     # Prevent mixing configuration source
                     conf_root = fn.split('/')[0]
 

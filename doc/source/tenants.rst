@@ -270,6 +270,27 @@ configuration. Some examples of tenant definitions are:
             circumstances and only calculate the configuration of a
             single additional branch when it is used.
 
+         .. attr:: implied-branch-matchers
+
+            This is a boolean, which, if set, may be used to enable
+            (``true``) or disable (``false``) the addition of implied
+            branch matchers to job and project-template definitions.
+            Normally Zuul decides whether to add these based on
+            heuristics described in :attr:`job.branches`.  This
+            attribute overrides that behavior.
+
+            This can be useful if branch settings for this project may
+            produce an unpredictable number of branches to load from.
+            Setting this value explicitly here can avoid unexpected
+            behavior changes as branches are added or removed from the
+            load set.
+
+            The :attr:`pragma.implied-branch-matchers` pragma will
+            override the setting here if present.
+
+            Note that if a job contains an explicit branch matcher, it
+            will be used regardless of the value supplied here.
+
          .. attr:: extra-config-paths
 
             Normally Zuul loads in-repo configuration from the first

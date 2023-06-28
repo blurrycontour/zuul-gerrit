@@ -25,13 +25,18 @@ pragma directives may not be set and then unset within the same file.
    .. attr:: implied-branch-matchers
 
       This is a boolean, which, if set, may be used to enable
-      (``True``) or disable (``False``) the addition of implied branch
+      (``true``) or disable (``false``) the addition of implied branch
       matchers to job and project-template definitions.  Normally Zuul
       decides whether to add these based on heuristics described in
       :attr:`job.branches`.  This attribute overrides that behavior.
 
       This can be useful if a project has multiple branches, yet the
       jobs defined in the master branch should apply to all branches.
+
+      The behavior may also be configured by a Zuul administrator
+      using
+      :attr:`tenant.untrusted-projects.<project>.implied-branch-matchers`.
+      This pragma overrides that setting if both are present.
 
       Note that if a job contains an explicit branch matcher, it will
       be used regardless of the value supplied here.
