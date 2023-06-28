@@ -27,6 +27,9 @@ class NullExecutionContext(BaseExecutionContext):
     def getPopen(self, **kwargs):
         return psutil.Popen
 
+    def getNamespacePids(self, proc):
+        return None, []
+
 
 class NullwrapDriver(Driver, WrapperInterface):
     name = 'nullwrap'
