@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d29211f4_99593df1",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-06-28T20:30:15Z",
+      "side": 1,
+      "message": "Yes, that\u0027s effectively what the ValueError is doing here -- the \"-\" will trip a failure and cause that line to be skipped.\n\n(I\u0027m not sure if that\u0027s what you meant, or if you were looking for a more efficient way of ignoring it...)\n\nIt\u0027s also worth noting that \"-a\" and \"-x\" are both required in order to see the processes we want, which will pull in the \"-\" pidns processes.  In other words, I wasn\u0027t able to find a combo of options that would filter out the unnamespaced pids and still show us the procs we need.",
+      "parentUuid": "4d82a772_4238b37d",
+      "revId": "95dd25b757f7a4dc9c83c9b75642db705eb5b63e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e910b98_270c96c8",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-06-28T13:23:53Z",
       "side": 1,
       "message": "Should that be `tuble(int, list[int])` ?",
+      "revId": "95dd25b757f7a4dc9c83c9b75642db705eb5b63e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b33ddcd2_9de48661",
+        "filename": "zuul/execution_context/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-06-28T20:30:15Z",
+      "side": 1,
+      "message": "Yes; I forgot to update that after an earlier revision.",
+      "parentUuid": "5e910b98_270c96c8",
       "revId": "95dd25b757f7a4dc9c83c9b75642db705eb5b63e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
