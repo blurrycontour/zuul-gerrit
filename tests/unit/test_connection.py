@@ -93,16 +93,8 @@ class TestSQLConnectionMysql(ZuulTestCase):
         indexes_buildset = insp.get_indexes(buildset_table)
         indexes_build = insp.get_indexes(build_table)
 
-        # Remove implicitly generated indexes by the foreign key.
-        # MySQL creates an implicit index with the name if the column (which
-        # is not a problem as in MySQL the index names are scoped within the
-        # table). This is an implementation detail of the db engine so don't
-        # check this.
-        indexes_build = [x for x in indexes_build
-                         if x['name'] != 'buildset_id']
-
         self.assertEqual(4, len(indexes_buildset))
-        self.assertEqual(2, len(indexes_build))
+        self.assertEqual(3, len(indexes_build))
 
         # check if all indexes are prefixed
         if table_prefix:
