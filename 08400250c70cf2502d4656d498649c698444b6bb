@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad13fe4b_f04f797e",
+        "filename": "web/src/api.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-07-06T13:35:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4de37e5_a92d8f8b",
+      "revId": "08400250c70cf2502d4656d498649c698444b6bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77891f70_e9b75248",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c7b325a_a43a2761",
+        "filename": "web/src/api.test.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-07-06T13:35:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77891f70_e9b75248",
+      "revId": "08400250c70cf2502d4656d498649c698444b6bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08202a0f_5487b704",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-07-06T13:02:01Z",
       "side": 1,
       "message": "I think we need to make this test pass:\n\n```\n it(\u0027should return the subdir homepage url\u0027, () ⇒ {                                                                                                                                                                                                                                                                                                                                  \n   const homepage \u003d \u0027https://example.com/zuul/\u0027                                                                                                                                                                                                                                                                                                                                             \n   Object.defineProperty(window, \u0027location\u0027, {                                                                                                                                                                                                                                                                                                                                              \n     value: new URL(homepage)                                                                                                                                                                                                                                                                                                                                                               \n   } )                                                                                                                                                                                                                                                                                                                                                                                      \n   Object.defineProperty(process.env, \u0027PUBLIC_URL\u0027, {                                                                                                                                                                                                                                                                                                                                       \n     value: \"/zuul/\"                                                                                                                                                                                                                                                                                                                                                                        \n   } )   \n                                                                                                                                                                                                                                                                                                                                                                                               \n   // Test some of the known, possible, URLs to verify                                                                                                                                                                                                                                                                                                                                      \n   // that the origin is returned.                                                                                                                                                                                                                                                                                                                                                          \n   const urls \u003d [                                                                                                                                                                                                                                                                                                                                                                           \n       // auth_callback test  as some providers build                                                                                                                                                                                                                                                                                                                                       \n       // different callback urls                                                                                                                                                                                                                                                                                                                                                           \n       \u0027https://example.com/zuul/auth_callback\u0027,                                                                                                                                                                                                                                                                                                                                            \n       \u0027https://example.com/zuul/auth_callback#state\u003d12345\u0027,                                                                                                                                                                                                                                                                                                                                \n                                                                                                                                                                                                                                                                                                                                                                                            \n       // Regular browser navigation urls                                                                                                                                                                                                                                                                                                                                                   \n       \u0027https://example.com/zuul/status\u0027,                                                                                                                                                                                                                                                                                                                                                   \n       \u0027https://example.com/zuul/t/zuul-tenant/status\u0027,                                                                                                                                                                                                                                                                                                                                     \n       \u0027https://example.com/zuul/t/zuul-tenant/jobs\u0027,                                                                                                                                                                                                                                                                                                                                       \n   ]                                                                                                                                                                                                                                                                                                                                                                                        \n                                                                                                                                                                                                                                                                                                                                                                                            \n   for (let url of urls) {                                                                                                                                                                                                                                                                                                                                                                  \n     window.location.href \u003d url                                                                                                                                                                                                                                                                                                                                                             \n     expect(getHomepageUrl()).toEqual(homepage)                                                                                                                                                                                                                                                                                                                                             \n   }                                                                                                                                                                                                                                                                                                                                                                                        \n })\n```",
+      "revId": "08400250c70cf2502d4656d498649c698444b6bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58513523_5126fa3d",
+        "filename": "web/src/api.test.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-07-06T13:35:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08202a0f_5487b704",
       "revId": "08400250c70cf2502d4656d498649c698444b6bb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
