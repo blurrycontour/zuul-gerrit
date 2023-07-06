@@ -12,3 +12,6 @@ zuul-sphinx
 # remove this requirement once this issue is fixed:
 # https://github.com/sphinx-contrib/openapi/issues/121
 mistune<2.0
+# sphinxcontrib-blockdiag uses pillow and is not compatible with 10.0.0
+# - corvus 2023-07-06
+Pillow<10.0.0
