@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "91ad41c0_ce083eb8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-06T13:33:17Z",
+      "side": 1,
+      "message": "Thanks. It would be good to check the web page preview before merging.",
+      "revId": "179145a6423b5a3755b699a3d0c3a1aabc95a348",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
