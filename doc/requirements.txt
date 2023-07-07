@@ -1,4 +1,6 @@
 ansible
+# https://github.com/blockdiag/sphinxcontrib-blockdiag/issues/26
+Pillow<10.0.0
 sphinx>=1.8
 sphinxcontrib-blockdiag>=1.1.0
 sphinxcontrib-programoutput
