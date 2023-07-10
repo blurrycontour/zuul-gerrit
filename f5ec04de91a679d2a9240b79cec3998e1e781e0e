@@ -16,6 +16,24 @@
       "message": "Are these constants necessary? They don\u0027t seem to be used.",
       "revId": "f5ec04de91a679d2a9240b79cec3998e1e781e0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37560016_2e875739",
+        "filename": "zuul/driver/sql/alembic/versions/151893067f91_build_idx.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-10T19:47:44Z",
+      "side": 1,
+      "message": "Nope, they predate the for loop below.  Removed in next ps.",
+      "parentUuid": "a01e3de8_fa89d781",
+      "revId": "f5ec04de91a679d2a9240b79cec3998e1e781e0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
