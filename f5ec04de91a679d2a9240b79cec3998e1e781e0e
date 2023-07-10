@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a01e3de8_fa89d781",
+        "filename": "zuul/driver/sql/alembic/versions/151893067f91_build_idx.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-07-10T03:35:46Z",
+      "side": 1,
+      "message": "Are these constants necessary? They don\u0027t seem to be used.",
+      "revId": "f5ec04de91a679d2a9240b79cec3998e1e781e0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
