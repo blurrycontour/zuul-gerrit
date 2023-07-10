@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdb5146c_a7311ff1",
+        "filename": "doc/source/configuration.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 678,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-10T21:32:13Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s reasonable to expect people to write playbooks that have to accomodate both configurations, and I think it\u0027s important for playbook/role reuse to have consistent behavior here.  So if we do this, I think we need to plan to switch the default.  Essentially decide that visible synchronization is worth less than split output.  I agree with that and am in favor of doing so.\n\nTherefore, I think in the docs we should mention that in the next major revision (9, currently), the default will change, and in the next major revision after that (10) the old behavior will be removed.",
+      "revId": "0cdd97cc742e12b335da436bc49a7a5b8401c98a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
