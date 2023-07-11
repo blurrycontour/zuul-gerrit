@@ -8,3 +8,4 @@
         - group-inventory
         - hostvars-inventory
         - ansible-version6-inventory
+        - ansible-version8-inventory
