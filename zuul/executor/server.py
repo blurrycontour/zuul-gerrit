@@ -2653,7 +2653,10 @@ class AnsibleJob(object):
             config.write('internal_poll_interval = 0.01\n')
 
             if self.ansible_callbacks:
-                config.write('callback_whitelist =\n')
+                if self.ansible_version == '6':
+                    config.write('callback_whitelist =\n')
+                else:
+                    config.write('callbacks_enabled =\n')
                 for callback in self.ansible_callbacks.keys():
                     config.write('    %s,\n' % callback)
 
