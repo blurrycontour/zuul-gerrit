@@ -2206,6 +2206,55 @@ class TestGerritCircularDependencies(ZuulTestCase):
     def test_job_deduplication_semaphore_resources_first(self):
         self._test_job_deduplication_semaphore()
 
+    @simple_layout('layouts/job-dedup-auto-shared-check.yaml')
+    def test_job_deduplication_check(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.release('common-job')
+        self.executor_server.release('project1-job')
+        self.waitUntilSettled()
+
+        # We do this even though it results in no changes to force an
+        # extra pipeline processing run to make sure we don't garbage
+        # collect the item early.
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.release('project2-job')
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 3)
+
+        # Make sure there are no leaked queue items
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        pipeline = tenant.layout.pipelines["check"]
+        pipeline_path = pipeline.state.getPath()
+        all_items = set(self.zk_client.client.get_children(
+            f"{pipeline_path}/item"))
+        self.assertEqual(len(all_items), 0)
+
     def test_submitted_together(self):
         self.fake_gerrit._fake_submit_whole_topic = True
         A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
