@@ -472,6 +472,8 @@ class SQLConnection(BaseConnection):
                      job_name, buildset_id)
             sa.Index(self.table_prefix + 'uuid_buildset_id_idx',
                      uuid, buildset_id)
+            sa.Index(self.table_prefix + 'build_buildset_id_idx',
+                     buildset_id)
 
             @property
             def duration(self):
@@ -529,6 +531,8 @@ class SQLConnection(BaseConnection):
                                      backref=orm.backref(
                                          "artifacts",
                                          cascade="all, delete-orphan"))
+            sa.Index(self.table_prefix + 'artifact_build_id_idx',
+                     build_id)
 
         class ProvidesModel(Base):
             __tablename__ = self.table_prefix + PROVIDES_TABLE
@@ -540,6 +544,8 @@ class SQLConnection(BaseConnection):
                                      backref=orm.backref(
                                          "provides",
                                          cascade="all, delete-orphan"))
+            sa.Index(self.table_prefix + 'provides_build_id_idx',
+                     build_id)
 
         class BuildEventModel(Base):
             __tablename__ = self.table_prefix + BUILD_EVENTS_TABLE
@@ -553,6 +559,8 @@ class SQLConnection(BaseConnection):
                                      backref=orm.backref(
                                          "build_events",
                                          cascade="all, delete-orphan"))
+            sa.Index(self.table_prefix + 'build_event_build_id_idx',
+                     build_id)
 
         self.buildEventModel = BuildEventModel
         self.zuul_build_event_table = self.buildEventModel.__table__
