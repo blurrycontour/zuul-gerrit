@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68907f13_a82a90db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-11T11:22:22Z",
+      "side": 1,
+      "message": "What is not expected again? Looking at another build there is an error (from https://zuul.opendev.org/t/zuul/build/c031662556d54cdabe6205b696950406/artifacts failing with \"Web Listing Disabled\")\n\nCould it be that the behavior depends on the cloud providing the logs?",
+      "revId": "34d38232bc47a590a8da9cce1150e40eaefc3dbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
