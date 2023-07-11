@@ -150,3 +150,11 @@ class TestZuulJSON6(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
     def setUp(self):
         super().setUp()
         self._setUp()
+
+
+class TestZuulJSON8(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
+    ansible_version = '8'
+
+    def setUp(self):
+        super().setUp()
+        self._setUp()
