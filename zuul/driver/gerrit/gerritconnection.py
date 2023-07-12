@@ -43,6 +43,7 @@ from zuul.connection import (
 from zuul.driver.gerrit.auth import FormAuth
 from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
+from zuul.driver.gerrit.gerriteventkafka import GerritKafkaEventListener
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib import tracing
 from zuul.lib.logutil import get_annotated_logger
@@ -395,20 +396,20 @@ class GerritWatcher(threading.Thread):
     log = logging.getLogger("gerrit.GerritWatcher")
     poll_timeout = 500
 
-    def __init__(self, gerrit_connection, username, hostname, port=29418,
-                 keyfile=None, keepalive=60):
+    def __init__(self, gerrit_connection, connection_config):
         threading.Thread.__init__(self)
-        self.username = username
-        self.keyfile = keyfile
-        self.hostname = hostname
-        self.port = port
+        self.username = connection_config.get('user')
+        self.keyfile = connection_config.get('sshkey', None)
+        server = connection_config.get('server')
+        self.hostname = connection_config.get('ssh_server', server)
+        self.port = int(connection_config.get('port', 29418))
         self.gerrit_connection = gerrit_connection
         self._stop_event = threading.Event()
         self.watcher_election = EventReceiverElection(
             gerrit_connection.sched.zk_client,
             gerrit_connection.connection_name,
             "watcher")
-        self.keepalive = keepalive
+        self.keepalive = int(connection_config.get('keepalive', 60))
         self._stopped = False
 
     def _read(self, fd):
@@ -605,6 +606,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     ref_watcher_poll_interval = 60
     submit_retry_backoff = 10
 
+    EVENT_SOURCE_NONE = 'none'
+    EVENT_SOURCE_STREAM_EVENTS = 'stream-events'
+    EVENT_SOURCE_CHECKS_PLUGIN = 'checks-plugin'
+    EVENT_SOURCE_KAFKA = 'kafka'
+
     def __init__(self, driver, connection_name, connection_config):
         super(GerritConnection, self).__init__(driver, connection_name,
                                                connection_config)
@@ -623,15 +629,22 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.port = int(self.connection_config.get('port', 29418))
         self.keyfile = self.connection_config.get('sshkey', None)
         self.keepalive = int(self.connection_config.get('keepalive', 60))
+        self.event_source = self.EVENT_SOURCE_NONE
+        enable_stream_events = self.connection_config.get(
+            'stream_events', True)
         # TODO(corvus): Document this when the checks api is stable;
         # it's not useful without it.
-        self.enable_stream_events = self.connection_config.get(
-            'stream_events', True)
-        if self.enable_stream_events not in [
+        if enable_stream_events not in [
                 'true', 'True', '1', 1, 'TRUE', True]:
-            self.enable_stream_events = False
-        self.watcher_thread = None
-        self.poller_thread = None
+            self.event_source = self.EVENT_SOURCE_CHECKS_PLUGIN
+        else:
+            self.event_source = self.EVENT_SOURCE_STREAM_EVENTS
+        if self.connection_config.get('kafka_bootstrap_servers', None):
+            self.event_source = self.EVENT_SOURCE_KAFKA
+
+        # Thread for whatever event source we use
+        self.event_thread = None
+        # Only used by checks plugin to poll for ref updates
         self.ref_watcher_thread = None
         self.client = None
         self.watched_checkers = []
@@ -1795,52 +1808,47 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.log.debug('Creating Zookeeper change cache')
         self._change_cache = GerritChangeCache(zk_client, self)
 
-        if self.enable_stream_events:
-            self._start_watcher_thread()
-        else:
-            self._start_ref_watcher_thread()
-        self._start_poller_thread()
+        self._start_event_source_thread()
         self._start_event_connector()
 
     def onStop(self):
         self.log.debug("Stopping Gerrit Connection/Watchers")
-        self._stop_watcher_thread()
-        self._stop_poller_thread()
+        self._stop_event_source_thread()
         self._stop_ref_watcher_thread()
         self._stop_event_connector()
 
     def getEventQueue(self):
         return getattr(self, "event_queue", None)
 
-    def _stop_watcher_thread(self):
-        if self.watcher_thread:
-            self.watcher_thread.stop()
-            self.watcher_thread.join()
+    def _stop_event_source_thread(self):
+        if self.event_thread:
+            self.event_thread.stop()
+            self.event_thread.join()
 
-    def _start_watcher_thread(self):
-        self.watcher_thread = GerritWatcher(
-            self,
-            self.user,
-            self.ssh_server,
-            self.port,
-            keyfile=self.keyfile,
-            keepalive=self.keepalive)
-        self.watcher_thread.start()
+    def _start_event_source_thread(self):
+        if self.event_source == self.EVENT_SOURCE_STREAM_EVENTS:
+            self.event_thread = GerritWatcher(self, self.connection_config)
+        elif self.event_source == self.EVENT_SOURCE_CHECKS_PLUGIN:
+            if self.session is not None:
+                self.event_thread = self._poller_class(self)
+            else:
+                self.log.info(
+                    "%s: Gerrit Poller is disabled because no "
+                    "HTTP authentication is defined",
+                    self.connection_name)
+            self._start_ref_watcher_thread()
+        elif self.event_source == self.EVENT_SOURCE_KAFKA:
+            self.event_thread = GerritKafkaEventListener(
+                self, self.connection_config)
+        else:
+            self.log.warning("No gerrit event source configured")
+        if self.event_thread:
+            self.event_thread.start()
 
     def _stop_poller_thread(self):
         if self.poller_thread:
             self.poller_thread.stop()
             self.poller_thread.join()
-
-    def _start_poller_thread(self):
-        if self.session is not None:
-            self.poller_thread = self._poller_class(self)
-            self.poller_thread.start()
-        else:
-            self.log.info(
-                "%s: Gerrit Poller is disabled because no "
-                "HTTP authentication is defined",
-                self.connection_name)
 
     def _stop_ref_watcher_thread(self):
         if self.ref_watcher_thread:
