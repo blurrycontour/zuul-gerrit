@@ -1241,7 +1241,7 @@ class GerritWebServer(object):
         self.httpd.server_close()
 
 
-class FakeGerritPoller(gerritconnection.GerritPoller):
+class FakeGerritPoller(gerritconnection.GerritChecksPoller):
     """A Fake Gerrit poller for use in tests.
 
     This subclasses
@@ -1544,7 +1544,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
             results = self._simpleQuery(query)
         return results
 
-    def _start_watcher_thread(self, *args, **kw):
+    def startSSHListener(self, *args, **kw):
         pass
 
     def _uploadPack(self, project):

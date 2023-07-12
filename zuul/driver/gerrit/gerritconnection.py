@@ -17,14 +17,12 @@ import copy
 import datetime
 import itertools
 import json
-import math
 import logging
 import paramiko
 import pprint
 import re
 import re2
 import requests
-import select
 import shlex
 import threading
 import time
@@ -43,6 +41,8 @@ from zuul.connection import (
 from zuul.driver.gerrit.auth import FormAuth
 from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
+from zuul.driver.gerrit.gerriteventssh import GerritSSHEventListener
+from zuul.driver.gerrit.gerriteventchecks import GerritChecksPoller
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib import tracing
 from zuul.lib.logutil import get_annotated_logger
@@ -53,7 +53,7 @@ from zuul.zk.change_cache import (
     ChangeKey,
     ConcurrentUpdateError,
 )
-from zuul.zk.event_queues import ConnectionEventQueue, EventReceiverElection
+from zuul.zk.event_queues import ConnectionEventQueue
 
 # HTTP timeout in seconds
 TIMEOUT = 30
@@ -391,203 +391,6 @@ class GerritEventConnector(threading.Thread):
                                            refresh=True, event=event)
 
 
-class GerritWatcher(threading.Thread):
-    log = logging.getLogger("gerrit.GerritWatcher")
-    poll_timeout = 500
-
-    def __init__(self, gerrit_connection, username, hostname, port=29418,
-                 keyfile=None, keepalive=60):
-        threading.Thread.__init__(self)
-        self.username = username
-        self.keyfile = keyfile
-        self.hostname = hostname
-        self.port = port
-        self.gerrit_connection = gerrit_connection
-        self._stop_event = threading.Event()
-        self.watcher_election = EventReceiverElection(
-            gerrit_connection.sched.zk_client,
-            gerrit_connection.connection_name,
-            "watcher")
-        self.keepalive = keepalive
-        self._stopped = False
-
-    def _read(self, fd):
-        while True:
-            l = fd.readline()
-            data = json.loads(l)
-            self.log.debug("Received data from Gerrit event stream: \n%s" %
-                           pprint.pformat(data))
-            self.gerrit_connection.addEvent(data)
-            # Continue until all the lines received are consumed
-            if fd._pos == fd._realpos:
-                break
-
-    def _listen(self, stdout, stderr):
-        poll = select.poll()
-        poll.register(stdout.channel)
-        while not self._stopped and self.watcher_election.is_still_valid():
-            ret = poll.poll(self.poll_timeout)
-            if not self.watcher_election.is_still_valid():
-                return
-            for (fd, event) in ret:
-                if fd == stdout.channel.fileno():
-                    if event == select.POLLIN:
-                        self._read(stdout)
-                    else:
-                        raise Exception("event on ssh connection")
-
-    def _run(self):
-        try:
-            client = paramiko.SSHClient()
-            client.load_system_host_keys()
-            client.set_missing_host_key_policy(paramiko.WarningPolicy())
-            # SSH banner, handshake, and auth timeouts default to 15
-            # seconds, so we only set the socket timeout here.
-            client.connect(self.hostname,
-                           username=self.username,
-                           port=self.port,
-                           key_filename=self.keyfile,
-                           timeout=SSH_TIMEOUT)
-            transport = client.get_transport()
-            transport.set_keepalive(self.keepalive)
-
-            stdin, stdout, stderr = client.exec_command("gerrit stream-events")
-
-            self._listen(stdout, stderr)
-
-            if not stdout.channel.exit_status_ready():
-                # The stream-event is still running but we are done polling
-                # on stdout most likely due to being asked to stop.
-                # Try to stop the stream-events command sending Ctrl-C
-                stdin.write("\x03")
-                time.sleep(.2)
-                if not stdout.channel.exit_status_ready():
-                    # we're still not ready to exit, lets force the channel
-                    # closed now.
-                    stdout.channel.close()
-            ret = stdout.channel.recv_exit_status()
-            self.log.debug("SSH exit status: %s" % ret)
-
-            if ret and ret not in [-1, 130]:
-                raise Exception("Gerrit error executing stream-events")
-        finally:
-            # If we don't close on exceptions to connect we can leak the
-            # connection and DoS Gerrit.
-            client.close()
-
-    def run(self):
-        while not self._stopped:
-            try:
-                self.watcher_election.run(self._run)
-            except Exception:
-                self.log.exception("Exception on ssh event stream with %s:",
-                                   self.gerrit_connection.connection_name)
-                self._stop_event.wait(5)
-
-    def stop(self):
-        self.log.debug("Stopping watcher")
-        self._stopped = True
-        self._stop_event.set()
-        self.watcher_election.cancel()
-
-
-class GerritPoller(threading.Thread):
-    # Poll gerrit without stream-events
-    log = logging.getLogger("gerrit.GerritPoller")
-    poll_interval = 30
-
-    def __init__(self, connection):
-        threading.Thread.__init__(self)
-        self.connection = connection
-        self.last_merged_poll = 0
-        self.poller_election = EventReceiverElection(
-            connection.sched.zk_client, connection.connection_name, "poller")
-        self._stopped = False
-        self._stop_event = threading.Event()
-
-    def _makePendingCheckEvent(self, change, uuid, check):
-        return {'type': 'pending-check',
-                'uuid': uuid,
-                'change': {
-                    'project': change['patch_set']['repository'],
-                    'number': change['patch_set']['change_number'],
-                },
-                'patchSet': {
-                    'number': change['patch_set']['patch_set_id'],
-                }}
-
-    def _makeChangeMergedEvent(self, change):
-        """Make a simulated change-merged event
-
-        Mostly for the benefit of scheduler reconfiguration.
-        """
-        rev = change['revisions'][change['current_revision']]
-        return {'type': 'change-merged',
-                'change': {
-                    'project': change['project'],
-                    'number': change['_number'],
-                },
-                'patchSet': {
-                    'number': rev['_number'],
-                }}
-
-    def _poll_checkers(self):
-        for checker in self.connection.watched_checkers:
-            changes = self.connection.get(
-                'plugins/checks/checks.pending/?'
-                'query=checker:%s+(state:NOT_STARTED)' % checker)
-            for change in changes:
-                for uuid, check in change['pending_checks'].items():
-                    event = self._makePendingCheckEvent(
-                        change, uuid, check)
-                    self.connection.addEvent(event)
-
-    def _poll_merged_changes(self):
-        now = datetime.datetime.utcnow()
-        age = self.last_merged_poll
-        if age:
-            # Allow an extra 4 seconds for request time
-            age = int(math.ceil((now - age).total_seconds())) + 4
-        changes = self.connection.simpleQueryHTTP(
-            "status:merged -age:%ss" % (age,))
-        self.last_merged_poll = now
-        for change in changes:
-            event = self._makeChangeMergedEvent(change)
-            self.connection.addEvent(event)
-
-    def _poll(self):
-        next_start = self._last_start + self.poll_interval
-        self._stop_event.wait(max(next_start - time.time(), 0))
-        if self._stopped or not self.poller_election.is_still_valid():
-            return
-        self._last_start = time.time()
-        self._poll_checkers()
-        if not self.connection.enable_stream_events:
-            self._poll_merged_changes()
-
-    def _run(self):
-        self._last_start = time.time()
-        while not self._stopped and self.poller_election.is_still_valid():
-            # during tests, a sub-class _poll method is used to send
-            # notifications
-            self._poll()
-
-    def run(self):
-        while not self._stopped:
-            try:
-                self.poller_election.run(self._run)
-            except Exception:
-                self.log.exception("Exception on Gerrit poll with %s:",
-                                   self.connection.connection_name)
-                time.sleep(1)
-
-    def stop(self):
-        self.log.debug("Stopping watcher")
-        self._stopped = True
-        self._stop_event.set()
-        self.poller_election.cancel()
-
-
 class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     driver_name = 'gerrit'
     log = logging.getLogger("zuul.GerritConnection")
@@ -600,10 +403,13 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         r"@{|\.\.|\.$|^@$|/$|^/|//+")  # everything else we can check with re2
     replication_timeout = 300
     replication_retry_interval = 5
-    _poller_class = GerritPoller
+    _poller_class = GerritChecksPoller
     _ref_watcher_class = GitWatcher
     ref_watcher_poll_interval = 60
     submit_retry_backoff = 10
+
+    EVENT_SOURCE_NONE = 'none'
+    EVENT_SOURCE_STREAM_EVENTS = 'stream-events'
 
     def __init__(self, driver, connection_name, connection_config):
         super(GerritConnection, self).__init__(driver, connection_name,
@@ -623,20 +429,25 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.port = int(self.connection_config.get('port', 29418))
         self.keyfile = self.connection_config.get('sshkey', None)
         self.keepalive = int(self.connection_config.get('keepalive', 60))
+        self.event_source = self.EVENT_SOURCE_NONE
         # TODO(corvus): Document this when the checks api is stable;
         # it's not useful without it.
-        self.enable_stream_events = self.connection_config.get(
+        enable_stream_events = self.connection_config.get(
             'stream_events', True)
-        if self.enable_stream_events not in [
+        if enable_stream_events in [
                 'true', 'True', '1', 1, 'TRUE', True]:
-            self.enable_stream_events = False
-        self.watcher_thread = None
+            self.event_source = self.EVENT_SOURCE_STREAM_EVENTS
+
+        # Thread for whatever event source we use
+        self.event_thread = None
+        # Next two are only used by checks plugin
         self.poller_thread = None
         self.ref_watcher_thread = None
         self.client = None
         self.watched_checkers = []
         self.project_checker_map = {}
         self.version = (0, 0, 0)
+        self.ssh_timeout = SSH_TIMEOUT
 
         self.baseurl = self.connection_config.get(
             'baseurl', 'https://%s' % self.server).rstrip('/')
@@ -1638,7 +1449,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                            username=self.user,
                            port=self.port,
                            key_filename=self.keyfile,
-                           timeout=SSH_TIMEOUT)
+                           timeout=self.ssh_timeout)
             transport = client.get_transport()
             transport.set_keepalive(self.keepalive)
             self.client = client
@@ -1795,44 +1606,44 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.log.debug('Creating Zookeeper change cache')
         self._change_cache = GerritChangeCache(zk_client, self)
 
-        if self.enable_stream_events:
-            self._start_watcher_thread()
-        else:
-            self._start_ref_watcher_thread()
-        self._start_poller_thread()
-        self._start_event_connector()
+        self.startEventSourceThread()
+        # TODO: This is only for the checks plugin and can be removed
+        # when checks support is removed.  Until then, we always start
+        # this thread, but if no checks are configured, it remains
+        # idle.
+        self.startPollerThread()
+        self.startEventConnector()
 
     def onStop(self):
         self.log.debug("Stopping Gerrit Connection/Watchers")
-        self._stop_watcher_thread()
-        self._stop_poller_thread()
-        self._stop_ref_watcher_thread()
-        self._stop_event_connector()
+        self.stopEventSourceThread()
+        self.stopPollerThread()
+        self.stopRefWatcherThread()
+        self.stopEventConnector()
 
     def getEventQueue(self):
         return getattr(self, "event_queue", None)
 
-    def _stop_watcher_thread(self):
-        if self.watcher_thread:
-            self.watcher_thread.stop()
-            self.watcher_thread.join()
+    def stopEventSourceThread(self):
+        if self.event_thread:
+            self.event_thread.stop()
+            self.event_thread.join()
 
-    def _start_watcher_thread(self):
-        self.watcher_thread = GerritWatcher(
-            self,
-            self.user,
-            self.ssh_server,
-            self.port,
-            keyfile=self.keyfile,
-            keepalive=self.keepalive)
-        self.watcher_thread.start()
+    def startEventSourceThread(self):
+        if self.event_source == self.EVENT_SOURCE_STREAM_EVENTS:
+            self.startSSHListener()
+        else:
+            self.log.warning("No gerrit event source configured")
+            self.startRefWatcherThread()
+        if self.event_thread:
+            self.event_thread.start()
 
-    def _stop_poller_thread(self):
-        if self.poller_thread:
-            self.poller_thread.stop()
-            self.poller_thread.join()
+    def startSSHListener(self):
+        self.log.info("Starting SSH event stream client")
+        self.event_thread = GerritSSHEventListener(
+            self, self.connection_config)
 
-    def _start_poller_thread(self):
+    def startPollerThread(self):
         if self.session is not None:
             self.poller_thread = self._poller_class(self)
             self.poller_thread.start()
@@ -1842,12 +1653,17 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 "HTTP authentication is defined",
                 self.connection_name)
 
-    def _stop_ref_watcher_thread(self):
+    def stopPollerThread(self):
+        if self.poller_thread:
+            self.poller_thread.stop()
+            self.poller_thread.join()
+
+    def stopRefWatcherThread(self):
         if self.ref_watcher_thread:
             self.ref_watcher_thread.stop()
             self.ref_watcher_thread.join()
 
-    def _start_ref_watcher_thread(self):
+    def startRefWatcherThread(self):
         self.ref_watcher_thread = self._ref_watcher_class(
             self,
             self.baseurl,
@@ -1856,11 +1672,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             election_name="ref-watcher")
         self.ref_watcher_thread.start()
 
-    def _stop_event_connector(self):
+    def startEventConnector(self):
+        self.gerrit_event_connector = GerritEventConnector(self)
+        self.gerrit_event_connector.start()
+
+    def stopEventConnector(self):
         if self.gerrit_event_connector:
             self.gerrit_event_connector.stop()
             self.gerrit_event_connector.join()
-
-    def _start_event_connector(self):
-        self.gerrit_event_connector = GerritEventConnector(self)
-        self.gerrit_event_connector.start()
