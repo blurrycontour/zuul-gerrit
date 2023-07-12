@@ -43,6 +43,7 @@ from zuul.driver.gerrit.gcloudauth import GCloudAuth
 from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.gerrit.gerriteventssh import GerritSSHEventListener
 from zuul.driver.gerrit.gerriteventchecks import GerritChecksPoller
+from zuul.driver.gerrit.gerriteventkafka import GerritKafkaEventListener
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib import tracing
 from zuul.lib.logutil import get_annotated_logger
@@ -410,6 +411,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
     EVENT_SOURCE_NONE = 'none'
     EVENT_SOURCE_STREAM_EVENTS = 'stream-events'
+    EVENT_SOURCE_KAFKA = 'kafka'
 
     def __init__(self, driver, connection_name, connection_config):
         super(GerritConnection, self).__init__(driver, connection_name,
@@ -437,6 +439,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if enable_stream_events in [
                 'true', 'True', '1', 1, 'TRUE', True]:
             self.event_source = self.EVENT_SOURCE_STREAM_EVENTS
+        if self.connection_config.get('kafka_bootstrap_servers', None):
+            self.event_source = self.EVENT_SOURCE_KAFKA
 
         # Thread for whatever event source we use
         self.event_thread = None
@@ -1632,6 +1636,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def startEventSourceThread(self):
         if self.event_source == self.EVENT_SOURCE_STREAM_EVENTS:
             self.startSSHListener()
+        elif self.event_source == self.EVENT_SOURCE_KAFKA:
+            self.startKafkaListener()
         else:
             self.log.warning("No gerrit event source configured")
             self.startRefWatcherThread()
@@ -1641,6 +1647,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def startSSHListener(self):
         self.log.info("Starting SSH event stream client")
         self.event_thread = GerritSSHEventListener(
+            self, self.connection_config)
+
+    def startKafkaListener(self):
+        self.log.info("Starting Kafka consumer")
+        self.event_thread = GerritKafkaEventListener(
             self, self.connection_config)
 
     def startPollerThread(self):

@@ -1,6 +1,6 @@
 upgrade:
   - |
-    The default for :attr:`<gerrit connection>.auth_type` has changed from
+    The default for `auth_type` has changed from
     ``digest`` to ``basic``.  Digest authentication has not been supported
     in Gerrit since version 2.15.
 

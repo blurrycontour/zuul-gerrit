@@ -10,15 +10,6 @@ sources, triggers, and reporters.
 
 Zuul will need access to a Gerrit user.
 
-Create an SSH keypair for Zuul to use if there isn't one already, and
-create a Gerrit user with that key::
-
-  cat ~/id_rsa.pub | ssh -p29418 review.example.com gerrit create-account --ssh-key - --full-name Zuul zuul
-
-.. note:: If you use an RSA key, ensure it is encoded in the PEM
-          format (use the ``-t rsa -m PEM`` arguments to
-          `ssh-keygen`).
-
 Give that user whatever permissions will be needed on the projects you
 want Zuul to report on.  For instance, you may want to grant
 ``Verified +/-1`` and ``Submit`` to the user.  Additional categories
@@ -31,6 +22,26 @@ dependencies.  However, it is still necessary to enable circular
 dependency support in any pipeline queues where such changes may
 appear.  See :attr:`queue.allow-circular-dependencies` for information
 on how to configure this.
+
+Zuul interacts with Gerrit in up to three ways:
+
+* Receiving trigger events
+* Fetching source code
+* Reporting results
+
+Trigger events arrive over an event stream, either SSH (via the
+``gerrit stream-events`` command) or a pub-sub protocol such as Kafka.
+
+Fetching source code may happen over SSH or HTTP.
+
+Reporting may happen over SSH or HTTP (strongly preferred).
+
+The appropriate connection methods must be configured to satisfy the
+interactions Zuul will have with Gerrit.  The recommended
+configuration is to configure both SSH and HTTP access.
+
+The section below describes commond configuration settings.  Specific
+settings for different connection methods follow.
 
 Connection Configuration
 ------------------------
@@ -51,12 +62,6 @@ The supported options in ``zuul.conf`` connections are:
 
       Fully qualified domain name of Gerrit server.
 
-   .. attr:: ssh_server
-
-      If SSH access to the Gerrit server should be via a different
-      hostname than web access, set this value to the hostname to use
-      for SSH connections.
-
    .. attr:: canonical_hostname
 
       The canonical hostname associated with the git repos on the
@@ -69,11 +74,6 @@ The supported options in ``zuul.conf`` connections are:
       hostname to clone or pull git repos so that when Zuul places
       them in the job's working directory, they appear under this
       directory name.
-
-   .. attr:: port
-      :default: 29418
-
-      Gerrit server port.
 
    .. attr:: baseurl
       :default: https://{server}
@@ -94,7 +94,36 @@ The supported options in ``zuul.conf`` connections are:
    .. attr:: user
       :default: zuul
 
-      User name to use when logging into Gerrit via ssh.
+      User name to use when accessing Gerrit.
+
+SSH Configuration
+~~~~~~~~~~~~~~~~~
+
+To prepare for SSH access, create an SSH keypair for Zuul to use if
+there isn't one already, and create a Gerrit user with that key::
+
+  cat ~/id_rsa.pub | ssh -p29418 review.example.com gerrit create-account --ssh-key - --full-name Zuul zuul
+
+.. note:: If you use an RSA key, ensure it is encoded in the PEM
+          format (use the ``-t rsa -m PEM`` arguments to
+          `ssh-keygen`).
+
+If using Gerrit 2.7 or later, make sure the user is a member of a group
+that is granted the ``Stream Events`` permission, otherwise it will not
+be able to invoke the ``gerrit stream-events`` command over SSH.
+
+.. attr:: <gerrit ssh connection>
+
+   .. attr:: ssh_server
+
+      If SSH access to the Gerrit server should be via a different
+      hostname than web access, set this value to the hostname to use
+      for SSH connections.
+
+   .. attr:: port
+      :default: 29418
+
+      Gerrit SSH server port.
 
    .. attr:: sshkey
       :default: ~zuul/.ssh/id_rsa
@@ -106,6 +135,20 @@ The supported options in ``zuul.conf`` connections are:
 
       SSH connection keepalive timeout; ``0`` disables.
 
+   .. attr:: git_over_ssh
+      :default: false
+
+      This forces git operation over SSH even if the ``password``
+      attribute is set.  This allow REST API access to the Gerrit
+      server even when git-over-http operation is disabled on the
+      server.
+
+
+HTTP Configuration
+~~~~~~~~~~~~~~~~~~
+
+.. attr:: <gerrit ssh connection>
+
    .. attr:: password
 
       The HTTP authentication password for the user.  This is
@@ -114,14 +157,6 @@ The supported options in ``zuul.conf`` connections are:
       comments to reported (the Gerrit SSH API only supports review
       messages).  Retrieve this password from the ``HTTP Password``
       section of the ``Settings`` page in Gerrit.
-
-   .. attr:: git_over_ssh
-      :default: false
-
-      This forces git operation over SSH even if the ``password``
-      attribute is set.  This allow REST API access to the Gerrit
-      server even when git-over-http operation is disabled on the
-      server.
 
    .. attr:: auth_type
       :default: basic
@@ -158,16 +193,63 @@ The supported options in ``zuul.conf`` connections are:
       When using a self-signed certificate, this may be set to
       ``false`` to disable SSL certificate verification.
 
+Kafka Event Support
+~~~~~~~~~~~~~~~~~~~
+
+Zuul includes support for Gerrit's `events-kafka` plugin.  This may be
+used as an alternative to SSH for receiving trigger events.
+
+Kafka does provide event delivery guarantees, so unlike SSH, if all
+Zuul schedulers are unable to communicate with Gerrit or Kafka, they
+will eventually receive queued events on reconnection.
+
+All Zuul schedulers will attempt to connect to Kafka brokers.  There
+are some implications for event delivery:
+
+* All events will be delivered to Zuul at least once.  In the case of
+  a disrupted connection, Zuul may receive duplicate events.
+
+* Events should generally arrive in order, however some events in
+  rapid succession may be received by Zuul out of order.
+
+.. attr:: <gerrit kafka connection>
+
+   .. attr:: kafka_bootstrap_servers
+      :required:
+
+      A comma-separated list of Kafka servers (optionally including
+      port separated with `:`).
+
+   .. attr:: kafka_topic
+      :default: gerrit
+
+      The Kafka topic to which Zuul should subscribe.
+
+   .. attr:: kafka_client_id
+      :default: zuul
+
+      The Kafka client ID.
+
+   .. attr:: kafka_group_id
+      :default: zuul
+
+      The Kafka group ID.
+
+   .. attr:: kafka_tls_cert
+
+      Path to TLS certificate to use when connecting to a Kafka broker.
+
+   .. attr:: kafka_tls_key
+
+      Path to TLS certificate key to use when connecting to a Kafka broker.
+
+   .. attr:: kafka_tls_ca
+
+      Path to TLS CA certificate to use when connecting to a Kafka broker.
+
+
 Trigger Configuration
 ---------------------
-
-Zuul works with standard versions of Gerrit by invoking the ``gerrit
-stream-events`` command over an SSH connection.  It also reports back
-to Gerrit using SSH.
-
-If using Gerrit 2.7 or later, make sure the user is a member of a group
-that is granted the ``Stream Events`` permission, otherwise it will not
-be able to invoke the ``gerrit stream-events`` command over SSH.
 
 .. attr:: pipeline.trigger.<gerrit source>
 
@@ -286,10 +368,6 @@ be able to invoke the ``gerrit stream-events`` command over SSH.
 
 Reporter Configuration
 ----------------------
-
-Zuul works with standard versions of Gerrit by invoking the ``gerrit``
-command over an SSH connection, unless the connection is configured
-with an HTTP password, in which case the HTTP API is used.
 
 .. attr:: pipeline.reporter.<gerrit reporter>
 
@@ -482,16 +560,14 @@ Here is an example of standard pipelines you may want to define:
 .. literalinclude:: /examples/pipelines/gerrit-reference-pipelines.yaml
    :language: yaml
 
-Checks Plugin Support (Experimental)
+
+Checks Plugin Support (Deprecated)
 ------------------------------------
 
-The Gerrit driver has experimental support for Gerrit's `checks`
-plugin.  Neither the `checks` plugin itself nor Zuul's support for it
-are stable yet, and this is not recommended for production use.  If
-you wish to help develop this support, you should expect to be able to
-upgrade both Zuul and Gerrit frequently as the two systems evolve.  No
-backward-compatible support will be provided and configurations may
-need to be updated frequently.
+The Gerrit driver has support for Gerrit's `checks` plugin.  Due to
+the deprecation of the checks plugin in Gerrit, support in Zuul is
+also deprecated and likely to be removed in a future version.  It is
+not recommended for use.
 
 Caveats include (but are not limited to):
 
