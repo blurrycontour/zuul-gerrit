@@ -16,6 +16,23 @@
       "message": "What is not expected again? Looking at another build there is an error (from https://zuul.opendev.org/t/zuul/build/c031662556d54cdabe6205b696950406/artifacts failing with \"Web Listing Disabled\")\n\nCould it be that the behavior depends on the cloud providing the logs?",
       "revId": "34d38232bc47a590a8da9cce1150e40eaefc3dbe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9878df9_55b2439f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-07-12T10:00:03Z",
+      "side": 1,
+      "message": "I\u0027m a bit confused by the last two comments. Is there any action I need to take? I\u0027m not sure I understand whether you found an issue with this PR or whether you were unable to verify it with the preview.\n\nWhat\u0027s a DNM change?",
+      "revId": "34d38232bc47a590a8da9cce1150e40eaefc3dbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
