@@ -33,6 +33,40 @@
       "message": "I\u0027m a bit confused by the last two comments. Is there any action I need to take? I\u0027m not sure I understand whether you found an issue with this PR or whether you were unable to verify it with the preview.\n\nWhat\u0027s a DNM change?",
       "revId": "34d38232bc47a590a8da9cce1150e40eaefc3dbe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c1db562_fd30aa84",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-12T20:00:22Z",
+      "side": 1,
+      "message": "Thanks for the detail Jim. The url does change (not just for white-label), but I think this is correct. It seems like the main issue is that the PUBLIC_URL shall be an absolute path, and as noted in the `playbooks/dashboard/run.yaml` comment, using `./` is just a hack to make the preview work at arbitrary location.\n\nThe previous getHomepageUrl tried to work around this manually, but I think the solution proposed by flaper87 is correct. Though to avoid unexpected side-effects, we might want to keep the implementation as-is, and adds an extra case to handle `#anchor` in the url. But I still think we could use the built-in URL data type along with the PUBLIC_URL setting as proposed in this review.",
+      "revId": "34d38232bc47a590a8da9cce1150e40eaefc3dbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34ff8355_26b4bcc6",
+        "filename": "web/src/api.js",
+        "patchSetId": 8
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-12T20:00:22Z",
+      "side": 1,
+      "message": "In the test build, PUBLIC_URL is `./` which result in the auth_calback to be `...rackcdn.com./`. So I guess we should ensure the path starts with a `/`. Though I\u0027m not sure that such PUBLIC_URL is correct anyway as explained in my other comment.",
+      "revId": "34d38232bc47a590a8da9cce1150e40eaefc3dbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
