@@ -44,6 +44,9 @@ from zuul.driver.gerrit.gerritmodel import GerritChange, GerritTriggerEvent
 from zuul.driver.gerrit.gerriteventssh import GerritSSHEventListener
 from zuul.driver.gerrit.gerriteventchecks import GerritChecksPoller
 from zuul.driver.gerrit.gerriteventkafka import GerritKafkaEventListener
+from zuul.driver.gerrit.gerriteventawskinesis import (
+    GerritAWSKinesisEventListener,
+)
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib import tracing
 from zuul.lib.logutil import get_annotated_logger
@@ -412,6 +415,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     EVENT_SOURCE_NONE = 'none'
     EVENT_SOURCE_STREAM_EVENTS = 'stream-events'
     EVENT_SOURCE_KAFKA = 'kafka'
+    EVENT_SOURCE_KINESIS = 'kinesis'
 
     def __init__(self, driver, connection_name, connection_config):
         super(GerritConnection, self).__init__(driver, connection_name,
@@ -441,6 +445,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             self.event_source = self.EVENT_SOURCE_STREAM_EVENTS
         if self.connection_config.get('kafka_bootstrap_servers', None):
             self.event_source = self.EVENT_SOURCE_KAFKA
+        elif self.connection_config.get('aws_kinesis_region', None):
+            self.event_source = self.EVENT_SOURCE_KINESIS
 
         # Thread for whatever event source we use
         self.event_thread = None
@@ -1638,6 +1644,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             self.startSSHListener()
         elif self.event_source == self.EVENT_SOURCE_KAFKA:
             self.startKafkaListener()
+        elif self.event_source == self.EVENT_SOURCE_KINESIS:
+            self.startAWSKinesisListener()
         else:
             self.log.warning("No gerrit event source configured")
             self.startRefWatcherThread()
@@ -1652,6 +1660,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def startKafkaListener(self):
         self.log.info("Starting Kafka consumer")
         self.event_thread = GerritKafkaEventListener(
+            self, self.connection_config)
+
+    def startAWSKinesisListener(self):
+        self.log.info("Starting AWS Kinesis consumer")
+        self.event_thread = GerritAWSKinesisEventListener(
             self, self.connection_config)
 
     def startPollerThread(self):
