@@ -953,3 +953,52 @@ class NodepoolEventElection(SessionAwareElection):
     def __init__(self, client):
         self.election_root = "/zuul/nodepool/election"
         super().__init__(client.client, self.election_root)
+
+
+class EventCheckpoint(ZooKeeperSimpleBase):
+    """Store checkpoint data for drivers that need it."""
+
+    log = logging.getLogger("zuul.zk.event_queues.EventCheckpoint")
+
+    def __init__(self, client, connection_name, receiver_name):
+        super().__init__(client)
+        self.root = "/".join(
+            (CONNECTION_ROOT, connection_name, f"checkpoint-{receiver_name}")
+        )
+        self.stat = None
+
+    def get(self):
+        """Return the most recently stored checkpoint value or None"""
+        try:
+            data, stat = self.kazoo_client.get(self.root)
+        except NoNodeError:
+            self.stat = None
+            return None
+
+        try:
+            data = json.loads(data.decode("utf-8"))
+        except Exception:
+            self.stat = None
+            return None
+
+        self.stat = stat
+        return data['checkpoint']
+
+    def set(self, checkpoint):
+        """Set the checkpoint value
+
+        If it has been updated since this object last read the value,
+        Kazoo will raise an exception.
+
+        """
+
+        data = {'checkpoint': checkpoint}
+        data = json.dumps(data, sort_keys=True).encode("utf-8")
+        version = -1
+        if self.stat:
+            version = self.stat.version
+        try:
+            self.stat = self.kazoo_client.set(self.root, data, version)
+        except NoNodeError:
+            path, self.stat = self.kazoo_client.create(self.root, data,
+                                                       include_data=True)
