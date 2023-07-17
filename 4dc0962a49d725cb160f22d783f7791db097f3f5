@@ -16,6 +16,24 @@
       "message": "Since the checks api is now deprecated, I guess this comment could be removed?",
       "revId": "4dc0962a49d725cb160f22d783f7791db097f3f5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "197f9cfd_c7afe38c",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-17T16:25:49Z",
+      "side": 1,
+      "message": "Or perhaps changed.  It\u0027s mostly there to remind us why it\u0027s not documented.  I think it\u0027s still doing a good job of that, even though circumstances have changed.  :)",
+      "parentUuid": "152bf663_a96c3af2",
+      "revId": "4dc0962a49d725cb160f22d783f7791db097f3f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
