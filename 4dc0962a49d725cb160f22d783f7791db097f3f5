@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "152bf663_a96c3af2",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-17T14:00:54Z",
+      "side": 1,
+      "message": "Since the checks api is now deprecated, I guess this comment could be removed?",
+      "revId": "4dc0962a49d725cb160f22d783f7791db097f3f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
