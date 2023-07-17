@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "3f2cd500_4ff48256",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-17T16:27:21Z",
+      "side": 1,
+      "message": "Whoops.",
+      "parentUuid": "a4dac2ca_f9231efa",
+      "revId": "30afec87a09134bd2dffa8c5d73f8c1718d2de11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "15ddac3c_bc31b1bd",
         "filename": "tests/fixtures/zuul-gerrit-awskinesis.conf",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2023-07-16T20:44:44Z",
       "side": 1,
       "message": "Why the singleton tuple here?",
+      "revId": "30afec87a09134bd2dffa8c5d73f8c1718d2de11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f01f2cc9_b11352b9",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-17T16:27:21Z",
+      "side": 1,
+      "message": "Super long line otherwise and pyflakes complains.",
+      "parentUuid": "9de2ea72_0e6cb586",
       "revId": "30afec87a09134bd2dffa8c5d73f8c1718d2de11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
