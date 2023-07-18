@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8518715_d681bee0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 30491
+      },
+      "writtenOn": "2023-07-18T11:46:41Z",
+      "side": 1,
+      "message": "recheck\n\nlooks like some irrelevant circular dependency testing failed",
+      "revId": "e9b6bfe6bbe356c53cb6ce28b822039238038e4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
