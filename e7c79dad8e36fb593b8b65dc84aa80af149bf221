@@ -16,6 +16,23 @@
       "message": "fixed linting errors",
       "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a99abad2_2fda83c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 30491
+      },
+      "writtenOn": "2023-07-18T13:53:52Z",
+      "side": 1,
+      "message": "recheck\n\nthe issue in py38 seems persistent despite being seemingly unrelated; new issue in py311 with test_live_reconfiguration_trigger_sequence\n\nrunning last recheck to verify the luck",
+      "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
