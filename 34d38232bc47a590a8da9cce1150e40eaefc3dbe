@@ -67,6 +67,24 @@
       "message": "In the test build, PUBLIC_URL is `./` which result in the auth_calback to be `...rackcdn.com./`. So I guess we should ensure the path starts with a `/`. Though I\u0027m not sure that such PUBLIC_URL is correct anyway as explained in my other comment.",
       "revId": "34d38232bc47a590a8da9cce1150e40eaefc3dbe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8aed68b8_e46d09d0",
+        "filename": "web/src/api.js",
+        "patchSetId": 8
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 30491
+      },
+      "writtenOn": "2023-07-18T12:07:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34ff8355_26b4bcc6",
+      "revId": "34d38232bc47a590a8da9cce1150e40eaefc3dbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
