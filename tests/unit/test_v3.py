@@ -7333,6 +7333,10 @@ class TestUnreachable(AnsibleZuulTestCase):
                                          '.ansible/nodes.unreachable')
         self.assertEqual('fake\n', unreachable_log)
 
+        conn = self.scheds.first.sched.sql.connection
+        for build in conn.getBuilds():
+            self.assertEqual(build.error_detail, 'Host unreachable')
+
 
 class TestJobPause(AnsibleZuulTestCase):
     tenant_config_file = 'config/job-pause/main.yaml'
