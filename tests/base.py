@@ -3330,11 +3330,12 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
         build = self.executor_server.job_builds[self.build_request.uuid]
         build.jobdir = self.jobdir
 
-        self.result = super(RecordingAnsibleJob, self).runPlaybooks(args)
+        self.result, error_detail = super(
+            RecordingAnsibleJob, self).runPlaybooks(args)
         if self.result is None:
             # Record result now because cleanup won't be performed
             self.recordResult(None)
-        return self.result
+        return self.result, error_detail
 
     def runCleanupPlaybooks(self, success):
         super(RecordingAnsibleJob, self).runCleanupPlaybooks(success)

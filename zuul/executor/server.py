@@ -1509,7 +1509,7 @@ class AnsibleJob(object):
 
         self.executor_server.updateBuildStatus(self.build_request, data)
 
-        result = self.runPlaybooks(args)
+        result, error_detail = self.runPlaybooks(args)
 
         self.runCleanupPlaybooks(result)
 
@@ -1524,6 +1524,7 @@ class AnsibleJob(object):
         self.mapLines(merger, args, data, item_commit, warnings)
         warnings.extend(get_warnings_from_result_data(data, logger=self.log))
         result_data = dict(result=result,
+                           error_detail=error_detail,
                            warnings=warnings,
                            data=data,
                            secret_data=secret_data)
@@ -1715,6 +1716,7 @@ class AnsibleJob(object):
 
     def runPlaybooks(self, args):
         result = None
+        error_detail = None
 
         with open(self.jobdir.job_output_file, 'a') as job_output:
             job_output.write("{now} | Running Ansible setup...\n".format(
@@ -1731,7 +1733,11 @@ class AnsibleJob(object):
         setup_status, setup_code = self.runAnsibleSetup(
             self.jobdir.setup_playbook, self.ansible_version)
         if setup_status != self.RESULT_NORMAL or setup_code != 0:
-            return result
+            if setup_status == self.RESULT_TIMED_OUT:
+                error_detail = "Ansible setup timeout"
+            elif setup_status == self.RESULT_UNREACHABLE:
+                error_detail = "Host unreachable"
+            return result, error_detail
 
         # Freeze the variables so that we have a copy of them without
         # any jinja templates for use in the trusted execution
@@ -1746,7 +1752,9 @@ class AnsibleJob(object):
         # later playbook may cause it to become reachable).  We just
         # won't have all of the variables set.
         if freeze_status != self.RESULT_NORMAL:
-            return result
+            if freeze_status == self.RESULT_TIMED_OUT:
+                error_detail = "Ansible variable freeze timeout"
+            return result, error_detail
 
         self.loadFrozenHostvars()
         pre_failed = False
@@ -1779,6 +1787,8 @@ class AnsibleJob(object):
                 pre_failed = True
                 should_retry = True
                 allow_post_result = False
+                if pre_status == self.RESULT_UNREACHABLE:
+                    error_detail = "Host unreachable"
                 break
 
         self.log.debug(
@@ -1796,7 +1806,7 @@ class AnsibleJob(object):
                     playbook, ansible_timeout, self.ansible_version,
                     phase='run', index=index)
                 if job_status == self.RESULT_ABORTED:
-                    return 'ABORTED'
+                    return 'ABORTED', None
                 elif job_status == self.RESULT_TIMED_OUT:
                     # Set the pre-failure flag so this doesn't get
                     # overridden by a post-failure.
@@ -1809,6 +1819,7 @@ class AnsibleJob(object):
                     # run post playbooks to get a chance to upload logs.
                     allow_post_result = False
                     should_retry = True
+                    error_detail = "Host unreachable"
                     break
                 elif job_status == self.RESULT_NORMAL:
                     success = (job_code == 0)
@@ -1820,7 +1831,7 @@ class AnsibleJob(object):
                 else:
                     # The result of the job is indeterminate.  Zuul will
                     # run it again.
-                    return None
+                    return None, None
 
         # check if we need to pause here
         result_data, secret_result_data = self.getResultData()
@@ -1828,7 +1839,7 @@ class AnsibleJob(object):
         if success and pause:
             self.pause()
         if self.aborted:
-            return 'ABORTED'
+            return 'ABORTED', None
 
         # Report a failure if pre-run failed and the user reported to
         # zuul that the job should not retry.
@@ -1849,7 +1860,7 @@ class AnsibleJob(object):
                 playbook, post_timeout, self.ansible_version, success,
                 phase='post', index=index, will_retry=will_retry)
             if post_status == self.RESULT_ABORTED:
-                return 'ABORTED'
+                return 'ABORTED', None
             if post_status == self.RESULT_UNREACHABLE:
                 # In case we encounter unreachable nodes we need to return None
                 # so the job can be retried. However in the case of post
@@ -1866,9 +1877,9 @@ class AnsibleJob(object):
                     self._logFinalPlaybookError()
 
         if should_retry:
-            return None
+            return None, error_detail
 
-        return result
+        return result, error_detail
 
     def runCleanupPlaybooks(self, result):
         if not self.jobdir.cleanup_playbooks:
