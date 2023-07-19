@@ -108,6 +108,7 @@ class TestGitlabDriver(ZuulTestCase):
         zuulvars = job.parameters['zuul']
         self.assertEqual(str(A.number), zuulvars['change'])
         self.assertEqual(str(A.sha), zuulvars['patchset'])
+        self.assertEqual(str(A.sha), zuulvars['commit_id'])
         self.assertEqual('master', zuulvars['branch'])
         self.assertEquals(f'{self.fake_gitlab._test_baseurl}/'
                           'org/project/merge_requests/1',
@@ -425,6 +426,7 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual('tag', zuulvars['pipeline'])
         self.assertEqual('project-tag-job', zuulvars['job'])
         self.assertEqual(tagsha, zuulvars['newrev'])
+        self.assertEqual(tagsha, zuulvars['commit_id'])
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_pull_request_with_dyn_reconf(self):

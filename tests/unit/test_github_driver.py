@@ -71,6 +71,7 @@ class TestGithubDriver(ZuulTestCase):
         zuulvars = job.parameters['zuul']
         self.assertEqual(str(A.number), zuulvars['change'])
         self.assertEqual(str(A.head_sha), zuulvars['patchset'])
+        self.assertEqual(str(A.head_sha), zuulvars['commit_id'])
         self.assertEqual('master', zuulvars['branch'])
         self.assertEquals('https://github.com/org/project/pull/1',
                           zuulvars['items'][0]['change_url'])
@@ -293,6 +294,7 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual('refs/tags/newtag', build_params['zuul']['ref'])
         self.assertFalse('oldrev' in build_params['zuul'])
         self.assertEqual(sha, build_params['zuul']['newrev'])
+        self.assertEqual(sha, build_params['zuul']['commit_id'])
         self.assertEqual(
             'https://github.com/org/project/releases/tag/newtag',
             build_params['zuul']['change_url'])

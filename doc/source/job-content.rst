@@ -786,6 +786,15 @@ are available:
       workspace for debugging and inspection purposes does not inclued
       the ``!unsafe`` tag.
 
+   .. var:: commit_id
+
+      The git sha of the change.  This may be the commit sha of the
+      current patchset revision or the tip of a pull request branch
+      depending on the source.  Because of Zuul's speculative merge
+      process, this commit may not even appear in the prepared git
+      repos, so it should not be relied upon for git operations in
+      jobs.  It is included here to support interfacing with systems
+      that identify a change by the commit.
 
 Branch Items
 ~~~~~~~~~~~~
@@ -816,6 +825,11 @@ additional variables are available:
       being pushed to the branch, the git sha of the new revision will
       be included here.  Otherwise, this variable will be undefined.
 
+   .. var:: commit_id
+
+      The git sha of the branch.  Identical to ``newrev`` or
+      ``oldrev`` if defined.
+
 Tag Items
 ~~~~~~~~~
 
@@ -842,6 +856,11 @@ available:
       the new git sha of the tag will be included here.  If the tag
       was deleted, this variable will be undefined.
 
+   .. var:: commit_id
+
+      The git sha of the branch.  Identical to ``newrev`` or
+      ``oldrev`` if defined.
+
 Ref Items
 ~~~~~~~~~
 
@@ -864,6 +883,11 @@ available:
       If the item was enqueued as the result of a ref being created,
       the new git sha of the ref will be included here.  If the ref
       was deleted, this variable will be undefined.
+
+   .. var:: commit_id
+
+      The git sha of the branch.  Identical to ``newrev`` or
+      ``oldrev`` if defined.
 
 Working Directory
 ~~~~~~~~~~~~~~~~~

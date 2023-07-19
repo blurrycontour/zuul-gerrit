@@ -40,6 +40,14 @@
         - event: ref-updated
           ref: ^(?!refs/).*$
 
+- pipeline:
+    name: tag
+    manager: independent
+    trigger:
+      gerrit:
+        - event: ref-updated
+          ref: ^refs/tags/.*$
+
 - job:
     name: base
     parent: null
@@ -57,6 +65,10 @@
     name: post-job
     run: playbooks/post.yaml
 
+- job:
+    name: tag-job
+    run: playbooks/tag.yaml
+
 - project:
     name: org/project
     check:
@@ -68,3 +80,6 @@
     post:
       jobs:
         - post-job
+    tag:
+      jobs:
+        - tag-job
