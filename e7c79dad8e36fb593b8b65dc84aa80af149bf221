@@ -120,6 +120,24 @@
       "parentUuid": "2ad9c895_5d15cb4a",
       "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07bee2d9_f227b7c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-19T16:54:22Z",
+      "side": 1,
+      "message": "If you do find that it\u0027s difficult to explain something without changing code, one way of doing that without taking over someone else\u0027s patch is to offer a followup patch where you can make the change and include the explanation in the commit message and/or comments.  We might merge them in quick succession, or squash them.",
+      "parentUuid": "632fca73_71596ea5",
+      "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
