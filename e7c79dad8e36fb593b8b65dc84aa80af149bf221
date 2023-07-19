@@ -67,6 +67,24 @@
       "message": "Thanks for the contributions to the patch, Radoslaw. Next time maybe just comment as it\u0027s quite confusing to have ones PR modified by others 😂",
       "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ad9c895_5d15cb4a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 30491
+      },
+      "writtenOn": "2023-07-19T07:29:33Z",
+      "side": 1,
+      "message": "Hi Flavio. You are welcome and I am sorry for confusing you. That said, please bear in mind this practice is quite common in this community (compared to elsewhere) as it favours collaboration on code. I, personally, try to comment more than amend (and I think this is the general trend). Each time, I analyse quickly whether it is easier to explain in comment or just do it. I amend also when I see (or guess) a fix to a failing job and I know the original committer is away - to help improve the development velocity (as failing jobs halt the process).",
+      "parentUuid": "9c25ca70_630abdec",
+      "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
