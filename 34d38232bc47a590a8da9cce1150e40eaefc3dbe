@@ -85,6 +85,24 @@
       "parentUuid": "34ff8355_26b4bcc6",
       "revId": "34d38232bc47a590a8da9cce1150e40eaefc3dbe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "646ac4b6_4724f606",
+        "filename": "web/src/api.js",
+        "patchSetId": 8
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-19T13:40:27Z",
+      "side": 1,
+      "message": "Interesting, so the pathname setter somehow auto converts values starting with `./` to `/`.",
+      "parentUuid": "8aed68b8_e46d09d0",
+      "revId": "34d38232bc47a590a8da9cce1150e40eaefc3dbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
