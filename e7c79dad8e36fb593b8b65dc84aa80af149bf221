@@ -138,6 +138,24 @@
       "parentUuid": "632fca73_71596ea5",
       "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b61ffa7_74e814ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 30491
+      },
+      "writtenOn": "2023-07-19T16:56:54Z",
+      "side": 1,
+      "message": "All right, I can change my behaviour in Zuul, sure (sadly, Gerrit cannot remind me, meh). As you have guessed, I meant the larger ecosystem. And yes, I seem to have skimmed over the explanation.\nReplying to this and your other comment... PS11 over PS9 is: simpler (this is what I managed to mention, heh) and relying on standard behaviour of the URL prototype so that we avoid the previous (PS9) workaround which was not covering more general cases such as \"./whatever\".",
+      "parentUuid": "632fca73_71596ea5",
+      "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
