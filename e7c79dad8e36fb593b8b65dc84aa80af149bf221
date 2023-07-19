@@ -102,6 +102,24 @@
       "message": "Even though the site-preview url changed, I think that is correct with regards to the PUBLIC_URL setting.",
       "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "632fca73_71596ea5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-19T16:35:45Z",
+      "side": 1,
+      "message": "I\u0027m not sure I agree with what you say Radosław.  You may be thinking about behavior in other Open Infrastructure projects, but the Zuul project has its own norms.  Development velocity is not the paramount concern (especially since we know how to use dependencies).  Sometimes a trivial fix can be okay, but in general, it\u0027s best to comment, or get permission to modify someone else\u0027s change.\n\nThe standard should be \"is the fix easy and obvious\" not \"can I do it faster than explaining\".  What was missing from the process in this change is, in fact, the explanation.",
+      "parentUuid": "2ad9c895_5d15cb4a",
+      "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
