@@ -1545,6 +1545,12 @@ class PipelineManager(metaclass=ABCMeta):
                 len(item.current_build_set.job_graph.jobs) > 0):
                 self.sql.reportBuildsetStart(build_set)
 
+        # If there are no jobs we don't need to schedule the global
+        # repo state as the item will be dequeued.
+        if (item.current_build_set.job_graph
+            and not item.current_build_set.job_graph.jobs):
+            return False
+
         # At this point we know all frozen jobs and their repos so update the
         # repo state with all missing repos.
         if build_set.repo_state_state == build_set.NEW:
