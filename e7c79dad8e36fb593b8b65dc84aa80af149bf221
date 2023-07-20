@@ -192,6 +192,23 @@
       "parentUuid": "6ef9e5a6_1e164336",
       "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fe35615_16f5b414",
+        "filename": "web/src/api.js",
+        "patchSetId": 11
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-07-20T12:38:50Z",
+      "side": 1,
+      "message": "The current version of this function (and previous patchsets too) made sure that the returned URL would always end with a `/`, which is something I believe Zuul expects.\n\nThis implementation (unless I am missing something) doesn\u0027t do that anymore, which may result in issues elsewhere.",
+      "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
