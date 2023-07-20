@@ -18,7 +18,12 @@ import textwrap
 
 from zuul.model import PromoteEvent
 
-from tests.base import ZuulTestCase, simple_layout, iterate_timeout
+from tests.base import (
+    iterate_timeout,
+    simple_layout,
+    ZuulGithubAppTestCase,
+    ZuulTestCase,
+)
 
 
 class TestGerritCircularDependencies(ZuulTestCase):
@@ -2925,6 +2930,65 @@ class TestGithubCircularDependencies(ZuulTestCase):
 
         self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.subject))
         self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name="project-job", result="ABORTED",
+                 changes=f"{A.number},{A.head_sha}"),
+            dict(name="project-job", result="SUCCESS",
+                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
+            dict(name="project-job", result="SUCCESS",
+                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
+        ], ordered=False)
+
+
+class TestGithubCircularDependencies(ZuulGithubAppTestCase):
+    config_file = "zuul-gerrit-github-app.conf"
+    tenant_config_file = "config/circular-dependencies/main.yaml"
+    scheduler_count = 1
+
+    def test_dependency_refresh_checks_api(self):
+        # Test that when two changes are put into a cycle, the
+        # dependencies are refreshed and items already in pipelines
+        # are updated and that the Github check-run is still
+        # in-progress.
+        self.executor_server.hold_jobs_in_build = True
+
+        # This simulates the typical workflow where a developer only
+        # knows the PR id of changes one at a time.
+        # The first change:
+        A = self.fake_github.openFakePullRequest("gh/project", "master", "A")
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        # Now that it has been uploaded, upload the second change and
+        # point it at the first.
+        # B -> A
+        B = self.fake_github.openFakePullRequest("gh/project", "master", "B")
+        B.body = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.url
+        )
+        self.fake_github.emitEvent(B.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        # Now that the second change is known, update the first change
+        # B <-> A
+        A.body = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.url
+        )
+
+        self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.subject))
+        self.waitUntilSettled()
+
+        # Validate that the Github check-run is still in progress
+        # and wasn't cancelled.
+        check_runs = self.fake_github.getCommitChecks("gh/project", A.head_sha)
+        self.assertEqual(len(check_runs), 1)
+        check_run = check_runs[0]
+        self.assertEqual(check_run["status"], "in_progress")
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()

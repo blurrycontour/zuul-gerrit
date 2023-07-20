@@ -72,8 +72,8 @@ class SupercedentPipelineManager(PipelineManager):
             self._pruneQueues()
         return ret
 
-    def dequeueItem(self, item):
-        super(SupercedentPipelineManager, self).dequeueItem(item)
+    def dequeueItem(self, item, quiet=False):
+        super(SupercedentPipelineManager, self).dequeueItem(item, quiet)
         # A supercedent pipeline manager dynamically removes empty
         # queues
         if not item.queue.queue:
