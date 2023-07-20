@@ -351,8 +351,8 @@ class PipelineManager(metaclass=ABCMeta):
             self.sql.reportBuildsetEnd(build_set, action,
                                        final, result)
 
-    def reportDequeue(self, item):
-        if not self.pipeline.state.disabled:
+    def reportDequeue(self, item, quiet=False):
+        if not (self.pipeline.state.disabled or quiet):
             self.log.info(
                 "Reporting dequeue, action %s item%s",
                 self.pipeline.dequeue_actions,
@@ -787,7 +787,7 @@ class PipelineManager(metaclass=ABCMeta):
             for cycle_item in enqueued_cycle_items:
                 self.dequeueItem(cycle_item)
 
-    def dequeueItem(self, item):
+    def dequeueItem(self, item, quiet=False):
         log = get_annotated_logger(self.log, item.event)
         log.debug("Removing change %s from queue", item.change)
         # In case a item is dequeued that doesn't have a result yet
@@ -796,7 +796,7 @@ class PipelineManager(metaclass=ABCMeta):
         # twice.
         if not item.current_build_set.result and item.live:
             item.setReportedResult('DEQUEUED')
-            self.reportDequeue(item)
+            self.reportDequeue(item, quiet)
         item.queue.dequeueItem(item)
 
         span_attrs = {
@@ -1619,7 +1619,7 @@ class PipelineManager(metaclass=ABCMeta):
                     self.reportItem(item)
                 except exceptions.MergeFailure:
                     pass
-            self.dequeueItem(item)
+            self.dequeueItem(item, quiet_dequeue)
             return (True, nnfi)
 
         actionable = change_queue.isActionable(item)
