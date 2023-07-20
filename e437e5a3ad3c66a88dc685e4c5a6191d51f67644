@@ -16,6 +16,24 @@
       "message": "Does this call need to pass warnings\u003dFalse as well? Otherwise the first element in the errors list may be a warning not an error and we\u0027ll report the wrong info?",
       "revId": "e437e5a3ad3c66a88dc685e4c5a6191d51f67644",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a01cbdd_d68d3f62",
+        "filename": "zuul/reporter/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-20T22:56:48Z",
+      "side": 1,
+      "message": "I think you are correct.",
+      "parentUuid": "ae6c5206_4f27c368",
+      "revId": "e437e5a3ad3c66a88dc685e4c5a6191d51f67644",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
