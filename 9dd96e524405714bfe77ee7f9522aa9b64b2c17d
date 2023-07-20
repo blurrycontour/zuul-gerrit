@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90704a1b_cb45d8d5",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-07-20T23:39:01Z",
+      "side": 1,
+      "message": "Nit, maybe drop the msg arg here to match the implementation we ended up with in the child below?",
+      "range": {
+        "startLine": 285,
+        "startChar": 51,
+        "endLine": 285,
+        "endChar": 54
+      },
+      "revId": "9dd96e524405714bfe77ee7f9522aa9b64b2c17d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1262174a_2a550f53",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-07-20T23:39:01Z",
+      "side": 1,
+      "message": "Should this class set zuul_error_name to something like `Configuration Deprecation Warning` rather than the default of `Unknown Configuration Warning`?",
+      "revId": "9dd96e524405714bfe77ee7f9522aa9b64b2c17d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb343938_33b23535",
+        "filename": "zuul/driver/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-07-20T23:39:01Z",
+      "side": 1,
+      "message": "I don\u0027t see where we pass loading_errors on getTrigger calls. Do we still needs this? Seems we\u0027ve done the passing of the accumulator in the getEventFilter methods instead.",
+      "range": {
+        "startLine": 132,
+        "startChar": 50,
+        "endLine": 132,
+        "endChar": 69
+      },
+      "revId": "9dd96e524405714bfe77ee7f9522aa9b64b2c17d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
