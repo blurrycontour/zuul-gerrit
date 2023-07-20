@@ -194,6 +194,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49edec6e_b4f8a4a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-07-20T12:44:11Z",
+      "side": 1,
+      "message": "Ah, nvm, I just read the documentation and it does resolve `\u0027\u0027` to `/`\n\nhttps://developer.mozilla.org/en-US/docs/Web/API/URL/pathname",
+      "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fe35615_16f5b414",
