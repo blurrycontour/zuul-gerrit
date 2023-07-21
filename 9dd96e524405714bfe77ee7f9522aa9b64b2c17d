@@ -24,6 +24,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31f3a7fe_dda319f7",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-21T00:22:27Z",
+      "side": 1,
+      "message": "Sounds reasonable.  :)",
+      "parentUuid": "90704a1b_cb45d8d5",
+      "revId": "9dd96e524405714bfe77ee7f9522aa9b64b2c17d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1262174a_2a550f53",
@@ -37,6 +55,24 @@
       "writtenOn": "2023-07-20T23:39:01Z",
       "side": 1,
       "message": "Should this class set zuul_error_name to something like `Configuration Deprecation Warning` rather than the default of `Unknown Configuration Warning`?",
+      "revId": "9dd96e524405714bfe77ee7f9522aa9b64b2c17d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53b5bcb7_39a48898",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-21T00:22:27Z",
+      "side": 1,
+      "message": "I think it\u0027s better to leave the \"unknown\" defaults to encourage us to actually use the subclasses.  Those are going to be what makes it possible to find specific errors/warnings in the future (ie, filter/sort them in the web ui).",
+      "parentUuid": "1262174a_2a550f53",
       "revId": "9dd96e524405714bfe77ee7f9522aa9b64b2c17d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -60,6 +96,24 @@
         "endLine": 132,
         "endChar": 69
       },
+      "revId": "9dd96e524405714bfe77ee7f9522aa9b64b2c17d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc4aeb1e_9ffc87af",
+        "filename": "zuul/driver/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-21T00:22:27Z",
+      "side": 1,
+      "message": "This one is future expansion.  That way when someone says:\n- pipeline:\n  trigger:\n    gerrit:\n      something-deprecated\n\nWe can return a warning.",
+      "parentUuid": "cb343938_33b23535",
       "revId": "9dd96e524405714bfe77ee7f9522aa9b64b2c17d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
