@@ -210,8 +210,9 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
                 msg, self._formatItemReportOtherBundleItems(item))
         elif item.didMergerFail():
             msg = item.pipeline.merge_conflict_message
-        elif item.getConfigErrors():
-            msg = str(item.getConfigErrors()[0].error)
+        elif item.getConfigErrors(errors=True, warnings=False):
+            msg = str(item.getConfigErrors(
+                errors=True, warnings=False)[0].error)
         else:
             msg = item.pipeline.failure_message
             if with_jobs:
