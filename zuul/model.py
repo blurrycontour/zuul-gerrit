@@ -6338,7 +6338,7 @@ class Ref(object):
         return False
 
     def getSafeAttributes(self):
-        return Attributes(project=self.project,
+        return Attributes(project=self.project.canonical_name,
                           ref=self.ref,
                           oldrev=self.oldrev,
                           newrev=self.newrev)
@@ -6556,7 +6556,7 @@ class Change(Branch):
                 change.getRelatedChanges(sched, related)
 
     def getSafeAttributes(self):
-        return Attributes(project=self.project,
+        return Attributes(project=self.project.canonical_name,
                           number=self.number,
                           patchset=self.patchset)
 
