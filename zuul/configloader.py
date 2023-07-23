@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import abc
 import collections
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -72,6 +73,10 @@ def check_config_path(path):
     elif path in ["zuul.yaml", "zuul.d/", ".zuul.yaml", ".zuul.d/"]:
         raise vs.Invalid("Default zuul configs are not "
                          "allowed in extra-config-paths")
+
+
+def indent(s):
+    return '\n'.join(['  ' + x for x in s.split('\n')])
 
 
 class ConfigurationSyntaxError(Exception):
@@ -271,8 +276,50 @@ class YAMLDuplicateKeyError(ConfigurationSyntaxError):
         super(YAMLDuplicateKeyError, self).__init__(m)
 
 
-def indent(s):
-    return '\n'.join(['  ' + x for x in s.split('\n')])
+class ConfigurationSyntaxWarning(object, metaclass=abc.ABCMeta):
+    zuul_error_name = 'Unknown Configuration Warning'
+    zuul_error_severity = model.SEVERITY_WARNING
+    zuul_error_message = 'Unknown Configuration Warning'
+
+    @abc.abstractmethod
+    def makeConfigurationError(self, stanza, conf):
+        "Return a ConfigurationError object"
+
+
+class DeprecationWarning(ConfigurationSyntaxWarning):
+    def makeConfigurationError(self, stanza, conf):
+        context = conf.get('_source_context')
+        start_mark = conf.get('_start_mark')
+        intro = textwrap.fill(textwrap.dedent("""\
+        Zuul encountered a deprecated syntax while parsing its
+        configuration in the repo {repo} on branch {branch}.  The
+        problem was:""".format(
+            repo=context.project_name,
+            branch=context.branch,
+        )))
+
+        m = textwrap.dedent("""\
+        {intro}
+
+        {error}
+
+        The problem appears in the following {stanza} stanza:
+
+        {content}
+
+        {start_mark}""")
+
+        m = m.format(intro=intro,
+                     error=indent(self.zuul_error_message),
+                     stanza=stanza,
+                     content=indent(start_mark.snippet.rstrip()),
+                     start_mark=str(start_mark))
+
+        return model.ConfigurationError(
+            context, start_mark, m,
+            short_error=self.zuul_error_message,
+            severity=self.zuul_error_severity,
+            name=self.zuul_error_name)
 
 
 @contextmanager
@@ -297,7 +344,7 @@ def project_configuration_exceptions(context, accumulator):
 
         m = m.format(intro=intro,
                      error=indent(str(e)))
-        accumulator.addError(
+        accumulator.makeError(
             context, None, m,
             short_error=str(e),
             severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
@@ -324,7 +371,7 @@ def early_configuration_exceptions(context, accumulator):
 
         m = m.format(intro=intro,
                      error=indent(str(e)))
-        accumulator.addError(
+        accumulator.makeError(
             context, None, m,
             short_error=str(e),
             severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
@@ -365,7 +412,7 @@ def configuration_exceptions(stanza, conf, accumulator):
                      content=indent(start_mark.snippet.rstrip()),
                      start_mark=str(start_mark))
 
-        accumulator.addError(
+        accumulator.makeError(
             context, start_mark, m,
             short_error=str(e),
             severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
@@ -405,11 +452,34 @@ def reference_exceptions(stanza, obj, accumulator):
                      content=indent(start_mark.snippet.rstrip()),
                      start_mark=str(start_mark))
 
-        accumulator.addError(
+        accumulator.makeError(
             context, start_mark, m,
             short_error=str(e),
             severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
             name=getattr(e, 'zuul_error_name', 'Unknown'))
+
+
+class LocalAccumulator:
+    """An error accumulator that wraps another accumulator (like
+    LoadingErrors) while holding local context information.
+    """
+    def __init__(self, accumulator, stanza, conf):
+        self.accumulator = accumulator
+        self.stanza = stanza
+        self.conf = conf
+
+    def addError(self, error):
+        """Add an error to the accumulator with the local context info.
+
+        This method currently expects that the input error object is a
+        subclass of ConfigurationSyntaxWarning and has an addError
+        method that returns a fully populated ConfigurationError.
+        Currently all "error" severity level errors are handled by
+        exception handlers, so this method doesn't expect them.
+        """
+
+        e = error.makeConfigurationError(self.stanza, self.conf)
+        self.accumulator.addError(e)
 
 
 class ZuulSafeLoader(yaml.EncryptedLoader):
@@ -1518,6 +1588,8 @@ class PipelineParser(object):
                 source.getRejectFilters(reject_config))
             seen_connections.add(source_name)
 
+        local_accumulator = LocalAccumulator(self.pcontext.loading_errors,
+                                             'pipeline', conf)
         for connection_name, trigger_config in conf.get('trigger').items():
             if self.pcontext.tenant.allowed_triggers is not None and \
                connection_name not in self.pcontext.tenant.allowed_triggers:
@@ -1527,7 +1599,8 @@ class PipelineParser(object):
             pipeline.triggers.append(trigger)
             manager.event_filters.extend(
                 trigger.getEventFilters(connection_name,
-                                        conf['trigger'][connection_name]))
+                                        conf['trigger'][connection_name],
+                                        local_accumulator))
             seen_connections.add(connection_name)
 
         pipeline.connections = list(seen_connections)

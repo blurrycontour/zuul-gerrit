@@ -23,7 +23,8 @@ class PagureTrigger(BaseTrigger):
     name = 'pagure'
     log = logging.getLogger("zuul.trigger.PagureTrigger")
 
-    def getEventFilters(self, connection_name, trigger_config):
+    def getEventFilters(self, connection_name, trigger_config,
+                        error_accumulator):
         efilters = []
         for trigger in to_list(trigger_config):
             f = PagureEventFilter(

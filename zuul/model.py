@@ -334,14 +334,17 @@ class LoadingErrors(object):
         self.errors = []
         self.error_keys = set()
 
-    def addError(self, context, mark, error, short_error=None,
-                 severity=None, name=None):
+    def makeError(self, context, mark, error, short_error=None,
+                  severity=None, name=None):
         e = ConfigurationError(context, mark, error,
                                short_error=short_error,
                                severity=severity,
                                name=name)
-        self.errors.append(e)
-        self.error_keys.add(e.key)
+        self.addError(e)
+
+    def addError(self, error):
+        self.errors.append(error)
+        self.error_keys.add(error.key)
 
     def __getitem__(self, index):
         return self.errors[index]

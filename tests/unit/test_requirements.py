@@ -197,6 +197,20 @@ class TestRequirementsVote1(ZuulTestCase):
         self.assertEqual(len(self.history), 1)
         self.assertEqual(self.history[0].name, job)
 
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEqual(len(tenant.layout.loading_errors), 1)
+        self.assertEqual(tenant.layout.loading_errors[0].name,
+                         'Gerrit require-approval Deprecation')
+        self.assertEqual(tenant.layout.loading_errors[0].severity,
+                         'warning')
+        self.assertIn('require-approval',
+                      tenant.layout.loading_errors[0].short_error)
+        self.assertIn('require-approval',
+                      tenant.layout.loading_errors[0].error)
+        self.assertIsNotNone(tenant.layout.loading_errors[0].key.context)
+        self.assertIsNotNone(tenant.layout.loading_errors[0].key.mark)
+        self.assertIsNotNone(tenant.layout.loading_errors[0].key.error_text)
+
 
 class TestRequirementsVote2(ZuulTestCase):
     """Requirements with a voting requirement"""
@@ -255,6 +269,20 @@ class TestRequirementsVote2(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 2)
         self.assertEqual(self.history[1].name, job)
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEqual(len(tenant.layout.loading_errors), 1)
+        self.assertEqual(tenant.layout.loading_errors[0].name,
+                         'Gerrit require-approval Deprecation')
+        self.assertEqual(tenant.layout.loading_errors[0].severity,
+                         'warning')
+        self.assertIn('require-approval',
+                      tenant.layout.loading_errors[0].short_error)
+        self.assertIn('require-approval',
+                      tenant.layout.loading_errors[0].error)
+        self.assertIsNotNone(tenant.layout.loading_errors[0].key.context)
+        self.assertIsNotNone(tenant.layout.loading_errors[0].key.mark)
+        self.assertIsNotNone(tenant.layout.loading_errors[0].key.error_text)
 
 
 class TestRequirementsState(ZuulTestCase):

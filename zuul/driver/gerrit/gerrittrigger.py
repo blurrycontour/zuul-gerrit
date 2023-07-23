@@ -18,13 +18,27 @@ from zuul.trigger import BaseTrigger
 from zuul.driver.gerrit.gerritmodel import GerritEventFilter
 from zuul.driver.gerrit import gerritsource
 from zuul.driver.util import scalar_or_list, to_list
+from zuul.configloader import DeprecationWarning
+
+
+class GerritRequireApprovalDeprecation(DeprecationWarning):
+    zuul_error_name = 'Gerrit require-approval Deprecation'
+    zuul_error_message = """The 'require-approval' trigger attribute
+is deprecated.  Use 'require' instead."""
+
+
+class GerritRejectApprovalDeprecation(DeprecationWarning):
+    zuul_error_name = 'Gerrit reject-approval Deprecation'
+    zuul_error_message = """The 'reject-approval' trigger attribute
+is deprecated.  Use 'reject' instead."""
 
 
 class GerritTrigger(BaseTrigger):
     name = 'gerrit'
     log = logging.getLogger("zuul.GerritTrigger")
 
-    def getEventFilters(self, connection_name, trigger_conf):
+    def getEventFilters(self, connection_name, trigger_conf,
+                        error_accumulator):
         efilters = []
         for trigger in to_list(trigger_conf):
             approvals = {}
@@ -42,6 +56,13 @@ class GerritTrigger(BaseTrigger):
             if not usernames:
                 usernames = to_list(trigger.get('username_filter'))
             ignore_deletes = trigger.get('ignore-deletes', True)
+            if 'require-approval' in trigger:
+                error_accumulator.addError(
+                    GerritRequireApprovalDeprecation())
+            if 'reject-approval' in trigger:
+                error_accumulator.addError(
+                    GerritRejectApprovalDeprecation())
+
             f = GerritEventFilter(
                 connection_name=connection_name,
                 trigger=self,
