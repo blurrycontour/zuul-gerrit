@@ -51,7 +51,11 @@ class ElasticsearchConnection(BaseConnection):
         "buildset_uuid": {"type": "keyword"},
         "job_name": {"type": "keyword"},
         "start_time": {"type": "date", "format": "epoch_second"},
+        "start_datetime": {"type": "date",
+                           "format": "strict_date_optional_time"},
         "end_time": {"type": "date", "format": "epoch_second"},
+        "end_datetime": {"type": "date",
+                         "format": "strict_date_optional_time"},
         "voting": {"type": "boolean"},
         "log_url": {"type": "keyword"},
         "nodeset": {"type": "keyword"}
