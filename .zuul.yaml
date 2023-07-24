@@ -64,6 +64,8 @@
       test_setup_environment:
         ZUUL_TEST_ROOT: /tmp/zuul-test
         YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
+      nox_force_python: "3.11"
+      python_version: "3.11"
 
 - job:
     name: zuul-nox-remote
@@ -114,8 +116,6 @@
     timeout: 7200  # 120 minutes
     vars:
       nox_keyword: tests
-      nox_force_python: "3.11"
-      python_version: "3.11"
 
 - job:
     name: zuul-nox-py311-multi-scheduler
