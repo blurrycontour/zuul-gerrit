@@ -1,0 +1,17 @@
+---
+features:
+  - |
+    Added new fields to the document: start_datetime and end_datetime which
+    represents conversion from timestamp to datetime in ISO format.
+    This might be a better solution for those, who are using
+    the Grafana Opensearch plugin to create dashboard with the build
+    statistics.
+issues:
+  - |
+    The start_time and end_time fields are a unix timestamp value, which is
+    always integer. By changing that field type to integer, the Grafana
+    OpenSearch plugin can properly parse the datetime.
+fixes:
+  - |
+    The start_time and end_time are parsed as a string in OpenSearch, not
+    as a number or date.
