@@ -20,6 +20,14 @@ import voluptuous as v
 from zuul.reporter import BaseReporter
 
 
+def format_elasticsearch_date(epoch):
+    """
+    >>> format_elasticsearch_date(0)
+    '1970-01-01T00:00:00Z'
+    """
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(epoch))
+
+
 class ElasticsearchReporter(BaseReporter):
     name = 'elasticsearch'
     log = logging.getLogger("zuul.ElasticsearchReporter")
@@ -86,8 +94,10 @@ class ElasticsearchReporter(BaseReporter):
                 "buildset_uuid": buildset_doc['uuid'],
                 "job_name": build.job.name,
                 "result": result,
-                "start_time": str(start_time),
-                "end_time": str(end_time),
+                "start_time": start_time,
+                "start_datetime": format_elasticsearch_date(start_time),
+                "end_time": end_time,
+                "end_datetime": format_elasticsearch_date(end_time),
                 "duration": end_time - start_time,
                 "voting": build.job.voting,
                 "log_url": url,
