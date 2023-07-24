@@ -19,7 +19,8 @@ class CallbackModule(CallbackBase):
     test callback
     """
     CALLBACK_VERSION = 2.0
-    CALLBACK_NEEDS_WHITELIST = True
+    CALLBACK_NEEDS_WHITELIST = True  # 6.0
+    CALLBACK_NEEDS_ENABLED = True  # 8.0
     # aggregate means we can be loaded and not be the stdout plugin
     CALLBACK_TYPE = 'aggregate'
     CALLBACK_NAME = 'test_callback'

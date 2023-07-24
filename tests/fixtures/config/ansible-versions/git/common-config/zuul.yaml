@@ -29,14 +29,15 @@
 
 # This job is used by a test case specifying a different ansible version in
 # fixtures/zuul-default-ansible-version.conf
-# TODO: make this something other than the Zuul default once there is
-# another version of Ansible available.
+# NOTE: make this something other than the Zuul default whenever there
+# is more than one version of Ansible available.  Update
+# zuul-default-ansible-version.conf to match
 - job:
     name: ansible-default-zuul-conf
     parent: ansible-version
     vars:
       test_ansible_version_major: 2
-      test_ansible_version_minor: 13
+      test_ansible_version_minor: 15
 
 - job:
     name: ansible-6
@@ -46,12 +47,21 @@
       test_ansible_version_major: 2
       test_ansible_version_minor: 13
 
+- job:
+    name: ansible-8
+    parent: ansible-version
+    ansible-version: 8
+    vars:
+      test_ansible_version_major: 2
+      test_ansible_version_minor: 15
+
 - project:
     name: common-config
     check:
       jobs:
         - ansible-default
         - ansible-6
+        - ansible-8
 
 - project:
     name: org/project
@@ -59,3 +69,4 @@
       jobs:
         - ansible-default-zuul-conf
         - ansible-6
+        - ansible-8

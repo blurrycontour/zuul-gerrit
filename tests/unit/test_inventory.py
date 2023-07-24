@@ -183,10 +183,12 @@ class TestInventoryShellType(TestInventoryBase):
         self.waitUntilSettled()
 
 
-class TestInventoryAutoPython(TestInventoryBase):
+class InventoryAutoPythonMixin:
+    ansible_version = 'X'
 
     def test_auto_python_ansible6_inventory(self):
-        inventory = self._get_build_inventory('ansible-version6-inventory')
+        inventory = self._get_build_inventory(
+            f'ansible-version{self.ansible_version}-inventory')
 
         all_nodes = ('ubuntu-xenial',)
         self.assertIn('all', inventory)
@@ -203,11 +205,22 @@ class TestInventoryAutoPython(TestInventoryBase):
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
-        self.assertEqual(z_vars['job'], 'ansible-version6-inventory')
+        self.assertEqual(z_vars['job'],
+                         f'ansible-version{self.ansible_version}-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
 
         self.executor_server.release()
         self.waitUntilSettled()
+
+
+class TestInventoryAutoPythonAnsible6(TestInventoryBase,
+                                      InventoryAutoPythonMixin):
+    ansible_version = '6'
+
+
+class TestInventoryAutoPythonAnsible8(TestInventoryBase,
+                                      InventoryAutoPythonMixin):
+    ansible_version = '8'
 
 
 class TestInventory(TestInventoryBase):
