@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "59cb2be412057369aa122c72ad657f1079d583fd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37b17582_75dd97ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-07-24T13:31:38Z",
+      "side": 1,
+      "message": "Agreed! \n\nI\u0027m assuming this is the right process for release notes: https://zuul-ci.org/docs/zuul/latest/developer/releasenotes.html",
+      "revId": "59cb2be412057369aa122c72ad657f1079d583fd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
