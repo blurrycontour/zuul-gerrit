@@ -675,6 +675,18 @@ of item.
        - shell: echo example
          when: zuul_success | bool
 
+.. var:: zuul_will_retry
+
+   Post run and cleanup playbook(s) will be passed this variable to indicate
+   if the job will be retried. This variable is meant to be used with the
+   `bool` filter.
+
+   .. code-block:: yaml
+
+     tasks:
+       - shell: echo example
+         when: zuul_will_retry | bool
+
 .. var:: nodepool
 
    Information about each host from Nodepool is supplied in the

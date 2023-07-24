@@ -7333,6 +7333,17 @@ class TestUnreachable(AnsibleZuulTestCase):
                                          '.ansible/nodes.unreachable')
         self.assertEqual('fake\n', unreachable_log)
 
+        retried_builds = set()
+        for build in self.history:
+            will_retry_flag = os.path.join(
+                self.jobdir_root, f'{build.uuid}.will-retry.flag')
+            self.assertTrue(os.path.exists(will_retry_flag))
+            with open(will_retry_flag) as f:
+                will_retry = f.readline()
+                expect_retry = build.name not in retried_builds
+                self.assertEqual(str(expect_retry), will_retry)
+            retried_builds.add(build.name)
+
 
 class TestJobPause(AnsibleZuulTestCase):
     tenant_config_file = 'config/job-pause/main.yaml'

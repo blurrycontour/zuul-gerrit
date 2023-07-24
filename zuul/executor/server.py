@@ -1000,6 +1000,7 @@ class AnsibleJob(object):
         self.time_starting_build = None
         self.paused = False
         self.aborted = False
+        self.unreachable = False
         self.aborted_reason = None
         self.cleanup_started = False
         self._resume_event = threading.Event()
@@ -1052,6 +1053,13 @@ class AnsibleJob(object):
         # The zuul.* vars
         self.debug_zuul_vars = {}
         self.waiting_for_semaphores = False
+        try:
+            max_attempts = self.arguments["zuul"]["max_attempts"]
+        except KeyError:
+            # TODO (swestphahl):
+            # Remove backward compatibility handling
+            max_attempts = self.arguments["max_attempts"]
+        self.retry_limit = self.arguments["zuul"]["attempts"] >= max_attempts
 
     def run(self):
         self.running = True
@@ -1503,9 +1511,8 @@ class AnsibleJob(object):
         self.executor_server.updateBuildStatus(self.build_request, data)
 
         result = self.runPlaybooks(args)
-        success = result == 'SUCCESS'
 
-        self.runCleanupPlaybooks(success)
+        self.runCleanupPlaybooks(result)
 
         # Stop the persistent SSH connections.
         setup_status, setup_code = self.runAnsibleCleanup(
@@ -1822,6 +1829,8 @@ class AnsibleJob(object):
         post_timeout = self.job.post_timeout
         post_unreachable = False
         for index, playbook in enumerate(self.jobdir.post_playbooks):
+            will_retry = (
+                (pre_failed or post_unreachable) and not self.retry_limit)
             # Post timeout operates a little differently to the main job
             # timeout. We give each post playbook the full post timeout to
             # do its job because post is where you'll often record job logs
@@ -1829,7 +1838,7 @@ class AnsibleJob(object):
             # the first place.
             post_status, post_code = self.runAnsiblePlaybook(
                 playbook, post_timeout, self.ansible_version, success,
-                phase='post', index=index)
+                phase='post', index=index, will_retry=will_retry)
             if post_status == self.RESULT_ABORTED:
                 return 'ABORTED'
             if post_status == self.RESULT_UNREACHABLE:
@@ -1857,7 +1866,7 @@ class AnsibleJob(object):
 
         return result
 
-    def runCleanupPlaybooks(self, success):
+    def runCleanupPlaybooks(self, result):
         if not self.jobdir.cleanup_playbooks:
             return
 
@@ -1871,11 +1880,14 @@ class AnsibleJob(object):
                 now=datetime.datetime.now()
             ))
 
+        success = result == 'SUCCESS'
+        will_retry = result is None and not self.retry_limit
         self.cleanup_started = True
         for index, playbook in enumerate(self.jobdir.cleanup_playbooks):
             self.runAnsiblePlaybook(
                 playbook, CLEANUP_TIMEOUT, self.ansible_version,
-                success=success, phase='cleanup', index=index)
+                success=success, phase='cleanup', index=index,
+                will_retry=will_retry)
 
     def _logFinalPlaybookError(self):
         # Failures in the final post playbook can include failures
@@ -2877,6 +2889,7 @@ class AnsibleJob(object):
         if ret == 3 or os.path.exists(self.jobdir.job_unreachable_file):
             # AnsibleHostUnreachable: We had a network issue connecting to
             # our zuul-worker.
+            self.unreachable = True
             return (self.RESULT_UNREACHABLE, None)
         elif ret == -9:
             # Received abort request.
@@ -2931,6 +2944,7 @@ class AnsibleJob(object):
                     # the ansible output. In this case we should treat the
                     # host as unreachable and retry the job.
                     if b'FATAL ERROR DURING FILE TRANSFER' in line:
+                        self.unreachable = True
                         return self.RESULT_UNREACHABLE, None
 
                     # Extract errors for special cases that are treated like
@@ -3090,7 +3104,8 @@ class AnsibleJob(object):
                 msg=msg))
 
     def runAnsiblePlaybook(self, playbook, timeout, ansible_version,
-                           success=None, phase=None, index=None):
+                           success=None, phase=None, index=None,
+                           will_retry=None):
         if playbook.trusted or playbook.secrets_content:
             self.writeInventory(playbook, self.frozen_hostvars)
         else:
@@ -3106,6 +3121,9 @@ class AnsibleJob(object):
 
         if success is not None:
             cmd.extend(['-e', 'zuul_success=%s' % str(bool(success))])
+
+        if will_retry is not None:
+            cmd.extend(['-e', f'zuul_will_retry={bool(will_retry)}'])
 
         if phase:
             cmd.extend(['-e', 'zuul_execution_phase=%s' % phase])
@@ -4081,23 +4099,14 @@ class ExecutorServer(BaseMergeServer):
             ansible_job.end_time = time.monotonic()
             duration = ansible_job.end_time - ansible_job.time_starting_build
 
-            params = ansible_job.arguments
             # If the result is None, check if the build has reached
             # its max attempts and if so set the result to
             # RETRY_LIMIT.  This must be done in order to correctly
             # process the autohold in the next step. Since we only
             # want to hold the node if the build has reached a final
             # result.
-            if result.get("result") is None:
-                attempts = params["zuul"]["attempts"]
-                try:
-                    max_attempts = params["zuul"]["max_attempts"]
-                except KeyError:
-                    # TODO (swestphahl):
-                    # Remove backward compatibility handling
-                    max_attempts = params["max_attempts"]
-                if attempts >= max_attempts:
-                    result["result"] = "RETRY_LIMIT"
+            if result.get("result") is None and ansible_job.retry_limit:
+                result["result"] = "RETRY_LIMIT"
 
             # Provide the hold information back to the scheduler via the build
             # result.
