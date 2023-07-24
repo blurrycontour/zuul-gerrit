@@ -16,6 +16,24 @@
       "message": "This removal seems unrelated, maybe at least mention in the commit message if you do not want to do a dedicated patch?",
       "revId": "c7adffc244b946dbb9628089f0a3482c424e7cbd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "795c4d25_f9d7a561",
+        "filename": ".zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-24T15:46:34Z",
+      "side": 0,
+      "message": "I should have mentionid it in the commit message, but I think with this comment and the mailing list thread, it\u0027s probably well-known enough at this point that the removal is due to Ansible\u0027s python version requirement.",
+      "parentUuid": "a3ae4a76_e3ae88f4",
+      "revId": "c7adffc244b946dbb9628089f0a3482c424e7cbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
