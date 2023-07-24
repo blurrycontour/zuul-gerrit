@@ -675,6 +675,18 @@ of item.
        - shell: echo example
          when: zuul_success | bool
 
+.. var:: zuul_unreachable
+
+   Post run playbook(s) will be passed this variable to indicate if the node
+   became unreachable during one of the earlier playbook executions. This
+   variable is meant to be used with the `bool` filter.
+
+   .. code-block:: yaml
+
+     tasks:
+       - shell: echo example
+         when: zuul_unreachable | bool
+
 .. var:: nodepool
 
    Information about each host from Nodepool is supplied in the

@@ -7333,6 +7333,14 @@ class TestUnreachable(AnsibleZuulTestCase):
                                          '.ansible/nodes.unreachable')
         self.assertEqual('fake\n', unreachable_log)
 
+        for build in self.history:
+            unreachable_flag = os.path.join(
+                self.jobdir_root, f'{build.uuid}.unreachable.flag')
+            self.assertTrue(os.path.exists(unreachable_flag))
+            with open(unreachable_flag) as f:
+                is_unreachable = f.readline()
+                self.assertEqual('True', is_unreachable)
+
 
 class TestJobPause(AnsibleZuulTestCase):
     tenant_config_file = 'config/job-pause/main.yaml'

@@ -1,0 +1,6 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - copy:
+        content: "{{ zuul_unreachable }}"
+        dest: "{{ zuul._test.test_root }}/builds/{{ zuul.build }}.unreachable.flag"

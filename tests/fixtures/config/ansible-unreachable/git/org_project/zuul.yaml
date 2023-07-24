@@ -22,11 +22,13 @@
     pre-run:
       - playbooks/unreachable.yaml
     run: playbooks/run.yaml
+    post-run: playbooks/post.yaml
 
 - job:
     name: run-unreachable
     attempts: 2
     run: playbooks/unreachable.yaml
+    post-run: playbooks/post.yaml
 
 - job:
     name: post-unreachable
@@ -34,6 +36,7 @@
     run: playbooks/run.yaml
     post-run:
       - playbooks/unreachable.yaml
+      - playbooks/post.yaml
 
 - project:
     check:

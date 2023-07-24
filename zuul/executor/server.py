@@ -1829,7 +1829,8 @@ class AnsibleJob(object):
             # the first place.
             post_status, post_code = self.runAnsiblePlaybook(
                 playbook, post_timeout, self.ansible_version, success,
-                phase='post', index=index)
+                phase='post', index=index,
+                unreachable=pre_failed or post_unreachable)
             if post_status == self.RESULT_ABORTED:
                 return 'ABORTED'
             if post_status == self.RESULT_UNREACHABLE:
@@ -3090,7 +3091,8 @@ class AnsibleJob(object):
                 msg=msg))
 
     def runAnsiblePlaybook(self, playbook, timeout, ansible_version,
-                           success=None, phase=None, index=None):
+                           success=None, phase=None, index=None,
+                           unreachable=None):
         if playbook.trusted or playbook.secrets_content:
             self.writeInventory(playbook, self.frozen_hostvars)
         else:
@@ -3106,6 +3108,9 @@ class AnsibleJob(object):
 
         if success is not None:
             cmd.extend(['-e', 'zuul_success=%s' % str(bool(success))])
+
+        if unreachable is not None:
+            cmd.extend(['-e', f'zuul_unreachable={bool(unreachable)}'])
 
         if phase:
             cmd.extend(['-e', 'zuul_execution_phase=%s' % phase])
