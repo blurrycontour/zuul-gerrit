@@ -15,6 +15,7 @@
 - job:
     name: base
     parent: null
+    post-run: playbooks/post.yaml
 
 - job:
     name: pre-unreachable
