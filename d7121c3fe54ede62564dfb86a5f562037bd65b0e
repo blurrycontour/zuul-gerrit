@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e1692bd_6d5f5542",
+        "filename": "releasenotes/notes/per-event-timestamp-ES-reporter-2912d84e62269c4e.yaml",
+        "patchSetId": 7
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 6159
+      },
+      "writtenOn": "2023-07-24T13:40:30Z",
+      "side": 1,
+      "message": "@corvus: Unsure how we want to classify this change. Let me know and I will adjust accordingly",
+      "revId": "d7121c3fe54ede62564dfb86a5f562037bd65b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
