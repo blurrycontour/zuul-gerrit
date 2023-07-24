@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import datetime
 import time
 import logging
 
@@ -86,8 +87,12 @@ class ElasticsearchReporter(BaseReporter):
                 "buildset_uuid": buildset_doc['uuid'],
                 "job_name": build.job.name,
                 "result": result,
-                "start_time": str(start_time),
-                "end_time": str(end_time),
+                "start_time": start_time,
+                "start_datetime": datetime.datetime.fromtimestamp(
+                    start_time).isoformat(),
+                "end_time": end_time,
+                "end_datetime": datetime.datetime.fromtimestamp(
+                    end_time).isoformat(),
                 "duration": end_time - start_time,
                 "voting": build.job.voting,
                 "log_url": url,
