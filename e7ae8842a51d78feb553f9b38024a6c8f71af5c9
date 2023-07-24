@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bec44d54_ea8762f8",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1833,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-24T21:15:15Z",
+      "side": 1,
+      "message": "Why does pre_failed imply unreachable?  It seems like there are plenty of reasons to have pre playbooks fail other than that.  We probably need to add unreachable handling to the pre-run playbook to set a \"pre_unreachable\" variable.\n\nAlso, this should include \"run_unreachable\" (which I acknowledge is covered by pre_failed currently, but we shouldn\u0027t rely on that).",
+      "revId": "e7ae8842a51d78feb553f9b38024a6c8f71af5c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "892f4386_d623373c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1879,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-24T21:15:15Z",
+      "side": 1,
+      "message": "Should we pass it here?",
+      "revId": "e7ae8842a51d78feb553f9b38024a6c8f71af5c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
