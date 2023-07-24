@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "60a8dfd451d15d51469bf46678647081cc6b2d0d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1920846_29846e16",
+        "filename": "zuul/lib/ansible-config.conf",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2023-07-24T07:42:08Z",
+      "side": 1,
+      "message": "iiuc this includes the collection openstack.cloud\u003d\u003d2.1.0 which in turn requires openstacksdk\u003e\u003d0.99",
+      "revId": "60a8dfd451d15d51469bf46678647081cc6b2d0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

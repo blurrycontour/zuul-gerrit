@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3ae4a76_e3ae88f4",
+        "filename": ".zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2023-07-24T07:42:08Z",
+      "side": 0,
+      "message": "This removal seems unrelated, maybe at least mention in the commit message if you do not want to do a dedicated patch?",
+      "revId": "c7adffc244b946dbb9628089f0a3482c424e7cbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
