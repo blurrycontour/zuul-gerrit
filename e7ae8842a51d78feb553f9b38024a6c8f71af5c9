@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "02e4a53b_ff1f29f6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1833,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-25T13:25:20Z",
+      "side": 1,
+      "message": "Ah, yes.  My guess was that you wanted to do something like try to avoid copying logs from a remote system but still do local processing or uploading.\n\nI\u0027d probably name it zuul_will_retry to make it clear that it isn\u0027t saying that the current run is a retry.\n\nAnd it probably makes sense to refactor things such that we use that variable internally to indicate that we will retry.  That might end up putting the comparison with max_attempts in zuul itself instead of in your playbooks.\n\nAn alternative might be to go more low-level, and have the variable be something like \"zuul_result_valid\" which is more or less what the executor is doing now.",
+      "parentUuid": "bec44d54_ea8762f8",
+      "revId": "e7ae8842a51d78feb553f9b38024a6c8f71af5c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "892f4386_d623373c",
         "filename": "zuul/executor/server.py",
         "patchSetId": 3
