@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0647a0b4_b96317e0",
+        "filename": "tests/unit/test_gerrit_awskinesis.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-25T18:03:32Z",
+      "side": 1,
+      "message": "I don\u0027t remember the details, but I believe this needs to be created before tests start, but then we make it active during the tests.\n\nBut this has made me realize we probably want a stop() in a teardown method.  That\u0027s what we do in nodepool for the aws driver.  Also, I just noticed that in nodepool we\u0027re missing a stop for one of the mocks (we have it for 2/3).  I\u0027ll fix that too.",
+      "parentUuid": "74122181_5cb50b72",
+      "revId": "da3c9136727cc0490f5ad98f50ff011679c514cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7bca448f_268cf38f",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-25T12:49:12Z",
       "side": 1,
       "message": "Do we need a way to cleanup checkpoints of unused connections and in case the number of shards was decreased?",
+      "revId": "da3c9136727cc0490f5ad98f50ff011679c514cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af975fec_df1f9340",
+        "filename": "zuul/driver/gerrit/gerriteventawskinesis.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-25T18:03:32Z",
+      "side": 1,
+      "message": "I don\u0027t think we have any cleanup of connections which are removed.  I\u0027m not too worried about leaving extra shard checkpoints around.  These are very small znodes, and the typical number is 4, and the identifiers are persistent.  So in practice I don\u0027t think it\u0027s going to be worth the complexity to clean up.",
+      "parentUuid": "7bca448f_268cf38f",
       "revId": "da3c9136727cc0490f5ad98f50ff011679c514cc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
