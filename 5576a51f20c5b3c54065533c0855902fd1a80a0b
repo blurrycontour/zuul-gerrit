@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e735eb59_6fc27675",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-25T14:36:58Z",
+      "side": 1,
+      "message": "If I remember correctly, elasticsearch needs a mapping update (https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-put-mapping.html#indices-put-mapping), otherwise its internal schema will be left unchanged to the previous type.",
+      "revId": "5576a51f20c5b3c54065533c0855902fd1a80a0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ac742ea_88b5a2f5",
+        "filename": "zuul/driver/elasticsearch/reporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-25T14:36:58Z",
+      "side": 1,
+      "message": "start_time and end_time are already of type int (see L72), so there is no need to cast them again.",
+      "range": {
+        "startLine": 89,
+        "startChar": 30,
+        "endLine": 89,
+        "endChar": 33
+      },
+      "revId": "5576a51f20c5b3c54065533c0855902fd1a80a0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
