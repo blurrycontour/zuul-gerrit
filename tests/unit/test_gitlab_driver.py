@@ -22,6 +22,7 @@ import time
 
 from zuul.lib import strings
 from zuul.zk.layout import LayoutState
+from zuul.zk.change_cache import ChangeKey
 
 from tests.base import random_sha1, simple_layout, skipIfMultiScheduler
 from tests.base import ZuulTestCase, ZuulWebFixture
@@ -897,6 +898,43 @@ class TestGitlabDriver(ZuulTestCase):
         # Only project-test1 should be run, because the file to-be-removed
         # is reverted and not in changed files to trigger project-test2
         self.assertEqual(1, len(self.history))
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_update_change(self):
+        # This tests the updateChange code path when no event is
+        # present (ie, during a pipeline refresh).
+        conn = self.scheds.first.sched.connections.connections['gitlab']
+        conn.gl_client.get_mr_wait_factor = 0
+        with self.fake_gitlab.enable_uncomplete_mr():
+            A = self.fake_gitlab.openFakeMergeRequest(
+                'org/project', 'master', 'A')
+            change_key = ChangeKey(conn.connection_name, "org/project",
+                                   "MergeRequest", str(A.number), A.sha)
+            # diff_refs has not populated yet, so this call tests the
+            # without-event and without-diff_refs path.
+            change = conn.getChange(change_key)
+            self.assertIsNone(change.commit_id, None)
+            self.fake_gitlab.emitEvent(
+                A.getMergeRequestOpenedEvent(), project='org/project')
+            self.waitUntilSettled()
+            # The above emits an event, so we should have populated
+            # the change cache using the event info.  This tests the
+            # with-event and without-diff_refs path.
+            change = conn.getChange(change_key)
+            self.assertEqual(change.commit_id, A.sha)
+
+        # We don't test with event and with diff_refs here, since
+        # having diff_refs supercedes using event data.  Also, any
+        # other test in the class which does not set the uncomplete
+        # flag will be testing that path.
+
+        # Delete the change from the cache
+        conn._change_cache.delete(change_key)
+        # This will force the driver to fetch the change info without
+        # an event.  This tests the without-event and with-diff_refs
+        # path
+        change = conn.getChange(change_key)
+        self.assertEqual(change.commit_id, A.sha)
 
 
 class TestGitlabUnprotectedBranches(ZuulTestCase):

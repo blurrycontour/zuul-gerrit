@@ -365,12 +365,12 @@ class GitlabAPIClient():
                 return mr
             if attempts > 4:
                 log.warning(
-                    "Fetched MR %s#%s with imcomplete data" % (
+                    "Fetched MR %s#%s with incomplete data" % (
                         project_name, number))
                 return mr
             wait_delay = attempts * self.get_mr_wait_factor
             log.info(
-                "Will retry to fetch %s#%s due to imcomplete data "
+                "Will retry to fetch %s#%s due to incomplete data "
                 "(in %s seconds) ..." % (project_name, number, wait_delay))
             time.sleep(wait_delay)
 
@@ -693,12 +693,22 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.ref = "refs/merge-requests/%s/head" % change.number
         change.branch = change.mr['target_branch']
         change.is_current_patchset = (change.mr['sha'] == change.patchset)
-        change.commit_id = event.patch_number
         diff_refs = change.mr.get("diff_refs", {})
+        # Diff_refs may not be available immediately after a MR is
+        # created.  We can get the commit_id/patch_number from the
+        # event if there is one (and there probably will be if we're
+        # getting a MR right after creation).  This method is also
+        # called with event=None later in the lifecycle of an MR, so
+        # we prefer to use diff_refs if it's available.
         if diff_refs:
             change.base_sha = diff_refs.get('base_sha')
+            change.commit_id = diff_refs.get('head_sha')
         else:
             change.base_sha = None
+            if event and hasattr(event, 'patch_number'):
+                change.commit_id = event.patch_number
+            else:
+                change.commit_id = None
         change.owner = change.mr['author'].get('username')
         # Files changes are not part of the Merge Request data
         # See api/merge_requests.html#get-single-mr-changes
