@@ -40,7 +40,9 @@ function getHomepageUrl() {
   } else {
     url.pathname = ''
   }
-
+  if (!url.pathname.endsWith('/')) {
+    url.pathname = url.pathname + '/'
+  }
   return url.origin + url.pathname
 }
 

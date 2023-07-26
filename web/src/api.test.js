@@ -36,8 +36,10 @@ it('should return the subdir homepage url', () => {
    Object.defineProperty(window, 'location', {
      value: new URL(homepage)
    } )
+   // The build process strips trailing slashes from PUBLIC_URL,
+   // so make sure we don't include any in our tests
    Object.defineProperty(process.env, 'PUBLIC_URL', {
-     value: '/zuul/'
+     value: '/zuul'
    } )
 
    // Test some of the known, possible, URLs to verify
