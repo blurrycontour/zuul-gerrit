@@ -52,6 +52,24 @@
       "parentUuid": "dcb191cc_a9bad883",
       "revId": "95814f7734832c97f7cf02ea069ad55427cf9d10",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbb43303_1b323cef",
+        "filename": "web/src/api.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 30491
+      },
+      "writtenOn": "2023-07-26T14:19:45Z",
+      "side": 1,
+      "message": "I\u0027m all in!",
+      "parentUuid": "2dcb43a2_37b6e16d",
+      "revId": "95814f7734832c97f7cf02ea069ad55427cf9d10",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
