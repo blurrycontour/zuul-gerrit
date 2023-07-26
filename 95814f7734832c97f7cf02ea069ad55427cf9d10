@@ -34,6 +34,24 @@
       "parentUuid": "dcb191cc_a9bad883",
       "revId": "95814f7734832c97f7cf02ea069ad55427cf9d10",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dcb43a2_37b6e16d",
+        "filename": "web/src/api.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-26T14:18:31Z",
+      "side": 1,
+      "message": "(So we could be confident about whether it was likely to change in the future.  The behavior seems wrong.)",
+      "parentUuid": "dcb191cc_a9bad883",
+      "revId": "95814f7734832c97f7cf02ea069ad55427cf9d10",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
