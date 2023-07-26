@@ -30,7 +30,8 @@ Zuul interacts with Gerrit in up to three ways:
 * Reporting results
 
 Trigger events arrive over an event stream, either SSH (via the
-``gerrit stream-events`` command) or a pub-sub protocol such as Kafka.
+``gerrit stream-events`` command) or other protocols such as Kafka, or
+AWS Kinesis.
 
 Fetching source code may happen over SSH or HTTP.
 
@@ -247,6 +248,53 @@ are some implications for event delivery:
 
       Path to TLS CA certificate to use when connecting to a Kafka broker.
 
+AWS Kinesis Event Support
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Zuul includes support for Gerrit's `events-aws-kinesis` plugin.  This
+may be used as an alternative to SSH for receiving trigger events.
+
+Kinesis does provide event delivery guarantees, so unlike SSH, if all
+Zuul schedulers are unable to communicate with Gerrit or AWS, they
+will eventually receive queued events on reconnection.
+
+All Zuul schedulers will attempt to connect to AWS Kinesis, but only
+one scheduler will process a given Kinesis shard at a time.  There are
+some implications for event delivery:
+
+* All events will be delivered to Zuul at least once.  In the case of
+  a disrupted connection, Zuul may receive duplicate events.
+
+* If a connection is disrupted longer than the Kinesis retention
+  period for a shard, Zuul may skip to the latest event ignoring all
+  previous events.
+
+* Because shard processing happens in parallel, events may not arrive
+  in order.
+
+* If a long period with no events elapses and a connection is
+  disrupted, it may take Zuul some time to catch up to the latest
+  events.
+
+.. attr:: <gerrit aws kinesis connection>
+
+   .. attr:: aws_kinesis_region
+      :required:
+
+      The AWS region name in which the Kinesis stream is located.
+
+   .. attr:: aws_kinesis_stream
+      :default: gerrit
+
+      The AWS Kinesis stream name.
+
+   .. attr:: aws_kinesis_access_key
+
+      The AWS access key to use.
+
+   .. attr:: aws_kinesis_secret_key
+
+      The AWS secret key to use.
 
 Trigger Configuration
 ---------------------
