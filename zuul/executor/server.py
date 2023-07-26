@@ -1750,6 +1750,10 @@ class AnsibleJob(object):
 
         self.loadFrozenHostvars()
         pre_failed = False
+        should_retry = False  # We encountered a retryable failure
+        will_retry = False  # The above and we have not hit retry_limit
+        # Whether we will allow POST_FAILURE to override the result:
+        allow_post_result = True
         success = False
         if self.executor_server.statsd:
             key = "zuul.executor.{hostname}.starting_builds"
@@ -1773,6 +1777,8 @@ class AnsibleJob(object):
                 # These should really never fail, so return None and have
                 # zuul try again
                 pre_failed = True
+                should_retry = True
+                allow_post_result = False
                 break
 
         self.log.debug(
@@ -1782,7 +1788,6 @@ class AnsibleJob(object):
              self.cpu_times['children_user'],
              self.cpu_times['children_system']))
 
-        run_unreachable = False
         if not pre_failed:
             for index, playbook in enumerate(self.jobdir.playbooks):
                 ansible_timeout = self.getAnsibleTimeout(
@@ -1795,15 +1800,15 @@ class AnsibleJob(object):
                 elif job_status == self.RESULT_TIMED_OUT:
                     # Set the pre-failure flag so this doesn't get
                     # overridden by a post-failure.
-                    pre_failed = True
+                    allow_post_result = False
                     result = 'TIMED_OUT'
                     break
                 elif job_status == self.RESULT_UNREACHABLE:
                     # In case we encounter unreachable nodes we need to return
                     # None so the job can be retried. However we still want to
                     # run post playbooks to get a chance to upload logs.
-                    pre_failed = True
-                    run_unreachable = True
+                    allow_post_result = False
+                    should_retry = True
                     break
                 elif job_status == self.RESULT_NORMAL:
                     success = (job_code == 0)
@@ -1825,11 +1830,16 @@ class AnsibleJob(object):
         if self.aborted:
             return 'ABORTED'
 
+        # Report a failure if pre-run failed and the user reported to
+        # zuul that the job should not retry.
+        if result_data.get('zuul', {}).get('retry') is False and pre_failed:
+            result = "FAILURE"
+            allow_post_result = False
+            should_retry = False
+
         post_timeout = self.job.post_timeout
-        post_unreachable = False
         for index, playbook in enumerate(self.jobdir.post_playbooks):
-            will_retry = (
-                (pre_failed or post_unreachable) and not self.retry_limit)
+            will_retry = should_retry and not self.retry_limit
             # Post timeout operates a little differently to the main job
             # timeout. We give each post playbook the full post timeout to
             # do its job because post is where you'll often record job logs
@@ -1845,23 +1855,18 @@ class AnsibleJob(object):
                 # so the job can be retried. However in the case of post
                 # playbooks we should still try to run all playbooks to get a
                 # chance to upload logs.
-                post_unreachable = True
+                should_retry = True
             if post_status != self.RESULT_NORMAL or post_code != 0:
                 success = False
                 # If we encountered a pre-failure, that takes
                 # precedence over the post result.
-                if not pre_failed:
+                if allow_post_result:
                     result = 'POST_FAILURE'
                 if (index + 1) == len(self.jobdir.post_playbooks):
                     self._logFinalPlaybookError()
 
-        if run_unreachable or post_unreachable:
+        if should_retry:
             return None
-
-        # Report a failure if pre-run failed and the user reported to
-        # zuul that the job should not retry.
-        if result_data.get('zuul', {}).get('retry') is False and not result:
-            result = "FAILURE"
 
         return result
 
