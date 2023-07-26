@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5a50387_2c3eac22",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-26T11:46:10Z",
+      "side": 1,
+      "message": "Another solution would be to format the date as string and use this mapping format: basic_date_time_no_millis. That way, the date would render cleanly in grafana.",
+      "revId": "5576a51f20c5b3c54065533c0855902fd1a80a0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ac742ea_88b5a2f5",
