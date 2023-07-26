@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcb191cc_a9bad883",
+        "filename": "web/src/api.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 30491
+      },
+      "writtenOn": "2023-07-26T14:14:48Z",
+      "side": 1,
+      "message": "You could have just added the trailing slash here unconditionally because you know it was stripped.",
+      "revId": "95814f7734832c97f7cf02ea069ad55427cf9d10",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
