@@ -226,6 +226,24 @@
       "message": "The current version of this function (and previous patchsets too) made sure that the returned URL would always end with a `/`, which is something I believe Zuul expects.\n\nThis implementation (unless I am missing something) doesn\u0027t do that anymore, which may result in issues elsewhere.",
       "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c6b3af8_4b5ad4a9",
+        "filename": "web/src/api.js",
+        "patchSetId": 11
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-07-26T13:44:24Z",
+      "side": 1,
+      "message": "It looks like we are hitting an edge-case here. We do set `PUBLIC_URL\u003d\"/zuul/\" when building the JS frontend, but it seems that the trailing slash is stripped somewhere along the way.\n\nAt least the generated JS code only contains `PUBLIC_URL:\"/zuul\"`. This leaves us with broken API URLs (`https://\u003cbase\u003e/zuulapi/api/...`).",
+      "parentUuid": "1fe35615_16f5b414",
+      "revId": "e7c79dad8e36fb593b8b65dc84aa80af149bf221",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ],
   "submitRequirementResults": [
