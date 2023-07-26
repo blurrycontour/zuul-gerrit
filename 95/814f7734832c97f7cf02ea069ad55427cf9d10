@@ -1,0 +1,10 @@
+Code-Review+2: Tristan Cacqueray <tdecacqu@redhat.com>
+Workflow+1: Tristan Cacqueray <tdecacqu@redhat.com>
+Code-Review+1: Radosław Piliszek <radoslaw.piliszek@gmail.com>
+Verified+2: Zuul
+Code-Review+2: Simon Westphahl <simon.westphahl@bmw.de>
+Submitted-by: Zuul
+Submitted-at: Wed, 26 Jul 2023 15:08:55 +0000
+Reviewed-on: https://review.opendev.org/c/zuul/zuul/+/889710
+Project: zuul/zuul
+Branch: refs/heads/master
