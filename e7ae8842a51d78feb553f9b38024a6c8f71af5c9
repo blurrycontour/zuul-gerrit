@@ -69,6 +69,24 @@
       "message": "Should we pass it here?",
       "revId": "e7ae8842a51d78feb553f9b38024a6c8f71af5c9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c000f821_8f9fd45a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1879,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-07-26T12:51:10Z",
+      "side": 1,
+      "message": "Yep, makes sense.",
+      "parentUuid": "892f4386_d623373c",
+      "revId": "e7ae8842a51d78feb553f9b38024a6c8f71af5c9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
