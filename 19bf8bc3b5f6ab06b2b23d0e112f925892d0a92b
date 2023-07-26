@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b3b042b_ae804e32",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1061,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-26T18:04:35Z",
+      "side": 1,
+      "message": "Note to reviewers: This hasn\u0027t appeared in a Zuul release yet, so it\u0027s still too new to remove.",
+      "revId": "19bf8bc3b5f6ab06b2b23d0e112f925892d0a92b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
