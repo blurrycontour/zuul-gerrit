@@ -779,6 +779,7 @@ class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.branch = change.pr.get('branch')
         change.is_current_patchset = (change.pr.get('commit_stop') ==
                                       change.patchset)
+        change.commit_id = change.pr.get('commit_stop')
         change.files = change.pr.get('files')
         change.title = change.pr.get('title')
         change.tags = change.pr.get('tags')

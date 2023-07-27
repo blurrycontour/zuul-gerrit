@@ -66,12 +66,20 @@ def construct_build_params(uuid, connections, job, item, pipeline,
     if hasattr(item.change, 'message'):
         zuul_params['message'] = strings.b64encode(item.change.message)
         zuul_params['change_message'] = item.change.message
+    commit_id = None
     if (hasattr(item.change, 'oldrev') and item.change.oldrev
         and item.change.oldrev != '0' * 40):
         zuul_params['oldrev'] = item.change.oldrev
+        commit_id = item.change.oldrev
     if (hasattr(item.change, 'newrev') and item.change.newrev
         and item.change.newrev != '0' * 40):
         zuul_params['newrev'] = item.change.newrev
+        commit_id = item.change.newrev
+    if hasattr(item.change, 'commit_id'):
+        commit_id = item.change.commit_id
+    if commit_id:
+        zuul_params['commit_id'] = commit_id
+
     zuul_params['projects'] = {}  # Set below
     zuul_params['items'] = dependent_changes
     zuul_params['child_jobs'] = list(item.current_build_set.job_graph.

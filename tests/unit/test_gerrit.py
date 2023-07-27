@@ -1,4 +1,5 @@
 # Copyright 2015 BMW Car IT GmbH
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -25,6 +26,7 @@ from tests.base import (
     skipIfMultiScheduler,
     ZuulTestCase,
 )
+from zuul.lib import strings
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.gerrit.gerritconnection import GerritConnection
 
@@ -1101,3 +1103,56 @@ class TestGerritUnicodeRefs(ZuulTestCase):
                           '52944ee370db5c87691e62e0f9079b6281319b4e',
                           'refs/heads/faster':
                           '52944ee370db5c87691e62e0f9079b6281319b4e'})
+
+
+class TestGerritDriver(ZuulTestCase):
+    # Most of the Zuul test suite tests the Gerrit driver, to some
+    # extent.  The other classes in this file test specific methods of
+    # Zuul interacting with Gerrit.  But the other drivers also test
+    # some basic driver functionality that, if tested for Gerrit at
+    # all, is spread out in random tests.  This class adds some
+    # (potentially duplicative) testing to validate parity with the
+    # other drivers.
+
+    @simple_layout('layouts/simple.yaml')
+    def test_change_event(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ])
+
+        job = self.getJobFromHistory('check-job')
+        zuulvars = job.parameters['zuul']
+        self.assertEqual(str(A.number), zuulvars['change'])
+        self.assertEqual('1', zuulvars['patchset'])
+        self.assertEqual(str(A.patchsets[-1]['revision']),
+                         zuulvars['commit_id'])
+        self.assertEqual('master', zuulvars['branch'])
+        self.assertEquals('https://review.example.com/1',
+                          zuulvars['items'][0]['change_url'])
+        self.assertEqual(zuulvars["message"], strings.b64encode('A'))
+        self.assertEqual(1, len(self.history))
+        self.assertEqual(1, len(A.messages))
+
+    @simple_layout('layouts/simple.yaml')
+    def test_tag_event(self):
+        event = self.fake_gerrit.addFakeTag('org/project', 'master', 'foo')
+        tagsha = event['refUpdate']['newRev']
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='tag-job', result='SUCCESS', ref='refs/tags/foo'),
+        ])
+
+        job = self.getJobFromHistory('tag-job')
+        zuulvars = job.parameters['zuul']
+        zuulvars = job.parameters['zuul']
+        self.assertEqual('refs/tags/foo', zuulvars['ref'])
+        self.assertEqual('tag', zuulvars['pipeline'])
+        self.assertEqual('tag-job', zuulvars['job'])
+        self.assertEqual(tagsha, zuulvars['newrev'])
+        self.assertEqual(tagsha, zuulvars['commit_id'])

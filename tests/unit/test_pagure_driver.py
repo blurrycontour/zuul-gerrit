@@ -50,6 +50,7 @@ class TestPagureDriver(ZuulTestCase):
         zuulvars = job.parameters['zuul']
         self.assertEqual(str(A.number), zuulvars['change'])
         self.assertEqual(str(A.commit_stop), zuulvars['patchset'])
+        self.assertEqual(str(A.commit_stop), zuulvars['commit_id'])
         self.assertEqual('master', zuulvars['branch'])
         self.assertEquals('https://pagure/org/project/pull-request/1',
                           zuulvars['items'][0]['change_url'])
@@ -207,6 +208,7 @@ class TestPagureDriver(ZuulTestCase):
             zuulvars['change_url'])
         self.assertEqual(expected_newrev, zuulvars['newrev'])
         self.assertEqual(expected_oldrev, zuulvars['oldrev'])
+        self.assertEqual(expected_newrev, zuulvars['commit_id'])
 
     @simple_layout('layouts/basic-pagure.yaml', driver='pagure')
     def test_ref_created(self):
