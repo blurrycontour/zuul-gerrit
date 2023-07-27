@@ -33,6 +33,29 @@
       "message": "Could you please add a release note about the new fields.",
       "revId": "579332b86191b00cac876184bf26fe617251a1f6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "594af238_2b640513",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-27T15:32:11Z",
+      "side": 1,
+      "message": "The isoformat() produces: `yyyy-MM-dd\u0027T\u0027HH:mm:ss.SSSSSS`, which is not compatible with the proposed format (which expect: `yyyy-MM-dd\u0027T\u0027HH:mm:ss.SSSZ`). I think we want \"strict_date_optional_time_nanos\" and we need to add the trailing `Z`",
+      "range": {
+        "startLine": 55,
+        "startChar": 38,
+        "endLine": 55,
+        "endChar": 63
+      },
+      "revId": "579332b86191b00cac876184bf26fe617251a1f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
