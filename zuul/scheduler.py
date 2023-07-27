@@ -1424,7 +1424,10 @@ class Scheduler(threading.Thread):
             loading_errors = []
             for tenant in abide.tenants.values():
                 for error in tenant.layout.loading_errors:
-                    loading_errors.append(repr(error))
+                    if isinstance(error, configloader.DeprecationWarning):
+                        self.log.warning(repr(error))
+                    else:
+                        loading_errors.append(repr(error))
             if loading_errors:
                 summary = '\n\n\n'.join(loading_errors)
                 raise configloader.ConfigurationSyntaxError(
