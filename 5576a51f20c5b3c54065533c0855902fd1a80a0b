@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c050f657_d48e399e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2023-07-27T09:19:26Z",
+      "side": 1,
+      "message": "I like that solution. It will require less work from the administrator site (like re-indexing already existing indexes).",
+      "parentUuid": "b5a50387_2c3eac22",
+      "revId": "5576a51f20c5b3c54065533c0855902fd1a80a0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ac742ea_88b5a2f5",
@@ -48,6 +66,30 @@
       "writtenOn": "2023-07-25T14:36:58Z",
       "side": 1,
       "message": "start_time and end_time are already of type int (see L72), so there is no need to cast them again.",
+      "range": {
+        "startLine": 89,
+        "startChar": 30,
+        "endLine": 89,
+        "endChar": 33
+      },
+      "revId": "5576a51f20c5b3c54065533c0855902fd1a80a0b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07098a1a_c70eb1b8",
+        "filename": "zuul/driver/elasticsearch/reporter.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2023-07-27T09:19:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ac742ea_88b5a2f5",
       "range": {
         "startLine": 89,
         "startChar": 30,
