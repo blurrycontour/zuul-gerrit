@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ea2cb61_a6192584",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1427,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-27T19:06:59Z",
+      "side": 1,
+      "message": "Actually we should check the severity attribute instead; the configloader class is separate from the model.ConfigurationError class which is actually what we get at this point.\n\nI\u0027ll update that and add a test.",
+      "revId": "548a1c89e70c9b6eac6e2bbffde8850461f3a73a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
