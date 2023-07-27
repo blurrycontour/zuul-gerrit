@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4890a897_ace94ea8",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1754,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-07-27T11:15:56Z",
+      "side": 1,
+      "message": "nit: This variable is only used when running the post playbooks, so maybe we don\u0027t need to initialize it here.",
+      "revId": "be385cad82eeaaeed17822c530b42fe1955be91b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
