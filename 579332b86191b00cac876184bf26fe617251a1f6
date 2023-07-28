@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "07ba8369_d2459908",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-07-28T12:20:14Z",
+      "side": 1,
+      "message": "The release note is still missing.",
+      "parentUuid": "a3daf340_1f7071d7",
+      "revId": "579332b86191b00cac876184bf26fe617251a1f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "594af238_2b640513",
         "filename": "zuul/driver/elasticsearch/connection.py",
         "patchSetId": 4
