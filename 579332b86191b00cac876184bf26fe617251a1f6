@@ -56,6 +56,30 @@
       },
       "revId": "579332b86191b00cac876184bf26fe617251a1f6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce97d5b4_a282ea5b",
+        "filename": "zuul/driver/elasticsearch/connection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2023-07-28T08:19:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "594af238_2b640513",
+      "range": {
+        "startLine": 55,
+        "startChar": 38,
+        "endLine": 55,
+        "endChar": 63
+      },
+      "revId": "579332b86191b00cac876184bf26fe617251a1f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
