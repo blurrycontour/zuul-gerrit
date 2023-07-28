@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96771ee6_2cc68f18",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-07-28T02:13:01Z",
+      "side": 1,
+      "message": "I\u0027m not approving this because I think this deserves monitoring once it lands and is deployed in OpenDev for any unexpected behavior and I\u0027m not sure I can provide that monitoring. Happy for someone else that can to approve the change.",
+      "revId": "1170b91bd893741dd0a664b28b56177998aa0675",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9355e093_1be9f3a9",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2851,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-07-28T02:13:01Z",
+      "side": 1,
+      "message": "Do we want to log result_line here?",
+      "range": {
+        "startLine": 2851,
+        "startChar": 69,
+        "endLine": 2851,
+        "endChar": 73
+      },
+      "revId": "1170b91bd893741dd0a664b28b56177998aa0675",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
