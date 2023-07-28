@@ -64,6 +64,8 @@
       test_setup_environment:
         ZUUL_TEST_ROOT: /tmp/zuul-test
         YARN_REGISTRY: "https://{{ zuul_site_mirror_fqdn }}:4443/registry.npmjs"
+      nox_force_python: "3.11"
+      python_version: "3.11"
 
 - job:
     name: zuul-nox-remote
@@ -82,6 +84,8 @@
         ZUUL_REMOTE_IPV4: "{{ nodepool.interface_ip }}"
         ZUUL_REMOTE_KEEP: "true"
         CI: "1"
+      nox_force_python: "3.11"
+      python_version: "3.11"
 
 - job:
     # Zuul cient uses this job so we can't just delete it yet.
@@ -114,8 +118,6 @@
     timeout: 7200  # 120 minutes
     vars:
       nox_keyword: tests
-      nox_force_python: "3.11"
-      python_version: "3.11"
 
 - job:
     name: zuul-nox-py311-multi-scheduler
@@ -336,7 +338,10 @@
     check:
       jobs:
         - zuul-build-image
-        - zuul-nox-docs
+        - zuul-nox-docs:
+            vars:
+              nox_force_python: "3.11"
+              python_version: "3.11"
         - nox-linters:
             vars:
               nox_install_bindep: false
@@ -367,7 +372,10 @@
     gate:
       jobs:
         - zuul-upload-image
-        - zuul-nox-docs
+        - zuul-nox-docs:
+            vars:
+              nox_force_python: "3.11"
+              python_version: "3.11"
         - nox-linters:
             vars:
               nox_install_bindep: false
