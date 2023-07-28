@@ -39,6 +39,24 @@
       },
       "revId": "1170b91bd893741dd0a664b28b56177998aa0675",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "adeb3e32_90018b32",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2851,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-28T14:53:21Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s necesseary since result_line is just line but with RESULT: stripped; so I think this is actually the more informative thing to line (if something goes wrong, we can run `result_line \u003d line[len(\u0027RESULT\u0027):].strip()` in a repl to see what it saw.",
+      "parentUuid": "9355e093_1be9f3a9",
+      "revId": "1170b91bd893741dd0a664b28b56177998aa0675",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
