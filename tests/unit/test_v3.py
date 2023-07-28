@@ -4811,6 +4811,16 @@ class TestBrokenConfig(ZuulTestCase):
             "Zuul encountered a syntax error",
             str(tenant.layout.loading_errors[0].error))
 
+    @simple_layout('layouts/broken-warnings.yaml')
+    def test_broken_config_on_startup_warnings(self):
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 1,
+            "An error should have been stored")
+        self.assertIn(
+            "Zuul encountered a deprecated syntax",
+            str(tenant.layout.loading_errors[0].error))
+
     def test_dynamic_ignore(self):
         # Verify dynamic config behaviors inside a tenant broken config
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-broken')
@@ -5170,6 +5180,23 @@ class TestValidateGood(ZuulTestCase):
     def test_validate_tenant_good(self):
         # If we reach this point we successfully validated the good tenant.
         # There is nothing more to test here.
+        pass
+
+
+class TestValidateWarnings(ZuulTestCase):
+    # Test we don't fail when we only have configuration warnings
+
+    validate_tenants = ['tenant-one']
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def setUp(self):
+        with self.assertLogs('zuul.ConfigLoader', level='DEBUG') as full_logs:
+            super().setUp()
+            self.assertRegexInList('Zuul encountered a deprecated syntax',
+                                   full_logs.output)
+
+    @simple_layout('layouts/broken-warnings.yaml')
+    def test_validate_warnings(self):
         pass
 
 
