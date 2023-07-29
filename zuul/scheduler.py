@@ -2843,9 +2843,14 @@ class Scheduler(threading.Thread):
         if not build:
             return
 
-        # Allow URL to be updated
+        args = {}
+        if 'url' in event.data:
+            args['url'] = event.data['url']
+        if (COMPONENT_REGISTRY.model_api >= 14):
+            if 'pre_fail' in event.data:
+                args['pre_fail'] = event.data['pre_fail']
         build.updateAttributes(pipeline.manager.current_context,
-                               url=event.data.get('url', build.url))
+                               **args)
 
     def _doBuildPausedEvent(self, event, pipeline):
         build = self._getBuildFromPipeline(event, pipeline)

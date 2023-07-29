@@ -3342,7 +3342,7 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
             self.recordResult(self.result)
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
-                   wrapped=True, cleanup=False):
+                   allow_pre_fail, wrapped=True, cleanup=False):
         build = self.executor_server.job_builds[self.build_request.uuid]
 
         if self.executor_server._run_ansible:
@@ -3353,7 +3353,8 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
                 build.run()
 
             result = super(RecordingAnsibleJob, self).runAnsible(
-                cmd, timeout, playbook, ansible_version, wrapped, cleanup)
+                cmd, timeout, playbook, ansible_version, allow_pre_fail,
+                wrapped, cleanup)
         else:
             if playbook not in [self.jobdir.setup_playbook,
                                 self.jobdir.freeze_playbook]:
