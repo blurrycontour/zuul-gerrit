@@ -7383,7 +7383,6 @@ class ProjectConfig(ConfigObject):
     def __init__(self, name):
         super(ProjectConfig, self).__init__()
         self.name = name
-        self.is_template = False
         self.templates = []
         # Pipeline name -> ProjectPipelineConfig
         self.pipelines = {}
@@ -7405,7 +7404,6 @@ class ProjectConfig(ConfigObject):
         r = self.__class__(self.name)
         r.source_context = self.source_context
         r.start_mark = self.start_mark
-        r.is_template = self.is_template
         r.templates = self.templates
         r.pipelines = self.pipelines
         r.branch_matcher = self.branch_matcher
@@ -7437,7 +7435,6 @@ class ProjectConfig(ConfigObject):
                                           MERGER_MAP.items()))[0][0]
         else:
             d['merge_mode'] = None
-        d['is_template'] = self.is_template
         d['templates'] = self.templates
         d['queue_name'] = self.queue_name
         return d
@@ -7454,7 +7451,6 @@ class ProjectMetadata:
     def __init__(self):
         self.merge_mode = None
         self._default_branch = None
-        self.is_template = False
         self.queue_name = None
 
     def isDefaultBranchSet(self):
@@ -7472,7 +7468,6 @@ class ProjectMetadata:
         return {
             'merge_mode': self.merge_mode,
             'default_branch': self.default_branch,
-            'is_template': self.is_template,
             'queue_name': self.queue_name,
         }
 
@@ -7481,7 +7476,6 @@ class ProjectMetadata:
         o = cls()
         o.merge_mode = data['merge_mode']
         o.default_branch = data['default_branch']
-        o.is_template = data['is_template']
         o.queue_name = data['queue_name']
         return o
 

@@ -28,7 +28,7 @@ export const receiveProject = (tenant, projectName, project) => {
   const templateIdx = []
   let idx
   project.configs.forEach((config, idx) => {
-    if (config.is_template === true) {
+    if (config.default_branch === null) {
       // This must be a template
       templateIdx.push(idx)
       config.pipelines.forEach(templatePipeline => {

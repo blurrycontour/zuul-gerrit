@@ -1232,7 +1232,6 @@ class ProjectTemplateParser(object):
         project_template = model.ProjectConfig(conf.get('name'))
         project_template.source_context = conf['_source_context']
         project_template.start_mark = conf['_start_mark']
-        project_template.is_template = True
         project_template.queue_name = conf.get('queue')
         for pipeline_name, conf_pipeline in conf.items():
             if pipeline_name in self.not_pipelines:
@@ -1354,10 +1353,6 @@ class ProjectParser(object):
                 fromYaml(conf, validate=False, freeze=False)
 
             project_config.name = project.canonical_name
-
-            # Explicitly override this to False since we're reusing the
-            # project-template loading method which sets it True.
-            project_config.is_template = False
 
             # Pragmas can cause templates to end up with implied
             # branch matchers for arbitrary branches, but project

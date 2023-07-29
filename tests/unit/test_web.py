@@ -847,7 +847,6 @@ class TestWeb(BaseTestWeb):
                 'connection_name': 'gerrit',
                 'name': 'org/project1',
                 'metadata': {
-                    'is_template': False,
                     'default_branch': 'master',
                     'merge_mode': 'merge-resolve',
                     'queue_name': 'integrated',
@@ -856,7 +855,6 @@ class TestWeb(BaseTestWeb):
                     'source_context': {'branch': 'master',
                                        'path': 'zuul.yaml',
                                        'project': 'common-config'},
-                    'is_template': False,
                     'templates': [],
                     'default_branch': None,
                     'queue_name': 'integrated',
