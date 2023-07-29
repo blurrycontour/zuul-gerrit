@@ -152,6 +152,9 @@ class ChangePanel extends React.Component {
               className = ' progress-bar-info'
               break
             default:
+              if (job.pre_fail) {
+                className = ' progress-bar-danger'
+              }
               break
           }
           return <div className={'progress-bar' + className}
@@ -183,11 +186,11 @@ class ChangePanel extends React.Component {
     )
   }
 
-  renderJobProgressBar (elapsedTime, remainingTime) {
+  renderJobProgressBar (job, elapsedTime, remainingTime) {
     let progressPercent = 100 * (elapsedTime / (elapsedTime +
                                                 remainingTime))
     // Show animation in preparation phase
-    let className
+    let className = ''
     let progressWidth = progressPercent
     let title = ''
     let remaining = remainingTime
@@ -195,9 +198,12 @@ class ChangePanel extends React.Component {
       progressWidth = 100
       progressPercent = 0
       className = 'progress-bar-striped progress-bar-animated'
+    } else if (job.pre_fail) {
+      className = 'progress-bar-danger'
+      title += 'Early failure detected.\n'
     }
     if (remaining !== null) {
-      title = 'Estimated time remaining: ' + moment.duration(remaining).format({
+      title += 'Estimated time remaining: ' + moment.duration(remaining).format({
         template: 'd [days] h [hours] m [minutes] s [seconds]',
         largest: 2,
         minValue: 30,
@@ -291,7 +297,7 @@ class ChangePanel extends React.Component {
     let resultBar
     let result = this.jobStrResult(job)
     if (result === 'in progress') {
-      resultBar = this.renderJobProgressBar(job_times.elapsed, job_times.remaining)
+      resultBar = this.renderJobProgressBar(job, job_times.elapsed, job_times.remaining)
     } else {
       resultBar = this.renderJobStatusLabel(job, result)
     }
