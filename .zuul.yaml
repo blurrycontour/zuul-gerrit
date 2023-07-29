@@ -9,11 +9,11 @@
       # need their python versions updated when these labels change to
       # a platform that uses a different python version.
       - name: controller
-        label: ubuntu-jammy
+        label: debian-bookworm
       - name: node1
-        label: ubuntu-jammy
+        label: debian-bookworm
       - name: node2
-        label: ubuntu-jammy
+        label: debian-bookworm
     groups:
       - name: node
         nodes:
