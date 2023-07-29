@@ -4,7 +4,7 @@
     - role: ensure-pip
 
     - role: bindep
-      bindep_profile: test
+      bindep_profile: compile
       bindep_dir: src/opendev.org/zuul/zuul
 
   post_tasks:
@@ -17,7 +17,7 @@
 
     - name: Install pip
       shell: |+
-        python3 -m pip install --upgrade pip setuptools wheel
+        python3 -m pip install --break-system-packages --upgrade pip setuptools wheel
       become: yes
 
     - name: Build wheel
