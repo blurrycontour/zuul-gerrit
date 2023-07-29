@@ -7481,7 +7481,7 @@ class ProjectMetadata:
         o = cls()
         o.merge_mode = data['merge_mode']
         o.default_branch = data['default_branch']
-        o.is_template = data['is_template']
+        o.is_template = data.get('is_template', False)
         o.queue_name = data['queue_name']
         return o
 
