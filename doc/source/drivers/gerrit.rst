@@ -30,8 +30,8 @@ Zuul interacts with Gerrit in up to three ways:
 * Reporting results
 
 Trigger events arrive over an event stream, either SSH (via the
-``gerrit stream-events`` command) or other protocols such as Kafka, or
-AWS Kinesis.
+``gerrit stream-events`` command) or other protocols such as Kafka,
+AWS Kinesis, or Google Cloud Pub/Sub.
 
 Fetching source code may happen over SSH or HTTP.
 
@@ -295,6 +295,53 @@ some implications for event delivery:
    .. attr:: aws_kinesis_secret_key
 
       The AWS secret key to use.
+
+Google Cloud Pub/Sub Event Support
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Zuul includes support for Gerrit's `events-gcloud-pubsub` plugin.  This may be
+used as an alternative to SSH for receiving trigger events.
+
+Google Cloud Pub/Sub does provide event delivery guarantees, so unlike
+SSH, if all Zuul schedulers are unable to communicate with Gerrit or
+Google Cloud Pub/Sub, they will eventually receive queued events on
+reconnection.
+
+All Zuul schedulers will attempt to connect to Google Cloud Pub/Sub.
+There are some implications for event delivery:
+
+* All events will be delivered to Zuul at least once.  In the case of
+  a disrupted connection, Zuul may receive duplicate events.
+
+* Because the `events-gcloud-pubsub` plugin does not at the time of
+  this writing specify that messages are ordered, events may be
+  received by Zuul out of order.  Since this behavior is under the
+  control of the Gerrit plugin, it may change in the future.
+
+.. attr:: <gerrit gcloud pubsub connection>
+
+   .. attr:: gcloud_pubsub_project
+      :required:
+
+      The Google Cloud project name to use.
+
+   .. attr:: gcloud_pubsub_topic
+      :default: gerrit
+
+      The Google Cloud Pub/Sub topic to which Zuul should subscribe.
+
+   .. attr:: gcloud_pubsub_subscription_id
+      :default: zuul
+
+      The ID of the Google Cloud Pub/Sub subscription to use.  If the
+      subscription does not exist, it will be created.
+
+   .. attr:: gcloud_pubsub_private_key
+
+      Path to a file containing the JSON encoded key of a service
+      account.  If not provided, then Google Cloud local auth is used.
+      If Zuul is not running in the same Google Cloud project as
+      Gerrit, this is required.
 
 Trigger Configuration
 ---------------------
