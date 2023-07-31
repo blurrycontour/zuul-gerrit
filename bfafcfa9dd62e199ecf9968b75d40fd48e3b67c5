@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b0c4abc_438c0d9f",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-31T23:41:39Z",
+      "side": 1,
+      "message": "Nit: we don\u0027t really need the word \"Also\" here, but it\u0027s fine.  :)",
+      "revId": "bfafcfa9dd62e199ecf9968b75d40fd48e3b67c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cddab84_01dbfcc5",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-07-31T23:41:39Z",
+      "side": 1,
+      "message": "Nit: it would be good to use :ref:`semaphore` here to link to it for clarity (but not required since we did so above).",
+      "revId": "bfafcfa9dd62e199ecf9968b75d40fd48e3b67c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
