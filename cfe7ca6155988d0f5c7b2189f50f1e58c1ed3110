@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6737e39c_7c07d665",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-07-31T04:50:34Z",
+      "side": 1,
+      "message": "The linter failures are a python problem independent of this change.",
+      "revId": "cfe7ca6155988d0f5c7b2189f50f1e58c1ed3110",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
