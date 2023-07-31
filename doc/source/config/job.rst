@@ -228,6 +228,10 @@ Here is an example of two job definitions:
       semaphores. If it's a string it references a semaphore using the
       default value for :attr:`job.semaphores.resources-first`.
 
+      Also the name of semaphore can be any string (without being
+      previosly defined via `semaphore` directive). In this case
+      implicit semaphore is created with capacity max=1.
+
       If multiple semaphores are requested, the job will not start
       until all have been acquired, and Zuul will wait until all are
       available before acquiring any.
