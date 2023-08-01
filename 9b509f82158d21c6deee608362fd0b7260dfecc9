@@ -16,6 +16,24 @@
       "message": "The format expects a trailing Z, if I remember correctly this is necessary to avoid a mapper_parsing_exception error. It appears that the datetime isoformat() function doesn\u0027t include the millisecond when the timestamp is an integer or when the fractional part is 0. So I think it would be cleaner to use a dedicated function like this:\n\n```\ndef format_elasticsearch_date(epoch):\n    \"\"\"\n    \u003e\u003e\u003e format_elasticsearch_date(0)\n    \u00271970-01-01T00:00:00Z\u0027\n    \"\"\"\n    return time.strftime(\"%Y-%m-%dT%H:%M:%SZ\", time.gmtime(epoch))\n```\n\nAnd use the `date_time_no_millis` format instead.",
       "revId": "9b509f82158d21c6deee608362fd0b7260dfecc9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b92a3d68_aa4dd9bc",
+        "filename": "zuul/driver/elasticsearch/reporter.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2023-08-01T11:53:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4da5ac19_08a94a52",
+      "revId": "9b509f82158d21c6deee608362fd0b7260dfecc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
