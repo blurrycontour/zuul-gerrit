@@ -52,6 +52,24 @@
       "parentUuid": "b92a3d68_aa4dd9bc",
       "revId": "9b509f82158d21c6deee608362fd0b7260dfecc9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abce5a10_df558acd",
+        "filename": "zuul/driver/elasticsearch/reporter.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2023-08-01T13:06:58Z",
+      "side": 1,
+      "message": "ah yes, sorry!",
+      "parentUuid": "908f2431_0e0ae300",
+      "revId": "9b509f82158d21c6deee608362fd0b7260dfecc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
