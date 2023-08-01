@@ -123,11 +123,11 @@ class PipelineManager(metaclass=ABCMeta):
         # the lock, that's fine, we're much less likely to encounter
         # read errors elsewhere in that case anyway.
         try:
-            with pipeline_lock(
+            with (pipeline_lock(
                     self.sched.zk_client, self.pipeline.tenant.name,
-                    self.pipeline.name, blocking=False) as lock,\
-                    self.sched.createZKContext(lock, self.log) as ctx,\
-                    self.currentContext(ctx):
+                    self.pipeline.name, blocking=False) as lock,
+                    self.sched.createZKContext(lock, self.log) as ctx,
+                    self.currentContext(ctx)):
                 if not self.pipeline.state.exists(ctx):
                     # We only do this if the pipeline doesn't exist in
                     # ZK because in that case, this process should be

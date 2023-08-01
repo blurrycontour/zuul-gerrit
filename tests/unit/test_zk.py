@@ -1689,9 +1689,9 @@ class TestZKObject(ZooKeeperBaseTestCase):
             return zstat.last_modified_transaction_id
 
         # Update an object
-        with tenant_write_lock(self.zk_client, tenant_name) as lock,\
-             ZKContext(self.zk_client, lock, stop_event, self.log)\
-             as context:
+        with (tenant_write_lock(self.zk_client, tenant_name) as lock,
+              ZKContext(
+                  self.zk_client, lock, stop_event, self.log) as context):
             ltime1 = get_ltime(pipeline1)
             pipeline1.updateAttributes(context, foo='qux')
             self.assertEqual(pipeline1.foo, 'qux')
@@ -1704,9 +1704,9 @@ class TestZKObject(ZooKeeperBaseTestCase):
             self.assertEqual(ltime2, ltime3)
 
         # Update an object using an active context
-        with tenant_write_lock(self.zk_client, tenant_name) as lock,\
-             ZKContext(self.zk_client, lock, stop_event, self.log)\
-             as context:
+        with (tenant_write_lock(self.zk_client, tenant_name) as lock,
+              ZKContext(
+                  self.zk_client, lock, stop_event, self.log) as context):
             ltime1 = get_ltime(pipeline1)
             with pipeline1.activeContext(context):
                 pipeline1.foo = 'baz'
@@ -1726,16 +1726,15 @@ class TestZKObject(ZooKeeperBaseTestCase):
         self.assertEqual(pipeline1.foo, 'baz')
 
         # Refresh an existing object
-        with tenant_write_lock(self.zk_client, tenant_name) as lock,\
-             ZKContext(self.zk_client, lock, stop_event, self.log)\
-             as context:
+        with (tenant_write_lock(self.zk_client, tenant_name) as lock,
+              ZKContext(
+                  self.zk_client, lock, stop_event, self.log) as context):
             pipeline2.refresh(context)
             self.assertEqual(pipeline2.foo, 'baz')
 
         # Delete an object
-        with tenant_write_lock(self.zk_client, tenant_name) as lock,\
-             ZKContext(self.zk_client, lock, stop_event, self.log)\
-             as context:
+        with (tenant_write_lock(self.zk_client, tenant_name) as lock,
+             ZKContext(self.zk_client, lock, stop_event, self.log) as context):
             self.assertIsNotNone(self.zk_client.client.exists(
                 '/zuul/pipeline/fake_tenant'))
             pipeline2.delete(context)
@@ -1777,9 +1776,9 @@ class TestZKObject(ZooKeeperBaseTestCase):
                 return self._real_client.set(*args, **kw)
 
         # Fail an update
-        with tenant_write_lock(self.zk_client, tenant_name) as lock,\
-             ZKContext(self.zk_client, lock, stop_event, self.log)\
-             as context:
+        with (tenant_write_lock(self.zk_client, tenant_name) as lock,
+              ZKContext(
+                  self.zk_client, lock, stop_event, self.log) as context):
             pipeline1 = zkobject_class.new(context,
                                            name=tenant_name,
                                            foo='one')
@@ -1984,9 +1983,9 @@ class TestConfigurationErrorList(ZooKeeperBaseTestCase):
         start_mark = model.ZuulMark(m1, m2, 'hello')
 
         # Create a new object
-        with tenant_write_lock(self.zk_client, 'test') as lock,\
-             ZKContext(self.zk_client, lock, stop_event, self.log)\
-             as context:
+        with (tenant_write_lock(self.zk_client, 'test') as lock,
+              ZKContext(
+                  self.zk_client, lock, stop_event, self.log) as context):
             pipeline = DummyZKObject.new(context, name="test", foo="bar")
             e1 = model.ConfigurationError(
                 source_context, start_mark, "Test error1")
@@ -2015,9 +2014,9 @@ class TestBlobStore(ZooKeeperBaseTestCase):
         tenant_name = 'fake_tenant'
 
         start_ltime = self.zk_client.getCurrentLtime()
-        with tenant_write_lock(self.zk_client, tenant_name) as lock,\
-             ZKContext(self.zk_client, lock, stop_event, self.log)\
-             as context:
+        with (tenant_write_lock(self.zk_client, tenant_name) as lock,
+              ZKContext(
+                  self.zk_client, lock, stop_event, self.log) as context):
             bs = BlobStore(context)
             with testtools.ExpectedException(KeyError):
                 bs.get('nope')

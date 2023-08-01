@@ -32,7 +32,7 @@ import random
 import re
 from collections import defaultdict, namedtuple
 from queue import Queue
-from typing import Callable, Optional, Any, Iterable, Generator, List, Dict
+from typing import Callable, Optional, Generator, List, Dict
 from unittest.case import skipIf
 import zlib
 
@@ -4585,13 +4585,13 @@ class SchedulerTestManager:
         self.instances.append(app)
         return app
 
-    def __len__(self) -> int:
+    def __len__(self):
         return len(self.instances)
 
-    def __getitem__(self, item: int) -> SchedulerTestApp:
+    def __getitem__(self, item):
         return self.instances[item]
 
-    def __setitem__(self, key: int, value: SchedulerTestApp):
+    def __setitem__(self, key, value):
         raise Exception("Not implemented, use create method!")
 
     def __delitem__(self, key):
@@ -4601,22 +4601,25 @@ class SchedulerTestManager:
         return iter(self.instances)
 
     @property
-    def first(self) -> SchedulerTestApp:
+    def first(self):
         if len(self.instances) == 0:
             raise Exception("No scheduler!")
         return self.instances[0]
 
-    def filter(self, matcher=None) -> Iterable[SchedulerTestApp]:
-        fcn = None  # type: Optional[Callable[[int, SchedulerTestApp], bool]]
-        if type(matcher) == list:
-            def fcn(_: int, app: SchedulerTestApp) -> bool:
+    def filter(self, matcher=None):
+        thefcn = None
+        if type(matcher) is list:
+            def fcn(_, app):
                 return app in matcher
+            thefcn = fcn
         elif type(matcher).__name__ == 'function':
-            fcn = matcher
+            thefcn = matcher
+        else:
+            thefcn = fcn
         return [e[1] for e in enumerate(self.instances)
-                if fcn is None or fcn(e[0], e[1])]
+                if thefcn is None or thefcn(e[0], e[1])]
 
-    def execute(self, function: Callable[[Any], None], matcher=None) -> None:
+    def execute(self, function, matcher=None):
         for instance in self.filter(matcher):
             function(instance)
 
@@ -5657,9 +5660,9 @@ class ZuulTestCase(BaseTestCase):
         for tenant in sched.abide.tenants.values():
             with tenant_read_lock(self.zk_client, tenant.name):
                 for pipeline in tenant.layout.pipelines.values():
-                    with pipeline_lock(self.zk_client, tenant.name,
-                                       pipeline.name) as lock,\
-                            self.createZKContext(lock) as ctx:
+                    with (pipeline_lock(self.zk_client, tenant.name,
+                                        pipeline.name) as lock,
+                          self.createZKContext(lock) as ctx):
                         with pipeline.manager.currentContext(ctx):
                             pipeline.state.refresh(ctx)
         # return the context in case the caller wants to examine iops

@@ -817,10 +817,10 @@ class Scheduler(threading.Thread):
                 # lock and refresh the pipeline
                 for tenant in self.abide.tenants.values():
                     for pipeline in tenant.layout.pipelines.values():
-                        with pipeline_lock(
+                        with (pipeline_lock(
                                 self.zk_client, tenant.name,
-                                pipeline.name) as lock,\
-                            self.createZKContext(lock, self.log) as ctx:
+                                pipeline.name) as lock,
+                              self.createZKContext(lock, self.log) as ctx):
                             pipeline.state.refresh(ctx, read_only=True)
                             # add any blobstore references
                             for item in pipeline.getAllItems(include_old=True):
@@ -1526,10 +1526,10 @@ class Scheduler(threading.Thread):
                 old_tenant = self.abide.tenants.get(tenant_name)
 
                 stats_key = f'zuul.tenant.{tenant_name}'
-                with tenant_write_lock(
+                with (tenant_write_lock(
                         self.zk_client, tenant_name,
-                        identifier=RECONFIG_LOCK_ID) as lock,\
-                        self.statsd_timer(f'{stats_key}.reconfiguration_time'):
+                        identifier=RECONFIG_LOCK_ID) as lock,
+                      self.statsd_timer(f'{stats_key}.reconfiguration_time')):
                     tenant = loader.loadTenant(
                         self.abide, tenant_name, self.ansible_manager,
                         self.unparsed_abide, min_ltimes=min_ltimes,
@@ -1591,10 +1591,10 @@ class Scheduler(threading.Thread):
                             [event.tenant_name])
 
             stats_key = f'zuul.tenant.{event.tenant_name}'
-            with tenant_write_lock(
+            with (tenant_write_lock(
                     self.zk_client, event.tenant_name,
-                    identifier=RECONFIG_LOCK_ID) as lock,\
-                    self.statsd_timer(f'{stats_key}.reconfiguration_time'):
+                    identifier=RECONFIG_LOCK_ID) as lock,
+                  self.statsd_timer(f'{stats_key}.reconfiguration_time')):
                 log.debug("Loading tenant %s", event.tenant_name)
                 loader.loadTenant(
                     self.abide, event.tenant_name, self.ansible_manager,
@@ -2251,10 +2251,10 @@ class Scheduler(threading.Thread):
                 return
             stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
             try:
-                with pipeline_lock(
+                with (pipeline_lock(
                         self.zk_client, tenant.name, pipeline.name,
-                        blocking=False) as lock,\
-                    self.createZKContext(lock, self.log) as ctx:
+                        blocking=False) as lock,
+                      self.createZKContext(lock, self.log) as ctx):
                     self.log.debug("Processing pipeline %s in tenant %s",
                                    pipeline.name, tenant.name)
                     with pipeline.manager.currentContext(ctx):
@@ -2363,8 +2363,8 @@ class Scheduler(threading.Thread):
 
     def _gatherConnectionCacheKeys(self):
         relevant = set()
-        with self.layout_lock,\
-             self.createZKContext(None, self.log) as ctx:
+        with (self.layout_lock,
+              self.createZKContext(None, self.log) as ctx):
             for tenant in self.abide.tenants.values():
                 for pipeline in tenant.layout.pipelines.values():
                     self.log.debug("Gather relevant cache items for: %s %s",
