@@ -3589,11 +3589,9 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with pipeline_lock(
-                self.zk_client, tenant.name,
-                gate.name) as lock,\
-                self.createZKContext(lock) as ctx,\
-                gate.manager.currentContext(ctx):
+        with (pipeline_lock(self.zk_client, tenant.name, gate.name) as lock,
+              self.createZKContext(lock) as ctx,
+              gate.manager.currentContext(ctx)):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3615,11 +3613,9 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with pipeline_lock(
-                self.zk_client, tenant.name,
-                gate.name) as lock,\
-                self.createZKContext(lock) as ctx,\
-                gate.manager.currentContext(ctx):
+        with (pipeline_lock(self.zk_client, tenant.name, gate.name) as lock,
+              self.createZKContext(lock) as ctx,
+              gate.manager.currentContext(ctx)):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3641,11 +3637,9 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with pipeline_lock(
-                self.zk_client, tenant.name,
-                gate.name) as lock,\
-                self.createZKContext(lock) as ctx,\
-                gate.manager.currentContext(ctx):
+        with (pipeline_lock(self.zk_client, tenant.name, gate.name) as lock,
+              self.createZKContext(lock) as ctx,
+              gate.manager.currentContext(ctx)):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3666,11 +3660,9 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with pipeline_lock(
-                self.zk_client, tenant.name,
-                gate.name) as lock,\
-                self.createZKContext(lock) as ctx,\
-                gate.manager.currentContext(ctx):
+        with (pipeline_lock(self.zk_client, tenant.name, gate.name) as lock,
+              self.createZKContext(lock) as ctx,
+              gate.manager.currentContext(ctx)):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)
@@ -3692,11 +3684,9 @@ class TestScheduler(ZuulTestCase):
         FakeChange = namedtuple('FakeChange', ['project', 'branch'])
         fake_a = FakeChange(project1, 'master')
         fake_b = FakeChange(project2, 'master')
-        with pipeline_lock(
-                self.zk_client, tenant.name,
-                gate.name) as lock,\
-                self.createZKContext(lock) as ctx,\
-                gate.manager.currentContext(ctx):
+        with (pipeline_lock(self.zk_client, tenant.name, gate.name) as lock,
+              self.createZKContext(lock) as ctx,
+              gate.manager.currentContext(ctx)):
             gate.manager.getChangeQueue(fake_a, None)
             gate.manager.getChangeQueue(fake_b, None)
         q1 = gate.getQueue(project1.canonical_name, None)

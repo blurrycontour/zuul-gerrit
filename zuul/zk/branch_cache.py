@@ -119,8 +119,8 @@ class BranchCache:
         # to the context.
         self.zk_context = ZKContext(zk_client, self.wlock, None, self.log)
 
-        with self.zk_context as ctx,\
-             locked(self.wlock):
+        with (self.zk_context as ctx,
+              locked(self.wlock)):
             try:
                 self.cache = BranchCacheZKObject.fromZK(
                     ctx, data_path, _path=data_path)
@@ -130,9 +130,9 @@ class BranchCache:
 
     def clear(self, projects=None):
         """Clear the cache"""
-        with locked(self.wlock),\
-             self.zk_context as ctx,\
-             self.cache.activeContext(ctx):
+        with (locked(self.wlock),
+              self.zk_context as ctx,
+              self.cache.activeContext(ctx)):
             if projects is None:
                 self.cache.protected.clear()
                 self.cache.remainder.clear()
@@ -175,8 +175,8 @@ class BranchCache:
             an error when fetching the branches.
         """
         if self.ltime < min_ltime:
-            with locked(self.rlock),\
-                 self.zk_context as ctx:
+            with (locked(self.rlock),
+                  self.zk_context as ctx):
                 self.cache.refresh(ctx)
 
         protected_branches = None
@@ -219,9 +219,9 @@ class BranchCache:
             The list of branches or None to indicate a fetch error.
         """
 
-        with locked(self.wlock),\
-             self.zk_context as ctx,\
-             self.cache.activeContext(ctx):
+        with (locked(self.wlock),
+              self.zk_context as ctx,
+              self.cache.activeContext(ctx)):
             if exclude_unprotected:
                 self.cache.protected[project_name] = branches
                 remainder_branches = self.cache.remainder.get(project_name)
@@ -245,9 +245,9 @@ class BranchCache:
         receiving an explicit event.
         """
 
-        with locked(self.wlock),\
-             self.zk_context as ctx,\
-             self.cache.activeContext(ctx):
+        with (locked(self.wlock),
+              self.zk_context as ctx,
+              self.cache.activeContext(ctx)):
             protected_branches = self.cache.protected.get(project_name)
             remainder_branches = self.cache.remainder.get(project_name)
             if protected:
