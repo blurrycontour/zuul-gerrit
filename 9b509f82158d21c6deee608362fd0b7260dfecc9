@@ -34,6 +34,24 @@
       "parentUuid": "4da5ac19_08a94a52",
       "revId": "9b509f82158d21c6deee608362fd0b7260dfecc9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "908f2431_0e0ae300",
+        "filename": "zuul/driver/elasticsearch/reporter.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-08-01T12:39:48Z",
+      "side": 1,
+      "message": "Thanks, but the format still needs to be updated since we no longer have nanos.",
+      "parentUuid": "b92a3d68_aa4dd9bc",
+      "revId": "9b509f82158d21c6deee608362fd0b7260dfecc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
