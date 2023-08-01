@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "93b5ecd2_de3d6c66",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2023-08-01T20:48:45Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "bfafcfa9dd62e199ecf9968b75d40fd48e3b67c5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5b0c4abc_438c0d9f",
         "filename": "doc/source/config/job.rst",
         "patchSetId": 4
