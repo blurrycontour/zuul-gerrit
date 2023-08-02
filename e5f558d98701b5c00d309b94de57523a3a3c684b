@@ -16,6 +16,40 @@
       "message": "recheck timeout",
       "revId": "e5f558d98701b5c00d309b94de57523a3a3c684b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34061783_195c62da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-08-02T15:47:28Z",
+      "side": 1,
+      "message": "recheck though the timeout does not appear flaky.",
+      "revId": "e5f558d98701b5c00d309b94de57523a3a3c684b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "902fa059_7b176151",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4618,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-08-02T15:47:28Z",
+      "side": 1,
+      "message": "Is this correct? Previously, fcn was left as None.",
+      "revId": "e5f558d98701b5c00d309b94de57523a3a3c684b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
