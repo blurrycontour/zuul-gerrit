@@ -978,6 +978,10 @@ class AnsibleJob(object):
         with executor_server.zk_context as ctx:
             self.job = FrozenJob.fromZK(ctx, arguments["job_ref"])
         self.arguments["zuul"].update(zuul_params_from_job(self.job))
+        if self.job.failure_output:
+            self.failure_output = json.dumps(self.job.failure_output)
+        else:
+            self.failure_output = '[]'
         self.early_failure = False
 
         self.zuul_event_id = self.arguments["zuul_event_id"]
@@ -1834,7 +1838,9 @@ class AnsibleJob(object):
                             self.log.info(
                                 "Overriding SUCCESS result as FAILURE "
                                 "due to early failure detection")
-                        result = 'SUCCESS'
+                            result = 'FAILURE'
+                        else:
+                            result = 'SUCCESS'
                     else:
                         result = 'FAILURE'
                         break
@@ -2751,6 +2757,7 @@ class AnsibleJob(object):
                     if not key.startswith("ZUUL_")}
         env_copy.update(self.ssh_agent.env)
         env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
+        env_copy['ZUUL_JOB_FAILURE_OUTPUT'] = self.failure_output
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root
         if self.executor_server.log_console_port != DEFAULT_STREAM_PORT:
             env_copy['ZUUL_CONSOLE_PORT'] = str(
@@ -2881,6 +2888,8 @@ class AnsibleJob(object):
                         self.early_failure = True
                         self.executor_server.updateBuildStatus(
                             self.build_request, {'pre_fail': True})
+                        # No need to pre-fail again
+                        allow_pre_fail = False
                 else:
                     idx += 1
                 if idx < BUFFER_LINES_FOR_SYNTAX:
