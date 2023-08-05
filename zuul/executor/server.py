@@ -22,6 +22,7 @@ import multiprocessing
 import os
 import psutil
 import re
+import re2
 import shutil
 import signal
 import shlex
@@ -978,6 +979,11 @@ class AnsibleJob(object):
         with executor_server.zk_context as ctx:
             self.job = FrozenJob.fromZK(ctx, arguments["job_ref"])
         self.arguments["zuul"].update(zuul_params_from_job(self.job))
+        if self.job.failure_output:
+            self.failure_output = [
+                re2.compile(x) for x in self.job.failure_output]
+        else:
+            self.failure_output = []
 
         self.zuul_event_id = self.arguments["zuul_event_id"]
         # Record ansible version being used for the cleanup phase
@@ -2856,6 +2862,8 @@ class AnsibleJob(object):
                         self.log.info("Early failure in job")
                         self.executor_server.updateBuildStatus(
                             self.build_request, {'pre_fail': True})
+                        # No need to pre-fail again
+                        allow_pre_fail = False
                 else:
                     idx += 1
                 if idx < BUFFER_LINES_FOR_SYNTAX:
@@ -2870,6 +2878,16 @@ class AnsibleJob(object):
                     ansible_log.debug("Ansible result output: %s" % (line,))
                 else:
                     ansible_log.debug("Ansible output: %s" % (line,))
+                    if allow_pre_fail:
+                        for fail_re in self.failure_output:
+                            if fail_re.match(line):
+                                self.log.info('Early failure in job, '
+                                              'matched regex "%s"',
+                                              fail_re.pattern)
+                                self.executor_server.updateBuildStatus(
+                                    self.build_request, {'pre_fail': True})
+                                # No need to pre-fail again
+                                allow_pre_fail = False
             self.log.debug("Ansible output terminated")
             try:
                 cpu_times = self.proc.cpu_times()
