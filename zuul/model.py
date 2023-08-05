@@ -2321,6 +2321,7 @@ class FrozenJob(zkobject.ZKObject):
                   'workspace_scheme',
                   'config_hash',
                   'deduplicate',
+                  'failure_output',
                   )
 
     job_data_attributes = ('artifact_data',
@@ -2444,7 +2445,7 @@ class FrozenJob(zkobject.ZKObject):
     def deserialize(self, raw, context):
         # Ensure that any special handling in this method is matched
         # in Job.freezeJob so that FrozenJobs are identical regardless
-        # of whether they have been desiraliazed.
+        # of whether they have been deserialized.
         data = super().deserialize(raw, context)
 
         # MODEL_API < 8
@@ -2460,6 +2461,10 @@ class FrozenJob(zkobject.ZKObject):
         # MODEL_API < 15
         if 'ansible_split_streams' not in data:
             data['ansible_split_streams'] = None
+
+        # MODEL_API < 15
+        if 'failure_output' not in data:
+            data['failure_output'] = []
 
         if hasattr(self, 'nodeset_alternatives'):
             alts = self.nodeset_alternatives
@@ -2746,6 +2751,7 @@ class Job(ConfigObject):
         d['post_review'] = self.post_review
         d['match_on_config_updates'] = self.match_on_config_updates
         d['deduplicate'] = self.deduplicate
+        d['failure_output'] = self.failure_output
         if self.isBase():
             d['parent'] = None
         elif self.parent:
@@ -2825,6 +2831,7 @@ class Job(ConfigObject):
             override_checkout=None,
             post_review=None,
             workspace_scheme=SCHEME_GOLANG,
+            failure_output=(),
         )
 
         # These are generally internal attributes which are not
@@ -3000,6 +3007,7 @@ class Job(ConfigObject):
         ]
         kw['dependencies'] = frozenset(kw['dependencies'])
         kw['semaphores'] = list(kw['semaphores'])
+        kw['failure_output'] = list(kw['failure_output'])
         # Don't add buildset to attributes since it's not serialized
         kw['buildset'] = buildset
         return FrozenJob.new(context, **kw)
@@ -3290,7 +3298,7 @@ class Job(ConfigObject):
                                  'roles', 'variables', 'extra_variables',
                                  'host_variables', 'group_variables',
                                  'required_projects', 'allowed_projects',
-                                 'semaphores']):
+                                 'semaphores', 'failure_output']):
                     setattr(self, k, other._get(k))
 
         # Don't set final above so that we don't trip an error halfway
@@ -3402,6 +3410,8 @@ class Job(ConfigObject):
             self.semaphores = tuple(
                 sorted(other.semaphores + self.semaphores,
                        key=lambda x: x.name))
+        if other._get('failure_output') is not None:
+            self.failure_output = self.failure_output + other.failure_output
 
         pb_semaphores = set()
         for pb in self.run + self.pre_run + self.post_run + self.cleanup_run:
