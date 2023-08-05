@@ -38,6 +38,7 @@ import logging
 import logging.config
 import json
 import os
+import re2
 import socket
 import threading
 import time
@@ -106,7 +107,9 @@ class CallbackModule(default.CallbackModule):
         self._play = None
         self._streamers = []
         self._streamers_stop = False
+        self.sent_failure_result = False
         self.configure_logger()
+        self.configure_regexes()
         self._items_done = False
         self._deferred_result = None
         self._playbook_name = None
@@ -127,6 +130,16 @@ class CallbackModule(default.CallbackModule):
         self._logger = logging.getLogger('zuul.executor.ansible')
         self._result_logger = logging.getLogger(
             'zuul.executor.ansible.result')
+
+    def configure_regexes(self):
+        try:
+            serialized = os.environ.get('ZUUL_JOB_FAILURE_OUTPUT', '[]')
+            regexes = json.loads(serialized)
+            self.failure_output = [re2.compile(x) for x in regexes]
+        except Exception as e:
+            self._log("Error compiling failure output regexes: %s"
+                      % (str(e),), job=False, executor=True)
+            self.failure_output = []
 
     def _log(self, msg, ts=None, job=True, executor=False, debug=False):
         # With the default "linear" strategy (and likely others),
@@ -264,10 +277,23 @@ class CallbackModule(default.CallbackModule):
             ts, ln = line.split(' | ', 1)
 
             self._log("%s | %s " % (host, ln), ts=ts)
+            self._check_failure_output(host, ln)
             return False
         else:
             self._log("%s | %s " % (host, line))
+            self._check_failure_output(host, line)
             return False
+
+    def _check_failure_output(self, host, line):
+        if self.sent_failure_result:
+            return
+        for fail_re in self.failure_output:
+            if fail_re.match(line):
+                self._log(
+                    '%s | Early failure in job, matched regex "%s"' % (
+                        host, fail_re.pattern,))
+                self._result_logger.info("failure")
+                self.sent_failure_result = True
 
     def _log_module_failure(self, result, result_dict):
         if 'module_stdout' in result_dict and result_dict['module_stdout']:
@@ -427,6 +453,7 @@ class CallbackModule(default.CallbackModule):
                 for line in stdout_lines:
                     hostname = self._get_hostname(result)
                     self._log("%s | %s " % (hostname, line))
+                    self._check_failure_output(hostname, line)
 
     def _v2_runner_on_failed(self, result, ignore_errors=False):
         result_dict = dict(result._result)
@@ -456,8 +483,9 @@ class CallbackModule(default.CallbackModule):
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         ret = self._v2_runner_on_failed(result, ignore_errors)
-        if not ignore_errors:
+        if (not ignore_errors) and (not self.sent_failure_result):
             self._result_logger.info("failure")
+            self.sent_failure_result = True
         return ret
 
     def v2_runner_on_unreachable(self, result):
