@@ -19,6 +19,7 @@ import copy
 import json
 import hashlib
 import logging
+import math
 import os
 from functools import total_ordering
 
@@ -504,6 +505,7 @@ class Pipeline(object):
         self.disable_at = None
         self.window = None
         self.window_floor = None
+        self.window_ceiling = None
         self.window_increase_type = None
         self.window_increase_factor = None
         self.window_decrease_type = None
@@ -1141,6 +1143,7 @@ class ChangeQueue(zkobject.ZKObject):
             queue=[],
             window=0,
             window_floor=1,
+            window_ceiling=math.inf,
             window_increase_type="linear",
             window_increase_factor=1,
             window_decrease_type="exponential",
@@ -1157,6 +1160,7 @@ class ChangeQueue(zkobject.ZKObject):
             "queue": [i.getPath() for i in self.queue],
             "window": self.window,
             "window_floor": self.window_floor,
+            "window_ceiling": self.window_ceiling,
             "window_increase_type": self.window_increase_type,
             "window_increase_factor": self.window_increase_factor,
             "window_decrease_type": self.window_decrease_type,
@@ -1347,9 +1351,13 @@ class ChangeQueue(zkobject.ZKObject):
             return
         with self.activeContext(self.zk_context):
             if self.window_increase_type == 'linear':
-                self.window += self.window_increase_factor
+                self.window = min(
+                    self.window_ceiling,
+                    self.window + self.window_increase_factor)
             elif self.window_increase_type == 'exponential':
-                self.window *= self.window_increase_factor
+                self.window = min(
+                    self.window_ceiling,
+                    self.window * self.window_increase_factor)
 
     def decreaseWindowSize(self):
         if not self.window:
