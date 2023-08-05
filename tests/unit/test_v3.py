@@ -6065,6 +6065,104 @@ class TestEarlyFailure(AnsibleZuulTestCase):
             dict(name='wait', result='SUCCESS', changes='2,1'),
         ], ordered=True)
 
+    def test_early_failure_output(self):
+        file_dict = {'output-failure.txt': ''}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+
+        self.log.debug("Wait for the first change to start its job")
+        for _ in iterate_timeout(30, 'job A started'):
+            if len(self.builds) == 1:
+                break
+        A_build = self.builds[0]
+        start = os.path.join(self.jobdir_root, A_build.uuid +
+                             '.output_failure_start.flag')
+        for _ in iterate_timeout(30, 'job A running'):
+            if os.path.exists(start):
+                break
+
+        self.log.debug("Add a second change which will test with the first")
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.log.debug("Wait for the second change to start its job")
+        for _ in iterate_timeout(30, 'job B started'):
+            if len(self.builds) == 2:
+                break
+        B_build = self.builds[1]
+        start = os.path.join(self.jobdir_root, B_build.uuid +
+                             '.wait_start.flag')
+        for _ in iterate_timeout(30, 'job B running'):
+            if os.path.exists(start):
+                break
+
+        self.log.debug("Continue the first job which will output failure text")
+        flag_path = os.path.join(self.jobdir_root, A_build.uuid,
+                                 'output_failure_continue1_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.log.debug("Wait for the second job to be aborted "
+                       "and restarted without the first change")
+        for _ in iterate_timeout(30, 'job B restarted'):
+            if len(self.builds) == 2:
+                B_build2 = self.builds[1]
+                if B_build2 != B_build:
+                    break
+
+        self.log.debug("Continue the first job on to actual failure")
+        flag_path = os.path.join(self.jobdir_root, A_build.uuid,
+                                 'output_failure_continue2_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.log.debug("Wait for the first job to be in its post-run playbook")
+        start = os.path.join(self.jobdir_root, A_build.uuid +
+                             '.wait_start.flag')
+        for _ in iterate_timeout(30, 'job A post running'):
+            if os.path.exists(start):
+                break
+
+        path = os.path.join(self.jobdir_root, A_build.uuid,
+                            'work/logs/job-output.txt')
+        with open(path) as f:
+            output = f.read()
+            self.log.info(output)
+            self.assertTrue('Early failure in job, matched regex '
+                            '"^.*output indicates failure.*$"' in output)
+
+        self.log.debug("Allow the first job to finish")
+        flag_path = os.path.join(self.jobdir_root, A_build.uuid,
+                                 'wait_continue_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.log.debug("Wait for the first job to finish")
+        for _ in iterate_timeout(30, 'job A complete'):
+            if A_build not in self.builds:
+                break
+
+        self.log.debug("Allow the restarted second job to finish")
+        flag_path = os.path.join(self.jobdir_root, B_build2.uuid,
+                                 'wait_continue_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='wait', result='ABORTED', changes='1,1 2,1'),
+            dict(name='output-failure', result='FAILURE', changes='1,1'),
+            dict(name='wait', result='SUCCESS', changes='2,1'),
+        ], ordered=True)
+
 
 class TestMaxNodesPerJob(AnsibleZuulTestCase):
     tenant_config_file = 'config/multi-tenant/main.yaml'

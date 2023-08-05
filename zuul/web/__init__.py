@@ -1701,6 +1701,7 @@ class ZuulWebAPI(object):
         params['host_vars'] = job.host_variables
         params['group_vars'] = job.group_variables
         params['secret_vars'] = job.secret_parent_data
+        params['failure_output'] = job.failure_output
 
         ret = params
         return ret

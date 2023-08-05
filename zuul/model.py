@@ -2320,6 +2320,7 @@ class FrozenJob(zkobject.ZKObject):
                   'workspace_scheme',
                   'config_hash',
                   'deduplicate',
+                  'failure_output',
                   )
 
     job_data_attributes = ('artifact_data',
@@ -2741,6 +2742,7 @@ class Job(ConfigObject):
         d['post_review'] = self.post_review
         d['match_on_config_updates'] = self.match_on_config_updates
         d['deduplicate'] = self.deduplicate
+        d['failure_output'] = self.failure_output
         if self.isBase():
             d['parent'] = None
         elif self.parent:
@@ -2818,6 +2820,7 @@ class Job(ConfigObject):
             override_checkout=None,
             post_review=None,
             workspace_scheme=SCHEME_GOLANG,
+            failure_output=(),
         )
 
         # These are generally internal attributes which are not
@@ -3266,7 +3269,7 @@ class Job(ConfigObject):
                                  'roles', 'variables', 'extra_variables',
                                  'host_variables', 'group_variables',
                                  'required_projects', 'allowed_projects',
-                                 'semaphores']):
+                                 'semaphores', 'failure_output']):
                     setattr(self, k, other._get(k))
 
         # Don't set final above so that we don't trip an error halfway
@@ -3378,6 +3381,8 @@ class Job(ConfigObject):
             self.semaphores = tuple(
                 sorted(other.semaphores + self.semaphores,
                        key=lambda x: x.name))
+        if other._get('failure_output') is not None:
+            self.failure_output = self.failure_output + other.failure_output
 
         pb_semaphores = set()
         for pb in self.run + self.pre_run + self.post_run + self.cleanup_run:
