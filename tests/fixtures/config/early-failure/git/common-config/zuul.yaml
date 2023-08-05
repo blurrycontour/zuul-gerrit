@@ -57,6 +57,17 @@
       - playbooks/wait.yaml
 
 - job:
+    name: output-failure
+    files:
+      - output-failure.txt
+    failure-output:
+      - "^.*output indicates failure.*$"
+    run:
+      - playbooks/output-failure.yaml
+    post-run:
+      - playbooks/wait.yaml
+
+- job:
     name: wait
     run:
       - playbooks/wait.yaml
@@ -74,10 +85,12 @@
       jobs:
         - early-failure
         - pre-failure
+        - output-failure
     gate:
       jobs:
         - early-failure
         - pre-failure
+        - output-failure
 
 - project:
     name: org/project2
