@@ -208,6 +208,13 @@ Database
       if you rely on external databases which are not under your control.
       The default is to have no prefix.
 
+   .. attr:: migrations
+      :default: True
+
+      Whether to run the database migrations on startup. This can be useful in
+      scenarios where, e.g., zuul-web has a read-only database connection and
+      shall not attempt to update the database schema.
+
 .. _scheduler:
 
 Scheduler

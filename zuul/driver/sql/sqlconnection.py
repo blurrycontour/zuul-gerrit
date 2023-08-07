@@ -389,6 +389,9 @@ class SQLConnection(BaseConnection):
             alembic.command.upgrade(config, revision, tag=tag)
 
     def onLoad(self, zk_client, component_registry=None):
+        if not self.connection_config.get('migrations', True):
+            return
+
         safe_connection = quote_plus(self.connection_name)
         while True:
             try:

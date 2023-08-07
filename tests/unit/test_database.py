@@ -251,3 +251,27 @@ class TestPostgresqlDatabase(DBBaseTestCase):
             env={'PGPASSWORD': self.db.passwd}
         )
         self.assertEqual(alembic_out, sqlalchemy_out)
+
+class TestNoMigrationDatabase(DBBaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+        f = MySQLSchemaFixture()
+        self.useFixture(f)
+
+        config = dict(dburi=f.dburi, migrations=False)
+        driver = SQLDriver()
+        self.connection = driver.getConnection('database', config)
+        self.connection.onLoad(self.zk_client)
+        self.addCleanup(self._cleanup)
+
+    def _cleanup(self):
+        self.connection.onStop()
+
+    def test_migration_skipped(self):
+        with self.connection.engine.begin() as connection:
+            tables = connection.exec_driver_sql("show tables")
+            self.assertEqual(tables.rowcount, 0)
+
+
+
