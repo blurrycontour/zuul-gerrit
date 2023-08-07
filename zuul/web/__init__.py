@@ -2252,7 +2252,7 @@ class ZuulWeb(object):
 
         # Remove TPCs of deleted tenants
         for tenant_name in deleted_tenants:
-            self.abide.clearTPCs(tenant_name)
+            self.abide.clearTPCRegistry(tenant_name)
 
         loader.loadAuthzRules(self.abide, self.unparsed_abide)
         loader.loadSemaphores(self.abide, self.unparsed_abide)
