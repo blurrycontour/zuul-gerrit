@@ -1918,10 +1918,11 @@ class TenantParser(object):
 
         tenant.unparsed_config = conf
         # tpcs is TenantProjectConfigs
-        config_tpcs = abide.getConfigTPCs(tenant.name)
+        tpc_registry = abide.getTPCRegistry(tenant.name)
+        config_tpcs = tpc_registry.getConfigTPCs()
         for tpc in config_tpcs:
             tenant.addConfigProject(tpc)
-        untrusted_tpcs = abide.getUntrustedTPCs(tenant.name)
+        untrusted_tpcs = tpc_registry.getUntrustedTPCs()
         for tpc in untrusted_tpcs:
             tenant.addUntrustedProject(tpc)
 
@@ -2419,12 +2420,8 @@ class TenantParser(object):
                                    loading_errors, ltime, min_ltimes):
         loaded = False
         tpc = tenant.project_configs[source_context.project_canonical_name]
-        # Make sure we are clearing the local cache before updating it.
-        abide.clearUnparsedBranchCache(source_context.project_canonical_name,
-                                       source_context.branch)
-        branch_cache = abide.getUnparsedBranchCache(
-            source_context.project_canonical_name,
-            source_context.branch)
+        # Make sure we start with an empty cache
+        branch_cache = model.UnparsedBranchCache()
         valid_dirs = ("zuul.d", ".zuul.d") + tpc.extra_config_dirs
         for conf_root in (ZUUL_CONF_ROOT + tpc.extra_config_files
                           + tpc.extra_config_dirs):
@@ -2454,6 +2451,11 @@ class TenantParser(object):
                     files[fn], source_context, loading_errors)
                 branch_cache.put(source_context.path, incdata)
         branch_cache.setValidFor(tpc, ltime)
+        # Atomically replacing the branch cache avoids locking
+        abide.setUnparsedBranchCache(
+            source_context.project_canonical_name,
+            source_context.branch,
+            branch_cache)
         if min_ltimes is not None:
             min_ltimes[source_context.project_canonical_name][
                 source_context.branch] = branch_cache.ltime
@@ -2893,15 +2895,18 @@ class ConfigLoader(object):
         # project's config files (incl. tenant specific extra config) at once.
         with ThreadPoolExecutor(max_workers=4) as executor:
             for tenant_name, unparsed_config in tenants_to_load.items():
+                tpc_registry = model.TenantTPCRegistry()
                 config_tpcs, untrusted_tpcs = (
                     self.tenant_parser.loadTenantProjects(unparsed_config,
                                                           executor)
                 )
-                abide.clearTPCs(tenant_name)
                 for tpc in config_tpcs:
-                    abide.addConfigTPC(tenant_name, tpc)
+                    tpc_registry.addConfigTPC(tpc)
                 for tpc in untrusted_tpcs:
-                    abide.addUntrustedTPC(tenant_name, tpc)
+                    tpc_registry.addUntrustedTPC(tpc)
+                # This atomic replacement of TPCs means that we don't need to
+                # lock the abide.
+                abide.setTPCRegistry(tenant_name, tpc_registry)
 
     def loadTenant(self, abide, tenant_name, ansible_manager, unparsed_abide,
                    min_ltimes=None, layout_uuid=None,

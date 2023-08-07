@@ -8759,44 +8759,73 @@ class UnparsedBranchCache(object):
         return ret
 
 
+class TenantTPCRegistry:
+    def __init__(self):
+        # The project TPCs are stored as a list as we don't check for
+        # duplicate projects here.
+        self.config_tpcs = defaultdict(list)
+        self.untrusted_tpcs = defaultdict(list)
+
+    def addConfigTPC(self, tpc):
+        self.config_tpcs[tpc.project.name].append(tpc)
+
+    def addUntrustedTPC(self, tpc):
+        self.untrusted_tpcs[tpc.project.name].append(tpc)
+
+    def getConfigTPCs(self):
+        return list(itertools.chain.from_iterable(
+            self.config_tpcs.values()))
+
+    def getUntrustedTPCs(self):
+        return list(itertools.chain.from_iterable(
+            self.untrusted_tpcs.values()))
+
+
 class Abide(object):
     def __init__(self):
         self.authz_rules = {}
         self.semaphores = {}
         self.tenants = {}
-        # tenant -> project -> list(tpcs)
-        # The project TPCs are stored as a list as we don't check for
-        # duplicate projects here.
-        self.config_tpcs = defaultdict(lambda: defaultdict(list))
-        self.untrusted_tpcs = defaultdict(lambda: defaultdict(list))
+        # tenant -> TenantTPCRegistry
+        self.tpc_registry = defaultdict(TenantTPCRegistry)
         # project -> branch -> UnparsedBranchCache
         self.unparsed_project_branch_cache = {}
         self.api_root = None
 
-    def addConfigTPC(self, tenant_name, tpc):
-        self.config_tpcs[tenant_name][tpc.project.name].append(tpc)
+    def clearTPCRegistry(self, tenant_name):
+        try:
+            del self.tpc_registry[tenant_name]
+        except KeyError:
+            pass
 
-    def getConfigTPCs(self, tenant_name):
-        return list(itertools.chain.from_iterable(
-            self.config_tpcs[tenant_name].values()))
+    def getTPCRegistry(self, tenant_name):
+        return self.tpc_registry[tenant_name]
 
-    def addUntrustedTPC(self, tenant_name, tpc):
-        self.untrusted_tpcs[tenant_name][tpc.project.name].append(tpc)
+    def setTPCRegistry(self, tenant_name, tpc_registry):
+        self.tpc_registry[tenant_name] = tpc_registry
 
-    def getUntrustedTPCs(self, tenant_name):
-        return list(itertools.chain.from_iterable(
-            self.untrusted_tpcs[tenant_name].values()))
-
-    def clearTPCs(self, tenant_name):
-        self.config_tpcs[tenant_name].clear()
-        self.untrusted_tpcs[tenant_name].clear()
+    def getAllTPCs(self, tenant_name):
+        # Hold a reference to the registry to make sure it doesn't
+        # change between the two calls below.
+        registry = self.tpc_registry[tenant_name]
+        return list(itertools.chain(
+            itertools.chain.from_iterable(
+                registry.config_tpcs.values()),
+            itertools.chain.from_iterable(
+                registry.untrusted_tpcs.values()),
+        ))
 
     def _allProjectTPCs(self, project_name):
         # Flatten the lists of a project TPCs from all tenants
-        return itertools.chain.from_iterable(
-            tenant_tpcs.get(project_name, [])
-            for tenant_tpcs in itertools.chain(self.config_tpcs.values(),
-                                               self.untrusted_tpcs.values()))
+        # Force to a list to avoid iteration errors since the clear
+        # method can mutate the dictionary.
+        for tpc_registry in list(self.tpc_registry.values()):
+            for config_tpc in tpc_registry.config_tpcs.get(
+                    project_name, []):
+                yield config_tpc
+            for untrusted_tpc in tpc_registry.untrusted_tpcs.get(
+                    project_name, []):
+                yield untrusted_tpc
 
     def getExtraConfigFiles(self, project_name):
         """Get all extra config files for a project accross tenants."""
@@ -8827,16 +8856,10 @@ class Abide(object):
         project_branch_cache[branch] = UnparsedBranchCache()
         return project_branch_cache[branch]
 
-    def clearUnparsedBranchCache(self, canonical_project_name, branch=None):
-        if canonical_project_name in self.unparsed_project_branch_cache:
-            project_branch_cache = \
-                self.unparsed_project_branch_cache[canonical_project_name]
-
-            if branch in project_branch_cache:
-                del project_branch_cache[branch]
-
-            if len(project_branch_cache) == 0 or branch is None:
-                del self.unparsed_project_branch_cache[canonical_project_name]
+    def setUnparsedBranchCache(self, canonical_project_name, branch, cache):
+        project_branch_cache = self.unparsed_project_branch_cache.setdefault(
+            canonical_project_name, {})
+        project_branch_cache[branch] = cache
 
 
 class Capabilities(object):
