@@ -16,7 +16,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import itertools
 import logging
 import socket
 import sys
@@ -221,8 +220,10 @@ class Scheduler(threading.Thread):
         self.layout_update_event = threading.Event()
         # Only used by tests in order to quiesce the layout update loop
         self.layout_update_lock = threading.Lock()
-        # Don't change the abide without holding this lock
-        self.layout_lock = threading.Lock()
+        # Hold this lock when updating the local unparsed abide
+        self.unparsed_abide_lock = threading.Lock()
+        # Hold this lock when updating the local layout for a tenant
+        self.layout_lock = defaultdict(threading.Lock)
         # Only used by tests in order to quiesce the main run loop
         self.run_handler_lock = threading.Lock()
         self.command_map = {
@@ -645,33 +646,27 @@ class Scheduler(threading.Thread):
             return
 
     def _runSemaphoreCleanup(self):
-        # Get the layout lock to make sure the abide doesn't change
-        # under us.
-        with self.layout_lock:
-            if self.semaphore_cleanup_lock.acquire(blocking=False):
-                try:
-                    self.log.debug("Starting semaphore cleanup")
-                    for tenant in self.abide.tenants.values():
-                        try:
-                            tenant.semaphore_handler.cleanupLeaks()
-                        except Exception:
-                            self.log.exception("Error in semaphore cleanup:")
-                finally:
-                    self.semaphore_cleanup_lock.release()
+        if self.semaphore_cleanup_lock.acquire(blocking=False):
+            try:
+                self.log.debug("Starting semaphore cleanup")
+                for tenant in self.abide.tenants.values():
+                    try:
+                        tenant.semaphore_handler.cleanupLeaks()
+                    except Exception:
+                        self.log.exception("Error in semaphore cleanup:")
+            finally:
+                self.semaphore_cleanup_lock.release()
 
     def _runNodeRequestCleanup(self):
-        # Get the layout lock to make sure the abide doesn't change
-        # under us.
-        with self.layout_lock:
-            if self.node_request_cleanup_lock.acquire(blocking=False):
+        if self.node_request_cleanup_lock.acquire(blocking=False):
+            try:
+                self.log.debug("Starting node request cleanup")
                 try:
-                    self.log.debug("Starting node request cleanup")
-                    try:
-                        self._cleanupNodeRequests()
-                    except Exception:
-                        self.log.exception("Error in node request cleanup:")
-                finally:
-                    self.node_request_cleanup_lock.release()
+                    self._cleanupNodeRequests()
+                except Exception:
+                    self.log.exception("Error in node request cleanup:")
+            finally:
+                self.node_request_cleanup_lock.release()
 
     def _cleanupNodeRequests(self):
         # Get all the requests in ZK that belong to us
@@ -726,19 +721,18 @@ class Scheduler(threading.Thread):
         self.log.debug("Finished general cleanup")
 
     def _runConfigCacheCleanup(self):
-        with self.layout_lock:
-            try:
-                self.log.debug("Starting config cache cleanup")
-                cached_projects = set(
-                    self.unparsed_config_cache.listCachedProjects())
-                active_projects = set(
-                    self.abide.unparsed_project_branch_cache.keys())
-                unused_projects = cached_projects - active_projects
-                for project_cname in unused_projects:
-                    self.unparsed_config_cache.clearCache(project_cname)
-                self.log.debug("Finished config cache cleanup")
-            except Exception:
-                self.log.exception("Error in config cache cleanup:")
+        try:
+            self.log.debug("Starting config cache cleanup")
+            cached_projects = set(
+                self.unparsed_config_cache.listCachedProjects())
+            active_projects = set(
+                self.abide.unparsed_project_branch_cache.keys())
+            unused_projects = cached_projects - active_projects
+            for project_cname in unused_projects:
+                self.unparsed_config_cache.clearCache(project_cname)
+            self.log.debug("Finished config cache cleanup")
+        except Exception:
+            self.log.exception("Error in config cache cleanup:")
 
     def _runExecutorApiCleanup(self):
         try:
@@ -810,21 +804,20 @@ class Scheduler(threading.Thread):
         self.log.debug("Starting blob store cleanup")
         try:
             live_blobs = set()
-            with self.layout_lock:
-                # get the start ltime so that we can filter out any
-                # blobs used since this point
-                start_ltime = self.zk_client.getCurrentLtime()
-                # lock and refresh the pipeline
-                for tenant in self.abide.tenants.values():
-                    for pipeline in tenant.layout.pipelines.values():
-                        with (pipeline_lock(
-                                self.zk_client, tenant.name,
-                                pipeline.name) as lock,
-                              self.createZKContext(lock, self.log) as ctx):
-                            pipeline.state.refresh(ctx, read_only=True)
-                            # add any blobstore references
-                            for item in pipeline.getAllItems(include_old=True):
-                                live_blobs.update(item.getBlobKeys())
+            # get the start ltime so that we can filter out any
+            # blobs used since this point
+            start_ltime = self.zk_client.getCurrentLtime()
+            # lock and refresh the pipeline
+            for tenant in self.abide.tenants.values():
+                for pipeline in tenant.layout.pipelines.values():
+                    with (pipeline_lock(
+                            self.zk_client, tenant.name,
+                            pipeline.name) as lock,
+                          self.createZKContext(lock, self.log) as ctx):
+                        pipeline.state.refresh(ctx, read_only=True)
+                        # add any blobstore references
+                        for item in pipeline.getAllItems(include_old=True):
+                            live_blobs.update(item.getBlobKeys())
             with self.createZKContext(None, self.log) as ctx:
                 blobstore = BlobStore(ctx)
                 # get the set of blob keys unused since the start time
@@ -1013,8 +1006,8 @@ class Scheduler(threading.Thread):
         new_tenants = (set(self.unparsed_abide.tenants)
                        - self.abide.tenants.keys())
 
-        with self.layout_lock:
-            for tenant_name in new_tenants:
+        for tenant_name in new_tenants:
+            with self.layout_lock[tenant_name]:
                 stats_key = f'zuul.tenant.{tenant_name}'
                 layout_state = self.tenant_layout_state.get(tenant_name)
                 # In case we don't have a cached layout state we need to
@@ -1312,10 +1305,11 @@ class Scheduler(threading.Thread):
         loader = configloader.ConfigLoader(
             self.connections, self.zk_client, self.globals, self.statsd, self,
             self.merger, self.keystore)
-        # Since we are using the ZK 'locked' context manager with a threading
-        # lock, we need to pass -1 as the timeout value here as the default
-        # value for ZK locks is None.
-        with locked(self.layout_lock, blocking=False, timeout=-1):
+        # Since we are using the ZK 'locked' context manager (in order
+        # to have a non-blocking lock) with a threading lock, we need
+        # to pass -1 as the timeout value here as the default value
+        # for ZK locks is None.
+        with locked(self.layout_lock[tenant_name], blocking=False, timeout=-1):
             start = time.monotonic()
             log.debug("Updating local layout of tenant %s ", tenant_name)
             layout_state = self.tenant_layout_state.get(tenant_name)
@@ -1333,11 +1327,14 @@ class Scheduler(threading.Thread):
             else:
                 min_ltimes = None
 
-            loader.loadTPCs(self.abide, self.unparsed_abide,
+            # Get a local reference in case the unparsed abide changes
+            # while we're running.
+            unparsed_abide = self.unparsed_abide
+            loader.loadTPCs(self.abide, unparsed_abide,
                             [tenant_name])
             tenant = loader.loadTenant(
                 self.abide, tenant_name, self.ansible_manager,
-                self.unparsed_abide, min_ltimes=min_ltimes,
+                unparsed_abide, min_ltimes=min_ltimes,
                 layout_uuid=layout_uuid,
                 branch_cache_min_ltimes=branch_cache_min_ltimes)
             if tenant is not None:
@@ -1390,49 +1387,48 @@ class Scheduler(threading.Thread):
 
     def validateTenants(self, config, tenants_to_validate):
         self.config = config
-        with self.layout_lock:
-            self.log.info("Config validation beginning")
-            start = time.monotonic()
+        self.log.info("Config validation beginning")
+        start = time.monotonic()
 
-            loader = configloader.ConfigLoader(
-                self.connections, self.zk_client, self.globals, self.statsd,
-                self, self.merger, self.keystore)
-            tenant_config, script = self._checkTenantSourceConf(self.config)
-            unparsed_abide = loader.readConfig(
-                tenant_config,
-                from_script=script,
-                tenants_to_validate=tenants_to_validate)
-            available_tenants = list(unparsed_abide.tenants)
-            tenants_to_load = tenants_to_validate or available_tenants
+        loader = configloader.ConfigLoader(
+            self.connections, self.zk_client, self.globals, self.statsd,
+            self, self.merger, self.keystore)
+        tenant_config, script = self._checkTenantSourceConf(self.config)
+        unparsed_abide = loader.readConfig(
+            tenant_config,
+            from_script=script,
+            tenants_to_validate=tenants_to_validate)
+        available_tenants = list(unparsed_abide.tenants)
+        tenants_to_load = tenants_to_validate or available_tenants
 
-            # Use a temporary config cache for the validation
-            validate_root = f"/zuul/validate/{uuid.uuid4().hex}"
-            self.unparsed_config_cache = UnparsedConfigCache(self.zk_client,
-                                                             validate_root)
+        # Use a temporary config cache for the validation
+        validate_root = f"/zuul/validate/{uuid.uuid4().hex}"
+        self.unparsed_config_cache = UnparsedConfigCache(self.zk_client,
+                                                         validate_root)
 
-            try:
-                abide = Abide()
-                loader.loadAuthzRules(abide, unparsed_abide)
-                loader.loadSemaphores(abide, unparsed_abide)
-                loader.loadTPCs(abide, unparsed_abide)
-                for tenant_name in tenants_to_load:
-                    loader.loadTenant(abide, tenant_name, self.ansible_manager,
-                                      unparsed_abide, min_ltimes=None,
-                                      ignore_cat_exception=False)
-            finally:
-                self.zk_client.client.delete(validate_root, recursive=True)
+        try:
+            abide = Abide()
+            loader.loadAuthzRules(abide, unparsed_abide)
+            loader.loadSemaphores(abide, unparsed_abide)
+            loader.loadTPCs(abide, unparsed_abide)
+            for tenant_name in tenants_to_load:
+                loader.loadTenant(abide, tenant_name, self.ansible_manager,
+                                  unparsed_abide, min_ltimes=None,
+                                  ignore_cat_exception=False)
+        finally:
+            self.zk_client.client.delete(validate_root, recursive=True)
 
-            loading_errors = []
-            for tenant in abide.tenants.values():
-                for error in tenant.layout.loading_errors:
-                    if error.severity == SEVERITY_WARNING:
-                        self.log.warning(repr(error))
-                    else:
-                        loading_errors.append(repr(error))
-            if loading_errors:
-                summary = '\n\n\n'.join(loading_errors)
-                raise configloader.ConfigurationSyntaxError(
-                    f"Configuration errors: {summary}")
+        loading_errors = []
+        for tenant in abide.tenants.values():
+            for error in tenant.layout.loading_errors:
+                if error.severity == SEVERITY_WARNING:
+                    self.log.warning(repr(error))
+                else:
+                    loading_errors.append(repr(error))
+        if loading_errors:
+            summary = '\n\n\n'.join(loading_errors)
+            raise configloader.ConfigurationSyntaxError(
+                f"Configuration errors: {summary}")
 
         duration = round(time.monotonic() - start, 3)
         self.log.info("Config validation complete (duration: %s seconds)",
@@ -1442,17 +1438,18 @@ class Scheduler(threading.Thread):
         # This is called in the scheduler loop after another thread submits
         # a request
         reconfigured_tenants = []
-        with self.layout_lock:
-            self.log.info("Reconfiguration beginning (smart=%s, tenants=%s)",
-                          event.smart, event.tenants)
-            start = time.monotonic()
 
-            # Update runtime related system attributes from config
-            self.config = self._zuul_app.config
-            self.globals = SystemAttributes.fromConfig(self.config)
-            self.ansible_manager = AnsibleManager(
-                default_version=self.globals.default_ansible_version)
+        self.log.info("Reconfiguration beginning (smart=%s, tenants=%s)",
+                      event.smart, event.tenants)
+        start = time.monotonic()
 
+        # Update runtime related system attributes from config
+        self.config = self._zuul_app.config
+        self.globals = SystemAttributes.fromConfig(self.config)
+        self.ansible_manager = AnsibleManager(
+            default_version=self.globals.default_ansible_version)
+
+        with self.unparsed_abide_lock:
             loader = configloader.ConfigLoader(
                 self.connections, self.zk_client, self.globals, self.statsd,
                 self, self.merger, self.keystore)
@@ -1463,58 +1460,56 @@ class Scheduler(threading.Thread):
             # Cache system config in Zookeeper
             self.system_config_cache.set(self.unparsed_abide, self.globals)
 
-            # We need to handle new and deleted tenants, so we need to process
-            # all tenants currently known and the new ones.
-            tenant_names = {t for t in self.abide.tenants}
-            tenant_names.update(self.unparsed_abide.tenants.keys())
+        # We need to handle new and deleted tenants, so we need to process
+        # all tenants currently known and the new ones.
+        tenant_names = {t for t in self.abide.tenants}
+        tenant_names.update(self.unparsed_abide.tenants.keys())
 
-            # Remove TPCs of deleted tenants
-            deleted_tenants = tenant_names.difference(
-                self.unparsed_abide.tenants.keys())
-            for tenant_name in deleted_tenants:
-                self.abide.clearTPCs(tenant_name)
+        # Remove TPCs of deleted tenants
+        deleted_tenants = tenant_names.difference(
+            self.unparsed_abide.tenants.keys())
+        for tenant_name in deleted_tenants:
+            self.abide.clearTPCRegistry(tenant_name)
 
-            loader.loadAuthzRules(self.abide, self.unparsed_abide)
-            loader.loadSemaphores(self.abide, self.unparsed_abide)
-            loader.loadTPCs(self.abide, self.unparsed_abide)
+        loader.loadAuthzRules(self.abide, self.unparsed_abide)
+        loader.loadSemaphores(self.abide, self.unparsed_abide)
+        loader.loadTPCs(self.abide, self.unparsed_abide)
 
-            if event.smart:
-                # Consider caches always valid
-                min_ltimes = defaultdict(
-                    lambda: defaultdict(lambda: -1))
-                # Consider all project branch caches valid.
-                branch_cache_min_ltimes = defaultdict(lambda: -1)
-            else:
-                # Consider caches valid if the cache ltime >= event ltime
-                min_ltimes = defaultdict(
-                    lambda: defaultdict(lambda: event.zuul_event_ltime))
-                # Invalidate the branch cache
-                for connection in self.connections.connections.values():
-                    if hasattr(connection, 'clearBranchCache'):
-                        if event.tenants:
-                            # Only clear the projects used by this
-                            # tenant (zuul-web won't be able to load
-                            # any tenants that we don't immediately
-                            # reconfigure after clearing)
-                            for tenant_name in event.tenants:
-                                projects = [
-                                    tpc.project.name for tpc in
-                                    itertools.chain(
-                                        self.abide.getConfigTPCs(tenant_name),
-                                        self.abide.getUntrustedTPCs(
-                                            tenant_name))
-                                ]
-                                connection.clearBranchCache(projects)
-                        else:
-                            # Clear all projects since we're reloading
-                            # all tenants.
-                            connection.clearBranchCache()
-                ltime = self.zk_client.getCurrentLtime()
-                # Consider the branch cache valid only after we
-                # cleared it
-                branch_cache_min_ltimes = defaultdict(lambda: ltime)
+        if event.smart:
+            # Consider caches always valid
+            min_ltimes = defaultdict(
+                lambda: defaultdict(lambda: -1))
+            # Consider all project branch caches valid.
+            branch_cache_min_ltimes = defaultdict(lambda: -1)
+        else:
+            # Consider caches valid if the cache ltime >= event ltime
+            min_ltimes = defaultdict(
+                lambda: defaultdict(lambda: event.zuul_event_ltime))
+            # Invalidate the branch cache
+            for connection in self.connections.connections.values():
+                if hasattr(connection, 'clearBranchCache'):
+                    if event.tenants:
+                        # Only clear the projects used by this
+                        # tenant (zuul-web won't be able to load
+                        # any tenants that we don't immediately
+                        # reconfigure after clearing)
+                        for tenant_name in event.tenants:
+                            projects = [
+                                tpc.project.name for tpc in
+                                self.abide.getAllTPCs(tenant_name)
+                            ]
+                            connection.clearBranchCache(projects)
+                    else:
+                        # Clear all projects since we're reloading
+                        # all tenants.
+                        connection.clearBranchCache()
+            ltime = self.zk_client.getCurrentLtime()
+            # Consider the branch cache valid only after we
+            # cleared it
+            branch_cache_min_ltimes = defaultdict(lambda: ltime)
 
-            for tenant_name in tenant_names:
+        for tenant_name in tenant_names:
+            with self.layout_lock[tenant_name]:
                 if event.smart:
                     old_tenant = old_unparsed_abide.tenants.get(tenant_name)
                     new_tenant = self.unparsed_abide.tenants.get(tenant_name)
@@ -1561,36 +1556,36 @@ class Scheduler(threading.Thread):
         if self.unparsed_abide.ltime < self.system_config_cache.ltime:
             self.updateSystemConfig()
 
-        with self.layout_lock:
-            log.info("Tenant reconfiguration beginning for %s due to "
-                     "projects %s", event.tenant_name, event.project_branches)
-            start = time.monotonic()
-            # Consider all caches valid (min. ltime -1) except for the
-            # changed project-branches.
-            min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
-            for project_name, branch_name in event.project_branches:
-                if branch_name is None:
-                    min_ltimes[project_name] = defaultdict(
-                        lambda: event.zuul_event_ltime)
-                else:
-                    min_ltimes[project_name][
-                        branch_name
-                    ] = event.zuul_event_ltime
+        log.info("Tenant reconfiguration beginning for %s due to "
+                 "projects %s", event.tenant_name, event.project_branches)
+        start = time.monotonic()
+        # Consider all caches valid (min. ltime -1) except for the
+        # changed project-branches.
+        min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
+        for project_name, branch_name in event.project_branches:
+            if branch_name is None:
+                min_ltimes[project_name] = defaultdict(
+                    lambda: event.zuul_event_ltime)
+            else:
+                min_ltimes[project_name][
+                    branch_name
+                ] = event.zuul_event_ltime
 
-            # Consider all branch caches valid except for the ones where
-            # the events provides a minimum ltime.
-            branch_cache_min_ltimes = defaultdict(lambda: -1)
-            for connection_name, ltime in event.branch_cache_ltimes.items():
-                branch_cache_min_ltimes[connection_name] = ltime
+        # Consider all branch caches valid except for the ones where
+        # the events provides a minimum ltime.
+        branch_cache_min_ltimes = defaultdict(lambda: -1)
+        for connection_name, ltime in event.branch_cache_ltimes.items():
+            branch_cache_min_ltimes[connection_name] = ltime
 
-            loader = configloader.ConfigLoader(
-                self.connections, self.zk_client, self.globals, self.statsd,
-                self, self.merger, self.keystore)
+        loader = configloader.ConfigLoader(
+            self.connections, self.zk_client, self.globals, self.statsd,
+            self, self.merger, self.keystore)
+        loader.loadTPCs(self.abide, self.unparsed_abide,
+                        [event.tenant_name])
+        stats_key = f'zuul.tenant.{event.tenant_name}'
+
+        with self.layout_lock[event.tenant_name]:
             old_tenant = self.abide.tenants.get(event.tenant_name)
-            loader.loadTPCs(self.abide, self.unparsed_abide,
-                            [event.tenant_name])
-
-            stats_key = f'zuul.tenant.{event.tenant_name}'
             with (tenant_write_lock(
                     self.zk_client, event.tenant_name,
                     identifier=RECONFIG_LOCK_ID) as lock,
@@ -2205,7 +2200,10 @@ class Scheduler(threading.Thread):
                 self.wake_event.set()
 
     def primeSystemConfig(self):
-        with self.layout_lock:
+        # Strictly speaking, we don't need this lock since it's
+        # guaranteed to be single-threaded, but it's used here for
+        # consistency and future-proofing.
+        with self.unparsed_abide_lock:
             loader = configloader.ConfigLoader(
                 self.connections, self.zk_client, self.globals, self.statsd,
                 self, self.merger, self.keystore)
@@ -2214,31 +2212,35 @@ class Scheduler(threading.Thread):
                 tenant_config, from_script=script)
             self.system_config_cache.set(self.unparsed_abide, self.globals)
 
-            loader.loadAuthzRules(self.abide, self.unparsed_abide)
-            loader.loadSemaphores(self.abide, self.unparsed_abide)
-            loader.loadTPCs(self.abide, self.unparsed_abide)
+        loader.loadAuthzRules(self.abide, self.unparsed_abide)
+        loader.loadSemaphores(self.abide, self.unparsed_abide)
+        loader.loadTPCs(self.abide, self.unparsed_abide)
 
     def updateSystemConfig(self):
-        with self.layout_lock:
+        with self.unparsed_abide_lock:
+            if self.unparsed_abide.ltime >= self.system_config_cache.ltime:
+                # We have updated our local unparsed abide since the
+                # caller last checked.
+                return
             self.log.debug("Updating system config")
             self.unparsed_abide, self.globals = self.system_config_cache.get()
-            self.ansible_manager = AnsibleManager(
-                default_version=self.globals.default_ansible_version)
-            loader = configloader.ConfigLoader(
-                self.connections, self.zk_client, self.globals, self.statsd,
-                self, self.merger, self.keystore)
+        self.ansible_manager = AnsibleManager(
+            default_version=self.globals.default_ansible_version)
+        loader = configloader.ConfigLoader(
+            self.connections, self.zk_client, self.globals, self.statsd,
+            self, self.merger, self.keystore)
 
-            tenant_names = set(self.abide.tenants)
-            deleted_tenants = tenant_names.difference(
-                self.unparsed_abide.tenants.keys())
+        tenant_names = set(self.abide.tenants)
+        deleted_tenants = tenant_names.difference(
+            self.unparsed_abide.tenants.keys())
 
-            # Remove TPCs of deleted tenants
-            for tenant_name in deleted_tenants:
-                self.abide.clearTPCs(tenant_name)
+        # Remove TPCs of deleted tenants
+        for tenant_name in deleted_tenants:
+            self.abide.clearTPCRegistry(tenant_name)
 
-            loader.loadAuthzRules(self.abide, self.unparsed_abide)
-            loader.loadSemaphores(self.abide, self.unparsed_abide)
-            loader.loadTPCs(self.abide, self.unparsed_abide)
+        loader.loadAuthzRules(self.abide, self.unparsed_abide)
+        loader.loadSemaphores(self.abide, self.unparsed_abide)
+        loader.loadTPCs(self.abide, self.unparsed_abide)
 
     def process_pipelines(self, tenant, tenant_lock):
         for pipeline in tenant.layout.pipelines.values():
@@ -2363,8 +2365,7 @@ class Scheduler(threading.Thread):
 
     def _gatherConnectionCacheKeys(self):
         relevant = set()
-        with (self.layout_lock,
-              self.createZKContext(None, self.log) as ctx):
+        with self.createZKContext(None, self.log) as ctx:
             for tenant in self.abide.tenants.values():
                 for pipeline in tenant.layout.pipelines.values():
                     self.log.debug("Gather relevant cache items for: %s %s",
