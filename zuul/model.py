@@ -21,6 +21,7 @@ import hashlib
 import logging
 import os
 from functools import partial, total_ordering
+import threading
 
 import re2
 import time
@@ -8738,40 +8739,18 @@ class Tenant(object):
         return Attributes(name=self.name)
 
 
-class UnparsedBranchCache(object):
+UnparsedBranchCacheEntry = namedtuple("UnparsedBranchCacheEntry",
+                                      ["ltime", "data"])
+
+
+class UnparsedBranchCache:
     """Cache information about a single branch"""
     def __init__(self):
-        self.load_skipped = True
-        self.extra_files_searched = set()
-        self.extra_dirs_searched = set()
-        self.files = {}
-        self.ltime = -1
+        self.entries = {}
 
-    def isValidFor(self, tpc, min_ltime):
-        """Return True if this has valid cache results for the extra
-        files/dirs in the tpc.
-        """
-        if self.load_skipped:
-            return False
-        if self.ltime < min_ltime:
-            return False
-        if (set(tpc.extra_config_files) <= self.extra_files_searched and
-            set(tpc.extra_config_dirs) <= self.extra_dirs_searched):
-            return True
-        return False
-
-    def setValidFor(self, tpc, ltime):
-        self.ltime = ltime
-        self.load_skipped = False
-        self.extra_files_searched |= set(tpc.extra_config_files)
-        self.extra_dirs_searched |= set(tpc.extra_config_dirs)
-
-    def put(self, path, config):
-        self.files[path] = config
-
-    def get(self, tpc):
-        ret = UnparsedConfig()
-        files_list = self.files.keys()
+    def _getPaths(self, tpc):
+        # Return a list of paths we have entries for that match the TPC.
+        files_list = self.entries.keys()
         fns1 = []
         fns2 = []
         fns3 = []
@@ -8789,11 +8768,104 @@ class UnparsedBranchCache(object):
                     fns4.append(fn)
         fns = (["zuul.yaml"] + sorted(fns1) + [".zuul.yaml"] +
                sorted(fns2) + fns3 + sorted(fns4))
-        for fn in fns:
-            data = self.files.get(fn)
-            if data is not None:
-                ret.extend(data)
+        return fns
+
+    def getValidFor(self, tpc, conf_root, min_ltime):
+        """Return the oldest ltime if this has valid cache results for the
+        extra files/dirs in the tpc.  Otherwise, return None.
+
+        """
+        oldest_ltime = None
+        for path in conf_root + tpc.extra_config_files + tpc.extra_config_dirs:
+            entry = self.entries.get(path)
+            if entry is None:
+                return None
+            if entry.ltime < min_ltime:
+                return None
+            if oldest_ltime is None or entry.ltime < oldest_ltime:
+                oldest_ltime = entry.ltime
+        return oldest_ltime
+
+    def setValidFor(self, tpc, conf_root, ltime):
+        """Indicate that the cache has just been made current for the given
+        TPC as of ltime"""
+
+        seen = set()
+        # Identify any entries we have that match the TPC, and remove
+        # them if they are not up to date.
+        for path in self._getPaths(tpc):
+            entry = self.entries.get(path)
+            if entry is None:
+                # Probably "zuul.yaml" or similar hardcoded path that
+                # is unused.
+                continue
+            else:
+                # If this is a real entry (i.e., actually has data
+                # from the file cache), then mark it as seen so we
+                # don't create a dummy entry for it later, and also
+                # check to see if it can be pruned.
+                if entry.data is not None:
+                    seen.add(path)
+                    if entry.ltime < ltime:
+                        # This is an old entry which is not in the present
+                        # update but should have been if it existed in the
+                        # repo.  That means it was deleted and we can
+                        # remove it.
+                        del self.entries[path]
+        # Set the ltime for any paths that did not appear in our list
+        # (so that we know they have been checked and the cache is
+        # valid for that path+ltime).
+        for path in conf_root + tpc.extra_config_files + tpc.extra_config_dirs:
+            if path in seen:
+                continue
+            self.entries[path] = UnparsedBranchCacheEntry(ltime, None)
+
+    def put(self, path, data, ltime):
+        entry = self.entries.get(path)
+        if entry is not None:
+            if ltime < entry.ltime:
+                # We don't want the entry to go backward
+                return
+        self.entries[path] = UnparsedBranchCacheEntry(ltime, data)
+
+    def get(self, tpc, conf_root):
+        ret = UnparsedConfig()
+        loaded = False
+        for fn in self._getPaths(tpc):
+            entry = self.entries.get(fn)
+            if entry is not None and entry.data is not None:
+                # Don't load from more than one configuration in a
+                # project-branch (unless an "extra" file/dir).
+                fn_root = fn.split('/')[0]
+                if (fn_root in conf_root):
+                    if (loaded and loaded != fn_root):
+                        # "Multiple configuration files in source_context"
+                        continue
+                    loaded = fn_root
+                ret.extend(entry.data)
         return ret
+
+
+class TenantTPCRegistry:
+    def __init__(self):
+        # The project TPCs are stored as a list as we don't check for
+        # duplicate projects here.
+        self.config_tpcs = defaultdict(list)
+        self.untrusted_tpcs = defaultdict(list)
+
+    def addConfigTPC(self, tpc):
+        self.config_tpcs[tpc.project.name].append(tpc)
+
+    def addUntrustedTPC(self, tpc):
+        self.untrusted_tpcs[tpc.project.name].append(tpc)
+
+    def getConfigTPCs(self):
+        return list(itertools.chain.from_iterable(
+            self.config_tpcs.values()))
+
+    def getUntrustedTPCs(self):
+        return list(itertools.chain.from_iterable(
+            self.untrusted_tpcs.values()))
 
 
 class Abide(object):
@@ -8801,39 +8873,47 @@ class Abide(object):
         self.authz_rules = {}
         self.semaphores = {}
         self.tenants = {}
-        # tenant -> project -> list(tpcs)
-        # The project TPCs are stored as a list as we don't check for
-        # duplicate projects here.
-        self.config_tpcs = defaultdict(lambda: defaultdict(list))
-        self.untrusted_tpcs = defaultdict(lambda: defaultdict(list))
+        self.tenant_lock = threading.Lock()
+        # tenant -> TenantTPCRegistry
+        self.tpc_registry = defaultdict(TenantTPCRegistry)
         # project -> branch -> UnparsedBranchCache
         self.unparsed_project_branch_cache = {}
         self.api_root = None
 
-    def addConfigTPC(self, tenant_name, tpc):
-        self.config_tpcs[tenant_name][tpc.project.name].append(tpc)
+    def clearTPCRegistry(self, tenant_name):
+        try:
+            del self.tpc_registry[tenant_name]
+        except KeyError:
+            pass
 
-    def getConfigTPCs(self, tenant_name):
-        return list(itertools.chain.from_iterable(
-            self.config_tpcs[tenant_name].values()))
+    def getTPCRegistry(self, tenant_name):
+        return self.tpc_registry[tenant_name]
 
-    def addUntrustedTPC(self, tenant_name, tpc):
-        self.untrusted_tpcs[tenant_name][tpc.project.name].append(tpc)
+    def setTPCRegistry(self, tenant_name, tpc_registry):
+        self.tpc_registry[tenant_name] = tpc_registry
 
-    def getUntrustedTPCs(self, tenant_name):
-        return list(itertools.chain.from_iterable(
-            self.untrusted_tpcs[tenant_name].values()))
-
-    def clearTPCs(self, tenant_name):
-        self.config_tpcs[tenant_name].clear()
-        self.untrusted_tpcs[tenant_name].clear()
+    def getAllTPCs(self, tenant_name):
+        # Hold a reference to the registry to make sure it doesn't
+        # change between the two calls below.
+        registry = self.tpc_registry[tenant_name]
+        return list(itertools.chain(
+            itertools.chain.from_iterable(
+                registry.config_tpcs.values()),
+            itertools.chain.from_iterable(
+                registry.untrusted_tpcs.values()),
+        ))
 
     def _allProjectTPCs(self, project_name):
         # Flatten the lists of a project TPCs from all tenants
-        return itertools.chain.from_iterable(
-            tenant_tpcs.get(project_name, [])
-            for tenant_tpcs in itertools.chain(self.config_tpcs.values(),
-                                               self.untrusted_tpcs.values()))
+        # Force to a list to avoid iteration errors since the clear
+        # method can mutate the dictionary.
+        for tpc_registry in list(self.tpc_registry.values()):
+            for config_tpc in tpc_registry.config_tpcs.get(
+                    project_name, []):
+                yield config_tpc
+            for untrusted_tpc in tpc_registry.untrusted_tpcs.get(
+                    project_name, []):
+                yield untrusted_tpc
 
     def getExtraConfigFiles(self, project_name):
         """Get all extra config files for a project accross tenants."""
@@ -8858,22 +8938,7 @@ class Abide(object):
     def getUnparsedBranchCache(self, canonical_project_name, branch):
         project_branch_cache = self.unparsed_project_branch_cache.setdefault(
             canonical_project_name, {})
-        cache = project_branch_cache.get(branch)
-        if cache is not None:
-            return cache
-        project_branch_cache[branch] = UnparsedBranchCache()
-        return project_branch_cache[branch]
-
-    def clearUnparsedBranchCache(self, canonical_project_name, branch=None):
-        if canonical_project_name in self.unparsed_project_branch_cache:
-            project_branch_cache = \
-                self.unparsed_project_branch_cache[canonical_project_name]
-
-            if branch in project_branch_cache:
-                del project_branch_cache[branch]
-
-            if len(project_branch_cache) == 0 or branch is None:
-                del self.unparsed_project_branch_cache[canonical_project_name]
+        return project_branch_cache.setdefault(branch, UnparsedBranchCache())
 
 
 class Capabilities(object):
