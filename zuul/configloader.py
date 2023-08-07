@@ -1918,10 +1918,11 @@ class TenantParser(object):
 
         tenant.unparsed_config = conf
         # tpcs is TenantProjectConfigs
-        config_tpcs = abide.getConfigTPCs(tenant.name)
+        tpc_registry = abide.getTPCRegistry(tenant.name)
+        config_tpcs = tpc_registry.getConfigTPCs()
         for tpc in config_tpcs:
             tenant.addConfigProject(tpc)
-        untrusted_tpcs = abide.getUntrustedTPCs(tenant.name)
+        untrusted_tpcs = tpc_registry.getUntrustedTPCs()
         for tpc in untrusted_tpcs:
             tenant.addUntrustedProject(tpc)
 
@@ -2324,9 +2325,10 @@ class TenantParser(object):
                 pb_ltime = min_ltimes[project.canonical_name][branch]
                 # If our unparsed branch cache is valid for the
                 # time, then we don't need to do anything else.
-                if branch_cache.isValidFor(tpc, pb_ltime):
-                    min_ltimes[project.canonical_name][branch] =\
-                        branch_cache.ltime
+                bc_ltime = branch_cache.getValidFor(tpc, ZUUL_CONF_ROOT,
+                                                    pb_ltime)
+                if bc_ltime is not None:
+                    min_ltimes[project.canonical_name][branch] = bc_ltime
                     return
             except KeyError:
                 self.log.exception(
@@ -2419,9 +2421,6 @@ class TenantParser(object):
                                    loading_errors, ltime, min_ltimes):
         loaded = False
         tpc = tenant.project_configs[source_context.project_canonical_name]
-        # Make sure we are clearing the local cache before updating it.
-        abide.clearUnparsedBranchCache(source_context.project_canonical_name,
-                                       source_context.branch)
         branch_cache = abide.getUnparsedBranchCache(
             source_context.project_canonical_name,
             source_context.branch)
@@ -2435,14 +2434,16 @@ class TenantParser(object):
                         or (conf_root in valid_dirs
                             and fn.startswith(f"{conf_root}/"))):
                     continue
-                # Don't load from more than one configuration in a
-                # project-branch (unless an "extra" file/dir).
+                # Warn if there is more than one configuration in a
+                # project-branch (unless an "extra" file/dir).  We
+                # continue to add the data to the cache for use by
+                # other tenants, but we will filter it out when we
+                # retrieve it later.
                 fn_root = fn.split('/')[0]
                 if (fn_root in ZUUL_CONF_ROOT):
                     if (loaded and loaded != conf_root):
                         self.log.warning("Multiple configuration files in %s",
                                          source_context)
-                        continue
                     loaded = conf_root
                 # Create a new source_context so we have unique filenames.
                 source_context = source_context.copy()
@@ -2452,11 +2453,11 @@ class TenantParser(object):
                     (source_context,))
                 incdata = self.loadProjectYAML(
                     files[fn], source_context, loading_errors)
-                branch_cache.put(source_context.path, incdata)
-        branch_cache.setValidFor(tpc, ltime)
+                branch_cache.put(source_context.path, incdata, ltime)
+        branch_cache.setValidFor(tpc, ZUUL_CONF_ROOT, ltime)
         if min_ltimes is not None:
             min_ltimes[source_context.project_canonical_name][
-                source_context.branch] = branch_cache.ltime
+                source_context.branch] = ltime
 
     def _loadTenantYAML(self, abide, tenant, loading_errors):
         config_projects_config = model.UnparsedConfig()
@@ -2468,7 +2469,7 @@ class TenantParser(object):
             branch_cache = abide.getUnparsedBranchCache(
                 project.canonical_name, branch)
             tpc = tenant.project_configs[project.canonical_name]
-            unparsed_branch_config = branch_cache.get(tpc)
+            unparsed_branch_config = branch_cache.get(tpc, ZUUL_CONF_ROOT)
 
             if unparsed_branch_config:
                 unparsed_branch_config = self.filterConfigProjectYAML(
@@ -2482,7 +2483,7 @@ class TenantParser(object):
                 branch_cache = abide.getUnparsedBranchCache(
                     project.canonical_name, branch)
                 tpc = tenant.project_configs[project.canonical_name]
-                unparsed_branch_config = branch_cache.get(tpc)
+                unparsed_branch_config = branch_cache.get(tpc, ZUUL_CONF_ROOT)
                 if unparsed_branch_config:
                     unparsed_branch_config = self.filterUntrustedProjectYAML(
                         unparsed_branch_config, loading_errors)
@@ -2893,15 +2894,18 @@ class ConfigLoader(object):
         # project's config files (incl. tenant specific extra config) at once.
         with ThreadPoolExecutor(max_workers=4) as executor:
             for tenant_name, unparsed_config in tenants_to_load.items():
+                tpc_registry = model.TenantTPCRegistry()
                 config_tpcs, untrusted_tpcs = (
                     self.tenant_parser.loadTenantProjects(unparsed_config,
                                                           executor)
                 )
-                abide.clearTPCs(tenant_name)
                 for tpc in config_tpcs:
-                    abide.addConfigTPC(tenant_name, tpc)
+                    tpc_registry.addConfigTPC(tpc)
                 for tpc in untrusted_tpcs:
-                    abide.addUntrustedTPC(tenant_name, tpc)
+                    tpc_registry.addUntrustedTPC(tpc)
+                # This atomic replacement of TPCs means that we don't need to
+                # lock the abide.
+                abide.setTPCRegistry(tenant_name, tpc_registry)
 
     def loadTenant(self, abide, tenant_name, ansible_manager, unparsed_abide,
                    min_ltimes=None, layout_uuid=None,
@@ -2974,9 +2978,10 @@ class ConfigLoader(object):
         """
         if tenant_name not in unparsed_abide.tenants:
             # Copy tenants dictionary to not break concurrent iterations.
-            tenants = abide.tenants.copy()
-            del tenants[tenant_name]
-            abide.tenants = tenants
+            with abide.tenant_lock:
+                tenants = abide.tenants.copy()
+                del tenants[tenant_name]
+                abide.tenants = tenants
             return None
 
         unparsed_config = unparsed_abide.tenants[tenant_name]
@@ -2986,9 +2991,10 @@ class ConfigLoader(object):
                 min_ltimes, layout_uuid, branch_cache_min_ltimes,
                 ignore_cat_exception)
         # Copy tenants dictionary to not break concurrent iterations.
-        tenants = abide.tenants.copy()
-        tenants[tenant_name] = new_tenant
-        abide.tenants = tenants
+        with abide.tenant_lock:
+            tenants = abide.tenants.copy()
+            tenants[tenant_name] = new_tenant
+            abide.tenants = tenants
         if len(new_tenant.layout.loading_errors):
             self.log.warning(
                 "%s errors detected during %s tenant configuration loading",
