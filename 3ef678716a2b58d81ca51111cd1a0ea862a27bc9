@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b25753d_ff72e025",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-08T21:47:31Z",
+      "side": 1,
+      "message": "Agreed, I will address that in a later patchset.",
+      "parentUuid": "0a7a1453_1d7e105b",
+      "revId": "3ef678716a2b58d81ca51111cd1a0ea862a27bc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "24653410_15f265ed",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-08T11:41:48Z",
       "side": 1,
       "message": "Could there be a problem when another configloader creates a new unparsed branch cache around the same time?\n\nE.g. a tenant reconfiguration and a local layout update could both update the unparsed branch cache for a project-branch combination. I\u0027m wondering if the local layout update could set an outdated branch cache in certain cases.",
+      "revId": "3ef678716a2b58d81ca51111cd1a0ea862a27bc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ea215fe_ce25d950",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2424,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-08T21:47:31Z",
+      "side": 1,
+      "message": "My original response to this was going to be that it should be fine since the two simultaneous loads should produce the same data, but then I realized that loads for different tenants won\u0027t have the same TPCs, and even the existing code doesn\u0027t do what we expect.  We intend this cache to support all of the tenants simultaneously, but we effectively use it one tenant at a time (and clear/reset it if a second tenant has a different TPC file configuration than the first).\n\nI will address both issues in the next PS.",
+      "parentUuid": "24653410_15f265ed",
       "revId": "3ef678716a2b58d81ca51111cd1a0ea862a27bc9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
