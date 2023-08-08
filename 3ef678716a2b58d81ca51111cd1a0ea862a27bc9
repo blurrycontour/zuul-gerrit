@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a7a1453_1d7e105b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-08-08T11:41:48Z",
+      "side": 1,
+      "message": "I think replacing the tenant list could be a potential problem now that multiple tenants can be loaded in parallel (e.g. a reconfig + layout update).",
+      "revId": "3ef678716a2b58d81ca51111cd1a0ea862a27bc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24653410_15f265ed",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2424,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-08-08T11:41:48Z",
+      "side": 1,
+      "message": "Could there be a problem when another configloader creates a new unparsed branch cache around the same time?\n\nE.g. a tenant reconfiguration and a local layout update could both update the unparsed branch cache for a project-branch combination. I\u0027m wondering if the local layout update could set an outdated branch cache in certain cases.",
+      "revId": "3ef678716a2b58d81ca51111cd1a0ea862a27bc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e75e9ae_0eaa093d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2892,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-08-08T11:41:48Z",
+      "side": 1,
+      "message": "Do we need to protect against concurrent modification of the tenants in the `unparsed_abide` here as well?",
+      "range": {
+        "startLine": 2888,
+        "startChar": 0,
+        "endLine": 2892,
+        "endChar": 52
+      },
+      "revId": "3ef678716a2b58d81ca51111cd1a0ea862a27bc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
