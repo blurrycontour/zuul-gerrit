@@ -424,6 +424,7 @@ class BaseMergeServer(metaclass=ABCMeta):
                     errors,
                     elapsed_time,
                     merge_request.span_info,
+                    merge_request.event_id,
                 )
 
             def put_complete_event(log, merge_request, event):

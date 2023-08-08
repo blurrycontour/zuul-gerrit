@@ -196,6 +196,7 @@ class MergeClient(object):
                     errors=None,
                     elapsed_time=None,
                     span_info=merge_request.span_info,
+                    zuul_event_id=merge_request.event_id,
                 )
             try:
                 self.result_events[merge_request.tenant_name][
