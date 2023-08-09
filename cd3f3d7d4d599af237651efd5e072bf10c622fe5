@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "cd3f3d7d4d599af237651efd5e072bf10c622fe5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c19c22d_f6c79cdf",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1551,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-09T21:19:34Z",
+      "side": 1,
+      "message": "It\u0027s arguable whether we should return true or false here.  Strictly speaking, the item is as ready as it will ever be, so True would be appropriate.  However, True causes us to run a few extra lines of code (executeJobs) that are not necessary.  Also, we haven\u0027t actually completed this process (we haven\u0027t gotten a repo state or deduplicated jobs).  All things considered, I think it\u0027s probably better to return False here.  Maybe it\u0027s worth a note though?",
+      "revId": "cd3f3d7d4d599af237651efd5e072bf10c622fe5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
