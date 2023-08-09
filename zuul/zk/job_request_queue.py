@@ -235,7 +235,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
             states = self.request_class.ALL_STATES
 
         requests = [
-            req for req in self._cached_requests.values()
+            req for req in list(self._cached_requests.values())
             if req.state in states
         ]
 
