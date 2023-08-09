@@ -92,6 +92,24 @@
       },
       "revId": "3ef678716a2b58d81ca51111cd1a0ea862a27bc9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cc8657d_379167f4",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2892,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-09T22:00:25Z",
+      "side": 1,
+      "message": "The unparsed_abine is atomically replaced on the scheduler, however, since it happens so rarely and should never happen simultaneously, we should go ahead and wrap those updates in a lock.  I do so in PS3.",
+      "parentUuid": "6e75e9ae_0eaa093d",
+      "revId": "3ef678716a2b58d81ca51111cd1a0ea862a27bc9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
