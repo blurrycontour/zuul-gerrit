@@ -3448,7 +3448,10 @@ class ExecutorServer(BaseMergeServer):
 
     @accepting_work.setter
     def accepting_work(self, work):
-        self.component_info.accepting_work = work
+        try:
+            self.component_info.accepting_work = work
+        except Exception:
+            self.log.exception("Unable to update component info")
 
     def start(self):
         # Start merger worker only if we process merge jobs
@@ -3502,7 +3505,10 @@ class ExecutorServer(BaseMergeServer):
 
     def stop(self):
         self.log.debug("Stopping executor")
-        self.component_info.state = self.component_info.STOPPED
+        try:
+            self.component_info.state = self.component_info.STOPPED
+        except Exception:
+            self.log.exception("Unable to set component state")
         self.connections.stop()
         self.disk_accountant.stop()
         # The governor can change function registration, so make sure
@@ -3577,7 +3583,10 @@ class ExecutorServer(BaseMergeServer):
 
     def pause(self):
         self.log.debug('Pausing')
-        self.component_info.state = self.component_info.PAUSED
+        try:
+            self.component_info.state = self.component_info.PAUSED
+        except Exception:
+            self.log.exception("Unable to set component state")
         self.pause_sensor.pause = True
         self.manageLoad()
         if self.process_merge_jobs:
@@ -3585,7 +3594,10 @@ class ExecutorServer(BaseMergeServer):
 
     def unpause(self):
         self.log.debug('Resuming')
-        self.component_info.state = self.component_info.RUNNING
+        try:
+            self.component_info.state = self.component_info.RUNNING
+        except Exception:
+            self.log.exception("Unable to set component state")
         self.pause_sensor.pause = False
         self.manageLoad()
         if self.process_merge_jobs:
