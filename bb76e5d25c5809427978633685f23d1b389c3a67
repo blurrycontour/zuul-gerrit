@@ -16,6 +16,24 @@
       "message": "Done. Maybe we need to add the project\u0027s canonical hostname later on as a separate safe attribute to avoid any ambiguity.",
       "revId": "bb76e5d25c5809427978633685f23d1b389c3a67",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3aca6297_ae2d3de1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-10T23:04:00Z",
+      "side": 1,
+      "message": "Yeah, or I think we could probably change this one too (we should double check where it\u0027s used and decide if it would be a problem).  But that should be a deliberate change with a release note.",
+      "parentUuid": "05b38b7e_c34baf79",
+      "revId": "bb76e5d25c5809427978633685f23d1b389c3a67",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
