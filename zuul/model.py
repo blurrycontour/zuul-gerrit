@@ -2291,6 +2291,8 @@ class FrozenJob(zkobject.ZKObject):
     # object, otherwise we store them on this one.
     MAX_DATA_LEN = 10 * 1024
 
+    log = logging.getLogger("zuul.FrozenJob")
+
     attributes = ('ansible_version',
                   'dependencies',
                   'inheritance_path',
@@ -2353,10 +2355,18 @@ class FrozenJob(zkobject.ZKObject):
         for k in self.attributes:
             if k in ['inheritance_path', 'waiting_status', 'queued']:
                 continue
-            if getattr(self, k) != getattr(other, k):
+            this_attr = getattr(self, k)
+            other_attr = getattr(other, k)
+            if this_attr != other_attr:
+                self.log.debug("Job %s attribute %s: %s != %s",
+                               self.name, k, this_attr, other_attr)
                 return False
         for k in self.job_data_attributes:
-            if getattr(self, k) != getattr(other, k):
+            this_dattr = getattr(self, k)
+            other_dattr = getattr(other, k)
+            if this_dattr != other_dattr:
+                self.log.debug("Job %s data attribute %s: %s != %s",
+                               self.name, k, this_dattr, other_dattr)
                 return False
         return True
 
