@@ -2283,6 +2283,24 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertIn('Pipelines may not be defined', A.messages[0],
                       "A should have a syntax error reported")
 
+    def test_untrusted_pipeline_ignored(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - pipeline:
+                name: test
+            """)
+
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/ignored-project', 'master',
+                                           'A', files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertNotIn('Pipelines may not be defined', A.messages[0],
+                         "A should not have a syntax error reported")
+
     def test_untrusted_project_error(self):
         in_repo_conf = textwrap.dedent(
             """
