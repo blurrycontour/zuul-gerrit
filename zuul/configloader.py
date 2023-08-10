@@ -2485,7 +2485,9 @@ class TenantParser(object):
                 unparsed_branch_config = branch_cache.get(tpc)
                 if unparsed_branch_config:
                     unparsed_branch_config = self.filterUntrustedProjectYAML(
-                        unparsed_branch_config, loading_errors)
+                        tpc.load_classes,
+                        unparsed_branch_config,
+                        loading_errors)
 
                     untrusted_projects_config.extend(unparsed_branch_config)
         return config_projects_config, untrusted_projects_config
@@ -2501,8 +2503,8 @@ class TenantParser(object):
         # Any config object may appear in a config project.
         return data.copy(trusted=True)
 
-    def filterUntrustedProjectYAML(self, data, loading_errors):
-        if data and data.pipelines:
+    def filterUntrustedProjectYAML(self, classes, data, loading_errors):
+        if data and data.pipelines and 'pipeline' in classes:
             with configuration_exceptions(
                     'pipeline', data.pipelines[0], loading_errors):
                 raise PipelineNotPermittedError()
@@ -3078,8 +3080,10 @@ class ConfigLoader(object):
                             incdata)
                     else:
                         incdata = self.tenant_parser.\
-                            filterUntrustedProjectYAML(incdata,
-                                                       pcontext.loading_errors)
+                            filterUntrustedProjectYAML(
+                                tpc.load_classes,
+                                incdata,
+                                pcontext.loading_errors)
 
                     config.extend(self.tenant_parser.parseConfig(
                         tenant, incdata, pcontext))
