@@ -1105,6 +1105,43 @@ class TestGerritUnicodeRefs(ZuulTestCase):
                           '52944ee370db5c87691e62e0f9079b6281319b4e'})
 
 
+class TestGerritMaxDeps(ZuulTestCase):
+    config_file = 'zuul-gerrit-max-deps.conf'
+
+    @simple_layout('layouts/simple.yaml')
+    def test_max_deps(self):
+        # max_dependencies for the connection is 1, so this is okay
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ])
+
+        # So is this
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+            dict(name='check-job', result='SUCCESS', changes='1,1 2,1'),
+        ])
+
+        # This is not
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        C.setDependsOn(B, 1)
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+            dict(name='check-job', result='SUCCESS', changes='1,1 2,1'),
+        ])
+
+
 class TestGerritDriver(ZuulTestCase):
     # Most of the Zuul test suite tests the Gerrit driver, to some
     # extent.  The other classes in this file test specific methods of

@@ -113,6 +113,13 @@ class IndependentPipelineManager(PipelineManager):
                 node = dependency_graph.setdefault(change, [])
                 node.append(needed_change)
 
+            if (self.pipeline.tenant.max_dependencies is not None and
+                dependency_graph is not None and
+                len(dependency_graph) > self.pipeline.tenant.max_dependencies):
+                log.debug("  Dependency graph for change %s is too large",
+                          change)
+                return True, []
+
             if self.isChangeAlreadyInQueue(needed_change, change_queue):
                 log.debug("  Needed change is already ahead in the queue")
                 continue

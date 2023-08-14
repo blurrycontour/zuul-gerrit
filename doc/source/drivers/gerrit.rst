@@ -92,6 +92,20 @@ The supported options in ``zuul.conf`` connections are:
       which points back to Gerrit, project and all of its safe attributes,
       and sha which is the git sha1.
 
+   .. attr:: max_dependencies
+
+      This setting can be used to limit the number of dependencies
+      that Zuul will consider when processing events from Gerrit.  If
+      used, it should be set to a value that is higher than the
+      highest number of dependencies that are expected to be
+      encountered.  If, when processing an event from Gerrit, Zuul
+      detects that the dependencies will exceed this value, Zuul will
+      ignore the event with no feedback to the user.  This is meant
+      only to protect the Zuul server from resource exhaustion when
+      excessive dependencies are present.  The default (unset) is no
+      limit.  Note that the value ``0`` does not disable this option;
+      instead it limits Zuul to zero dependencies.
+
    .. attr:: user
       :default: zuul
 

@@ -338,6 +338,20 @@ configuration. Some examples of tenant definitions are:
 
             A list of **project** items.
 
+   .. attr:: max-dependencies
+
+      This setting can be used to limit the number of dependencies
+      that Zuul will consider when enqueing a change in any pipeline
+      in this tenant.  If used, it should be set to a value that is
+      higher than the highest number of dependencies that are expected
+      to be encountered.  If, when enqueing a change, Zuul detects
+      that the dependencies will exceed this value, Zuul will not
+      enqueue the change and will provide no feedback to the user.
+      This is meant only to protect the Zuul server from resource
+      exhaustion when excessive dependencies are present.  The default
+      (unset) is no limit.  Note that the value ``0`` does not disable
+      this option; instead it limits Zuul to zero dependencies.
+
    .. attr:: max-nodes-per-job
       :default: 5
 

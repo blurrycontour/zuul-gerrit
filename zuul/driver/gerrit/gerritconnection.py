@@ -84,6 +84,10 @@ class HTTPBadRequestException(Exception):
     pass
 
 
+class GerritEventProcessingException(Exception):
+    pass
+
+
 class GerritChangeCache(AbstractChangeCache):
     log = logging.getLogger("zuul.driver.GerritChangeCache")
 
@@ -226,6 +230,8 @@ class GerritEventConnector(threading.Thread):
                         "GerritEventProcessing", links=[link]):
                     try:
                         self._handleEvent(event)
+                    except GerritEventProcessingException as e:
+                        self.log.warning("Skipping event due to %s", e)
                     finally:
                         self.event_queue.ack(event)
                 if self._stopped:
@@ -435,6 +441,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.port = int(self.connection_config.get('port', 29418))
         self.keyfile = self.connection_config.get('sshkey', None)
         self.keepalive = int(self.connection_config.get('keepalive', 60))
+        self.max_dependencies = self.connection_config.get(
+            'max_dependencies', None)
+        if self.max_dependencies is not None:
+            self.max_dependencies = int(self.max_dependencies)
         self.event_source = self.EVENT_SOURCE_NONE
         # TODO(corvus): Document this when the checks api is stable;
         # it's not useful without it.
@@ -794,6 +804,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             log.debug("Change %s is in history", change)
             return change
 
+        if (self.max_dependencies is not None and
+            history and
+            len(history) > self.max_dependencies):
+            raise GerritEventProcessingException(
+                f"Change {change} has too many dependencies")
+
         log.info("Updating %s", change)
         data = self.queryChange(change.number, event=event)
 
@@ -857,6 +873,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     dep not in needed_by_changes):
                     git_needed_by_changes.append(dep.cache_key)
                     needed_by_changes.add(dep.cache_key)
+            except GerritEventProcessingException:
+                raise
             except Exception:
                 log.exception("Failed to get git-needed change %s,%s",
                               dep_num, dep_ps)
@@ -882,6 +900,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     and dep not in needed_by_changes):
                     compat_needed_by_changes.append(dep.cache_key)
                     needed_by_changes.add(dep.cache_key)
+            except GerritEventProcessingException:
+                raise
             except Exception:
                 log.exception("Failed to get commit-needed change %s,%s",
                               dep_num, dep_ps)
@@ -917,6 +937,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     and dep not in needed_by_changes):
                     compat_needed_by_changes.append(dep.cache_key)
                     needed_by_changes.add(dep.cache_key)
+            except GerritEventProcessingException:
+                raise
             except Exception:
                 log.exception("Failed to get commit-needed change %s,%s",
                               dep_num, dep_ps)
