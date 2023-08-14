@@ -8572,6 +8572,7 @@ class Tenant(object):
         self.name = name
         self.max_nodes_per_job = 5
         self.max_job_timeout = 10800
+        self.max_dependencies = None
         self.exclude_unprotected_branches = False
         self.default_base_job = None
         self.layout = None
