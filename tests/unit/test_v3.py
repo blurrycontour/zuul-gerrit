@@ -9237,3 +9237,49 @@ class TestDynamicBranchesProject(IncludeBranchesTestCase):
             dict(name='project-test', result='SUCCESS', changes='2,1'),
         ]
         self._test_include_branches(history1, history2, history3, history4)
+
+
+class TestMaxDeps(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main-max-deps.yaml'
+
+    def test_max_deps(self):
+        # max_dependencies for the connection is 1, so this is okay
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        # So is this
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
+        ], ordered=False)
+
+        # This is not
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        C.setDependsOn(B, 1)
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
+        ], ordered=False)
