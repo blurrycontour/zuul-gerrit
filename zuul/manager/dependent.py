@@ -276,8 +276,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
             return failing_items
         return None
 
-    def dequeueItem(self, item):
-        super(DependentPipelineManager, self).dequeueItem(item)
+    def dequeueItem(self, item, quiet=False):
+        super(DependentPipelineManager, self).dequeueItem(item, quiet)
         # If this was a dynamic queue from a speculative change,
         # remove the queue (if empty)
         if item.queue.dynamic:

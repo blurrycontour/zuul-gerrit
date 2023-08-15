@@ -20,11 +20,21 @@
         Verified: 1
       github:
         status: success
+        check: success
     failure:
       gerrit:
         Verified: -1
       github:
         status: failure
+        check: failure
+    start:
+      github:
+        check: in_progress
+        comment: false
+    dequeue:
+      github:
+        check: cancelled
+        comment: false
 
 - pipeline:
     name: gate
@@ -53,14 +63,22 @@
         submit: true
       github:
         merge: true
+        check: success
     failure:
       gerrit:
         Verified: -2
-      github: {}
+      github:
+        check: failure
     start:
       gerrit:
         Verified: 0
-      github: {}
+      github:
+        check: in_progress
+        comment: false
+    dequeue:
+      github:
+        check: cancelled
+        comment: false
     precedence: high
 
 - job:

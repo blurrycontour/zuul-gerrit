@@ -124,8 +124,8 @@ class IndependentPipelineManager(PipelineManager):
             # verifying that the dependent change is mergable.
         return abort, changes_needed
 
-    def dequeueItem(self, item):
-        super(IndependentPipelineManager, self).dequeueItem(item)
+    def dequeueItem(self, item, quiet=False):
+        super(IndependentPipelineManager, self).dequeueItem(item, quiet)
         # An independent pipeline manager dynamically removes empty
         # queues
         if not item.queue.queue:
