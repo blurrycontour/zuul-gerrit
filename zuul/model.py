@@ -2855,7 +2855,9 @@ class Job(ConfigObject):
         project_canonical_names.update(self._projectsFromPlaybooks(
             itertools.chain(self.pre_run, [self.run[0]], self.post_run,
                             self.cleanup_run), with_implicit=True))
-        return list(project_canonical_names)
+        # Return a sorted list so the order is deterministic for
+        # comparison.
+        return sorted(project_canonical_names)
 
     def _projectsFromPlaybooks(self, playbooks, with_implicit=False):
         for playbook in playbooks:
