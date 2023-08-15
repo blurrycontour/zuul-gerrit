@@ -6995,7 +6995,7 @@ class MergeCompletedEvent(ResultEvent):
 
     def __init__(self, request_uuid, build_set_uuid, merged, updated,
                  commit, files, repo_state, item_in_branches,
-                 errors, elapsed_time, span_info=None):
+                 errors, elapsed_time, span_info=None, zuul_event_id=None):
         self.request_uuid = request_uuid
         self.build_set_uuid = build_set_uuid
         self.merged = merged
@@ -7007,6 +7007,7 @@ class MergeCompletedEvent(ResultEvent):
         self.errors = errors or []
         self.elapsed_time = elapsed_time
         self.span_info = span_info
+        self.zuul_event_id = zuul_event_id
 
     def __repr__(self):
         return ('<MergeCompletedEvent job: %s buildset: %s merged: %s '
@@ -7028,6 +7029,7 @@ class MergeCompletedEvent(ResultEvent):
             "errors": list(self.errors),
             "elapsed_time": self.elapsed_time,
             "span_info": self.span_info,
+            "zuul_event_id": self.zuul_event_id,
         }
 
     @classmethod
@@ -7044,6 +7046,7 @@ class MergeCompletedEvent(ResultEvent):
             list(data.get("errors", [])),
             data.get("elapsed_time"),
             data.get("span_info"),
+            data.get("zuul_event_id"),
         )
 
 
