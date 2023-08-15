@@ -1077,3 +1077,33 @@ class TestExecutorFailure(ZuulTestCase):
         self.assertTrue(re.search(
             '- project-merge .* ERROR',
             A.messages[-1]))
+
+    def test_executor_transient_error(self):
+        self.hold_jobs_in_queue = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        with mock.patch('zuul.merger.merger.Merger.updateRepo') as update_mock:
+            update_mock.side_effect = IOError("Transient error")
+            self.executor_api.release()
+            self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        pipeline = tenant.layout.pipelines['gate']
+        items = pipeline.getAllItems()
+        self.assertEqual(len(items), 1)
+
+        self.hold_jobs_in_queue = False
+        self.executor_api.release()
+        self.waitUntilSettled()
+
+        retry_builds = items[0].current_build_set.retry_builds
+        self.assertIn("project-merge", retry_builds)
+        build_retries = retry_builds["project-merge"]
+        self.assertEqual(len(build_retries), 1)
+        self.assertIsNotNone(build_retries[0].error_detail)
+        self.assertTrue(
+            build_retries[0].error_detail.startswith(
+                "Failed to update project"))
