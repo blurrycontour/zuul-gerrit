@@ -1,4 +1,5 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -195,6 +196,18 @@ class GerritSource(BaseSource):
         # by "git merge -s resolve", so we return that as the default
         # for the Gerrit driver.
         return 'merge-resolve'
+
+    def getProjectDefaultBranch(self, project, tenant, min_ltime=-1):
+        # We have to return something here, so try to get it from the
+        # cache, and if that fails, return the Zuul default.
+        try:
+            default_branch = self.connection.getProjectDefaultBranch(
+                project, tenant, min_ltime)
+        except Exception:
+            default_branch = None
+        if default_branch is None:
+            return super().getProjectDefaultBranch(project, tenant, min_ltime)
+        return default_branch
 
     def getProjectBranches(self, project, tenant, min_ltime=-1):
         return self.connection.getProjectBranches(project, tenant, min_ltime)

@@ -991,6 +991,7 @@ class GerritWebServer(object):
                                   r'\?parent=1')
             change_search_re = re.compile(r'/a/changes/\?n=500.*&q=(.*)')
             version_re = re.compile(r'/a/config/server/version')
+            head_re = re.compile(r'/a/projects/(.*)/HEAD')
 
             def do_POST(self):
                 path = self.path
@@ -1041,6 +1042,9 @@ class GerritWebServer(object):
                 m = self.version_re.match(path)
                 if m:
                     return self.version()
+                m = self.head_re.match(path)
+                if m:
+                    return self.head(m.group(1))
                 self.send_response(500)
                 self.end_headers()
 
@@ -1216,6 +1220,13 @@ class GerritWebServer(object):
                 self.send_data('3.0.0-some-stuff')
                 self.end_headers()
 
+            def head(self, project):
+                project = urllib.parse.unquote(project)
+                head = fake_gerrit._fake_project_default_branch.get(
+                    project, 'master')
+                self.send_data(head)
+                self.end_headers()
+
             def send_data(self, data):
                 data = json.dumps(data).encode('utf-8')
                 data = b")]}'\n" + data
@@ -1329,6 +1340,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self._ref_watcher_event = ref_watcher_event
         self._fake_submit_whole_topic = False
         self._fake_submit_permission = True
+        self._fake_project_default_branch = {}
         self.submit_retry_backoff = 0
 
     def onStop(self):
@@ -1410,6 +1422,15 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                 "refName": 'refs/heads/' + branch,
                 "project": project,
             }
+        }
+        return event
+
+    def getProjectHeadUpdatedEvent(self, project, old, new):
+        event = {
+            "projectName": project,
+            "oldHead": f"refs/heads/{old}",
+            "newHead": f"refs/heads/{new}",
+            "type": "project-head-updated",
         }
         return event
 
