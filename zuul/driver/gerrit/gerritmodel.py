@@ -1,4 +1,5 @@
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -209,6 +210,7 @@ class GerritTriggerEvent(TriggerEvent):
         self.uuid = None
         self.scheme = None
         self.patchsetcomments = None
+        self.default_branch_changed = None
 
     def toDict(self):
         d = super().toDict()
@@ -216,6 +218,7 @@ class GerritTriggerEvent(TriggerEvent):
         d["uuid"] = self.uuid
         d["scheme"] = self.scheme
         d["patchsetcomments"] = self.patchsetcomments
+        d["default_branch_changed"] = self.default_branch_changed
         return d
 
     def updateFromDict(self, d):
@@ -224,6 +227,7 @@ class GerritTriggerEvent(TriggerEvent):
         self.uuid = d["uuid"]
         self.scheme = d["scheme"]
         self.patchsetcomments = d["patchsetcomments"]
+        self.default_branch_changed = d.get("default_branch_changed")
 
     def __repr__(self):
         ret = '<GerritTriggerEvent %s %s' % (self.type,
@@ -245,6 +249,9 @@ class GerritTriggerEvent(TriggerEvent):
 
     def isChangeAbandoned(self):
         return 'change-abandoned' == self.type
+
+    def isDefaultBranchChanged(self):
+        return bool(self.default_branch_changed)
 
 
 class GerritEventFilter(EventFilter):
