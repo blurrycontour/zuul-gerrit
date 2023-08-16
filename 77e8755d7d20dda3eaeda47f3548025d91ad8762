@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5078c8b8_0ddfd9ae",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-16T20:26:16Z",
+      "side": 1,
+      "message": "Correct.",
+      "parentUuid": "c4a5b8bf_bc77a7f1",
+      "revId": "77e8755d7d20dda3eaeda47f3548025d91ad8762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8fbef23_b5f5143d",
@@ -41,6 +59,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2f75bbf_ac283291",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 1130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-16T20:26:16Z",
+      "side": 1,
+      "message": "Ack will do.",
+      "parentUuid": "c8fbef23_b5f5143d",
+      "revId": "77e8755d7d20dda3eaeda47f3548025d91ad8762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57028fb1_ee3904e0",
@@ -54,6 +90,24 @@
       "writtenOn": "2023-08-16T19:42:05Z",
       "side": 1,
       "message": "Is this necessary? We are processing localhost after the fact and not in a streaming fashion so we will know whether or not it has failed at this point. I guess one reason to do this check is for result consistency between localhost and remote nodes?",
+      "revId": "77e8755d7d20dda3eaeda47f3548025d91ad8762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7351043c_5959ce4c",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-16T20:26:16Z",
+      "side": 1,
+      "message": "I think so.  Primarily for the consistency (I really don\u0027t want zuul job behavior to change like that), but also, probably no less importantly, this lets us test the behavior in unit tests.",
+      "parentUuid": "57028fb1_ee3904e0",
       "revId": "77e8755d7d20dda3eaeda47f3548025d91ad8762",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -75,6 +129,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90d7984a_f23a12fb",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2458,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-16T20:26:16Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "e11c6f0c_a41b5bc4",
+      "revId": "77e8755d7d20dda3eaeda47f3548025d91ad8762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c0a6f6f_51a44728",
@@ -88,6 +160,24 @@
       "writtenOn": "2023-08-16T19:42:05Z",
       "side": 1,
       "message": "Related to the comment above: Is this setting a default value to empty tuple? Then db data can override it if present? If that is the case I\u0027m still concerned that the frozen job type needs its own defaults to be set.",
+      "revId": "77e8755d7d20dda3eaeda47f3548025d91ad8762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95724b80_7ad76987",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2823,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-16T20:26:16Z",
+      "side": 1,
+      "message": "This class is the abstract in-memory job, so isn\u0027t serialized to ZK.  The FrozenJob does need a default set, but this class gets its default here, and it\u0027s overridden if a user sets a value in zuul.yaml.",
+      "parentUuid": "3c0a6f6f_51a44728",
       "revId": "77e8755d7d20dda3eaeda47f3548025d91ad8762",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
