@@ -1105,6 +1105,36 @@ class TestGerritUnicodeRefs(ZuulTestCase):
                           '52944ee370db5c87691e62e0f9079b6281319b4e'})
 
 
+class TestGerritDefaultBranch(ZuulTestCase):
+    config_file = 'zuul-gerrit-web.conf'
+    tenant_config_file = 'config/single-tenant/main.yaml'
+    scheduler_count = 1
+
+    def test_default_branch_changed(self):
+        """Test the project-head-updated event"""
+        self.waitUntilSettled()
+
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata('review.example.com/org/project1')
+        self.assertEqual('master', md.default_branch)
+        prev_layout = layout.uuid
+
+        self.fake_gerrit._fake_project_default_branch[
+            'org/project1'] = 'foobar'
+        self.fake_gerrit.addEvent(self.fake_gerrit.getProjectHeadUpdatedEvent(
+            project='org/project1',
+            old='master',
+            new='foobar'
+        ))
+        self.waitUntilSettled()
+
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata('review.example.com/org/project1')
+        self.assertEqual('foobar', md.default_branch)
+        new_layout = layout.uuid
+        self.assertNotEqual(new_layout, prev_layout)
+
+
 class TestGerritDriver(ZuulTestCase):
     # Most of the Zuul test suite tests the Gerrit driver, to some
     # extent.  The other classes in this file test specific methods of

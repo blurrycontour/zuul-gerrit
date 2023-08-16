@@ -108,10 +108,10 @@ pipeline.
       objects are processed.  Zuul will process the default branch
       first before any other branches.
 
-      The GitHub driver will automatically use the default branch as
-      specified in GitHub for the repository as a default value for
-      this setting.  It may be overridden by setting this value
-      explicitly.
+      The Gerrit and GitHub drivers will automatically use the default
+      branch as specified for the repository in their respective
+      systems as a default value for this setting.  It may be
+      overridden by setting this value explicitly.
 
    .. attr:: merge-mode
       :default: (driver specific)
