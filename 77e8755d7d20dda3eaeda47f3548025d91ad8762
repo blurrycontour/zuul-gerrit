@@ -147,6 +147,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "831534aa_d2df0f9b",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2458,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-16T20:37:57Z",
+      "side": 1,
+      "message": "To be clear -- I didn\u0027t rev the model api since it\u0027s not strictly necessary, but we do need a default here, and i tagged it with the next model api rev just so we\u0027ll know when we can drop it.",
+      "parentUuid": "e11c6f0c_a41b5bc4",
+      "revId": "77e8755d7d20dda3eaeda47f3548025d91ad8762",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c0a6f6f_51a44728",
