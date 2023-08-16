@@ -2992,6 +2992,15 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         }
         return (name, data)
 
+    def getRepositoryEvent(self, repository, action, changes):
+        name = 'repository'
+        data = {
+            'action': action,
+            'changes': changes,
+            'repository': repository,
+        }
+        return (name, data)
+
     def emitEvent(self, event, use_zuulweb=False):
         """Emulates sending the GitHub webhook event to the connection."""
         name, data = event

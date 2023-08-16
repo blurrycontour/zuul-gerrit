@@ -1,4 +1,5 @@
 # Copyright 2015 Hewlett-Packard Development Company, L.P.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -690,6 +691,35 @@ class GithubEventProcessor(object):
             self.connection.clearConnectionCacheOnBranchEvent(event)
 
         return events
+
+    def _event_repository(self):
+        project_name = self.body['repository']['full_name']
+        project = self.connection.source.getProject(project_name)
+
+        events = []
+        if self.body.get('action') == 'edited':
+            if 'default_branch' in self.body.get('changes', {}):
+                default_branch = self.body['repository']['default_branch']
+                self.log.debug('Updating default branch for %s to %s',
+                               project, default_branch)
+                self.connection._branch_cache.setProjectDefaultBranch(
+                    project.name, default_branch)
+                event = self._repository_to_event(project_name, default_branch)
+                event.action = 'edited'
+                events.append(event)
+        return events
+
+    def _repository_to_event(self, project_name, branch):
+        event = GithubTriggerEvent()
+        event.connection_name = self.connection.connection_name
+        event.trigger_name = 'github'
+        event.project_name = project_name
+        event.default_branch_changed = True
+        event.type = 'repository'
+
+        event.ref = f'refs/heads/{branch}'
+        event.branch = branch
+        return event
 
     def _branch_protection_rule_to_event(self, project_name, branch):
         event = GithubTriggerEvent()
@@ -1835,6 +1865,26 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             merge_modes.append(model.MERGER_REBASE)
 
         return merge_modes
+
+    def _fetchProjectDefaultBranch(self, project):
+        github = self.getGithubClient(project.name)
+        url = github.session.build_url('repos', project.name)
+        headers = {'Accept': 'application/vnd.github.loki-preview+json'}
+
+        resp = github.session.get(url, headers=headers)
+
+        if resp.status_code == 403:
+            self.log.error(str(resp))
+            rate_limit = github.rate_limit()
+            if rate_limit['resources']['core']['remaining'] == 0:
+                self.log.warning("Rate limit exceeded")
+            return None
+        elif resp.status_code == 404:
+            raise Exception("Got status code 404 when fetching "
+                            "project %s" % project.name)
+
+        resp = resp.json()
+        return resp['default_branch']
 
     def isBranchProtected(self, project_name: str, branch_name: str,
                           zuul_event_id=None) -> Optional[bool]:

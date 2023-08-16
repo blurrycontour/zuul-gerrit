@@ -185,6 +185,22 @@ class ZKBranchCacheMixin:
         """
         return model.ALL_MERGE_MODES
 
+    def _fetchProjectDefaultBranch(self, project):
+        """Perform a remote query to determine the project's default branch.
+
+        Connection subclasses should implement this method if they are
+        able to determine the upstream default branch for a project.  The
+        default implemantion returns 'master' for now and will likely change
+        to return something else if and when the git default changes.
+
+        :param model.Project project:
+            The project.
+
+        :returns: The name of the default branch.
+
+        """
+        return 'master'
+
     def clearConnectionCacheOnBranchEvent(self, event):
         """Update event and clear connection cache if needed.
 
@@ -250,6 +266,10 @@ class ZKBranchCacheMixin:
         merge_modes = self._fetchProjectMergeModes(project)
         self._branch_cache.setProjectMergeModes(
             project.name, merge_modes)
+
+        default_branch = self._fetchProjectDefaultBranch(project)
+        self._branch_cache.setProjectDefaultBranch(
+            project.name, default_branch)
         self.log.info("Got branches for %s" % project.name)
 
     def getProjectBranches(self, project, tenant, min_ltime=-1):
@@ -364,6 +384,63 @@ class ZKBranchCacheMixin:
                 project.name, merge_modes)
 
         return merge_modes
+
+    def getProjectDefaultBranch(self, project, tenant, min_ltime=-1):
+        """Get the default branch for the given project.
+
+        :param zuul.model.Project project:
+            The project for which the default branch is returned.
+        :param zuul.model.Tenant tenant:
+            The related tenant.
+        :param int min_ltime:
+            The minimum ltime to determine if we need to refresh the cache.
+
+        :returns: The name of the default branch.
+        """
+        default_branch = None
+
+        if self._branch_cache:
+            try:
+                default_branch = self._branch_cache.getProjectDefaultBranch(
+                    project.name, min_ltime)
+            except LookupError:
+                if self.read_only:
+                    # A scheduler hasn't attempted to fetch it yet
+                    raise ReadOnlyBranchCacheError(
+                        "Will not fetch default branch as read-only is set")
+                else:
+                    default_branch = None
+
+        if default_branch is not None:
+            return default_branch
+        elif self.read_only:
+            # A scheduler has previously attempted a fetch, but got
+            # the None due to an error; we can't retry since we're
+            # read-only.
+            raise RuntimeError(
+                "Will not fetch default branch as read-only is set")
+
+        # We need to perform a query
+        try:
+            default_branch = self._fetchProjectDefaultBranch(project)
+        except Exception:
+            # We weren't able to get the default branch.  We need to tell
+            # future schedulers to try again but tell zuul-web that we
+            # tried and failed.  Set the default branch to None to indicate
+            # that we have performed a fetch and retrieved no data.  Any
+            # time we encounter None in the cache, we will try again.
+            if self._branch_cache:
+                self._branch_cache.setProjectDefaultBranch(
+                    project.name, None)
+            raise
+        self.log.info("Got default branch for %s: %s", project.name,
+                      default_branch)
+
+        if self._branch_cache:
+            self._branch_cache.setProjectDefaultBranch(
+                project.name, default_branch)
+
+        return default_branch
 
     def checkBranchCache(self, project_name: str, event,
                          protected: bool = None) -> None:
