@@ -1272,3 +1272,31 @@ class TestDefaultBranch(ZuulTestCase):
         md = layout.getProjectMetadata(
             'review.example.com/org/regex-override-project-develop')
         self.assertEqual('develop', md.default_branch)
+
+    @simple_layout('layouts/default-branch.yaml', driver='github')
+    def test_default_branch_upstream(self):
+        self.waitUntilSettled()
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project-default')
+        repo._repodata['default_branch'] = 'foobar'
+        connection = self.scheds.first.connections.connections['github']
+        connection.clearBranchCache()
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata(
+            'github.com/org/project-default')
+        self.assertEqual('foobar', md.default_branch)
+        md = layout.getProjectMetadata(
+            'github.com/org/regex-default-project-empty')
+        self.assertEqual('master', md.default_branch)
+        md = layout.getProjectMetadata(
+            'github.com/org/regex-default-project-develop')
+        self.assertEqual('develop', md.default_branch)
+        md = layout.getProjectMetadata(
+            'github.com/org/regex-override-project-empty')
+        self.assertEqual('regex', md.default_branch)
+        md = layout.getProjectMetadata(
+            'github.com/org/regex-override-project-develop')
+        self.assertEqual('develop', md.default_branch)

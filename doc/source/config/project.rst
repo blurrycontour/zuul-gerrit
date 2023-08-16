@@ -104,6 +104,14 @@ pipeline.
       (regardless of in which branch the definition appears).  It may
       not appear in a :ref:`project-template` definition.
 
+      This setting also affects the order in which configuration
+      objects are processed.  Zuul will process the default branch
+      first before any other branches.
+
+      The GitHub driver will automatically use the default branch as
+      specified in GitHub as a default value for this setting.  It may
+      be overridden by setting this value explicitly.
+
    .. attr:: merge-mode
       :default: (driver specific)
 

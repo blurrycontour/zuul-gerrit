@@ -242,6 +242,7 @@ class FakeRepository(object):
             'allow_merge_commit': True,
             'allow_squash_merge': True,
             'allow_rebase_merge': True,
+            'default_branch': 'master',
         }
 
         # fail the next commit requests with 404
