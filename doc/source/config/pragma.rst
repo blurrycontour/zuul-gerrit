@@ -31,7 +31,7 @@ pragma directives may not be set and then unset within the same file.
       :attr:`job.branches`.  This attribute overrides that behavior.
 
       This can be useful if a project has multiple branches, yet the
-      jobs defined in the master branch should apply to all branches.
+      jobs defined in the default branch should apply to all branches.
 
       The behavior may also be configured by a Zuul administrator
       using
