@@ -1,0 +1,186 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fec9cf9_6f1e9155",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-17T21:40:05Z",
+      "side": 1,
+      "message": "Some thoughts inline. Also, I think https://review.opendev.org/c/zuul/zuul/+/890591 will conflict with this change. We may wish to explicitly order them as a result.",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2473b50b_b58fe8bc",
+        "filename": "tests/fixtures/config/job-output/git/common-config/playbooks/job-output.yaml",
+        "patchSetId": 16
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-17T21:40:05Z",
+      "side": 1,
+      "message": "I didn\u0027t realize you could prepend commands with this redirection. Neat.",
+      "range": {
+        "startLine": 8,
+        "startChar": 8,
+        "endLine": 8,
+        "endChar": 11
+      },
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2f4a34a_39356cf9",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 7429,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-17T21:40:05Z",
+      "side": 1,
+      "message": "Should the zuul stream functional playbook test be updated to split the stream too for at least one case?",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13c9c728_151af1f2",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 7538,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-17T21:40:05Z",
+      "side": 1,
+      "message": "Nit token_stdout appears to define this same value below. We could combine them.",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86d23064_119b58b1",
+        "filename": "zuul/ansible/base/action/command.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-17T21:40:05Z",
+      "side": 1,
+      "message": "Does this need to be a .get() against the environment to avoid keyerrors in the case that we have installed a new zuul but not restarted onto it yet? I think this is a non issue for container deployments but non container might run into this.",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eeb9908d_68d4da85",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-17T21:40:05Z",
+      "side": 1,
+      "message": "This is my biggest concern. We will always get stderr lines after stdout lines even if they would come before or be mixed otherwise. This potentially makes debugging difficult. I think it would lead me personally to avoid using stderr in some situations which is unfortunate since stderr should make debugging easier not harder...",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "923bebcd_8a8832d4",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-17T21:40:05Z",
+      "side": 1,
+      "message": "Nit this might be more succinct as `while rselect:`",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdd8fc3f_818c48da",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 523,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-17T21:40:05Z",
+      "side": 1,
+      "message": "This Popen object attribute is automatically None if PIPE was not set for stderr. This then causes follow() to ignore the stream.",
+      "range": {
+        "startLine": 523,
+        "startChar": 66,
+        "endLine": 523,
+        "endChar": 76
+      },
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43e3074e_d9dde166",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 961,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-17T21:40:05Z",
+      "side": 1,
+      "message": "Should we default to False here and then we can drop the if this is None set to False check in the next file?\n\nOr have we been a bit more explicit here because the long term plan is to split the streams for all jobs by default?",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f09d755_0c078aee",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 986,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-17T21:40:05Z",
+      "side": 1,
+      "message": "This is the check I\u0027m talking about in the previous file.",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
