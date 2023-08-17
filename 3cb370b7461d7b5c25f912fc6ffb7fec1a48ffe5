@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08b6f26c_2878b905",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-08-17T07:32:01Z",
+      "side": 1,
+      "message": "Looking at the log message below (ms unit) this should probably be `* 1000` as `time.perf_counter()` returns fractional seconds.",
+      "range": {
+        "startLine": 430,
+        "startChar": 70,
+        "endLine": 430,
+        "endChar": 76
+      },
+      "revId": "3cb370b7461d7b5c25f912fc6ffb7fec1a48ffe5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
