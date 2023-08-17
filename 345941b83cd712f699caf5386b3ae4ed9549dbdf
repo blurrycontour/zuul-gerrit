@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3628e9c0_22517cce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-17T22:41:31Z",
+      "side": 1,
+      "message": "I thought about that, but I think it\u0027s better to keep them separate; I can quickly update whichever doesn\u0027t merge first.",
+      "parentUuid": "4fec9cf9_6f1e9155",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2473b50b_b58fe8bc",
@@ -58,6 +76,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "742e0c95_88fb295f",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 7429,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-17T22:41:31Z",
+      "side": 1,
+      "message": "Seems reasonable.",
+      "parentUuid": "e2f4a34a_39356cf9",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "13c9c728_151af1f2",
@@ -71,6 +107,24 @@
       "writtenOn": "2023-08-17T21:40:05Z",
       "side": 1,
       "message": "Nit token_stdout appears to define this same value below. We could combine them.",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9075e1ba_62537d33",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 7538,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-17T22:41:31Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "13c9c728_151af1f2",
       "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -94,6 +148,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "55022b32_3c32c3e5",
+        "filename": "zuul/ansible/base/action/command.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-17T22:41:31Z",
+      "side": 1,
+      "message": "Considering all the ansible stuff that could change, I think that\u0027s a pretty bad deployment strategy at this point.  I don\u0027t think we should bend over backwards for it.  Adding a .get does sacrifice some code safety for it, and I\u0027d rather not.  But I can do so if you think it\u0027s important.",
+      "parentUuid": "86d23064_119b58b1",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eeb9908d_68d4da85",
         "filename": "zuul/ansible/base/callback/zuul_stream.py",
         "patchSetId": 16
@@ -105,6 +177,24 @@
       "writtenOn": "2023-08-17T21:40:05Z",
       "side": 1,
       "message": "This is my biggest concern. We will always get stderr lines after stdout lines even if they would come before or be mixed otherwise. This potentially makes debugging difficult. I think it would lead me personally to avoid using stderr in some situations which is unfortunate since stderr should make debugging easier not harder...",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "455accbd_e1be00af",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-17T22:41:31Z",
+      "side": 1,
+      "message": "Keep in mind that this is only true for the occasions where we can\u0027t stream -- localhost and looped items.  Normal command tasks will have output interleaved (but still not exactly the same way as a terminal would).\n\nBut yes, this is the crux of the matter -- whether the Ansible interface is more important than emulating a terminal.",
+      "parentUuid": "eeb9908d_68d4da85",
       "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -166,6 +256,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f80375f1_93a37e73",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 961,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-17T22:41:31Z",
+      "side": 1,
+      "message": "This goes to the mechanics of job inheritance.  We set None here to express no preference; otherwise we could end up with a lot of unpredictable flapping as we applied variants.",
+      "parentUuid": "43e3074e_d9dde166",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8f09d755_0c078aee",
@@ -179,6 +287,24 @@
       "writtenOn": "2023-08-17T21:40:05Z",
       "side": 1,
       "message": "This is the check I\u0027m talking about in the previous file.",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54344e50_b9d0793b",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 986,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-17T22:41:31Z",
+      "side": 1,
+      "message": "As described earlier, we can\u0027t set the default in the configloader, but an alternative would be to do so in job freezing.  But I think this is easier.",
+      "parentUuid": "8f09d755_0c078aee",
       "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
