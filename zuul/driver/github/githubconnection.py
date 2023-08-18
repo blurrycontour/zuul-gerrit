@@ -16,6 +16,7 @@ import collections
 import concurrent.futures
 import datetime
 import logging
+import os
 import hmac
 import hashlib
 import threading
@@ -779,7 +780,8 @@ class GithubEventConnector:
         self._event_dispatcher = threading.Thread(
             name='GithubEventDispatcher', target=self.run_event_dispatcher,
             daemon=True)
-        self._thread_pool = concurrent.futures.ThreadPoolExecutor()
+        self._thread_pool = concurrent.futures.ThreadPoolExecutor(
+            max_workers=min(32, (os.cpu_count() or 1) * 4))
         self._event_forward_queue = collections.deque()
 
     def stop(self):
