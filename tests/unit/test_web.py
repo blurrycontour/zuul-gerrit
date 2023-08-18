@@ -348,6 +348,7 @@ class TestWeb(BaseTestWeb):
 
         self.assertEqual([
             {'abstract': False,
+             'ansible_split_streams': None,
              'ansible_version': None,
              'attempts': 3,
              'branches': [],
@@ -449,6 +450,7 @@ class TestWeb(BaseTestWeb):
             {
                 'name': 'project-test1',
                 'abstract': False,
+                'ansible_split_streams': None,
                 'ansible_version': None,
                 'attempts': 4,
                 'branches': [],
@@ -501,6 +503,7 @@ class TestWeb(BaseTestWeb):
             }, {
                 'name': 'project-test1',
                 'abstract': False,
+                'ansible_split_streams': None,
                 'ansible_version': None,
                 'attempts': 3,
                 'branches': ['stable'],
@@ -557,6 +560,7 @@ class TestWeb(BaseTestWeb):
         self.assertEqual([
             {
                 'abstract': False,
+                'ansible_split_streams': None,
                 'ansible_version': None,
                 'attempts': 3,
                 'branches': [],
@@ -682,6 +686,7 @@ class TestWeb(BaseTestWeb):
             'api/tenant/tenant-one/project/org/project1').json()
 
         jobs = [[{'abstract': False,
+                  'ansible_split_streams': None,
                   'ansible_version': None,
                   'attempts': 3,
                   'branches': [],
@@ -721,6 +726,7 @@ class TestWeb(BaseTestWeb):
                   'voting': True,
                   'workspace_scheme': 'golang'}],
                 [{'abstract': False,
+                  'ansible_split_streams': None,
                   'ansible_version': None,
                   'attempts': 3,
                   'branches': [],
@@ -761,6 +767,7 @@ class TestWeb(BaseTestWeb):
                   'voting': True,
                   'workspace_scheme': 'golang'}],
                 [{'abstract': False,
+                  'ansible_split_streams': None,
                   'ansible_version': None,
                   'attempts': 3,
                   'branches': [],
@@ -801,6 +808,7 @@ class TestWeb(BaseTestWeb):
                   'voting': True,
                   'workspace_scheme': 'golang'}],
                 [{'abstract': False,
+                  'ansible_split_streams': None,
                   'ansible_version': None,
                   'attempts': 3,
                   'branches': [],
@@ -870,6 +878,7 @@ class TestWeb(BaseTestWeb):
                     }, {'name': 'post',
                         'jobs': [[
                             {'abstract': False,
+                             'ansible_split_streams': None,
                              'ansible_version': None,
                              'attempts': 3,
                              'branches': [],
@@ -1150,6 +1159,7 @@ class TestWeb(BaseTestWeb):
 
         job_params = {
             'job': 'project-test1',
+            'ansible_split_streams': None,
             'ansible_version': '6',
             'timeout': None,
             'post_timeout': None,
@@ -1250,6 +1260,7 @@ class TestWeb(BaseTestWeb):
             "noop")
 
         job_params = {
+            'ansible_split_streams': None,
             'ansible_version': '6',
             'branch': 'master',
             'extra_vars': {},

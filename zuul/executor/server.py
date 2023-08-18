@@ -982,6 +982,9 @@ class AnsibleJob(object):
         self.zuul_event_id = self.arguments["zuul_event_id"]
         # Record ansible version being used for the cleanup phase
         self.ansible_version = self.job.ansible_version
+        self.ansible_split_streams = self.job.ansible_split_streams
+        if self.ansible_split_streams is None:
+            self.ansible_split_streams = False
         # TODO(corvus): Remove default setting after 4.3.0; this is to handle
         # scheduler/executor version skew.
         self.scheme = self.job.workspace_scheme or zuul.model.SCHEME_GOLANG
@@ -2746,6 +2749,8 @@ class AnsibleJob(object):
             env_copy['ZUUL_CONSOLE_PORT'] = str(
                 self.executor_server.log_console_port)
         env_copy['TMP'] = self.jobdir.local_tmp
+        env_copy['ZUUL_ANSIBLE_SPLIT_STREAMS'] = str(
+            self.ansible_split_streams)
         pythonpath = env_copy.get('PYTHONPATH')
         if pythonpath:
             pythonpath = [pythonpath]
