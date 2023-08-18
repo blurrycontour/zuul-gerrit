@@ -6239,10 +6239,22 @@ class Bundle:
     @classmethod
     def deserialize(cls, context, queue, items_by_path, data):
         bundle = cls(data["uuid"])
-        bundle.items = [
-            items_by_path.get(p) or QueueItem.fromZK(context, p, queue=queue)
-            for p in data["items"]
-        ]
+
+        bundle.items = []
+        for p in data["items"]:
+            item = items_by_path.get(p)
+            if not item:
+                context.log.warning(
+                    "Bundle item %s referenced by bundle but not part of the "
+                    "change queue", p)
+                try:
+                    item = QueueItem.fromZK(
+                        context, p, queue=queue, bundle=bundle)
+                except NoNodeError:
+                    context.log.warning(
+                        "Referenced bundle item %s does not exist anymore", p)
+                    continue
+            bundle.items.append(item)
         bundle.started_reporting = data["started_reporting"]
         bundle.failed_reporting = data["failed_reporting"]
         bundle.cannot_merge = data["cannot_merge"]
