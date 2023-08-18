@@ -153,6 +153,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "afaff076_f132c292",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 7538,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-18T00:46:55Z",
+      "side": 1,
+      "message": "Actually this is entirely rendundant with line 7554 so we can drop it.",
+      "parentUuid": "13c9c728_151af1f2",
+      "revId": "345941b83cd712f699caf5386b3ae4ed9549dbdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "86d23064_119b58b1",
