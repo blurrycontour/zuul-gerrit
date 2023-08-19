@@ -1,4 +1,5 @@
 # Copyright 2015 Hewlett-Packard Development Company, L.P.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -17,7 +18,7 @@ import voluptuous as v
 from zuul.trigger import BaseTrigger
 from zuul.driver.github.githubmodel import GithubEventFilter
 from zuul.driver.github import githubsource
-from zuul.driver.util import scalar_or_list, to_list
+from zuul.driver.util import scalar_or_list, to_list, make_regex, ZUUL_REGEX
 
 
 class GithubTrigger(BaseTrigger):
@@ -39,14 +40,20 @@ class GithubTrigger(BaseTrigger):
                         error_accumulator):
         efilters = []
         for trigger in to_list(trigger_config):
+
+            types = [make_regex(x) for x in to_list(trigger['event'])]
+            branches = [make_regex(x) for x in to_list(trigger.get('branch'))]
+            refs = [make_regex(x) for x in to_list(trigger.get('ref'))]
+            comments = [make_regex(x) for x in to_list(trigger.get('comment'))]
+
             f = GithubEventFilter(
                 connection_name=connection_name,
                 trigger=self,
-                types=to_list(trigger['event']),
+                types=types,
                 actions=to_list(trigger.get('action')),
-                branches=to_list(trigger.get('branch')),
-                refs=to_list(trigger.get('ref')),
-                comments=to_list(trigger.get('comment')),
+                branches=branches,
+                refs=refs,
+                comments=comments,
                 check_runs=to_list(trigger.get('check')),
                 labels=to_list(trigger.get('label')),
                 unlabels=to_list(trigger.get('unlabel')),
@@ -72,9 +79,9 @@ def getSchema():
                                  'push',
                                  'check_run')),
         'action': scalar_or_list(str),
-        'branch': scalar_or_list(str),
-        'ref': scalar_or_list(str),
-        'comment': scalar_or_list(str),
+        'branch': scalar_or_list(v.Any(ZUUL_REGEX, str)),
+        'ref': scalar_or_list(v.Any(ZUUL_REGEX, str)),
+        'comment': scalar_or_list(v.Any(ZUUL_REGEX, str)),
         'label': scalar_or_list(str),
         'unlabel': scalar_or_list(str),
         'state': scalar_or_list(str),

@@ -17,7 +17,7 @@ import logging
 import voluptuous as v
 from zuul.trigger import BaseTrigger
 from zuul.driver.zuul.zuulmodel import ZuulEventFilter
-from zuul.driver.util import scalar_or_list, to_list
+from zuul.driver.util import scalar_or_list, to_list, make_regex, ZUUL_REGEX
 
 
 class ZuulTrigger(BaseTrigger):
@@ -33,11 +33,14 @@ class ZuulTrigger(BaseTrigger):
                         error_accumulator):
         efilters = []
         for trigger in to_list(trigger_conf):
+            types = [make_regex(x) for x in to_list(trigger['event'])]
+            pipelines = [make_regex(x) for x in
+                         to_list(trigger.get('pipeline'))]
             f = ZuulEventFilter(
                 connection_name=connection_name,
                 trigger=self,
-                types=to_list(trigger['event']),
-                pipelines=to_list(trigger.get('pipeline')),
+                types=types,
+                pipelines=pipelines,
             )
             efilters.append(f)
 
@@ -49,7 +52,7 @@ def getSchema():
         v.Required('event'):
         scalar_or_list(v.Any('parent-change-enqueued',
                              'project-change-merged')),
-        'pipeline': scalar_or_list(str),
+        'pipeline': scalar_or_list(v.Any(ZUUL_REGEX, str)),
     }
 
     return zuul_trigger

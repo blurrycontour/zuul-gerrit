@@ -1,6 +1,7 @@
 # Copyright 2015 Hewlett-Packard Development Company, L.P.
 # Copyright 2017 IBM Corp.
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -196,14 +197,14 @@ class GithubEventFilter(EventFilter):
         else:
             self.reject_filter = None
 
-        self._types = types
-        self._branches = branches
-        self._refs = refs
-        self._comments = comments
-        self.types = [re.compile(x) for x in types]
-        self.branches = [re.compile(x) for x in branches]
-        self.refs = [re.compile(x) for x in refs]
-        self.comments = [re.compile(x) for x in comments]
+        self._types = [x.pattern for x in types]
+        self._branches = [x.pattern for x in branches]
+        self._refs = [x.pattern for x in refs]
+        self._comments = [x.pattern for x in comments]
+        self.types = types
+        self.branches = branches
+        self.refs = refs
+        self.comments = comments
         self.actions = actions
         self.labels = labels
         self.unlabels = unlabels
@@ -304,6 +305,8 @@ class GithubEventFilter(EventFilter):
         if self.check_runs:
             check_run_found = False
             for check_run in self.check_runs:
+                # TODO: construct as ZuulRegex in initializer when re2
+                # migration is complete.
                 if re2.fullmatch(check_run, event.check_run):
                     check_run_found = True
                     break
@@ -330,6 +333,8 @@ class GithubEventFilter(EventFilter):
         if self.statuses:
             status_found = False
             for status in self.statuses:
+                # TODO: construct as ZuulRegex in initializer when re2
+                # migration is complete.
                 if re2.fullmatch(status, event.status):
                     status_found = True
                     break
@@ -549,6 +554,8 @@ class GithubRefFilter(RefFilter):
         if self.required_statuses:
             for required_status in self.required_statuses:
                 for status in change.status:
+                    # TODO: construct as ZuulRegex in initializer when
+                    # re2 migration is complete.
                     if re2.fullmatch(required_status, status):
                         return True
             return FalseWithReason("Required statuses %s do not match %s" % (
@@ -560,6 +567,8 @@ class GithubRefFilter(RefFilter):
         # If any of the rejected statusses are present, we return false
         for rstatus in self.reject_statuses:
             for status in change.status:
+                # TODO: construct as ZuulRegex in initializer when re2
+                # migration is complete.
                 if re2.fullmatch(rstatus, status):
                     return FalseWithReason("Reject statuses %s match %s" % (
                         self.reject_statuses, change.status))
