@@ -1,4 +1,5 @@
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -15,6 +16,8 @@
 # Utility methods to promote consistent configuration among drivers.
 
 import voluptuous as vs
+
+from zuul.configloader import ZUUL_REGEX, make_regex  # noqa
 
 
 def time_to_seconds(s):

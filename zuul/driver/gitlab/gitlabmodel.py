@@ -1,5 +1,5 @@
 # Copyright 2019 Red Hat, Inc.
-# Copyright 2022 Acme Gating, LLC
+# Copyright 2022-2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import re
 from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
@@ -152,13 +151,21 @@ class GitlabEventFilter(EventFilter):
             comments=None, refs=None, labels=None, unlabels=None,
             ignore_deletes=True):
         super().__init__(connection_name, trigger)
-        self._types = types or []
-        self.types = [re.compile(x) for x in self._types]
+
+        types = types if types is not None else []
+        refs = refs if refs is not None else []
+        comments = comments if comments is not None else []
+
+        self._refs = [x.pattern for x in refs]
+        self.refs = refs
+
+        self._types = [x.pattern for x in types]
+        self.types = types
+
+        self._comments = [x.pattern for x in comments]
+        self.comments = comments
+
         self.actions = actions or []
-        self._comments = comments or []
-        self.comments = [re.compile(x) for x in self._comments]
-        self._refs = refs or []
-        self.refs = [re.compile(x) for x in self._refs]
         self.labels = labels or []
         self.unlabels = unlabels or []
         self.ignore_deletes = ignore_deletes

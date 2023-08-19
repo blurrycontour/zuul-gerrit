@@ -1,4 +1,5 @@
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -13,14 +14,13 @@
 # under the License.
 
 import copy
-import re
 import time
 import urllib.parse
 import dateutil.parser
 
 from zuul.model import EventFilter, RefFilter
 from zuul.model import Change, TriggerEvent, FalseWithReason
-from zuul.driver.util import time_to_seconds, to_list
+from zuul.driver.util import time_to_seconds, to_list, make_regex
 from zuul import exceptions
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
@@ -274,18 +274,18 @@ class GerritEventFilter(EventFilter):
         else:
             self.reject_filter = None
 
-        self._types = types
-        self._branches = branches
-        self._refs = refs
-        self._comments = comments
-        self._emails = emails
-        self._usernames = usernames
-        self.types = [re.compile(x) for x in types]
-        self.branches = [re.compile(x) for x in branches]
-        self.refs = [re.compile(x) for x in refs]
-        self.comments = [re.compile(x) for x in comments]
-        self.emails = [re.compile(x) for x in emails]
-        self.usernames = [re.compile(x) for x in usernames]
+        self._types = [x.pattern for x in types]
+        self._branches = [x.pattern for x in branches]
+        self._refs = [x.pattern for x in refs]
+        self._comments = [x.pattern for x in comments]
+        self._emails = [x.pattern for x in emails]
+        self._usernames = [x.pattern for x in usernames]
+        self.types = types
+        self.branches = branches
+        self.refs = refs
+        self.comments = comments
+        self.emails = emails
+        self.usernames = usernames
         self.event_approvals = event_approvals
         self.uuid = uuid
         self.scheme = scheme
@@ -559,9 +559,9 @@ class GerritRefFilter(RefFilter):
         for a in approvals:
             for k, v in a.items():
                 if k == 'username':
-                    a['username'] = re.compile(v)
+                    a['username'] = make_regex(v)
                 elif k == 'email':
-                    a['email'] = re.compile(v)
+                    a['email'] = make_regex(v)
                 elif k == 'newer-than':
                     a[k] = time_to_seconds(v)
                 elif k == 'older-than':

@@ -1,3 +1,5 @@
+# Copyright 2023 Acme Gating, LLC
+#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -35,13 +37,19 @@ import zuul.manager.independent
 import zuul.manager.supercedent
 import zuul.manager.serial
 from zuul.lib.logutil import get_annotated_logger
-from zuul.lib.re2util import filter_allowed_disallowed
+from zuul.lib.re2util import filter_allowed_disallowed, ZuulRegex
 from zuul.lib.varnames import check_varnames
 from zuul.zk.components import COMPONENT_REGISTRY
 from zuul.zk.config_cache import UnparsedConfigCache
 from zuul.zk.semaphore import SemaphoreHandler
 
 ZUUL_CONF_ROOT = ('zuul.yaml', 'zuul.d', '.zuul.yaml', '.zuul.d')
+
+# A voluptuous schema for a regular expression.
+ZUUL_REGEX = {
+    vs.Required('regex'): str,
+    'negate': bool,
+}
 
 
 # Several forms accept either a single item or a list, this makes
@@ -74,6 +82,13 @@ def check_config_path(path):
     elif path in ["zuul.yaml", "zuul.d/", ".zuul.yaml", ".zuul.d/"]:
         raise vs.Invalid("Default zuul configs are not "
                          "allowed in extra-config-paths")
+
+
+def make_regex(data):
+    if isinstance(data, dict):
+        return ZuulRegex(data['regex'],
+                         negate=data.get('negate', False))
+    return ZuulRegex(data)
 
 
 def indent(s):
@@ -586,7 +601,7 @@ def copy_safe_config(conf):
 class PragmaParser(object):
     pragma = {
         'implied-branch-matchers': bool,
-        'implied-branches': to_list(str),
+        'implied-branches': to_list(vs.Any(ZUUL_REGEX, str)),
         '_source_context': model.SourceContext,
         '_start_mark': model.ZuulMark,
     }
@@ -615,7 +630,7 @@ class PragmaParser(object):
             # (automatically generated from source file branches) are
             # ImpliedBranchMatchers.
             source_context.implied_branches = [
-                change_matcher.BranchMatcher(x)
+                change_matcher.BranchMatcher(make_regex(x))
                 for x in as_list(branches)]
 
 
@@ -806,7 +821,7 @@ class JobParser(object):
                       'semaphore': vs.Any(semaphore, str),
                       'semaphores': to_list(vs.Any(semaphore, str)),
                       'tags': to_list(str),
-                      'branches': to_list(str),
+                      'branches': to_list(vs.Any(ZUUL_REGEX, str)),
                       'files': to_list(str),
                       'secrets': to_list(vs.Any(secret, str)),
                       'irrelevant-files': to_list(str),
@@ -891,7 +906,9 @@ class JobParser(object):
         job.source_context = conf['_source_context']
         job.start_mark = conf['_start_mark']
         job.variant_description = conf.get(
-            'variant-description', " ".join(as_list(conf.get('branches'))))
+            'variant-description', " ".join([
+                str(x) for x in as_list(conf.get('branches'))
+            ]))
 
         if project_pipeline and conf['_source_context'].trusted:
             # A config project has attached this job to a
@@ -1165,7 +1182,7 @@ class JobParser(object):
 
         branches = None
         if 'branches' in conf:
-            branches = [change_matcher.BranchMatcher(x)
+            branches = [change_matcher.BranchMatcher(make_regex(x))
                         for x in as_list(conf['branches'])]
         elif not project_pipeline:
             branches = self.pcontext.getImpliedBranches(job.source_context)
@@ -1382,7 +1399,7 @@ class ProjectParser(object):
             else:
                 project_config.setImpliedBranchMatchers(
                     [change_matcher.ImpliedBranchMatcher(
-                        source_context.branch)])
+                        ZuulRegex(source_context.branch))])
 
         # Add templates
         for name in conf.get('templates', []):
@@ -1787,7 +1804,8 @@ class ParseContext(object):
         if source_context.implied_branch_matchers is True:
             if source_context.implied_branches is not None:
                 return source_context.implied_branches
-            return [change_matcher.ImpliedBranchMatcher(source_context.branch)]
+            return [change_matcher.ImpliedBranchMatcher(
+                ZuulRegex(source_context.branch))]
         elif source_context.implied_branch_matchers is False:
             return None
 
@@ -1805,7 +1823,8 @@ class ParseContext(object):
 
         if source_context.implied_branches is not None:
             return source_context.implied_branches
-        return [change_matcher.ImpliedBranchMatcher(source_context.branch)]
+        return [change_matcher.ImpliedBranchMatcher(
+            ZuulRegex(source_context.branch))]
 
 
 class TenantParser(object):
