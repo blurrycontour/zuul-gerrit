@@ -131,3 +131,9 @@ Version 15
 :Prior Zuul version: 9.0.0
 :Description: Adds ansible_split_streams to FrozenJob.
               Affects schedulers and executors.
+
+Version 16
+----------
+:Prior Zuul version: 9.0.0
+:Description: Adds ZuulRegex and adjusts SourceContext serialialization.
+              Affects schedulers and web.

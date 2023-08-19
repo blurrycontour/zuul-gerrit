@@ -12,8 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import re
-
 from zuul.model import EventFilter, TriggerEvent
 
 
@@ -21,10 +19,10 @@ class ZuulEventFilter(EventFilter):
     def __init__(self, connection_name, trigger, types=[], pipelines=[]):
         EventFilter.__init__(self, connection_name, trigger)
 
-        self._types = types
-        self._pipelines = pipelines
-        self.types = [re.compile(x) for x in types]
-        self.pipelines = [re.compile(x) for x in pipelines]
+        self._types = [x.pattern for x in types]
+        self._pipelines = [x.pattern for x in pipelines]
+        self.types = types
+        self.pipelines = pipelines
 
     def __repr__(self):
         ret = '<ZuulEventFilter'

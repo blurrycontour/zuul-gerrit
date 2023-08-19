@@ -1,4 +1,5 @@
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -11,8 +12,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
-import re
 
 from zuul.model import TriggerEvent
 from zuul.model import EventFilter
@@ -44,10 +43,11 @@ class GitEventFilter(EventFilter):
 
         super().__init__(connection_name, trigger)
 
-        self._refs = refs
-        self.types = types if types is not None else []
         refs = refs if refs is not None else []
-        self.refs = [re.compile(x) for x in refs]
+        self._refs = [x.pattern for x in refs]
+        self.refs = refs
+
+        self.types = types if types is not None else []
         self.ignore_deletes = ignore_deletes
 
     def __repr__(self):
