@@ -1,4 +1,5 @@
 # Copyright 2015 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -32,6 +33,7 @@ import zuul.lib.connections
 from tests.base import BaseTestCase, FIXTURE_DIR
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib import tracing
+from zuul.lib.re2util import ZuulRegex
 from zuul.model_api import MODEL_API
 from zuul.zk.zkobject import LocalZKContext
 from zuul.zk.components import COMPONENT_REGISTRY
@@ -769,6 +771,8 @@ class TestRef(BaseTestCase):
 class TestSourceContext(BaseTestCase):
     def setUp(self):
         super().setUp()
+        COMPONENT_REGISTRY.registry = Dummy()
+        COMPONENT_REGISTRY.registry.model_api = MODEL_API
         self.connection = Dummy(connection_name='dummy_connection')
         self.source = Dummy(canonical_hostname='git.example.com',
                             connection=self.connection)
@@ -777,8 +781,8 @@ class TestSourceContext(BaseTestCase):
             self.project.canonical_name, self.project.name,
             self.project.connection_name, 'master', 'test', True)
         self.context.implied_branches = [
-            change_matcher.BranchMatcher('foo'),
-            change_matcher.ImpliedBranchMatcher('foo'),
+            change_matcher.BranchMatcher(ZuulRegex('foo')),
+            change_matcher.ImpliedBranchMatcher(ZuulRegex('foo')),
         ]
 
     def test_serialize(self):

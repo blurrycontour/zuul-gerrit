@@ -1,4 +1,5 @@
 # Copyright 2015 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,6 +15,7 @@
 
 from zuul import change_matcher as cm
 from zuul import model
+from zuul.lib.re2util import ZuulRegex
 
 from tests.base import BaseTestCase
 
@@ -30,22 +32,22 @@ class BaseTestMatcher(BaseTestCase):
 class TestAbstractChangeMatcher(BaseTestMatcher):
 
     def test_str(self):
-        matcher = cm.ProjectMatcher(self.project)
+        matcher = cm.ProjectMatcher(ZuulRegex(self.project))
         self.assertEqual(str(matcher), '{ProjectMatcher:project}')
 
     def test_repr(self):
-        matcher = cm.ProjectMatcher(self.project)
+        matcher = cm.ProjectMatcher(ZuulRegex(self.project))
         self.assertEqual(repr(matcher), '<ProjectMatcher project>')
 
 
 class TestProjectMatcher(BaseTestMatcher):
 
     def test_matches_returns_true(self):
-        matcher = cm.ProjectMatcher(self.project)
+        matcher = cm.ProjectMatcher(ZuulRegex(self.project))
         self.assertTrue(matcher.matches(self.change))
 
     def test_matches_returns_false(self):
-        matcher = cm.ProjectMatcher('not_project')
+        matcher = cm.ProjectMatcher(ZuulRegex('not_project'))
         self.assertFalse(matcher.matches(self.change))
 
 
@@ -53,7 +55,7 @@ class TestBranchMatcher(BaseTestMatcher):
 
     def setUp(self):
         super(TestBranchMatcher, self).setUp()
-        self.matcher = cm.BranchMatcher('foo')
+        self.matcher = cm.BranchMatcher(ZuulRegex('foo'))
 
     def test_matches_returns_true_on_matching_branch(self):
         self.change.branch = 'foo'
@@ -73,7 +75,7 @@ class TestBranchMatcher(BaseTestMatcher):
 class TestAbstractMatcherCollection(BaseTestMatcher):
 
     def test_str(self):
-        matcher = cm.MatchAll([cm.FileMatcher('foo')])
+        matcher = cm.MatchAll([cm.FileMatcher(ZuulRegex('foo'))])
         self.assertEqual(str(matcher), '{MatchAll:{FileMatcher:foo}}')
 
     def test_repr(self):
@@ -93,7 +95,8 @@ class TestMatchAllFiles(BaseTestFilesMatcher):
 
     def setUp(self):
         super(TestMatchAllFiles, self).setUp()
-        self.matcher = cm.MatchAllFiles([cm.FileMatcher('^docs/.*$')])
+        self.matcher = cm.MatchAllFiles(
+            [cm.FileMatcher(ZuulRegex('^docs/.*$'))])
 
     def test_matches_returns_false_when_files_attr_missing(self):
         delattr(self.change, 'files')
@@ -122,7 +125,8 @@ class TestMatchAnyFiles(BaseTestFilesMatcher):
 
     def setUp(self):
         super(TestMatchAnyFiles, self).setUp()
-        self.matcher = cm.MatchAnyFiles([cm.FileMatcher('^docs/.*$')])
+        self.matcher = cm.MatchAnyFiles(
+            [cm.FileMatcher(ZuulRegex('^docs/.*$'))])
 
     def test_matches_returns_true_when_files_attr_missing(self):
         delattr(self.change, 'files')
@@ -147,20 +151,20 @@ class TestMatchAnyFiles(BaseTestFilesMatcher):
 class TestMatchAll(BaseTestMatcher):
 
     def test_matches_returns_true(self):
-        matcher = cm.MatchAll([cm.ProjectMatcher(self.project)])
+        matcher = cm.MatchAll([cm.ProjectMatcher(ZuulRegex(self.project))])
         self.assertTrue(matcher.matches(self.change))
 
     def test_matches_returns_false_for_missing_matcher(self):
-        matcher = cm.MatchAll([cm.ProjectMatcher('not_project')])
+        matcher = cm.MatchAll([cm.ProjectMatcher(ZuulRegex('not_project'))])
         self.assertFalse(matcher.matches(self.change))
 
 
 class TestMatchAny(BaseTestMatcher):
 
     def test_matches_returns_true(self):
-        matcher = cm.MatchAny([cm.ProjectMatcher(self.project)])
+        matcher = cm.MatchAny([cm.ProjectMatcher(ZuulRegex(self.project))])
         self.assertTrue(matcher.matches(self.change))
 
     def test_matches_returns_false(self):
-        matcher = cm.MatchAny([cm.ProjectMatcher('not_project')])
+        matcher = cm.MatchAny([cm.ProjectMatcher(ZuulRegex('not_project'))])
         self.assertFalse(matcher.matches(self.change))
