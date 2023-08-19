@@ -1,4 +1,5 @@
 # Copyright 2018 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -11,8 +12,6 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-
-import re
 
 from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 
@@ -142,12 +141,12 @@ class PagureEventFilter(EventFilter):
 
         EventFilter.__init__(self, connection_name, trigger)
 
-        self._types = types
-        self._refs = refs
-        self._comments = comments
-        self.types = [re.compile(x) for x in types]
-        self.refs = [re.compile(x) for x in refs]
-        self.comments = [re.compile(x) for x in comments]
+        self._types = [x.pattern for x in types]
+        self._refs = [x.pattern for x in refs]
+        self._comments = [x.pattern for x in comments]
+        self.types = types
+        self.refs = refs
+        self.comments = comments
         self.actions = actions
         self.statuses = statuses
         self.tags = tags

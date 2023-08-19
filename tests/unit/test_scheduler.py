@@ -1705,6 +1705,35 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(self.history), 1)
         self.assertIn('project-post', job_names)
 
+    @simple_layout('layouts/negate-post.yaml')
+    def test_post_negative_regex(self):
+        "Test that post jobs run"
+        p = "review.example.com/org/project"
+        upstream = self.getUpstreamRepos([p])
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
+        A_commit = str(upstream[p].commit('master'))
+        self.log.debug("A commit: %s" % A_commit)
+
+        e = {
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+            },
+            "refUpdate": {
+                "oldRev": "90f173846e3af9154517b88543ffbd1691f31366",
+                "newRev": A_commit,
+                "refName": "master",
+                "project": "org/project",
+            }
+        }
+        self.fake_gerrit.addEvent(e)
+        self.waitUntilSettled()
+
+        job_names = [x.name for x in self.history]
+        self.assertEqual(len(self.history), 1)
+        self.assertIn('post-job', job_names)
+
     def test_post_ignore_deletes(self):
         "Test that deleting refs does not trigger post jobs"
 

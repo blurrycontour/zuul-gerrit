@@ -590,6 +590,23 @@ class TestBranchNegative(ZuulTestCase):
         self.assertHistory([
             dict(name='test-job', result='SUCCESS', changes='1,1')])
 
+    def test_negative_branch_match_regex(self):
+        # Test that a negated branch matcher regex works with implied branches.
+        self.create_branch('org/project2', 'stable/pike')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project2', 'stable/pike'))
+        self.waitUntilSettled()
+
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        B = self.fake_gerrit.addFakeChange('org/project2', 'stable/pike', 'A')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='test-job2', result='SUCCESS', changes='1,1')])
+
 
 class TestBranchTemplates(ZuulTestCase):
     tenant_config_file = 'config/branch-templates/main.yaml'
