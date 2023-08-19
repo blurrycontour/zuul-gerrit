@@ -210,6 +210,22 @@ The supported options in ``zuul.conf`` connections are:
       git fetches every 30 seconds, and this value will be rounded up
       to the next highest multiple of 30 seconds.
 
+   .. attr:: max_threads_per_installation
+      :default: 1
+
+      The GitHub driver performs event pre-processing in parallel
+      before forwarding the events (in the correct order) to the
+      scheduler for processing.  By default, this parallel
+      pre-processing is restricted to a single request for each GitHub
+      App installation that Zuul uses when interacting with GitHub.
+      This is to avoid running afoul of GitHub's abuse detection
+      mechanisms.  Some high-traffic installations of GitHub
+      Enterprise may wish to increase this value to allow more
+      parallel requests if resources permit.  If GitHub Enterprise
+      resource usage is not a concern, setting this value to ``10`` or
+      greater may be reasonable.
+
+
 Trigger Configuration
 ---------------------
 GitHub webhook events can be configured as triggers.
