@@ -14,6 +14,8 @@
 
 import json
 
+from zuul import change_matcher
+from zuul.lib.re2util import ZuulRegex
 from zuul.zk.components import ComponentRegistry
 
 from tests.base import ZuulTestCase, simple_layout, iterate_timeout
@@ -319,6 +321,33 @@ class TestModelUpgrade(ZuulTestCase):
             dict(name='project1-project2-integration',
                  result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+    @model_version(16)
+    def test_model_16_17(self):
+        matcher = change_matcher.BranchMatcher(ZuulRegex('foo'))
+        ser = matcher.serialize()
+        self.assertEqual(ser, {'regex': 'foo', 'implied': False})
+        matcher2 = change_matcher.BranchMatcher.deserialize(ser)
+        self.assertEqual(matcher, matcher2)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 17
+        component_registry = ComponentRegistry(self.zk_client)
+        for _ in iterate_timeout(30, "model api to update"):
+            if component_registry.model_api == 17:
+                break
+
+        matcher = change_matcher.BranchMatcher(ZuulRegex('foo'))
+        ser = matcher.serialize()
+        self.assertEqual(ser, {
+            'regex': {
+                'negate': False,
+                'pattern': 'foo',
+            },
+            'implied': False
+        })
+        matcher2 = change_matcher.BranchMatcher.deserialize(ser)
+        self.assertEqual(matcher, matcher2)
 
 
 class TestGithubModelUpgrade(ZuulTestCase):

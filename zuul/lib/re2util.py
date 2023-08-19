@@ -1,4 +1,5 @@
 # Copyright (C) 2020 Red Hat, Inc
+# Copyright (C) 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import re
 import re2
 
 
@@ -44,3 +46,45 @@ def filter_allowed_disallowed(
         if allowed:
             ret.append(subject)
     return ret
+
+
+class ZuulRegex:
+    def __init__(self, pattern, negate=False):
+        self.pattern = pattern
+        self.negate = negate
+        # TODO: switch this to re2
+        self.re = re.compile(pattern)
+
+    def __eq__(self, other):
+        return (isinstance(other, ZuulRegex) and
+                self.pattern == other.pattern and
+                self.negate == other.negate)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def match(self, subject):
+        if self.negate:
+            return not self.re.match(subject)
+        return self.re.match(subject)
+
+    def fullmatch(self, subject):
+        if self.negate:
+            return not self.re.fullmatch(subject)
+        return self.re.fullmatch(subject)
+
+    def search(self, subject):
+        if self.negate:
+            return not self.re.search(subject)
+        return self.re.search(subject)
+
+    def serialize(self):
+        return {
+            "pattern": self.pattern,
+            "negate": self.negate,
+        }
+
+    @classmethod
+    def deserialize(cls, data):
+        o = cls(data['pattern'], data['negate'])
+        return o

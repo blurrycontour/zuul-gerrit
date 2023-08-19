@@ -1,4 +1,5 @@
 # Copyright 2015 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -19,12 +20,21 @@ configuration.
 
 import re
 
+from zuul.lib.re2util import ZuulRegex
+from zuul.zk.components import COMPONENT_REGISTRY
+
 
 class AbstractChangeMatcher(object):
+    """An abstract class that matches change attributes against regular
+    expressions
+
+    :arg ZuulRegex regex: A Zuul regular expression object to match
+
+    """
 
     def __init__(self, regex):
-        self._regex = regex
-        self.regex = re.compile(regex)
+        self._regex = regex.pattern
+        self.regex = regex
 
     def matches(self, change):
         """Return a boolean indication of whether change matches
@@ -33,13 +43,14 @@ class AbstractChangeMatcher(object):
         raise NotImplementedError()
 
     def copy(self):
-        return self.__class__(self._regex)
+        return self.__class__(self.regex)
 
     def __deepcopy__(self, memo):
         return self.copy()
 
     def __eq__(self, other):
-        return str(self) == str(other)
+        return (self.__class__ == other.__class__ and
+                self.regex == other.regex)
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -83,14 +94,25 @@ class BranchMatcher(AbstractChangeMatcher):
         return False
 
     def serialize(self):
-        return {
-            "implied": self.exactmatch,
-            "regex": self._regex,
-        }
+        if (COMPONENT_REGISTRY.model_api < 17):
+            return {
+                "implied": self.exactmatch,
+                "regex": self.regex.pattern,
+            }
+        else:
+            return {
+                "implied": self.exactmatch,
+                "regex": self.regex.serialize(),
+            }
 
     @classmethod
     def deserialize(cls, data):
-        o = cls.__new__(cls, data['regex'])
+        if isinstance(data['regex'], dict):
+            regex = ZuulRegex.deserialize(data['regex'])
+        else:
+            # MODEL_API >= 17
+            regex = ZuulRegex(data['regex'])
+        o = cls(regex)
         return o
 
 

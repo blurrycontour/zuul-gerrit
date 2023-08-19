@@ -1,4 +1,5 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -17,7 +18,7 @@ import voluptuous as v
 from zuul.trigger import BaseTrigger
 from zuul.driver.gerrit.gerritmodel import GerritEventFilter
 from zuul.driver.gerrit import gerritsource
-from zuul.driver.util import scalar_or_list, to_list
+from zuul.driver.util import scalar_or_list, to_list, make_regex, ZUUL_REGEX
 from zuul.configloader import DeprecationWarning
 
 
@@ -63,12 +64,19 @@ class GerritTrigger(BaseTrigger):
                 error_accumulator.addError(
                     GerritRejectApprovalDeprecation())
 
+            types = [make_regex(x) for x in to_list(trigger['event'])]
+            branches = [make_regex(x) for x in to_list(trigger.get('branch'))]
+            refs = [make_regex(x) for x in to_list(trigger.get('ref'))]
+            comments = [make_regex(x) for x in comments]
+            emails = [make_regex(x) for x in emails]
+            usernames = [make_regex(x) for x in usernames]
+
             f = GerritEventFilter(
                 connection_name=connection_name,
                 trigger=self,
-                types=to_list(trigger['event']),
-                branches=to_list(trigger.get('branch')),
-                refs=to_list(trigger.get('ref')),
+                types=types,
+                branches=branches,
+                refs=refs,
                 event_approvals=approvals,
                 comments=comments,
                 emails=emails,
@@ -114,13 +122,13 @@ def getSchema():
         'uuid': str,
         'scheme': str,
         'comment_filter': scalar_or_list(str),
-        'comment': scalar_or_list(str),
+        'comment': scalar_or_list(v.Any(ZUUL_REGEX, str)),
         'email_filter': scalar_or_list(str),
-        'email': scalar_or_list(str),
+        'email': scalar_or_list(v.Any(ZUUL_REGEX, str)),
         'username_filter': scalar_or_list(str),
-        'username': scalar_or_list(str),
-        'branch': scalar_or_list(str),
-        'ref': scalar_or_list(str),
+        'username': scalar_or_list(v.Any(ZUUL_REGEX, str)),
+        'branch': scalar_or_list(v.Any(ZUUL_REGEX, str)),
+        'ref': scalar_or_list(v.Any(ZUUL_REGEX, str)),
         'ignore-deletes': bool,
         'approval': scalar_or_list(variable_dict),
         'require-approval': scalar_or_list(approval),

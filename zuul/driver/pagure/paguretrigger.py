@@ -1,4 +1,5 @@
 # Copyright 2018 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,7 +17,7 @@ import logging
 import voluptuous as v
 from zuul.trigger import BaseTrigger
 from zuul.driver.pagure.paguremodel import PagureEventFilter
-from zuul.driver.util import scalar_or_list, to_list
+from zuul.driver.util import scalar_or_list, to_list, make_regex, ZUUL_REGEX
 
 
 class PagureTrigger(BaseTrigger):
@@ -27,13 +28,17 @@ class PagureTrigger(BaseTrigger):
                         error_accumulator):
         efilters = []
         for trigger in to_list(trigger_config):
+            types = [make_regex(x) for x in to_list(trigger['event'])]
+            refs = [make_regex(x) for x in to_list(trigger.get('ref'))]
+            comments = [make_regex(x) for x in to_list(trigger.get('comment'))]
+
             f = PagureEventFilter(
                 connection_name=connection_name,
                 trigger=self,
-                types=to_list(trigger['event']),
+                types=types,
                 actions=to_list(trigger.get('action')),
-                refs=to_list(trigger.get('ref')),
-                comments=to_list(trigger.get('comment')),
+                refs=refs,
+                comments=comments,
                 statuses=to_list(trigger.get('status')),
                 tags=to_list(trigger.get('tag')),
             )
@@ -56,8 +61,8 @@ def getSchema():
                                  'pg_pull_request_review',
                                  'pg_push')),
         'action': scalar_or_list(str),
-        'ref': scalar_or_list(str),
-        'comment': scalar_or_list(str),
+        'ref': scalar_or_list(v.Any(ZUUL_REGEX, str)),
+        'comment': scalar_or_list(v.Any(ZUUL_REGEX, str)),
         'status': scalar_or_list(str),
         'tag': scalar_or_list(str)
     }

@@ -1,5 +1,5 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
-# Copyright 2021-2022 Acme Gating, LLC
+# Copyright 2021-2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -42,6 +42,7 @@ import jsonpath_rw
 
 from zuul import change_matcher
 from zuul.lib.config import get_default
+from zuul.lib.re2util import ZuulRegex
 from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
@@ -3193,7 +3194,7 @@ class Job(ConfigObject):
         self._files = files
         matchers = []
         for fn in files:
-            matchers.append(change_matcher.FileMatcher(fn))
+            matchers.append(change_matcher.FileMatcher(ZuulRegex(fn)))
         self.file_matcher = change_matcher.MatchAnyFiles(matchers)
 
     def setIrrelevantFileMatcher(self, irrelevant_files):
@@ -3201,7 +3202,7 @@ class Job(ConfigObject):
         self._irrelevant_files = irrelevant_files
         matchers = []
         for fn in irrelevant_files:
-            matchers.append(change_matcher.FileMatcher(fn))
+            matchers.append(change_matcher.FileMatcher(ZuulRegex(fn)))
         self.irrelevant_file_matcher = change_matcher.MatchAllFiles(matchers)
 
     def updateVariables(self, other_vars, other_extra_vars, other_host_vars,
@@ -3447,6 +3448,7 @@ class Job(ConfigObject):
         if self.branch_matcher and not self.branch_matcher.matches(
                 branch_change):
             return False
+
         return True
 
     def changeMatchesFiles(self, change):

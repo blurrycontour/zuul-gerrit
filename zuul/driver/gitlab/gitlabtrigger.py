@@ -1,4 +1,5 @@
 # Copyright 2019 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,7 +17,7 @@ import logging
 import voluptuous as v
 from zuul.driver.gitlab.gitlabmodel import GitlabEventFilter
 from zuul.trigger import BaseTrigger
-from zuul.driver.util import scalar_or_list, to_list
+from zuul.driver.util import scalar_or_list, to_list, make_regex, ZUUL_REGEX
 
 
 class GitlabTrigger(BaseTrigger):
@@ -27,13 +28,18 @@ class GitlabTrigger(BaseTrigger):
                         error_accumulator):
         efilters = []
         for trigger in to_list(trigger_config):
+            types = [make_regex(x) for x in to_list(trigger['event'])]
+            refs = [make_regex(x) for x in to_list(trigger.get('ref'))]
+            comments = [make_regex(x) for x in
+                        to_list(trigger.get('comment'))]
+
             f = GitlabEventFilter(
                 connection_name=connection_name,
                 trigger=self,
-                types=to_list(trigger['event']),
+                types=types,
                 actions=to_list(trigger.get('action')),
-                comments=to_list(trigger.get('comment')),
-                refs=to_list(trigger.get('ref')),
+                comments=comments,
+                refs=refs,
                 labels=to_list(trigger.get('labels')),
                 unlabels=to_list(trigger.get('unlabels')),
             )
@@ -53,8 +59,8 @@ def getSchema():
                     'gl_push',
                 )),
         'action': scalar_or_list(str),
-        'comment': scalar_or_list(str),
-        'ref': scalar_or_list(str),
+        'comment': scalar_or_list(v.Any(ZUUL_REGEX, str)),
+        'ref': scalar_or_list(v.Any(ZUUL_REGEX, str)),
         'labels': scalar_or_list(str),
         'unlabels': scalar_or_list(str),
     }

@@ -73,6 +73,44 @@ regular expression.
 Zuul uses the `RE2 library <https://github.com/google/re2/wiki/Syntax>`_
 which has a restricted regular expression syntax compared to PCRE.
 
+Some options may be specified for regular expressions.  To do so, use
+a dictionary to specify the regular expression in the YAML
+configuration.
+
+For example, the following are all valid values for the
+:attr:`job.branches` attribute, and will all match the branch "devel":
+
+.. code-block:: yaml
+
+   - job:
+       branches: devel
+
+   - job:
+       branches:
+         - devel
+
+   - job:
+       branches:
+         regex: devel
+         negate: false
+
+   - job:
+       branches:
+         - regex: devel
+           negate: false
+
+.. attr:: <regular expression>
+
+   .. attr:: regex
+
+      The pattern for the regular expression.  This uses the RE2 syntax.
+
+   .. attr:: negate
+      :type: bool
+      :default: false
+
+      Whether to negate the match.
+
 .. _encryption:
 
 Encryption

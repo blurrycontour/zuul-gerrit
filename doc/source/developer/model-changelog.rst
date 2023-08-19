@@ -137,3 +137,9 @@ Version 16
 :Prior Zuul version: 9.0.0
 :Description: Adds default_branch to the branch cache.
               Affects schedulers.
+
+Version 17
+----------
+:Prior Zuul version: 9.1.0
+:Description: Adds ZuulRegex and adjusts SourceContext serialialization.
+              Affects schedulers and web.
