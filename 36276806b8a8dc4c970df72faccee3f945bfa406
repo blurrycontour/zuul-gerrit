@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cd64528_cf8ec562",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-21T23:02:10Z",
+      "side": 1,
+      "message": "I did a fairly high level review, but this looks the way I would expect it to.",
+      "revId": "36276806b8a8dc4c970df72faccee3f945bfa406",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0107870_f848caa1",
+        "filename": "requirements.txt",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-21T23:02:10Z",
+      "side": 1,
+      "message": "https://pypi.org/project/google-cloud-pubsub/ indicates this is an Apache licensed pieces of software which shouldn\u0027t be a problem with zuul.",
+      "revId": "36276806b8a8dc4c970df72faccee3f945bfa406",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
