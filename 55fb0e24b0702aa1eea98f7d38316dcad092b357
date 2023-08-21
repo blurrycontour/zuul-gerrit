@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca597e03_865c0c22",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-08-21T21:14:45Z",
+      "side": 1,
+      "message": "The test failure seems relevant. The logs contains \"Overriding SUCCESS result as FAILURE due to early failure detection\", even though the job doesn\u0027t use failure-output. Are we missing a `AnsibleJobs.early_failure \u003d False` in some case?",
+      "revId": "55fb0e24b0702aa1eea98f7d38316dcad092b357",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
