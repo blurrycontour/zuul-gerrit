@@ -28,10 +28,12 @@ class GitlabTrigger(BaseTrigger):
                         error_accumulator):
         efilters = []
         for trigger in to_list(trigger_config):
-            types = [make_regex(x) for x in to_list(trigger['event'])]
-            refs = [make_regex(x) for x in to_list(trigger.get('ref'))]
-            comments = [make_regex(x) for x in
-                        to_list(trigger.get('comment'))]
+            types = [make_regex(x, error_accumulator)
+                     for x in to_list(trigger['event'])]
+            refs = [make_regex(x, error_accumulator)
+                    for x in to_list(trigger.get('ref'))]
+            comments = [make_regex(x, error_accumulator)
+                        for x in to_list(trigger.get('comment'))]
 
             f = GitlabEventFilter(
                 connection_name=connection_name,

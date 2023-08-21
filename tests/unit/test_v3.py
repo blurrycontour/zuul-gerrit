@@ -31,7 +31,7 @@ import paramiko
 
 import zuul.configloader
 from zuul.lib import yamlutil as yaml
-from zuul.model import MergeRequest
+from zuul.model import MergeRequest, SEVERITY_WARNING
 from zuul.zk.blob_store import BlobStore
 
 from tests.base import (
@@ -5215,6 +5215,132 @@ class TestValidateWarnings(ZuulTestCase):
     @simple_layout('layouts/broken-warnings.yaml')
     def test_validate_warnings(self):
         pass
+
+
+class TestPCREDeprecation(ZuulTestCase):
+    @simple_layout('layouts/pcre-deprecation.yaml')
+    def test_pcre_deprecation(self):
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 3)
+
+        # Pragma implied-branches
+        idx = 0
+        self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[idx].name, 'Regex Deprecation')
+        self.assertIn('pragma stanza', errors[idx].error)
+
+        # Job branches
+        idx = 1
+        self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[idx].name, 'Regex Deprecation')
+        self.assertIn('job stanza', errors[idx].error)
+
+        # Project-pipeline job branches
+        idx = 2
+        self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[idx].name, 'Regex Deprecation')
+        self.assertIn('project stanza', errors[idx].error)
+
+
+class TestPCREDeprecationGerrit(ZuulTestCase):
+    @simple_layout('layouts/pcre-deprecation-gerrit.yaml')
+    def test_pcre_deprecation_gerrit(self):
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 2)
+
+        # Pipeline gerrit trigger ref
+        idx = 0
+        self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[idx].name, 'Regex Deprecation')
+        self.assertIn('pipeline stanza', errors[idx].error)
+        self.assertIn('name: gate', errors[idx].error)
+
+        # Pipeline gerrit require approval
+        idx = 1
+        self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[idx].name, 'Regex Deprecation')
+        self.assertIn('pipeline stanza', errors[idx].error)
+        self.assertIn('name: post', errors[idx].error)
+
+
+class TestPCREDeprecationGit(ZuulTestCase):
+    config_file = 'zuul-git-driver.conf'
+
+    @simple_layout('layouts/pcre-deprecation-git.yaml')
+    def test_pcre_deprecation_git(self):
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 1)
+
+        # Pipeline git trigger ref
+        idx = 0
+        self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[idx].name, 'Regex Deprecation')
+        self.assertIn('pipeline stanza', errors[idx].error)
+
+
+class TestPCREDeprecationGithub(ZuulTestCase):
+    config_file = 'zuul-connections-gerrit-and-github.conf'
+
+    @simple_layout('layouts/pcre-deprecation-github.yaml')
+    def test_pcre_deprecation_github(self):
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 1)
+
+        # Pipeline github trigger ref
+        idx = 0
+        self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[idx].name, 'Regex Deprecation')
+        self.assertIn('pipeline stanza', errors[idx].error)
+
+
+class TestPCREDeprecationGitlab(ZuulTestCase):
+    config_file = 'zuul-gitlab-driver.conf'
+
+    @simple_layout('layouts/pcre-deprecation-gitlab.yaml', driver='gitlab')
+    def test_pcre_deprecation_gitlab(self):
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 1)
+
+        # Pipeline gitlab trigger ref
+        idx = 0
+        self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[idx].name, 'Regex Deprecation')
+        self.assertIn('pipeline stanza', errors[idx].error)
+
+
+class TestPCREDeprecationPagure(ZuulTestCase):
+    config_file = 'zuul-pagure-driver.conf'
+
+    @simple_layout('layouts/pcre-deprecation-pagure.yaml', driver='pagure')
+    def test_pcre_deprecation_pagure(self):
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 1)
+
+        # Pipeline pagure trigger ref
+        idx = 0
+        self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[idx].name, 'Regex Deprecation')
+        self.assertIn('pipeline stanza', errors[idx].error)
+
+
+class TestPCREDeprecationZuul(ZuulTestCase):
+    @simple_layout('layouts/pcre-deprecation-zuul.yaml')
+    def test_pcre_deprecation_zuul(self):
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 1)
+
+        # Pipeline zuul trigger ref
+        idx = 0
+        self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[idx].name, 'Regex Deprecation')
+        self.assertIn('pipeline stanza', errors[idx].error)
 
 
 class RoleTestCase(ZuulTestCase):
