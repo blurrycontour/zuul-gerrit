@@ -22,6 +22,53 @@
       },
       "revId": "12f7387bc39d163453929053b5486b5f191cc595",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8228c128_600d8c09",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 1163,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-08-21T13:03:46Z",
+      "side": 1,
+      "message": "Couldn\u0027t the callback ensure that the task (and the job) fails when a failure is detected through regex?",
+      "parentUuid": "d4745f05_25651207",
+      "range": {
+        "startLine": 1162,
+        "startChar": 52,
+        "endLine": 1163,
+        "endChar": 16
+      },
+      "revId": "12f7387bc39d163453929053b5486b5f191cc595",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "def112f7_85557c50",
+        "filename": "releasenotes/notes/early-failure-regex-2a9290b3fdb2b8c1.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-08-21T13:03:46Z",
+      "side": 1,
+      "message": "typo: pipeline",
+      "range": {
+        "startLine": 7,
+        "startChar": 48,
+        "endLine": 7,
+        "endChar": 55
+      },
+      "revId": "12f7387bc39d163453929053b5486b5f191cc595",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
