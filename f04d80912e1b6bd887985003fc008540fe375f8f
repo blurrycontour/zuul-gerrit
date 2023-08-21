@@ -16,6 +16,24 @@
       "message": "It isn\u0027t clear to me why we would want to recurse upward here. Is this just catching the case where parent is block and doesn\u0027t have a rescue clause?",
       "revId": "f04d80912e1b6bd887985003fc008540fe375f8f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "623e8fd3_e4bb0715",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-21T23:57:53Z",
+      "side": 1,
+      "message": "Yeah, I\u0027m trying to be conservative here in case it\u0027s possible to construct something like:\n\n- block:\n    - block:\n       - failing task\n  rescue:\n    - rescue task\n\nie, the immediate parent is not a rescuable block, but the grandparent is -- ultimately resulting in the playbook succeeding after a task failed.",
+      "parentUuid": "a0337cb9_21720368",
+      "revId": "f04d80912e1b6bd887985003fc008540fe375f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
