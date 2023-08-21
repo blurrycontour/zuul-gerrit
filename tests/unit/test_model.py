@@ -108,7 +108,7 @@ class TestJob(BaseTestCase):
             'parent': None,
             'irrelevant-files': [
                 '^docs/.*$'
-            ]})
+            ]}, None)
         return job
 
     def test_change_matches_returns_false_for_matched_skip_if(self):
@@ -194,7 +194,7 @@ class TestJob(BaseTestCase):
             'name': 'base',
             'parent': None,
             'timeout': 30,
-        })
+        }, None)
         self.layout.addJob(base)
         python27 = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
@@ -202,7 +202,7 @@ class TestJob(BaseTestCase):
             'name': 'python27',
             'parent': 'base',
             'timeout': 40,
-        })
+        }, None)
         self.layout.addJob(python27)
         python27diablo = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
@@ -212,7 +212,7 @@ class TestJob(BaseTestCase):
                 'stable/diablo'
             ],
             'timeout': 50,
-        })
+        }, None)
         self.layout.addJob(python27diablo)
 
         project_config = self.pcontext.project_parser.fromYaml({
@@ -225,7 +225,7 @@ class TestJob(BaseTestCase):
                                   'run': 'playbooks/python27.yaml'}}
                 ]
             }
-        })
+        }, None)
         self.layout.addProjectConfig(project_config)
 
         change = model.Change(self.project)
@@ -269,7 +269,7 @@ class TestJob(BaseTestCase):
             'name': 'base',
             'parent': None,
             'timeout': 30,
-        })
+        }, None)
         self.layout.addJob(base)
         python27 = self.pcontext.job_parser.fromYaml({
             '_source_context': self.context,
@@ -278,7 +278,7 @@ class TestJob(BaseTestCase):
             'parent': 'base',
             'timeout': 40,
             'irrelevant-files': ['^ignored-file$'],
-        })
+        }, None)
         self.layout.addJob(python27)
 
         project_config = self.pcontext.project_parser.fromYaml({
@@ -290,7 +290,7 @@ class TestJob(BaseTestCase):
                     'python27',
                 ]
             }
-        })
+        }, None)
         self.layout.addProjectConfig(project_config)
 
         change = model.Change(self.project)
@@ -321,7 +321,7 @@ class TestJob(BaseTestCase):
             '_start_mark': self.start_mark,
             'parent': None,
             'name': 'base',
-        })
+        }, None)
         self.layout.addJob(base)
 
         other_project = model.Project('other_project', self.source)
@@ -334,7 +334,7 @@ class TestJob(BaseTestCase):
             '_source_context': other_context,
             '_start_mark': self.start_mark,
             'name': 'base',
-        })
+        }, None)
         with testtools.ExpectedException(
                 Exception,
                 "Job base in other_project is not permitted "
@@ -350,22 +350,21 @@ class TestJob(BaseTestCase):
             'name': 'job',
             'parent': None,
             'post-review': True
-        })
+        }, None)
 
         self.layout.addJob(job)
 
-        project_config = self.pcontext.project_parser.fromYaml(
-            {
-                '_source_context': self.context,
-                '_start_mark': self.start_mark,
-                'name': 'project',
-                'gate': {
-                    'jobs': [
-                        'job'
-                    ]
-                }
+        project_config = self.pcontext.project_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'project',
+            'gate': {
+                'jobs': [
+                    'job'
+                ]
             }
-        )
+        }, None)
+
         self.layout.addProjectConfig(project_config)
 
         change = model.Change(self.project)

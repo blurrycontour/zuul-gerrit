@@ -41,10 +41,14 @@ class GithubTrigger(BaseTrigger):
         efilters = []
         for trigger in to_list(trigger_config):
 
-            types = [make_regex(x) for x in to_list(trigger['event'])]
-            branches = [make_regex(x) for x in to_list(trigger.get('branch'))]
-            refs = [make_regex(x) for x in to_list(trigger.get('ref'))]
-            comments = [make_regex(x) for x in to_list(trigger.get('comment'))]
+            types = [make_regex(x, error_accumulator)
+                     for x in to_list(trigger['event'])]
+            branches = [make_regex(x, error_accumulator)
+                        for x in to_list(trigger.get('branch'))]
+            refs = [make_regex(x, error_accumulator)
+                    for x in to_list(trigger.get('ref'))]
+            comments = [make_regex(x, error_accumulator)
+                        for x in to_list(trigger.get('comment'))]
 
             f = GithubEventFilter(
                 connection_name=connection_name,

@@ -64,12 +64,15 @@ class GerritTrigger(BaseTrigger):
                 error_accumulator.addError(
                     GerritRejectApprovalDeprecation())
 
-            types = [make_regex(x) for x in to_list(trigger['event'])]
-            branches = [make_regex(x) for x in to_list(trigger.get('branch'))]
-            refs = [make_regex(x) for x in to_list(trigger.get('ref'))]
-            comments = [make_regex(x) for x in comments]
-            emails = [make_regex(x) for x in emails]
-            usernames = [make_regex(x) for x in usernames]
+            types = [make_regex(x, error_accumulator)
+                     for x in to_list(trigger['event'])]
+            branches = [make_regex(x, error_accumulator)
+                        for x in to_list(trigger.get('branch'))]
+            refs = [make_regex(x, error_accumulator)
+                    for x in to_list(trigger.get('ref'))]
+            comments = [make_regex(x, error_accumulator) for x in comments]
+            emails = [make_regex(x, error_accumulator) for x in emails]
+            usernames = [make_regex(x, error_accumulator) for x in usernames]
 
             f = GerritEventFilter(
                 connection_name=connection_name,
@@ -92,6 +95,7 @@ class GerritTrigger(BaseTrigger):
                 ignore_deletes=ignore_deletes,
                 require=trigger.get('require'),
                 reject=trigger.get('reject'),
+                error_accumulator=error_accumulator,
             )
             efilters.append(f)
 

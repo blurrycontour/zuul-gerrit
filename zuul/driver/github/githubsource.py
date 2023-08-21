@@ -177,13 +177,13 @@ class GithubSource(BaseSource):
     def _ghTimestampToDate(self, timestamp):
         return time.strptime(timestamp, '%Y-%m-%dT%H:%M:%SZ')
 
-    def getRequireFilters(self, config):
+    def getRequireFilters(self, config, error_accumulator):
         f = GithubRefFilter.requiresFromConfig(
             self.connection.connection_name,
             config)
         return [f]
 
-    def getRejectFilters(self, config):
+    def getRejectFilters(self, config, error_accumulator):
         f = GithubRefFilter.rejectFromConfig(
             self.connection.connection_name,
             config)

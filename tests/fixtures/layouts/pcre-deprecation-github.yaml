@@ -1,0 +1,15 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      github:
+        - event: pull_request_review
+          action: submitted
+          state: approve
+          ref: '(?!invalid)'
+    start:
+      github: {}
+    success:
+      github: {}
+    failure:
+      github: {}

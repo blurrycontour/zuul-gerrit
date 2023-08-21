@@ -33,9 +33,10 @@ class ZuulTrigger(BaseTrigger):
                         error_accumulator):
         efilters = []
         for trigger in to_list(trigger_conf):
-            types = [make_regex(x) for x in to_list(trigger['event'])]
-            pipelines = [make_regex(x) for x in
-                         to_list(trigger.get('pipeline'))]
+            types = [make_regex(x, error_accumulator)
+                     for x in to_list(trigger['event'])]
+            pipelines = [make_regex(x, error_accumulator)
+                         for x in to_list(trigger.get('pipeline'))]
             f = ZuulEventFilter(
                 connection_name=connection_name,
                 trigger=self,
