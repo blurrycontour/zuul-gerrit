@@ -978,6 +978,7 @@ class AnsibleJob(object):
         with executor_server.zk_context as ctx:
             self.job = FrozenJob.fromZK(ctx, arguments["job_ref"])
         self.arguments["zuul"].update(zuul_params_from_job(self.job))
+        self.early_failure = False
 
         self.zuul_event_id = self.arguments["zuul_event_id"]
         # Record ansible version being used for the cleanup phase
@@ -1827,6 +1828,12 @@ class AnsibleJob(object):
                 elif job_status == self.RESULT_NORMAL:
                     success = (job_code == 0)
                     if success:
+                        if self.early_failure:
+                            # Override the result, but proceed as
+                            # normal.
+                            self.log.info(
+                                "Overriding SUCCESS result as FAILURE "
+                                "due to early failure detection")
                         result = 'SUCCESS'
                     else:
                         result = 'FAILURE'
@@ -2871,6 +2878,7 @@ class AnsibleJob(object):
                         allow_pre_fail = False
                     if allow_pre_fail and result_line == b'failure':
                         self.log.info("Early failure in job")
+                        self.early_failure = True
                         self.executor_server.updateBuildStatus(
                             self.build_request, {'pre_fail': True})
                 else:

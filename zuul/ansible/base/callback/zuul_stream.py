@@ -42,6 +42,7 @@ import socket
 import threading
 import time
 
+from ansible.playbook.block import Block
 from ansible.plugins.callback import default
 from ansible.module_utils._text import to_text
 from ansible.module_utils.parsing.convert_bool import boolean
@@ -91,6 +92,15 @@ def zuul_filter_result(result):
 
     # Combine stdout / stderr
     return stdout_lines + stderr_lines
+
+
+def is_rescuable(task):
+    if task._parent is None:
+        return False
+    if isinstance(task._parent, Block):
+        if task._parent.rescue:
+            return True
+    return is_rescuable(task._parent)
 
 
 class CallbackModule(default.CallbackModule):
@@ -462,7 +472,8 @@ class CallbackModule(default.CallbackModule):
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         ret = self._v2_runner_on_failed(result, ignore_errors)
-        if not ignore_errors:
+        if (not ignore_errors and
+            not is_rescuable(result._task)):
             self._result_logger.info("failure")
         return ret
 
