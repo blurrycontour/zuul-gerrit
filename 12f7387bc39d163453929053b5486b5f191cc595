@@ -48,6 +48,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ee47002_241f2e30",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 1163,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-21T17:42:54Z",
+      "side": 1,
+      "message": "Yeah, we can make the failure \"sticky\".  I mostly wasn\u0027t sure whether we wanted to give it priority over the \"real\" result, but I think that\u0027s fine to do, and it is a conservative approach (presumably if there are problems with detection, the failures will prompt users to find and fix them).  Next ps does this (in the excecutor -- that has minimal changes to the existing logic).",
+      "parentUuid": "d4745f05_25651207",
+      "revId": "12f7387bc39d163453929053b5486b5f191cc595",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "def112f7_85557c50",
@@ -67,6 +85,24 @@
         "endLine": 7,
         "endChar": 55
       },
+      "revId": "12f7387bc39d163453929053b5486b5f191cc595",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5346f83f_70681440",
+        "filename": "releasenotes/notes/early-failure-regex-2a9290b3fdb2b8c1.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-21T17:42:54Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "def112f7_85557c50",
       "revId": "12f7387bc39d163453929053b5486b5f191cc595",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
