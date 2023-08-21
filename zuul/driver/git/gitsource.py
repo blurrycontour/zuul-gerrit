@@ -80,10 +80,10 @@ class GitSource(BaseSource):
     def getProjectOpenChanges(self, project):
         raise NotImplementedError()
 
-    def getRequireFilters(self, config):
+    def getRequireFilters(self, config, error_accumulator):
         return []
 
-    def getRejectFilters(self, config):
+    def getRejectFilters(self, config, error_accumulator):
         return []
 
     def getRefForChange(self, change):
