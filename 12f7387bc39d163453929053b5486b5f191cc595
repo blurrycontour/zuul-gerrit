@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4745f05_25651207",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 1163,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-08-21T11:08:55Z",
+      "side": 1,
+      "message": "To be honest I\u0027m not super thrilled about leaving that undefined. Would it be possible to fail the job if a pre-fail was detected?\n\nI\u0027m mainly concerned about what an \u0027gate\u0027 pipeline manager will do with an item where all jobs succeeded, but the item was moved out-of-line already. Will the change be merged in that case? Looking at `QueueItem.didAllJobsSucceed()`, `QueueItem.isBundleFailing()`, `QueueItem.hasAnyJobFailed()` and the use of those methods, the answer might be \"yes\".\n\nI think there is some truth to the saying \"when you try to solve a problem with a regex you\u0027ve got two problems\". Considering that regex might not be easy to get 100% right, I think we should make this case \"safe\" to fail for the users.",
+      "range": {
+        "startLine": 1162,
+        "startChar": 52,
+        "endLine": 1163,
+        "endChar": 16
+      },
+      "revId": "12f7387bc39d163453929053b5486b5f191cc595",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
