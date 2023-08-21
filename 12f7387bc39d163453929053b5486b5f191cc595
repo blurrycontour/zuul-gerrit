@@ -66,6 +66,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ead042e_10c14725",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 1163,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-08-21T17:46:27Z",
+      "side": 1,
+      "message": "Isn\u0027t the result now defined in that case? e.g. the playbook run is marked as FAILED.",
+      "parentUuid": "1ee47002_241f2e30",
+      "revId": "12f7387bc39d163453929053b5486b5f191cc595",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "def112f7_85557c50",
