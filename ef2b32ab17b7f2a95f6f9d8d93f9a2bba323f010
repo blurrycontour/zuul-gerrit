@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c902f7a_7fde39f2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-21T17:22:13Z",
+      "side": 1,
+      "message": "I don\u0027t follow the logic here.  If the item is not part of the queue, then why are we processing the item in processQueue?  Doesn\u0027t that explicitly process each item in the queue?  What am I missing?\n\nAre you by any chance saying that an item that is in the queue may have a reference to a bundle and that bundle may include an item that is no longer in the queue?  That would explain how we could be dealing with an item that is not in the queue, however, that contradicts your statement \"the item that references the bundle\" -- what I just described would be a bundle that references an item.  Maybe that\u0027s what you menat though and I\u0027m just not reading it right?\n\nOnce we sort this out -- we should be able to come up with a sequence of events that explains this behavior, and then produce a test for this.  I think that\u0027s important for a change like this which is clearly showing us we have an untested code path.",
+      "revId": "ef2b32ab17b7f2a95f6f9d8d93f9a2bba323f010",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8aa73b3_c527489b",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 6248,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-21T17:22:13Z",
+      "side": 1,
+      "message": "It might be nicer to use context.log.warning so that we use a more relevant logger.\n\nI\u0027m also a little concerned here; this seems like an error condition that Zuul should correct.  I\u0027m not sure these are the right actions to take in this situation; but let\u0027s see what we learn from the questions I asked about the commit message.",
+      "revId": "ef2b32ab17b7f2a95f6f9d8d93f9a2bba323f010",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
