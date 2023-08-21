@@ -52,8 +52,23 @@ class ZuulRegex:
     def __init__(self, pattern, negate=False):
         self.pattern = pattern
         self.negate = negate
-        # TODO: switch this to re2
-        self.re = re.compile(pattern)
+        self.re2_failure = False
+        self.re2_failure_message = None
+        try:
+            o = re2.Options()
+            o.log_errors = False
+            self.re = re2.compile(pattern, options=o)
+        except re2.error as e:
+            # Compile under re first to find out if this is also a
+            # PCRE error, which should take precedence.
+            self.re = re.compile(pattern)
+            # If it compiled okay, then the problem is re2 vs pcre
+            self.re2_failure = True
+            if e.args and len(e.args) == 1:
+                if isinstance(e.args[0], bytes):
+                    self.re2_failure_message = e.args[0].decode('utf8')
+                elif isinstance(e.args[0], str):
+                    self.re2_failure_message = e.args[0]
 
     def __eq__(self, other):
         return (isinstance(other, ZuulRegex) and

@@ -208,16 +208,16 @@ class GerritSource(BaseSource):
     def _getGitwebUrl(self, project, sha=None):
         return self.connection._getGitwebUrl(project, sha)
 
-    def getRequireFilters(self, config):
+    def getRequireFilters(self, config, error_accumulator):
         f = GerritRefFilter.requiresFromConfig(
             self.connection.connection_name,
-            config)
+            config, error_accumulator)
         return [f]
 
-    def getRejectFilters(self, config):
+    def getRejectFilters(self, config, error_accumulator):
         f = GerritRefFilter.rejectFromConfig(
             self.connection.connection_name,
-            config)
+            config, error_accumulator)
         return [f]
 
     def getRefForChange(self, change):

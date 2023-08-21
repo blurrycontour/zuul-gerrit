@@ -28,7 +28,7 @@ class TimerTrigger(BaseTrigger):
                         error_accumulator):
         efilters = []
         for trigger in to_list(trigger_conf):
-            types = [make_regex('timer')]
+            types = [make_regex('timer', error_accumulator)]
             f = TimerEventFilter(connection_name=connection_name,
                                  trigger=self,
                                  types=types,

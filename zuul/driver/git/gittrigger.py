@@ -29,7 +29,8 @@ class GitTrigger(BaseTrigger):
         efilters = []
         for trigger in to_list(trigger_conf):
 
-            refs = [make_regex(x) for x in to_list(trigger.get('ref'))]
+            refs = [make_regex(x, error_accumulator)
+                    for x in to_list(trigger.get('ref'))]
 
             f = GitEventFilter(
                 connection_name=connection_name,
