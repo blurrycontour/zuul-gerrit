@@ -399,10 +399,10 @@ class SQLConnection(BaseConnection):
                 ):
                     self._migrate()
                 break
-            except sa.exc.OperationalError:
+            except sa.exc.OperationalError as e:
                 self.log.error(
                     "Unable to connect to the database or establish the "
-                    "required tables.")
+                    "required tables: %s", e)
             time.sleep(10)
 
     def _setup_models(self):
