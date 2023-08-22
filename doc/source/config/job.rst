@@ -1139,6 +1139,29 @@ Here is an example of two job definitions:
       :attr:`job.deduplicate` may be set to ``true`` to ignore the
       heuristic and deduplicate anyway.
 
+   .. attr:: failure-output
+
+      A regular expression (or list of regular expressions) that
+      should be matched against job output to determine if the job is
+      going to fail.  Matches are performed line-by-line (multiline
+      regular expressions will not be effective).
+
+      This option is not required; job failure is determined by the
+      result code from its Ansible playbooks.  However, if this option
+      is supplied, and one of the regular expressions matches a line
+      in the streaming output from the job, Zuul will be able to
+      anticipate the failure before the completion of the playbook.
+      In this case, it will be able to restart jobs for changes behind
+      it in a dependent pipeline.
+
+      When inheriting or applying variants this option is combined
+      so that regular expressions from all parents and variants used
+      will be applied.
+
+      Use caution when specifying this option.  If an early failure is
+      triggered, the job result will be recorded as FAILURE even if
+      the job playbooks ultimately succeed.
+
    .. attr:: workspace-scheme
       :default: golang
 

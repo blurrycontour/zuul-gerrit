@@ -21,6 +21,7 @@ import logging
 import textwrap
 import io
 import re
+import re2
 import subprocess
 
 import voluptuous as vs
@@ -838,6 +839,7 @@ class JobParser(object):
                       'match-on-config-updates': bool,
                       'workspace-scheme': vs.Any('golang', 'flat', 'unique'),
                       'deduplicate': vs.Any(bool, 'auto'),
+                      'failure-output': to_list(str),
     }
 
     job_name = {vs.Required('name'): str}
@@ -1173,6 +1175,15 @@ class JobParser(object):
             job.setFileMatcher(as_list(conf['files']))
         if 'irrelevant-files' in conf:
             job.setIrrelevantFileMatcher(as_list(conf['irrelevant-files']))
+        if 'failure-output' in conf:
+            failure_output = as_list(conf['failure-output'])
+            # Test compilation to detect errors, but the zuul_stream
+            # callback plugin is what actually needs re objects, so we
+            # let it recompile them later.
+            for x in failure_output:
+                re2.compile(x)
+            job.failure_output = tuple(failure_output)
+
         job.freeze()
         return job
 
