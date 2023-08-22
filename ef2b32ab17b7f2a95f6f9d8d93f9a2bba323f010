@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9d7e3aee_a159080e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-08-22T13:34:27Z",
+      "side": 1,
+      "message": "Reading my comment now, I\u0027m not quite sure anymore which item I meant yesterday. Maybe ignore the part with \"the item in the code above\" for now. I think it\u0027s the case you describe as \"a bundle that references an item that is not part of the queue anymore\". I would say it\u0027s an item referencing a bundle which references another item that is not part of the queue anymore.\n\nMaybe a little more explanation is helpful (I hope at least):\n\nI wasn\u0027t referring to the item being processed in processQueue but rather that the item is not \"processed\" within `ChangeQueue.deserialize()` because it\u0027s not in the queue anymore. In https://opendev.org/zuul/zuul/src/commit/f658640c30007dad92e7d8f2ac957c1ed53fe058/zuul/model.py#L1188 we build a list `items_by_path` that contains all items in the queue. Further down we use this list to also deserialize the bundles https://opendev.org/zuul/zuul/src/commit/f658640c30007dad92e7d8f2ac957c1ed53fe058/zuul/model.py#L1221. If we now have a bundle that is not deserialized properly it means that this bundle was linked to an item that wasn\u0027t \"processed\" in `ChangeQueue.deserialize()` which would also mean it was not part of the queue anymore (since the items in the queue are the basis for the list in `ChangeQueue.deserialize()`.\n\nAt that point it wasn\u0027t clear to me where the item could come from, therefore the fix to \"correct\" the bundle itself and ensure that it is deserialized properly in any case.\n\nAfter looking further into this topic, I think the missing piece is this if branch in `ChangeQueue.dequeueItem()`: https://opendev.org/zuul/zuul/src/commit/f658640c30007dad92e7d8f2ac957c1ed53fe058/zuul/model.py#L1297. In case the item contains a bundle, we don\u0027t remove the item in ZK, but only update it to clear the `item_ahead` and `items_behind`. However, we don\u0027t touch the `bundle` here, so I think this could explain how we still reference an item that is not part of the queue anymore.\n\nThis still doesn\u0027t answer the question how we could end up in a state like this at all, and I\u0027m still looking into it. My assumption is that something like this could happen if the dependencies within a cycle are changed while the changes are already enqueued. In this case the scheduler will dequeue the changes and resolve the dependencies again. In our case the scheduler only dequeued some of the changes in the cycle, but not all (for unknown reasons). I haven\u0027t found out yet why. So there is still something missing here like another exception during that time on the same scheduler, a scheduler crash, zk connection loss...something that caused the scheduler to deserialize the data from ZooKeeper again (or at least parts of it).",
+      "parentUuid": "1c902f7a_7fde39f2",
+      "revId": "ef2b32ab17b7f2a95f6f9d8d93f9a2bba323f010",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e8aa73b3_c527489b",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-21T17:22:13Z",
       "side": 1,
       "message": "It might be nicer to use context.log.warning so that we use a more relevant logger.\n\nI\u0027m also a little concerned here; this seems like an error condition that Zuul should correct.  I\u0027m not sure these are the right actions to take in this situation; but let\u0027s see what we learn from the questions I asked about the commit message.",
+      "revId": "ef2b32ab17b7f2a95f6f9d8d93f9a2bba323f010",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59b17fb0_3ebfd716",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 6248,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-08-22T13:34:27Z",
+      "side": 1,
+      "message": "Thanks for the hint, I wasn\u0027t aware of this context logger.",
+      "parentUuid": "e8aa73b3_c527489b",
       "revId": "ef2b32ab17b7f2a95f6f9d8d93f9a2bba323f010",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
