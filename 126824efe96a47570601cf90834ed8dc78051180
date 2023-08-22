@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4659d8b_59bb08b1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-08-22T13:44:55Z",
+      "side": 1,
+      "message": "nit: AFAIK Python\u0027s re module is not using PCRE",
+      "range": {
+        "startLine": 14,
+        "startChar": 62,
+        "endLine": 14,
+        "endChar": 66
+      },
+      "revId": "126824efe96a47570601cf90834ed8dc78051180",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a4dd201_44d995f0",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-08-22T13:44:55Z",
+      "side": 1,
+      "message": "debug leftover?",
+      "revId": "126824efe96a47570601cf90834ed8dc78051180",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
