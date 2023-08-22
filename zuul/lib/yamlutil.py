@@ -138,16 +138,16 @@ class AnsibleUnsafeStr:
         return yaml.ScalarNode(tag=cls.yaml_tag, value=data.value)
 
 
-class AnsibleUnsafeDumper(yaml.SafeDumper):
+class AnsibleUnsafeDumper(SafeDumper):
     pass
 
 
-class AnsibleUnsafeDumperWithoutAliases(yaml.SafeDumper):
+class AnsibleUnsafeDumperWithoutAliases(SafeDumper):
     def ignore_aliases(self, data):
         return True
 
 
-class AnsibleUnsafeLoader(yaml.SafeLoader):
+class AnsibleUnsafeLoader(SafeLoader):
     pass
 
 

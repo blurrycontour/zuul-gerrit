@@ -64,24 +64,32 @@ class TestYamlDumper(BaseTestCase):
     def test_ansible_dumper(self):
         data = {'foo': 'bar'}
         data = yamlutil.mark_strings_unsafe(data)
-        expected = "foo: !unsafe 'bar'\n"
+        expected = "foo: !unsafe bar\n"
         yaml_out = yamlutil.ansible_unsafe_dump(data, default_flow_style=False)
+        # Assert the serialized string looks good
         self.assertEqual(yaml_out, expected)
+        # Check the round trip
+        data_in = yamlutil.ansible_unsafe_load(yaml_out)
+        self.assertEqual(data, data_in)
 
         data = {'foo': {'bar': 'baz'}, 'list': ['bar', 1, 3.0, True, None]}
         data = yamlutil.mark_strings_unsafe(data)
         expected = """\
 foo:
-  bar: !unsafe 'baz'
+  bar: !unsafe baz
 list:
-- !unsafe 'bar'
+- !unsafe bar
 - 1
 - 3.0
 - true
 - null
 """
         yaml_out = yamlutil.ansible_unsafe_dump(data, default_flow_style=False)
+        # Assert the serialized string looks good
         self.assertEqual(yaml_out, expected)
+        data_in = yamlutil.ansible_unsafe_load(yaml_out)
+        # Check the round trip
+        self.assertEqual(data, data_in)
 
     def test_ansible_dumper_with_aliases(self):
         foo = {'bar': 'baz'}
