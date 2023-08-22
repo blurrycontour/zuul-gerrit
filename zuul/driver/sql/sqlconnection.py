@@ -400,7 +400,7 @@ class SQLConnection(BaseConnection):
                     self._migrate()
                 break
             except sa.exc.OperationalError:
-                self.log.error(
+                self.log.exception(
                     "Unable to connect to the database or establish the "
                     "required tables.")
             time.sleep(10)
