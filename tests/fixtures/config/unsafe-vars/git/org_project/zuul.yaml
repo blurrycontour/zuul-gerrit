@@ -9,6 +9,9 @@
     vars:
       latesub: "{{ latefact | default('undefined') }}"
       jobvar: "{{ base_secret.secret | default('undefined') }}"
+      # Make sure we have a top level variable that is undefined to
+      # ensure that it doesn't cause all values to be omitted.
+      undefvar: "{{ undefinedvar }}"
     run: playbooks/testjob-run.yaml
 
 - job:
