@@ -3059,22 +3059,18 @@ class AnsibleJob(object):
             'name': 'localhost',
         }
         for host in self.host_list + [localhost]:
+            vardict = '{'
+            for var in self.original_hostvars[host['name']].keys():
+                vardict += "'%s': %s," % (var, var)
+            vardict += '}'
+            val = "{{ {} | zuul_combine(%s) }}" % (vardict,)
             tasks = [{
                 'set_fact': {
-                    '_zuul_frozen': {},
+                    '_zuul_frozen': val,
                     'cacheable': True,
                 },
+                'ignore_errors': True,
             }]
-            for var in self.original_hostvars[host['name']].keys():
-                val = "{{ _zuul_frozen | combine({'%s': %s}) }}" % (var, var)
-                task = {
-                    'set_fact': {
-                        '_zuul_frozen': val,
-                        'cacheable': True,
-                    },
-                    'ignore_errors': True,
-                }
-                tasks.append(task)
             play = {
                 'hosts': host['name'],
                 'tasks': tasks,
