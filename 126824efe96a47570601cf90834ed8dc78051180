@@ -24,6 +24,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbe441db_2de33a1a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-22T14:02:33Z",
+      "side": 1,
+      "message": "Correct, I used that as a shortcut in the code (because it is using perl compatible regular expressions, but not actually using the PCRE library) so that this is all easier to grep.  I did make sure that \"PCRE\" didn\u0027t make it to anything user-visible.  You\u0027re right that the commit message is technically wrong though.",
+      "parentUuid": "e4659d8b_59bb08b1",
+      "revId": "126824efe96a47570601cf90834ed8dc78051180",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a4dd201_44d995f0",
@@ -37,6 +55,24 @@
       "writtenOn": "2023-08-22T13:44:55Z",
       "side": 1,
       "message": "debug leftover?",
+      "revId": "126824efe96a47570601cf90834ed8dc78051180",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cbf83a2_8fd0e121",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-22T14:02:33Z",
+      "side": 1,
+      "message": "Yep fixed.",
+      "parentUuid": "6a4dd201_44d995f0",
       "revId": "126824efe96a47570601cf90834ed8dc78051180",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
