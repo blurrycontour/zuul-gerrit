@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3335ca19_872a28d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-08-23T08:22:29Z",
+      "side": 1,
+      "message": "I have added comments taken from this article: https://www.softwarefactory-project.io/hacking-zuul-for-developers-running-unit-tests.html",
+      "revId": "081f99c4efc2c25cf5143fd8c7830e5d36800d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99913d55_b681ff6f",
+        "filename": "TESTING.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-08-23T08:22:29Z",
+      "side": 1,
+      "message": "we can safely bump to latest LTS aka 22.04",
+      "range": {
+        "startLine": 9,
+        "startChar": 10,
+        "endLine": 9,
+        "endChar": 12
+      },
+      "revId": "081f99c4efc2c25cf5143fd8c7830e5d36800d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d60e492_4b2e8d1f",
+        "filename": "TESTING.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-08-23T08:22:29Z",
+      "side": 1,
+      "message": "bindep could be installed as well to handle OS dependencies",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 7
+      },
+      "revId": "081f99c4efc2c25cf5143fd8c7830e5d36800d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bfdba7a_727c6bd0",
+        "filename": "TESTING.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-08-23T08:22:29Z",
+      "side": 1,
+      "message": "Installing OS dependencies with bindep:\n\n  cd path/to/zuul_repository \u0026\u0026 sudo apt -y install $(bindep --brief test)\n\nBut bindep will install db services that conflict with the test compose below, so next, do:\n\n  sudo apt -y remove mysql-server postgresql\n  sudo apt -y install postgresql-client mysql-client\n  sudo apt -y autoremove",
+      "revId": "081f99c4efc2c25cf5143fd8c7830e5d36800d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e22df552_6b3cab67",
+        "filename": "TESTING.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-08-23T08:22:29Z",
+      "side": 1,
+      "message": "NIT: \nZookeeper needs a lot of file descriptors, you can run\n\n  ulimit -n $(ulimit -Hn)\n  \nto bump the fd limit to its maximum for the current user session.",
+      "revId": "081f99c4efc2c25cf5143fd8c7830e5d36800d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
