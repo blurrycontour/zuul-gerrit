@@ -1,0 +1,135 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5da7911e_00fb5c8d",
+        "filename": "doc/source/config/project.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-23T17:21:29Z",
+      "side": 1,
+      "message": "It might be worth clarifying that this is the default branch for the specific repo and not github\u0027s default branch which is currently always main.",
+      "range": {
+        "startLine": 111,
+        "startChar": 66,
+        "endLine": 112,
+        "endChar": 61
+      },
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51b08791_3e7d1932",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2995,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-23T17:21:29Z",
+      "side": 1,
+      "message": "This value appears to be unused. Do we need it?",
+      "range": {
+        "startLine": 2995,
+        "startChar": 33,
+        "endLine": 2995,
+        "endChar": 40
+      },
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c013165_566c3d3a",
+        "filename": "tests/fakegithub.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-23T17:21:29Z",
+      "side": 1,
+      "message": "Nit: I believe github will actually create repos with main as the default branch now. Might be a good idea to have the fake here mimic that behavior?",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc8d4fa6_834ad866",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-23T17:21:29Z",
+      "side": 1,
+      "message": "Nit. I would log the default branch value here too.",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd0fbadb_69cc987e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1884,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-23T17:21:29Z",
+      "side": 1,
+      "message": "Do we need to handle all other non 2XX response codes here with a return None or an exception?",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ea642ba_712fb264",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-23T17:21:29Z",
+      "side": 1,
+      "message": "I was wondering about this. It seems like the model doesn\u0027t actually need an api bump as we default to the values zuul would have used prior to this change. Is the model api bump purely for testing purposes then?",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80571a32_14b64415",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-23T17:21:29Z",
+      "side": 1,
+      "message": "Do we need to check ltime again after this refresh to ensure we refreshed to a new enough state? I\u0027m trying to come up with a situation where one scheduler would be ahead enough to make that happen and I think we\u0027re ok as is?",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
