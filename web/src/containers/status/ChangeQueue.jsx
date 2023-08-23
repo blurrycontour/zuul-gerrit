@@ -14,6 +14,8 @@
 
 import * as React from 'react'
 import PropTypes from 'prop-types'
+import { Badge } from 'patternfly-react'
+import { Tooltip } from '@patternfly/react-core'
 
 import Change from './Change'
 
@@ -48,9 +50,22 @@ class ChangeQueue extends React.Component {
           />)
       })
     })
+    const window = queue.window || '\u221e'  // infinity
+    const is_dependent = pipeline.manager === 'dependent'
     return (
       <div className="change-queue" data-zuul-pipeline={pipeline.name}>
-        <p>Queue: <abbr title={fullName}>{shortName}</abbr></p>
+        <p>
+          Queue: <abbr title={fullName}>{shortName}</abbr>
+          <Tooltip position="bottom"
+                   content={
+                     <div>
+                       <p>Queue length: {changesList.length}</p>
+                       {is_dependent && <p>Window size: {window}</p>}
+                     </div>
+                   }>
+            <Badge>{changesList.length} {is_dependent && `/ ${window}`}</Badge>
+          </Tooltip>
+        </p>
         {changesList}
       </div>)
   }
