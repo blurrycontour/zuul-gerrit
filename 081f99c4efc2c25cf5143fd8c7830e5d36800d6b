@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65957523_a8d22105",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-08-23T13:40:57Z",
+      "side": 1,
+      "message": "On ubuntu 2x.04 the default python is 3.10, it is necessary to install python3.11 first\n\n  sudo apt install python3.11",
+      "revId": "081f99c4efc2c25cf5143fd8c7830e5d36800d6b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "99913d55_b681ff6f",
