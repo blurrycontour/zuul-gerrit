@@ -24,6 +24,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a338d07_a7a095bc",
+        "filename": "doc/source/config/project.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-23T18:01:11Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "5da7911e_00fb5c8d",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "51b08791_3e7d1932",
@@ -47,6 +65,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "048319d2_af0bb80d",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2995,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-23T18:01:11Z",
+      "side": 1,
+      "message": "We can drop it.",
+      "parentUuid": "51b08791_3e7d1932",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c013165_566c3d3a",
@@ -60,6 +96,24 @@
       "writtenOn": "2023-08-23T17:21:29Z",
       "side": 1,
       "message": "Nit: I believe github will actually create repos with main as the default branch now. Might be a good idea to have the fake here mimic that behavior?",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7dd04ee8_b7b21f14",
+        "filename": "tests/fakegithub.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-23T18:01:11Z",
+      "side": 1,
+      "message": "Probably someday, but for now, I think it\u0027s best to leave this as master.  Changing this will only break a handful of unit tests, but it\u0027s still a bit of a distraction for this change.  Keep in mind that all the test fixtures in zuul assume a master branch when they auto-create the git repos, so some of that may need to change, and it could add some cognitive dissonance with all the gerrit fixtures remaining on master.\n\nIn short, we could, but I\u0027d rather defer it since the tests are just as effective with any value.",
+      "parentUuid": "4c013165_566c3d3a",
       "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -81,6 +135,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8dcd3271_8412663a",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-23T18:01:11Z",
+      "side": 1,
+      "message": "the log line is mostly about api debugging.  it mimics a bunch of other log lines, like branch lists and merge modes where we also don\u0027t log the values.  but we can make this one different.",
+      "parentUuid": "dc8d4fa6_834ad866",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd0fbadb_69cc987e",
@@ -94,6 +166,24 @@
       "writtenOn": "2023-08-23T17:21:29Z",
       "side": 1,
       "message": "Do we need to handle all other non 2XX response codes here with a return None or an exception?",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae21862f_33039678",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1884,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-23T18:01:11Z",
+      "side": 1,
+      "message": "Anything else is very unexpected, and will just raise an exception below.  This matches the handling we have for similar requests, so I think it\u0027s sufficient.",
+      "parentUuid": "bd0fbadb_69cc987e",
       "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -115,6 +205,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ba5c44e_1d544fe3",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-23T18:01:11Z",
+      "side": 1,
+      "message": "Partially for testing, but mostly so that we don\u0027t end up with a branch cache that\u0027s partially populated during the upgrade.",
+      "parentUuid": "4ea642ba_712fb264",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80571a32_14b64415",
@@ -128,6 +236,24 @@
       "writtenOn": "2023-08-23T17:21:29Z",
       "side": 1,
       "message": "Do we need to check ltime again after this refresh to ensure we refreshed to a new enough state? I\u0027m trying to come up with a situation where one scheduler would be ahead enough to make that happen and I think we\u0027re ok as is?",
+      "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eeef7494_4c9b717b",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-23T18:01:11Z",
+      "side": 1,
+      "message": "This duplicates an existing pattern, but no, I don\u0027t think it\u0027s necessary because the supplied min_ltime would have come from the branch cache on another scheduler which means it should not be possible for the new current value in zk to be older than what that other scheduler had.",
+      "parentUuid": "80571a32_14b64415",
       "revId": "f6a32d0f38272647504dbe35d236694c8be3a1ef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
