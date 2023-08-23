@@ -17,6 +17,7 @@
 import os
 import logging
 import threading
+import time
 
 import git
 from opentelemetry import trace
@@ -124,7 +125,23 @@ class GitWatcher(threading.Thread):
         self.log.debug("Walk through projects refs for connection: %s" %
                        self.connection.connection_name)
         for project in list(self.connection.projects)[:]:
-            refs = self.lsRemote(project)
+            try:
+                refs = self.lsRemote(project)
+            except git.exc.GitCommandError as err:
+                self.connection._health["projects"][project] = {
+                    'status': 'ERROR',
+                    'description': str(err),
+                    'timestamp': time.time(),
+                }
+                self.log.error(
+                    "Could not fetch refs for "
+                    "project %s: %s" % (project, err))
+                continue
+            self.connection._health["projects"][project] = {
+                'status': 'OK',
+                'description': 'refs loaded successfully',
+                'timestamp': time.time(),
+            }
             self.log.debug("Read %s refs for project %s",
                            len(refs), project)
             if not self.projects_refs.get(project):
