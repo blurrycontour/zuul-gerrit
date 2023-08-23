@@ -2054,22 +2054,6 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
         return reviews.values()
 
-    def _getBranchProtection(self, project_name: str, branch: str,
-                             zuul_event_id=None):
-        github = self.getGithubClient(
-            project_name, zuul_event_id=zuul_event_id)
-        url = github.session.build_url('repos', project_name,
-                                       'branches', branch,
-                                       'protection')
-
-        headers = {'Accept': 'application/vnd.github.loki-preview+json'}
-        resp = github.session.get(url, headers=headers)
-
-        if resp.status_code == 404:
-            return {}
-
-        return resp.json()
-
     @staticmethod
     def _getMissingStatusChecks(change, allow_needs):
         if not change.required_contexts:
