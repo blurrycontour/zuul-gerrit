@@ -523,6 +523,10 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.sched = None
         self.source = driver.getSource(self)
 
+        self._health = {
+            "projects": {},
+        }
+
     def _start_event_connector(self):
         self.gitlab_event_connector = GitlabEventConnector(self)
         self.gitlab_event_connector.start()

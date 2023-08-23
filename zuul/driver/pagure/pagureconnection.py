@@ -503,6 +503,10 @@ class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             r"^\*\*Metadata Update", re.MULTILINE)
         self.sched = None
 
+        self._health = {
+            "projects": {},
+        }
+
     def onLoad(self, zk_client, component_registry):
         self.log.info('Starting Pagure connection: %s', self.connection_name)
 

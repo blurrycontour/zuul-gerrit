@@ -51,6 +51,7 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         self.connection_name = connection_name
         self.connection_config = connection_config
         self.sched = None
+        self._health = {}
 
     def logEvent(self, event):
         log = get_annotated_logger(self.log, event.zuul_event_id)
@@ -125,12 +126,18 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         """
         return False
 
+    @property
+    def health(self):
+        """Return status information about the health of the connection."""
+        return self._health
+
     def toDict(self):
         """Return public information about the connection
         """
         return {
             "name": self.connection_name,
             "driver": self.driver.name,
+            "health": self.health,
         }
 
 

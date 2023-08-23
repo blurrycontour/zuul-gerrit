@@ -320,6 +320,7 @@ class TestWeb(BaseTestWeb):
             'server': 'review.example.com',
             'ssh_server': 'review.example.com',
             'port': 29418,
+            'health': {'projects': {}},
         }
         self.assertEqual([connection], data)
 
@@ -3303,6 +3304,7 @@ class TestWebMulti(BaseTestWeb):
             'server': 'review.example.com',
             'ssh_server': 'ssh-review.example.com',
             'port': 29418,
+            'health': {'projects':{}},
         }
         github_connection = {
             'baseurl': 'https://api.github.com',
@@ -3311,6 +3313,7 @@ class TestWebMulti(BaseTestWeb):
             'name': 'github',
             'server': 'github.com',
             'repo_cache': None,
+            'health': {'projects':{}},
         }
         self.assertEqual([gerrit_connection, github_connection], data)
 

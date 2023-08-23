@@ -52,6 +52,14 @@ class TestGitDriver(ZuulTestCase):
         self.assertEqual(len(self.history), 1)
         self.assertEqual(A.reported, 1)
 
+        # Ensure health info is accurate
+        self.assertTrue(
+            'common-config' in self.git_connection.health["projects"])
+        self.assertEqual(
+            'OK',
+            self.git_connection.health["projects"]["common-config"]["status"]
+        )
+
     def test_config_refreshed(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
