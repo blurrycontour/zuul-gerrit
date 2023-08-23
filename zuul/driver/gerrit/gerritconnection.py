@@ -510,6 +510,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 authclass = requests.auth.HTTPBasicAuth
             self.auth = authclass(self.user, self.password)
 
+        self._health = {
+            "projects": {},
+        }
+
     def setWatchedCheckers(self, checkers_to_watch):
         self.log.debug("Setting watched checkers to %s", checkers_to_watch)
         self.watched_checkers = set()

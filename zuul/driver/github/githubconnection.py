@@ -1389,6 +1389,10 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.graphql_client = GraphQLClient(
             '%s/graphql' % self._github_client_manager.api_base_url)
 
+        self._health = {
+            "projects": {},
+        }
+
     def toDict(self):
         d = super().toDict()
         d.update({
