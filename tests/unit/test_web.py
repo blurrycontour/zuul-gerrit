@@ -322,7 +322,10 @@ class TestWeb(BaseTestWeb):
             'port': 29418,
             'health': {'projects': {}},
         }
-        self.assertEqual([connection], data)
+        for k, v in data[0].items():
+            if k != 'health':
+                self.assertEqual(v, connection[k])
+        self.assertTrue("health" in data[0])
 
     def test_web_bad_url(self):
         # do we redirect to index.html
@@ -683,7 +686,18 @@ class TestWeb(BaseTestWeb):
         for p in expected_list:
             p["canonical_name"] = "review.example.com/%s" % p["name"]
             p["connection_name"] = "gerrit"
-        self.assertEqual(expected_list, data)
+
+            found = [d for d in data if d['name'] == p['name']]
+            self.assertEqual(1, len(found))
+            for k, v in found[0].items():
+                if k == "connection_health":
+                    for x in ("status", "description", "timestamp"):
+                        self.assertTrue(x in found[0]["connection_health"])
+                else:
+                    self.assertEqual(v, p[k])
+
+        for d in data:
+            self.assertTrue("connection_health" in d)
 
     def test_web_project_get(self):
         # can we fetch project details
@@ -858,6 +872,12 @@ class TestWeb(BaseTestWeb):
                   'voting': True,
                   'workspace_scheme': 'golang'}]]
 
+        health = data["connection_health"]
+        for x in ["status", "description", "timestamp"]:
+            self.assertTrue(x in health)
+
+        # We do not test content for now
+        del data["connection_health"]
         self.assertEqual(
             {
                 'canonical_name': 'review.example.com/org/project1',
