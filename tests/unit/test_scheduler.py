@@ -404,6 +404,19 @@ class TestScheduler(ZuulTestCase):
             'zuul.tenant.tenant-one.pipeline.gate.current_changes',
             value='1', kind='g')
         self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.window',
+            value='20', kind='g')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.queue.'
+            'org.project.current_changes',
+            value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.queue.org.project.window',
+            value='20', kind='g')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.queue.org.project.window',
+            value='21', kind='g')
+        self.assertReportedStat(
             'zuul.tenant.tenant-one.pipeline.gate.project.review_example_com.'
             'org_project.master.job.project-merge.SUCCESS', kind='ms')
         self.assertReportedStat(
@@ -414,6 +427,13 @@ class TestScheduler(ZuulTestCase):
             'zuul.tenant.tenant-one.pipeline.gate.resident_time', kind='ms')
         self.assertReportedStat(
             'zuul.tenant.tenant-one.pipeline.gate.total_changes', value='1',
+            kind='c')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.queue.'
+            'org.project.resident_time', kind='ms')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.queue.'
+            'org.project.total_changes', value='1',
             kind='c')
         self.assertReportedStat(
             'zuul.tenant.tenant-one.pipeline.gate.trigger_events',
