@@ -3,6 +3,120 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "52ebc940_a64ee964",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8770,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-24T23:46:42Z",
+      "side": 1,
+      "message": "The comment at the beginning of the function indicates we return the entries that match the TPC. But here we blindly add zuul.yaml and .zuul.yaml without checking that they are in the files list. Is that correct?",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3043561f_f4d9648d",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8773,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-24T23:46:42Z",
+      "side": 1,
+      "message": "Nit it looks like we always call getValidFor with conf_root set to ZUUL_CONF_ROOT. We may not need this parameter and can just use the constant within the function?",
+      "range": {
+        "startLine": 8773,
+        "startChar": 31,
+        "endLine": 8773,
+        "endChar": 40
+      },
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a700e561_b2457649",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8789,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-24T23:46:42Z",
+      "side": 1,
+      "message": "setValidFor seems to be called the same way as getValidFor and we may not need the conf_root argument?",
+      "range": {
+        "startLine": 8789,
+        "startChar": 31,
+        "endLine": 8789,
+        "endChar": 40
+      },
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80f41d36_06ad1c53",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8821,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-24T23:46:42Z",
+      "side": 1,
+      "message": "Does this line create \"leaked\" entries in the cache. Or is this our way of knowing the path has no data eg doesn\u0027t exist on disk? Wouldn\u0027t we know that from the key not existing in the dict?\n\nFWIW I think this is related to my earlier comment about blindly adding in the zuul.yaml and .zuul.yaml as they apparently have a None entry instead of an UnparsedBranchCacheEntry with None data.\n\nIf this is intentional maybe we should document (with a comment at the top of the class) the intended null structures and what that implies. Otherwise it seems like we can just avoid carrying entries for things that don\u0027t exist and check for the presence of the key instead.",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26718596_4f1b79c2",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8852,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-24T23:46:42Z",
+      "side": 1,
+      "message": "This would happen if you have a project with the same name from two different sources? I guess we handle that later.",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5734430e_17f88816",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-24T23:46:42Z",
+      "side": 1,
+      "message": "Totally not worth solving now, but the GIL removal pep has me wondering if tools like defaultdict will need to be replaced to take advantage of that. Depending on defaultdict\u0027s implementation it may not end up as thread safe and multiple concurrent threads could potentially initialize a value for the same key resulting in one value clobbering the other.",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b396caac_ac3a9630",
         "filename": "zuul/scheduler.py",
         "patchSetId": 6
