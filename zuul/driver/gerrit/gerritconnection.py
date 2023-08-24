@@ -1,5 +1,6 @@
 # Copyright 2011 OpenStack, LLC.
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -305,6 +306,15 @@ class GerritEventConnector(threading.Thread):
             event.project_name = data.get('project')
         if event.type == 'project-created':
             event.project_name = data.get('projectName')
+        if event.type == 'project-head-updated':
+            event.project_name = data.get('projectName')
+            event.ref = data.get('newHead')
+            event.branch = event.ref[len('refs/heads/'):]
+            event.default_branch_changed = True
+            self.log.debug('Updating default branch for %s to %s',
+                           event.project_name, event.branch)
+            self.connection._branch_cache.setProjectDefaultBranch(
+                event.project_name, event.branch)
         # Map the event types to a field name holding a Gerrit
         # account attribute. See Gerrit stream-event documentation
         # in cmd-stream-events.html
@@ -322,6 +332,7 @@ class GerritEventConnector(threading.Thread):
             'vote-deleted': 'deleter',
             'project-created': None,  # Gerrit 2.14
             'pending-check': None,  # Gerrit 3.0+
+            'project-head-updated': None,
         }
         event.account = None
         if event.type in accountfield_from_type:
@@ -1069,6 +1080,19 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                  if k.startswith('refs/heads/') and
                  GerritConnection._checkRefFormat(k)]
         return heads
+
+    def _fetchProjectDefaultBranch(self, project):
+        if not self.session:
+            return 'master'
+        head = None
+        try:
+            head = self.get(
+                'projects/%s/HEAD' % (
+                    urllib.parse.quote(project.name, safe=''),
+                ))
+        except Exception:
+            self.log.exception("Unable to get HEAD")
+        return head
 
     def isBranchProtected(self, project_name, branch_name,
                           zuul_event_id=None):
