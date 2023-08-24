@@ -1399,10 +1399,19 @@ class Project(object):
         return Attributes(name=self.name)
 
     def toDict(self):
+        connection_health = self.source.connection.health.get(
+            self.name,
+            {'status': 'UNKNOWN',
+             'description': 'The connection has not been polled '
+                            'for this project yet',
+             'timestamp': time.time(),
+            }
+        )
         d = {}
         d['name'] = self.name
         d['connection_name'] = self.connection_name
         d['canonical_name'] = self.canonical_name
+        d['connection_health'] = connection_health
         return d
 
 
