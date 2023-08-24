@@ -2751,3 +2751,42 @@ class TestGithubDriverEnterpriseCache(ZuulGithubAppTestCase):
                             r'.*I shouldnt be seen.*',
                             re.DOTALL)))
         self.assertEqual(len(A.comments), 0)
+
+
+class TestGithubDefaultBranch(ZuulTestCase):
+    config_file = 'zuul-github-driver.conf'
+    tenant_config_file = 'config/unprotected-branches/main.yaml'
+    scheduler_count = 1
+
+    def test_default_branch_changed(self):
+        """Test the repository edited event"""
+        self.waitUntilSettled()
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project1')
+
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata('github.com/org/project1')
+        self.assertEqual('master', md.default_branch)
+        prev_layout = layout.uuid
+
+        repo._repodata['default_branch'] = 'foobar'
+        changes = {
+            'default_branch': {
+                'from': 'master',
+            }
+        }
+        repository = {
+            'full_name': 'org/project1',
+            'default_branch': 'foobar',
+        }
+        self.fake_github.emitEvent(
+            self.fake_github.getRepositoryEvent(repository, 'edited',
+                                                changes)
+        )
+        self.waitUntilSettled()
+
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata('github.com/org/project1')
+        self.assertEqual('foobar', md.default_branch)
+        new_layout = layout.uuid
+        self.assertNotEqual(new_layout, prev_layout)

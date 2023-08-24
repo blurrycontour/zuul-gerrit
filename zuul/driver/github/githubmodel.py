@@ -1,6 +1,7 @@
 # Copyright 2015 Hewlett-Packard Development Company, L.P.
 # Copyright 2017 IBM Corp.
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -112,6 +113,7 @@ class GithubTriggerEvent(TriggerEvent):
         self.commits = []
         self.body_edited = None
         self.branch_protection_changed = None
+        self.default_branch_changed = None
 
     def toDict(self):
         d = super().toDict()
@@ -125,6 +127,7 @@ class GithubTriggerEvent(TriggerEvent):
         d["commits"] = self.commits
         d["body_edited"] = self.body_edited
         d["branch_protection_changed"] = self.branch_protection_changed
+        d["default_branch_changed"] = self.default_branch_changed
         return d
 
     def updateFromDict(self, d):
@@ -139,9 +142,13 @@ class GithubTriggerEvent(TriggerEvent):
         self.commits = d["commits"]
         self.body_edited = d["body_edited"]
         self.branch_protection_changed = d.get("branch_protection_changed")
+        self.default_branch_changed = d.get("default_branch_changed")
 
     def isBranchProtectionChanged(self):
         return bool(self.branch_protection_changed)
+
+    def isDefaultBranchChanged(self):
+        return bool(self.default_branch_changed)
 
     def isPatchsetCreated(self):
         if self.type == 'pull_request':

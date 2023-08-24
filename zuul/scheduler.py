@@ -2504,9 +2504,10 @@ class Scheduler(threading.Thread):
             not tpc.includesBranch(event.branch)):
             reconfigure_tenant = False
 
-        # But if the event is that branch protection status has
-        # changed, do reconfigure.
-        if (event.isBranchProtectionChanged()):
+        # But if the event is that branch protection status or the
+        # default branch has changed, do reconfigure.
+        if (event.isBranchProtectionChanged() or
+            event.isDefaultBranchChanged()):
             reconfigure_tenant = True
 
         if reconfigure_tenant:

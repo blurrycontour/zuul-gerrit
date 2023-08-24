@@ -452,6 +452,50 @@ class TestGithubModelUpgrade(ZuulTestCase):
             str(loading_errors[0].error))
 
 
+class TestDefaultBranchUpgrade(ZuulTestCase):
+    config_file = "zuul-gerrit-github.conf"
+    scheduler_count = 1
+
+    @model_version(15)
+    @simple_layout('layouts/default-branch.yaml', driver='github')
+    def test_default_branch(self):
+        self.waitUntilSettled()
+
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project-default')
+        repo._repodata['default_branch'] = 'foobar'
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        # Verify we use the default from the defaultdict.
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata(
+            'github.com/org/project-default')
+        self.assertEqual('master', md.default_branch)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 16
+
+        # Perform a smart reconfiguration which should not clear the
+        # cache; we should continue to see no change because we should
+        # still be using the defaultdict.
+        self.scheds.first.smartReconfigure()
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata(
+            'github.com/org/project-default')
+        self.assertEqual('master', md.default_branch)
+
+        # Perform a full reconfiguration which should cause us to
+        # actually query and update the branch cache.
+        self.scheds.first.fullReconfigure()
+        self.waitUntilSettled()
+
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        md = layout.getProjectMetadata(
+            'github.com/org/project-default')
+        self.assertEqual('foobar', md.default_branch)
+
+
 class TestDeduplication(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
     tenant_config_file = "config/circular-dependencies/main.yaml"

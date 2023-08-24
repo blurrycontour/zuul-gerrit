@@ -1,4 +1,5 @@
 # Copyright 2014 Puppet Labs Inc
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -137,6 +138,18 @@ class GithubSource(BaseSource):
 
     def getProjectMergeModes(self, project, tenant, min_ltime=-1):
         return self.connection.getProjectMergeModes(project, tenant, min_ltime)
+
+    def getProjectDefaultBranch(self, project, tenant, min_ltime=-1):
+        # We have to return something here, so try to get it from the
+        # cache, and if that fails, return the Zuul default.
+        try:
+            default_branch = self.connection.getProjectDefaultBranch(
+                project, tenant, min_ltime)
+        except Exception:
+            default_branch = None
+        if default_branch is None:
+            return super().getProjectDefaultBranch(project, tenant, min_ltime)
+        return default_branch
 
     def getProjectBranchCacheLtime(self):
         return self.connection._branch_cache.ltime

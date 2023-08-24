@@ -198,6 +198,22 @@ class BaseSource(object, metaclass=abc.ABCMeta):
 
         return model.ALL_MERGE_MODES
 
+    def getProjectDefaultBranch(self, project, tenant, min_ltime=-1):
+        """Return the default branch for this project.
+
+        If users do not specify the default branch for a project, this
+        mode will be used.  It may be a driver-specific default, or
+        the driver may use data from the remote system to provide a
+        project-specific default.
+
+        This method is called very frequently, and should generally
+        return quickly.  The connection is expected to cache default
+        branches for all projects queried.
+
+        """
+
+        return 'master'
+
     @abc.abstractmethod
     def getProjectBranchCacheLtime(self):
         """Return the current ltime of the project branch cache."""

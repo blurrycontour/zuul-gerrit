@@ -2034,9 +2034,11 @@ class TenantParser(object):
             min_ltime = -1
         branches = sorted(tpc.project.source.getProjectBranches(
             tpc.project, tenant, min_ltime))
-        if 'master' in branches:
-            branches.remove('master')
-            branches = ['master'] + branches
+        default_branch = tpc.project.source.getProjectDefaultBranch(
+            tpc.project, tenant, min_ltime)
+        if default_branch in branches:
+            branches.remove(default_branch)
+            branches = [default_branch] + branches
         static_branches = []
         always_dynamic_branches = []
         for b in branches:
@@ -2784,6 +2786,10 @@ class TenantParser(object):
             if project_metadata.merge_mode is None:
                 mode = project.source.getProjectDefaultMergeMode(project)
                 project_metadata.merge_mode = model.MERGER_MAP[mode]
+            if project_metadata.default_branch is None:
+                default_branch = project.source.getProjectDefaultBranch(
+                    project, tenant)
+                project_metadata.default_branch = default_branch
             tpc = tenant.project_configs[project.canonical_name]
             if tpc.merge_modes is not None:
                 source_context = model.SourceContext(

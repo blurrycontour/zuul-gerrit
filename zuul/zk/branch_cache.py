@@ -68,7 +68,8 @@ class BranchCacheZKObject(ShardedZKObject):
         super().__init__()
         self._set(protected={},
                   remainder={},
-                  merge_modes={})
+                  merge_modes={},
+                  default_branch={})
 
     def serialize(self, context):
         data = {
@@ -79,6 +80,10 @@ class BranchCacheZKObject(ShardedZKObject):
         # safe to move into the dict above at any time.
         if (COMPONENT_REGISTRY.model_api >= 11):
             data["merge_modes"] = self.merge_modes
+        # This is mostly here to enable unit tests of upgrades, it's
+        # safe to move into the dict above at any time.
+        if (COMPONENT_REGISTRY.model_api >= 16):
+            data["default_branch"] = self.default_branch
         return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
@@ -87,6 +92,10 @@ class BranchCacheZKObject(ShardedZKObject):
         if "merge_modes" not in data:
             data["merge_modes"] = collections.defaultdict(
                 lambda: model.ALL_MERGE_MODES)
+        # MODEL_API < 16
+        if "default_branch" not in data:
+            data["default_branch"] = collections.defaultdict(
+                lambda: 'master')
         return data
 
     def _save(self, context, data, create=False):
@@ -137,11 +146,13 @@ class BranchCache:
                 self.cache.protected.clear()
                 self.cache.remainder.clear()
                 self.cache.merge_modes.clear()
+                self.cache.default_branch.clear()
             else:
                 for p in projects:
                     self.cache.protected.pop(p, None)
                     self.cache.remainder.pop(p, None)
                     self.cache.merge_modes.pop(p, None)
+                    self.cache.default_branch.pop(p, None)
 
     def getProjectBranches(self, project_name, exclude_unprotected,
                            min_ltime=-1, default=RAISE_EXCEPTION):
@@ -335,6 +346,69 @@ class BranchCache:
         with locked(self.wlock):
             with self.cache.activeContext(self.zk_context):
                 self.cache.merge_modes[project_name] = merge_modes
+
+    def getProjectDefaultBranch(self, project_name,
+                                min_ltime=-1, default=RAISE_EXCEPTION):
+        """Get the default branch for the given project.
+
+        Checking the branch cache we need to distinguish three different
+        cases:
+
+            1. cache miss (not queried yet)
+            2. cache hit (including unknown default branch)
+            3. error when fetching default branch
+
+        If the cache doesn't contain a default branch for the project
+        and no default value is provided a LookupError is raised.
+
+        If there was an error fetching the default branch, the return
+        value will be None.
+
+        Otherwise the default branch will be returned.
+
+        :param str project_name:
+            The project for which the default branch is returned.
+        :param int min_ltime:
+            The minimum cache ltime to consider the cache valid.
+        :param any default:
+            Optional default value to return if no cache entry exits.
+
+        :returns: The name of the default branch or None if there was
+            an error when fetching it.
+
+        """
+        if self.ltime < min_ltime:
+            with locked(self.rlock):
+                self.cache.refresh(self.zk_context)
+
+        default_branch = None
+        try:
+            default_branch = self.cache.default_branch[project_name]
+        except KeyError:
+            if default is RAISE_EXCEPTION:
+                raise LookupError(
+                    f"No default branch for project {project_name}")
+            else:
+                return default
+
+        return default_branch
+
+    def setProjectDefaultBranch(self, project_name, default_branch):
+        """Set the upstream default branch for the given project.
+
+        Use None as a sentinel value for the default branch to indicate
+        that there was a fetch error.
+
+        :param str project_name:
+            The project for the default branch.
+        :param str default_branch:
+            The default branch or None.
+
+        """
+
+        with locked(self.wlock):
+            with self.cache.activeContext(self.zk_context):
+                self.cache.default_branch[project_name] = default_branch
 
     @property
     def ltime(self):
