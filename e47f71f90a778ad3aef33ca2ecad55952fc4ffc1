@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b396caac_ac3a9630",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 732,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-08-24T12:35:12Z",
+      "side": 1,
+      "message": "This is unrelated to your change, but I\u0027m wondering if there could be a data race with other schedulers that are trying to add a new project in parallel.\nBasically `listCachedProjects()` would already return the newly cached project but the unparsed project-branch cache would not contain the new project.\n\nMaybe we need to check if the system config cache is up-to-date before the cleanup as we do in other places:\n\n          if self.unparsed_abide.ltime \u003c self.system_config_cache.ltime:\n            self.updateSystemConfig()\n            \nOr there is a better way using some cutoff ltime instead. We do the general cleanup ZK lock when this method is called but that only used to prevent multiple cleanups from running at the same time.",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
