@@ -887,6 +887,32 @@ class TestUnparsedConfigCache(ZuulTestCase):
         self.assertIsNone(self.merge_job_history.get(MergeRequest.CAT))
         sched.apsched.start()
 
+    def test_cache_cleanup(self):
+        sched = self.scheds.first.sched
+        # Stop cleanup jobs so it's not removing projects from
+        # the cache during the test.
+        sched.apsched.shutdown()
+
+        self.newTenantConfig('config/single-tenant/main-one-project.yaml')
+        # This layout defines only org/project, not org/project1
+        self.commitConfigUpdate(
+            'common-config',
+            'layouts/live-reconfiguration-del-project.yaml')
+        sched.reconfigure(sched.config)
+        self.waitUntilSettled()
+
+        sched._runConfigCacheCleanup()
+        ucc = sched.unparsed_config_cache
+        ubc = sched.abide.unparsed_project_branch_cache
+        self.log.debug("Unparsed config cache %s",
+                       sorted(list(ucc.listCachedProjects())))
+        self.log.debug("Unparsed branch cache %s",
+                       sorted(list(ubc.keys())))
+        self.assertNotIn('review.example.com/org/project1',
+                         list(ucc.listCachedProjects()))
+        self.assertNotIn('review.example.com/org/project1',
+                         list(ubc.keys()))
+
 
 class TestAuthorizationRuleParser(ZuulTestCase):
     tenant_config_file = 'config/tenant-parser/authorizations.yaml'
