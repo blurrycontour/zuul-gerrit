@@ -228,8 +228,8 @@
     allowed-projects: zuul/zuul
     timeout: 2700  # 45 minutes
     requires:
-      - python-builder-3.11-bullseye-container-image
-      - python-base-3.11-bullseye-container-image
+      - python-builder-3.11-bookworm-container-image
+      - python-base-3.11-bookworm-container-image
     provides: zuul-container-image
     vars: &zuul_image_vars
       promote_container_image_method: intermediate-registry
@@ -296,8 +296,8 @@
     description: Build container images and upload.
     allowed-projects: zuul/zuul
     requires:
-      - python-builder-3.11-bullseye-container-image
-      - python-base-3.11-bullseye-container-image
+      - python-builder-3.11-bookworm-container-image
+      - python-base-3.11-bookworm-container-image
     provides: zuul-container-image
     secrets:
       name: container_registry_credentials
