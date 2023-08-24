@@ -382,8 +382,12 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
    .. attr:: dequeue
 
       These reporters describe what Zuul should do if an item is
-      dequeued. The dequeue reporters will only apply, if the item
-      was dequeued without a result.
+      dequeued. The dequeue reporters will only apply if all of the
+      following are true:
+
+         * The pipeline has a start reporter
+         * The item has reported start
+         * The item was dequeued without a result
 
    The following options can be used to alter Zuul's behavior to
    mitigate situations in which jobs are failing frequently (perhaps

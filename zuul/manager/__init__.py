@@ -797,6 +797,11 @@ class PipelineManager(metaclass=ABCMeta):
         # twice.
         if not item.current_build_set.result and item.live:
             item.setReportedResult('DEQUEUED')
+            if not item.reported_start:
+                # If we haven't reported start, we don't know if Zuul
+                # was supposed to act on the item at all, so keep it
+                # quiet.
+                quiet = True
             self.reportDequeue(item, quiet)
         item.queue.dequeueItem(item)
 
