@@ -16,6 +16,24 @@
       "message": "This is unrelated to your change, but I\u0027m wondering if there could be a data race with other schedulers that are trying to add a new project in parallel.\nBasically `listCachedProjects()` would already return the newly cached project but the unparsed project-branch cache would not contain the new project.\n\nMaybe we need to check if the system config cache is up-to-date before the cleanup as we do in other places:\n\n          if self.unparsed_abide.ltime \u003c self.system_config_cache.ltime:\n            self.updateSystemConfig()\n            \nOr there is a better way using some cutoff ltime instead. We do the general cleanup ZK lock when this method is called but that only used to prevent multiple cleanups from running at the same time.",
       "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7bfce1b_b5959e4b",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 732,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-24T14:36:47Z",
+      "side": 1,
+      "message": "I agree with your assesment, and I like the update solution, but in looking into that, I think it\u0027s technically not necessary because this method is partially ineffective.\n\nHere\u0027s why I like the proposed update solution: when we add a project, this happens:\n1) We load the tenant yaml into memory and then put it in ZK in the unparsed_config_cache\n2) We iterate over either all the tenants, or a single changed tenant\n3) We start to load the tenant project yaml, which is where we can start adding entries to the unparsed branch cache\n\nSo we know that the unparsed_config_cache and the corresponding data in zk are up to date before we start potentially adding new entries.\n\nNow the reason that it doesn\u0027t matter and this method is partially ineffective: on line 728 we get the active projects from the local abide unparsed_project_branch_cache (aka unparsed branch cache).  This is an in-memory data structure, and nothing ever removes anything from it (except for some invasive unit tests).  So the only time a project could actually be deleted from the unparsed config cache is if a new scheduler comes online and the project has already been removed from the running config.\n\nSo with all that in mind, I think the only time we could encounter the problem you describe is if we are rapidly adding and removing the same project while starting new schedulers.  I.e., remove the project, start a new scheduler, add the same project back -- all pretty much at the same time.\n\nI think I agree with your +2 -- we can merge this change as-is.  Separately, we may want to look into updating this method to remove projects more quickly (ie, without scheduler restarts), or if we like it this way, probably add some comments.",
+      "parentUuid": "b396caac_ac3a9630",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
