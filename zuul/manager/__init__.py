@@ -2267,10 +2267,27 @@ class PipelineManager(metaclass=ABCMeta):
             # stats.timers.zuul.tenant.<tenant>.pipeline.<pipeline>.resident_time
             # stats_counts.zuul.tenant.<tenant>.pipeline.<pipeline>.total_changes
             # stats.gauges.zuul.tenant.<tenant>.pipeline.<pipeline>.current_changes
+            # stats.gauges.zuul.tenant.<tenant>.pipeline.<pipeline>.window
             self.sched.statsd.gauge(key + '.current_changes', items)
+            self.sched.statsd.gauge(key + '.window', item.pipeline.window)
             if dt:
                 self.sched.statsd.timing(key + '.resident_time', dt)
                 self.sched.statsd.incr(key + '.total_changes')
+            if item.queue and item.queue.name:
+                queuename = (item.queue.name.
+                             replace('.', '_').replace('/', '.'))
+                # stats.gauges.zuul.tenant.<tenant>.pipeline.<pipeline>.queue.<queue>.resident_time
+                # stats.gauges.zuul.tenant.<tenant>.pipeline.<pipeline>.queue.<queue>.total_changes
+                # stats.gauges.zuul.tenant.<tenant>.pipeline.<pipeline>.queue.<queue>.current_changes
+                # stats.gauges.zuul.tenant.<tenant>.pipeline.<pipeline>.queue.<queue>.window
+                queuekey = '%s.queue.%s' % (key, queuename)
+                self.sched.statsd.gauge(queuekey + '.current_changes',
+                                        len(item.queue.queue))
+                self.sched.statsd.gauge(queuekey + '.window',
+                                        item.queue.window)
+                if dt:
+                    self.sched.statsd.timing(queuekey + '.resident_time', dt)
+                    self.sched.statsd.incr(queuekey + '.total_changes')
             if hasattr(item.change, 'branch'):
                 hostname = (item.change.project.canonical_hostname.
                             replace('.', '_'))
