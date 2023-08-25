@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2461e8f9_6d3d97bd",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8770,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-25T00:14:03Z",
+      "side": 1,
+      "message": "Yeah, I guess the comment could have been more clear.  This is \"all of the potential paths in the TPC\" and the built-ins are always included.  The old presence check on old-line 8793 is on new-line 8835, so that still works the same.",
+      "parentUuid": "52ebc940_a64ee964",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3043561f_f4d9648d",
@@ -37,6 +55,24 @@
         "endLine": 8773,
         "endChar": 40
       },
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61a285cb_6bf2376d",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8773,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-25T00:14:03Z",
+      "side": 1,
+      "message": "Yes... but it\u0027s defined in configloader and configloader imports model, so it\u0027s a bit of an import mess (and even if we sorted that out, the directionality is wrong -- we shouldn\u0027t have the model depending on configloader).  So I decided not to invest in that and just pass the argument so it\u0027s explicit.",
+      "parentUuid": "3043561f_f4d9648d",
       "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -64,6 +100,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e9adad0_950bee7c",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8789,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-25T00:14:03Z",
+      "side": 1,
+      "message": "Yes and ditto.",
+      "parentUuid": "a700e561_b2457649",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80f41d36_06ad1c53",
@@ -77,6 +131,23 @@
       "writtenOn": "2023-08-24T23:46:42Z",
       "side": 1,
       "message": "Does this line create \"leaked\" entries in the cache. Or is this our way of knowing the path has no data eg doesn\u0027t exist on disk? Wouldn\u0027t we know that from the key not existing in the dict?\n\nFWIW I think this is related to my earlier comment about blindly adding in the zuul.yaml and .zuul.yaml as they apparently have a None entry instead of an UnparsedBranchCacheEntry with None data.\n\nIf this is intentional maybe we should document (with a comment at the top of the class) the intended null structures and what that implies. Otherwise it seems like we can just avoid carrying entries for things that don\u0027t exist and check for the presence of the key instead.",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a28efb8_ba81b8ed",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8821,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-25T00:14:03Z",
+      "side": 1,
+      "message": "Let\u0027s start with what you said about zuul.yaml having a None entry -- it doesn\u0027t.  Nothing has a None entry in the cache.  I think maybe you\u0027re responding to line 8798.  The None in the check there is because 8797 is a .get() which returns None if there is no entry.  So to expand on that comment there, what we\u0027re doing around 8798 is:\n\n  We get the union of hardcoded paths (zuul.yaml) and the actual paths previously cached.\n  We iterate over them and see if we have a cache entry.  If we don\u0027t then the one we\u0027re looking at must be a hardcoded path that isn\u0027t used.  If that\u0027s the case, then we just ignore it.\n  Otherwise, we\u0027re talking about a path that was previously cached (it might be zuul.yaml, or it might be a custom path).  It will have a real UnparsedBranchCacheEntry.  Mark it as seen.\n\nNow down in this section of code (8821) we add entries for all of the real actual paths that we got data back for (no matter whether they are builtins or not).\n\nSo we don\u0027t blindly add zuul.yaml entries -- we only add them if we have seen them in the results.  The structure is the simple \"if the path exists in the repo, we have an entry for it\".",
       "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -98,6 +169,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c81fa9e1_76dca0ba",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8852,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-25T00:14:03Z",
+      "side": 1,
+      "message": "I hope so, but we might not!  Regardless, it doesn\u0027t change in this change.  This comment and the behavior are just copied from old line 8805.",
+      "parentUuid": "26718596_4f1b79c2",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5734430e_17f88816",
@@ -111,6 +200,24 @@
       "writtenOn": "2023-08-24T23:46:42Z",
       "side": 1,
       "message": "Totally not worth solving now, but the GIL removal pep has me wondering if tools like defaultdict will need to be replaced to take advantage of that. Depending on defaultdict\u0027s implementation it may not end up as thread safe and multiple concurrent threads could potentially initialize a value for the same key resulting in one value clobbering the other.",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1ddf53e_ce5399b4",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-25T00:14:03Z",
+      "side": 1,
+      "message": "That\u0027s going to be like the transition to py3 isn\u0027t it?",
+      "parentUuid": "5734430e_17f88816",
       "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
