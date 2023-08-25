@@ -273,6 +273,24 @@
       "parentUuid": "b396caac_ac3a9630",
       "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5264849_6dac74a7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 732,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-08-25T05:41:01Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e7bfce1b_b5959e4b",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
