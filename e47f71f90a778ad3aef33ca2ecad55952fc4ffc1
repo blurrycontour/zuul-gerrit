@@ -152,6 +152,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "248aa855_4bef4aaf",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 8821,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-25T00:31:12Z",
+      "side": 1,
+      "message": "We clarified offline that the confusion is the meaning of None in the UnparsedBranchCacheEntry.  Ultimately, it\u0027s to achive a tristate: 1) unchecked (entry is None); 2) checked and no data (entry is an UnparsedBranchCacheEntry with data\u003dNone); 3) checked with data (ditto with data\u003dyaml).\n\nI will update with comments.",
+      "parentUuid": "1a28efb8_ba81b8ed",
+      "revId": "e47f71f90a778ad3aef33ca2ecad55952fc4ffc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26718596_4f1b79c2",
