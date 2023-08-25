@@ -16,7 +16,7 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { PageSection, PageSectionVariants } from '@patternfly/react-core'
+import { PageSection, PageSectionVariants, Tooltip } from '@patternfly/react-core'
 import {
   Table,
   TableVariant,
@@ -26,6 +26,8 @@ import {
 import {
   CubeIcon,
   ConnectedIcon,
+  DisconnectedIcon,
+  OutlinedQuestionCircleIcon,
 } from '@patternfly/react-icons'
 import { IconProperty } from '../Misc'
 
@@ -89,10 +91,26 @@ class ProjectsPage extends React.Component {
     ]
     let rows = []
     projects.forEach((project) => {
+      let health = project.connection_health ? project.connection_health : {'status': '?', 'description': 'No data available', }
+      const connectionIcon = (function () {
+        switch (health.status) {
+          case 'OK':
+            return <span style={{ color: 'var(--pf-global--success-color--100)'}}><ConnectedIcon /></span>
+          case 'DEGRADED':
+            return <span style={{ color: 'var(--pf-global--warning-color--100)'}}><ConnectedIcon status="warning"/></span>
+          case 'ERROR':
+            return <span style={{ color: 'var(--pf-global--danger-color--100)'}}><DisconnectedIcon status="danger"/></span>
+          default:
+            return <span style={{ color: 'var(--pf-global--info-color--100)'}}><OutlinedQuestionCircleIcon status="info"/></span>
+        }
+      })()
+      let iconWithTooltip = <Tooltip
+        content={health.description}>{connectionIcon}</Tooltip>
+
       let r = {
         cells: [
           {title: <Link to={this.props.tenant.linkPrefix + '/project/' + project.canonical_name}>{project.name}</Link>, props: {column: 'Name'}},
-          {title: project.connection_name, props: {column: 'Connection'}},
+          {title: <IconProperty icon={iconWithTooltip} value={project.connection_name} />, props: {column: 'Connection'}},
           {title: project.type, props: {column: 'Type'}},
           {title: <Link to={this.props.tenant.linkPrefix + '/builds?project=' + project.name}>Builds</Link>, props: {column: 'Last builds'}},
         ]
