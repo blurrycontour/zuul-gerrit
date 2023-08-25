@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04bf4806_9a59262f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-25T20:34:08Z",
+      "side": 1,
+      "message": "Need to update some bullseye references in .zuul.yaml as well:\n\nhttps://opendev.org/zuul/zuul/src/branch/master/.zuul.yaml#L231-L232\nhttps://opendev.org/zuul/zuul/src/branch/master/.zuul.yaml#L299-L300",
+      "revId": "8646a7286602385b56bd28804c3c49e29105a115",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35da3c67_7bf290a8",
+        "filename": "Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-25T20:34:08Z",
+      "side": 1,
+      "message": "Not for this change, but we should consider updating node at some point. I think node 20 exists so we probably want to bump to at least 18.",
+      "range": {
+        "startLine": 16,
+        "startChar": 23,
+        "endLine": 16,
+        "endChar": 39
+      },
+      "revId": "8646a7286602385b56bd28804c3c49e29105a115",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
