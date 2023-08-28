@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "314596f7_241edd2c",
+        "filename": "doc/source/project-config.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-28T21:49:12Z",
+      "side": 1,
+      "message": "I think we should keep the dict-or-list-of-dicts approach here.  We use that in a lot of places, and it\u0027s intentional so that the easy case of \"branches: master\" is nice and brief, and the complex case of a list of dicts is possible.  I think the main thing is that ability is an intentional general design choice for the configuration language, and not an accident that we need to deprecate and clean up.",
+      "parentUuid": "7670965b_eccb2814",
+      "revId": "07d9dc811c08156f6d2feb4b4d20d718fdaabf2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34f0129e_57a458b3",
@@ -41,6 +59,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1cee9d0_dfd74377",
+        "filename": "tests/fixtures/layouts/negate-post.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-28T21:49:12Z",
+      "side": 1,
+      "message": "Actually this is correct for post! It\u0027s a gerrit quirk: if it\u0027s a ref-update of refs/branches/foo, gerrit doesn\u0027t give us refs/branches, we just get foo.  So:\n* ref-updated with no refs/ prefix means a change merged to a branch\n* ref-updated with refs/... means anything else (tag, refs/meta, etc)",
+      "parentUuid": "34f0129e_57a458b3",
+      "revId": "07d9dc811c08156f6d2feb4b4d20d718fdaabf2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aeb56870_c615944f",
@@ -60,6 +96,24 @@
         "endLine": 23,
         "endChar": 65
       },
+      "revId": "07d9dc811c08156f6d2feb4b4d20d718fdaabf2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56920dc1_7603ff65",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-28T21:49:12Z",
+      "side": 1,
+      "message": "to_list in driver.util is a copy of as_list in configloader.  So apparently at some point we decided that we\u0027d put some configloader helper methods in driver.util.  That doesn\u0027t sound like a bad idea, so I\u0027m trying to keep that going here, but without copying the code as happened with to_list.  But maybe we should unify as_list/to_list and clean that up.  Either way, there\u0027s a lot of stuff in configloader that isn\u0027t really meant to be used outside of it, and a few things that are, so dileneating that in some way seems good.\n\nMaybe let\u0027s keep this for now since it provides that signal, and we can look at other re-org options later.",
+      "parentUuid": "aeb56870_c615944f",
       "revId": "07d9dc811c08156f6d2feb4b4d20d718fdaabf2b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
