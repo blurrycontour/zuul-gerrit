@@ -139,6 +139,30 @@
       },
       "revId": "07d9dc811c08156f6d2feb4b4d20d718fdaabf2b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a97fde6b_25725fe8",
+        "filename": "zuul/driver/gerrit/gerrittrigger.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-28T22:39:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66578c5c_6f776823",
+      "range": {
+        "startLine": 21,
+        "startChar": 66,
+        "endLine": 21,
+        "endChar": 76
+      },
+      "revId": "07d9dc811c08156f6d2feb4b4d20d718fdaabf2b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
