@@ -117,6 +117,9 @@
     name: zuul-nox-py311
     parent: zuul-nox
     timeout: 7200  # 120 minutes
+    failure-output:
+      # This matches stestr output when a test fails
+      - '\{\d+\} (.*?) \[[\d\.]+s\] \.\.\. FAILED'
     vars:
       nox_keyword: tests
 
