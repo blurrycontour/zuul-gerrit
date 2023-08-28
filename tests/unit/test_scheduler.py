@@ -368,6 +368,7 @@ class TestScheduler(ZuulTestCase):
     def test_jobs_executed(self):
         "Test that jobs are executed and a change is merged"
 
+        raise Exception("test failure")
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
