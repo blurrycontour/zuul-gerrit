@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d89506b_7495fc76",
+        "filename": "releasenotes/notes/pcre-deprecation-7be018a179588f8b.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-28T21:56:01Z",
+      "side": 1,
+      "message": "Sure.  We actually deprecated them like 4 years ago, and the documentation has only said re2 is supported since then, we just didn\u0027t have a way to actually finish the job until now.  I\u0027ll patch this in a followup.",
+      "parentUuid": "ec70c17e_1ec17ace",
+      "revId": "20a18337ac4fb157c5488d095281a5af2dc2c716",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc0a9f28_28fb5007",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-28T20:42:18Z",
       "side": 1,
       "message": "The pipeline parser fromYaml method creates a new localaccumulator on line 1643. Will that mask errors for this accumulator?",
+      "revId": "20a18337ac4fb157c5488d095281a5af2dc2c716",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4194dd23_93ef7062",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2600,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-28T21:56:01Z",
+      "side": 1,
+      "message": "No, they both add errors to the same error list (loading_errors).  Probably a better name for that class would have been LocalContextAccumulatorWrapper, but that\u0027s a mouthful.",
+      "parentUuid": "cc0a9f28_28fb5007",
       "revId": "20a18337ac4fb157c5488d095281a5af2dc2c716",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
