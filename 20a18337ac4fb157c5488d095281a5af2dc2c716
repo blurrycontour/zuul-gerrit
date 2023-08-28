@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec70c17e_1ec17ace",
+        "filename": "releasenotes/notes/pcre-deprecation-7be018a179588f8b.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-28T20:42:18Z",
+      "side": 1,
+      "message": "It might be good to provide some justification to users for this change. Speed and safety?",
+      "revId": "20a18337ac4fb157c5488d095281a5af2dc2c716",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc0a9f28_28fb5007",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2600,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-28T20:42:18Z",
+      "side": 1,
+      "message": "The pipeline parser fromYaml method creates a new localaccumulator on line 1643. Will that mask errors for this accumulator?",
+      "revId": "20a18337ac4fb157c5488d095281a5af2dc2c716",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
