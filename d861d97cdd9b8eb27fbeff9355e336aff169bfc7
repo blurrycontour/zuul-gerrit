@@ -16,6 +16,24 @@
       "message": "Nit: I think blockdiag is essentially unmaintained at thsi point so we may want to use inkscape to generate svgs and embed them or some other alternative.",
       "revId": "d861d97cdd9b8eb27fbeff9355e336aff169bfc7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84051541_114e4ced",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-29T22:44:23Z",
+      "side": 1,
+      "message": "I don\u0027t think this significantly adds to the debt though.",
+      "parentUuid": "ff127a34_f26be8d1",
+      "revId": "d861d97cdd9b8eb27fbeff9355e336aff169bfc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
