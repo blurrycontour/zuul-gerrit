@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c77d9440_769768ee",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4888,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-29T22:12:22Z",
+      "side": 1,
+      "message": "Nit this comment is no longer accurate.",
+      "range": {
+        "startLine": 4888,
+        "startChar": 55,
+        "endLine": 4888,
+        "endChar": 56
+      },
+      "revId": "0d4f28ffee4a194fa1412477fdad8941099e949f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0420b8e0_42527961",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1231,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-29T22:12:22Z",
+      "side": 1,
+      "message": "Do we need to set a window ceiling of math.inf if the value isn\u0027t in the deserialized data? That would allow us to do this transition without a model api version bump?\n\nOr is that what line 1146 does setting the value to a default on object initialization?",
+      "revId": "0d4f28ffee4a194fa1412477fdad8941099e949f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
