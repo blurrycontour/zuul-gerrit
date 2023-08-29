@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "989c3512_2f730fc5",
+        "filename": "doc/source/monitoring.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-29T22:31:16Z",
+      "side": 1,
+      "message": "Nit: `The number of changes processed by the queue`.",
+      "range": {
+        "startLine": 267,
+        "startChar": 29,
+        "endLine": 267,
+        "endChar": 38
+      },
+      "revId": "d96a9d9445885966e3e6fdade9ca379fa8d91cc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd70e2a9_a88626ec",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-29T22:31:16Z",
+      "side": 1,
+      "message": "Why do we get this second window state sent without sending the current_changes again first? looks like we always sense queue current_changes then window.",
+      "revId": "d96a9d9445885966e3e6fdade9ca379fa8d91cc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f04c2354_722d445e",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-29T22:31:16Z",
+      "side": 1,
+      "message": "Don\u0027t these two come immediate after the queue total changes and window reports above?",
+      "revId": "d96a9d9445885966e3e6fdade9ca379fa8d91cc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee9b05f8_08fe5a4b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2278,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-29T22:31:16Z",
+      "side": 1,
+      "message": "I wonder if we need to do a more robust encoding. Like maybe full urlencode? In particular queue names are user configurable right?",
+      "revId": "d96a9d9445885966e3e6fdade9ca379fa8d91cc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
