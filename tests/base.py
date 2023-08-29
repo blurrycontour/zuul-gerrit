@@ -1343,6 +1343,16 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self._fake_project_default_branch = {}
         self.submit_retry_backoff = 0
 
+    @property
+    def health(self):
+        return {
+            'projects': dict((p, {
+                'status': 'OK',
+                'description': 'Fake Gerrit connection',
+                'timestamp': 0,
+            }) for p in self.projects)
+        }
+
     def onStop(self):
         super().onStop()
         if self.web_server:

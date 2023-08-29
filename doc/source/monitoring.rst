@@ -48,6 +48,66 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       The number of bytes required to for the change cache (the
       decompressed value of ``data_size_compressed``).
 
+.. stat:: zuul.connection.<connection>.health
+
+   If the connection is git-based (gerrit, github, etc), the metric is
+   split over projects:
+
+   .. stat:: zuul.connection.<connection>.health.project.<project>.OK
+      :type: gauge
+
+      Returns 1 if the connection is in a healthy state (ie. is able to
+      fetch git data) for the given project, 0 otherwise.
+
+   .. stat:: zuul.connection.<connection>.health.project.<project>.DEGRADED
+      :type: gauge
+
+      Returns 1 if the connection is in a degraded state for the given
+      project, 0 otherwise. What a degraded state means is specific to
+      a given connection. For example, a Github connection expecting to
+      fetch data through a Github app may fall back to anonymous API calls
+      if the app is misconfigured; in such a case the connection status
+      will be reported as "DEGRADED".
+
+   .. stat:: zuul.connection.<connection>.health.project.<project>.UNKNOWN
+      :type: gauge
+
+      Returns 1 if the connection is in an unknown state for the given
+      project, 0 otherwise. A connection can be in an unknown state if
+      it hasn't been polled yet, or if the connection driver doesn't
+      implement a health check mechanism.
+
+   .. stat:: zuul.connection.<connection>.health.project.<project>.ERROR
+      :type: gauge
+
+      Returns 1 if the connection is in an unhealthy state (ie. is unable to
+      fetch git data) for the given project, 0 otherwise.
+
+   For non git connections, the following generic metrics are available:
+
+   .. stat:: zuul.connection.<connection>.health.OK
+      :type: gauge
+
+      Returns 1 if the connection is in a healthy state, 0 otherwise.
+
+   .. stat:: zuul.connection.<connection>.health.DEGRADED
+      :type: gauge
+
+      Returns 1 if the connection is in a degraded state, 0 otherwise.
+      What a degraded state means is specific to a given connection.
+
+   .. stat:: zuul.connection.<connection>.health.UNKNOWN
+      :type: gauge
+
+      Returns 1 if the connection is in an unknown state, 0 otherwise.
+      A connection can be in an unknown state if it hasn't been polled yet,
+      or if the connection driver doesn't implement a health check mechanism.
+
+   .. stat:: zuul.connection.<connection>.health.ERROR
+      :type: gauge
+
+      Returns 1 if the connection is in an unhealthy state, 0 otherwise.
+
 .. stat:: zuul.tenant.<tenant>.event_enqueue_processing_time
    :type: timer
 
