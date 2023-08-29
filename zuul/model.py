@@ -20,9 +20,8 @@ import json
 import hashlib
 import logging
 import os
-from functools import partial, total_ordering
+from functools import total_ordering
 import threading
-
 import re2
 import time
 from uuid import uuid4
@@ -2904,8 +2903,11 @@ class Job(ConfigObject):
             role['project'] = role_project.name
         return d
 
-    def _deduplicateSecrets(self, context, frozen_playbooks):
-        # At the end of this method, the values in the playbooks'
+    def _deduplicateSecrets(self, context, secrets, playbook):
+        # secrets is a list of secrets accumulated so far
+        # playbook is a frozen playbook from _freezePlaybook
+
+        # At the end of this method, the values in the playbook
         # secrets dictionary will be mutated to either be an integer
         # (which is an index into the job's secret list) or a dict
         # (which contains a pointer to a key in the global blob
@@ -2913,39 +2915,23 @@ class Job(ConfigObject):
 
         blobstore = BlobStore(context)
 
-        def _resolve_index(secret_value, secrets):
-            return secrets.index(secret_value)
-
-        # Collect secrets that can be deduplicated
-        secrets_map = {}
-        for playbook in frozen_playbooks:
-            # Cast to list so we can modify in place
-            for secret_key, secret_value in list(playbook['secrets'].items()):
-                secret_serialized = json_dumps(
-                    secret_value, sort_keys=True).encode("utf8")
-                if (COMPONENT_REGISTRY.model_api >= 6 and
-                    len(secret_serialized) > self.SECRET_BLOB_SIZE):
-                    # If the secret is large, store it in the blob store
-                    # and store the key in the playbook secrets dict.
-                    blob_key = blobstore.put(secret_serialized)
-                    playbook['secrets'][secret_key] = {'blob': blob_key}
+        # Cast to list so we can modify in place
+        for secret_key, secret_value in list(playbook['secrets'].items()):
+            secret_serialized = json_dumps(
+                secret_value, sort_keys=True).encode("utf8")
+            if (COMPONENT_REGISTRY.model_api >= 6 and
+                len(secret_serialized) > self.SECRET_BLOB_SIZE):
+                # If the secret is large, store it in the blob store
+                # and store the key in the playbook secrets dict.
+                blob_key = blobstore.put(secret_serialized)
+                playbook['secrets'][secret_key] = {'blob': blob_key}
+            else:
+                if secret_value in secrets:
+                    playbook['secrets'][secret_key] =\
+                        secrets.index(secret_value)
                 else:
-                    secrets_map[secret_key] = secret_value
-                    playbook['secrets'][secret_key] = partial(
-                        _resolve_index, secret_value)
-
-        # The list of secrets needs to be sorted so that the same job
-        # compares equal accross scheduler instances.
-        secrets = [secrets_map[k] for k in sorted(secrets_map)]
-
-        # Resolve secret indexes
-        for playbook in frozen_playbooks:
-            # Cast to list so we can modify in place
-            for secret_key in list(playbook['secrets'].keys()):
-                resolver = playbook['secrets'][secret_key]
-                if callable(resolver):
-                    playbook['secrets'][secret_key] = resolver(secrets)
-        return secrets
+                    secrets.append(secret_value)
+                    playbook['secrets'][secret_key] = len(secrets) - 1
 
     def flattenNodesetAlternatives(self, layout):
         nodeset = self.nodeset
@@ -2972,7 +2958,7 @@ class Job(ConfigObject):
         # Nodeset alternatives are flattened at this point
         attributes.discard('nodeset_alternatives')
         attributes.discard('nodeset_index')
-        frozen_playbooks = []
+        secrets = []
         for k in attributes:
             # If this is a config object, it's frozen, so it's
             # safe to shallow copy.
@@ -2988,17 +2974,15 @@ class Job(ConfigObject):
                 v = [self._freezePlaybook(layout, item, pb,
                                           redact_secrets_and_keys)
                      for pb in v if pb.source_context]
-                frozen_playbooks.extend(v)
-
+                if not redact_secrets_and_keys:
+                    # If we're redacting, don't de-duplicate so that
+                    # it's clear that the value ("REDACTED") is
+                    # redacted.
+                    for pb in v:
+                        self._deduplicateSecrets(context, secrets, pb)
             kw[k] = v
-
         kw['nodeset_index'] = 0
-        kw['secrets'] = []
-        if not redact_secrets_and_keys:
-            # If we're redacting, don't de-duplicate so that
-            # it's clear that the value ("REDACTED") is
-            # redacted.
-            kw['secrets'] = self._deduplicateSecrets(context, frozen_playbooks)
+        kw['secrets'] = secrets
         kw['affected_projects'] = self._getAffectedProjects(tenant)
         kw['config_hash'] = self.getConfigHash(tenant)
         # Ensure that the these attributes are exactly equal to what
