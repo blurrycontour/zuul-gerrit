@@ -111,6 +111,16 @@ class TestGithubDriver(ZuulTestCase):
 
         # post job must be run
         self.assertEqual(3, len(self.history))
+        # TODO improve FakeGithubClientManager to reflect expected
+        # health status
+        # current implementation makes us fall in the degraded
+        # anonymous API access case
+        health = self.scheds.first.connections.connections['github'].health
+        self.assertEqual(
+            'DEGRADED',
+            health['projects']['org/project']['status'],
+            health
+        )
 
     @simple_layout('layouts/files-github.yaml', driver='github')
     def test_pull_matched_file_event(self):
