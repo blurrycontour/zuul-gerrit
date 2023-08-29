@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff127a34_f26be8d1",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-29T22:18:11Z",
+      "side": 1,
+      "message": "Nit: I think blockdiag is essentially unmaintained at thsi point so we may want to use inkscape to generate svgs and embed them or some other alternative.",
+      "revId": "d861d97cdd9b8eb27fbeff9355e336aff169bfc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
