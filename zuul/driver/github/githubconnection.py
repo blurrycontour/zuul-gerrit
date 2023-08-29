@@ -128,6 +128,91 @@ class GithubChangeCache(AbstractChangeCache):
     }
 
 
+class GithubConnectionHealthHandler:
+    """
+    This handler updates the connection's repo health status depending
+    on specific API events and return values.
+    """
+    def __init__(self, connection, github, zuul_event_id):
+        log = logging.getLogger("zuul.GithubConnectionHealthHandler")
+        self.log = get_annotated_logger(log, zuul_event_id)
+        self.connection = connection
+        self.github = github
+
+    def update_health(self, response, *args, **kwargs):
+        ts = time.time()
+        project_name = self.github._zuul_project
+        # Auth error -> ERROR
+        if response.status_code == 401:
+            self.log.debug(
+                'Reporting 401 error on project %s' % project_name
+            )
+            status = {
+                'status': 'ERROR',
+                'description': 'Authentication failure',
+                'timestamp': ts,
+            }
+        # Rate limiting -> DEGRADED
+        elif response.status_code == 403:
+            self.log.debug(
+                'Reporting 403 error on project '
+                '%s' % project_name
+            )
+            try:
+                body = json.loads(response.content)
+                message = body.get('message', '')
+                if message.startswith('API rate limit exceeded') or\
+                   message.startswith('You have triggered an abuse detection'):
+                    status = {
+                        'status': 'DEGRADED',
+                        'description': message,
+                        'timestamp': ts,
+                    }
+            except Exception:
+                # we cannot decode the message, log a generic description
+                status = {
+                        'status': 'ERROR',
+                        'description': 'Insufficient privileges',
+                        'timestamp': ts,
+                    }
+        # Insufficient privileges (410 'Gone') -> ERROR
+        elif response.status_code == 410:
+            self.log.debug(
+                'Reporting 410 error on project '
+                '%s' % project_name
+            )
+            status = {
+                'status': 'ERROR',
+                'description': 'Insufficient privileges',
+                'timestamp': ts,
+            }
+        # Validation error (422) -> ERROR
+        elif response.status_code == 422:
+            self.log.debug(
+                'Reporting 422 error on project '
+                '%s' % project_name
+            )
+            status = {
+                'status': 'ERROR',
+                'description': 'Input is failing validation',
+                'timestamp': ts,
+            }
+        # Server-side error -> ERROR
+        elif response.status_code == 500:
+            self.log.debug(
+                'Reporting 500 error on project '
+                '%s' % project_name
+            )
+            status = {
+                'status': 'ERROR',
+                'description': 'Server-side issue',
+                'timestamp': ts,
+            }
+        else:
+            return      
+        self.connection._health['projects'][project_name] = status
+
+
 class GithubRequestLogger:
 
     def __init__(self, zuul_event_id):
@@ -986,8 +1071,9 @@ class GithubClientManager:
     github_class = github3.GitHub
     github_enterprise_class = github3.GitHubEnterprise
 
-    def __init__(self, connection_config):
-        self.connection_config = connection_config
+    def __init__(self, connection):
+        self.connection = connection
+        self.connection_config = connection.connection_config
         self.server = self.connection_config.get('server', 'github.com')
 
         if self.server == 'github.com':
@@ -1126,6 +1212,12 @@ class GithubClientManager:
         # Install hook for handling retries of GET requests transparently
         retry_handler = GithubRetryHandler(github, 5, 30, zuul_event_id)
         github.session.hooks['response'].append(retry_handler.handle_response)
+
+        # Install hook for updating projects health
+        health_handler = GithubConnectionHealthHandler(
+            self.connection, github, zuul_event_id
+        )
+        github.session.hooks['response'].append(health_handler.update_health)
 
         # Add properties to store project and user for logging later
         github._zuul_project = None
@@ -1310,6 +1402,11 @@ class GithubClientManager:
             # also what the github.login() method would do if the token is not
             # set.
             if token:
+                self.connection._health['projects'][project_name] = {
+                    'status': 'OK',
+                    'description': '',
+                    'timestamp': time.time(), 
+                }
                 # To set the AppInstallationAuthToken on the github session, we
                 # also need the expiry date, but in the correct ISO format.
                 installation_id = self.installation_map.get(project_name)
@@ -1329,6 +1426,13 @@ class GithubClientManager:
                 github.session.auth = AppInstallationTokenAuth(
                     token, format_expiry
                 )
+            else:
+                self.connection._health['projects'][project_name] = {
+                    'status': 'DEGRADED',
+                    'description': 'No authentication token available for '
+                                   'integration %s' % self.app_id,
+                    'timestamp': time.time(), 
+                }
 
             github._zuul_project = project_name
             github._zuul_user_id = self.installation_map.get(project_name)
@@ -1338,8 +1442,19 @@ class GithubClientManager:
         else:
             api_token = self.connection_config.get('api_token')
             if api_token:
+                self.connection._health['projects'][project_name] = {
+                    'status': 'OK',
+                    'description': '',
+                    'timestamp': time.time(), 
+                }
                 github.login(token=api_token)
-
+            else:
+                self.connection._health['projects'][project_name] = {
+                    'status': 'DEGRADED',
+                    'description': 'Using anonymous access to API, '
+                                   'some features might not work',
+                    'timestamp': time.time(), 
+                }
         return github
 
 
@@ -1382,7 +1497,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             'max_threads_per_installation', 1))
 
         self._github_client_manager = self.client_manager_class(
-            self.connection_config)
+            self)
 
         self.sched = None
 
@@ -1814,6 +1929,11 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
     def addProject(self, project):
         self.projects[project.name] = project
+        self._health['projects'][project.name] = {
+            'status': 'UNKNOWN',
+            'description': 'Project added, awaiting event',
+            'timestamp': time.time(),
+        }
 
     def _fetchProjectBranches(self, project: Project,
                               exclude_unprotected: bool) -> List[str]:
