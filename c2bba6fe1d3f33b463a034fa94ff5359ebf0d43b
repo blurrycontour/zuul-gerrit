@@ -16,6 +16,23 @@
       "message": "maybe some issue with the submission? I do not see the test cases in patch set 3.",
       "revId": "c2bba6fe1d3f33b463a034fa94ff5359ebf0d43b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e6c66e6_5f435926",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-08-29T14:37:28Z",
+      "side": 1,
+      "message": "ah, I think I misunderstood your comment, you mean another change instead of patch set. Just ignore my last comment.",
+      "revId": "c2bba6fe1d3f33b463a034fa94ff5359ebf0d43b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
