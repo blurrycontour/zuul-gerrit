@@ -16,6 +16,23 @@
       "message": "The issue is not always up to the Zuul admin to fix. For example, there might be an issue with a zuul Github app that isn\u0027t installed or is disabled on a particular repo, and the Zuul admin isn\u0027t the repository\u0027s owner. Assuming the repo\u0027s owner also uses its CI, this would give them a way to figure the problem out.\n\nIt\u0027s also good to add more transparency as to what\u0027s going on for end users who will be impacted by connection disruptions. As it stands, users experiencing issues have no idea why and can\u0027t provide any lead to a Zuul admin.\n\nI agree on adding monitoring metrics around these as well, especially for connections that are not git-related (MQTT, SQL, etc), I\u0027ll do this in a parallel patch should we abandon this GUI change.",
       "revId": "73a04315f10f630a7d4fe536cf97beccd203a19c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "564e53fc_31f44549",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2023-08-29T06:49:11Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "73a04315f10f630a7d4fe536cf97beccd203a19c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
