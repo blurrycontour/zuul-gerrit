@@ -561,6 +561,14 @@ class Scheduler(threading.Thread):
                           self.reconfigure_event_queue.qsize())
         queue_base = 'zuul.scheduler.eventqueues.connection'
         conn_base = 'zuul.connection'
+
+        def health_gauges(metric_name, health):
+            for m in ['OK', 'DEGRADED', 'UNKNOWN', 'ERROR']:
+                self.statsd.gauge(
+                    metric_name + '.' + m,
+                    int(health['status'] == m)
+                )
+
         for connection in self.connections.connections.values():
             queue = connection.getEventQueue()
             if queue is not None:
@@ -575,6 +583,29 @@ class Scheduler(threading.Thread):
                 self.statsd.gauge(f'{conn_base}.{connection.connection_name}.'
                                   'cache.data_size_uncompressed',
                                   uncompressed_size)
+            if hasattr(connection, 'health'):
+                if 'projects' in connection.health:
+                    self.log.debug(connection.health['projects'])
+                    for project in connection.health['projects']:
+                        health_gauges(
+                            f'{conn_base}.{connection.connection_name}.health'
+                            f'.project.{project}',
+                            connection.health['projects'][project]
+                        )
+                else:
+                    try:
+                        health_gauges(
+                            f'{conn_base}.{connection.connection_name}.health',
+                            connection.health
+                        )
+                    except Exception:
+                        self.log.debug(
+                            'No health status available for connection '
+                            f'{connection.connection_name}')
+                        health_gauges(
+                            f'{conn_base}.{connection.connection_name}.health',
+                            {'status': 'UNKNOWN'}
+                        )
 
         for tenant in self.abide.tenants.values():
             self.statsd.gauge(f"zuul.tenant.{tenant.name}.management_events",

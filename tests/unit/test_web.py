@@ -3316,6 +3316,11 @@ class TestWebMulti(BaseTestWeb):
         data = self.get_url('api/connections').json()
         port = self.web.connections.connections['gerrit'].web_server.port
         url = f'http://localhost:{port}'
+        fake_gerrit_health = {
+            'status': 'OK',
+            'description': 'Fake Gerrit connection',
+            'timestamp': 0,
+        }
         gerrit_connection = {
             'driver': 'gerrit',
             'name': 'gerrit',
@@ -3324,7 +3329,12 @@ class TestWebMulti(BaseTestWeb):
             'server': 'review.example.com',
             'ssh_server': 'ssh-review.example.com',
             'port': 29418,
-            'health': {'projects': {}},
+            'health': {'projects': {
+                'common-config': fake_gerrit_health,
+                'org/project': fake_gerrit_health,
+                'org/project1': fake_gerrit_health,
+                'org/project2': fake_gerrit_health,
+            }},
         }
         github_connection = {
             'baseurl': 'https://api.github.com',

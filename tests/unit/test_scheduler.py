@@ -511,6 +511,23 @@ class TestScheduler(ZuulTestCase):
                                 'data_size_uncompressed',
                                 kind='g')
 
+        for proj in ['common-config',
+                     'org/project',
+                     'org/project1',
+                     'org/project2']:
+            self.assertReportedStat(
+                f'zuul.connection.gerrit.health.project.{proj}.OK',
+                kind='g')
+            self.assertReportedStat(
+                f'zuul.connection.gerrit.health.project.{proj}.DEGRADED',
+                kind='g')
+            self.assertReportedStat(
+                f'zuul.connection.gerrit.health.project.{proj}.UNKNOWN',
+                kind='g')
+            self.assertReportedStat(
+                f'zuul.connection.gerrit.health.project.{proj}.ERROR',
+                kind='g')
+
         for build in self.history:
             self.assertTrue(build.parameters['zuul']['voting'])
 
