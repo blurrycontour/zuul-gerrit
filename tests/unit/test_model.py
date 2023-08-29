@@ -379,6 +379,96 @@ class TestJob(BaseTestCase):
                                     skip_file_matcher=False,
                                     redact_secrets_and_keys=False)
 
+    def test_job_deduplicate_secrets(self):
+        # Verify that in a job with two secrets with the same name on
+        # different playbooks (achieved by inheritance) the secrets
+        # are not deduplicated.  Also verify that the same secret used
+        # twice is deduplicated.
+
+        secret1_data = {'text': 'secret1 data'}
+        secret2_data = {'text': 'secret2 data'}
+        secret1 = self.pcontext.secret_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'secret1',
+            'data': secret1_data,
+        })
+        self.layout.addSecret(secret1)
+
+        secret2 = self.pcontext.secret_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'secret2',
+            'data': secret2_data,
+        })
+        self.layout.addSecret(secret2)
+
+        base = self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'base',
+            'parent': None,
+            'secrets': [
+                {'name': 'mysecret',
+                 'secret': 'secret1'},
+            ],
+            'pre-run': 'playbooks/pre.yaml',
+        }, None)
+        self.layout.addJob(base)
+        python27 = self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'python27',
+            'parent': 'base',
+            'secrets': [
+                {'name': 'mysecret',
+                 'secret': 'secret2'},
+                {'name': 'othersecret',
+                 'secret': 'secret2'},
+            ],
+            'run': 'playbooks/python27.yaml',
+        }, None)
+        self.layout.addJob(python27)
+
+        project_config = self.pcontext.project_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'project',
+            'gate': {
+                'jobs': ['python27'],
+            }
+        }, None)
+        self.layout.addProjectConfig(project_config)
+
+        change = model.Change(self.project)
+        change.branch = 'master'
+        item = self.queue.enqueueChange(change, None)
+
+        self.assertTrue(base.changeMatchesBranch(change))
+        self.assertTrue(python27.changeMatchesBranch(change))
+
+        with self.zk_context as ctx:
+            item.freezeJobGraph(self.layout, ctx,
+                                skip_file_matcher=False,
+                                redact_secrets_and_keys=False)
+        self.assertEqual(len(item.getJobs()), 1)
+        job = item.getJobs()[0]
+        self.assertEqual(job.name, 'python27')
+
+        pre_idx = job.pre_run[0]['secrets']['mysecret']
+        pre_secret = yaml.encrypted_load(
+            job.secrets[pre_idx]['encrypted_data'])
+        self.assertEqual(pre_secret, secret1_data)
+
+        run_idx = job.run[0]['secrets']['mysecret']
+        run_secret = yaml.encrypted_load(
+            job.secrets[run_idx]['encrypted_data'])
+        self.assertEqual(run_secret, secret2_data)
+
+        # Verify that they were deduplicated
+        run2_idx = job.run[0]['secrets']['othersecret']
+        self.assertEqual(run_idx, run2_idx)
+
 
 class TestGraph(BaseTestCase):
     def test_job_graph_disallows_multiple_jobs_with_same_name(self):
