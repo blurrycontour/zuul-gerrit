@@ -2917,7 +2917,7 @@ class Job(ConfigObject):
             return secrets.index(secret_value)
 
         # Collect secrets that can be deduplicated
-        secrets_map = {}
+        secrets_list = []
         for playbook in frozen_playbooks:
             # Cast to list so we can modify in place
             for secret_key, secret_value in list(playbook['secrets'].items()):
@@ -2930,13 +2930,14 @@ class Job(ConfigObject):
                     blob_key = blobstore.put(secret_serialized)
                     playbook['secrets'][secret_key] = {'blob': blob_key}
                 else:
-                    secrets_map[secret_key] = secret_value
+                    if secret_value not in secrets_list:
+                        secrets_list.append(secret_value)
                     playbook['secrets'][secret_key] = partial(
                         _resolve_index, secret_value)
 
         # The list of secrets needs to be sorted so that the same job
         # compares equal accross scheduler instances.
-        secrets = [secrets_map[k] for k in sorted(secrets_map)]
+        secrets = sorted(secrets_list, key=lambda item: item['encrypted_data'])
 
         # Resolve secret indexes
         for playbook in frozen_playbooks:
