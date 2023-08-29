@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "723f4c37_c6686c62",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 20676
+      },
+      "writtenOn": "2023-08-29T15:14:03Z",
+      "side": 1,
+      "message": "IIRC the date can be parsed by Opensearch to string, but it does not work opposite. So if zuul will push the data to the Opensearch as a date, not string it would be fine, but if you want to make something with that data like do special visualization in Grafana, it will not work until you will not reindex all indexes.",
+      "revId": "b8c44b59825b859ad6afcc984cfb3e82298146ee",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
