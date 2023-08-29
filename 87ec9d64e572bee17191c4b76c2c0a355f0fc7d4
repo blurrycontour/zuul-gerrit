@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f238492b_ab4426ec",
+        "filename": ".zuul.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-08-29T23:05:28Z",
+      "side": 1,
+      "message": "Nit might be nice to put an example line in the comment here.",
+      "revId": "87ec9d64e572bee17191c4b76c2c0a355f0fc7d4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
