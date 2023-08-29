@@ -4918,6 +4918,11 @@ class QueueItem(zkobject.ZKObject):
             return self.bundle.items
         return [self]
 
+    def all_items_behind(self):
+        for item in self.items_behind:
+            yield item
+            yield from item.all_items_behind()
+
     @classmethod
     def new(klass, context, **kw):
         obj = klass()

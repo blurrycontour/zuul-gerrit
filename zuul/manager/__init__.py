@@ -1,3 +1,5 @@
+# Copyright 2021-2023 Acme Gating, LLC
+#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -9,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
 import collections
 import contextlib
 import itertools
@@ -687,18 +690,21 @@ class PipelineManager(metaclass=ABCMeta):
         self.sql.reportBuildsetEnd(ci.current_build_set,
                                    'failure', final=True)
 
-    def cycleForChange(self, change, dependency_graph, event):
-        log = get_annotated_logger(self.log, event)
-        log.debug("Running Tarjan's algorithm on current dependencies: %s",
-                  dependency_graph)
+    def cycleForChange(self, change, dependency_graph, event, debug=True):
+        if debug:
+            log = get_annotated_logger(self.log, event)
+            log.debug("Running Tarjan's algorithm on current dependencies: %s",
+                      dependency_graph)
         sccs = [s for s in strongly_connected_components(dependency_graph)
                 if len(s) > 1]
-        log.debug("Strongly connected components (cyles): %s", sccs)
+        if debug:
+            log.debug("Strongly connected components (cyles): %s", sccs)
         for scc in sccs:
             if change in scc:
-                log.debug("Dependency cycle detected for "
-                          "change %s in project %s",
-                          change, change.project)
+                if debug:
+                    log.debug("Dependency cycle detected for "
+                              "change %s in project %s",
+                              change, change.project)
                 # Change can not be part of multiple cycles, so we can return
                 return scc
         return []
@@ -709,6 +715,30 @@ class PipelineManager(metaclass=ABCMeta):
             itertools.chain.from_iterable(
                 dependency_graph[c] for c in cycle if c != change)
         ) - set(cycle)
+
+    def getDependencyGraph(self, change, dependency_graph, event,
+                           history=None):
+        if self.pipeline.ignore_dependencies:
+            return
+        if not isinstance(change, model.Change):
+            return
+        if not change.getNeedsChanges(
+                self.useDependenciesByTopic(change.project)):
+            return
+        if history is None:
+            history = set()
+        history.add(change)
+        for needed_change in self.resolveChangeReferences(
+                change.getNeedsChanges(
+                    self.useDependenciesByTopic(change.project))):
+            if needed_change.is_merged:
+                continue
+
+            node = dependency_graph.setdefault(change, [])
+            node.append(needed_change)
+            if needed_change not in history:
+                self.getDependencyGraph(needed_change, dependency_graph,
+                                        event, history)
 
     def getQueueConfig(self, project):
         layout = self.pipeline.tenant.layout
@@ -752,7 +782,7 @@ class PipelineManager(metaclass=ABCMeta):
             return
 
         log = get_annotated_logger(self.log, item.event)
-        item.updateAttributes(self.current_context, bundle=model.Bundle())
+        bundle = None
 
         # Try to find already enqueued items of this cycle, so we use
         # the same bundle
@@ -761,12 +791,14 @@ class PipelineManager(metaclass=ABCMeta):
             if not needed_item:
                 continue
             # Use a common bundle for the cycle
-            item.updateAttributes(self.current_context,
-                                  bundle=needed_item.bundle)
-            break
+            if needed_item.bundle is not None:
+                bundle = needed_item.bundle
+                break
+
+        if bundle is None:
+            bundle = model.Bundle()
 
         log.info("Adding cycle item %s to bundle %s", item, item.bundle)
-        bundle = item.bundle
         bundle.add_item(item)
 
         # Write out the updated bundle info to Zookeeper for all items
@@ -1589,8 +1621,33 @@ class PipelineManager(metaclass=ABCMeta):
                 item.change, item.event)
         else:
             meets_reqs = True
+
         abort, needs_changes = self.getMissingNeededChanges(
             item.change, change_queue, item.event)
+
+        # Check that the bundle dependency graph is correct
+        dependency_graph = collections.OrderedDict()
+        self.getDependencyGraph(item.change, dependency_graph, item.event)
+        cycle = self.cycleForChange(
+            item.change, dependency_graph, item.event, debug=False)
+        if item.bundle:
+            bundle_cycle = {i.change for i in item.bundle.items}
+        else:
+            bundle_cycle = set()
+        if set(cycle) != bundle_cycle:
+            log.info("Item bundle has changed: %s", item)
+            # If the item is part of a bundle that has started
+            # reporting, we can't touch it.  Otherwise, make sure it's
+            # up to date.
+            if ((item.bundle is None) or
+                (not item.didBundleStartReporting())):
+                # Clear the bundle here and all other items in it.
+                if item.bundle:
+                    for i in item.bundle.items:
+                        i.updateAttributes(self.current_context, bundle=None)
+                # Then update the bundle.
+                self.updateBundle(item, change_queue, cycle)
+
         if not (meets_reqs and not needs_changes):
             # It's not okay to enqueue this change, we should remove it.
             log.info("Dequeuing change %s because "
@@ -1688,10 +1745,31 @@ class PipelineManager(metaclass=ABCMeta):
 
         if item.hasAnyJobFailed():
             failing_reasons.append("at least one job failed")
-        if (not item.live) and (not item.items_behind) and (not dequeued):
-            failing_reasons.append("is a non-live item with no items behind")
-            self.dequeueItem(item)
-            changed = dequeued = True
+        if not item.live and not dequeued:
+            if item.items_behind:
+                dependents_behind = False
+                for ib in item.all_items_behind():
+                    if item.change in self.resolveChangeReferences(
+                            ib.change.getNeedsChanges(
+                                self.useDependenciesByTopic(
+                                    ib.change.project))):
+                        dependents_behind = True
+                        break
+                if not dependents_behind:
+                    failing_reasons.append("is a non-live item "
+                                           "with no dependents behind")
+                    self.dequeueItem(item)
+                    changed = dequeued = True
+                    for item_behind in item.items_behind:
+                        log.info("Resetting builds for change %s because the "
+                                 "item ahead, %s, was dequeued" %
+                                 (item_behind.change, item))
+                        self.cancelJobs(item_behind)
+            else:
+                failing_reasons.append("is a non-live item "
+                                       "with no items behind")
+                self.dequeueItem(item)
+                changed = dequeued = True
 
         can_report = not item_ahead and item.areAllJobsComplete() and item.live
         if can_report and item.bundle:
