@@ -192,6 +192,14 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          The number of items currently being processed by this
          pipeline.
 
+      .. stat:: window
+         :type: gauge
+
+         The configured window size for the pipeline.  Note that this
+         will not change during operation.  This value is used to
+         initialize each :term:`project queue`, and as changes in that
+         queue succeed or fail, that queue's window will adjust.
+
       .. stat:: handling
          :type: timer
 
@@ -223,6 +231,40 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          The number of bytes required to represent the serialized
          state of the pipeline (the decompressed value of
          ``data_size_compressed``).
+
+      .. stat:: queue
+
+         This hierarchy holds more specific metrics for each
+         :term:`project queue` in the pipeline.
+
+         .. stat:: <queue name>
+
+            The name of the queue.  If the queue is automatically
+            generated for a single project, the name of the project is
+            used by default.  Embedded ``.`` characters will be
+            translated to ``_``, and ``/`` to ``.``.
+
+            .. stat:: current_changes
+               :type: gauge
+
+               The number of items currently in this queue.
+
+            .. stat:: window
+               :type: gauge
+
+               The window size for the queue.  This will change as
+               individual changes in the queue succeed or fail.
+
+            .. stat:: resident_time
+               :type: timer
+
+               A timer metric reporting how long each item has been in
+               the queue.
+
+            .. stat:: total_changes
+               :type: counter
+
+               The number of changes processed by the queue.
 
       .. stat:: project
 
@@ -283,7 +325,7 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
                      :type: counter
 
                      The number of changes for this project processed by the
-                     pipeline since Zuul started.
+                     pipeline.
 
       .. stat:: read_time
          :type: timer
@@ -323,8 +365,7 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       .. stat:: total_changes
          :type: counter
 
-         The number of changes processed by the pipeline since Zuul
-         started.
+         The number of changes processed by the pipeline.
 
       .. stat:: trigger_events
          :type: gauge
