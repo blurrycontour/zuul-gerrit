@@ -137,7 +137,7 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
         return {
             "name": self.connection_name,
             "driver": self.driver.name,
-            "health": self.health,
+            "health": dict(self.health),
         }
 
 

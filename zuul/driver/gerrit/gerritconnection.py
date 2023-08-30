@@ -85,6 +85,22 @@ class HTTPBadRequestException(Exception):
     pass
 
 
+class GerritConnectionHealth(object):
+    """Limited dictionary emulation to simulate health info per project"""
+
+    def __init__(self, connection):
+        self.connection = connection
+
+    def __getitem__(self, key):
+        return self.connection._health
+
+    def __iter__(self):
+        return self.connection.projects.__iter__()
+
+    def keys(self):
+        return self.connection.projects.keys()
+
+
 class GerritChangeCache(AbstractChangeCache):
     log = logging.getLogger("zuul.driver.GerritChangeCache")
 
@@ -431,10 +447,23 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def __init__(self, driver, connection_name, connection_config):
         super(GerritConnection, self).__init__(driver, connection_name,
                                                connection_config)
+        self._health = {
+            'status': 'UNKNOWN',
+            'description': 'Initialized',
+            'timestamp': time.time(),
+        }
         if 'server' not in self.connection_config:
+            self._health.update({
+                'status': 'ERROR',
+                'description': 'Incorrect server configuration'
+            })
             raise Exception('server is required for gerrit connections in '
                             '%s' % self.connection_name)
         if 'user' not in self.connection_config:
+            self._health.update({
+                'status': 'ERROR',
+                'description': 'Incorrect user configuration'
+            })
             raise Exception('user is required for gerrit connections in '
                             '%s' % self.connection_name)
 
@@ -510,9 +539,9 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 authclass = requests.auth.HTTPBasicAuth
             self.auth = authclass(self.user, self.password)
 
-        self._health = {
-            "projects": {},
-        }
+    @property
+    def health(self):
+        return {'projects': GerritConnectionHealth(self)}
 
     def setWatchedCheckers(self, checkers_to_watch):
         self.log.debug("Setting watched checkers to %s", checkers_to_watch)
@@ -576,6 +605,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if r.status_code == 409:
             raise HTTPConflictException()
         elif r.status_code != 200:
+            if r.status_code >= 500:
+                self._health.update({
+                    'status': 'ERROR',
+                    'description': 'Internal server error',
+                    'timestamp': time.time(),
+                })
             raise Exception("Received response %s" % (r.status_code,))
         ret = None
         if r.text and len(r.text) > 4:
@@ -586,6 +621,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     "Unable to parse result %s from post to %s" %
                     (r.text, url))
                 raise
+        self._health.update({
+            'status': 'OK',
+            'description': 'REST API success',
+            'timestamp': time.time(),
+        })
         return ret
 
     def post(self, path, data):
@@ -604,6 +644,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if r.status_code == 400:
             raise HTTPBadRequestException('Received response 400: %s' % r.text)
         elif r.status_code != 200:
+            if r.status_code >= 500:
+                self._health.update({
+                    'status': 'ERROR',
+                    'description': 'Internal server error',
+                    'timestamp': time.time(),
+                })
             raise Exception("Received response %s: %s" % (
                 r.status_code, r.text))
         ret = None
@@ -615,6 +661,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     "Unable to parse result %s from post to %s" %
                     (r.text, url))
                 raise
+        self._health.update({
+            'status': 'OK',
+            'description': 'REST API success',
+            'timestamp': time.time(),
+        })
         return ret
 
     def getProject(self, name: str) -> Project:
@@ -1491,9 +1542,19 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             transport = client.get_transport()
             transport.set_keepalive(self.keepalive)
             self.client = client
+            self._health.update({
+                'status': 'OK',
+                'description': 'SSH session success',
+                'timestamp': time.time(),
+            })
         except Exception:
             client.close()
             self.client = None
+            self._health.update({
+                'status': 'ERROR',
+                'description': 'Unable to open SSH session',
+                'timestamp': time.time(),
+            })
             raise
 
     def _ssh(self, command, stdin_data=None, zuul_event_id=None):
