@@ -586,7 +586,7 @@ class Scheduler(threading.Thread):
             if hasattr(connection, 'health'):
                 if 'projects' in connection.health:
                     self.log.debug(connection.health['projects'])
-                    for project in connection.health['projects']:
+                    for project in connection.health['projects'].keys():
                         health_gauges(
                             f'{conn_base}.{connection.connection_name}.health'
                             f'.project.{project}',

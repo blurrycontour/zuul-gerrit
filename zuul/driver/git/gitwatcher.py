@@ -128,20 +128,34 @@ class GitWatcher(threading.Thread):
             try:
                 refs = self.lsRemote(project)
             except git.exc.GitCommandError as err:
-                self.connection._health["projects"][project] = {
-                    'status': 'ERROR',
-                    'description': str(err),
-                    'timestamp': time.time(),
-                }
+                if "projects" in self.connection._health:
+                    self.connection._health["projects"][project] = {
+                        'status': 'ERROR',
+                        'description': str(err),
+                        'timestamp': time.time(),
+                    }
+                else:
+                    self.connection._health = {
+                        'status': 'ERROR',
+                        'description': str(err),
+                        'timestamp': time.time(),
+                    }
                 self.log.error(
                     "Could not fetch refs for "
                     "project %s: %s" % (project, err))
                 continue
-            self.connection._health["projects"][project] = {
-                'status': 'OK',
-                'description': 'refs loaded successfully',
-                'timestamp': time.time(),
-            }
+            if "projects" in self.connection._health:
+                self.connection._health["projects"][project] = {
+                    'status': 'OK',
+                    'description': 'refs loaded successfully',
+                    'timestamp': time.time(),
+                }
+            else:
+                self.connection._health = {
+                    'status': 'OK',
+                    'description': 'refs loaded successfully',
+                    'timestamp': time.time(),
+                }
             self.log.debug("Read %s refs for project %s",
                            len(refs), project)
             if not self.projects_refs.get(project):
