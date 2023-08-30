@@ -4874,6 +4874,7 @@ class TestScheduler(ZuulTestCase):
         # A failed so window is reduced by 1 to 1.
         self.assertEqual(queue.window, 1)
         self.assertEqual(queue.window_floor, 1)
+        self.assertEqual(queue.window_ceiling, 2)
         self.assertEqual(A.data['status'], 'NEW')
 
         # Gate is reset and only B's merge job is queued because
@@ -4895,6 +4896,7 @@ class TestScheduler(ZuulTestCase):
         # B was successfully merged so window is increased to 2.
         self.assertEqual(queue.window, 2)
         self.assertEqual(queue.window_floor, 1)
+        self.assertEqual(queue.window_ceiling, 2)
         self.assertEqual(B.data['status'], 'MERGED')
 
         # Only C is left and its merge job is queued.
@@ -4912,9 +4914,10 @@ class TestScheduler(ZuulTestCase):
         self.executor_server.release('project-.*')
         self.waitUntilSettled()
 
-        # C successfully merged so window is bumped to 3.
-        self.assertEqual(queue.window, 3)
+        # C successfully merged but hit the ceiling of 2
+        self.assertEqual(queue.window, 2)
         self.assertEqual(queue.window_floor, 1)
+        self.assertEqual(queue.window_ceiling, 2)
         self.assertEqual(C.data['status'], 'MERGED')
 
     @simple_layout('layouts/rate-limit.yaml')

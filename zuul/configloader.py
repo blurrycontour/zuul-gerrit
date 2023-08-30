@@ -17,14 +17,15 @@ import collections
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import copy
-import itertools
-import os
-import logging
-import textwrap
 import io
+import itertools
+import logging
+import math
+import os
 import re
 import re2
 import subprocess
+import textwrap
 
 import voluptuous as vs
 
@@ -1502,6 +1503,7 @@ class PipelineParser(object):
 
         window = vs.All(int, vs.Range(min=0))
         window_floor = vs.All(int, vs.Range(min=1))
+        window_ceiling = vs.Any(None, vs.All(int, vs.Range(min=1)))
         window_type = vs.Any('linear', 'exponential')
         window_factor = vs.All(int, vs.Range(min=1))
 
@@ -1526,6 +1528,7 @@ class PipelineParser(object):
                         vs.All(int, vs.Range(min=1)),
                     'window': window,
                     'window-floor': window_floor,
+                    'window-ceiling': window_ceiling,
                     'window-increase-type': window_type,
                     'window-increase-factor': window_factor,
                     'window-decrease-type': window_type,
@@ -1615,6 +1618,12 @@ class PipelineParser(object):
 
         pipeline.window = conf.get('window', 20)
         pipeline.window_floor = conf.get('window-floor', 3)
+        pipeline.window_ceiling = conf.get('window-ceiling', None)
+        if (pipeline.window_ceiling is None):
+            pipeline.window_ceiling = math.inf
+        if pipeline.window_ceiling < pipeline.window_floor:
+            raise Exception("Pipeline window-ceiling may not be "
+                            "less than window-floor")
         pipeline.window_increase_type = conf.get(
             'window-increase-type', 'linear')
         pipeline.window_increase_factor = conf.get(

@@ -422,6 +422,13 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       the window described above. Should be a positive non zero
       integer value.
 
+   .. attr:: window-ceiling
+
+      Dependent pipeline managers only. This is the maximum value for
+      the window described above.  When omitted or set to ``null``,
+      there is no upper limit on the size of the window.  If set, must
+      be greater than or equal to the floor.
+
    .. attr:: window-increase-type
       :default: linear
 

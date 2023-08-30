@@ -3162,6 +3162,23 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertEqual(A.reported, 1)
         self.assertIn('protected job in a different project', A.messages[0])
 
+    def test_window_ceiling(self):
+        in_repo_conf = textwrap.dedent(
+            """
+            - pipeline:
+                name: test
+                manager: dependent
+                window-floor: 3
+                window-ceiling: 2
+            """)
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('common-config', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1)
+        self.assertIn('ceiling may not be less than', A.messages[0])
+
 
 class TestInRepoConfigSOS(ZuulTestCase):
     config_file = 'zuul-connections-gerrit-and-github.conf'

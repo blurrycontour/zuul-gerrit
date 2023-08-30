@@ -44,6 +44,7 @@ class SupercedentPipelineManager(PipelineManager):
             pipeline=self.pipeline,
             window=1,
             window_floor=1,
+            window_ceiling=1,
             window_increase_type='none',
             window_decrease_type='none',
             dynamic=True)
