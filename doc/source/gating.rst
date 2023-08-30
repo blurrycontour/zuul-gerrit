@@ -208,6 +208,79 @@ starts the process again testing *D* against the tip of the branch, and
     }
   }
 
+.. _pipeline_window:
+
+Pipeline Window
+~~~~~~~~~~~~~~~
+
+Zuul allows for some control over this process.  Pipelines have a
+:term:`window` which is portion of the pipeline where jobs are
+permitted to run.  The window is the number of changes at the head of
+the queue where Zuul will start jobs.  Any changes beyond this number
+are held in the queue without running jobs.  As changes exit the head
+of the queue, the changes outside the window will move up and
+eventually start their jobs.
+
+.. blockdiag::
+
+  blockdiag foo {
+    node_width = 40;
+    span_width = 40;
+    master <- A <- B <- C <- D <- E;
+    group window {
+        label = "Pipeline active window";
+        color = "lightblue";
+        A <- B <- C;
+    }
+    group outside {
+        label = "Waiting to run jobs";
+        color = "lightgray";
+        D <- E;
+    }
+  }
+
+The window is designed to control the amount of resources used for
+parallel testing.  As described above, if changes fail testing in a
+dependent pipeline, build results are discarded and new builds are
+started without the failing changes.  If this happens frequently, then
+Zuul can end up using increasingly large amounts of test resources for
+little gain.  Ideally if builds frequently succeed, the window should
+be large in order to maximize throughput, and if they frequently fail,
+it should be small in order to minimize waste.
+
+By default, Zuul uses an algorithm inspired by the Transmission
+Control Protocol's flow control to determine the window size.  It
+starts with the window set to a certain value (twenty changes by
+default).  Each time a change successfully merges, the window is
+increased by one.  Each time a change fails, the window is halved.
+This allows the window to shrink rapidly when changes start to fail,
+and recover slowly if they succeed.  A floor is set to ensure that (by
+default) there is always at least some amount of parallel testing, and
+a ceiling may be set to prevent a wildly successful pipeline from
+starving others of resources.
+
+All of the parameters above can be customized to match local needs,
+but the defaults are a good starting point.  See
+:attr:`pipeline.window` for details.
+
+The window parameters are set on the pipeline, but each :term:`project
+queue` within that pipeline maintains its own window so that
+unreliable tests in one project queue don't affect the window of other
+project queues.
+
+While every pipeline has a window, only pipelines using the
+:value:`dependent <pipeline.manager.dependent>` pipeline manager allow
+configuration of the window.  Other pipeline managers use fixed values
+to implement their particular behaviors.  For example,
+:value:`independent <pipeline.manager.independent>` pipelines always
+have unlimited windows, and :value:`serial <pipeline.manager.serial>`
+pipelines have a fixed window size of 1.
+
+The window can be visualized in the web interface by inspecting the
+icon to the left of a change.  If a change is outside the window, it
+will have an hourglass icon and the mouseover text will indicate that
+jobs will start when the change moves closer to the head of the queue.
+
 
 Cross Project Testing
 ---------------------

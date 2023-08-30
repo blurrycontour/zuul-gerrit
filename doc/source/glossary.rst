@@ -376,3 +376,12 @@ Glossary
       restricted, and jobs defined in these projects run in a
       restricted execution environment since they may be operating on
       changes which have not yet undergone review.
+
+   window
+
+      The portion of a pipeline (most relevant to :value:`dependent
+      pipelines <pipeline.manager.dependent>`) that is permitted to
+      run jobs.  Zuul has a number of configuration options and
+      heuristics designed to match resource usage to pipeline
+      throughput in order to merge changes quickly without wasting
+      test resources on changes unlikely to merge.

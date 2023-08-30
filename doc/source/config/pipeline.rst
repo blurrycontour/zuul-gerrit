@@ -407,12 +407,13 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       :default: 20
 
       Dependent pipeline managers only. Zuul can rate limit dependent
-      pipelines in a manner similar to TCP flow control.  Jobs are
-      only started for items in the queue if they are within the
-      actionable window for the pipeline. The initial length of this
-      window is configurable with this value. The value given should
-      be a positive integer value. A value of ``0`` disables rate
-      limiting on the :value:`dependent pipeline manager
+      pipelines in a manner similar to TCP flow control.  See
+      :ref:`pipeline_window` for an overview.  Jobs are only started
+      for items in the queue if they are within the active window for
+      the pipeline. The initial length of this window is configurable
+      with this value. The value given should be a positive integer
+      value. A value of ``0`` disables rate limiting on the
+      :value:`dependent pipeline manager
       <pipeline.manager.dependent>`.
 
    .. attr:: window-floor
