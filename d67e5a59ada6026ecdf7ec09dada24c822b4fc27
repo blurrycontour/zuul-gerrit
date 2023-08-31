@@ -16,6 +16,24 @@
       "message": "This used to be log.exception, up until we added a retry loop.  On a simple connection error while waiting for a db to startup, we might spam the logs quite a bit with this.\n\nWe need something here to mitigate that.  Two ideas: We could either detect a connection error specifically and log the line at error level in that case and exception in all other cases.  Or we could log the first intance at exception level, and then each subsequent instance of the same error at error level.",
       "revId": "d67e5a59ada6026ecdf7ec09dada24c822b4fc27",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05b30dba_29f4bf8e",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-08-31T20:28:42Z",
+      "side": 1,
+      "message": "Third option: maybe just serializing the error text gets the additional information?  So if we continue to log at error level, but include a str(exception) in the log line, would that provide the additional info?",
+      "parentUuid": "b970438c_9139ee72",
+      "revId": "d67e5a59ada6026ecdf7ec09dada24c822b4fc27",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
