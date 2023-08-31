@@ -1,5 +1,7 @@
 ansible
-sphinx>=1.8
+# 7.2.5 has this issue:
+# https://github.com/sphinx-doc/sphinx/issues/11662
+sphinx>=1.8,!=7.2.5
 sphinxcontrib-blockdiag>=1.1.0
 sphinxcontrib-programoutput
 sphinx-autodoc-typehints
