@@ -50,6 +50,40 @@
       "message": "recheck",
       "revId": "73a04315f10f630a7d4fe536cf97beccd203a19c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68d08ff8_b784f720",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-09-01T15:12:05Z",
+      "side": 1,
+      "message": "It seems like this attribute is used by child object implementations, so I think it would be easier to follow if the attribute was named `health` without using the @property annotation.",
+      "revId": "73a04315f10f630a7d4fe536cf97beccd203a19c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53dda201_e80bf679",
+        "filename": "zuul/driver/git/gitwatcher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-09-01T15:12:05Z",
+      "side": 1,
+      "message": "I am not entirely sure of the implication here, but shouldn\u0027t we raise the exception here to keep the existing logic? Otherwise we might process an incomplete tenant config.",
+      "revId": "73a04315f10f630a7d4fe536cf97beccd203a19c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
