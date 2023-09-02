@@ -39,7 +39,7 @@ from zuul.zk.executor import ExecutorApi
 from zuul.zk.job_request_queue import JobRequestEvent
 from zuul.zk.merger import MergerApi
 from zuul.zk.layout import LayoutStateStore, LayoutState
-from zuul.zk.locks import locked
+from zuul.zk.locks import locked, SessionAwareLock
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.sharding import (
     RawShardIO,
@@ -59,6 +59,7 @@ from zuul.zk.zkobject import (
 )
 from zuul.zk.locks import tenant_write_lock
 
+import kazoo
 from kazoo.exceptions import ZookeeperError, OperationTimeoutError, NoNodeError
 
 
@@ -1284,6 +1285,62 @@ class TestLocks(ZooKeeperBaseTestCase):
                 self.assertTrue(lock.is_acquired)
                 raise RuntimeError
         self.assertFalse(lock.is_acquired)
+
+    def test_lock_cleanup(self):
+        # This tests the overridden _best_effort_cleanup method.
+
+        # The goal of that method is to ensure that locks are cleaned
+        # up even if a connection loss occurs during the cleanup
+        # method.
+
+        # The following scenario with three actors (A, B, C) can cause
+        # this, so this is what we test:
+
+        # A: successfully acquire lock
+        # B: try to acquire lock
+        # B: already locked by A, lock not acquired
+        # B: connection failure in best_effort_cleanup
+        # A: release lock
+        # C: acquire lock (no one should have it)
+
+        # Without our patch, B will fail to clean up its lock
+        # contender node and C will see the lock as owned by B.  With
+        # our patch, B succeeds in cleaning up and C is able to lock.
+
+        # A acquires lock
+        a = SessionAwareLock(self.zk_client.client, "/lock")
+        a_locked = a.acquire()
+        self.assertTrue(a_locked)
+
+        # We mock the _delete_node method so we can cause a failure on
+        # the first attempt and succeed on the retry.
+        orig = kazoo.recipe.lock.Lock._delete_node
+        fail_delete = True
+
+        def mock_delete(self, node):
+            nonlocal fail_delete
+            if fail_delete:
+                # Fail the first time, succeed thereafter
+                fail_delete = False
+                raise kazoo.exceptions.ConnectionLoss()
+            orig(self, node)
+
+        # B attempts and fails to acquire the lock
+        b = SessionAwareLock(self.zk_client.client, "/lock")
+        with mock.patch("kazoo.recipe.lock.Lock._delete_node",
+                        autospec=True) as mymock:
+            mymock.side_effect = mock_delete
+            b_locked = b.acquire(blocking=False)
+        self.assertFalse(b_locked)
+
+        # A releases the lock, so there should be no holders or
+        # contenders now.
+        a.release()
+
+        # C should acquire the lock succesfully.
+        c = SessionAwareLock(self.zk_client.client, "/lock")
+        c_locked = c.acquire(timeout=5)
+        self.assertTrue(c_locked)
 
 
 class TestLayoutStore(ZooKeeperBaseTestCase):

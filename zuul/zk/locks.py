@@ -60,6 +60,21 @@ class SessionAwareMixin:
             return True
         return not self._zuul_session_expired
 
+    def _best_effort_cleanup(self):
+        # The kazoo recipe best effort cleanup can leave a lock file
+        # in place if a connection loss happens in the delete call.
+        # This will deadlock the lock until the session is terminated
+        # and the ephemeral node is removed.  To avoid this, we will
+        # retry the cleanup in the usual manner.
+        return self.client.retry(self._best_effort_cleanup_inner)
+
+    def _best_effort_cleanup_inner(self):
+        # This mimics the superclass _best_effort_cleanup without the
+        # catch-all exception handler.
+        node = self.node or self._find_node()
+        if node:
+            self._delete_node(node)
+
 
 class SessionAwareLock(SessionAwareMixin, Lock):
     pass
