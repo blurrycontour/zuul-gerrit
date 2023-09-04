@@ -43,11 +43,15 @@ class ExecutorQueue(JobRequestQueue):
     def lostRequests(self):
         # Get a list of requests which are running but not locked by
         # any client.
-        yield from filter(
-            lambda b: not self.isLocked(b),
-            self.inState(self.request_class.RUNNING,
-                         self.request_class.PAUSED),
-        )
+        for request in self.inState(self.request_class.RUNNING,
+                                    self.request_class.PAUSED):
+            try:
+                if self.isLocked(request):
+                    continue
+                yield request
+            except NoNodeError:
+                # Request disappeared
+                pass
 
 
 class ExecutorApi:
