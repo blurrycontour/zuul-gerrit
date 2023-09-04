@@ -5234,6 +5234,50 @@ class TestValidateWarnings(ZuulTestCase):
         pass
 
 
+class TestValidateWarningsAcceptable(ZuulTestCase):
+    # Test we don't fail new configs when warnings exist
+
+    @simple_layout('layouts/pcre-deprecation.yaml')
+    def test_validate_warning_new_config(self):
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 3)
+        # Make note of the warnings in our config.
+        for error in errors:
+            self.assertEqual(error.severity, SEVERITY_WARNING)
+
+        self.executor_server.hold_jobs_in_build = True
+        conf = textwrap.dedent(
+            """
+            - job:
+                name: new-job
+
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - new-job
+            """)
+
+        file_dict = {'.zuul.yaml': conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # check-job and new-job
+        self.assertEqual(len(self.builds), 2)
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+            # New job runs despite warnings existing in the config.
+            dict(name='new-job', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+
 class TestPCREDeprecation(ZuulTestCase):
     @simple_layout('layouts/pcre-deprecation.yaml')
     def test_pcre_deprecation(self):
