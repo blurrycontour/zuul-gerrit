@@ -5220,8 +5220,9 @@ class TestValidateGood(ZuulTestCase):
 class TestValidateWarnings(ZuulTestCase):
     # Test we don't fail when we only have configuration warnings
 
+    # Note, we use a simple_layout below which defines tenant-one,
+    # unlike the test class above.
     validate_tenants = ['tenant-one']
-    tenant_config_file = 'config/broken/main.yaml'
 
     def setUp(self):
         with self.assertLogs('zuul.ConfigLoader', level='DEBUG') as full_logs:
