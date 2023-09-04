@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4833f01_1b28b413",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-04T23:20:20Z",
+      "side": 1,
+      "message": "With your (offline) help, I was able to identify the underlying cause and have started a new change to address that: https://review.opendev.org/893592\n\nI looked into the code you mentioned where we dequeue without clearing the bundle.  It would be nice to clear the bundle at that point, however, processing still occurs after removing it from the queue.  If we clear the bundle at that point, the reporters won\u0027t have all the information they need to report correctly (specifically, we will lose some of the \"This change is part of a bundle that failed\" messages).  We could cache that on another attribute, or try to reorder the operations.  However, I don\u0027t think it\u0027s actually a problem in practice, so I think we can leave it as-is.\n\nMoreover, if we now merge this change, if it does become a problem, we will have some protection.\n\nI\u0027m much more comfortable merging this change now once the underlying issue is resolved.  It does what the code was originally intended to do (not crash) in the unlikely event that we somehow get into this situation.\n\nI am somewhat inclined to switch the log severity to error, however, since we know at this point it should never happen.",
+      "parentUuid": "9d7e3aee_a159080e",
+      "revId": "ef2b32ab17b7f2a95f6f9d8d93f9a2bba323f010",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8aa73b3_c527489b",
