@@ -2185,7 +2185,7 @@ class PipelineManager(metaclass=ABCMeta):
             action = 'no-jobs'
             actions = self.pipeline.no_jobs_actions
             item.setReportedResult('NO_JOBS')
-        elif item.getConfigErrors():
+        elif item.getConfigErrors(warnings=False):
             log.debug("Invalid config for change %s", item.change)
             action = 'config-error'
             actions = self.pipeline.config_error_actions
