@@ -148,6 +148,10 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         action = action or self._action
         ret = self._getFormatter(action)(item, with_jobs)
 
+        config_warnings = item.getConfigErrors(errors=False, warnings=True)
+        if config_warnings:
+            ret += '\nWarning:\n  ' + config_warnings[0].error + '\n'
+
         if item.current_build_set.warning_messages:
             warning = '\n  '.join(item.current_build_set.warning_messages)
             ret += '\nWarning:\n  ' + warning + '\n'
@@ -210,7 +214,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
                 msg, self._formatItemReportOtherBundleItems(item))
         elif item.didMergerFail():
             msg = item.pipeline.merge_conflict_message
-        elif item.getConfigErrors(errors=True, warnings=False):
+        elif item.current_build_set.has_blocking_errors:
             msg = str(item.getConfigErrors(
                 errors=True, warnings=False)[0].error)
         else:

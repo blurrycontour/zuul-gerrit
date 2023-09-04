@@ -347,7 +347,7 @@ class PipelineManager(metaclass=ABCMeta):
     def reportNormalBuildsetEnd(self, build_set, action, final, result=None):
         # Report a buildset end if there are jobs or errors
         if ((build_set.job_graph and len(build_set.job_graph.jobs) > 0) or
-            build_set.config_errors or
+            build_set.has_blocking_errors or
             build_set.unable_to_merge):
             self.sql.reportBuildsetEnd(build_set, action,
                                        final, result)
@@ -504,7 +504,7 @@ class PipelineManager(metaclass=ABCMeta):
                 # Similarly, reset the item state.
                 if item.current_build_set.unable_to_merge:
                     item.setUnableToMerge()
-                if item.current_build_set.config_errors:
+                if item.current_build_set.has_blocking_errors:
                     item.setConfigErrors(item.getConfigErrors())
                 if item.dequeued_needing_change:
                     item.setDequeuedNeedingChange(item.dequeued_needing_change)
@@ -1459,7 +1459,7 @@ class PipelineManager(metaclass=ABCMeta):
         # Next, if a change ahead has a broken config, then so does
         # this one.  Record that and don't do anything else.
         if (item.item_ahead and item.item_ahead.current_build_set and
-            item.item_ahead.current_build_set.config_errors):
+            item.item_ahead.current_build_set.has_blocking_errors):
             msg = "This change depends on a change "\
                   "with an invalid configuration.\n"
             item.setConfigError(msg)
@@ -1516,7 +1516,7 @@ class PipelineManager(metaclass=ABCMeta):
 
         # If the change can not be merged or has config errors, don't
         # run jobs.
-        if build_set.unable_to_merge or build_set.config_errors:
+        if build_set.unable_to_merge or build_set.has_blocking_errors:
             # Find our layout since the reporter will need it to
             # determine if the project is in the pipeline.
             self.getLayout(item)
@@ -1673,7 +1673,7 @@ class PipelineManager(metaclass=ABCMeta):
                                           reported_start=True)
                 if item.current_build_set.unable_to_merge:
                     failing_reasons.append("it has a merge conflict")
-                if item.current_build_set.config_errors:
+                if item.current_build_set.has_blocking_errors:
                     failing_reasons.append("it has an invalid configuration")
                 if ready and self.provisionNodes(item):
                     changed = True
@@ -2185,7 +2185,7 @@ class PipelineManager(metaclass=ABCMeta):
             action = 'no-jobs'
             actions = self.pipeline.no_jobs_actions
             item.setReportedResult('NO_JOBS')
-        elif item.getConfigErrors(warnings=False):
+        elif item.current_build_set.has_blocking_errors:
             log.debug("Invalid config for change %s", item.change)
             action = 'config-error'
             actions = self.pipeline.config_error_actions

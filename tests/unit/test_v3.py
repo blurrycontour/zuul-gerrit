@@ -5235,10 +5235,12 @@ class TestValidateWarnings(ZuulTestCase):
 
 
 class TestValidateWarningsAcceptable(ZuulTestCase):
-    # Test we don't fail new configs when warnings exist
+    # Test we don't fail new configs when warnings and errors exist
 
     @simple_layout('layouts/pcre-deprecation.yaml')
     def test_validate_warning_new_config(self):
+        # Test that we can add new valid configuration despite the
+        # existence of existing errors and warnings.
         tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
         errors = tenant.layout.loading_errors
         self.assertEqual(len(errors), 3)
@@ -5246,7 +5248,47 @@ class TestValidateWarningsAcceptable(ZuulTestCase):
         for error in errors:
             self.assertEqual(error.severity, SEVERITY_WARNING)
 
-        self.executor_server.hold_jobs_in_build = True
+        # Put an error on a different branch.  This ensures that we
+        # will always have configuration errors, but they are not
+        # relevant, so should not affect further changes.
+        self.create_branch('org/project', 'stable/queens')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable/queens'))
+        self.waitUntilSettled()
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - nonexistent-job
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'stable/queens', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # Put an existing warning on this branch.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: broken-job
+                branches: ^(?!invalid).*$
+            """)
+
+        file_dict = {'zuul.d/broken.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        B.setMerged()
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # Make sure we can add a new job with an existing error on
+        # another branch and warning on this one.
         conf = textwrap.dedent(
             """
             - job:
@@ -5256,13 +5298,77 @@ class TestValidateWarningsAcceptable(ZuulTestCase):
                 name: org/project
                 check:
                   jobs:
+                    - check-job
                     - new-job
             """)
 
-        file_dict = {'.zuul.yaml': conf}
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+        file_dict = {'zuul.d/new.yaml': conf}
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C',
                                            files=file_dict)
-        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='3,1'),
+            # New job runs despite warnings existing in the config.
+            dict(name='new-job', result='SUCCESS', changes='3,1'),
+        ], ordered=False)
+
+    @simple_layout('layouts/pcre-deprecation.yaml')
+    def test_validate_new_warning(self):
+        # Test that we can add new deprecated configuration.
+
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 3)
+        # Make note of the warnings in our config.
+        for error in errors:
+            self.assertEqual(error.severity, SEVERITY_WARNING)
+
+        # Put an error on a different branch.  This ensures that we
+        # will always have configuration errors, but they are not
+        # relevant, so should not affect further changes.
+        self.create_branch('org/project', 'stable/queens')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable/queens'))
+        self.waitUntilSettled()
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - nonexistent-job
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'stable/queens', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # Add a new configuration warning.
+        self.executor_server.hold_jobs_in_build = True
+        conf = textwrap.dedent(
+            """
+            - job:
+                name: new-job
+                branches: ^(?!invalid).*$
+
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - check-job
+                    - new-job
+            """)
+
+        file_dict = {'zuul.yaml': conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
         # check-job and new-job
@@ -5271,10 +5377,11 @@ class TestValidateWarningsAcceptable(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
+        self.assertIn('encountered a deprecated syntax', B.messages[-1])
         self.assertHistory([
-            dict(name='check-job', result='SUCCESS', changes='1,1'),
+            dict(name='check-job', result='SUCCESS', changes='2,1'),
             # New job runs despite warnings existing in the config.
-            dict(name='new-job', result='SUCCESS', changes='1,1'),
+            dict(name='new-job', result='SUCCESS', changes='2,1'),
         ], ordered=False)
 
 

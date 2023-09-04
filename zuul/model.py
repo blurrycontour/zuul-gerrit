@@ -4353,6 +4353,14 @@ class BuildSet(zkobject.ZKObject):
                                         _path=path)
         self.config_errors = el
 
+    @property
+    def has_blocking_errors(self):
+        if not self.config_errors:
+            return False
+        errs = filter_severity(self.config_errors.errors,
+                               errors=True, warnings=False)
+        return bool(errs)
+
     def setMergeRepoState(self, repo_state):
         if self.merge_repo_state is not None:
             raise Exception("Merge repo state can not be updated")
@@ -5179,7 +5187,7 @@ class QueueItem(zkobject.ZKObject):
         return True
 
     def areAllJobsComplete(self):
-        if (self.current_build_set.config_errors or
+        if (self.current_build_set.has_blocking_errors or
             self.current_build_set.unable_to_merge):
             return True
         if not self.hasJobGraph():
