@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a94229e_0fac91bf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-04T21:30:52Z",
+      "side": 1,
+      "message": "Yes, this is adding a property on the python classes that is derivative of the data in zookeeper. This should be fine but I\u0027ll hold off approving so that corvus can confirm.",
+      "revId": "267f6755333ad6eb59351ad51522d4db2c1a9c02",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
