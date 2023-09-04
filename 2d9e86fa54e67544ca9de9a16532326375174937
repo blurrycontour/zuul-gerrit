@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08231c0c_997c971b",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6284,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-04T23:21:41Z",
+      "side": 1,
+      "message": "I think we should set this to error level since it should never happen.",
+      "revId": "2d9e86fa54e67544ca9de9a16532326375174937",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34b3ecaa_f78157f9",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6291,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-04T23:21:41Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "2d9e86fa54e67544ca9de9a16532326375174937",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
