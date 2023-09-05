@@ -4015,15 +4015,15 @@ class ChrootedKazooFixture(fixtures.Fixture):
 
         if 'ZOOKEEPER_2181_TCP' in os.environ:
             # prevent any nasty hobbits^H^H^H suprises
-            if 'NODEPOOL_ZK_HOST' in os.environ:
+            if 'ZUUL_ZK_HOST' in os.environ:
                 raise Exception(
                     'Looks like tox-docker is being used but you have also '
-                    'configured NODEPOOL_ZK_HOST. Either avoid using the '
-                    'docker environment or unset NODEPOOL_ZK_HOST.')
+                    'configured ZUUL_ZK_HOST. Either avoid using the '
+                    'docker environment or unset ZUUL_ZK_HOST.')
 
-            zk_host = 'localhost:' + os.environ['ZOOKEEPER_2181_TCP']
-        elif 'NODEPOOL_ZK_HOST' in os.environ:
-            zk_host = os.environ['NODEPOOL_ZK_HOST']
+            zk_host = 'localhost:' + os.environ['ZUUL_2181_TCP']
+        elif 'ZUUL_ZK_HOST' in os.environ:
+            zk_host = os.environ['ZUUL_ZK_HOST']
         else:
             zk_host = 'localhost'
 
