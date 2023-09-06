@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e5a98a3_0eace518",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1630,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-06T09:57:52Z",
+      "side": 1,
+      "message": "Isn\u0027t this doing a lot of the same things that we already do in `getMissingNeededChanges()`? Maybe we could pass a dict to the above call in line 1625 for the `dependency_graph` argument and re-use that afterwards to detect if the bundle has changed.",
+      "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
