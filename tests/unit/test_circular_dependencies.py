@@ -1739,10 +1739,12 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self._test_job_deduplication()
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/02/2/1'),
             dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is not deduplicated
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/01/1/1'),
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 4)
 
@@ -1763,10 +1765,12 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self._test_job_deduplication()
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/02/2/1'),
             dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is not deduplicated, though it would be under auto
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/01/1/1'),
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 4)
 
@@ -1783,6 +1787,96 @@ class TestGerritCircularDependencies(ZuulTestCase):
             # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 0)
+
+    @simple_layout('layouts/job-dedup-child-jobs.yaml')
+    def test_job_deduplication_child_jobs(self):
+        # Test that child jobs of deduplicated parents are
+        # deduplicated, and also that supplying child_jobs to
+        # zuul_return filters correctly.  child1-job should not run,
+        # but child2 should run and be deduplicated.  This uses auto
+        # deduplication.
+        self.executor_server.returnData(
+            'common-job', 'refs/changes/02/2/1',
+            {'zuul': {'child_jobs': ['child2-job']}}
+        )
+        self.executor_server.returnData(
+            'common-job', 'refs/changes/01/1/1',
+            {'zuul': {'child_jobs': ['child2-job']}}
+        )
+
+        self._test_job_deduplication()
+        self.assertHistory([
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="child2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            # dict(name="child2-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+
+    @simple_layout('layouts/job-dedup-mismatched-child-jobs.yaml')
+    def test_job_deduplication_mismatched_child_jobs(self):
+        # Test that a parent job with different child jobs is
+        # deduplicated.  This uses auto-deduplication.
+        self._test_job_deduplication()
+        self.assertHistory([
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="child1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="child2-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+
+    @simple_layout('layouts/job-dedup-child-of-diff-parent.yaml')
+    def test_job_deduplication_child_of_diff_parent(self):
+        # This will never happen in practice, but it's theoretically
+        # possible, so we have a test to codify and exercise the
+        # behavior.
+
+        # The common job is forced to not deduplicate, but since there
+        # is no return data, the inputs to child-job are identical, so
+        # child-job is deduplicated.  In practice, there will always
+        # be different return data so this is unlikely to happen.
+
+        # The child job uses auto deduplication.
+        self._test_job_deduplication()
+        self.assertHistory([
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/02/2/1'),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/01/1/1'),
+            dict(name="child-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+
+    @simple_layout('layouts/job-dedup-child-of-diff-parent.yaml')
+    def test_job_deduplication_child_of_diff_parent_diff_data(self):
+        # This is the more realistic test of the above, where we
+        # return different data from the non-deduplicated parent job,
+        # which causes the child job not to be deduplicated.
+
+        # The child job uses auto deduplication.
+        self.executor_server.returnData(
+            'common-job', 'refs/changes/02/2/1',
+            {'foo': 'a'}
+        )
+        self.executor_server.returnData(
+            'common-job', 'refs/changes/01/1/1',
+            {'foo': 'b'}
+        )
+        self._test_job_deduplication()
+        self.assertHistory([
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/02/2/1'),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/01/1/1'),
+            dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/02/2/1'),
+            dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/01/1/1'),
+        ], ordered=False)
 
     @simple_layout('layouts/job-dedup-auto-shared.yaml')
     def test_job_deduplication_failed_node_request(self):
@@ -2062,7 +2156,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         )
 
         self.executor_server.returnData(
-            'parent-job', A,
+            'parent-job', B,
             {'zuul': {'pause': True}}
         )
 

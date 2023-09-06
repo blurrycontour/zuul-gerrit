@@ -8699,7 +8699,7 @@ class TestProvidesRequiresBuildset(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = True
         event = self.fake_gerrit.addFakeTag('org/project1', 'master', 'foo')
         self.executor_server.returnData(
-            'image-builder', event,
+            'image-builder', 'refs/tags/foo',
             {'zuul':
              {'artifacts': [
                  {'name': 'image',

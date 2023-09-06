@@ -5507,6 +5507,30 @@ class QueueItem(zkobject.ZKObject):
         If another item in the bundle has a duplicate job,
         return the other item
         """
+        # A note on some of the checks below:
+        #
+        # A possible difference between jobs could be the dependent
+        # job tree under this one.  Because that is passed to the job
+        # as zuul.child_jobs, that could be a different input to the
+        # job, and therefore produce a different output.  However, a
+        # very common pattern is to build a common artifact in a
+        # parent job and then do something different with it in a
+        # child job.  The utility of automatic deduplication in that
+        # case is very compelling, so we do not check child_jobs when
+        # deduplicating.  Users can set deduplicate:false if that
+        # behavior is important.
+        #
+        # Theoretically, it would be okay to deduplicate a job with
+        # different parents as long as the inputs are the same.  But
+        # that won't happen because the job's dependencies are checked
+        # in isEqual.  Similarly, it would be okay to deduplicate the
+        # same job with a deduplicated parent as long as the returned
+        # data are the same.  However, in practice, that will never be
+        # the case since all Zuul jobs return artifacts (the
+        # manifest), and those will be different.  No special handling
+        # is done here, that is a natural consequence of parent_data
+        # being different.
+
         if not self.bundle:
             return None
         if job.deduplicate is False:
