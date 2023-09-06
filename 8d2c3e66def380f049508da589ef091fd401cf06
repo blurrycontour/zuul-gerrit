@@ -16,6 +16,24 @@
       "message": "Isn\u0027t this doing a lot of the same things that we already do in `getMissingNeededChanges()`? Maybe we could pass a dict to the above call in line 1625 for the `dependency_graph` argument and re-use that afterwards to detect if the bundle has changed.",
       "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c4a0f05_e4bee9a6",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1630,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-06T13:40:13Z",
+      "side": 1,
+      "message": "Yes, and I originally started writing it that way, but getMessingNeededChanges short circuits if a change is merged, so the logic is different.  Additionally, it\u0027s very verbose.  So we\u0027d need to call it twice anyway for the logic change, and half the calls in it would need to be wrapped by a conditional saying which mode to run it in.\n\nI\u0027m open to suggestions though if someone sees a way through that.  It would be my preference as well.",
+      "parentUuid": "3e5a98a3_0eace518",
+      "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
