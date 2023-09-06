@@ -3259,7 +3259,7 @@ class FakeBuild(object):
 
     def writeReturnData(self):
         changes = self.executor_server.return_data.get(self.name, {})
-        data = changes.get(self.change)
+        data = changes.get(self.parameters['zuul']['ref'])
         if data is None:
             return
         with open(self.jobdir.result_data_file, 'w') as f:
@@ -3649,9 +3649,13 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
         # return data. We currently rely on the hack that None is used as a
         # key for the changes dict, but we should improve that to look up
         # refnames or similar.
+        # (Partially addressed -- a ref string can now be passed to
+        # this method.)
         changes = self.return_data.setdefault(name, {})
         if hasattr(change, 'number'):
-            cid = ' '.join((str(change.number), str(change.latest_patchset)))
+            cid = change.data['currentPatchSet']['ref']
+        elif isinstance(change, str):
+            cid = change
         else:
             # Not actually a change, but a ref update event for tags/etc
             # In this case a key of None is used by writeReturnData
