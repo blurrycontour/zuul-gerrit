@@ -1090,6 +1090,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 'projects/%s/HEAD' % (
                     urllib.parse.quote(project.name, safe=''),
                 ))
+            if head.startswith('refs/heads/'):
+                head = head[len('refs/heads/'):]
         except Exception:
             self.log.exception("Unable to get HEAD")
         return head

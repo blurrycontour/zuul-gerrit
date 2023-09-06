@@ -1224,7 +1224,7 @@ class GerritWebServer(object):
                 project = urllib.parse.unquote(project)
                 head = fake_gerrit._fake_project_default_branch.get(
                     project, 'master')
-                self.send_data(head)
+                self.send_data('refs/heads/'+head)
                 self.end_headers()
 
             def send_data(self, data):
