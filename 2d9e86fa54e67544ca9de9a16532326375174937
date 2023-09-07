@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90279a9b_7caad8fe",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6284,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-09-07T13:43:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08231c0c_997c971b",
+      "revId": "2d9e86fa54e67544ca9de9a16532326375174937",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34b3ecaa_f78157f9",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-04T23:21:41Z",
       "side": 1,
       "message": "Ditto.",
+      "revId": "2d9e86fa54e67544ca9de9a16532326375174937",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b451acc7_0fb218b7",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6291,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-09-07T13:43:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34b3ecaa_f78157f9",
       "revId": "2d9e86fa54e67544ca9de9a16532326375174937",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
