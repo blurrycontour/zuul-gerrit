@@ -5481,7 +5481,13 @@ class QueueItem(zkobject.ZKObject):
         Find other bundles in the pipeline that are equivalent to ours.
         """
         if not self.bundle:
-            return None
+            return []
+
+        if len([i for i in self.bundle.items if i.live]) > 1:
+            # We are in a queue that has multiple live items, so we
+            # will only check our own bundle.
+            return [self.bundle]
+
         ret = []
         for item in self.queue.pipeline.getAllItems():
             if not item.live:
@@ -5644,13 +5650,7 @@ class QueueItem(zkobject.ZKObject):
 
         build_set = self.current_build_set
         job_graph = build_set.job_graph
-        if self.bundle and len([i for i in self.bundle.items if i.live]) > 1:
-            # We are in a queue that has multiple live items, so we
-            # will only check our own bundle.
-            other_bundles = [self.bundle]
-        else:
-            # Look for identical bundles elsewhere in the pipeline
-            other_bundles = self.findDuplicateBundles()
+        other_bundles = self.findDuplicateBundles()
         for job in job_graph.getJobs():
             this_request = build_set.getJobNodeRequestID(job.name)
             this_nodeset = build_set.getJobNodeSetInfo(job.name)
