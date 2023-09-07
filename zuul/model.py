@@ -5673,6 +5673,13 @@ class QueueItem(zkobject.ZKObject):
                 self.addBuild(other_build)
                 job._set(_ready_to_run=False)
 
+                # Log for debugging the issue that build is dedeuplicated but
+                # node request is not deduplicated
+                # At this point, we would expect "this_request" is a dict
+                # with key "deduplicated_item", and other_request is not None
+                log.debug("this_request: %s, other_request: %s",
+                          this_request, other_request)
+
     def findJobsToRun(self, semaphore_handler):
         torun = []
         if not self.live:
