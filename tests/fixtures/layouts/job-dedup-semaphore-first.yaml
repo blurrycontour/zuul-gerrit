@@ -6,6 +6,19 @@
     name: test-semaphore
 
 - pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+    failure:
+      gerrit:
+        Verified: -1
+
+- pipeline:
     name: gate
     manager: dependent
     success-message: Build succeeded (gate).
@@ -57,6 +70,10 @@
 - project:
     name: org/project1
     queue: integrated
+    check:
+      jobs:
+        - common-job
+        - project1-job
     gate:
       jobs:
         - common-job
@@ -65,6 +82,10 @@
 - project:
     name: org/project2
     queue: integrated
+    check:
+      jobs:
+        - common-job
+        - project2-job
     gate:
       jobs:
         - common-job
