@@ -33,6 +33,24 @@
       "message": "One thing that isn\u0027t clear to me is if you set the gerrit config is the tenant config necessary and vice versa. I don\u0027t think the release note is the best place to describe that, but the docs are also separated for each of the config options. Might be worth figuring out?",
       "revId": "39fa2e75e9b2920f4e98b167c17511cac1131cbe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74ffd08c_7aef1c02",
+        "filename": "releasenotes/notes/max-dependencies-7e50194dbe23aaaf.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-07T17:24:21Z",
+      "side": 1,
+      "message": "They are separate; I can add a xref to each mentioning that it is independent of the other to help clarify that.\n\nSince Gerrit needs to be system-wide due to (at least) the topic dependency support, it has to have its own setting (though I suppose we could go with the max of all tenants).  But I could see someone setting the gerrit limit to like 100 and then limiting tenants to 50 or something.",
+      "parentUuid": "51b698d4_4eb11735",
+      "revId": "39fa2e75e9b2920f4e98b167c17511cac1131cbe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
