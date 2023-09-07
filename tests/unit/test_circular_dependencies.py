@@ -2706,6 +2706,58 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="check-job", result="SUCCESS", changes="2,1 1,1 3,1"),
         ], ordered=False)
 
+    def test_dependency_refresh_config_error(self):
+        # Test that when two changes are put into a cycle, the
+        # dependencies are refreshed and items already in pipelines
+        # are updated.
+        self.executor_server.hold_jobs_in_build = True
+
+        # This simulates the typical workflow where a developer only
+        # knows the change id of changes one at a time.
+        # The first change:
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Now that it has been uploaded, upload the second change and
+        # point it at the first.
+        # B -> A
+        B = self.fake_gerrit.addFakeChange("org/project", "master", "B")
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Enforce a broken project pipeline config. The project stanza
+        # for org/project references an non-existing project-template
+        # which triggers the corner case we are looking for in this test.
+        self.commitConfigUpdate(
+            'common-config',
+            'config/circular-dependencies/zuul-reconfiguration-broken.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        # Now that the second change is known, update the first change
+        # B <-> A
+        A.addPatchset()
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # Since the tenant configuration got broken, zuul won't attempt to
+        # re-enqueue those changes.
+        self.assertHistory([
+            dict(name="project-job", result="ABORTED", changes="1,1"),
+            dict(name="project-job", result="ABORTED", changes="1,1 2,1"),
+        ], ordered=False)
+
 
 class TestGithubCircularDependencies(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
