@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0eac414_e0d4ad96",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5489,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-08T09:36:58Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we rather return an empty list here? I wouldn\u0027t consider the current bundle to be a duplicate and this method now behaves differently depending on the pipeline type (in dependent pipelines it\u0027s a list with only the current bundle and in independent pipelines it is a list of other bundles **excluding** the current bundle).\n\nThe other option might be to rename this method and always return also the current bundle.",
+      "revId": "742669ab09399e39c2563bda80317d53724cf7ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
