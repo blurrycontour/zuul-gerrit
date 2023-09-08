@@ -34,6 +34,57 @@
       "parentUuid": "3e5a98a3_0eace518",
       "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b56c13df_1b87d17c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1638,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-08T13:37:25Z",
+      "side": 1,
+      "message": "Should we maybe log what exactly has changed?",
+      "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b480519c_4f41a813",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1642,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-08T13:37:25Z",
+      "side": 1,
+      "message": "Can the bundle here be `None`? Just wondering if it would also make sense to wrap the whole block from line 1631-1649 in a `if item.bundle:`.",
+      "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62dcb381_512183f9",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4921,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-08T13:37:25Z",
+      "side": 1,
+      "message": "nit: was this meant to be a property? Otherwise we might want to camel-case that method name.",
+      "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
