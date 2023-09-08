@@ -16,6 +16,24 @@
       "message": "Shouldn\u0027t we rather return an empty list here? I wouldn\u0027t consider the current bundle to be a duplicate and this method now behaves differently depending on the pipeline type (in dependent pipelines it\u0027s a list with only the current bundle and in independent pipelines it is a list of other bundles **excluding** the current bundle).\n\nThe other option might be to rename this method and always return also the current bundle.",
       "revId": "742669ab09399e39c2563bda80317d53724cf7ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fea6dd8_1612ffc5",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5489,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-08T14:52:08Z",
+      "side": 1,
+      "message": "The intention is to replace lines 5647--5653 which always need this.  Since we\u0027re using this in more places, all the call sites would need those lines as well, so I moved it into the method.\n\nI agree the name is slightly misleading, but I\u0027d rather keep it because it shows up when I search for duplicate.  There\u0027s a nice symmetry to findDuplicate(Job|Bundle).\n\nMaybe findIdenticalBundles and findIdenticalJobs would be better (depending on one\u0027s understanding of the identity property)?\n\nFor me though, it doesn\u0027t seem like much of an improvement.  We do have a comment explaining the weird behavior.",
+      "parentUuid": "d0eac414_e0d4ad96",
+      "revId": "742669ab09399e39c2563bda80317d53724cf7ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
