@@ -72,6 +72,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fa2c0862_5f9137b5",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1761,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-08T13:51:47Z",
+      "side": 1,
+      "message": "For items that are part of a bundle this will set `iten.items_behind` to an empty list: https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L1306-L1314\n\nAre we correctly canceling jobs in this case in the loop below?",
+      "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "62dcb381_512183f9",
         "filename": "zuul/model.py",
         "patchSetId": 2
