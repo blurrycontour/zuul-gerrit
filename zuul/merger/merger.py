@@ -102,13 +102,15 @@ class Repo(object):
         try:
             self._setup_known_hosts()
         except Exception:
-            log.exception("Unable to set up known_hosts for %s", remote)
+            log.exception("Unable to set up known_hosts for %s",
+                          redact_url(remote))
         try:
             self._ensure_cloned(zuul_event_id)
             self._git_set_remote_url(
                 git.Repo(self.local_path), self.remote_url)
         except Exception:
-            log.exception("Unable to initialize repo for %s", remote)
+            log.exception("Unable to initialize repo for %s",
+                          redact_url(remote))
 
     def __repr__(self):
         return "<Repo {} {}>".format(hex(id(self)), self.local_path)
