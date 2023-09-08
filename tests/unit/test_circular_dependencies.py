@@ -2998,6 +2998,64 @@ class TestGerritCircularDependencies(ZuulTestCase):
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 6)
 
+    @simple_layout('layouts/job-dedup-parent.yaml')
+    def test_job_deduplication_check_parent_data2(self):
+        # This is similar to the parent_data test, but it waits longer
+        # to add the second change so that the deduplication of both
+        # parent and child happen at the same time.  This verifies
+        # that when parent data is supplied to child jobs
+        # deduplication still works.
+
+        # This has no equivalent for dependent pipelines since it's
+        # not possible to delay enqueing the second change.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        self.executor_server.returnData(
+            'common-job', A,
+            {'zuul':
+             {'artifacts': [
+                 {'name': 'image',
+                  'url': 'http://example.com/image',
+                  'metadata': {
+                      'type': 'container_image'
+                  }},
+             ]}}
+        )
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.executor_server.release('common-job')
+        self.waitUntilSettled()
+        self.executor_server.release('child-job')
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/01/1/1'),
+            dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/01/1/1'),
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/01/1/1'),
+        ], ordered=False)
+        self._assert_job_deduplication_check()
+
     def _test_job_deduplication_check_semaphore(self):
         "Test semaphores with max=1 (mutex) and get resources first"
         self.executor_server.hold_jobs_in_build = True
