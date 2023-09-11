@@ -53,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30b7aa8d_e35aaa59",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1638,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-11T22:01:38Z",
+      "side": 1,
+      "message": "Good idea.  I\u0027ll have it log old and new bundle items..",
+      "parentUuid": "b56c13df_1b87d17c",
+      "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b480519c_4f41a813",
@@ -66,6 +84,24 @@
       "writtenOn": "2023-09-08T13:37:25Z",
       "side": 1,
       "message": "Can the bundle here be `None`? Just wondering if it would also make sense to wrap the whole block from line 1631-1649 in a `if item.bundle:`.",
+      "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a533df16_0aca169e",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1642,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-11T22:01:38Z",
+      "side": 1,
+      "message": "I doubt it, but I think this is the safest approach.  It could only happen if an item stops being part of a bundle (ie, all other items are removed from the bundle).  I\u0027m pretty sure that would leave us with item.bundle.items \u003d [], but this seems safe as it handles all possible cases, and the logic seems sound to me.\n\nHaving said that, I see the argument for simplicity for the other approach.  I\u0027ll make a followup change and we can see if we like it better.",
+      "parentUuid": "b480519c_4f41a813",
       "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -87,6 +123,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d365884_c67a5780",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1761,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-11T22:01:38Z",
+      "side": 1,
+      "message": "Nope.  Fixed.",
+      "parentUuid": "fa2c0862_5f9137b5",
+      "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "62dcb381_512183f9",
@@ -100,6 +154,24 @@
       "writtenOn": "2023-09-08T13:37:25Z",
       "side": 1,
       "message": "nit: was this meant to be a property? Otherwise we might want to camel-case that method name.",
+      "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35356496_5ff3ba9a",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4921,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-11T22:01:38Z",
+      "side": 1,
+      "message": "Indeed it was!",
+      "parentUuid": "62dcb381_512183f9",
       "revId": "8d2c3e66def380f049508da589ef091fd401cf06",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
