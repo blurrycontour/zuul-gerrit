@@ -31,11 +31,16 @@ Zuul implements the timer using `apscheduler`_, Please check the
       The time specification in cron syntax.  Only the 5 part syntax
       is supported, not the symbolic names.  Example: ``0 0 * * *``
       runs at midnight.
-      An optional 6th part specifies seconds.  The optional 7th part specifies
-      a jitter in seconds. This delays the trigger randomly, limited by
-      the specified value.  Example ``0 0 * * * * 60`` runs at
-      midnight or randomly up to 60 seconds later.  The jitter is
-      applied individually to each project-branch combination.
+
+      An optional 6th part specifies seconds.  The optional 7th part
+      specifies a jitter in seconds. This delays the trigger randomly,
+      limited by the specified value.  Example ``0 0 * * * * 60`` runs
+      at midnight or randomly up to 60 seconds later.  The jitter is
+      applied individually to each project-branch combination.  While
+      the jitter is initaliazed to a random value, the same value will
+      often be used for a given project-branch combination (in other
+      words, it is not guaranteed to vary from one run of the timer
+      trigger to the next).
 
    .. warning::
        Be aware the day-of-week value differs from from cron.
