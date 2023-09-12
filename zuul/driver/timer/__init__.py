@@ -1,6 +1,7 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013 OpenStack Foundation
 # Copyright 2016 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,20 +15,22 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import json
 import logging
 import threading
 import time
+import random
 from collections import defaultdict
 from uuid import uuid4
 
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.cron import CronTrigger
 from opentelemetry import trace
 
 from zuul.driver import Driver, TriggerInterface
 from zuul.driver.timer import timertrigger
 from zuul.driver.timer import timermodel
 from zuul.driver.timer.timermodel import TimerTriggerEvent
+from zuul.driver.timer.crontrigger import ZuulCronTrigger
 from zuul.lib.logutil import get_annotated_logger
 from zuul.zk.election import SessionAwareElection
 
@@ -118,22 +121,23 @@ class TimerDriver(Driver, TriggerInterface):
                                 timespec,
                                 pipeline.name))
                         continue
-                    minute, hour, dom, month, dow = parts[:5]
-                    # default values
-                    second = None
-                    jitter = None
-
-                    if len(parts) > 5:
-                        second = parts[5]
-                    if len(parts) > 6:
-                        jitter = parts[6]
-
                     try:
-                        jitter = int(jitter) if jitter is not None else None
-
-                        trigger = CronTrigger(day=dom, day_of_week=dow,
-                                              hour=hour, minute=minute,
-                                              second=second, jitter=jitter)
+                        cron_args = dict(
+                            minute=parts[0],
+                            hour=parts[2],
+                            day=parts[3],
+                            day_of_week=parts[4],
+                            second=None,
+                        )
+                        if len(parts) > 5:
+                            cron_args['second'] = parts[5]
+                        if len(parts) > 6:
+                            jitter = int(parts[6])
+                        else:
+                            jitter = None
+                        # Trigger any value errors by creating a
+                        # throwaway object.
+                        ZuulCronTrigger(jitter=jitter, **cron_args)
                     except ValueError:
                         self.log.exception(
                             "Unable to create CronTrigger "
@@ -143,12 +147,14 @@ class TimerDriver(Driver, TriggerInterface):
                             pipeline.name)
                         continue
 
-                    self._addJobsInner(tenant, pipeline, trigger, timespec,
+                    self._addJobsInner(tenant, pipeline,
+                                       cron_args, jitter, timespec,
                                        jobs)
         self._removeJobs(tenant, jobs)
         self.tenant_jobs[tenant.name] = jobs
 
-    def _addJobsInner(self, tenant, pipeline, trigger, timespec, jobs):
+    def _addJobsInner(self, tenant, pipeline, cron_args, jitter,
+                      timespec, jobs):
         # jobs is a dict of args->job that we mutate
         existing_jobs = self.tenant_jobs.get(tenant.name, {})
         for project_name, pcs in tenant.layout.project_configs.items():
@@ -164,9 +170,25 @@ class TimerDriver(Driver, TriggerInterface):
             try:
                 for branch in project.source.getProjectBranches(
                         project, tenant):
+                    prng_init = dict(
+                        tenant=tenant.name,
+                        project=project_name,
+                        branch=branch,
+                    )
+                    prng_seed = json.dumps(prng_init, sort_keys=True)
+                    prng = random.Random(prng_seed)
                     args = (tenant.name, pipeline.name, project_name,
                             branch, timespec,)
                     existing_job = existing_jobs.get(args)
+                    if jitter:
+                        # Resolve jitter here so that it is the same
+                        # on every scheduler for a given
+                        # project-branch, assuming the same
+                        # configuration.
+                        job_jitter = prng.uniform(0, jitter)
+                    else:
+                        job_jitter = None
+
                     if existing_job:
                         job = existing_job
                     else:
@@ -177,6 +199,8 @@ class TimerDriver(Driver, TriggerInterface):
                         # to e.g. high scheduler load. Those short
                         # delays are not a problem for our trigger
                         # use-case.
+                        trigger = ZuulCronTrigger(
+                            jitter=job_jitter, **cron_args)
                         job = self.apsched.add_job(
                             self._onTrigger, trigger=trigger,
                             args=args, misfire_grace_time=None)
