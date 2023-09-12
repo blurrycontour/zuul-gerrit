@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ddb3107_9a65493c",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 6289,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-09-12T12:24:22Z",
+      "side": 1,
+      "message": "Would the problem be that the parameter \"bundle\u003dbundle\" set here does not have an effect?\n Because it is set at the beginning of QueueItem.fromZK(), but the `bundle` is then  overwritten later by the dict of `bundle` in `ZKObject._load()` in the line:\n\n```self._set(**self.deserialize(data, context))```",
+      "revId": "310f87d852977a4794caea14161943bad89999e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
