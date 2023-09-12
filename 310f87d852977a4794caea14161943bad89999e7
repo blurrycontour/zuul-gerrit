@@ -16,6 +16,24 @@
       "message": "Would the problem be that the parameter \"bundle\u003dbundle\" set here does not have an effect?\n Because it is set at the beginning of QueueItem.fromZK(), but the `bundle` is then  overwritten later by the dict of `bundle` in `ZKObject._load()` in the line:\n\n```self._set(**self.deserialize(data, context))```",
       "revId": "310f87d852977a4794caea14161943bad89999e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b6df45d_1aa09c5c",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 6289,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-12T12:36:41Z",
+      "side": 1,
+      "message": "I think you are right. When we deserialize the bundle we are already in the process of resolving the objects at the `ChangeQueue` level.\n\nMaybe it\u0027s enough to just set the bundle after we\u0027ve created the `QueueItem` (`item._set(bundle\u003dbundle)`) but I\u0027m wondering if there could be other issues with e.g. unresolved items ahead/behind?",
+      "parentUuid": "0ddb3107_9a65493c",
+      "revId": "310f87d852977a4794caea14161943bad89999e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
