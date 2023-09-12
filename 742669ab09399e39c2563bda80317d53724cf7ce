@@ -52,6 +52,24 @@
       "parentUuid": "d0eac414_e0d4ad96",
       "revId": "742669ab09399e39c2563bda80317d53724cf7ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "867d4a50_23d7a267",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5489,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-12T11:56:49Z",
+      "side": 1,
+      "message": "Name of the method aside I\u0027m wondering if we could at least keep the behavior the same and return `self.bundle` with the list of other related bundles for non-dependent pipelines. In the changes to the manager\u0027s `_getItemsWithBuild()` we are currently explicitly adding our own builds, so that could even be removed. But maybe there would be problems in `findDuplicateJob()` due to that change.\n\nChanging my vote to a +2 since this is not a hill to die on.",
+      "parentUuid": "abcd9aac_004a6cf8",
+      "revId": "742669ab09399e39c2563bda80317d53724cf7ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
