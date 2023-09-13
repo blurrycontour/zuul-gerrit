@@ -2505,6 +2505,37 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(D.data["status"], "MERGED")
 
     @simple_layout('layouts/deps-by-topic.yaml')
+    def test_deps_by_topic_git_needs_outdated_patchset(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project1', "master", "B",
+                                           topic='other-topic')
+        C = self.fake_gerrit.addFakeChange('org/project2', "master", "C",
+                                           topic='other-topic')
+        D = self.fake_gerrit.addFakeChange('org/project2', "master", "D",
+                                           topic='test-topic')
+
+        B.addPatchset()
+        D.addPatchset()
+        # Git level dependency between A and B + C and D on outdated
+        # patchset.
+        A.setDependsOn(B, 1)
+        C.setDependsOn(D, 1)
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(2))
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(2))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name="check-job", result="SUCCESS",
+                 changes="4,2 4,1 3,1 2,2 2,1 1,1"),
+            dict(name="check-job", result="SUCCESS",
+                 changes="4,2 2,2 2,1 1,1 4,1 3,1"),
+        ], ordered=False)
+
+    @simple_layout('layouts/deps-by-topic.yaml')
     def test_deps_by_topic_new_patchset(self):
         # Make sure that we correctly update the change cache on new
         # patchsets.

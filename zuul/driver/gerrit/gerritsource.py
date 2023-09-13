@@ -145,12 +145,16 @@ class GerritSource(BaseSource):
                 changes.append(change)
         return changes
 
-    def getChangesByTopic(self, topic, changes=None):
+    def getChangesByTopic(self, topic, changes=None, history=None):
         if not topic:
             return []
 
         if changes is None:
             changes = {}
+
+        if history is None:
+            history = []
+        history.append(topic)
 
         query = 'status:open topic:%s' % topic
         results = self.connection.simpleQuery(query)
@@ -173,9 +177,9 @@ class GerritSource(BaseSource):
                 if change_key in changes:
                     continue
                 git_change = self.getChange(change_key)
-                if not git_change.topic or git_change.topic == topic:
+                if not git_change.topic or git_change.topic in history:
                     continue
-                self.getChangesByTopic(git_change.topic, changes)
+                self.getChangesByTopic(git_change.topic, changes, history)
         return list(changes.values())
 
     def getCachedChanges(self):
