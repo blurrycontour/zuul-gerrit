@@ -2969,7 +2969,8 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha}"),
-            dict(name="project-job", result="SUCCESS",
+            # TODO: changed for safety check
+            dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
             dict(name="project-job", result="SUCCESS",
                  changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
@@ -3016,10 +3017,14 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
 
         # Validate that the Github check-run is still in progress
         # and wasn't cancelled.
+
+        # TODO: we actually do cancel the check-run now due to the
+        # safety check in processOneItem.  In the future we should be
+        # able to avoid that.
         check_runs = self.fake_github.getCommitChecks("gh/project", A.head_sha)
         self.assertEqual(len(check_runs), 1)
         check_run = check_runs[0]
-        self.assertEqual(check_run["status"], "in_progress")
+        # self.assertEqual(check_run["status"], "in_progress")
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -3028,8 +3033,18 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.assertHistory([
             dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha}"),
-            dict(name="project-job", result="SUCCESS",
+            # TODO: changed for safety check
+            dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
             dict(name="project-job", result="SUCCESS",
                  changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
         ], ordered=False)
+        # TODO: We shouldn't need this in the future, but for now,
+        # verify that since we are issuing two check runs, they both
+        # complete.
+        check_runs = self.fake_github.getCommitChecks("gh/project", A.head_sha)
+        self.assertEqual(len(check_runs), 2)
+        check_run = check_runs[0]
+        self.assertEqual(check_run["status"], "completed")
+        check_run = check_runs[1]
+        self.assertEqual(check_run["status"], "completed")

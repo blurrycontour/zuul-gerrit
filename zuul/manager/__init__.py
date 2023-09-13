@@ -687,18 +687,21 @@ class PipelineManager(metaclass=ABCMeta):
         self.sql.reportBuildsetEnd(ci.current_build_set,
                                    'failure', final=True)
 
-    def cycleForChange(self, change, dependency_graph, event):
-        log = get_annotated_logger(self.log, event)
-        log.debug("Running Tarjan's algorithm on current dependencies: %s",
-                  dependency_graph)
+    def cycleForChange(self, change, dependency_graph, event, debug=True):
+        if debug:
+            log = get_annotated_logger(self.log, event)
+            log.debug("Running Tarjan's algorithm on current dependencies: %s",
+                      dependency_graph)
         sccs = [s for s in strongly_connected_components(dependency_graph)
                 if len(s) > 1]
-        log.debug("Strongly connected components (cyles): %s", sccs)
+        if debug:
+            log.debug("Strongly connected components (cyles): %s", sccs)
         for scc in sccs:
             if change in scc:
-                log.debug("Dependency cycle detected for "
-                          "change %s in project %s",
-                          change, change.project)
+                if debug:
+                    log.debug("Dependency cycle detected for "
+                              "change %s in project %s",
+                              change, change.project)
                 # Change can not be part of multiple cycles, so we can return
                 return scc
         return []
@@ -709,6 +712,30 @@ class PipelineManager(metaclass=ABCMeta):
             itertools.chain.from_iterable(
                 dependency_graph[c] for c in cycle if c != change)
         ) - set(cycle)
+
+    def getDependencyGraph(self, change, dependency_graph, event,
+                           history=None):
+        if self.pipeline.ignore_dependencies:
+            return
+        if not isinstance(change, model.Change):
+            return
+        if not change.getNeedsChanges(
+                self.useDependenciesByTopic(change.project)):
+            return
+        if history is None:
+            history = set()
+        history.add(change)
+        for needed_change in self.resolveChangeReferences(
+                change.getNeedsChanges(
+                    self.useDependenciesByTopic(change.project))):
+            if needed_change.is_merged:
+                continue
+
+            node = dependency_graph.setdefault(change, [])
+            node.append(needed_change)
+            if needed_change not in history:
+                self.getDependencyGraph(needed_change, dependency_graph,
+                                        event, history)
 
     def getQueueConfig(self, project):
         layout = self.pipeline.tenant.layout
@@ -1635,6 +1662,23 @@ class PipelineManager(metaclass=ABCMeta):
                 except exceptions.MergeFailure:
                     pass
             self.dequeueItem(item, quiet_dequeue)
+            return (True, nnfi)
+
+        # Safety check: verify that the bundle dependency graph is correct
+        dependency_graph = collections.OrderedDict()
+        self.getDependencyGraph(item.change, dependency_graph, item.event)
+        cycle = self.cycleForChange(
+            item.change, dependency_graph, item.event, debug=False)
+        if item.bundle:
+            bundle_cycle = {i.change for i in item.bundle.items}
+        else:
+            bundle_cycle = set()
+        if (item.live and
+            set(cycle) != bundle_cycle and
+            not item.didBundleStartReporting()):
+            log.info("Item bundle has changed: %s, now: %s, was: %s", item,
+                     set(cycle), bundle_cycle)
+            self.removeItem(item)
             return (True, nnfi)
 
         actionable = change_queue.isActionable(item)
