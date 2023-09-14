@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e15ed89f_0e8433df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-14T18:03:25Z",
+      "side": 1,
+      "message": "I agree this should be quicker unless Ansible does something very unexpected. The old code was processing 1 var, then 2 vars, then 3 vars, and so on until n vars which runs in ~n^2 time. The new code processes all n vars at once which should be processed in n time.",
+      "revId": "49122ad71e1e54b1c09729f9f092501a692b9b8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
