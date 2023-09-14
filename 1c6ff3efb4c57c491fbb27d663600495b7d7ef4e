@@ -68,6 +68,24 @@
       "parentUuid": "7ac22e8a_af9eafb5",
       "revId": "1c6ff3efb4c57c491fbb27d663600495b7d7ef4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4614051_af975b5e",
+        "filename": "doc/source/drivers/github.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2023-09-14T23:26:09Z",
+      "side": 1,
+      "message": "++ to this split up being made quite clear.  perhaps adding little generic examples helps explain too.\n\nAs mentioned in matrix; the system-config example is probably apt.  We have ansible/ara as required projects as we install from their main/master in the devel job, and zuul pulls that for us.  that is ok unauthenticated.\n\nhowever, if you want to depend-on, then that hits the graphql backend to get details on the PR and requires an auth token.\n\nobviously to add comments/push it needs the full access.",
+      "parentUuid": "1505dfb2_0c6ff884",
+      "revId": "1c6ff3efb4c57c491fbb27d663600495b7d7ef4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
