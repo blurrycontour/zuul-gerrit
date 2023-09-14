@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8566a390_bb9e96c8",
+        "filename": "zuul/ansible/base/action/zuul_freeze.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-14T20:51:43Z",
+      "side": 1,
+      "message": "For other reviewers this short block seems to come from other examples of action plugins in Ansible. A standard set of action module run tasks to take at startup of the run() method.",
+      "revId": "3f69f0835b47f388fa849e6fcc0a844ea71e9345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c659afe3_6325fe48",
+        "filename": "zuul/ansible/base/action/zuul_freeze.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-14T20:51:43Z",
+      "side": 1,
+      "message": "Considering this appears to be a \"private\" result dict entry is there a good reason to set the cacheable state here rather than on the task we run? I guess because setting it on the task we run means we cache the result of the task not the facts?\n\nI wonder if we should set fact as a second task and set it to be cacheable instead to be a bit more future proof.",
+      "revId": "3f69f0835b47f388fa849e6fcc0a844ea71e9345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "137d67ac_bbc387a5",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3067,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-14T20:51:43Z",
+      "side": 1,
+      "message": "Do we still need to ignore errors here since the action module should be ignoring possible errors for us already? If something did go wrong we might want a clear error at this point.",
+      "revId": "3f69f0835b47f388fa849e6fcc0a844ea71e9345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
