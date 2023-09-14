@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebff06dd_faaba5bf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-14T16:24:26Z",
+      "side": 1,
+      "message": "Patchset 9 was just a rebase to address the merge conflict (thought C git had no problem with it)",
+      "revId": "eb96abd7b91d6ffeb1833d8bb1d3e9d69da12ea7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
