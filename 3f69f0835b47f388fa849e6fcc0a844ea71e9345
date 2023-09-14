@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b7eac24_ca286755",
+        "filename": "zuul/ansible/base/action/zuul_freeze.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-14T21:00:05Z",
+      "side": 1,
+      "message": "Doing anything in ansible requires the use of private attributes, (see _templar) so the tail has lost its taboo for me.\n\nIf they do ever change this, the tests will fail since we rely on reading it from the cache, and we can correct it then.  In the meanwhile, it\u0027s one less task to deal with, and we avoid sending a potentially multi-megabyte dictionary through unecessary jinja templating, so I think it\u0027s worth it.",
+      "parentUuid": "c659afe3_6325fe48",
+      "revId": "3f69f0835b47f388fa849e6fcc0a844ea71e9345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "137d67ac_bbc387a5",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-09-14T20:51:43Z",
       "side": 1,
       "message": "Do we still need to ignore errors here since the action module should be ignoring possible errors for us already? If something did go wrong we might want a clear error at this point.",
+      "revId": "3f69f0835b47f388fa849e6fcc0a844ea71e9345",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18555450_68f6d009",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3067,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-14T21:00:05Z",
+      "side": 1,
+      "message": "I\u0027m ambivalent about this one.  I can\u0027t make a compelling argument for which behavior is more conservative.  I\u0027ll switch it.",
+      "parentUuid": "137d67ac_bbc387a5",
       "revId": "3f69f0835b47f388fa849e6fcc0a844ea71e9345",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
