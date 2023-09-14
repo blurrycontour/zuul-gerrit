@@ -33,6 +33,23 @@
       "message": "recheck was that node just really slow?",
       "revId": "1c6ff3efb4c57c491fbb27d663600495b7d7ef4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ac22e8a_af9eafb5",
+        "filename": "doc/source/drivers/github.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2023-09-14T22:04:23Z",
+      "side": 1,
+      "message": "The original story this fixes was describing a situation where opendev system-config was trying to depends-on: a change in github.com/ansible/ansible and this failed to enqueue in the check queue because a graphql query only works with an authenticated call.\n\nObviously this was seen a long time ago, so things might have changed.  But I don\u0027t think the authentication requirements for the graphql query on github have (https://docs.github.com/en/graphql/guides/forming-calls-with-graphql#authenticating-with-graphql).\n\nThe graphql call in _updateCanMergeInfo() @ https://opendev.org/zuul/zuul/src/branch/master/zuul/driver/github/githubconnection.py#L1744 is still \"unprotected\" in that it doesn\u0027t check you are authenticated.\n\nI think the contention is that this function should not be called for changes enqueued for a check (because they don\u0027t merge) -- but this doesn\u0027t match what what was seen originally in https://review.opendev.org/c/opendev/system-config/+/794353 where checks never started.  \n\nIf there has been a fix for this -- I took a look but am the first to admit I\u0027ve probably missed it -- I think we should explicitly call it out in the CL here as closing the story.  And we probably need to clearly explain the caveat that you need a token to merge changes, but not to check changes... (TBH I\u0027m still fuzzy on how it works in this situation -- I think Zuul would say \"can\u0027t gate this because I can\u0027t merge to the Depends-On: project\"?)\n\nIf there hasn\u0027t been a fix for this, then I\u0027m not sure this is correct.  It is strictly required to have authentication to Depends-On: a project you\u0027re not installed in or you just hit the same 401 in the graphql query as in the story?\n\nI\u0027m super hesitant to -1 this, but I think that no matter how I\u0027m wrong here there is something we can update -- either the CL to explain how the closed story is not longer affected by this, or the description of how the authentication has to work for graphql queries...",
+      "revId": "1c6ff3efb4c57c491fbb27d663600495b7d7ef4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
