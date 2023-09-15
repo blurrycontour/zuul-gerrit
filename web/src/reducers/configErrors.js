@@ -1,4 +1,5 @@
 // Copyright 2018 Red Hat, Inc
+// Copyright 2023 Acme Gating, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -12,14 +13,56 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-export default (state = {errors: [], ready: false}, action) => {
+import {
+  CONFIGERRORS_FETCH_FAIL,
+  CONFIGERRORS_FETCH_REQUEST,
+  CONFIGERRORS_FETCH_SUCCESS,
+  CONFIGERRORS_CLEAR
+} from '../actions/configErrors'
+
+export default (state = {
+  errors: [],
+  isFetching: false,
+  ready: false,
+  tenant: '',
+}, action) => {
   switch (action.type) {
-    case 'CONFIGERRORS_FETCH_SUCCESS':
-      return {errors: action.errors, ready: true}
-    case 'CONFIGERRORS_FETCH_FAIL':
-      return {errors: [], ready: true}
-    case 'CONFIGERRORS_CLEAR':
-      return {errors: [], ready: false}
+    case CONFIGERRORS_FETCH_REQUEST:
+      return {
+        isFetching: true,
+        ready: false,
+        tenant: action.tenant,
+        errors: action.errors,
+      }
+    case CONFIGERRORS_FETCH_SUCCESS:
+      if (action.tenant === state.tenant) {
+        return {
+          isFetching: false,
+          ready: true,
+          tenant: action.tenant,
+          errors: action.errors,
+        }
+      } else {
+        return state
+      }
+    case CONFIGERRORS_FETCH_FAIL:
+      if (action.tenant === state.tenant) {
+        return {
+          isFetching: false,
+          ready: false,
+          tenant: action.tenant,
+          errors: action.errors,
+        }
+      } else {
+        return state
+      }
+    case CONFIGERRORS_CLEAR:
+      return {
+        isFetching: false,
+        ready: false,
+        tenant: '',
+        errors: [],
+      }
     default:
       return state
   }
