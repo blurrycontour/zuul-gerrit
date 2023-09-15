@@ -86,7 +86,7 @@ class BubblewrapExecutionContext(BaseExecutionContext):
             pid_to_child_list.setdefault(ppid, []).append(pid)
             ns_to_pid_list.setdefault(pidns, []).append(pid)
             pid_to_ns_map[pid] = pidns
-        for child in pid_to_child_list.get(proc.pid):
+        for child in pid_to_child_list.get(proc.pid, []):
             ns = pid_to_ns_map.get(child)
             if ns is not None:
                 return ns, ns_to_pid_list.get(ns)
