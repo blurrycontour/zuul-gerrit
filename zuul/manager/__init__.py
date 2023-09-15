@@ -1571,7 +1571,11 @@ class PipelineManager(metaclass=ABCMeta):
         if build_set.repo_state_state == build_set.PENDING:
             return False
 
-        item.deduplicateJobs(log)
+        while item.deduplicateJobs(log):
+            # If we deduplicated a build, then we may need to apply
+            # its parent data to child jobs, so keep running this
+            # until we stop deduplicating builds.
+            pass
         return True
 
     def _processOneItem(self, item, nnfi):

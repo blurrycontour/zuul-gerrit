@@ -51,13 +51,18 @@
 
 - job:
     name: common-job
-    deduplicate: true
+    required-projects:
+      - org/project1
+      - org/project2
+
+- job:
+    name: child-job
+    required-projects:
+      - org/project1
+      - org/project2
 
 - job:
     name: project1-job
-
-- job:
-    name: project2-job
 
 - project:
     name: org/project1
@@ -65,13 +70,9 @@
     check:
       jobs:
         - common-job
-        - project1-job:
+        - child-job:
             dependencies: common-job
-    gate:
-      jobs:
-        - common-job
-        - project1-job:
-            dependencies: common-job
+        - project1-job
 
 - project:
     name: org/project2
@@ -79,10 +80,5 @@
     check:
       jobs:
         - common-job
-        - project2-job:
-            dependencies: common-job
-    gate:
-      jobs:
-        - common-job
-        - project2-job:
+        - child-job:
             dependencies: common-job

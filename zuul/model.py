@@ -5629,24 +5629,28 @@ class QueueItem(zkobject.ZKObject):
                 job._set(_ready_to_run=True)
 
     def deduplicateJobs(self, log):
-        """Sync node request and build info with deduplicated jobs"""
+        """Sync node request and build info with deduplicated jobs
+
+        Returns a boolean indicating whether a build was deduplicated.
+        """
+        deduplicated = False
         if not self.live:
-            return
+            return False
         if not self.current_build_set.job_graph:
-            return
+            return False
         if self.item_ahead:
             # Only run jobs if any 'hold' jobs on the change ahead
             # have completed successfully.
             if self.item_ahead.isHoldingFollowingChanges():
-                return
+                return False
 
         self.updateJobParentData()
 
         if COMPONENT_REGISTRY.model_api < 8:
-            return
+            return False
 
         if not self.bundle:
-            return
+            return False
 
         build_set = self.current_build_set
         job_graph = build_set.job_graph
@@ -5671,7 +5675,7 @@ class QueueItem(zkobject.ZKObject):
                 other_request.get('deduplicated_item') == self.uuid):
                 # We're the original, but we're probably in the middle
                 # of a retry
-                return
+                return False
             if other_request is not None and this_request is None:
                 log.info("Deduplicating request of bundle job %s for item %s "
                          "with item %s", job, self, other_item)
@@ -5683,7 +5687,7 @@ class QueueItem(zkobject.ZKObject):
                 other_nodeset.get('deduplicated_item') == self.uuid):
                 # We're the original, but we're probably in the middle
                 # of a retry
-                return
+                return False
             if other_nodeset is not None and this_nodeset is None:
                 log.info("Deduplicating nodeset of bundle job %s for item %s "
                          "with item %s", job, self, other_item)
@@ -5696,6 +5700,8 @@ class QueueItem(zkobject.ZKObject):
                          "with item %s", job, self, other_item)
                 self.addBuild(other_build)
                 job._set(_ready_to_run=False)
+                deduplicated = True
+        return deduplicated
 
     def findJobsToRun(self, semaphore_handler):
         torun = []
