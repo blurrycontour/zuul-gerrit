@@ -417,6 +417,9 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         try:
             lock = SessionAwareLock(self.kazoo_client, path)
             have_lock = lock.acquire(blocking, timeout)
+        except NoNodeError:
+            # Request disappeared
+            have_lock = False
         except LockTimeout:
             have_lock = False
             self.log.error(
