@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95b6baa3_2dc9895f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-15T20:29:24Z",
+      "side": 1,
+      "message": "My only other feedback would be that the reporting we do doesn\u0027t appear to give the end user a clear next step. I\u0027m not sure what that next step should be but if we abort changes for this reason it may help users to get some feedback on what they can try next.",
+      "revId": "9406bcc2d3e09fb6ff69e9775d4208a0ae335ccb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd6acb11_6e9f5b59",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 723,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-15T20:29:24Z",
+      "side": 1,
+      "message": "Nit: you can save the results of the getNeedsChanges() call here then you don\u0027t need to call it twice for every getDependencyGraph() call that needs changes. This function is recursive too so that may cut out a number of function calls.",
+      "revId": "9406bcc2d3e09fb6ff69e9775d4208a0ae335ccb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
