@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fdb20843_4b3568c7",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3054,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-15T21:30:35Z",
+      "side": 1,
+      "message": "This doesn\u0027t so much trip the safety check as not work.  The tests are paired here, the original version that should at least function, but doesn\u0027t, and so it\u0027s disabled.  Then there\u0027s the working version that trips the safety check.\n\nIn other words, I don\u0027t think we want to annotate the old versions of the test like that because they just don\u0027t make sense.  If you look at the code difference between the skipped and non-skipped versions of the tests, it\u0027s substantial.",
+      "parentUuid": "c63d684e_089c6590",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdcec7ea_0f48866b",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-09-15T21:07:20Z",
       "side": 1,
       "message": "Do we need corresponding tests for Gerrit? (in particular you can update gerrit change topics without pushing new patchests and may be using same topic merging).",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "714b32a1_6d602af3",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3055,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-15T21:30:35Z",
+      "side": 1,
+      "message": "It\u0027s not a bad idea in the long run, however, I believe they are functionally equivalent and I think this is good for now.",
+      "parentUuid": "cdcec7ea_0f48866b",
       "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -69,6 +105,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "77237157_c190729e",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3124,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-15T21:30:35Z",
+      "side": 1,
+      "message": "It\u0027s probably not worth *too* much time getting in the weeds on this since it doesn\u0027t work.  I just didn\u0027t want to lose track of all the work to get to this point.\n\nThe answer now is: because E is already in the pipeline, so it doesn\u0027t get added.  But then it can\u0027t be there anymore, so it gets removed.\n\nIt\u0027s not satisfactory, that\u0027s one of the things I want to fix.\n\nI expect this test to change later, and when it does, we should understand its behavior.  Right now, there is no reasonable way to get it to do something satisfactory.",
+      "parentUuid": "ed25cb94_58429c20",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92411bf4_dd289551",
@@ -86,6 +140,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7daec20_d722d8f1",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3279,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-15T21:30:35Z",
+      "side": 1,
+      "message": "Nope.",
+      "parentUuid": "92411bf4_dd289551",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eadb677b_c45886dc",
@@ -99,6 +171,24 @@
       "writtenOn": "2023-09-15T21:07:20Z",
       "side": 1,
       "message": "We never emit an event for this edit. Should we clean this up?",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35667408_6f84d036",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3290,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-15T21:30:35Z",
+      "side": 1,
+      "message": "It could probably be removed.",
+      "parentUuid": "eadb677b_c45886dc",
       "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -126,6 +216,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e072758a_c90e2124",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3447,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-15T21:30:35Z",
+      "side": 1,
+      "message": "As a general rule, I don\u0027t see any difference between updating the value of a variable whether it\u0027s in the function signature or not; they\u0027re all variables, not constants, and there\u0027s nothing precious about any of them.\n\nBut I do agree in this case that would be easier to read and follow, I don\u0027t mind changing it.",
+      "parentUuid": "c69148e1_0d74fcb0",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d1bfd247_adf12d4e",
@@ -143,6 +251,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5a67232_4be61528",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3519,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-15T21:30:35Z",
+      "side": 1,
+      "message": "Again, getting into the weeds on something that doesn\u0027t work, but I think it got removed for some possibly unsatisfactory reason.",
+      "parentUuid": "d1bfd247_adf12d4e",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2dc1e721_e9017335",
@@ -156,6 +282,24 @@
       "writtenOn": "2023-09-15T21:07:20Z",
       "side": 1,
       "message": "Isn\u0027t it two changes? B and C? Or maybe B and C run the same jobs and deduplication results in a single one running? But I think each of the projects has distinct jobs so should end up with a separate change.",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f586002b_11dcd62b",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3717,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-15T21:30:35Z",
+      "side": 1,
+      "message": "No this is correct.  One of them ends up with an incorrect bundle and is ejected.  The other one is fine.",
+      "parentUuid": "2dc1e721_e9017335",
       "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
