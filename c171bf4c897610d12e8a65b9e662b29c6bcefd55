@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f046c2a_679d897d",
+        "filename": "doc/source/drivers/github.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-15T16:16:59Z",
+      "side": 1,
+      "message": "This is supposed to be a step-by-step list of actions to take to set up an application.  We shouldn\u0027t have anything in here more complex than\n* do this\n* if this, then that\n\nI think if we want to go into a bunch of detail about the possible choices people might make, that should be done in the narrative section above, then refer to the choices here.",
+      "revId": "c171bf4c897610d12e8a65b9e662b29c6bcefd55",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
