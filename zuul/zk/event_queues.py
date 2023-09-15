@@ -513,6 +513,9 @@ class JobResultFuture(EventResultFuture):
         self.repo_state = None
         self.item_in_branches = None
 
+    def __repr__(self):
+        return f"<JobResultFuture request_path={self.request_path}>"
+
     def _read(self):
         result_node = self.kazoo_client.get(self._result_path)[0]
         result = json.loads(result_node)
