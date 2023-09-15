@@ -1862,14 +1862,17 @@ class PipelineManager(metaclass=ABCMeta):
         """
         Resumes all paused builds of a buildset that may be resumed.
         """
-        job_graph = build_set.job_graph
         for build in build_set.builds.values():
             if not build.paused:
                 continue
             # check if all child jobs are finished
-            child_builds = [build_set.builds.get(x.name) for x in
-                            job_graph.getDependentJobsRecursively(
-                                build.job.name)]
+            child_builds = []
+            for item in self._getItemsWithBuild(build):
+                job_graph = item.current_build_set.job_graph
+                child_builds += [
+                    item.current_build_set.builds.get(x.name)
+                    for x in job_graph.getDependentJobsRecursively(
+                        build.job.name)]
             all_completed = True
             for child_build in child_builds:
                 if not child_build or not child_build.result:
