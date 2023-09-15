@@ -672,16 +672,20 @@ class PipelineManager(metaclass=ABCMeta):
         # to report a message to the user.
         actions = self.pipeline.failure_actions
         ci = change_queue.enqueueChange(change, event)
-        for w in warnings:
-            ci.warning(w)
-        ci.setReportedResult('FAILURE')
+        try:
+            for w in warnings:
+                ci.warning(w)
+            ci.setReportedResult('FAILURE')
 
-        # Only report the item if the project is in the current
-        # pipeline. Otherwise the change could be spammed by
-        # reports from unrelated pipelines.
-        if self.pipeline.tenant.layout.getProjectPipelineConfig(ci):
-            self.sendReport(actions, ci)
-        self.dequeueItem(ci)
+            # Only report the item if the project is in the current
+            # pipeline. Otherwise the change could be spammed by
+            # reports from unrelated pipelines.
+            if self.pipeline.tenant.layout.getProjectPipelineConfig(ci):
+                self.sendReport(actions, ci)
+        finally:
+            # Ensure that the item is dequeued in any case. Otherwise we
+            # might leak items caused by this temporary enqueue.
+            self.dequeueItem(ci)
         # We don't use reportNormalBuildsetEnd here because we want to
         # report even with no jobs.
         self.sql.reportBuildsetEnd(ci.current_build_set,
