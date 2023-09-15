@@ -3,6 +3,19 @@
     allow-circular-dependencies: true
 
 - pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+    failure:
+      gerrit:
+        Verified: -1
+
+- pipeline:
     name: gate
     manager: dependent
     success-message: Build succeeded (gate).
@@ -49,6 +62,11 @@
 - project:
     name: org/project1
     queue: integrated
+    check:
+      jobs:
+        - parent-job
+        - project1-job:
+            dependencies: parent-job
     gate:
       jobs:
         - parent-job
@@ -58,6 +76,11 @@
 - project:
     name: org/project2
     queue: integrated
+    check:
+      jobs:
+        - parent-job
+        - project2-job:
+            dependencies: parent-job
     gate:
       jobs:
         - parent-job

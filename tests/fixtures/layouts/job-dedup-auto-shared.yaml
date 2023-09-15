@@ -3,6 +3,19 @@
     allow-circular-dependencies: true
 
 - pipeline:
+    name: check
+    manager: independent
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+    failure:
+      gerrit:
+        Verified: -1
+
+- pipeline:
     name: gate
     manager: dependent
     success-message: Build succeeded (gate).
@@ -50,6 +63,26 @@
 - project:
     name: org/project1
     queue: integrated
+    check:
+      jobs:
+        - common-job:
+            # Set some identical attributes on the project-pipeline
+            # job config to make sure we're generating some distinct
+            # objects.
+            required-projects:
+              - org/project1
+              - org/project2
+            semaphores:
+              - test-semaphore
+            run:
+              - playbooks/foo.yaml
+            files:
+              - '.*'
+            dependencies: []
+            provides: a
+            requires: b
+            tags: c
+        - project1-job
     gate:
       jobs:
         - common-job:
@@ -63,7 +96,6 @@
               - test-semaphore
             run:
               - playbooks/foo.yaml
-              - playbooks/bar.yaml
             files:
               - '.*'
             dependencies: []
@@ -75,6 +107,23 @@
 - project:
     name: org/project2
     queue: integrated
+    check:
+      jobs:
+        - common-job:
+            required-projects:
+              - org/project1
+              - org/project2
+            semaphores:
+              - test-semaphore
+            run:
+              - playbooks/foo.yaml
+            files:
+              - '.*'
+            dependencies: []
+            provides: a
+            requires: b
+            tags: c
+        - project2-job
     gate:
       jobs:
         - common-job:
@@ -85,7 +134,6 @@
               - test-semaphore
             run:
               - playbooks/foo.yaml
-              - playbooks/bar.yaml
             files:
               - '.*'
             dependencies: []
