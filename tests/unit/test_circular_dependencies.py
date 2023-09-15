@@ -2305,8 +2305,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
     def test_job_deduplication_semaphore_resources_first(self):
         self._test_job_deduplication_semaphore()
 
-    @simple_layout('layouts/job-dedup-auto-shared-check.yaml')
-    def test_job_deduplication_check(self):
+    # Start check tests
+
+    def _test_job_deduplication_check(self):
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
@@ -2337,15 +2338,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.executor_server.release('project2-job')
         self.waitUntilSettled()
 
-        self.assertHistory([
-            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
-            # This is deduplicated
-            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-        ], ordered=False)
-        self.assertEqual(len(self.fake_nodepool.history), 3)
-
+    def _assert_job_deduplication_check(self):
         # Make sure there are no leaked queue items
         tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
         pipeline = tenant.layout.pipelines["check"]
@@ -2353,6 +2346,51 @@ class TestGerritCircularDependencies(ZuulTestCase):
         all_items = set(self.zk_client.client.get_children(
             f"{pipeline_path}/item"))
         self.assertEqual(len(all_items), 0)
+        self.assertEqual(len(self.fake_nodepool.history), len(self.history))
+
+    @simple_layout('layouts/job-dedup-auto-shared-check.yaml')
+    def test_job_deduplication_check(self):
+        self._test_job_deduplication_check()
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self._assert_job_deduplication_check()
+
+    @simple_layout('layouts/job-dedup-child-jobs.yaml')
+    def test_job_deduplication_check_child_jobs(self):
+        # Test that child jobs of deduplicated parents are
+        # deduplicated, and also that supplying child_jobs to
+        # zuul_return filters correctly.  child1-job should not run,
+        # but child2 should run and be deduplicated.  This uses auto
+        # deduplication.
+        self.executor_server.returnData(
+            'common-job', 'refs/changes/02/2/1',
+            {'zuul': {'child_jobs': ['child2-job']}}
+        )
+        self.executor_server.returnData(
+            'common-job', 'refs/changes/01/1/1',
+            {'zuul': {'child_jobs': ['child2-job']}}
+        )
+
+        self._test_job_deduplication_check()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="child2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            # dict(name="child2-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self._assert_job_deduplication_check()
 
     def test_submitted_together(self):
         self.fake_gerrit._fake_submit_whole_topic = True

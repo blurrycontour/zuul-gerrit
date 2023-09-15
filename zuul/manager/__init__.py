@@ -1903,6 +1903,23 @@ class PipelineManager(metaclass=ABCMeta):
             if not build or not build.result:
                 self.sched.cancelJob(build_set, job, final=True)
 
+    def _getItemsWithBuild(self, build):
+        # If the build was for deduplicated jobs, apply the results to
+        # all the items that use this build.
+        item = build.build_set.item
+        build_in_items = [item]
+
+        for bundle in item.findDuplicateBundles():
+            for other_item in bundle.items:
+                if other_item in build_in_items:
+                    continue
+                other_build = other_item.current_build_set.getBuild(
+                    build.job.name)
+                if other_build is not None and other_build is build:
+                    build_in_items.append(other_item)
+
+        return build_in_items
+
     def onBuildCompleted(self, build):
         log = get_annotated_logger(self.log, build.zuul_event_id)
         item = build.build_set.item
@@ -1919,18 +1936,7 @@ class PipelineManager(metaclass=ABCMeta):
                      build, item)
             return
 
-        # If the build was for deduplicated jobs, apply the results to
-        # all the items that use this build.
-        build_in_items = [item]
-        if item.bundle:
-            for other_item in item.bundle.items:
-                if other_item in build_in_items:
-                    continue
-                other_build = other_item.current_build_set.getBuild(
-                    build.job.name)
-                if other_build is not None and other_build is build:
-                    build_in_items.append(other_item)
-        for item in build_in_items:
+        for item in self._getItemsWithBuild(build):
             # We don't care about some actions below if this build
             # isn't in the current buildset, so determine that before
             # it is potentially removed with setResult.
