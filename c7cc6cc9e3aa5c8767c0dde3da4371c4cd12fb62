@@ -16,6 +16,148 @@
       "message": "recheck",
       "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c63d684e_089c6590",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3054,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-15T21:07:20Z",
+      "side": 1,
+      "message": "It might be a good idea to call out with a comment where in the test this is currently tripping the safety check. I assume this occurs when updating the cycles and zuul doesn\u0027t change the bundle.",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdcec7ea_0f48866b",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3055,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-15T21:07:20Z",
+      "side": 1,
+      "message": "Do we need corresponding tests for Gerrit? (in particular you can update gerrit change topics without pushing new patchests and may be using same topic merging).",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed25cb94_58429c20",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3124,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-15T21:07:20Z",
+      "side": 1,
+      "message": "D and E are approved. Why wouldn\u0027t this enqueue both D and E when we emit the PR edited event below?",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92411bf4_dd289551",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3279,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-15T21:07:20Z",
+      "side": 1,
+      "message": "Is this comment accurate? Below we end up with nothing enqueued after updating only A\u0027s dependency.",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eadb677b_c45886dc",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3290,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-15T21:07:20Z",
+      "side": 1,
+      "message": "We never emit an event for this edit. Should we clean this up?",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c69148e1_0d74fcb0",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3447,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-15T21:07:20Z",
+      "side": 1,
+      "message": "Nit, I\u0027m not a huge fan of redefining an argument name to be something else. Maybe this should be queue_index?",
+      "range": {
+        "startLine": 3447,
+        "startChar": 42,
+        "endLine": 3447,
+        "endChar": 48
+      },
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1bfd247_adf12d4e",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3519,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-15T21:07:20Z",
+      "side": 1,
+      "message": "Why not check the queue bundes for C,A,B\u003clive\u003e ?",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2dc1e721_e9017335",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3717,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-15T21:07:20Z",
+      "side": 1,
+      "message": "Isn\u0027t it two changes? B and C? Or maybe B and C run the same jobs and deduplication results in a single one running? But I think each of the projects has distinct jobs so should end up with a separate change.",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
