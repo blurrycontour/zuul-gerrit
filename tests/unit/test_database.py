@@ -1,4 +1,4 @@
-# Copyright 2021 Acme Gating, LLC
+# Copyright 2021-2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import difflib
 import os
 import re
 import subprocess
@@ -21,6 +22,9 @@ from zuul.zk import ZooKeeperClient
 from tests.base import (
     BaseTestCase, MySQLSchemaFixture, PostgresqlSchemaFixture
 )
+
+import sqlalchemy
+import testtools
 
 
 class DBBaseTestCase(BaseTestCase):
@@ -167,29 +171,165 @@ class TestMysqlDatabase(DBBaseTestCase):
                               '2022-05-03 12:34:56',
                               '2022-05-13 12:34:56'])
 
+    def test_migration_f7843ddf1552(self):
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("set foreign_key_checks=0")
+            for table in connection.exec_driver_sql("show tables"):
+                table = table[0]
+                connection.exec_driver_sql(f"drop table {table}")
+            connection.exec_driver_sql("set foreign_key_checks=1")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('151893067f91')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("""
+            insert into zuul_buildset
+            (id, uuid, zuul_ref, project, `change`, patchset, ref,
+             ref_url, oldrev, newrev, branch)
+            values
+            (1, "bsuuid1", "Z1", "project1",
+            1, "1",
+            "refs/changes/1",
+             "http://project1/1",
+            "2d48fe5afe0bc7785294b28e9e96a6c622945b9d",
+            "8a938aff20d691d1b9a9f461c6375f0c45acd305",
+            "master"),
+            (2, "bsuuid2", "Z2", "project1",
+            2, "ee743613ce5b3aee11d12e91e932d7876bc0b40c",
+            "refs/changes/2",
+             "http://project1/2",
+            "bd11c4ff79245ae555418e19840ce4752e48ea38",
+            "d1ffc204e4b4955f2a47e7e37618fcf13bb1b9fd",
+            "stable"),
+            (3, "bsuuid3", "Z3", "project2", NULL, NULL, "refs/tags/foo",
+             "http://project3",
+            "a6cf0e07e9e2964a810196f764fc4ac766742568",
+            "1a226acbd022968914574fdeb467b78bc5bfcc77",
+            NULL)
+            """)
+            connection.exec_driver_sql("""
+            insert into zuul_build
+            (id, buildset_id, uuid, job_name, result)
+            values
+            (1, 1, "builduuid1", "job1", "RESULT1"),
+            (2, 1, "builduuid2", "job2", "RESULT2"),
+            (3, 2, "builduuid3", "job1", "RESULT3"),
+            (4, 2, "builduuid4", "job2", "RESULT4"),
+            (5, 3, "builduuid5", "job3", "RESULT5"),
+            (6, 3, "builduuid6", "job4", "RESULT6")
+            """)
+
+        self.connection._migrate()
+        with self.connection.engine.begin() as connection:
+            results = [r for r in connection.exec_driver_sql(
+                "select b.id, r.ref from zuul_build b join zuul_ref r "
+                "on b.ref_id=r.id order by b.id")]
+            self.assertEqual(results, [
+                (1, 'refs/changes/1'),
+                (2, 'refs/changes/1'),
+                (3, 'refs/changes/2'),
+                (4, 'refs/changes/2'),
+                (5, 'refs/tags/foo'),
+                (6, 'refs/tags/foo'),
+            ])
+            results = [r for r in connection.exec_driver_sql(
+                "select bs.uuid, r.ref "
+                "from zuul_buildset bs, zuul_buildset_ref t, zuul_ref r "
+                "where bs.id = t.buildset_id and r.id = t.ref_id "
+                "order by bs.uuid")]
+            self.assertEqual(results, [
+                ('bsuuid1', 'refs/changes/1'),
+                ('bsuuid2', 'refs/changes/2'),
+                ('bsuuid3', 'refs/tags/foo'),
+            ])
+
+    def test_migration_f7843ddf1552_failure(self):
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("set foreign_key_checks=0")
+            for table in connection.exec_driver_sql("show tables"):
+                table = table[0]
+                connection.exec_driver_sql(f"drop table {table}")
+            connection.exec_driver_sql("set foreign_key_checks=1")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('151893067f91')
+        # This test is identical to the one above, except the patchset
+        # sha for the first buildset row is too long to fit in the
+        # column (it's lengith is double).  The insert here is fine,
+        # but that will cause the migration to fail.
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("""
+            insert into zuul_buildset
+            (id, uuid, zuul_ref, project, `change`, patchset, ref,
+             ref_url, oldrev, newrev, branch)
+            values
+            (1, "bsuuid1", "Z1", "project1",
+            1, "1",
+            "refs/changes/1",
+             "http://project1/1",
+            "2d48fe5afe0bc7785294b28e9e96a6c622945b9d"
+            "2d48fe5afe0bc7785294b28e9e96a6c622945b9d",
+            "8a938aff20d691d1b9a9f461c6375f0c45acd305",
+            "master"),
+            (2, "bsuuid2", "Z2", "project1",
+            2, "ee743613ce5b3aee11d12e91e932d7876bc0b40c",
+            "refs/changes/2",
+             "http://project1/2",
+            "bd11c4ff79245ae555418e19840ce4752e48ea38",
+            "d1ffc204e4b4955f2a47e7e37618fcf13bb1b9fd",
+            "stable"),
+            (3, "bsuuid3", "Z3", "project2", NULL, NULL, "refs/tags/foo",
+             "http://project3",
+            "a6cf0e07e9e2964a810196f764fc4ac766742568",
+            "1a226acbd022968914574fdeb467b78bc5bfcc77",
+            NULL)
+            """)
+            connection.exec_driver_sql("""
+            insert into zuul_build
+            (id, buildset_id, uuid, job_name, result)
+            values
+            (1, 1, "builduuid1", "job1", "RESULT1"),
+            (2, 1, "builduuid2", "job2", "RESULT2"),
+            (3, 2, "builduuid3", "job1", "RESULT3"),
+            (4, 2, "builduuid4", "job2", "RESULT4"),
+            (5, 3, "builduuid5", "job3", "RESULT5"),
+            (6, 3, "builduuid6", "job4", "RESULT6")
+            """)
+
+        with testtools.ExpectedException(sqlalchemy.exc.DataError):
+            self.connection._migrate()
+
+        with self.connection.engine.begin() as connection:
+            tables = [r[0] for r in connection.exec_driver_sql(
+                "show tables")]
+            # Make sure we rolled back the buildset_new table creation
+            self.assertNotIn('zuul_buildset_new', tables)
+            self.assertIn('zuul_buildset', tables)
+
     def test_buildsets(self):
         tenant = 'tenant1',
         buildset_uuid = 'deadbeef'
         change = 1234
-        buildset_args = dict(
-            uuid=buildset_uuid,
-            tenant=tenant,
-            pipeline='check',
-            project='project',
-            change=change,
-            patchset='1',
-            ref='',
-            oldrev='',
-            newrev='',
-            branch='master',
-            zuul_ref='Zdeadbeef',
-            ref_url='http://example.com/1234',
-            event_id='eventid',
-        )
 
         # Create the buildset entry (driver-internal interface)
         with self.connection.getSession() as db:
-            db.createBuildSet(**buildset_args)
+            bs = db.createBuildSet(
+                uuid=buildset_uuid,
+                tenant=tenant,
+                pipeline='check',
+                event_id='eventid',
+            )
+            ref = db.getOrCreateRef(
+                project='project',
+                change=change,
+                patchset='1',
+                ref='',
+                oldrev='',
+                newrev='',
+                branch='master',
+                ref_url='http://example.com/1234',
+            )
+            bs.refs.append(ref)
 
         # Verify that worked using the driver-external interface
         self.assertEqual(len(self.connection.getBuildsets()), 1)
@@ -198,7 +338,7 @@ class TestMysqlDatabase(DBBaseTestCase):
         # Update the buildset using the internal interface
         with self.connection.getSession() as db:
             db_buildset = db.getBuildset(tenant=tenant, uuid=buildset_uuid)
-            self.assertEqual(db_buildset.change, change)
+            self.assertEqual(db_buildset.refs[0].change, change)
             db_buildset.result = 'SUCCESS'
 
         # Verify that worked
@@ -252,4 +392,151 @@ class TestPostgresqlDatabase(DBBaseTestCase):
             shell=True,
             env={'PGPASSWORD': self.db.passwd}
         )
-        self.assertEqual(alembic_out, sqlalchemy_out)
+        try:
+            self.assertEqual(alembic_out, sqlalchemy_out)
+        except Exception:
+            differ = difflib.Differ()
+            alembic_out = alembic_out.decode('utf8').splitlines()
+            sqlalchemy_out = sqlalchemy_out.decode('utf8').splitlines()
+            diff = '\n'.join(list(differ.compare(alembic_out, sqlalchemy_out)))
+            self.log.debug("Diff:\n%s", diff)
+            raise
+
+    def test_migration_f7843ddf1552(self):
+        with self.connection.engine.begin() as connection:
+            tables = [x[0] for x in connection.exec_driver_sql(
+                "select tablename from pg_catalog.pg_tables "
+                "where schemaname='public'"
+            ).all()]
+
+            self.assertTrue(len(tables) > 0)
+            for table in tables:
+                connection.exec_driver_sql(f"drop table {table} cascade")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('151893067f91')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("""
+            insert into zuul_buildset
+            (id, uuid, zuul_ref, project, change, patchset, ref,
+             ref_url, oldrev, newrev, branch)
+            values
+            (1, 'bsuuid1', 'Z1', 'project1',
+            1, '1',
+            'refs/changes/1',
+             'http://project1/1',
+            '2d48fe5afe0bc7785294b28e9e96a6c622945b9d',
+            '8a938aff20d691d1b9a9f461c6375f0c45acd305',
+            'master'),
+            (2, 'bsuuid2', 'Z2', 'project1',
+            2, 'ee743613ce5b3aee11d12e91e932d7876bc0b40c',
+            'refs/changes/2',
+             'http://project1/2',
+            'bd11c4ff79245ae555418e19840ce4752e48ea38',
+            'd1ffc204e4b4955f2a47e7e37618fcf13bb1b9fd',
+            'stable'),
+            (3, 'bsuuid3', 'Z3', 'project2', NULL, NULL, 'refs/tags/foo',
+             'http://project3',
+            'a6cf0e07e9e2964a810196f764fc4ac766742568',
+            '1a226acbd022968914574fdeb467b78bc5bfcc77',
+            NULL)
+            """)
+            connection.exec_driver_sql("""
+            insert into zuul_build
+            (id, buildset_id, uuid, job_name, result)
+            values
+            (1, 1, 'builduuid1', 'job1', 'RESULT1'),
+            (2, 1, 'builduuid2', 'job2', 'RESULT2'),
+            (3, 2, 'builduuid3', 'job1', 'RESULT3'),
+            (4, 2, 'builduuid4', 'job2', 'RESULT4'),
+            (5, 3, 'builduuid5', 'job3', 'RESULT5'),
+            (6, 3, 'builduuid6', 'job4', 'RESULT6')
+            """)
+
+        self.connection._migrate()
+        with self.connection.engine.begin() as connection:
+            results = [r for r in connection.exec_driver_sql(
+                "select b.id, r.ref from zuul_build b join zuul_ref r "
+                "on b.ref_id=r.id order by b.id")]
+            self.assertEqual(results, [
+                (1, 'refs/changes/1'),
+                (2, 'refs/changes/1'),
+                (3, 'refs/changes/2'),
+                (4, 'refs/changes/2'),
+                (5, 'refs/tags/foo'),
+                (6, 'refs/tags/foo'),
+            ])
+            results = [r for r in connection.exec_driver_sql(
+                "select bs.uuid, r.ref "
+                "from zuul_buildset bs, zuul_buildset_ref t, zuul_ref r "
+                "where bs.id = t.buildset_id and r.id = t.ref_id "
+                "order by bs.uuid")]
+            self.assertEqual(results, [
+                ('bsuuid1', 'refs/changes/1'),
+                ('bsuuid2', 'refs/changes/2'),
+                ('bsuuid3', 'refs/tags/foo'),
+            ])
+
+    def test_migration_f7843ddf1552_failure(self):
+        with self.connection.engine.begin() as connection:
+            tables = [x[0] for x in connection.exec_driver_sql(
+                "select tablename from pg_catalog.pg_tables "
+                "where schemaname='public'"
+            ).all()]
+
+            self.assertTrue(len(tables) > 0)
+            for table in tables:
+                connection.exec_driver_sql(f"drop table {table} cascade")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('151893067f91')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("""
+            insert into zuul_buildset
+            (id, uuid, zuul_ref, project, change, patchset, ref,
+             ref_url, oldrev, newrev, branch)
+            values
+            (1, 'bsuuid1', 'Z1', 'project1',
+            1, '1',
+            'refs/changes/1',
+             'http://project1/1',
+            '2d48fe5afe0bc7785294b28e9e96a6c622945b9d'
+            '2d48fe5afe0bc7785294b28e9e96a6c622945b9d',
+            '8a938aff20d691d1b9a9f461c6375f0c45acd305',
+            'master'),
+            (2, 'bsuuid2', 'Z2', 'project1',
+            2, 'ee743613ce5b3aee11d12e91e932d7876bc0b40c',
+            'refs/changes/2',
+             'http://project1/2',
+            'bd11c4ff79245ae555418e19840ce4752e48ea38',
+            'd1ffc204e4b4955f2a47e7e37618fcf13bb1b9fd',
+            'stable'),
+            (3, 'bsuuid3', 'Z3', 'project2', NULL, NULL, 'refs/tags/foo',
+             'http://project3',
+            'a6cf0e07e9e2964a810196f764fc4ac766742568',
+            '1a226acbd022968914574fdeb467b78bc5bfcc77',
+            NULL)
+            """)
+            connection.exec_driver_sql("""
+            insert into zuul_build
+            (id, buildset_id, uuid, job_name, result)
+            values
+            (1, 1, 'builduuid1', 'job1', 'RESULT1'),
+            (2, 1, 'builduuid2', 'job2', 'RESULT2'),
+            (3, 2, 'builduuid3', 'job1', 'RESULT3'),
+            (4, 2, 'builduuid4', 'job2', 'RESULT4'),
+            (5, 3, 'builduuid5', 'job3', 'RESULT5'),
+            (6, 3, 'builduuid6', 'job4', 'RESULT6')
+            """)
+
+        with testtools.ExpectedException(sqlalchemy.exc.DataError):
+            self.connection._migrate()
+
+        with self.connection.engine.begin() as connection:
+            tables = [x[0] for x in connection.exec_driver_sql(
+                "select tablename from pg_catalog.pg_tables "
+                "where schemaname='public'"
+            ).all()]
+            # Make sure we rolled back the buildset_new table creation
+            self.assertNotIn('zuul_buildset_new', tables)
+            self.assertIn('zuul_buildset', tables)

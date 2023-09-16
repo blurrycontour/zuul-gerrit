@@ -53,23 +53,26 @@ class SQLReporter(BaseReporter):
             event_id = getattr(item.event, "zuul_event_id", None)
             event_timestamp = datetime.datetime.fromtimestamp(
                 item.event.timestamp, tz=datetime.timezone.utc)
-        db_buildset = db.createBuildSet(
-            uuid=buildset.uuid,
-            tenant=item.pipeline.tenant.name,
-            pipeline=item.pipeline.name,
+
+        ref = db.getOrCreateRef(
             project=item.change.project.name,
             change=getattr(item.change, 'number', None),
             patchset=getattr(item.change, 'patchset', None),
+            ref_url=item.change.url,
             ref=getattr(item.change, 'ref', ''),
             oldrev=getattr(item.change, 'oldrev', ''),
             newrev=getattr(item.change, 'newrev', ''),
             branch=getattr(item.change, 'branch', ''),
-            zuul_ref=buildset.ref,
-            ref_url=item.change.url,
+        )
+        db_buildset = db.createBuildSet(
+            uuid=buildset.uuid,
+            tenant=item.pipeline.tenant.name,
+            pipeline=item.pipeline.name,
             event_id=event_id,
             event_timestamp=event_timestamp,
             updated=datetime.datetime.utcnow(),
         )
+        db_buildset.refs.append(ref)
         return db_buildset
 
     def reportBuildsetStart(self, buildset):
@@ -196,8 +199,20 @@ class SQLReporter(BaseReporter):
             db_buildset = self._createBuildset(db, buildset)
         if db_buildset.first_build_start_time is None:
             db_buildset.first_build_start_time = start
+        item = buildset.item
+        ref = db.getOrCreateRef(
+            project=item.change.project.name,
+            change=getattr(item.change, 'number', None),
+            patchset=getattr(item.change, 'patchset', None),
+            ref_url=item.change.url,
+            ref=getattr(item.change, 'ref', ''),
+            oldrev=getattr(item.change, 'oldrev', ''),
+            newrev=getattr(item.change, 'newrev', ''),
+            branch=getattr(item.change, 'branch', ''),
+        )
 
         db_build = db_buildset.createBuild(
+            ref=ref,
             uuid=build.uuid,
             job_name=build.job.name,
             start_time=start,

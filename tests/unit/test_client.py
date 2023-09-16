@@ -519,15 +519,6 @@ class DBPruneTestCase(ZuulTestCase):
                 uuid=buildset_uuid,
                 tenant='tenant-one',
                 pipeline='check',
-                project='org/project',
-                change='1',
-                patchset='1',
-                ref='refs/changes/1',
-                oldrev='',
-                newrev='',
-                branch='master',
-                zuul_ref='Zref',
-                ref_url='http://gerrit.example.com/1',
                 event_id=event_id,
                 event_timestamp=update_time,
                 updated=update_time,
@@ -535,9 +526,22 @@ class DBPruneTestCase(ZuulTestCase):
                 last_build_end_time=end_time,
                 result='SUCCESS',
             )
+            db_ref = db.getOrCreateRef(
+                project='org/project',
+                ref='refs/changes/1',
+                change=1,
+                patchset='1',
+                oldrev='',
+                newrev='',
+                branch='master',
+                ref_url='http://gerrit.example.com/1',
+            )
+            db_buildset.refs.append(db_ref)
+
             for build_num in range(2):
                 build_uuid = uuid.uuid4().hex
                 db_build = db_buildset.createBuild(
+                    ref=db_ref,
                     uuid=build_uuid,
                     job_name=f'job{build_num}',
                     start_time=start_time,
