@@ -5392,15 +5392,15 @@ class QueueItem(zkobject.ZKObject):
                     '(triggered by change %s on project %s), but that build '
                     'failed with result "%s"' % (
                         job.name, ', '.join(requirement), build.uuid,
-                        build.buildset.change, build.buildset.project,
+                        build.ref.change, build.ref.project,
                         build.result))
             else:
                 for a in build.artifacts:
                     artifact = {'name': a.name,
                                 'url': a.url,
-                                'project': build.buildset.project,
-                                'change': str(build.buildset.change),
-                                'patchset': build.buildset.patchset,
+                                'project': build.ref.project,
+                                'change': str(build.ref.change),
+                                'patchset': build.ref.patchset,
                                 'job': build.job_name}
                     if a.meta:
                         artifact['metadata'] = json.loads(a.meta)
