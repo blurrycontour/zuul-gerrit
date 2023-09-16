@@ -1,4 +1,5 @@
 # Copyright 2014 Rackspace Australia
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -30,6 +31,8 @@ from zuul.zk.locks import CONNECTION_LOCK_ROOT, locked, SessionAwareLock
 
 
 BUILDSET_TABLE = 'zuul_buildset'
+REF_TABLE = 'zuul_ref'
+BUILDSET_REF_TABLE = 'zuul_buildset_ref'
 BUILD_TABLE = 'zuul_build'
 BUILD_EVENTS_TABLE = 'zuul_build_event'
 ARTIFACT_TABLE = 'zuul_artifact'
@@ -209,6 +212,30 @@ class DatabaseSession(object):
         self.session().add(bs)
         self.session().flush()
         return bs
+
+    def getOrCreateRef(self, project, ref, ref_url,
+                       change=None, patchset=None, branch=None,
+                       oldrev=None, newrev=None):
+        ref_table = self.connection.zuul_ref_table
+        q = self.session().query(self.connection.refModel)
+        q = q.filter(ref_table.c.project == project,
+                     ref_table.c.ref == ref,
+                     ref_table.c.ref_url == ref_url,
+                     ref_table.c.change == change,
+                     ref_table.c.patchset == patchset,
+                     ref_table.c.branch == branch,
+                     ref_table.c.oldrev == oldrev,
+                     ref_table.c.newrev == newrev)
+        ret = q.all()
+        if ret:
+            return ret[0]
+        ret = self.connection.refModel(
+            project=project, ref=ref, ref_url=ref_url,
+            change=change, patchset=patchset, branch=branch,
+            oldrev=oldrev, newrev=newrev)
+        self.session().add(ret)
+        self.session().flush()
+        return ret
 
     def getBuildsets(self, tenant=None, project=None, pipeline=None,
                      change=None, branch=None, patchset=None, ref=None,
@@ -408,44 +435,60 @@ class SQLConnection(BaseConnection):
     def _setup_models(self):
         Base = orm.declarative_base(metadata=self.metadata)
 
-        class BuildSetModel(Base):
-            __tablename__ = self.table_prefix + BUILDSET_TABLE
+        class RefModel(Base):
+            __tablename__ = self.table_prefix + REF_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
-            zuul_ref = sa.Column(sa.String(255))
-            pipeline = sa.Column(sa.String(255))
             project = sa.Column(sa.String(255))
             change = sa.Column(sa.Integer, nullable=True)
             patchset = sa.Column(sa.String(255), nullable=True)
             ref = sa.Column(sa.String(255))
-            message = sa.Column(sa.TEXT())
-            tenant = sa.Column(sa.String(255))
-            result = sa.Column(sa.String(255))
             ref_url = sa.Column(sa.String(255))
             oldrev = sa.Column(sa.String(255))
             newrev = sa.Column(sa.String(255))
             branch = sa.Column(sa.String(255))
+
+            sa.Index(self.table_prefix + 'project_change_idx',
+                     project, change)
+            sa.Index(self.table_prefix + 'change_idx', change)
+
+        class BuildSetModel(Base):
+            __tablename__ = self.table_prefix + BUILDSET_TABLE
+            id = sa.Column(sa.Integer, primary_key=True)
             uuid = sa.Column(sa.String(36))
+            tenant = sa.Column(sa.String(255))
+            pipeline = sa.Column(sa.String(255))
+            result = sa.Column(sa.String(255))
+            message = sa.Column(sa.TEXT())
             event_id = sa.Column(sa.String(255), nullable=True)
             event_timestamp = sa.Column(sa.DateTime, nullable=True)
             first_build_start_time = sa.Column(sa.DateTime, nullable=True)
             last_build_end_time = sa.Column(sa.DateTime, nullable=True)
             updated = sa.Column(sa.DateTime, nullable=True)
 
-            sa.Index(self.table_prefix + 'project_pipeline_idx',
-                     project, pipeline)
-            sa.Index(self.table_prefix + 'project_change_idx',
-                     project, change)
-            sa.Index(self.table_prefix + 'change_idx', change)
+            refs = orm.relationship(
+                RefModel,
+                secondary=self.table_prefix + BUILDSET_REF_TABLE)
             sa.Index(self.table_prefix + 'uuid_idx', uuid)
 
-            def createBuild(self, *args, **kw):
+            def createBuild(self, ref, *args, **kw):
                 session = orm.session.Session.object_session(self)
                 b = BuildModel(*args, **kw)
                 b.buildset_id = self.id
+                b.ref_id = ref.id
                 self.builds.append(b)
                 session.add(b)
                 session.flush()
                 return b
+
+        class BuildSetRefModel(Base):
+            __tablename__ = self.table_prefix + BUILDSET_REF_TABLE
+            __table_args__ = (
+                sa.PrimaryKeyConstraint('buildset_id', 'ref_id'),
+            )
+            buildset_id = sa.Column(sa.Integer, sa.ForeignKey(
+                self.table_prefix + BUILDSET_TABLE + ".id"))
+            ref_id = sa.Column(sa.Integer, sa.ForeignKey(
+                self.table_prefix + REF_TABLE + ".id"))
 
         class BuildModel(Base):
             __tablename__ = self.table_prefix + BUILD_TABLE
@@ -453,6 +496,9 @@ class SQLConnection(BaseConnection):
             buildset_id = sa.Column(sa.Integer, sa.ForeignKey(
                 self.table_prefix + BUILDSET_TABLE + ".id"))
             uuid = sa.Column(sa.String(36))
+            ref_id = sa.Column(sa.Integer, sa.ForeignKey(
+                self.table_prefix + REF_TABLE + ".id"))
+
             job_name = sa.Column(sa.String(255))
             result = sa.Column(sa.String(255))
             start_time = sa.Column(sa.DateTime)
@@ -463,10 +509,12 @@ class SQLConnection(BaseConnection):
             final = sa.Column(sa.Boolean)
             held = sa.Column(sa.Boolean)
             nodeset = sa.Column(sa.String(255))
+
             buildset = orm.relationship(BuildSetModel,
                                         backref=orm.backref(
                                             "builds",
                                             cascade="all, delete-orphan"))
+            ref = orm.relationship(RefModel)
 
             sa.Index(self.table_prefix + 'job_name_buildset_id_idx',
                      job_name, buildset_id)
@@ -576,6 +624,12 @@ class SQLConnection(BaseConnection):
 
         self.buildSetModel = BuildSetModel
         self.zuul_buildset_table = self.buildSetModel.__table__
+
+        self.refModel = RefModel
+        self.zuul_ref_table = self.refModel.__table__
+
+        self.buildSetRefModel = BuildSetRefModel
+        self.zuul_buildset_ref_table = self.buildSetRefModel.__table__
 
     def onStop(self):
         self.log.debug("Stopping SQL connection %s" % self.connection_name)

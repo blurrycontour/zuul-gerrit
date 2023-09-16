@@ -1,4 +1,5 @@
 # Copyright 2014 Rackspace Australia
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,12 +13,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import configparser
+import datetime
 import os
 import re
 import textwrap
 import time
 import types
 
+from prettytable import PrettyTable
 import sqlalchemy as sa
 
 import zuul
@@ -105,6 +108,70 @@ class TestSQLConnectionMysql(ZuulTestCase):
     def test_sql_indexes_created(self):
         "Test the indexes are created properly"
         self._sql_indexes_created('database')
+
+    def test_bundle_refactor_smoketest(self):
+        # This is a smoketest for the bundle refactor
+        connection = self.scheds.first.connections.getSqlConnection()
+        with connection.getSession() as db:
+            bs = db.createBuildSet(
+                uuid='buildset uuid',
+                tenant='tenant-one',
+                pipeline='check',
+                result='SUCCESS',
+                event_id='event id',
+                event_timestamp=datetime.datetime.utcnow(),
+                updated=datetime.datetime.utcnow(),
+            )
+
+            ref1 = db.getOrCreateRef(
+                project='project1',
+                ref='refs/changes/01/1',
+                change=1,
+                patchset='1',
+                branch='master',
+                ref_url='http://review.example.com/1',
+            )
+            bs.refs.append(ref1)
+
+            ref2 = db.getOrCreateRef(
+                project='project2',
+                ref='refs/changes/02/2',
+                change=2,
+                patchset='1',
+                branch='master',
+                ref_url='http://review.example.com/2',
+            )
+            bs.refs.append(ref2)
+
+            bs.createBuild(
+                ref=ref1,
+                job_name='linters',
+                result='SUCCESS',
+                start_time=datetime.datetime.utcnow(),
+                end_time=datetime.datetime.utcnow(),
+            )
+            bs.createBuild(
+                ref=ref2,
+                job_name='linters',
+                result='SUCCESS',
+                start_time=datetime.datetime.utcnow(),
+                end_time=datetime.datetime.utcnow(),
+            )
+
+        with connection.engine.connect() as conn:
+            for tobj in [
+                    connection.zuul_buildset_table,
+                    connection.zuul_ref_table,
+                    connection.zuul_buildset_ref_table,
+                    connection.zuul_build_table,
+            ]:
+                result = conn.execute(sa.sql.select(tobj))
+                table = PrettyTable()
+                table.field_names = result.keys()
+                for row in result:
+                    table.add_row(row)
+                print(tobj.name)
+                print(table)
 
     def test_sql_results(self):
         "Test results are entered into an sql table"

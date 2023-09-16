@@ -1,4 +1,4 @@
-# Copyright 2021 Acme Gating, LLC
+# Copyright 2021-2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -165,6 +165,54 @@ class TestMysqlDatabase(DBBaseTestCase):
                               '2022-05-02 12:34:56',
                               '2022-05-03 12:34:56',
                               '2022-05-13 12:34:56'])
+
+    def test_migration_f7843ddf1552(self):
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("set foreign_key_checks=0")
+            for table in connection.exec_driver_sql("show tables"):
+                table = table[0]
+                connection.exec_driver_sql(f"drop table {table}")
+            connection.exec_driver_sql("set foreign_key_checks=1")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('151893067f91')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("""
+            insert into zuul_buildset
+            (id, zuul_ref, project, `change`, patchset, ref,
+             ref_url, oldrev, newrev, branch)
+            values
+            (1, "Z1", "project1", 1, "1", "refs/changes/1",
+             "http://project1/1", "old1", "new1", "master"),
+            (2, "Z2", "project1", 2, "a", "refs/changes/2",
+             "http://project1/2", "old2", "new2", "stable"),
+            (3, "Z3", "project2", NULL, NULL, "refs/tags/foo",
+             "http://project3", "old3", "new3", NULL)
+            """)
+            connection.exec_driver_sql("""
+            insert into zuul_build
+            (id, buildset_id, uuid, job_name, result)
+            values
+            (1, 1, "builduuid1", "job1", "RESULT1"),
+            (2, 1, "builduuid2", "job2", "RESULT2"),
+            (3, 2, "builduuid3", "job1", "RESULT3"),
+            (4, 2, "builduuid4", "job2", "RESULT4"),
+            (5, 3, "builduuid5", "job3", "RESULT5"),
+            (6, 3, "builduuid6", "job4", "RESULT6")
+            """)
+
+        self.connection._migrate()
+        with self.connection.engine.begin() as connection:
+            results = [r[0] for r in connection.exec_driver_sql(
+                "select ref_id from zuul_build")]
+            self.assertEqual(results, [1, 1, 2, 2, 3, 3])
+            results = list(connection.exec_driver_sql(
+                "select buildset_id, ref_id from zuul_buildset_ref"))
+            self.assertEqual(results, [
+                (1, 1),
+                (2, 2),
+                (3, 3),
+            ])
 
     def test_buildsets(self):
         tenant = 'tenant1',
