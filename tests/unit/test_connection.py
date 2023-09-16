@@ -1,4 +1,5 @@
 # Copyright 2014 Rackspace Australia
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,12 +13,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import configparser
+import datetime
 import os
 import re
 import textwrap
 import time
 import types
 
+from prettytable import PrettyTable
 import sqlalchemy as sa
 
 import zuul
@@ -70,11 +73,21 @@ class TestSQLConnectionMysql(ZuulTestCase):
         table_prefix = connection.table_prefix
         self.assertEqual(self.expected_table_prefix, table_prefix)
 
+        ref_table = table_prefix + 'zuul_ref'
         buildset_table = table_prefix + 'zuul_buildset'
+        buildset_ref_table = table_prefix + 'zuul_buildset_ref'
         build_table = table_prefix + 'zuul_build'
+        artifact_table = table_prefix + 'zuul_artifact'
+        provides_table = table_prefix + 'zuul_provides'
+        build_event_table = table_prefix + 'zuul_build_event'
 
-        self.assertEqual(20, len(insp.get_columns(buildset_table)))
-        self.assertEqual(13, len(insp.get_columns(build_table)))
+        self.assertEqual(9, len(insp.get_columns(ref_table)))
+        self.assertEqual(11, len(insp.get_columns(buildset_table)))
+        self.assertEqual(2, len(insp.get_columns(buildset_ref_table)))
+        self.assertEqual(14, len(insp.get_columns(build_table)))
+        self.assertEqual(5, len(insp.get_columns(artifact_table)))
+        self.assertEqual(3, len(insp.get_columns(provides_table)))
+        self.assertEqual(5, len(insp.get_columns(build_event_table)))
 
     def test_sql_tables_created(self):
         "Test the tables for storing results are created properly"
@@ -87,18 +100,35 @@ class TestSQLConnectionMysql(ZuulTestCase):
         table_prefix = connection.table_prefix
         self.assertEqual(self.expected_table_prefix, table_prefix)
 
+        ref_table = table_prefix + 'zuul_ref'
         buildset_table = table_prefix + 'zuul_buildset'
+        buildset_ref_table = table_prefix + 'zuul_buildset_ref'
         build_table = table_prefix + 'zuul_build'
+        artifact_table = table_prefix + 'zuul_artifact'
+        provides_table = table_prefix + 'zuul_provides'
+        build_event_table = table_prefix + 'zuul_build_event'
 
+        indexes_ref = insp.get_indexes(ref_table)
         indexes_buildset = insp.get_indexes(buildset_table)
+        indexes_buildset_ref = insp.get_indexes(buildset_ref_table)
         indexes_build = insp.get_indexes(build_table)
+        indexes_artifact = insp.get_indexes(artifact_table)
+        indexes_provides = insp.get_indexes(provides_table)
+        indexes_build_event = insp.get_indexes(build_event_table)
 
-        self.assertEqual(4, len(indexes_buildset))
-        self.assertEqual(3, len(indexes_build))
+        self.assertEqual(2, len(indexes_ref))
+        self.assertEqual(1, len(indexes_buildset))
+        self.assertEqual(2, len(indexes_buildset_ref))
+        self.assertEqual(4, len(indexes_build))
+        self.assertEqual(1, len(indexes_artifact))
+        self.assertEqual(1, len(indexes_provides))
+        self.assertEqual(1, len(indexes_build_event))
 
         # check if all indexes are prefixed
         if table_prefix:
-            indexes = indexes_buildset + indexes_build
+            indexes = (indexes_ref + indexes_buildset + indexes_buildset_ref +
+                       indexes_build + indexes_artifact + indexes_provides +
+                       indexes_build_event)
             for index in indexes:
                 self.assertTrue(index['name'].startswith(table_prefix))
 
@@ -106,132 +136,130 @@ class TestSQLConnectionMysql(ZuulTestCase):
         "Test the indexes are created properly"
         self._sql_indexes_created('database')
 
+    def test_bundle_refactor_smoketest(self):
+        # This is a smoketest for the bundle refactor
+        connection = self.scheds.first.connections.getSqlConnection()
+        with connection.getSession() as db:
+            bs = db.createBuildSet(
+                uuid='buildset uuid',
+                tenant='tenant-one',
+                pipeline='check',
+                result='SUCCESS',
+                event_id='event id',
+                event_timestamp=datetime.datetime.utcnow(),
+                updated=datetime.datetime.utcnow(),
+            )
+
+            ref1 = db.getOrCreateRef(
+                project='project1',
+                ref='refs/changes/01/1',
+                change=1,
+                patchset='1',
+                branch='master',
+                ref_url='http://review.example.com/1',
+            )
+            bs.refs.append(ref1)
+
+            ref2 = db.getOrCreateRef(
+                project='project2',
+                ref='refs/changes/02/2',
+                change=2,
+                patchset='1',
+                branch='master',
+                ref_url='http://review.example.com/2',
+            )
+            bs.refs.append(ref2)
+
+            bs.createBuild(
+                ref=ref1,
+                job_name='linters',
+                result='SUCCESS',
+                start_time=datetime.datetime.utcnow(),
+                end_time=datetime.datetime.utcnow(),
+            )
+            bs.createBuild(
+                ref=ref2,
+                job_name='linters',
+                result='SUCCESS',
+                start_time=datetime.datetime.utcnow(),
+                end_time=datetime.datetime.utcnow(),
+            )
+
+        with connection.engine.connect() as conn:
+            for tobj in [
+                    connection.zuul_buildset_table,
+                    connection.zuul_ref_table,
+                    connection.zuul_buildset_ref_table,
+                    connection.zuul_build_table,
+            ]:
+                result = conn.execute(sa.sql.select(tobj))
+                table = PrettyTable()
+                table.field_names = result.keys()
+                for row in result:
+                    table.add_row(row)
+
     def test_sql_results(self):
         "Test results are entered into an sql table"
 
         def check_results():
             # Grab the sa tables
-            tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
-            pipeline = tenant.layout.pipelines['check']
-            reporter = self.scheds.first.connections.getSqlReporter(
-                pipeline)
-            with self.scheds.first.connections.getSqlConnection().\
-                    engine.connect() as conn:
-
-                result = conn.execute(
-                    sa.sql.select(reporter.connection.zuul_buildset_table))
-
-                buildsets = result.fetchall()
+            connection = self.scheds.first.connections.getSqlConnection()
+            with connection.getSession() as db:
+                buildsets = list(reversed(db.getBuildsets()))
                 self.assertEqual(5, len(buildsets))
-                buildset0 = buildsets[0]
-                buildset1 = buildsets[1]
-                buildset2 = buildsets[2]
-                buildset3 = buildsets[3]
-                buildset4 = buildsets[4]
 
-                self.assertEqual('check', buildset0.pipeline)
-                self.assertEqual('org/project', buildset0.project)
-                self.assertEqual(1, buildset0.change)
-                self.assertEqual('1', buildset0.patchset)
-                self.assertEqual('SUCCESS', buildset0.result)
-                self.assertEqual('Build succeeded.', buildset0.message)
-                self.assertEqual('tenant-one', buildset0.tenant)
+                self.assertEqual('check', buildsets[0].pipeline)
+                self.assertEqual('org/project', buildsets[0].refs[0].project)
+                self.assertEqual(1, buildsets[0].refs[0].change)
+                self.assertEqual('1', buildsets[0].refs[0].patchset)
+                self.assertEqual('SUCCESS', buildsets[0].result)
+                self.assertEqual('Build succeeded.', buildsets[0].message)
+                self.assertEqual('tenant-one', buildsets[0].tenant)
                 self.assertEqual(
-                    'https://review.example.com/%d' % buildset0.change,
-                    buildset0.ref_url)
-                self.assertNotEqual(None, buildset0.event_id)
-                self.assertNotEqual(None, buildset0.event_timestamp)
-
-                buildset0_builds = conn.execute(
-                    sa.sql.select(
-                        reporter.connection.zuul_build_table
-                    ).where(
-                        reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset0.id
-                    )
-                ).fetchall()
+                    'https://review.example.com/%d' %
+                    buildsets[0].refs[0].change,
+                    buildsets[0].refs[0].ref_url)
+                self.assertNotEqual(None, buildsets[0].event_id)
+                self.assertNotEqual(None, buildsets[0].event_timestamp)
 
                 # Check the first result, which should be the project-merge job
                 self.assertEqual(
-                    'project-merge', buildset0_builds[0].job_name)
-                self.assertEqual("SUCCESS", buildset0_builds[0].result)
-                self.assertEqual(None, buildset0_builds[0].log_url)
-                self.assertEqual('check', buildset1.pipeline)
-                self.assertEqual('master', buildset1.branch)
-                self.assertEqual('org/project', buildset1.project)
-                self.assertEqual(2, buildset1.change)
-                self.assertEqual('1', buildset1.patchset)
-                self.assertEqual('FAILURE', buildset1.result)
-                self.assertEqual('Build failed.', buildset1.message)
-
-                buildset1_builds = conn.execute(
-                    sa.sql.select(
-                        reporter.connection.zuul_build_table
-                    ).where(
-                        reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset1.id
-                    )
-                ).fetchall()
+                    'project-merge', buildsets[0].builds[0].job_name)
+                self.assertEqual("SUCCESS", buildsets[0].builds[0].result)
+                self.assertEqual(None, buildsets[0].builds[0].log_url)
+                self.assertEqual('check', buildsets[1].pipeline)
+                self.assertEqual('master', buildsets[1].refs[0].branch)
+                self.assertEqual('org/project', buildsets[1].refs[0].project)
+                self.assertEqual(2, buildsets[1].refs[0].change)
+                self.assertEqual('1', buildsets[1].refs[0].patchset)
+                self.assertEqual('FAILURE', buildsets[1].result)
+                self.assertEqual('Build failed.', buildsets[1].message)
 
                 # Check the second result, which should be the project-test1
                 # job which failed
                 self.assertEqual(
-                    'project-test1', buildset1_builds[1].job_name)
-                self.assertEqual("FAILURE", buildset1_builds[1].result)
-                self.assertEqual(None, buildset1_builds[1].log_url)
-
-                buildset2_builds = conn.execute(
-                    sa.sql.select(
-                        reporter.connection.zuul_build_table
-                    ).where(
-                        reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset2.id
-                    )
-                ).fetchall()
+                    'project-test1', buildsets[1].builds[1].job_name)
+                self.assertEqual("FAILURE", buildsets[1].builds[1].result)
+                self.assertEqual(None, buildsets[1].builds[1].log_url)
 
                 # Check the first result, which should be the project-publish
                 # job
                 self.assertEqual('project-publish',
-                                 buildset2_builds[0].job_name)
-                self.assertEqual("SUCCESS", buildset2_builds[0].result)
-
-                buildset3_builds = conn.execute(
-                    sa.sql.select(
-                        reporter.connection.zuul_build_table
-                    ).where(
-                        reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset3.id
-                    )
-                ).fetchall()
+                                 buildsets[2].builds[0].job_name)
+                self.assertEqual("SUCCESS", buildsets[2].builds[0].result)
 
                 self.assertEqual(
-                    'project-test1', buildset3_builds[1].job_name)
-                self.assertEqual('NODE_FAILURE', buildset3_builds[1].result)
-                self.assertEqual(None, buildset3_builds[1].log_url)
-                self.assertIsNotNone(buildset3_builds[1].start_time)
-                self.assertIsNotNone(buildset3_builds[1].end_time)
+                    'project-test1', buildsets[3].builds[1].job_name)
+                self.assertEqual('NODE_FAILURE', buildsets[3].builds[1].result)
+                self.assertEqual(None, buildsets[3].builds[1].log_url)
+                self.assertIsNotNone(buildsets[3].builds[1].start_time)
+                self.assertIsNotNone(buildsets[3].builds[1].end_time)
                 self.assertGreaterEqual(
-                    buildset3_builds[1].end_time,
-                    buildset3_builds[1].start_time)
+                    buildsets[3].builds[1].end_time,
+                    buildsets[3].builds[1].start_time)
 
                 # Check the paused build result
-                buildset4_builds = conn.execute(
-                    sa.sql.select(
-                        reporter.connection.zuul_build_table
-                    ).where(
-                        reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset4.id
-                    ).order_by(reporter.connection.zuul_build_table.c.id)
-                ).fetchall()
-
-                paused_build_events = conn.execute(
-                    sa.sql.select(
-                        reporter.connection.zuul_build_event_table
-                    ).where(
-                        reporter.connection.zuul_build_event_table.c.build_id
-                        == buildset4_builds[0].id
-                    )
-                ).fetchall()
+                paused_build_events = buildsets[4].builds[0].build_events
 
                 self.assertEqual(len(paused_build_events), 2)
                 pause_event = paused_build_events[0]
@@ -316,60 +344,42 @@ class TestSQLConnectionMysql(ZuulTestCase):
         # Check the results
         def check_results():
             # Grab the sa tables
-            tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
-            pipeline = tenant.layout.pipelines['check']
-            reporter = self.scheds.first.connections.getSqlReporter(
-                pipeline)
+            connection = self.scheds.first.connections.getSqlConnection()
+            with connection.getSession() as db:
+                buildsets = db.getBuildsets()
 
-            with self.scheds.first.connections.getSqlConnection().\
-                    engine.connect() as conn:
-
-                result = conn.execute(
-                    sa.sql.select(reporter.connection.zuul_buildset_table)
-                )
-
-                buildsets = result.fetchall()
                 self.assertEqual(1, len(buildsets))
                 buildset0 = buildsets[0]
 
                 self.assertEqual('check', buildset0.pipeline)
-                self.assertEqual('org/project', buildset0.project)
-                self.assertEqual(1, buildset0.change)
-                self.assertEqual('1', buildset0.patchset)
+                self.assertEqual('org/project', buildset0.refs[0].project)
+                self.assertEqual(1, buildset0.refs[0].change)
+                self.assertEqual('1', buildset0.refs[0].patchset)
                 self.assertEqual('SUCCESS', buildset0.result)
                 self.assertEqual('Build succeeded.', buildset0.message)
                 self.assertEqual('tenant-one', buildset0.tenant)
                 self.assertEqual(
-                    'https://review.example.com/%d' % buildset0.change,
-                    buildset0.ref_url)
+                    'https://review.example.com/%d' % buildset0.refs[0].change,
+                    buildset0.refs[0].ref_url)
 
-                buildset0_builds = conn.execute(
-                    sa.sql.select(
-                        reporter.connection.zuul_build_table
-                    ).where(
-                        reporter.connection.zuul_build_table.c.buildset_id ==
-                        buildset0.id
-                    )
-                ).fetchall()
+                # Check the retry results
+                self.assertEqual('project-merge', buildset0.builds[0].job_name)
+                self.assertEqual('SUCCESS', buildset0.builds[0].result)
+                self.assertTrue(buildset0.builds[0].final)
 
-            # Check the retry results
-            self.assertEqual('project-merge', buildset0_builds[0].job_name)
-            self.assertEqual('SUCCESS', buildset0_builds[0].result)
-            self.assertTrue(buildset0_builds[0].final)
+                self.assertEqual('project-test1', buildset0.builds[1].job_name)
+                self.assertEqual('RETRY', buildset0.builds[1].result)
+                self.assertFalse(buildset0.builds[1].final)
+                self.assertEqual('project-test2', buildset0.builds[2].job_name)
+                self.assertEqual('RETRY', buildset0.builds[2].result)
+                self.assertFalse(buildset0.builds[2].final)
 
-            self.assertEqual('project-test1', buildset0_builds[1].job_name)
-            self.assertEqual('RETRY', buildset0_builds[1].result)
-            self.assertFalse(buildset0_builds[1].final)
-            self.assertEqual('project-test2', buildset0_builds[2].job_name)
-            self.assertEqual('RETRY', buildset0_builds[2].result)
-            self.assertFalse(buildset0_builds[2].final)
-
-            self.assertEqual('project-test1', buildset0_builds[3].job_name)
-            self.assertEqual('SUCCESS', buildset0_builds[3].result)
-            self.assertTrue(buildset0_builds[3].final)
-            self.assertEqual('project-test2', buildset0_builds[4].job_name)
-            self.assertEqual('SUCCESS', buildset0_builds[4].result)
-            self.assertTrue(buildset0_builds[4].final)
+                self.assertEqual('project-test1', buildset0.builds[3].job_name)
+                self.assertEqual('SUCCESS', buildset0.builds[3].result)
+                self.assertTrue(buildset0.builds[3].final)
+                self.assertEqual('project-test2', buildset0.builds[4].job_name)
+                self.assertEqual('SUCCESS', buildset0.builds[4].result)
+                self.assertTrue(buildset0.builds[4].final)
 
         self.executor_server.hold_jobs_in_build = True
 
@@ -402,6 +412,9 @@ class TestSQLConnectionMysql(ZuulTestCase):
         with self.scheds.first.connections.getSqlConnection().\
              engine.connect() as conn:
 
+            # We don't actually need to delete the zuul_ref entry
+            result = conn.execute(sa.text(
+                f"delete from {self.expected_table_prefix}zuul_buildset_ref;"))
             result = conn.execute(sa.text(
                 f"delete from {self.expected_table_prefix}zuul_build;"))
             result = conn.execute(sa.text(

@@ -1,4 +1,5 @@
 # Copyright 2014 Rackspace Australia
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -30,6 +31,8 @@ from zuul.zk.locks import CONNECTION_LOCK_ROOT, locked, SessionAwareLock
 
 
 BUILDSET_TABLE = 'zuul_buildset'
+REF_TABLE = 'zuul_ref'
+BUILDSET_REF_TABLE = 'zuul_buildset_ref'
 BUILD_TABLE = 'zuul_build'
 BUILD_EVENTS_TABLE = 'zuul_build_event'
 ARTIFACT_TABLE = 'zuul_artifact'
@@ -96,6 +99,7 @@ class DatabaseSession(object):
                   offset=0, idx_min=None, idx_max=None,
                   exclude_result=None, query_timeout=None):
 
+        ref_table = self.connection.zuul_ref_table
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
         provides_table = self.connection.zuul_provides_table
@@ -105,8 +109,10 @@ class DatabaseSession(object):
         # joinedload).
         q = self.session().query(self.connection.buildModel).\
             join(self.connection.buildSetModel).\
+            join(self.connection.refModel).\
             outerjoin(self.connection.providesModel).\
             options(orm.contains_eager(self.connection.buildModel.buildset),
+                    orm.contains_eager(self.connection.buildModel.ref),
                     orm.selectinload(self.connection.buildModel.provides),
                     orm.selectinload(self.connection.buildModel.artifacts))
         # If the query planner isn't able to reduce either the number
@@ -134,13 +140,13 @@ class DatabaseSession(object):
                 dialect_name='postgresql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
-        q = self.listFilter(q, buildset_table.c.project, project)
         q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
-        q = self.listFilter(q, buildset_table.c.change, change)
-        q = self.listFilter(q, buildset_table.c.branch, branch)
-        q = self.listFilter(q, buildset_table.c.patchset, patchset)
-        q = self.listFilter(q, buildset_table.c.ref, ref)
-        q = self.listFilter(q, buildset_table.c.newrev, newrev)
+        q = self.listFilter(q, ref_table.c.project, project)
+        q = self.listFilter(q, ref_table.c.change, change)
+        q = self.listFilter(q, ref_table.c.branch, branch)
+        q = self.listFilter(q, ref_table.c.patchset, patchset)
+        q = self.listFilter(q, ref_table.c.ref, ref)
+        q = self.listFilter(q, ref_table.c.newrev, newrev)
         q = self.listFilter(q, buildset_table.c.event_id, event_id)
         q = self.listFilter(
             q, buildset_table.c.event_timestamp, event_timestamp)
@@ -210,6 +216,32 @@ class DatabaseSession(object):
         self.session().flush()
         return bs
 
+    def getOrCreateRef(self, project, ref, ref_url,
+                       change=None, patchset=None, branch=None,
+                       oldrev=None, newrev=None):
+        # TODO: attempt insert and catch unique constraint error to
+        # avoid race condition
+        ref_table = self.connection.zuul_ref_table
+        q = self.session().query(self.connection.refModel)
+        q = q.filter(ref_table.c.project == project,
+                     ref_table.c.ref == ref,
+                     ref_table.c.ref_url == ref_url,
+                     ref_table.c.change == change,
+                     ref_table.c.patchset == patchset,
+                     ref_table.c.branch == branch,
+                     ref_table.c.oldrev == oldrev,
+                     ref_table.c.newrev == newrev)
+        ret = q.all()
+        if ret:
+            return ret[0]
+        ret = self.connection.refModel(
+            project=project, ref=ref, ref_url=ref_url,
+            change=change, patchset=patchset, branch=branch,
+            oldrev=oldrev, newrev=newrev)
+        self.session().add(ret)
+        self.session().flush()
+        return ret
+
     def getBuildsets(self, tenant=None, project=None, pipeline=None,
                      change=None, branch=None, patchset=None, ref=None,
                      newrev=None, uuid=None, result=None, complete=None,
@@ -218,9 +250,13 @@ class DatabaseSession(object):
                      query_timeout=None):
 
         buildset_table = self.connection.zuul_buildset_table
+        ref_table = self.connection.zuul_ref_table
 
         # See note above about the hint.
-        q = self.session().query(self.connection.buildSetModel)
+        q = self.session().query(self.connection.buildSetModel).\
+            join(self.connection.buildSetRefModel).\
+            join(self.connection.refModel).\
+            options(orm.contains_eager(self.connection.buildSetModel.refs))
         if not (project or change or uuid):
             q = q.with_hint(buildset_table, 'USE INDEX (PRIMARY)', 'mysql')
 
@@ -236,13 +272,13 @@ class DatabaseSession(object):
                 dialect_name='postgresql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
-        q = self.listFilter(q, buildset_table.c.project, project)
         q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
-        q = self.listFilter(q, buildset_table.c.change, change)
-        q = self.listFilter(q, buildset_table.c.branch, branch)
-        q = self.listFilter(q, buildset_table.c.patchset, patchset)
-        q = self.listFilter(q, buildset_table.c.ref, ref)
-        q = self.listFilter(q, buildset_table.c.newrev, newrev)
+        q = self.listFilter(q, ref_table.c.project, project)
+        q = self.listFilter(q, ref_table.c.change, change)
+        q = self.listFilter(q, ref_table.c.branch, branch)
+        q = self.listFilter(q, ref_table.c.patchset, patchset)
+        q = self.listFilter(q, ref_table.c.ref, ref)
+        q = self.listFilter(q, ref_table.c.newrev, newrev)
         q = self.listFilter(q, buildset_table.c.uuid, uuid)
         q = self.listFilter(q, buildset_table.c.result, result)
         if idx_min:
@@ -273,6 +309,7 @@ class DatabaseSession(object):
         buildset_table = self.connection.zuul_buildset_table
 
         q = self.session().query(self.connection.buildSetModel).\
+            options(orm.joinedload(self.connection.buildSetModel.refs)).\
             options(orm.joinedload(self.connection.buildSetModel.builds).
                     subqueryload(self.connection.buildModel.artifacts)).\
             options(orm.joinedload(self.connection.buildSetModel.builds).
@@ -408,22 +445,30 @@ class SQLConnection(BaseConnection):
     def _setup_models(self):
         Base = orm.declarative_base(metadata=self.metadata)
 
-        class BuildSetModel(Base):
-            __tablename__ = self.table_prefix + BUILDSET_TABLE
+        class RefModel(Base):
+            __tablename__ = self.table_prefix + REF_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
-            zuul_ref = sa.Column(sa.String(255))
-            pipeline = sa.Column(sa.String(255))
             project = sa.Column(sa.String(255))
             change = sa.Column(sa.Integer, nullable=True)
             patchset = sa.Column(sa.String(255), nullable=True)
             ref = sa.Column(sa.String(255))
-            message = sa.Column(sa.TEXT())
-            tenant = sa.Column(sa.String(255))
-            result = sa.Column(sa.String(255))
             ref_url = sa.Column(sa.String(255))
             oldrev = sa.Column(sa.String(255))
             newrev = sa.Column(sa.String(255))
             branch = sa.Column(sa.String(255))
+
+            sa.Index(self.table_prefix + 'project_change_idx',
+                     project, change)
+            sa.Index(self.table_prefix + 'change_idx', change)
+            # TODO: unique constraint
+
+        class BuildSetModel(Base):
+            __tablename__ = self.table_prefix + BUILDSET_TABLE
+            id = sa.Column(sa.Integer, primary_key=True)
+            pipeline = sa.Column(sa.String(255))
+            message = sa.Column(sa.TEXT())
+            tenant = sa.Column(sa.String(255))
+            result = sa.Column(sa.String(255))
             uuid = sa.Column(sa.String(36))
             event_id = sa.Column(sa.String(255), nullable=True)
             event_timestamp = sa.Column(sa.DateTime, nullable=True)
@@ -431,27 +476,40 @@ class SQLConnection(BaseConnection):
             last_build_end_time = sa.Column(sa.DateTime, nullable=True)
             updated = sa.Column(sa.DateTime, nullable=True)
 
-            sa.Index(self.table_prefix + 'project_pipeline_idx',
-                     project, pipeline)
-            sa.Index(self.table_prefix + 'project_change_idx',
-                     project, change)
-            sa.Index(self.table_prefix + 'change_idx', change)
+            refs = orm.relationship(
+                RefModel,
+                secondary=self.table_prefix + BUILDSET_REF_TABLE)
             sa.Index(self.table_prefix + 'uuid_idx', uuid)
 
-            def createBuild(self, *args, **kw):
+            def createBuild(self, ref, *args, **kw):
                 session = orm.session.Session.object_session(self)
                 b = BuildModel(*args, **kw)
                 b.buildset_id = self.id
+                b.ref_id = ref.id
                 self.builds.append(b)
                 session.add(b)
                 session.flush()
                 return b
 
+        class BuildSetRefModel(Base):
+            __tablename__ = self.table_prefix + BUILDSET_REF_TABLE
+            __table_args__ = (
+                sa.PrimaryKeyConstraint('buildset_id', 'ref_id'),
+            )
+            buildset_id = sa.Column(sa.Integer, sa.ForeignKey(
+                self.table_prefix + BUILDSET_TABLE + ".id"))
+            ref_id = sa.Column(sa.Integer, sa.ForeignKey(
+                self.table_prefix + REF_TABLE + ".id"))
+            sa.Index(self.table_prefix + 'buildset_ref_buildset_id_idx',
+                     buildset_id)
+            sa.Index(self.table_prefix + 'buildset_ref_ref_id_idx', ref_id)
+
         class BuildModel(Base):
             __tablename__ = self.table_prefix + BUILD_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
             buildset_id = sa.Column(sa.Integer, sa.ForeignKey(
-                self.table_prefix + BUILDSET_TABLE + ".id"))
+                self.table_prefix + BUILDSET_TABLE + ".id",
+            ))
             uuid = sa.Column(sa.String(36))
             job_name = sa.Column(sa.String(255))
             result = sa.Column(sa.String(255))
@@ -463,10 +521,14 @@ class SQLConnection(BaseConnection):
             final = sa.Column(sa.Boolean)
             held = sa.Column(sa.Boolean)
             nodeset = sa.Column(sa.String(255))
+            ref_id = sa.Column(sa.Integer, sa.ForeignKey(
+                self.table_prefix + REF_TABLE + ".id"))
+
             buildset = orm.relationship(BuildSetModel,
                                         backref=orm.backref(
                                             "builds",
                                             cascade="all, delete-orphan"))
+            ref = orm.relationship(RefModel)
 
             sa.Index(self.table_prefix + 'job_name_buildset_id_idx',
                      job_name, buildset_id)
@@ -474,6 +536,8 @@ class SQLConnection(BaseConnection):
                      uuid, buildset_id)
             sa.Index(self.table_prefix + 'build_buildset_id_idx',
                      buildset_id)
+            sa.Index(self.table_prefix + 'build_ref_id_idx',
+                     ref_id)
 
             @property
             def duration(self):
@@ -576,6 +640,12 @@ class SQLConnection(BaseConnection):
 
         self.buildSetModel = BuildSetModel
         self.zuul_buildset_table = self.buildSetModel.__table__
+
+        self.refModel = RefModel
+        self.zuul_ref_table = self.refModel.__table__
+
+        self.buildSetRefModel = BuildSetRefModel
+        self.zuul_buildset_ref_table = self.buildSetRefModel.__table__
 
     def onStop(self):
         self.log.debug("Stopping SQL connection %s" % self.connection_name)

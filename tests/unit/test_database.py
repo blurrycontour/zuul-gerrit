@@ -1,4 +1,4 @@
-# Copyright 2021 Acme Gating, LLC
+# Copyright 2021-2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -166,29 +166,78 @@ class TestMysqlDatabase(DBBaseTestCase):
                               '2022-05-03 12:34:56',
                               '2022-05-13 12:34:56'])
 
+    def test_migration_f7843ddf1552(self):
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("set foreign_key_checks=0")
+            for table in connection.exec_driver_sql("show tables"):
+                table = table[0]
+                connection.exec_driver_sql(f"drop table {table}")
+            connection.exec_driver_sql("set foreign_key_checks=1")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('151893067f91')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("""
+            insert into zuul_buildset
+            (id, zuul_ref, project, `change`, patchset, ref,
+             ref_url, oldrev, newrev, branch)
+            values
+            (1, "Z1", "project1", 1, "1", "refs/changes/1",
+             "http://project1/1", "old1", "new1", "master"),
+            (2, "Z2", "project1", 2, "a", "refs/changes/2",
+             "http://project1/2", "old2", "new2", "stable"),
+            (3, "Z3", "project2", NULL, NULL, "refs/tags/foo",
+             "http://project3", "old3", "new3", NULL)
+            """)
+            connection.exec_driver_sql("""
+            insert into zuul_build
+            (id, buildset_id, uuid, job_name, result)
+            values
+            (1, 1, "builduuid1", "job1", "RESULT1"),
+            (2, 1, "builduuid2", "job2", "RESULT2"),
+            (3, 2, "builduuid3", "job1", "RESULT3"),
+            (4, 2, "builduuid4", "job2", "RESULT4"),
+            (5, 3, "builduuid5", "job3", "RESULT5"),
+            (6, 3, "builduuid6", "job4", "RESULT6")
+            """)
+
+        self.connection._migrate()
+        with self.connection.engine.begin() as connection:
+            results = [r[0] for r in connection.exec_driver_sql(
+                "select ref_id from zuul_build")]
+            self.assertEqual(results, [1, 1, 2, 2, 3, 3])
+            results = list(connection.exec_driver_sql(
+                "select buildset_id, ref_id from zuul_buildset_ref"))
+            self.assertEqual(results, [
+                (1, 1),
+                (2, 2),
+                (3, 3),
+            ])
+
     def test_buildsets(self):
         tenant = 'tenant1',
         buildset_uuid = 'deadbeef'
         change = 1234
-        buildset_args = dict(
-            uuid=buildset_uuid,
-            tenant=tenant,
-            pipeline='check',
-            project='project',
-            change=change,
-            patchset='1',
-            ref='',
-            oldrev='',
-            newrev='',
-            branch='master',
-            zuul_ref='Zdeadbeef',
-            ref_url='http://example.com/1234',
-            event_id='eventid',
-        )
 
         # Create the buildset entry (driver-internal interface)
         with self.connection.getSession() as db:
-            db.createBuildSet(**buildset_args)
+            bs = db.createBuildSet(
+                uuid=buildset_uuid,
+                tenant=tenant,
+                pipeline='check',
+                event_id='eventid',
+            )
+            ref = db.getOrCreateRef(
+                project='project',
+                change=change,
+                patchset='1',
+                ref='',
+                oldrev='',
+                newrev='',
+                branch='master',
+                ref_url='http://example.com/1234',
+            )
+            bs.refs.append(ref)
 
         # Verify that worked using the driver-external interface
         self.assertEqual(len(self.connection.getBuildsets()), 1)
@@ -197,7 +246,7 @@ class TestMysqlDatabase(DBBaseTestCase):
         # Update the buildset using the internal interface
         with self.connection.getSession() as db:
             db_buildset = db.getBuildset(tenant=tenant, uuid=buildset_uuid)
-            self.assertEqual(db_buildset.change, change)
+            self.assertEqual(db_buildset.refs[0].change, change)
             db_buildset.result = 'SUCCESS'
 
         # Verify that worked

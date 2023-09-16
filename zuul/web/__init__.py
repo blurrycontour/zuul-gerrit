@@ -1398,17 +1398,19 @@ class ZuulWebAPI(object):
             'provides': [],
         }
 
+        # TODO: This should not be conditional in the future, when we
+        # can have multiple refs for a buildset.
         if buildset:
             event_timestamp = self._datetimeToString(buildset.event_timestamp)
             ret.update({
-                'project': buildset.project,
-                'branch': buildset.branch,
+                'project': build.ref.project,
+                'branch': build.ref.branch,
                 'pipeline': buildset.pipeline,
-                'change': buildset.change,
-                'patchset': buildset.patchset,
-                'ref': buildset.ref,
-                'newrev': buildset.newrev,
-                'ref_url': buildset.ref_url,
+                'change': build.ref.change,
+                'patchset': build.ref.patchset,
+                'ref': build.ref.ref,
+                'newrev': build.ref.newrev,
+                'ref_url': build.ref.ref_url,
                 'event_id': buildset.event_id,
                 'event_timestamp': event_timestamp,
                 'buildset': {
@@ -1498,14 +1500,15 @@ class ZuulWebAPI(object):
             'uuid': buildset.uuid,
             'result': buildset.result,
             'message': buildset.message,
-            'project': buildset.project,
-            'branch': buildset.branch,
+            'project': buildset.refs[0].project,
+            'branch': buildset.refs[0].branch,
             'pipeline': buildset.pipeline,
-            'change': buildset.change,
-            'patchset': buildset.patchset,
-            'ref': buildset.ref,
-            'newrev': buildset.newrev,
-            'ref_url': buildset.ref_url,
+            'change': buildset.refs[0].change,
+            'patchset': buildset.refs[0].patchset,
+            'ref': buildset.refs[0].ref,
+            'oldrev': buildset.refs[0].oldrev,
+            'newrev': buildset.refs[0].newrev,
+            'ref_url': buildset.refs[0].ref_url,
             'event_id': buildset.event_id,
             'event_timestamp': event_timestamp,
             'first_build_start_time': start,
