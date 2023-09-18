@@ -4135,8 +4135,9 @@ class Build(zkobject.ZKObject):
 
     @property
     def failed(self):
-        if self.pre_fail:
-            return True
+        # Temporarily disable pre-fail detection
+        # if self.pre_fail:
+        #     return True
         if self.result and self.result not in ['SUCCESS', 'SKIPPED', 'RETRY']:
             return True
         return False
