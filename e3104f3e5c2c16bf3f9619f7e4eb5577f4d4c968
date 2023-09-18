@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef5a14dd_f1c09699",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-18T06:14:01Z",
+      "side": 1,
+      "message": "This is mainly happening when builds are cancelled. Example logs:\n\n2023-09-15 08:47:59,841 DEBUG zuul.BubblewrapExecutionContext: Bubblewrap command: ...\n\t2023-09-15 08:48:00,215 DEBUG zuul.ExecutorServer: [e: c49f6860-53a3-11ee-92b4-ad2cb6d22227] [build: 0432bd87c7b5470c9b0da08503ad24e2] Received CANCELED event for build \u003cBuildRequest 0432bd87c7b5470c9b0da08503ad24e2, job\u003djob-name, state\u003drunning, path\u003d/zuul/executor/zones/foobar/requests/0432bd87c7b5470c9b0da08503ad24e2 zone\u003dfoobar\u003e\n\t2023-09-15 08:48:00,216 DEBUG zuul.ExecutorServer: [e: c49f6860-53a3-11ee-92b4-ad2cb6d22227] [build: 0432bd87c7b5470c9b0da08503ad24e2] Stop job\n\t2023-09-15 08:48:00,216 DEBUG zuul.AnsibleJob: [e: c49f6860-53a3-11ee-92b4-ad2cb6d22227] [build: 0432bd87c7b5470c9b0da08503ad24e2] Abort: sending kill signal to job process group\n\t2023-09-15 08:48:00,220 ERROR zuul.AnsibleJob: [e: c49f6860-53a3-11ee-92b4-ad2cb6d22227] [build: 0432bd87c7b5470c9b0da08503ad24e2] Unable to list namespace pids\n\tTraceback (most recent call last):\n\t  File \"/opt/zuul/lib/python3.11/site-packages/zuul/executor/server.py\", line 2868, in runAnsible\n\t    ns, pids \u003d context.getNamespacePids(self.proc)\n\t\t       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n\t  File \"/opt/zuul/lib/python3.11/site-packages/zuul/driver/bubblewrap/__init__.py\", line 89, in getNamespacePids\n\t    for child in pid_to_child_list.get(proc.pid):\n\tTypeError: \u0027NoneType\u0027 object is not iterable\n\t2023-09-15 08:48:00,222 DEBUG zuul.AnsibleJob.output: [e: c49f6860-53a3-11ee-92b4-ad2cb6d22227] [build: 0432bd87c7b5470c9b0da08503ad24e2] Ansible output: b\u0027 being removed. This feature will be removed from ansible-core in version 2.14.\u0027\n\t2023-09-15 08:48:00,222 DEBUG zuul.AnsibleJob.output: [e: c49f6860-53a3-11ee-92b4-ad2cb6d22227] [build: 0432bd87c7b5470c9b0da08503ad24e2] Ansible output: b\u0027Using /var/cache/zuul-executor/jobs/0432bd87c7b5470c9b0da08503ad24e2/ansible/post_playbook_8/ansible.cfg as config file\u0027",
+      "revId": "e3104f3e5c2c16bf3f9619f7e4eb5577f4d4c968",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
