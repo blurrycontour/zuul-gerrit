@@ -844,6 +844,7 @@ class ZuulWebAPI(object):
             'config_errors': '/api/tenant/{tenant}/config-errors',
             'tenant_authorizations': ('/api/tenant/{tenant}'
                                       '/authorizations'),
+            'tenant_status': '/api/tenant/{tenant}/tenant-status',
             'autohold': '/api/tenant/{tenant}/project/{project:.*}/autohold',
             'autohold_list': '/api/tenant/{tenant}/autohold',
             'autohold_by_request_id': ('/api/tenant/{tenant}'
@@ -1210,6 +1211,17 @@ class ZuulWebAPI(object):
             }
             for e in tenant.layout.loading_errors.errors
         ]
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.check_tenant_auth()
+    def tenant_status(self, tenant_name, tenant, auth):
+        ret = {
+            'config_error_count': len(tenant.layout.loading_errors.errors),
+        }
         return ret
 
     @cherrypy.expose
@@ -2074,6 +2086,8 @@ class ZuulWeb(object):
                           controller=api, action='buildset')
         route_map.connect('api', '/api/tenant/{tenant_name}/config-errors',
                           controller=api, action='config_errors')
+        route_map.connect('api', '/api/tenant/{tenant_name}/tenant-status',
+                          controller=api, action='tenant_status')
 
         for connection in connections.connections.values():
             controller = connection.getWebController(self)
