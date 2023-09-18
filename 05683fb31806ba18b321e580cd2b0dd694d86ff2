@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e29970d_b197cec0",
+        "filename": "doc/source/drivers/github.rst",
+        "patchSetId": 14
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 7118
+      },
+      "writtenOn": "2023-09-18T00:27:43Z",
+      "side": 1,
+      "message": "I think this might be a big-enough \"gotcha\" to warrant a bit more expansion in the description here.\n\n* Reporting: Requires authentication with write access to the project so that comments can be left\n\n* Enqueing a merge request (including Depends-On: of a merge request) : the API queries needed to examine MR\u0027s so that Zuul can enqueue them requires authentication with read access.\n\n* `required-projects` listing : no authentication required.  For example, you may have a project where you are only interested in testing against a specific branch of a GitHub project.  In this case you do not need any authentication to have Zuul pull the project.  However, note that if you will ever need to speculatively test a MR in this project, you will require authenticated read access (see note above)",
+      "revId": "05683fb31806ba18b321e580cd2b0dd694d86ff2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
