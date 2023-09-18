@@ -1747,6 +1747,10 @@ class TestTenantInfoConfigBroken(BaseTestWeb):
     tenant_config_file = 'config/broken/main.yaml'
 
     def test_tenant_info_broken_config(self):
+        tenant_status = self.get_url(
+            "api/tenant/tenant-broken/tenant-status").json()
+        self.assertEqual(tenant_status['config_error_count'], 2)
+
         config_errors = self.get_url(
             "api/tenant/tenant-broken/config-errors").json()
         self.assertEqual(
