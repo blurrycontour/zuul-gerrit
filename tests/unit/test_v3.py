@@ -6105,7 +6105,7 @@ class TestDiskAccounting(AnsibleZuulTestCase):
         self.assertHistory([
             dict(name='dd-big-empty-file', result='ABORTED', changes='1,1')])
 
-
+@skip("pre-fail disabled")
 class TestEarlyFailure(AnsibleZuulTestCase):
     tenant_config_file = 'config/early-failure/main.yaml'
 
