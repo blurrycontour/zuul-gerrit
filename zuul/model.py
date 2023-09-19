@@ -5063,8 +5063,12 @@ class QueueItem(zkobject.ZKObject):
             pipeline = self.pipeline.name
         else:
             pipeline = None
-        return '<QueueItem %s for %s in %s>' % (
-            self.uuid, self.change, pipeline)
+        if self.live:
+            live = 'live'
+        else:
+            live = 'non-live'
+        return '<QueueItem %s %s for %s in %s>' % (
+            self.uuid, live, self.change, pipeline)
 
     def resetAllBuilds(self):
         context = self.pipeline.manager.current_context
