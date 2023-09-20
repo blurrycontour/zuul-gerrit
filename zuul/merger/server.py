@@ -1,5 +1,5 @@
 # Copyright 2014 OpenStack Foundation
-# Copyright 2021-2022, 2024 Acme Gating, LLC
+# Copyright 2021-2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -511,37 +511,30 @@ class MergeServer(BaseMergeServer):
                                                   self.component_info)
         self.monitoring_server.start()
 
-        self.command_map = {
-            commandsocket.StopCommand.name: self.stop,
-            # Stop for the mergers is always graceful. We add this alias
-            # to make it clearer to users that they can gracefully stop.
-            commandsocket.GracefulCommand.name: self.stop,
-            commandsocket.PauseCommand.name: self.pause,
-            commandsocket.UnPauseCommand.name: self.unpause,
-        }
         command_socket = get_default(
             self.config, 'merger', 'command_socket',
             '/var/lib/zuul/merger.socket')
-        self.command_socket = commandsocket.CommandSocket(command_socket)
-
-        self._command_running = False
+        command_map = {
+            commandsocket.StopCommand: self.stop,
+            # Stop for the mergers is always graceful. We add this alias
+            # to make it clearer to users that they can gracefully stop.
+            commandsocket.GracefulCommand: self.stop,
+            commandsocket.PauseCommand: self.pause,
+            commandsocket.UnPauseCommand: self.unpause,
+        }
+        self.command_socket = commandsocket.CommandSocket(command_socket,
+                                                          command_map)
 
     def start(self):
         super().start()
-        self._command_running = True
         self.log.debug("Starting command processor")
         self.command_socket.start()
-        self.command_thread = threading.Thread(
-            target=self.runCommand, name='command')
-        self.command_thread.daemon = True
-        self.command_thread.start()
         self.component_info.state = self.component_info.RUNNING
 
     def stop(self):
         self.log.debug("Stopping merger")
         self.component_info.state = self.component_info.STOPPED
         super().stop()
-        self._command_running = False
         self.command_socket.stop()
         self.monitoring_server.stop()
         self.log.debug("Stopped merger")
@@ -561,12 +554,3 @@ class MergeServer(BaseMergeServer):
         self.log.debug('Resuming')
         super().unpause()
         self.component_info.state = self.component_info.RUNNING
-
-    def runCommand(self):
-        while self._command_running:
-            try:
-                command, args = self.command_socket.get()
-                if command != '_stop':
-                    self.command_map[command](*args)
-            except Exception:
-                self.log.exception("Exception while processing command")

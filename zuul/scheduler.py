@@ -231,16 +231,6 @@ class Scheduler(threading.Thread):
         self.layout_lock = defaultdict(threading.Lock)
         # Only used by tests in order to quiesce the main run loop
         self.run_handler_lock = threading.Lock()
-        self.command_map = {
-            FullReconfigureCommand.name: self.fullReconfigureCommandHandler,
-            SmartReconfigureCommand.name: self.smartReconfigureCommandHandler,
-            TenantReconfigureCommand.name:
-                self.tenantReconfigureCommandHandler,
-            ZKProfileCommand.name: self.zkProfileCommandHandler,
-            commandsocket.StopCommand.name: self.stop,
-            commandsocket.ReplCommand.name: self.startRepl,
-            commandsocket.NoReplCommand.name: self.stopRepl,
-        }
         self._stopped = False
 
         self._zuul_app = app
@@ -328,7 +318,18 @@ class Scheduler(threading.Thread):
         command_socket = get_default(
             self.config, 'scheduler', 'command_socket',
             '/var/lib/zuul/scheduler.socket')
-        self.command_socket = commandsocket.CommandSocket(command_socket)
+        command_map = {
+            FullReconfigureCommand: self.fullReconfigureCommandHandler,
+            SmartReconfigureCommand: self.smartReconfigureCommandHandler,
+            TenantReconfigureCommand:
+                self.tenantReconfigureCommandHandler,
+            ZKProfileCommand: self.zkProfileCommandHandler,
+            commandsocket.StopCommand: self.stop,
+            commandsocket.ReplCommand: self.startRepl,
+            commandsocket.NoReplCommand: self.stopRepl,
+        }
+        self.command_socket = commandsocket.CommandSocket(command_socket,
+                                                          command_map)
 
         self.last_reconfigured = None
 
@@ -351,13 +352,8 @@ class Scheduler(threading.Thread):
             self.zk_client,
             password=self._get_key_store_password())
 
-        self._command_running = True
         self.log.debug("Starting command processor")
         self.command_socket.start()
-        self.command_thread = threading.Thread(target=self.runCommand,
-                                               name='command')
-        self.command_thread.daemon = True
-        self.command_thread.start()
 
         self.stats_thread.start()
         self.apsched.start()
@@ -406,12 +402,8 @@ class Scheduler(threading.Thread):
         self.stats_election.cancel()
         self.stats_thread.join()
         self.stopRepl()
-        self._command_running = False
         self.log.debug("Stopping command socket")
         self.command_socket.stop()
-        # If we stop from the command socket we cannot join the command thread.
-        if threading.current_thread() is not self.command_thread:
-            self.command_thread.join()
         self.log.debug("Stopping timedb thread")
         self.times.join()
         self.log.debug("Stopping monitoring server")
@@ -421,15 +413,6 @@ class Scheduler(threading.Thread):
         self.zk_client.disconnect()
         self.log.debug("Stopping tracing")
         self.tracing.stop()
-
-    def runCommand(self):
-        while self._command_running:
-            try:
-                command, args = self.command_socket.get()
-                if command != '_stop':
-                    self.command_map[command](*args)
-            except Exception:
-                self.log.exception("Exception while processing command")
 
     def stopConnections(self):
         self.connections.stop()

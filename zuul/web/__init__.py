@@ -2109,16 +2109,15 @@ class ZuulWeb(object):
             self.config, 'web', 'command_socket',
             '/var/lib/zuul/web.socket'
         )
-
-        self.command_socket = commandsocket.CommandSocket(command_socket)
+        command_map = {
+            commandsocket.StopCommand: self.stop,
+            commandsocket.ReplCommand: self.startRepl,
+            commandsocket.NoReplCommand: self.stopRepl,
+        }
+        self.command_socket = commandsocket.CommandSocket(command_socket,
+                                                          command_map)
 
         self.repl = None
-
-        self.command_map = {
-            commandsocket.StopCommand.name: self.stop,
-            commandsocket.ReplCommand.name: self.startRepl,
-            commandsocket.NoReplCommand.name: self.stopRepl,
-        }
 
         self.finger_tls_key = get_default(
             self.config, 'fingergw', 'tls_key')
@@ -2297,12 +2296,7 @@ class ZuulWeb(object):
         self.component_info.state = self.component_info.INITIALIZING
 
         self.log.info("Starting command processor")
-        self._command_running = True
         self.command_socket.start()
-        self.command_thread = threading.Thread(target=self.runCommand,
-                                               name='command')
-        self.command_thread.daemon = True
-        self.command_thread.start()
 
         # Wait for system config and layouts to be loaded
         self.log.info("Waiting for system config from scheduler")
@@ -2362,24 +2356,13 @@ class ZuulWeb(object):
         if self.system_config_thread:
             self.system_config_thread.join()
         self.stopRepl()
-        self._command_running = False
         self.command_socket.stop()
         self.monitoring_server.stop()
         self.tracing.stop()
         self.zk_client.disconnect()
 
     def join(self):
-        self.command_thread.join()
         self.monitoring_server.join()
-
-    def runCommand(self):
-        while self._command_running:
-            try:
-                command, args = self.command_socket.get()
-                if command != '_stop':
-                    self.command_map[command]()
-            except Exception:
-                self.log.exception("Exception while processing command")
 
     def startRepl(self):
         if self.repl:

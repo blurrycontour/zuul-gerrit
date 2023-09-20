@@ -3337,7 +3337,6 @@ class ExecutorServer(BaseMergeServer):
             self.zk_client,
             password=self._get_key_store_password())
         self._running = False
-        self._command_running = False
         # TODOv3(mordred): make the executor name more unique --
         # perhaps hostname+pid.
         self.hostname = get_default(self.config, 'executor', 'hostname',
@@ -3355,18 +3354,6 @@ class ExecutorServer(BaseMergeServer):
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
         self.verbose = False
-        self.command_map = {
-            commandsocket.StopCommand.name: self.stop,
-            commandsocket.PauseCommand.name: self.pause,
-            commandsocket.UnPauseCommand.name: self.unpause,
-            commandsocket.GracefulCommand.name: self.graceful,
-            VerboseCommand.name: self.verboseOn,
-            UnVerboseCommand.name: self.verboseOff,
-            KeepCommand.name: self.keep,
-            NoKeepCommand.name: self.nokeep,
-            commandsocket.ReplCommand.name: self.startRepl,
-            commandsocket.NoReplCommand.name: self.stopRepl,
-        }
         self.log_console_port = log_console_port
         self.repl = None
 
@@ -3416,7 +3403,20 @@ class ExecutorServer(BaseMergeServer):
         command_socket = get_default(
             self.config, 'executor', 'command_socket',
             '/var/lib/zuul/executor.socket')
-        self.command_socket = commandsocket.CommandSocket(command_socket)
+        command_map = {
+            commandsocket.StopCommand: self.stop,
+            commandsocket.PauseCommand: self.pause,
+            commandsocket.UnPauseCommand: self.unpause,
+            commandsocket.GracefulCommand: self.graceful,
+            VerboseCommand: self.verboseOn,
+            UnVerboseCommand: self.verboseOff,
+            KeepCommand: self.keep,
+            NoKeepCommand: self.nokeep,
+            commandsocket.ReplCommand: self.startRepl,
+            commandsocket.NoReplCommand: self.stopRepl,
+        }
+        self.command_socket = commandsocket.CommandSocket(command_socket,
+                                                          command_map)
 
         state_dir = get_default(self.config, 'executor', 'state_dir',
                                 '/var/lib/zuul', expand_user=True)
@@ -3553,7 +3553,6 @@ class ExecutorServer(BaseMergeServer):
             super().start()
 
         self._running = True
-        self._command_running = True
 
         try:
             multiprocessing.set_start_method('spawn')
@@ -3568,10 +3567,6 @@ class ExecutorServer(BaseMergeServer):
 
         self.log.debug("Starting command processor")
         self.command_socket.start()
-        self.command_thread = threading.Thread(target=self.runCommand,
-                                               name='command')
-        self.command_thread.daemon = True
-        self.command_thread.start()
 
         self.log.debug("Starting %s update workers" % self.update_workers)
         for i in range(self.update_workers):
@@ -3610,7 +3605,6 @@ class ExecutorServer(BaseMergeServer):
         # and grab the list of currently running job workers.
         with self.run_lock:
             self._running = False
-            self._command_running = False
             workers = list(self.job_workers.values())
 
         for job_worker in workers:
@@ -3671,7 +3665,6 @@ class ExecutorServer(BaseMergeServer):
         # all other threads that interact with Zookeeper.
         if self.process_merge_jobs:
             super().join()
-        self.command_thread.join()
         self.monitoring_server.join()
         self.log.debug("Joined executor")
 
@@ -3728,15 +3721,6 @@ class ExecutorServer(BaseMergeServer):
             return
         self.repl.stop()
         self.repl = None
-
-    def runCommand(self):
-        while self._command_running:
-            try:
-                command, args = self.command_socket.get()
-                if command != '_stop':
-                    self.command_map[command](*args)
-            except Exception:
-                self.log.exception("Exception while processing command")
 
     def _updateLoop(self):
         while True:
