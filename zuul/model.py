@@ -26,7 +26,7 @@ import threading
 
 import re2
 import time
-from uuid import uuid4
+from uuid import UUID, uuid4, uuid5
 import urllib.parse
 import textwrap
 import types
@@ -1141,6 +1141,7 @@ class ChangeQueue(zkobject.ZKObject):
             pipeline=None,
             name="",
             project_branches=[],
+            head_uuid=uuid4().hex,
             _jobs=set(),
             queue=[],
             window=0,
@@ -1158,6 +1159,7 @@ class ChangeQueue(zkobject.ZKObject):
             "uuid": self.uuid,
             "name": self.name,
             "project_branches": self.project_branches,
+            "head_uuid": self.head_uuid,
             "_jobs": list(self._jobs),
             "queue": [i.getPath() for i in self.queue],
             "window": self.window,
@@ -1173,6 +1175,7 @@ class ChangeQueue(zkobject.ZKObject):
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
+        data["head_uuid"] = data.get("head_uuid")
 
         existing_items = {}
         for item in self.queue:
@@ -1295,6 +1298,12 @@ class ChangeQueue(zkobject.ZKObject):
         if item in self.queue:
             with self.activeContext(self.zk_context):
                 self.queue.remove(item)
+                if item.current_build_set.result == "SUCCESS":
+                    # If the dequeued item was merged we use its stable
+                    # UUID as the new head UUID so that calculation of the
+                    # buildset's stable UUIDs still works for the remaining
+                    # items.
+                    self.head_uuid = item.current_build_set.stable_uuid
         if item.item_ahead:
             with item.item_ahead.activeContext(self.zk_context):
                 item.item_ahead.items_behind.remove(item)
@@ -4282,6 +4291,7 @@ class BuildSet(zkobject.ZKObject):
             retry_builds={},
             result=None,
             uuid=uuid4().hex,
+            stable_uuid=None,
             commit=None,
             dependent_changes=None,
             merger_items=None,
@@ -4314,6 +4324,12 @@ class BuildSet(zkobject.ZKObject):
             _old_job_graph=None,
             _old_jobs={},
         )
+
+    @classmethod
+    def new(klass, context, *, item, **kw):
+        stable_uuid = item.getBuildsetUuid()
+        return super(BuildSet, klass).new(
+            context, stable_uuid=stable_uuid, item=item, **kw)
 
     def setFiles(self, items):
         if self.files is not None:
@@ -4401,6 +4417,7 @@ class BuildSet(zkobject.ZKObject):
                              for j, l in self.retry_builds.items()},
             "result": self.result,
             "uuid": self.uuid,
+            "stable_uuid": self.stable_uuid,
             "commit": self.commit,
             "dependent_changes": self.dependent_changes,
             "merger_items": self.merger_items,
@@ -5069,6 +5086,22 @@ class QueueItem(zkobject.ZKObject):
             live = 'non-live'
         return '<QueueItem %s %s for %s in %s>' % (
             self.uuid, live, self.change, pipeline)
+
+    def getBuildsetUuid(self):
+        queue = self.queue.queue
+        if self.item_ahead:
+            uuid_ahead = self.item_ahead.current_build_set.stable_uuid
+        elif queue and self not in queue:
+            # There are items in the queue but we are not one of them, so
+            # this item is currently being enqueued.
+            uuid_ahead = self.queue.queue[-1].current_build_set.stable_uuid
+        else:
+            # If there are no items ahead and the queue is empty we need to
+            # use the head UUID of the queue. This could mean that the current
+            # item is added to an empty queue or that we are at the head of
+            # the queue and the item ahead of us was dequeued.
+            uuid_ahead = self.queue.head_uuid
+        return uuid5(UUID(self.uuid), uuid_ahead).hex
 
     def resetAllBuilds(self):
         context = self.pipeline.manager.current_context

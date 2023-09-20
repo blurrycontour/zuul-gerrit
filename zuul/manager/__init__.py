@@ -1612,6 +1612,21 @@ class PipelineManager(metaclass=ABCMeta):
         dequeued = False
         failing_reasons = []  # Reasons this item is failing
 
+        if (item.current_build_set.stable_uuid != item.getBuildsetUuid()
+                and not item.didBundleStartReporting()):
+            if item.current_build_set.ref:
+                self.reportNormalBuildsetEnd(
+                    item.current_build_set, 'dequeue', final=False,
+                    result='DEQUEUED')
+                tracing.endSavedSpan(item.current_build_set.span_info)
+            log.debug("Current stable buildset UUID: %s",
+                      item.current_build_set.stable_uuid)
+            log.debug("Expected stable buildset UUID: %s",
+                      item.getBuildsetUuid())
+            log.warning("Buildset needs to be reset as item ahead changed")
+            # Reset buildset to correct the wrong stable UUID.
+            item.resetAllBuilds()
+
         item_ahead = item.item_ahead
         if item_ahead and (not item_ahead.live):
             item_ahead = None
