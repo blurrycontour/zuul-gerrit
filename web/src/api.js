@@ -69,6 +69,17 @@ function getZuulUrl() {
 }
 const apiUrl = getZuulUrl()
 
+function getApiBasicAuth() {
+  const basic_auth_user = process.env.REACT_APP_BASIC_AUTH_USERNAME
+  const basic_auth_pass = process.env.REACT_APP_BASIC_AUTH_PASSWORD
+
+  if (basic_auth_user && basic_auth_pass) {
+    return btoa(`${basic_auth_user}:${basic_auth_pass}`)
+  }
+  return null
+}
+const apiBasicAuth = getApiBasicAuth()
+
 
 function getStreamUrl(apiPrefix) {
   const streamUrl = (apiUrl + apiPrefix)
@@ -85,11 +96,13 @@ function makeRequest(url, method, data) {
   // This performs a simple GET and tries to detect if CORS errors are
   // due to proxy authentication errors.
   const instance = Axios.create({
-    baseURL: apiUrl
+    baseURL: apiUrl,
   })
 
   if (authToken) {
-    instance.defaults.headers.common['Authorization'] = 'Bearer ' + authToken
+    instance.defaults.headers.common['Authorization'] = `Bearer ${authToken}`
+  } else if(apiBasicAuth) {
+    instance.defaults.headers.common['Authorization'] = `Basic ${apiBasicAuth}`
   }
 
   const config = {method, url, data}
