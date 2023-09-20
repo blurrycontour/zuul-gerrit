@@ -265,3 +265,6 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
         s.connect(command_socket)
         cmd = '%s\n' % cmd
         s.sendall(cmd.encode('utf8'))
+        ret = s.recv(4096)
+        if ret:
+            print(ret.decode('utf8'))
