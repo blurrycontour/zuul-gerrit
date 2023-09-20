@@ -28,6 +28,7 @@ class Command:
     name = None
     help = None
     args = []
+    output = False
 
 
 class Argument:
@@ -70,10 +71,14 @@ class NoReplCommand(Command):
 class CommandSocket(object):
     log = logging.getLogger("zuul.CommandSocket")
 
-    def __init__(self, path):
+    def __init__(self, path, command_map):
         self.running = False
         self.path = path
         self.queue = NamedQueue('CommandSocketQueue')
+        self.command_map = command_map
+        self.command_name_map = {}
+        for command in command_map:
+            self.command_name_map[command.name] = command
 
     def start(self):
         self.running = True
@@ -100,6 +105,7 @@ class CommandSocket(object):
         # then check to see if they should continue to run before
         # re-entering their loop.
         self.queue.put(('_stop', []))
+        # If we stop from the command socket we cannot join the command thread.
         self.socket_thread.join()
 
     def _socketListener(self):
@@ -114,18 +120,28 @@ class CommandSocket(object):
                         break
                 buf = buf.strip()
                 self.log.debug("Received %s from socket" % (buf,))
-                s.close()
 
-                buf = buf.decode('utf8')
-                parts = buf.split(' ', 1)
-                # Because we use '_stop' internally to wake up a
-                # waiting thread, don't allow it to actually be
-                # injected externally.
-                args = parts[1:]
-                if args:
-                    args = json.loads(args[0])
-                if parts[0] != '_stop':
-                    self.queue.put((parts[0], args))
+                try:
+                    buf = buf.decode('utf8')
+                    parts = buf.split(' ', 1)
+                    # Because we use '_stop' internally to wake up a
+                    # waiting thread, don't allow it to actually be
+                    # injected externally.
+                    args = parts[1:]
+                    if args:
+                        args = json.loads(args[0])
+                    if parts[0] != '_stop':
+                        cmd = self.command_name_map.get(parts[0])
+                        if cmd:
+                            func = self.command_map[cmd]
+                            print('func', func)
+                            ret = func(*args)
+                            print('ret', repr(ret))
+                            if cmd.output and ret:
+                                print('send')
+                                s.sendall(ret.encode('utf8'))
+                finally:
+                    s.close()
             except Exception:
                 self.log.exception("Exception in socket handler")
 

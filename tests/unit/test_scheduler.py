@@ -4031,6 +4031,18 @@ class TestScheduler(ZuulTestCase):
             else:
                 time.sleep(0)
 
+    def test_scheduler_status(self):
+        # Test the scheduler status command
+        command_socket = self.scheds.first.config.get(
+            'scheduler', 'command_socket')
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.connect(command_socket)
+            s.sendall('status\n'.encode('utf8'))
+            out = s.recv(4096)
+        self.log.debug("Received: %s", out)
+        status = json.loads(out.decode('utf8'))
+        self.assertTrue('Run handler' in status)
+
     def test_double_live_reconfiguration_shared_queue(self):
         # This was a real-world regression.  A change is added to
         # gate; a reconfigure happens, a second change which depends

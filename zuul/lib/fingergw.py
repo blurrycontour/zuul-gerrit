@@ -1,5 +1,5 @@
 # Copyright 2017 Red Hat, Inc.
-# Copyright 2021-2022 Acme Gating, LLC
+# Copyright 2021-2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -18,8 +18,6 @@ import logging
 import socket
 import ssl
 import threading
-from configparser import ConfigParser
-from typing import Optional
 
 from zuul.exceptions import StreamingError
 from zuul.lib import streamer_utils
@@ -130,12 +128,7 @@ class FingerGateway(object):
     log = logging.getLogger("zuul.fingergw")
     handler_class = RequestHandler
 
-    def __init__(
-        self,
-        config: ConfigParser,
-        command_socket: Optional[str],
-        pid_file: Optional[str],
-    ):
+    def __init__(self, config, command_socket, pid_file):
         '''
         Initialize the finger gateway.
 
@@ -157,8 +150,6 @@ class FingerGateway(object):
         self.server = None
         self.server_thread = None
 
-        self.command_thread = None
-        self.command_running = False
         self.command_socket_path = command_socket
         self.command_socket = None
 
@@ -174,10 +165,6 @@ class FingerGateway(object):
             self.tls_listen = True
         else:
             self.tls_listen = False
-
-        self.command_map = {
-            commandsocket.StopCommand.name: self.stop,
-        }
 
         self.hostname = get_default(config, 'fingergw', 'hostname',
                                     socket.getfqdn())
@@ -201,17 +188,6 @@ class FingerGateway(object):
         self.monitoring_server.start()
 
         self.executor_api = ExecutorApi(self.zk_client, use_cache=False)
-
-    def _runCommand(self):
-        while self.command_running:
-            try:
-                command, args = self.command_socket.get()
-                if command != '_stop':
-                    self.command_map[command](*args)
-                else:
-                    return
-            except Exception:
-                self.log.exception("Exception while processing command")
 
     def _run(self):
         try:
@@ -246,14 +222,12 @@ class FingerGateway(object):
         # Start the command processor after the server and privilege drop
         if self.command_socket_path:
             self.log.debug("Starting command processor")
+            command_map = {
+                commandsocket.StopCommand: self.stop,
+            }
             self.command_socket = commandsocket.CommandSocket(
-                self.command_socket_path)
+                self.command_socket_path, command_map)
             self.command_socket.start()
-            self.command_running = True
-            self.command_thread = threading.Thread(
-                target=self._runCommand, name='command')
-            self.command_thread.daemon = True
-            self.command_thread.start()
 
         # The socketserver shutdown() call will hang unless the call
         # to server_forever() happens in another thread. So let's do that.
@@ -277,8 +251,6 @@ class FingerGateway(object):
                 self.log.exception("Error stopping TCP server:")
 
         if self.command_socket:
-            self.command_running = False
-
             try:
                 self.command_socket.stop()
             except Exception:
@@ -294,7 +266,4 @@ class FingerGateway(object):
         Wait on the gateway to shutdown.
         '''
         self.server_thread.join()
-
-        if self.command_thread:
-            self.command_thread.join()
         self.monitoring_server.join()
