@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "043d4e58_acdd9de7",
+        "filename": "web/src/actions/configErrors.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-21T13:37:53Z",
+      "side": 1,
+      "message": "Oh yep that was the intent.  :)",
+      "parentUuid": "37554a9f_a1fc080b",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b432320_07eee130",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-09-21T07:27:39Z",
       "side": 1,
       "message": "Since we are using the \"isFetching\" pattern now, we could also drop the `ready` flag here and use the isFetching flag in the ConfigErrors page instead: https://opendev.org/zuul/zuul/src/commit/ebd223cf077cadda38f9cebedf232ba674506294/web/src/pages/ConfigErrors.jsx#L171",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bd19fd8_408eb1d5",
+        "filename": "web/src/reducers/configErrors.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-21T13:37:53Z",
+      "side": 1,
+      "message": "I tried that, but it\u0027s actually a bit more complicated -- ready isn\u0027t exactly !isFetching.  For example, the fail case here sets both to false.  Getting rid of ready here makes the logic in App.js quite a bit more complex.",
+      "parentUuid": "6b432320_07eee130",
       "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -69,6 +105,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f59b59c_bf3e5cd1",
+        "filename": "web/src/reducers/configErrors.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-21T13:37:53Z",
+      "side": 1,
+      "message": "Good point, that will make the refresh link work better.  The clear action will take care of changing tenants.",
+      "parentUuid": "0de28a44_e81cf657",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae01b22b_c70bee24",
@@ -82,6 +136,24 @@
       "writtenOn": "2023-09-21T07:27:39Z",
       "side": 1,
       "message": "Same like above.",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c969fa3a_164dfbb5",
+        "filename": "web/src/reducers/configErrors.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-21T13:37:53Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "ae01b22b_c70bee24",
       "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
