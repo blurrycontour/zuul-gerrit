@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45d144cc_bfc3f687",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-21T12:42:48Z",
+      "side": 1,
+      "message": "Since this doesn\u0027t seem to properly work with the current implementation I\u0027m wondering if we could simplify this to only support provides/requires between different queue items (basically the way it currently is).\n\nIn the context of a single item you can use dependencies to provide data to other jobs which should also work in the case of circular dependencies. So for circular dependencies this would open up another possibility to pass data around which I think could be confusing.",
+      "revId": "00cf388291ec0847d11d005ab6069e5a368a2276",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84a8bd43_1e9e403e",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-21T12:42:48Z",
+      "side": 1,
+      "message": "typo: which",
+      "range": {
+        "startLine": 222,
+        "startChar": 21,
+        "endLine": 222,
+        "endChar": 25
+      },
+      "revId": "00cf388291ec0847d11d005ab6069e5a368a2276",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a7d54a4_36676eba",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-21T12:42:48Z",
+      "side": 1,
+      "message": "I think at this point we cannot determine if a job can be deduplicated as that might depend on the return data of parent jobs.",
+      "revId": "00cf388291ec0847d11d005ab6069e5a368a2276",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bdef493_be113091",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-21T12:42:48Z",
+      "side": 1,
+      "message": "How To Draw an Owl ;)",
+      "revId": "00cf388291ec0847d11d005ab6069e5a368a2276",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
