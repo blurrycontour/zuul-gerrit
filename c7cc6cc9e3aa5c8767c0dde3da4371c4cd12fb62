@@ -193,6 +193,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f55148a_ed3d3983",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3290,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-21T20:26:10Z",
+      "side": 1,
+      "message": "Oops this was serving a purpose; it needs to be updated not to depend on C at least so it doesn\u0027t get pulled back in.  I did that in the next patchset and added a better comment.",
+      "parentUuid": "eadb677b_c45886dc",
+      "revId": "c7cc6cc9e3aa5c8767c0dde3da4371c4cd12fb62",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c69148e1_0d74fcb0",
