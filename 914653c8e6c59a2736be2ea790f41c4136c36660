@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b1c89fd_5a2ac6b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-09-21T07:27:39Z",
+      "side": 1,
+      "message": "LGTM, just a few suggestions/questions.",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37554a9f_a1fc080b",
+        "filename": "web/src/actions/configErrors.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-09-21T07:27:39Z",
+      "side": 1,
+      "message": "nit: Since you defined the CONFIGERRORS_CLEAR constant above, you might want to use it here ;-)",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b432320_07eee130",
+        "filename": "web/src/reducers/configErrors.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-09-21T07:27:39Z",
+      "side": 1,
+      "message": "Since we are using the \"isFetching\" pattern now, we could also drop the `ready` flag here and use the isFetching flag in the ConfigErrors page instead: https://opendev.org/zuul/zuul/src/commit/ebd223cf077cadda38f9cebedf232ba674506294/web/src/pages/ConfigErrors.jsx#L171",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0de28a44_e81cf657",
+        "filename": "web/src/reducers/configErrors.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-09-21T07:27:39Z",
+      "side": 1,
+      "message": "I think in other actions, we return the data from our current state here to not \"clear\" the UI while fetching but still show the current data. In that case we should change this to:\n\n    errors: state.errors,",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae01b22b_c70bee24",
+        "filename": "web/src/reducers/configErrors.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-09-21T07:27:39Z",
+      "side": 1,
+      "message": "Same like above.",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
