@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03a6b07d_d27e877c",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-21T14:08:12Z",
+      "side": 1,
+      "message": "I\u0027m open to that -- here\u0027s my understanding of the current situation (but I have not experimentally verified this):\n\n* Provides/requires for cycles should currently work between items if they are ahead\n* The above may not be true in the case that some jobs are deduplicated (because the build in an item\n  may actually be in an item ahead)\n* Provides requires for cycles may not work for items behind\n\nSo, I guess the probability that provides/requires works as expected in a cycle is proportional to how close it is to the rear of the queue.\n\nI think that\u0027s a pretty good argument for saying we may as well do as you describe -- it keeps the current definitions and at least makes the behavior consistent.  Then as described below, we can consider changing it.",
+      "parentUuid": "45d144cc_bfc3f687",
+      "revId": "00cf388291ec0847d11d005ab6069e5a368a2276",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84a8bd43_1e9e403e",
@@ -41,6 +59,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e715d6d1_b69a4124",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-21T14:08:12Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "84a8bd43_1e9e403e",
+      "revId": "00cf388291ec0847d11d005ab6069e5a368a2276",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a7d54a4_36676eba",
@@ -58,6 +94,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c98bb847_3526e6ef",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-21T14:08:12Z",
+      "side": 1,
+      "message": "Good point.  However, in general, we are also determining which jobs are parents at the job graph freezing stage, so we should be able to determine if two builds are going to have the same parent(s).  That changes the order of operations here -- maybe we need to make the full job graph, analyze parents, then deduplicate.",
+      "parentUuid": "0a7d54a4_36676eba",
+      "revId": "00cf388291ec0847d11d005ab6069e5a368a2276",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1bdef493_be113091",
@@ -71,6 +125,24 @@
       "writtenOn": "2023-09-21T12:42:48Z",
       "side": 1,
       "message": "How To Draw an Owl ;)",
+      "revId": "00cf388291ec0847d11d005ab6069e5a368a2276",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fd15660_fb3fd5d1",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-21T14:08:12Z",
+      "side": 1,
+      "message": "Indeed.  :)  Hopefully we can subdivide this further, but I don\u0027t quite see how right now.  We might be able to have a series of more-easily-reviewable changes that we squash together at the end at least.",
+      "parentUuid": "1bdef493_be113091",
       "revId": "00cf388291ec0847d11d005ab6069e5a368a2276",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
