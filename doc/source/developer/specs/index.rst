@@ -17,6 +17,7 @@ documentation instead.
    :maxdepth: 1
 
    circular-dependencies
+   circular-dependencies-refactor
    community-matrix
    enhanced-regional-executors
    kubernetes-operator
