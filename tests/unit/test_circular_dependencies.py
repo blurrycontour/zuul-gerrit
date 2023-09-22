@@ -2507,6 +2507,39 @@ class TestGerritCircularDependencies(ZuulTestCase):
         ], ordered=False)
         self._assert_job_deduplication_check()
 
+    @simple_layout('layouts/job-dedup-child-jobs.yaml')
+    def test_job_deduplication_check_child_jobs_paused_parent(self):
+        # Test that child jobs returned from deduplicated paused
+        # parents are deduplicated and correctly skipped.
+        # child1-job should not run, but child2 should run and be
+        # deduplicated.  This uses auto deduplication.
+        self.executor_server.returnData(
+            'common-job', 'refs/changes/02/2/1',
+            {'zuul': {
+                'child_jobs': ['child2-job'],
+                'pause': True,
+            }}
+        )
+        self.executor_server.returnData(
+            'common-job', 'refs/changes/01/1/1',
+            {'zuul': {
+                'child_jobs': ['child2-job'],
+                'pause': True,
+            }}
+        )
+
+        self._test_job_deduplication_check()
+        self.assertHistory([
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="child2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            # dict(name="child2-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self._assert_job_deduplication_check()
+
     @simple_layout('layouts/job-dedup-mismatched-child-jobs.yaml')
     def test_job_deduplication_check_mismatched_child_jobs(self):
         # Test that a parent job with different child jobs is

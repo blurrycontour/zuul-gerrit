@@ -1899,7 +1899,8 @@ class PipelineManager(metaclass=ABCMeta):
         log = get_annotated_logger(self.log, build.zuul_event_id)
         item = build.build_set.item
         log.debug("Build %s of %s paused", build, item.change)
-        item.setResult(build)
+        for item_with_build in self._getItemsWithBuild(build):
+            item_with_build.setResult(build)
 
         # We need to resume builds because we could either have no children
         # or have children that are already skipped.
