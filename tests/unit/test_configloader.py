@@ -790,6 +790,10 @@ class TestConfigConflict(ZuulTestCase):
              'untrusted-zuul.yaml-job'],
             jobs)
 
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 4)
+
 
 class TestUnparsedConfigCache(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'

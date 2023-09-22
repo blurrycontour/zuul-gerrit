@@ -145,6 +145,18 @@ class UnknownConnection(Exception):
         super(UnknownConnection, self).__init__(message)
 
 
+class MultipleProjectConfigurations(Exception):
+    zuul_error_name = 'Multiple Project Configurations'
+    zuul_error_severity = model.SEVERITY_WARNING
+
+    def __init__(self, source_context):
+        message = textwrap.dedent(f"""\
+        Configuration in {source_context.path} ignored because project-branch
+        is already configured.""")
+        message = textwrap.fill(message)
+        super().__init__(message)
+
+
 class LabelForbiddenError(Exception):
     zuul_error_name = 'Label Forbidden'
     zuul_error_severity = model.SEVERITY_ERROR
@@ -2518,8 +2530,9 @@ class TenantParser(object):
                 fn_root = fn.split('/')[0]
                 if (fn_root in ZUUL_CONF_ROOT):
                     if (loaded and loaded != conf_root):
-                        self.log.warning("Multiple configuration files in %s",
-                                         source_context)
+                        with project_configuration_exceptions(
+                                source_context, loading_errors):
+                            raise MultipleProjectConfigurations(source_context)
                     loaded = conf_root
                 # Create a new source_context so we have unique filenames.
                 source_context = source_context.copy()
