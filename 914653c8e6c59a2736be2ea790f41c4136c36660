@@ -123,6 +123,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ad1e8cc_441eff38",
+        "filename": "web/src/reducers/configErrors.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-09-22T12:00:15Z",
+      "side": 1,
+      "message": "This should be `state.errors` rather than `action.errors`. The action doesn\u0027t return any errors.",
+      "parentUuid": "6f59b59c_bf3e5cd1",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae01b22b_c70bee24",
@@ -154,6 +172,24 @@
       "side": 1,
       "message": "Done.",
       "parentUuid": "ae01b22b_c70bee24",
+      "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ce82416_83712b03",
+        "filename": "web/src/reducers/configErrors.js",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-09-22T12:00:15Z",
+      "side": 1,
+      "message": "This should be `state.errors` rather than `action.errors`. The action doesn\u0027t return any errors.",
+      "parentUuid": "c969fa3a_164dfbb5",
       "revId": "914653c8e6c59a2736be2ea790f41c4136c36660",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
