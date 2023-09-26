@@ -2398,7 +2398,7 @@ class FrozenJob(zkobject.ZKObject):
         # If we need to make any JobData entries, do that now.
         update_kw = {}
         for (k, v) in job_data_vars.items():
-            update_kw['_' + k] = obj._makeJobData(context, k, v)
+            update_kw['_' + k] = obj._makeJobData(context, v)
         if update_kw:
             obj.updateAttributes(context, **update_kw)
         return obj
@@ -2655,12 +2655,12 @@ class FrozenJob(zkobject.ZKObject):
                 artifact_data.append(a)
         return parent_data, secret_parent_data, artifact_data
 
-    def _makeJobData(self, context, name, data):
+    def _makeJobData(self, context, data):
         # If the data is large, store it in another object
         if (len(json_dumps(data, sort_keys=True).encode('utf8')) >
             self.MAX_DATA_LEN):
             return JobData.new(
-                context, _path=self.getPath() + '/' + name,
+                context, _path=f"{self.getPath()}/{uuid4().hex}",
                 data=data)
         # Otherwise we can store it as a local dict
         return data
@@ -2670,13 +2670,13 @@ class FrozenJob(zkobject.ZKObject):
         kw = {}
         if self.parent_data != parent_data:
             kw['_parent_data'] = self._makeJobData(
-                context, 'parent_data', parent_data)
+                context, parent_data)
         if self.secret_parent_data != secret_parent_data:
             kw['_secret_parent_data'] = self._makeJobData(
-                context, 'secret_parent_data', secret_parent_data)
+                context, secret_parent_data)
         if self.artifact_data != artifact_data:
             kw['_artifact_data'] = self._makeJobData(
-                context, 'artifact_data', artifact_data)
+                context, artifact_data)
         if kw:
             self.updateAttributes(
                 self.buildset.item.pipeline.manager.current_context,
@@ -2687,8 +2687,7 @@ class FrozenJob(zkobject.ZKObject):
         if self.artifact_data != artifact_data:
             self.updateAttributes(
                 context,
-                _artifact_data=self._makeJobData(
-                    context, 'artifact_data', artifact_data))
+                _artifact_data=self._makeJobData(context, artifact_data))
 
     @property
     def all_playbooks(self):
