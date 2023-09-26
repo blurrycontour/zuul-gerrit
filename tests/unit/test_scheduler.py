@@ -5933,6 +5933,18 @@ For CI problems and help debugging, contact ci@example.org"""
                                   A.messages[1]))
         self.assertTrue(
             'Skipped due to failed job project-merge' in A.messages[1])
+        self.assertReportedStat(
+            'zuul.nodepool.requests.requested.total', value='1', kind='c')
+        self.assertReportedStat(
+            'zuul.nodepool.requests.requested.label.label1',
+            value='1', kind='c')
+        self.assertReportedStat(
+            'zuul.nodepool.requests.failed.label.label1',
+            value='1', kind='c')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.project.review_example_com.'
+            'org_project.master.job.project-merge.NODE_FAILURE', value='1',
+            kind='c')
 
     def test_nodepool_resources(self):
         "Test that resources are reported"
