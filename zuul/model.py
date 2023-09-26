@@ -2660,7 +2660,7 @@ class FrozenJob(zkobject.ZKObject):
         if (len(json_dumps(data, sort_keys=True).encode('utf8')) >
             self.MAX_DATA_LEN):
             return JobData.new(
-                context, _path=self.getPath() + '/' + name,
+                context, _path=f"{self.getPath()}/{uuid4().hex}",
                 data=data)
         # Otherwise we can store it as a local dict
         return data
