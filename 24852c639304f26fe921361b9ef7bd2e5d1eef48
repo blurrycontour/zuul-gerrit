@@ -16,6 +16,24 @@
       "message": "I was imagining this is the thing we would change.  We will have the possibility to end up with two frozen jobs with the same name, but different configurations (not just the jobdata objects).\n\nSo the \"safe_job\" part of this path would end up being the uuid.",
       "revId": "24852c639304f26fe921361b9ef7bd2e5d1eef48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c99a316_582ec34b",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2412,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-09-27T12:05:24Z",
+      "side": 1,
+      "message": "Yap, that makes more sense.",
+      "parentUuid": "07dbf771_4d9c12a4",
+      "revId": "24852c639304f26fe921361b9ef7bd2e5d1eef48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
