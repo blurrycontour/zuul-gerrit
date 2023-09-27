@@ -5472,7 +5472,7 @@ class QueueItem(zkobject.ZKObject):
                                   job=job, build_set=self.current_build_set,
                                   error_detail=str(e), result='FAILURE')
             self.addBuild(fakebuild)
-            self.pipeline.manager.sql.reportBuildEnd(
+            self.pipeline.manager.sched.reportBuildEnd(
                 fakebuild,
                 tenant=self.pipeline.tenant.name,
                 final=True)
@@ -5881,7 +5881,7 @@ class QueueItem(zkobject.ZKObject):
                                       error_detail=skipped_reason,
                                       result='SKIPPED')
                 self.addBuild(fakebuild)
-                self.pipeline.manager.sql.reportBuildEnd(
+                self.pipeline.manager.sched.reportBuildEnd(
                     fakebuild,
                     tenant=self.pipeline.tenant.name,
                     final=True)
@@ -5897,7 +5897,7 @@ class QueueItem(zkobject.ZKObject):
             result='NODE_FAILURE',
         )
         self.addBuild(fakebuild)
-        self.pipeline.manager.sql.reportBuildEnd(
+        self.pipeline.manager.sched.reportBuildEnd(
             fakebuild,
             tenant=self.pipeline.tenant.name,
             final=True)
@@ -5958,7 +5958,7 @@ class QueueItem(zkobject.ZKObject):
                                   job=job, build_set=self.current_build_set,
                                   error_detail=msg, result='SKIPPED')
             self.addBuild(fakebuild)
-            self.pipeline.manager.sql.reportBuildEnd(
+            self.pipeline.manager.sched.reportBuildEnd(
                 fakebuild,
                 tenant=self.pipeline.tenant.name,
                 final=True)
@@ -5972,7 +5972,7 @@ class QueueItem(zkobject.ZKObject):
                                   job=job, build_set=self.current_build_set,
                                   error_detail=msg, result='SKIPPED')
             self.addBuild(fakebuild)
-            self.pipeline.manager.sql.reportBuildEnd(
+            self.pipeline.manager.sched.reportBuildEnd(
                 fakebuild,
                 tenant=self.pipeline.tenant.name,
                 final=True)

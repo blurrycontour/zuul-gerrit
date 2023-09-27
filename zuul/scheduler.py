@@ -887,6 +887,10 @@ class Scheduler(threading.Thread):
             event, needs_result=False
         )
 
+    def reportBuildEnd(self, build, tenant, final):
+        self.sql.reportBuildEnd(build, tenant=tenant, final=final)
+        self._reportBuildStats(build)
+
     def _reportBuildStats(self, build):
         # Note, as soon as the result is set, other threads may act
         # upon this, even though the event hasn't been fully
@@ -2904,6 +2908,9 @@ class Scheduler(threading.Thread):
             )
 
             self._cleanupCompletedBuild(build)
+            # This usually happens when we have already canceled a
+            # build and reported stats for it, so don't send stats in
+            # this case.
             try:
                 self.sql.reportBuildEnd(
                     build, tenant=pipeline.tenant.name,
@@ -2974,11 +2981,9 @@ class Scheduler(threading.Thread):
             }
             tracing.endSavedSpan(build.span_info, attributes=attributes)
 
-        self._reportBuildStats(build)
-
         self._cleanupCompletedBuild(build)
         try:
-            self.sql.reportBuildEnd(
+            self.reportBuildEnd(
                 build, tenant=pipeline.tenant.name, final=(not build.retry))
         except Exception:
             log.exception("Error reporting build completion to DB:")
@@ -3130,7 +3135,7 @@ class Scheduler(threading.Thread):
                     # anymore once the pipeline is removed.
                     self.executor.removeBuild(build)
                     try:
-                        self.sql.reportBuildEnd(
+                        self.reportBuildEnd(
                             build, build.build_set.item.pipeline.tenant.name,
                             final=False)
                     except Exception:
