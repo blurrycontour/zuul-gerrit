@@ -19,6 +19,7 @@ import collections
 import os
 import random
 import types
+import uuid
 from unittest import mock
 
 import fixtures
@@ -476,11 +477,18 @@ class TestJob(BaseTestCase):
         self.assertEqual(run_secret, secret2_data)
 
 
+class FakeFrozenJob(model.Job):
+
+    def __init__(self, name):
+        super().__init__(name)
+        self.uuid = uuid.uuid4().hex
+
+
 class TestGraph(BaseTestCase):
     def test_job_graph_disallows_multiple_jobs_with_same_name(self):
         graph = model.JobGraph({})
-        job1 = model.Job('job')
-        job2 = model.Job('job')
+        job1 = FakeFrozenJob('job')
+        job2 = FakeFrozenJob('job')
         graph.addJob(job1)
         with testtools.ExpectedException(Exception,
                                          "Job job already added"):
@@ -488,7 +496,7 @@ class TestGraph(BaseTestCase):
 
     def test_job_graph_disallows_circular_dependencies(self):
         graph = model.JobGraph({})
-        jobs = [model.Job('job%d' % i) for i in range(0, 10)]
+        jobs = [FakeFrozenJob('job%d' % i) for i in range(0, 10)]
         prevjob = None
         for j in jobs[:3]:
             if prevjob:
@@ -502,7 +510,7 @@ class TestGraph(BaseTestCase):
         with testtools.ExpectedException(
                 Exception,
                 "Dependency cycle detected in job jobX"):
-            j = model.Job('jobX')
+            j = FakeFrozenJob('jobX')
             j.dependencies = frozenset([model.JobDependency(j.name)])
             graph.addJob(j)
 
@@ -535,8 +543,8 @@ class TestGraph(BaseTestCase):
         graph.addJob(jobs[6])
 
     def test_job_graph_allows_soft_dependencies(self):
-        parent = model.Job('parent')
-        child = model.Job('child')
+        parent = FakeFrozenJob('parent')
+        child = FakeFrozenJob('child')
         child.dependencies = frozenset([
             model.JobDependency(parent.name, True)])
 
