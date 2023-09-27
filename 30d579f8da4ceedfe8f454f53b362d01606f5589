@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "105d599b_644abcc2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-09-27T18:39:10Z",
+      "side": 1,
+      "message": "Something that just occurred to me and consider this brainstorming and not an endorsement:\n\nOne feature that some other CI systems support is the idea of batching changes automatically to conserve resources. This has the downsides of losing bisect-ability, but may be useful to some users. I think this spec\u0027s treatment of queue items potentially makes that possible with a new pipeline manager. One that collects events and acts on them on some time period creating a zuul specific bundele not represented in the code review system. I don\u0027t think we need to solve that here or ever if the need doesn\u0027t arise but it is cool that I think this spec makes that much easier to implement.",
+      "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff45a278_c8f60289",
