@@ -2378,6 +2378,10 @@ class FrozenJob(zkobject.ZKObject):
     @classmethod
     def new(klass, context, **kw):
         obj = klass()
+        if (COMPONENT_REGISTRY.model_api < 18):
+            obj._set(uuid=None)
+        else:
+            obj._set(uuid=uuid4().hex)
 
         # Convert these to JobData after creation.
         job_data_vars = {}
@@ -2407,18 +2411,24 @@ class FrozenJob(zkobject.ZKObject):
         return self.parent is None
 
     @classmethod
-    def jobPath(cls, job_name, parent_path):
-        safe_job = urllib.parse.quote_plus(job_name)
-        return f"{parent_path}/job/{safe_job}"
+    def jobPath(cls, job_id, parent_path):
+        # MODEL_API < 18
+        # Job name is used as path component and needs to be quoted.
+        safe_id = urllib.parse.quote_plus(job_id)
+        return f"{parent_path}/job/{safe_id}"
 
     def getPath(self):
-        return self.jobPath(self.name, self.buildset.getPath())
+        # MODEL_API < 18
+        job_id = self.uuid or self.name
+        return self.jobPath(job_id, self.buildset.getPath())
 
     def serialize(self, context):
         # Ensure that any special handling in this method is matched
         # in Job.freezeJob so that FrozenJobs are identical regardless
         # of whether they have been deserialized.
-        data = {}
+        data = {
+            "uuid": self.uuid,
+        }
         for k in self.attributes:
             # TODO: Backwards compat handling, remove after 5.0
             if k == 'config_hash':
@@ -2478,6 +2488,9 @@ class FrozenJob(zkobject.ZKObject):
         # MODEL_API < 15
         if 'failure_output' not in data:
             data['failure_output'] = []
+
+        # MODEL_API < 18
+        data.setdefault("uuid", None)
 
         if hasattr(self, 'nodeset_alternatives'):
             alts = self.nodeset_alternatives
@@ -3596,6 +3609,8 @@ class JobGraph(object):
         self._job_map = job_map
         # An ordered list of jobs
         self.jobs = []
+        # An ordered list of jobs UUIDs
+        self.job_uuids = []
         # dependent_job_name -> dict(parent_job_name -> soft)
         self._dependencies = {}
         self.project_metadata = {}
@@ -3606,6 +3621,7 @@ class JobGraph(object):
     def toDict(self):
         data = {
             "jobs": self.jobs,
+            "job_uuids": self.job_uuids,
             "dependencies": self._dependencies,
             "project_metadata": {
                 k: v.toDict() for (k, v) in self.project_metadata.items()
@@ -3617,6 +3633,9 @@ class JobGraph(object):
     def fromDict(klass, data, job_map):
         self = klass(job_map)
         self.jobs = data['jobs']
+        # MODEL_API < 18: if job uuids is not set, we default the
+        # UUID for all jobs to None.
+        self.job_uuids = data.get('job_uuids', [None] * len(self.jobs))
         self._dependencies = data['dependencies']
         self.project_metadata = {
             k: ProjectMetadata.fromDict(v)
@@ -3631,6 +3650,7 @@ class JobGraph(object):
             raise Exception("Job %s already added" % (job.name,))
         self._job_map[job.name] = job
         self.jobs.append(job.name)
+        self.job_uuids.append(job.uuid)
         # Append the dependency information
         self._dependencies.setdefault(job.name, {})
         try:
@@ -3647,12 +3667,16 @@ class JobGraph(object):
         except Exception:
             del self._job_map[job.name]
             self.jobs.pop()
+            self.job_uuids.pop()
             del self._dependencies[job.name]
             raise
 
     def getJobs(self):
         # Report in the order of layout cfg
         return list([self._job_map[x] for x in self.jobs])
+
+    def getUuidForJob(self, job_name):
+        return self.job_uuids[self.jobs.index(job_name)]
 
     def getDirectDependentJobs(self, parent_job, skip_soft=False):
         ret = set()
@@ -4518,8 +4542,8 @@ class BuildSet(zkobject.ZKObject):
         job_versions = data.get('job_versions', {})
         build_versions = data.get('build_versions', {})
         # jobs (deserialize as separate objects)
-        if data['job_graph']:
-            for job_name in data['job_graph'].jobs:
+        if job_graph := data['job_graph']:
+            for job_name in job_graph.jobs:
                 # If we have a current build before refreshing, we may
                 # be able to skip refreshing some items since they
                 # will not have changed.
@@ -4535,7 +4559,9 @@ class BuildSet(zkobject.ZKObject):
                         tpe_jobs.append((None, job_name,
                                          tpe.submit(job.refresh, context)))
                 else:
-                    job_path = FrozenJob.jobPath(job_name, self.getPath())
+                    job_uuid = job_graph.getUuidForJob(job_name)
+                    job_path = FrozenJob.jobPath(
+                        job_uuid or job_name, self.getPath())
                     tpe_jobs.append(('job', job_name, tpe.submit(
                         FrozenJob.fromZK, context, job_path, buildset=self)))
 

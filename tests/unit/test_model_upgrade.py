@@ -349,6 +349,52 @@ class TestModelUpgrade(ZuulTestCase):
         matcher2 = change_matcher.BranchMatcher.deserialize(ser)
         self.assertEqual(matcher, matcher2)
 
+    @model_version(17)
+    def test_model_17(self):
+        # Test backward compatibility with old name-based job storage
+        # when not all components have updated yet.
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+    @model_version(17)
+    def test_model_17_18(self):
+        # Test backward compatibility with existing job graphs that
+        # still use the name-based job storage.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 18
+        component_registry = ComponentRegistry(self.zk_client)
+        for _ in iterate_timeout(30, "model api to update"):
+            if component_registry.model_api == 18:
+                break
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
 
 class TestGithubModelUpgrade(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
