@@ -1052,9 +1052,6 @@ class TestScheduler(ZuulTestCase):
     def test_failed_change_at_head_with_queue(self):
         "Test that if a change at the head fails, queued jobs are canceled"
 
-        def get_name(params):
-            return params.get('job_ref', '').split('/')[-1]
-
         self.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
@@ -1075,7 +1072,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(queue), 1)
         self.assertEqual(queue[0].zone, None)
         params = self.executor_server.executor_api.getParams(queue[0])
-        self.assertEqual(get_name(params), 'project-merge')
+        self.assertEqual(queue[0].job_name, 'project-merge')
         self.assertEqual(params['items'][0]['number'], '%d' % A.number)
 
         self.executor_api.release('.*-merge')
@@ -1084,19 +1081,17 @@ class TestScheduler(ZuulTestCase):
         self.waitUntilSettled()
         self.executor_api.release('.*-merge')
         self.waitUntilSettled()
-        queue = list(self.executor_api.queued())
-        params = [self.executor_server.executor_api.getParams(item)
-                  for item in queue]
 
+        queue = list(self.executor_api.queued())
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 6)
 
-        self.assertEqual(get_name(params[0]), 'project-test1')
-        self.assertEqual(get_name(params[1]), 'project-test2')
-        self.assertEqual(get_name(params[2]), 'project-test1')
-        self.assertEqual(get_name(params[3]), 'project-test2')
-        self.assertEqual(get_name(params[4]), 'project-test1')
-        self.assertEqual(get_name(params[5]), 'project-test2')
+        self.assertEqual(queue[0].job_name, 'project-test1')
+        self.assertEqual(queue[1].job_name, 'project-test2')
+        self.assertEqual(queue[2].job_name, 'project-test1')
+        self.assertEqual(queue[3].job_name, 'project-test2')
+        self.assertEqual(queue[4].job_name, 'project-test1')
+        self.assertEqual(queue[5].job_name, 'project-test2')
 
         self.executor_api.release(queue[0])
         self.waitUntilSettled()
