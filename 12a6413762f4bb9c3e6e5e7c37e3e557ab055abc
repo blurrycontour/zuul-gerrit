@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce5d371b_dc32bd6a",
+        "filename": "releasenotes/notes/change-elasticsearch-datatype-afc03905234f093e.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-09-28T11:51:51Z",
+      "side": 1,
+      "message": "Please clarify what \"the document\" is in this case. Keep in mind that release notes are not presented within the context of a change, but rather appear without any additional context in a list at https://zuul-ci.org/docs/zuul/latest/releasenotes.html (and are copied into release announcements).",
+      "revId": "12a6413762f4bb9c3e6e5e7c37e3e557ab055abc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11cfa0ad_995598e4",
+        "filename": "releasenotes/notes/change-elasticsearch-datatype-afc03905234f093e.yaml",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-09-28T11:51:51Z",
+      "side": 1,
+      "message": "It might be better to combine the issues/fixes below into a single upgrade nodes entry explaining what actions an operator needs to take (reindexing?) on their external systems.",
+      "revId": "12a6413762f4bb9c3e6e5e7c37e3e557ab055abc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
