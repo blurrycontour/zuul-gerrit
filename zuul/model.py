@@ -4935,6 +4935,8 @@ class QueueItem(zkobject.ZKObject):
 
         data = obj._trySerialize(context)
         obj._save(context, data, create=True)
+        merge_state = (BuildSet.COMPLETE if not isinstance(obj.change, Change)
+                       else BuildSet.NEW)
         files_state = (BuildSet.COMPLETE if obj.change.files is not None
                        else BuildSet.NEW)
 
@@ -4942,6 +4944,7 @@ class QueueItem(zkobject.ZKObject):
             buildset_span_info = tracing.startSavedSpan("BuildSet")
             obj.updateAttributes(context, current_build_set=BuildSet.new(
                 context, item=obj, files_state=files_state,
+                merge_state=merge_state,
                 span_info=buildset_span_info))
         return obj
 
