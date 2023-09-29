@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24f15f7b_651b23eb",
+        "filename": "tests/fixtures/layouts/overlapping-repos.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-29T06:25:30Z",
+      "side": 1,
+      "message": "The changes in this file aren\u0027t described by the commit message and don\u0027t appear to be necessary; did you accidentally add it to this commit?",
+      "revId": "bcaa38f704729c167acfc8881a682336e32ceafd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
