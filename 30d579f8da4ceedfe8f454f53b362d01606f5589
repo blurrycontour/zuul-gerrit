@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f9012c02_c07e7d69",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-29T06:52:51Z",
+      "side": 1,
+      "message": "Not yet, but we can probably get some numbers as we do the work.  My guess is it may take many minutes but not hours.  We\u0027ve done similar-sized upgrades before.",
+      "parentUuid": "ff45a278_c8f60289",
+      "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "18fc3b5a_70beda7f",
         "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
         "patchSetId": 2
@@ -65,6 +83,24 @@
       "writtenOn": "2023-09-27T18:33:12Z",
       "side": 1,
       "message": "I like this potential future as we could reduce the double accounting between provides/requires and job order within a buildset.",
+      "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78253c17_8235c723",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-29T06:52:51Z",
+      "side": 1,
+      "message": "Me too.",
+      "parentUuid": "18fc3b5a_70beda7f",
       "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -86,6 +122,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "759b5e12_7194788d",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-29T06:52:51Z",
+      "side": 1,
+      "message": "True.",
+      "parentUuid": "d6eb54a4_0c977d3b",
+      "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d88191be_53c4aa01",
@@ -99,6 +153,24 @@
       "writtenOn": "2023-09-27T18:33:12Z",
       "side": 1,
       "message": "We will need to carry enough of both models in order to convert existing queue items from one to the other though. Though that is likely to be much simpler than having two largely separate pipeline processing behaviors.",
+      "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fe4345c_a24f325a",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-29T06:52:51Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "d88191be_53c4aa01",
       "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -122,6 +194,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0f7e526f_2b64aadd",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-29T06:52:51Z",
+      "side": 1,
+      "message": "Yes (though to be clear, they aren\u0027t ahead of the new change, they\u0027re all part of the same item at this point).",
+      "parentUuid": "85f1f72b_3992835b",
+      "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "974b3e60_784eb9c2",
         "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
         "patchSetId": 2
@@ -133,6 +223,24 @@
       "writtenOn": "2023-09-27T18:33:12Z",
       "side": 1,
       "message": "Any concern this makes the db less navigable/debuggable? We could use something like jobname/uuid or some other more unique key if so.",
+      "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c103ef43_5a4a3599",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-09-29T06:52:51Z",
+      "side": 1,
+      "message": "UUID mapping is a pretty common pattern we use; I don\u0027t think it\u0027s going to be especially difficult to debug compared to the rest of the system.  A developer can still find the correct frozen job by name from the buildset using the mapping, and given a particular frozen job, they can still identify the name of the job.",
+      "parentUuid": "974b3e60_784eb9c2",
       "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
