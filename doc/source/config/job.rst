@@ -1206,3 +1206,19 @@ Here is an example of two job definitions:
 
          This scheme will produce unique workspace paths for every repository
          and won't cause collisions.
+
+         Note, however that some default shells (e.g. older versions of ash)
+         uses % as a flag indicator when doing PATH search. This can cause the
+         shell not to find executables in src_dir or its subdirectories if they
+         were added to PATH. An example could be to not find scripts in an
+         activated virtual python environment created under a src_dir. The
+         solution is to change the shell module argument executable, for
+         example::
+
+            tasks:
+              - name: Run pytest from venv
+                shell: |
+                  source {{ zuul.project.src_dir }}/.venv/bin/activate
+                  pytest .
+                args:
+                  executable: "/bin/bash"
