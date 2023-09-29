@@ -611,9 +611,11 @@ class PipelineManager(metaclass=ABCMeta):
             if isinstance(change, model.Change):
                 cycle = self.cycleForChange(change, dependency_graph, event)
                 if cycle and not self.canProcessCycle(change.project):
-                    log.info("Dequeing change %s since at least one project "
+                    log.info("Dequeing change %s since the project "
                              "does not allow circular dependencies", change)
-                    warnings = ["Dependency cycle detected"]
+                    warnings = ["Dependency cycle detected and project "
+                                f"{change.project.name} doesn't allow "
+                                "circular dependencies"]
                     self._reportNonEqueuedItem(change_queue,
                                                cycle[-1], event, warnings)
                     return False
