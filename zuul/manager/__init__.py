@@ -1316,7 +1316,8 @@ class PipelineManager(metaclass=ABCMeta):
         # Else this item updates the config,
         # ask the merger for the result.
         build_set = item.current_build_set
-        if build_set.merge_state != build_set.COMPLETE:
+        if build_set.merge_state not in (
+                build_set.COMPLETE, build_set.SKIPPED):
             return None
         if build_set.unable_to_merge:
             return self.getFallbackLayout(item)
@@ -1461,6 +1462,11 @@ class PipelineManager(metaclass=ABCMeta):
             projects=projects, tenant=tenant, items=[item])
 
         new_items = list()
+        build_set = item.current_build_set
+        # If we skipped the initial repo state, we need to include
+        # the merger items for the final state here.
+        if build_set.merge_state == build_set.SKIPPED:
+            new_items.extend(item.current_build_set.merger_items)
         for project in projects:
             new_item = dict()
             new_item['project'] = project.name
@@ -2043,7 +2049,7 @@ class PipelineManager(metaclass=ABCMeta):
                                       event.elapsed_time, elapsed=True)
 
     def onMergeCompleted(self, event, build_set):
-        if build_set.merge_state == build_set.COMPLETE:
+        if build_set.merge_state in (build_set.COMPLETE, build_set.SKIPPED):
             self._onGlobalRepoStateCompleted(event, build_set)
             self.reportPipelineTiming('repo_state_time',
                                       build_set.repo_state_request_time)
