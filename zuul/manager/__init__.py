@@ -1461,6 +1461,12 @@ class PipelineManager(metaclass=ABCMeta):
             projects=projects, tenant=tenant, items=[item])
 
         new_items = list()
+        build_set = item.current_build_set
+        # If we skipped the initial repo state (for branch/ref items),
+        # we need to include the merger items for the final repo state.
+        if build_set.merge_repo_state is None:
+            new_items.extend(build_set.merger_items)
+
         for project in projects:
             new_item = dict()
             new_item['project'] = project.name
