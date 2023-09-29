@@ -52,14 +52,29 @@
       - component/subcomponent
       - component
 
-- project:
-    name: component/subcomponent
-    check:
-      jobs:
-        - test-job
+- job:
+    name: test-job-unique
+    workspace-scheme: unique
+    required-projects:
+      - component_1
+      - component_1/subcomponent
+      - component_2/subcomponent
 
 - project:
-    name: component
+    name: component_1
     check:
       jobs:
-        - test-job
+        - test-job-unique
+
+- project:
+    name: component_1/subcomponent
+    check:
+      jobs:
+        - test-job-unique
+
+
+- project:
+    name: component_2/subcomponent
+    check:
+      jobs:
+        - test-job-unique
