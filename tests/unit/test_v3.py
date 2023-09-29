@@ -9739,6 +9739,21 @@ class TestDynamicBranchesProject(IncludeBranchesTestCase):
         ]
         self._test_include_branches(history1, history2, history3, history4)
 
+    def test_post_jobs(self):
+        self.create_branch('org/project', 'feature/bar')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'feature/bar'))
+        self.waitUntilSettled()
+        A = self.fake_gerrit.addFakeChange('org/project', 'feature/bar', 'A')
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='central-post', result='SUCCESS',
+                 ref='refs/heads/feature/bar'),
+        ], ordered=False)
+
 
 class TestMaxDeps(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main-max-deps.yaml'

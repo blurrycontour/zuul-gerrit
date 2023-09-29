@@ -1422,7 +1422,6 @@ class PipelineManager(metaclass=ABCMeta):
 
     def scheduleGlobalRepoState(self, item: QueueItem) -> bool:
         log = item.annotateLogger(self.log)
-        log.info('Scheduling global repo state for item %s', item)
 
         tenant = item.pipeline.tenant
         jobs = item.current_build_set.job_graph.getJobs()
@@ -1447,6 +1446,7 @@ class PipelineManager(metaclass=ABCMeta):
                 repo_state_state=item.current_build_set.COMPLETE)
             return True
 
+        log.info('Scheduling global repo state for item %s', item)
         # At this point we know we're going to request a merge job;
         # set the waiting state on all the item's jobs so users know
         # what we're waiting on.
@@ -1461,6 +1461,12 @@ class PipelineManager(metaclass=ABCMeta):
             projects=projects, tenant=tenant, items=[item])
 
         new_items = list()
+        build_set = item.current_build_set
+        # If we skipped the initial repo state (for branch/ref items),
+        # we need to include the merger items for the final repo state.
+        if build_set.merge_repo_state is None:
+            new_items.extend(build_set.merger_items)
+
         for project in projects:
             new_item = dict()
             new_item['project'] = project.name

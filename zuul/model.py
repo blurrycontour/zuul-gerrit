@@ -4935,6 +4935,11 @@ class QueueItem(zkobject.ZKObject):
 
         data = obj._trySerialize(context)
         obj._save(context, data, create=True)
+        # Skip the initial merge for branch/ref items as we don't need it in
+        # order to build a job graph. The merger items will be included as
+        # part of the extra repo state if there are jobs to run.
+        merge_state = (BuildSet.NEW if isinstance(obj.change, (Change, Tag))
+                       else BuildSet.COMPLETE)
         files_state = (BuildSet.COMPLETE if obj.change.files is not None
                        else BuildSet.NEW)
 
@@ -4942,6 +4947,7 @@ class QueueItem(zkobject.ZKObject):
             buildset_span_info = tracing.startSavedSpan("BuildSet")
             obj.updateAttributes(context, current_build_set=BuildSet.new(
                 context, item=obj, files_state=files_state,
+                merge_state=merge_state,
                 span_info=buildset_span_info))
         return obj
 
