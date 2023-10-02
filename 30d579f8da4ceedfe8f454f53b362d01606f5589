@@ -70,6 +70,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1870d280_f5176290",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-02T16:20:53Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f9012c02_c07e7d69",
+      "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18fc3b5a_70beda7f",
@@ -241,6 +259,24 @@
       "side": 1,
       "message": "UUID mapping is a pretty common pattern we use; I don\u0027t think it\u0027s going to be especially difficult to debug compared to the rest of the system.  A developer can still find the correct frozen job by name from the buildset using the mapping, and given a particular frozen job, they can still identify the name of the job.",
       "parentUuid": "974b3e60_784eb9c2",
+      "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c74f0a20_34b05a7e",
+        "filename": "doc/source/developer/specs/circular-dependencies-refactor.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-02T16:20:53Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c103ef43_5a4a3599",
       "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
