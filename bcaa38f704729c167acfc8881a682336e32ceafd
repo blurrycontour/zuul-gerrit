@@ -16,6 +16,24 @@
       "message": "The changes in this file aren\u0027t described by the commit message and don\u0027t appear to be necessary; did you accidentally add it to this commit?",
       "revId": "bcaa38f704729c167acfc8881a682336e32ceafd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b30a7ccf_135cf7f1",
+        "filename": "tests/fixtures/layouts/overlapping-repos.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 32721
+      },
+      "writtenOn": "2023-10-03T07:53:33Z",
+      "side": 1,
+      "message": "Mistakenly commited",
+      "parentUuid": "24f15f7b_651b23eb",
+      "revId": "bcaa38f704729c167acfc8881a682336e32ceafd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
