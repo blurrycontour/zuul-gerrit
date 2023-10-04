@@ -42,3 +42,4 @@ opentelemetry-exporter-otlp-proto-grpc
 opentelemetry-exporter-otlp-proto-http
 confluent-kafka
 boto3
+google-cloud-pubsub

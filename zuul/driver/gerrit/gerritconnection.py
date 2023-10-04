@@ -48,6 +48,9 @@ from zuul.driver.gerrit.gerriteventkafka import GerritKafkaEventListener
 from zuul.driver.gerrit.gerriteventawskinesis import (
     GerritAWSKinesisEventListener,
 )
+from zuul.driver.gerrit.gerriteventgcloudpubsub import (
+    GerritGcloudPubsubEventListener,
+)
 from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib import tracing
 from zuul.lib.logutil import get_annotated_logger
@@ -433,6 +436,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     EVENT_SOURCE_STREAM_EVENTS = 'stream-events'
     EVENT_SOURCE_KAFKA = 'kafka'
     EVENT_SOURCE_KINESIS = 'kinesis'
+    EVENT_SOURCE_GCLOUD_PUBSUB = 'gcloudpubsub'
 
     def __init__(self, driver, connection_name, connection_config):
         super(GerritConnection, self).__init__(driver, connection_name,
@@ -468,6 +472,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             self.event_source = self.EVENT_SOURCE_KAFKA
         elif self.connection_config.get('aws_kinesis_region', None):
             self.event_source = self.EVENT_SOURCE_KINESIS
+        elif self.connection_config.get('gcloud_pubsub_project', None):
+            self.event_source = self.EVENT_SOURCE_GCLOUD_PUBSUB
 
         # Thread for whatever event source we use
         self.event_thread = None
@@ -1694,6 +1700,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             self.startKafkaListener()
         elif self.event_source == self.EVENT_SOURCE_KINESIS:
             self.startAWSKinesisListener()
+        elif self.event_source == self.EVENT_SOURCE_GCLOUD_PUBSUB:
+            self.startGcloudPubsubListener()
         else:
             self.log.warning("No gerrit event source configured")
             self.startRefWatcherThread()
@@ -1713,6 +1721,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def startAWSKinesisListener(self):
         self.log.info("Starting AWS Kinesis consumer")
         self.event_thread = GerritAWSKinesisEventListener(
+            self, self.connection_config)
+
+    def startGcloudPubsubListener(self):
+        self.log.info("Starting gcloud pubsub consumer")
+        self.event_thread = GerritGcloudPubsubEventListener(
             self, self.connection_config)
 
     def startPollerThread(self):
