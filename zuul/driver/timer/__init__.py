@@ -160,10 +160,8 @@ class TimerDriver(Driver, TriggerInterface):
             if not [True for pc in pcst if pipeline.name in pc.pipelines]:
                 continue
 
-            (trusted, project) = tenant.getProject(project_name)
             try:
-                for branch in project.source.getProjectBranches(
-                        project, tenant):
+                for branch in tenant.getProjectBranches(project_name):
                     args = (tenant.name, pipeline.name, project_name,
                             branch, timespec,)
                     existing_job = existing_jobs.get(args)
@@ -184,7 +182,7 @@ class TimerDriver(Driver, TriggerInterface):
             except Exception:
                 self.log.exception("Unable to create APScheduler job for "
                                    "%s %s %s",
-                                   tenant, pipeline, project)
+                                   tenant, pipeline, project_name)
 
     def _onTrigger(self, tenant_name, pipeline_name, project_name, branch,
                    timespec):
