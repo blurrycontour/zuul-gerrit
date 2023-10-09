@@ -954,7 +954,7 @@ class TestBranchMismatch(ZuulTestCase):
 
         self.assertEqual(
             {'testbranch': True, 'this_branch': 'testbranch'},
-            self.builds[0].job.combined_variables)
+            self.builds[0].job.variables)
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -968,7 +968,7 @@ class TestBranchMismatch(ZuulTestCase):
         # testbranch2 should not pick up vars from testbranch.
         self.assertEqual(
             {'testbranch2': True, 'this_branch': 'testbranch2'},
-            self.builds[0].job.combined_variables)
+            self.builds[0].job.variables)
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -1038,14 +1038,14 @@ class TestBranchMismatch(ZuulTestCase):
 
         self.assertEqual(
             {'testbranch': True, 'this_branch': 'testbranch'},
-            self.builds[0].job.combined_variables)
+            self.builds[0].job.variables)
 
         # The two jobs should have distinct variables (notably, the
         # variant on testbranch2 should not pick up vars from
         # testbranch.
         self.assertEqual(
             {'testbranch2': True, 'this_branch': 'testbranch2'},
-            self.builds[1].job.combined_variables)
+            self.builds[1].job.variables)
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()

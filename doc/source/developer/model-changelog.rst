@@ -143,3 +143,9 @@ Version 17
 :Prior Zuul version: 9.1.0
 :Description: Adds ZuulRegex and adjusts SourceContext serialialization.
               Affects schedulers and web.
+
+Version 18
+----------
+:Prior Zuul version: 9.2.0
+:Description: Send (secret) job parent data via build request parameters
+              instead of updating the job.
