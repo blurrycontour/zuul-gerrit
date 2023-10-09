@@ -2596,14 +2596,6 @@ class FrozenJob(zkobject.ZKObject):
     def affected_projects(self):
         return self._getJobData('_affected_projects')
 
-    @property
-    def combined_variables(self):
-        """
-        Combines the data that has been returned by parent jobs with the
-        job variables where job variables have priority over parent data.
-        """
-        return Job._deepUpdate(self.parent_data or {}, self.variables)
-
     def getSafeAttributes(self):
         return Attributes(name=self.name)
 
@@ -5607,7 +5599,8 @@ class QueueItem(zkobject.ZKObject):
                 # Iterate over all jobs of the graph (which is
                 # in sorted config order) and apply parent data of the jobs we
                 # already found.
-                if len(parent_builds_with_data) > 0:
+                if (parent_builds_with_data
+                        and COMPONENT_REGISTRY.model_api < 18):
                     # We have all of the parent data here, so we can
                     # start from scratch each time.
                     new_parent_data = {}
@@ -5631,6 +5624,35 @@ class QueueItem(zkobject.ZKObject):
                                       new_secret_parent_data,
                                       new_artifact_data)
                 job._set(_ready_to_run=True)
+
+    def getJobParentData(self, job):
+        if not job._ready_to_run:
+            raise RuntimeError(f"Job {job.name} is not ready to run")
+
+        job_graph = self.current_build_set.job_graph
+        parent_builds_with_data = {}
+        for parent_job in job_graph.getParentJobsRecursively(job.name):
+            parent_build = self.current_build_set.getBuild(parent_job.name)
+            if parent_build.result_data:
+                parent_builds_with_data[parent_job.name] = parent_build
+
+        parent_data = {}
+        secret_parent_data = {}
+        # We may have artifact data from
+        # jobRequirementsReady, so we preserve it.
+        # updateParentData de-duplicates it.
+        artifact_data = job.artifact_data or []
+        # Iterate over all jobs of the graph (which is
+        # in sorted config order) and apply parent data of the jobs we
+        # already found.
+        for parent_build in parent_builds_with_data.values():
+            (parent_data, secret_parent_data, artifact_data
+                ) = FrozenJob.updateParentData(
+                    parent_data,
+                    secret_parent_data,
+                    artifact_data,
+                    parent_build)
+        return parent_data, secret_parent_data, artifact_data
 
     def deduplicateJobs(self, log):
         """Sync node request and build info with deduplicated jobs
