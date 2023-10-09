@@ -16,6 +16,24 @@
       "message": "The reducer sets `errors: state.errors` for this state. Does the `error` here expand to `errors: something` that can be consumed by the reducer?",
       "revId": "e429a907226162b366c552623d0a4b654a8ff716",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24f57a35_f31c1578",
+        "filename": "web/src/actions/configErrors.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-10-09T20:33:58Z",
+      "side": 1,
+      "message": "\"state.errors\" is the current set of errors stored in memory, so we\u0027re setting the variable to its current value.  In other words, if we fail, we won\u0027t update the redux store with the return value.  Contrast to the success path where we update it to \"action.errors\" instead of \"state.errors\".\n\nThe \"error\" variable here is indeed some dictionary returned by the ajax lib, but I don\u0027t recall its contents right now; I think very few, if any, reducers actually do anything with it.",
+      "parentUuid": "308c2fe1_86685eec",
+      "revId": "e429a907226162b366c552623d0a4b654a8ff716",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
