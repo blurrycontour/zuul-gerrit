@@ -15,6 +15,7 @@
 import os
 
 from zuul.lib import strings
+from zuul.zk.components import COMPONENT_REGISTRY
 
 
 def construct_build_params(uuid, connections, job, item, pipeline,
@@ -86,6 +87,15 @@ def construct_build_params(uuid, connections, job, item, pipeline,
                                      getDirectDependentJobs(job.name))
 
     params = dict()
+    if COMPONENT_REGISTRY.model_api >= 19:
+        (
+            params["parent_data"],
+            params["secret_parent_data"],
+            artifact_data
+        ) = item.getJobParentData(job)
+        if artifact_data:
+            zuul_params['artifacts'] = artifact_data
+
     params['job_ref'] = job.getPath()
     params['items'] = merger_items
     params['projects'] = []

@@ -149,3 +149,10 @@ Version 18
 :Prior Zuul version: 9.2.0
 :Description: Adds new merge modes 'recursive' and 'ort' for the Github
               driver.
+
+Version 19
+----------
+:Prior Zuul version: 9.2.0
+:Description: Send (secret) job parent and artifact data via build request
+              parameters instead of updating the job.
+              Affects schedulers and executors.
