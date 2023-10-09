@@ -18,7 +18,12 @@ from zuul import change_matcher
 from zuul.lib.re2util import ZuulRegex
 from zuul.zk.components import ComponentRegistry
 
-from tests.base import ZuulTestCase, simple_layout, iterate_timeout
+from tests.base import (
+    AnsibleZuulTestCase,
+    ZuulTestCase,
+    simple_layout,
+    iterate_timeout,
+)
 from tests.base import ZuulWebFixture
 
 
@@ -565,3 +570,22 @@ class TestDeduplication(ZuulTestCase):
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 4)
+
+
+class TestDataReturn(AnsibleZuulTestCase):
+    tenant_config_file = 'config/data-return/main.yaml'
+
+    @model_version(17)
+    def test_data_return(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='data-return', result='SUCCESS', changes='1,1'),
+            dict(name='data-return-relative', result='SUCCESS', changes='1,1'),
+            dict(name='child', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        self.assertIn('- data-return https://zuul.example.com/',
+                      A.messages[-1])
+        self.assertIn('- data-return-relative https://zuul.example.com',
+                      A.messages[-1])
