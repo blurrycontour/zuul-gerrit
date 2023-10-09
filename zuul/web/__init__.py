@@ -1694,6 +1694,8 @@ class ZuulWebAPI(object):
             uuid, self.zuulweb.connections, job, item, item.pipeline)
         params['zuul'].update(zuul.executor.common.zuul_params_from_job(job))
         del params['job_ref']
+        del params['parent_data']
+        del params['secret_parent_data']
         params['job'] = job.name
         params['zuul']['buildset'] = None
         params['timeout'] = job.timeout
@@ -1709,7 +1711,7 @@ class ZuulWebAPI(object):
             params['post_playbooks'] = job.post_run
             params['cleanup_playbooks'] = job.cleanup_run
         params["nodeset"] = job.nodeset.toDict()
-        params['vars'] = job.combined_variables
+        params['vars'] = job.variables
         params['extra_vars'] = job.extra_variables
         params['host_vars'] = job.host_variables
         params['group_vars'] = job.group_variables
