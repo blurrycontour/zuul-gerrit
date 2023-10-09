@@ -3497,7 +3497,7 @@ class TestScheduler(ZuulTestCase):
         ], ordered=False)
         j = self.getJobFromHistory('parentjob')
         rp = set([p['name'] for p in j.parameters['projects']])
-        job_vars = j.job.combined_variables
+        job_vars = j.job.variables
         self.assertEqual(job_vars['project_var'], 'set_in_project')
         self.assertEqual(job_vars['template_var1'], 'set_in_template1')
         self.assertEqual(job_vars['template_var2'], 'set_in_template2')
@@ -3512,7 +3512,7 @@ class TestScheduler(ZuulTestCase):
                                   'org/project0']))
         j = self.getJobFromHistory('child1')
         rp = set([p['name'] for p in j.parameters['projects']])
-        job_vars = j.job.combined_variables
+        job_vars = j.job.variables
         self.assertEqual(job_vars['project_var'], 'set_in_project')
         self.assertEqual(job_vars['override'], 1)
         self.assertEqual(job_vars['child1override'], 1)
@@ -3524,7 +3524,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(rp, set(['org/project', 'org/project0',
                                   'org/project1']))
         j = self.getJobFromHistory('child2')
-        job_vars = j.job.combined_variables
+        job_vars = j.job.variables
         self.assertEqual(job_vars['project_var'], 'set_in_project')
         rp = set([p['name'] for p in j.parameters['projects']])
         self.assertEqual(job_vars['override'], 2)
@@ -3537,7 +3537,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(rp, set(['org/project', 'org/project0',
                                   'org/project2']))
         j = self.getJobFromHistory('child3')
-        job_vars = j.job.combined_variables
+        job_vars = j.job.variables
         self.assertEqual(job_vars['project_var'], 'set_in_project')
         rp = set([p['name'] for p in j.parameters['projects']])
         self.assertEqual(job_vars['override'], 3)
@@ -3550,7 +3550,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(rp, set(['org/project', 'org/project0',
                                   'org/project3']))
         j = self.getJobFromHistory('override_project_var')
-        job_vars = j.job.combined_variables
+        job_vars = j.job.variables
         self.assertEqual(job_vars['project_var'], 'override_in_job')
 
     @simple_layout('layouts/job-variants.yaml')

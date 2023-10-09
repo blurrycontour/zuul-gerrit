@@ -70,6 +70,7 @@ from zuul.model import (
     BuildStatusEvent,
     ExtraRepoState,
     FrozenJob,
+    Job,
     MergeRepoState,
 )
 import zuul.model
@@ -1068,6 +1069,22 @@ class AnsibleJob(object):
             max_attempts = self.arguments["max_attempts"]
         self.retry_limit = self.arguments["zuul"]["attempts"] >= max_attempts
 
+    @property
+    def all_vars(self):
+        try:
+            parent_data = self.arguments["parent_data"]
+        except KeyError:
+            parent_data = self.job.parent_data or {}
+
+        return Job._deepUpdate(parent_data.copy(), self.job.variables)
+
+    @property
+    def secret_vars(self):
+        try:
+            return self.arguments["secret_parent_data"]
+        except KeyError:
+            return self.job.secret_parent_data or {}
+
     def run(self):
         self.running = True
         self.thread = threading.Thread(target=self.execute,
@@ -1992,7 +2009,7 @@ class AnsibleJob(object):
                 # var or all-var, then don't do anything here; let the
                 # user control.
                 api = 'ansible_python_interpreter'
-                if (api not in self.job.combined_variables and
+                if (api not in self.job.variables and
                     not is_group_var_set(api, name, self.nodeset, self.job)):
                     python = getattr(node, 'python_path', 'auto')
                     host_vars.setdefault(api, python)
@@ -2261,7 +2278,7 @@ class AnsibleJob(object):
         :arg secrets dict: Actual Zuul secrets.
         '''
 
-        secret_vars = self.job.secret_parent_data or {}
+        secret_vars = self.secret_vars
 
         # We need to handle secret vars specially.  We want to pass
         # them to Ansible as we do secrets, but we want them to have
@@ -2270,7 +2287,7 @@ class AnsibleJob(object):
         # anything above it in precedence.
 
         other_vars = set()
-        other_vars.update(self.job.combined_variables.keys())
+        other_vars.update(self.all_vars.keys())
         for group_vars in self.job.group_variables.values():
             other_vars.update(group_vars.keys())
         for host_vars in self.job.host_variables.values():
@@ -2495,7 +2512,7 @@ class AnsibleJob(object):
         return zuul_resources
 
     def prepareVars(self, args, zuul_resources):
-        all_vars = self.job.combined_variables.copy()
+        all_vars = self.all_vars.copy()
         check_varnames(all_vars)
 
         # Check the group and extra var names for safety; they'll get

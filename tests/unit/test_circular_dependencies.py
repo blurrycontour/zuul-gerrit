@@ -1246,8 +1246,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
         self.assertEqual(len(vars_builds), 1)
-        self.assertEqual(vars_builds[0].job.combined_variables["test_var"],
-                         "pass")
+        self.assertEqual(vars_builds[0].job.variables["test_var"], "pass")
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -1261,8 +1260,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
         self.assertEqual(len(vars_builds), 1)
-        self.assertEqual(vars_builds[0].job.combined_variables["test_var"],
-                         "pass")
+        self.assertEqual(vars_builds[0].job.variables["test_var"], "pass")
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -1276,8 +1274,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
         self.assertEqual(len(vars_builds), 1)
-        self.assertEqual(vars_builds[0].job.combined_variables["test_var"],
-                         "pass")
+        self.assertEqual(vars_builds[0].job.variables["test_var"], "pass")
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -1298,8 +1295,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
         self.assertEqual(len(vars_builds), 3)
         for build in vars_builds:
-            self.assertEqual(build.job.combined_variables["test_var"],
-                             "pass")
+            self.assertEqual(build.job.variables["test_var"], "pass")
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()

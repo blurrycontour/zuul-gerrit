@@ -1697,7 +1697,7 @@ class ZuulWebAPI(object):
             params['post_playbooks'] = job.post_run
             params['cleanup_playbooks'] = job.cleanup_run
         params["nodeset"] = job.nodeset.toDict()
-        params['vars'] = job.combined_variables
+        params['vars'] = job.variables
         params['extra_vars'] = job.extra_variables
         params['host_vars'] = job.host_variables
         params['group_vars'] = job.group_variables
