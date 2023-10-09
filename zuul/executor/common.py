@@ -41,6 +41,7 @@ def construct_build_params(uuid, connections, job, item, pipeline,
                                  job.workspace_scheme)),
     )
 
+    parent_data, secret_parent_data, artifact_data = item.getJobParentData(job)
     zuul_params = dict(
         build=uuid,
         buildset=item.current_build_set.uuid,
@@ -52,6 +53,7 @@ def construct_build_params(uuid, connections, job, item, pipeline,
         tenant=tenant.name,
         event_id=item.event.zuul_event_id if item.event else None,
         jobtags=sorted(job.tags),
+        artifacts=artifact_data,
     )
     if hasattr(item.change, 'branch'):
         zuul_params['branch'] = item.change.branch
@@ -85,7 +87,11 @@ def construct_build_params(uuid, connections, job, item, pipeline,
     zuul_params['child_jobs'] = list(item.current_build_set.job_graph.
                                      getDirectDependentJobs(job.name))
 
-    params = dict()
+    params = dict(
+        parent_data=parent_data,
+        secret_parent_data=secret_parent_data,
+        articact_data=artifact_data,
+    )
     params['job_ref'] = job.getPath()
     params['items'] = merger_items
     params['projects'] = []
