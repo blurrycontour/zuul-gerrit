@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "308c2fe1_86685eec",
+        "filename": "web/src/actions/configErrors.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-09T19:59:51Z",
+      "side": 1,
+      "message": "The reducer sets `errors: state.errors` for this state. Does the `error` here expand to `errors: something` that can be consumed by the reducer?",
+      "revId": "e429a907226162b366c552623d0a4b654a8ff716",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
