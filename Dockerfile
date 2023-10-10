@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ARG IMAGE_FLAVOR=-debug
+
 FROM docker.io/library/node:16-bookworm as js-builder
 
 COPY web /tmp/src
@@ -49,7 +51,7 @@ RUN /output/install-from-bindep \
   && echo $OPENSHIFT_SHA /tmp/openshift-install/openshift-client.tgz | sha256sum --check \
   && tar xvfz openshift-client.tgz -C /tmp/openshift-install
 
-FROM docker.io/opendevorg/python-base:3.11-bookworm as zuul
+FROM insecure-ci-registry.opendev.org:5000/opendevorg/python-base:fe6ca2503d1a4263b6a2c9263068ca4d_3.11-bookworm${IMAGE_FLAVOR} as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /output/ /output
