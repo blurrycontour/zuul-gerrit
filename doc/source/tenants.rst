@@ -158,6 +158,8 @@ configuration. Some examples of tenant definitions are:
       changes in response to proposed changes, and Zuul will read
       configuration files in all of their branches.
 
+      Project names in this list can also be regular expressions.
+
       .. attr:: <project>
 
          The items in the list may either be simple string values of
