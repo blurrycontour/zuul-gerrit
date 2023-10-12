@@ -3109,9 +3109,9 @@ class ConfigLoader(object):
                 self.log.warning(err.error)
         return new_tenant
 
-    def _loadDynamicProjectData(self, config, project,
-                                files, trusted, item,
-                                pcontext):
+    def _loadDynamicProjectData(self, config, project, files,
+                                additional_project_branches, trusted,
+                                item, pcontext):
         tenant = item.pipeline.tenant
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
@@ -3121,6 +3121,18 @@ class ConfigLoader(object):
             # reconfiguration there should not be any branch changes.
             branches = tenant.getProjectBranches(project.canonical_name,
                                                  include_always_dynamic=True)
+            # Except that we might be dealing with a change on a
+            # dynamic branch which hasn't shown up in our cached list
+            # yet (since we don't reconfigure on dynamic branch
+            # creation).  Add additional branches in the queue which
+            # match the dynamic branch regexes.
+            additional_branches = list(additional_project_branches.get(
+                project.canonical_name, []))
+            additional_branches = [b for b in additional_branches
+                                   if b not in branches
+                                   and tpc.isAlwaysDynamicBranch(b)]
+            if additional_branches:
+                branches = branches + additional_branches
 
         for branch in branches:
             fns1 = []
@@ -3181,6 +3193,9 @@ class ConfigLoader(object):
                             continue
                         loaded = conf_root
 
+                    self.log.info(
+                        "Loading configuration dynamically from %s" %
+                        (source_context,))
                     incdata = self.tenant_parser.loadProjectYAML(
                         data, source_context, pcontext.loading_errors)
 
@@ -3195,7 +3210,9 @@ class ConfigLoader(object):
                     config.extend(self.tenant_parser.parseConfig(
                         tenant, incdata, pcontext))
 
-    def createDynamicLayout(self, item, files, ansible_manager,
+    def createDynamicLayout(self, item, files,
+                            additional_project_branches,
+                            ansible_manager,
                             include_config_projects=False,
                             zuul_event_id=None):
         tenant = item.pipeline.tenant
@@ -3205,14 +3222,16 @@ class ConfigLoader(object):
         if include_config_projects:
             config = model.ParsedConfig()
             for project in tenant.config_projects:
-                self._loadDynamicProjectData(config, project, files, True,
-                                             item, pcontext)
+                self._loadDynamicProjectData(config, project, files,
+                                             additional_project_branches,
+                                             True, item, pcontext)
         else:
             config = tenant.config_projects_config.copy()
 
         for project in tenant.untrusted_projects:
-            self._loadDynamicProjectData(config, project, files, False, item,
-                                         pcontext)
+            self._loadDynamicProjectData(config, project, files,
+                                         additional_project_branches,
+                                         False, item, pcontext)
 
         layout = model.Layout(tenant, item.layout_uuid)
         layout.loading_errors = pcontext.loading_errors
