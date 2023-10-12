@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb18b6ac_4919e5f0",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 9781,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-12T18:47:24Z",
+      "side": 1,
+      "message": "See comment in the other file, but maybe this test case should be expanded a bit to cover the situation I\u0027ve talked about in the other comment? Specifically if you have multiple changes (items) from different projects and need to (or not) load configs from both.",
+      "revId": "6fda08b8eb2b55e4ed4c9f4ca84d38b6f68909a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "084ef0ee_024626c6",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1275,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-12T18:47:24Z",
+      "side": 1,
+      "message": "We seem to ignore project_branches entries for projects other than the one loading when we load the config for item above. Should we only add entries for the single project to avoid confusion here? Or should the loading be modified to check project branches for other projects in items ahead?",
+      "range": {
+        "startLine": 1275,
+        "startChar": 20,
+        "endLine": 1275,
+        "endChar": 54
+      },
+      "revId": "6fda08b8eb2b55e4ed4c9f4ca84d38b6f68909a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
