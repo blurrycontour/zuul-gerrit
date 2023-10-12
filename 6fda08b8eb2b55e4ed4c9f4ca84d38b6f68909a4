@@ -18,6 +18,58 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "caeb4dda_23ad1f59",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 9781,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-12T18:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fb18b6ac_4919e5f0",
+      "revId": "6fda08b8eb2b55e4ed4c9f4ca84d38b6f68909a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b0797bc_47729edb",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3224,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-12T18:59:47Z",
+      "side": 1,
+      "message": "The for loop here and the one noted below are why we need to have additional_project_branches for projects in all items. My previous pair of comments don\u0027t point to any problem and were instead a result of my missing these loops.",
+      "revId": "6fda08b8eb2b55e4ed4c9f4ca84d38b6f68909a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15b72b80_0e4a2999",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3231,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-12T18:59:47Z",
+      "side": 1,
+      "message": "This is the other for loop noted above.",
+      "revId": "6fda08b8eb2b55e4ed4c9f4ca84d38b6f68909a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "084ef0ee_024626c6",
@@ -31,6 +83,30 @@
       "writtenOn": "2023-10-12T18:47:24Z",
       "side": 1,
       "message": "We seem to ignore project_branches entries for projects other than the one loading when we load the config for item above. Should we only add entries for the single project to avoid confusion here? Or should the loading be modified to check project branches for other projects in items ahead?",
+      "range": {
+        "startLine": 1275,
+        "startChar": 20,
+        "endLine": 1275,
+        "endChar": 54
+      },
+      "revId": "6fda08b8eb2b55e4ed4c9f4ca84d38b6f68909a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f06b0d36_9d34a5a7",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1275,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-12T18:59:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "084ef0ee_024626c6",
       "range": {
         "startLine": 1275,
         "startChar": 20,
