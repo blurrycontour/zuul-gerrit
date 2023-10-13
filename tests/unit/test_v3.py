@@ -8925,6 +8925,36 @@ class TestProvidesRequiresMysql(ZuulTestCase):
                                       kind='ms')
         self.assertTrue(0.0 < float(val) < 60000.0)
 
+    @simple_layout('layouts/provides-requires-circular.yaml')
+    def test_gate_circular_dependency_non_voting_failure(self):
+        # Changes with a circular dependency share a queue,
+        # with both running at the same time.
+        # The non-voting image-builer job fails and blocks any further
+        # progress of the items in the queue as B cannot make progress
+        # without the required artifacts and A does not report or cancel
+        # as it is waiting for the image-user job of B to finish.
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B (via commit-depends)
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.executor_server.failJob('image-builder', A)
+        A.addApproval('Code-Review', 2)
+        A.addApproval('Approved', 1)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='image-builder', result='FAILURE', changes='1,1 2,1'),
+        ])
+
     @simple_layout('layouts/provides-requires-unshared.yaml')
     def test_provides_requires_unshared_queue(self):
         self.executor_server.hold_jobs_in_build = True
