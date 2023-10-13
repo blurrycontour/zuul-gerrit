@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "224f4a8b_8ed5c1f1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-10-13T12:58:20Z",
+      "side": 1,
+      "message": "Thank you for the write up, it\u0027s very insightful!",
+      "revId": "30d579f8da4ceedfe8f454f53b362d01606f5589",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff45a278_c8f60289",
