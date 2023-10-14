@@ -62,4 +62,8 @@ ${ROOTCMD} ${MYSQL} -e "CREATE USER 'openstack_citest'@'%' identified by 'openst
 ${ROOTCMD} ${MYSQL} -e "GRANT ALL PRIVILEGES ON *.* TO 'openstack_citest'@'%' WITH GRANT OPTION;"
 ${ROOTCMD} ${MYSQL} -u openstack_citest -popenstack_citest -e "SET default_storage_engine=MYISAM; DROP DATABASE IF EXISTS openstack_citest; CREATE DATABASE openstack_citest CHARACTER SET utf8;"
 
+set +x
 echo "Finished"
+
+echo "Set this variable to use the in-container pg_dump command:"
+echo 'export ZUUL_TEST_PG_DUMP="docker exec -t zuul-test-postgres pg_dump"'
