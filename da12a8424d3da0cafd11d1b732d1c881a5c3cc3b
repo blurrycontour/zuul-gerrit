@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c393ed2e_96058dda",
+        "filename": "doc/source/drivers/timer.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-10-16T08:11:16Z",
+      "side": 1,
+      "message": "typo: initialized",
+      "range": {
+        "startLine": 40,
+        "startChar": 20,
+        "endLine": 40,
+        "endChar": 31
+      },
+      "revId": "da12a8424d3da0cafd11d1b732d1c881a5c3cc3b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91cb0a47_61655b84",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-10-16T08:11:16Z",
+      "side": 1,
+      "message": "This relies on the list of projects and the branches being the same and in the same order each time. If there is a new branch in any of those projects, a new project or any of the lists is not sorted the same, it will produce different values for all following projects/branches.\n\nGiven that, I think fungi\u0027s proposal of using a PRNG per branch makes sense to me.",
+      "revId": "da12a8424d3da0cafd11d1b732d1c881a5c3cc3b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
