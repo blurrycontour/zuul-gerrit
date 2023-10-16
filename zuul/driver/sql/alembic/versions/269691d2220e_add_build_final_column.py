@@ -35,7 +35,8 @@ def upgrade(table_prefix=''):
 
     # Set all existing build entries to final (otherwise they will vanish from
     # the UI)
-    new_column = sa.table(table_prefix + BUILD_TABLE, sa.column('final'))
+    new_column = sa.table(table_prefix + BUILD_TABLE,
+                          sa.Column('final', sa.Boolean))
     op.execute(new_column.update().values(**{'final': True}))
 
 
