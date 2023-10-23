@@ -3656,7 +3656,8 @@ class TestWebApiAccessRules(BaseTestWeb):
         '/api/tenant/{tenant}/nodes',
         '/api/tenant/{tenant}/key/{project}.pub',
         '/api/tenant/{tenant}/project-ssh-key/{project}.pub',
-        '/api/tenant/{tenant}/console-stream',
+        # console-stream is tested by test_auth_websocket_streaming
+        # '/api/tenant/{tenant}/console-stream',
         '/api/tenant/{tenant}/badge',
         '/api/tenant/{tenant}/builds',
         '/api/tenant/{tenant}/build/{uuid}',
