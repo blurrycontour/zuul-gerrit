@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a971a4b_a0de5630",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-23T18:18:21Z",
+      "side": 1,
+      "message": "Thinking through the migration between api models here.\n\nThis protects us from using a newer default before all components are up to date.\n\nLooks like the checks at https://review.opendev.org/c/zuul/zuul/+/877937/11/zuul/driver/github/githubconnection.py#1885 are sufficient to prevent a user from explicitly adding a new merge mode until all components are updated as well. This is because that list is ultimately used in the config loader to determine if valid merge modes were chosen.",
+      "revId": "80de932fb1b72967fdbd044067d34e8e7e678e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fa948fa_d2be4113",
+        "filename": "zuul/driver/github/githubsource.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-23T18:18:21Z",
+      "side": 1,
+      "message": "This function introduces a behavior change for existing Zuul installations. Specifically once yup update to model api version 18 the default becomes merge-recursive for old GHE installs and merge-ort for new installations.\n\nNewer git installations (like those on debian bookworm) will be using merge-ort as the default anyway so they won\u0027t have a difference of behavior when transitioning to model api 18 against newer github. However installs against older github will switch to merge-recursive which will be a difference for them.\n\nSimilarly users on debian bullseye or similar will be merge-recursive by default and their git installations may be too old for merge-ort entirely. I\u0027m assuming this will lead to hard failures performing git merges on those platforms.\n\nAll this to say I think we should capture the behavior changes in an upgrade release note. Something like:\n\n\n\u003e Zuul\u0027s GitHub driver has updated default merge behavior to better align\n\u003e with GitHub\u0027s default behavior. This change requires Git 2.33.0 or newer\n\u003e unless you explicitly override Zuul\u0027s default behavior. Additionally, if\n\u003e you aren\u0027t overriding merge behaviors then the merge algorithm chosen may\n\u003e change depending on your git version and GitHub versions. This is\n\u003e expected to provide more deterministic results, and you may configure\n\u003e Zuul to override the settings if this isn\u0027t the case.",
+      "revId": "80de932fb1b72967fdbd044067d34e8e7e678e5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
