@@ -55,10 +55,12 @@ class ZooKeeperNodepool(ZooKeeperBase):
     def __init__(self, client,
                  enable_node_request_cache=False,
                  node_request_event_callback=None,
+                 connection_suspended_callback=None,
                  enable_node_cache=False):
         super().__init__(client)
         self.enable_node_request_cache = enable_node_request_cache
         self.node_request_event_callback = node_request_event_callback
+        self.connection_suspended_callback = connection_suspended_callback
         self.enable_node_cache = enable_node_cache
         # The caching model we use is designed around handing out model
         # data as objects. To do this, we use two caches: one is a TreeCache
@@ -96,6 +98,9 @@ class ZooKeeperNodepool(ZooKeeperBase):
         if self._node_tree is not None:
             self._node_tree.close()
             self._node_tree = None
+
+    def _onSuspended(self):
+        self.connection_suspended_callback()
 
     def _nodePath(self, node):
         return "%s/%s" % (self.NODES_ROOT, node)
