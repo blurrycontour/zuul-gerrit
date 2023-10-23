@@ -75,6 +75,7 @@ class ZooKeeperClient(object):
         self.on_disconnect_listeners: List[Callable[[], None]] = []
         self.on_connection_lost_listeners: List[Callable[[], None]] = []
         self.on_reconnect_listeners: List[Callable[[], None]] = []
+        self.on_suspended_listeners = []
 
     def _connectionListener(self, state):
         """
@@ -92,6 +93,11 @@ class ZooKeeperClient(object):
                     self.log.exception("Exception calling listener:")
         elif state == KazooState.SUSPENDED:
             self.log.debug("ZooKeeper connection: SUSPENDED")
+            for listener in self.on_suspended_listeners:
+                try:
+                    listener()
+                except Exception:
+                    self.log.exception("Exception calling listener:")
         else:
             self.log.debug("ZooKeeper connection: CONNECTED")
             # Create a throwaway thread since zk operations can't
@@ -241,6 +247,7 @@ class ZooKeeperBase(ZooKeeperSimpleBase):
             self.client.on_connect_listeners.append(self._onConnect)
             self.client.on_disconnect_listeners.append(self._onDisconnect)
             self.client.on_reconnect_listeners.append(self._onReconnect)
+            self.client.on_suspended_listeners.append(self._onSuspended)
 
     def _onConnect(self):
         pass
@@ -249,4 +256,7 @@ class ZooKeeperBase(ZooKeeperSimpleBase):
         pass
 
     def _onReconnect(self):
+        pass
+
+    def _onSuspended(self):
         pass
