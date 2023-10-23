@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e2ed046_033515ac",
+        "filename": "web/src/pages/Stream.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-10-23T23:44:01Z",
+      "side": 1,
+      "message": "We shouldn\u0027t rely on the user to send this, we should use the tenant encoded in the api endpoint instead.",
+      "revId": "203d79c02a69cee46d02167cd07727c056cf6668",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15bccee9_5bd81a95",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-10-23T23:44:01Z",
+      "side": 1,
+      "message": "There are two problems with the code above:\n* It doesn\u0027t work because the \"Connection\" header can have multiple values, like \"keep-alive, Upgrade\"\n* It allows anyone to trivially bypass all authorization protections for all endpoints just by running something like: curl -H \"Connection: Upgrade\" -H \"Upgrade: websocket\" http://localhost:9000/api/tenant/example-tenant/status",
+      "revId": "203d79c02a69cee46d02167cd07727c056cf6668",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5ff01dd_c554df30",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-10-23T23:44:01Z",
+      "side": 1,
+      "message": "This method is very similar to the authz sequence we go through for http endpoints.  I\u0027d prefer to re-use that code directly in order to reduce duplication and the potential for errors.  We\u0027re not often too strict about that, but I think it\u0027s especially important for auth code paths.",
+      "revId": "203d79c02a69cee46d02167cd07727c056cf6668",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
