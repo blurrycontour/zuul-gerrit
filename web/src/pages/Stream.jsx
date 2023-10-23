@@ -25,7 +25,7 @@ import { FitAddon} from 'xterm-addon-fit'
 import { WebLinksAddon } from 'xterm-addon-web-links'
 import { SearchAddon } from 'xterm-addon-search'
 
-import { getStreamUrl } from '../api'
+import { getStreamUrl, getAuthToken } from '../api'
 
 class StreamPage extends React.Component {
   static propTypes = {
@@ -71,6 +71,10 @@ class StreamPage extends React.Component {
     const logfile = urlParams.get('logfile')
     if (logfile) {
       params.logfile = logfile
+    }
+    const authToken = getAuthToken()
+    if (authToken) {
+      params.token = authToken
     }
     document.title = 'Zuul Stream | ' + params.uuid.slice(0, 7)
 

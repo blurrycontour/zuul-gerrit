@@ -1,5 +1,5 @@
 # Copyright (c) 2017 Red Hat
-# Copyright 2021-2022 Acme Gating, LLC
+# Copyright 2021-2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -109,13 +109,15 @@ def get_request_logger(logger=None):
 
 
 class APIError(cherrypy.HTTPError):
-    def __init__(self, code, json_doc=None):
+    def __init__(self, code, json_doc=None, headers=None):
+        self._headers = headers or {}
         self._json_doc = json_doc
         super().__init__(code)
 
     def set_response(self):
         super().set_response()
         resp = cherrypy.response
+        resp.headers.update(self._headers)
         if self._json_doc:
             ret = json.dumps(self._json_doc).encode('utf8')
             resp.body = ret
@@ -183,35 +185,108 @@ class AuthInfo:
         self.admin = admin
 
 
-def _check_auth(require_admin=False, require_auth=False, tenant=None):
-    if require_admin:
-        require_auth = True
-    request = cherrypy.serving.request
-    zuulweb = request.app.root
+class AuthContext:
+    """This stores common information about the authorization context for
+    a resource so that the request for the resource can be authorized
+    either in a Cherrpy tool or a Websocket handler.
 
-    if tenant:
-        if not require_auth and tenant.access_rules:
-            # This tenant requires auth for read-only access
+    :param Tenant tenant: The Zuul tenant object; supply if it is relevant
+        for authorization to the protected resource
+    :param bool require_admin: Whether admin access is required for
+        this resource
+    :param bool require_auth: Whether authenticated access is required for
+        this resource
+    """
+
+    def __init__(self, tenant=None, require_admin=None, require_auth=None):
+        request = cherrypy.serving.request
+        zuulweb = request.app.root.zuulweb
+        if require_admin:
             require_auth = True
-    else:
-        if not require_auth and zuulweb.zuulweb.abide.api_root.access_rules:
-            # The API root requires auth for read-only access
-            require_auth = True
-    # Always set the auth variable
-    request.params['auth'] = None
 
-    basic_error = zuulweb._basic_auth_header_check(required=require_auth)
-    if basic_error is not None:
-        return
-    claims, token_error = zuulweb._auth_token_check(required=require_auth)
-    if token_error is not None:
-        return
-    access, admin = zuulweb._isAuthorized(tenant, claims)
-    if (require_auth and not access) or (require_admin and not admin):
-        raise APIError(403)
+        if tenant:
+            if not require_auth and tenant.access_rules:
+                # This tenant requires auth for read-only access
+                require_auth = True
+        else:
+            if not require_auth and zuulweb.abide.api_root.access_rules:
+                # The API root requires auth for read-only access
+                require_auth = True
+        self.require_admin = require_admin
+        self.require_auth = require_auth
+        self.headers = request.headers
+        self.tenant = tenant
+        self.zuulweb = zuulweb
 
-    request.params['auth'] = AuthInfo(claims['__zuul_uid_claim'],
-                                      admin)
+    def validate(self, token=None):
+        """Validate access to the resource
+
+        :param str token: The bearer token; if not supplied, it will be
+            retreieved from the request header
+
+        Raises an exception if authorization failed and was required.
+
+        :returns: an AuthInfo instance if authorization succeeded;
+            None if it failed but was not required.
+
+        """
+        if token is None:
+            try:
+                token = self._getTokenFromHeader()
+            except APIError:
+                if self.require_auth:
+                    raise
+                return None
+        try:
+            claims = self._getClaims(token)
+        except APIError:
+            if self.require_auth:
+                raise
+            return None
+
+        access, admin = self.zuulweb.api._isAuthorized(self.tenant, claims)
+        if ((self.require_auth and not access) or
+            (self.require_admin and not admin)):
+            raise APIError(403)
+
+        return AuthInfo(claims['__zuul_uid_claim'], admin)
+
+    def _getTokenFromHeader(self):
+        """Make sure protected endpoints have a Authorization header with the
+        bearer token."""
+        token_header = self.headers.get('Authorization', None)
+        # Add basic checks here
+        if token_header is None:
+            e = 'Missing "Authorization" header'
+            e_desc = e
+        elif not token_header.lower().startswith('bearer '):
+            e = 'Invalid Authorization header format'
+            e_desc = '"Authorization" header must start with "Bearer"'
+        else:
+            token = token_header[len('Bearer '):]
+            return token
+        error_header = '''Bearer realm="%s"
+       error="%s"
+       error_description="%s"''' % (self.zuulweb.authenticators.default_realm,
+                                    e,
+                                    e_desc)
+        error_data = {'description': e_desc,
+                      'error': e,
+                      'realm': self.zuulweb.authenticators.default_realm}
+        raise APIError(401, json_doc=error_data, headers={
+            "WWW-Authenticate": error_header
+        })
+
+    def _getClaims(self, token):
+        try:
+            claims = self.zuulweb.authenticators.authenticate(token)
+        except exceptions.AuthTokenException as e:
+            error_data = {'description': str(e.error_description),
+                          'error': str(e.error),
+                          'realm': str(e.realm)}
+            raise APIError(e.HTTPError, json_doc=error_data,
+                           headers=e.getAdditionalHeaders())
+        return claims
 
 
 def check_root_auth(**kw):
@@ -221,7 +296,8 @@ def check_root_auth(**kw):
     if request.handler is None:
         # handle_options has already aborted the request.
         return
-    return _check_auth(**kw)
+    auth_context = AuthContext(**kw)
+    request.params['auth'] = auth_context.validate()
 
 
 def check_tenant_auth(**kw):
@@ -237,7 +313,8 @@ def check_tenant_auth(**kw):
     # Always set the tenant variable
     tenant = zuulweb._getTenantOrRaise(tenant_name)
     request.params['tenant'] = tenant
-    return _check_auth(**kw, tenant=tenant)
+    auth_context = AuthContext(tenant=tenant, **kw)
+    request.params['auth'] = auth_context.validate()
 
 
 cherrypy.tools.check_root_auth = cherrypy.Tool('on_start_resource',
@@ -324,6 +401,16 @@ class LogStreamHandler(WebSocket):
         super(LogStreamHandler, self).__init__(*args, **kw)
         self.streamer = None
 
+        # Because we lose our request context by the time we get the
+        # authorization token over the websocket protocol, we create
+        # an AuthContext here, and then perform delayed validation on
+        # messages we recieve.
+        request = cherrypy.serving.request
+        self.zuulweb = request.app.root.zuulweb
+        self.tenant_name = request.params.get('tenant_name')
+        tenant = self.zuulweb.api._getTenantOrRaise(self.tenant_name)
+        self.auth_context = AuthContext(tenant=tenant)
+
     def received_message(self, message):
         if message.is_text:
             req = json.loads(message.data.decode('utf-8'))
@@ -331,6 +418,17 @@ class LogStreamHandler(WebSocket):
             if self.streamer:
                 self.log.debug("Ignoring request due to existing streamer")
                 return
+
+            token = req.get('token')
+            try:
+                self.auth_context.validate(token=token)
+            except APIError as e:
+                if e._json_doc and e._json_doc.get('error'):
+                    msg = e._json_doc.get('error').encode('utf8')[:123]
+                else:
+                    msg = b'Authorization error'
+                return self.logClose(4000, msg)
+
             try:
                 self._streamLog(req)
             except Exception:
@@ -369,7 +467,8 @@ class LogStreamHandler(WebSocket):
         try:
             port_location = streamer_utils.getJobLogStreamAddress(
                 self.zuulweb.executor_api,
-                request['uuid'], source_zone=self.zuulweb.zone)
+                request['uuid'], source_zone=self.zuulweb.zone,
+                tenant_name=self.tenant_name)
         except exceptions.StreamingError as e:
             return self.logClose(4011, str(e))
 
@@ -474,48 +573,6 @@ class ZuulWebAPI(object):
     @property
     def log(self):
         return get_request_logger()
-
-    def _basic_auth_header_check(self, required=True):
-        """make sure protected endpoints have a Authorization header with the
-        bearer token."""
-        token = cherrypy.request.headers.get('Authorization', None)
-        # Add basic checks here
-        if token is None:
-            e = 'Missing "Authorization" header'
-            e_desc = e
-        elif not token.lower().startswith('bearer '):
-            e = 'Invalid Authorization header format'
-            e_desc = '"Authorization" header must start with "Bearer"'
-        else:
-            return None
-        error_header = '''Bearer realm="%s"
-       error="%s"
-       error_description="%s"''' % (self.zuulweb.authenticators.default_realm,
-                                    e,
-                                    e_desc)
-        error_data = {'description': e_desc,
-                      'error': e,
-                      'realm': self.zuulweb.authenticators.default_realm}
-        if required:
-            cherrypy.response.headers["WWW-Authenticate"] = error_header
-            raise APIError(401, error_data)
-        return error_data
-
-    def _auth_token_check(self, required=True):
-        rawToken = \
-            cherrypy.request.headers['Authorization'][len('Bearer '):]
-        try:
-            claims = self.zuulweb.authenticators.authenticate(rawToken)
-        except exceptions.AuthTokenException as e:
-            if required:
-                for header, contents in e.getAdditionalHeaders().items():
-                    cherrypy.response.headers[header] = contents
-                raise APIError(e.HTTPError)
-            return ({},
-                    {'description': e.error_description,
-                     'error': e.error,
-                     'realm': e.realm})
-        return (claims, None)
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -1642,15 +1699,17 @@ class ZuulWebAPI(object):
     @cherrypy.tools.handle_options()
     # We don't check auth here since we would never fall through to it
     def console_stream_options(self, tenant_name):
-        cherrypy.request.ws_handler.zuulweb = self.zuulweb
+        pass
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.websocket(handler_cls=LogStreamHandler)
     # Options handling in _options method
-    @cherrypy.tools.check_tenant_auth()
-    def console_stream_get(self, tenant_name, tenant, auth):
-        cherrypy.request.ws_handler.zuulweb = self.zuulweb
+    # The Authorization header is not included when upgrading to
+    # websocket, so the websocket handler itself will validate auth
+    # using the websocket protocol.
+    def console_stream_get(self, tenant_name):
+        pass
 
     @cherrypy.expose
     @cherrypy.tools.save_params()

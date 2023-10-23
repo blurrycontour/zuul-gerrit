@@ -1983,9 +1983,9 @@ class TenantParser(object):
             tenant.exclude_unprotected_branches = \
                 conf['exclude-unprotected-branches']
         if conf.get('admin-rules') is not None:
-            tenant.admin_rules = conf['admin-rules']
+            tenant.admin_rules = as_list(conf['admin-rules'])
         if conf.get('access-rules') is not None:
-            tenant.access_rules = conf['access-rules']
+            tenant.access_rules = as_list(conf['access-rules'])
         if conf.get('authentication-realm') is not None:
             tenant.default_auth_realm = conf['authentication-realm']
         if conf.get('semaphores') is not None:
