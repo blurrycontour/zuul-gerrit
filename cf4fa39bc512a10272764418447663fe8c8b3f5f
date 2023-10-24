@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6f77c17_8173a77e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2023-10-24T18:54:29Z",
+      "side": 1,
+      "message": "Unfortunately this does not work with apache httpd index of page. Perhaps this need instructions to update such logserver setups?",
+      "revId": "cf4fa39bc512a10272764418447663fe8c8b3f5f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
