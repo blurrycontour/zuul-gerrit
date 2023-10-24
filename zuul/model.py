@@ -54,15 +54,19 @@ from zuul.zk.blob_store import BlobStore
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.components import COMPONENT_REGISTRY
 
-MERGER_MERGE = 1          # "git merge"
-MERGER_MERGE_RESOLVE = 2  # "git merge -s resolve"
-MERGER_CHERRY_PICK = 3    # "git cherry-pick"
-MERGER_SQUASH_MERGE = 4   # "git merge --squash"
-MERGER_REBASE = 5         # "git rebase"
+MERGER_MERGE = 1            # "git merge"
+MERGER_MERGE_RESOLVE = 2    # "git merge -s resolve"
+MERGER_CHERRY_PICK = 3      # "git cherry-pick"
+MERGER_SQUASH_MERGE = 4     # "git merge --squash"
+MERGER_REBASE = 5           # "git rebase"
+MERGER_MERGE_RECURSIVE = 6  # "git merge -s recursive"
+MERGER_MERGE_ORT = 7        # "git merge -s ort"
 
 MERGER_MAP = {
     'merge': MERGER_MERGE,
     'merge-resolve': MERGER_MERGE_RESOLVE,
+    'merge-recursive': MERGER_MERGE_RECURSIVE,
+    'merge-ort': MERGER_MERGE_ORT,
     'cherry-pick': MERGER_CHERRY_PICK,
     'squash-merge': MERGER_SQUASH_MERGE,
     'rebase': MERGER_REBASE,
