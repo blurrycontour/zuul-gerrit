@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "18675a03_7a2c9c00",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35923
+      },
+      "writtenOn": "2023-10-24T09:04:21Z",
+      "side": 1,
+      "message": "Thanks for reworking this proposal/workaround and mentioning me as co-author.\nI will check your change when I will have next rebase to latest Zuul release on our environment.",
+      "revId": "203d79c02a69cee46d02167cd07727c056cf6668",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "7e2ed046_033515ac",
         "filename": "web/src/pages/Stream.jsx",
         "patchSetId": 3
@@ -14,6 +31,24 @@
       "writtenOn": "2023-10-23T23:44:01Z",
       "side": 1,
       "message": "We shouldn\u0027t rely on the user to send this, we should use the tenant encoded in the api endpoint instead.",
+      "revId": "203d79c02a69cee46d02167cd07727c056cf6668",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27e4a025_56022040",
+        "filename": "web/src/pages/Stream.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 35923
+      },
+      "writtenOn": "2023-10-24T09:04:21Z",
+      "side": 1,
+      "message": "Agree, I wanted to do that on server side, but without refactoring it was very complex and took more efforts than I had for this.",
+      "parentUuid": "7e2ed046_033515ac",
       "revId": "203d79c02a69cee46d02167cd07727c056cf6668",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -37,6 +72,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "43e0a52f_10ebc825",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 35923
+      },
+      "writtenOn": "2023-10-24T09:04:21Z",
+      "side": 1,
+      "message": "Agree.",
+      "parentUuid": "15bccee9_5bd81a95",
+      "revId": "203d79c02a69cee46d02167cd07727c056cf6668",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "d5ff01dd_c554df30",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 3
@@ -48,6 +101,24 @@
       "writtenOn": "2023-10-23T23:44:01Z",
       "side": 1,
       "message": "This method is very similar to the authz sequence we go through for http endpoints.  I\u0027d prefer to re-use that code directly in order to reduce duplication and the potential for errors.  We\u0027re not often too strict about that, but I think it\u0027s especially important for auth code paths.",
+      "revId": "203d79c02a69cee46d02167cd07727c056cf6668",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf38c7a7_70029ca6",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 395,
+      "author": {
+        "id": 35923
+      },
+      "writtenOn": "2023-10-24T09:04:21Z",
+      "side": 1,
+      "message": "Agree.",
+      "parentUuid": "d5ff01dd_c554df30",
       "revId": "203d79c02a69cee46d02167cd07727c056cf6668",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
