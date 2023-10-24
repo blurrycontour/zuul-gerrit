@@ -49,6 +49,10 @@ function Build({ build, tenant, timezone, user }) {
   const job_name = build.job_name
 
   const build_link = buildExternalLink(build)
+  const build_log_url = build.log_url ?
+        (build.log_url.endsWith('/') ?
+         build.log_url + 'index.html' : build.log_url)
+        : ''
 
   function renderAutoholdButton() {
     const value = (
@@ -252,8 +256,8 @@ function Build({ build, tenant, timezone, user }) {
                 WrapElement={ListItem}
                 icon={<FileCodeIcon />}
                 value={
-                  build.log_url ? (
-                    <ExternalLink target={build.log_url}>View log</ExternalLink>
+                  build_log_url ? (
+                    <ExternalLink target={build_log_url}>View log</ExternalLink>
                   ) : (
                     <span
                       style={{
