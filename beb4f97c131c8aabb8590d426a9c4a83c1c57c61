@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e99d408a_e0057244",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-10-24T20:42:11Z",
+      "side": 1,
+      "message": "PS2 should be nearly as useful as PS1 while being more deployment agnostic, so I think that should address Tristan\u0027s concern.",
+      "revId": "beb4f97c131c8aabb8590d426a9c4a83c1c57c61",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
