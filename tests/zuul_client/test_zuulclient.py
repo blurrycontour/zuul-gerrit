@@ -201,7 +201,8 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(p.returncode, 0, output)
         # Check result
         resp = self.get_url(
-            "api/tenant/tenant-one/autohold")
+            "api/tenant/tenant-one/autohold",
+            headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(200, resp.status_code, resp.text)
         autohold_requests = resp.json()
         self.assertNotEqual([], autohold_requests)
@@ -718,3 +719,9 @@ class TestZuulClientFreezeJob(BaseTestWeb):
                  '@master [trusted]'),
         ]:
             self.assertIn(s, output)
+
+
+class TestZuulClientAdminWithAccessRules(TestZuulClientAdmin):
+    """Test the admin commands of zuul-client with access rules"""
+    config_file = 'zuul-admin-web.conf'
+    tenant_config_file = 'config/single-tenant/main-access-rules.yaml'
