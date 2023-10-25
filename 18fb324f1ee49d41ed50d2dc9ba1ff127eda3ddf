@@ -33,6 +33,63 @@
       "message": "LGTM and works in our environment",
       "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "556bf5de_2ae3073d",
+        "filename": "tests/fixtures/config/auth-streamer/git/common-config/playbooks/python27.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-25T22:43:52Z",
+      "side": 1,
+      "message": "I know this NOTE comes from another test setup, and this file matches that one as well. That said I\u0027m not sure I understand this note. Is this saying we shouldn\u0027t run any command tasks that use the special streamer implementation hooks?",
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92857136_f3e03165",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-25T22:43:52Z",
+      "side": 1,
+      "message": "Super minor nit. Looks like it always raises APIError? If we expect other types of exceptions then the logstreamer try catch should be updated to handle something other than APIErrors as well?",
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ea1d636_7eafb891",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-10-25T22:43:52Z",
+      "side": 1,
+      "message": "Why do we only want the first 123 characters of the message?",
+      "range": {
+        "startLine": 427,
+        "startChar": 66,
+        "endLine": 427,
+        "endChar": 70
+      },
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
