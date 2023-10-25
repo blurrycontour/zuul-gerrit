@@ -52,6 +52,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15c9daf7_c2ab6a44",
+        "filename": "tests/fixtures/config/auth-streamer/git/common-config/playbooks/python27.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-10-25T23:50:20Z",
+      "side": 1,
+      "message": "Yes exactly; put another way, don\u0027t run \"shell\" tasks here; and we don\u0027t.",
+      "parentUuid": "556bf5de_2ae3073d",
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92857136_f3e03165",
@@ -65,6 +83,24 @@
       "writtenOn": "2023-10-25T22:43:52Z",
       "side": 1,
       "message": "Super minor nit. Looks like it always raises APIError? If we expect other types of exceptions then the logstreamer try catch should be updated to handle something other than APIErrors as well?",
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ceaac16f_bad66b5b",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-10-25T23:50:20Z",
+      "side": 1,
+      "message": "It\u0027s written defensively so that if any unexpected exceptions occur, they will be raised and cause a failure regardless of require_auth.  The only exceptions we expect to signal \"user didn\u0027t authenticate and the process of determining that did not explode\" are all currently APIError.\n\n(This is not intended to be a code change; if we had raised \"KeyError\" in _check_auth before, we would get the same result.)",
+      "parentUuid": "92857136_f3e03165",
       "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -88,6 +124,24 @@
         "endLine": 427,
         "endChar": 70
       },
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fa7208d_6978adb6",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-10-25T23:50:20Z",
+      "side": 1,
+      "message": "Websocket protocol length limit: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason",
+      "parentUuid": "2ea1d636_7eafb891",
       "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
