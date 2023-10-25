@@ -16,6 +16,23 @@
       "message": "looks good to me and tested it works.",
       "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a02fe7e_c3563597",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35923
+      },
+      "writtenOn": "2023-10-25T18:38:24Z",
+      "side": 1,
+      "message": "LGTM and works in our environment",
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
