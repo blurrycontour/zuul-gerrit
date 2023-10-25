@@ -700,7 +700,7 @@ class TestAuthWebsocketStreaming(TestStreamingBase):
         client1 = self.runWSClient(web.port, build.uuid)
         client1.thread.join()
         self.assertEqual(
-            (4000, b'Missing "Authorization" header'),
+            (4000, b'MissingAuthError'),
             client1.close_results)
 
         # Attempt to bypass authz by using a valid token with a
