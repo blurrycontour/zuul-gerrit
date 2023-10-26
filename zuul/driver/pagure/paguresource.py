@@ -144,7 +144,7 @@ class PagureSource(BaseSource):
         """Get the git-web url for a project."""
         raise NotImplementedError()
 
-    def getRequireFilters(self, config, error_accumulator):
+    def getRequireFilters(self, config, parse_context):
         f = PagureRefFilter(
             connection_name=self.connection.connection_name,
             score=config.get('score'),
@@ -155,7 +155,7 @@ class PagureSource(BaseSource):
         )
         return [f]
 
-    def getRejectFilters(self, config, error_accumulator):
+    def getRejectFilters(self, config, parse_context):
         raise NotImplementedError()
 
     def getRefForChange(self, change):

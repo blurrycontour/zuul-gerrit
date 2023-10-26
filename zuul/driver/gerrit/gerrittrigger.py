@@ -23,7 +23,6 @@ from zuul.driver.util import (
     to_list,
     make_regex,
     ZUUL_REGEX,
-    get_conf_attr,
 )
 from zuul.configloader import DeprecationWarning
 
@@ -45,7 +44,8 @@ class GerritTrigger(BaseTrigger):
     log = logging.getLogger("zuul.GerritTrigger")
 
     def getEventFilters(self, connection_name, trigger_conf,
-                        error_accumulator):
+                        parse_context):
+        pcontext = parse_context
         efilters = []
         for trigger in to_list(trigger_conf):
             approvals = {}
@@ -53,34 +53,37 @@ class GerritTrigger(BaseTrigger):
                 for key, val in approval_dict.items():
                     approvals[key] = val
             # Backwards compat for *_filter versions of these args
-            comments = to_list(trigger.get('comment'))
-            if not comments:
-                comments = to_list(trigger.get('comment_filter'))
-            emails = to_list(trigger.get('email'))
-            if not emails:
-                emails = to_list(trigger.get('email_filter'))
-            usernames = to_list(trigger.get('username'))
-            if not usernames:
-                usernames = to_list(trigger.get('username_filter'))
-            ignore_deletes = trigger.get('ignore-deletes', True)
-            if 'require-approval' in trigger:
-                acc, _ = get_conf_attr(trigger, 'require-approval',
-                                       error_accumulator)
-                acc.addError(GerritRequireApprovalDeprecation())
-            if 'reject-approval' in trigger:
-                acc, _ = get_conf_attr(trigger, 'reject-approval',
-                                       error_accumulator)
-                acc.addError(GerritRejectApprovalDeprecation())
+            attrname = 'comment' if 'comment' in trigger else 'comment_filter'
+            with pcontext.confAttr(trigger, attrname) as attr:
+                comments = [make_regex(x, pcontext)
+                            for x in to_list(attr)]
+            attrname = 'email' if 'email' in trigger else 'email_filter'
+            with pcontext.confAttr(trigger, attrname) as attr:
+                emails = [make_regex(x, pcontext)
+                          for x in to_list(attr)]
+            attrname = ('username' if 'username' in trigger
+                        else 'username_filter')
+            with pcontext.confAttr(trigger, attrname) as attr:
+                usernames = [make_regex(x, pcontext)
+                             for x in to_list(attr)]
 
-            types = [make_regex(x, error_accumulator)
-                     for x in to_list(trigger['event'])]
-            branches = [make_regex(x, error_accumulator)
-                        for x in to_list(trigger.get('branch'))]
-            refs = [make_regex(x, error_accumulator)
-                    for x in to_list(trigger.get('ref'))]
-            comments = [make_regex(x, error_accumulator) for x in comments]
-            emails = [make_regex(x, error_accumulator) for x in emails]
-            usernames = [make_regex(x, error_accumulator) for x in usernames]
+            with pcontext.confAttr(trigger, 'event') as attr:
+                types = [make_regex(x, pcontext) for x in to_list(attr)]
+            with pcontext.confAttr(trigger, 'branch') as attr:
+                branches = [make_regex(x, pcontext) for x in to_list(attr)]
+            with pcontext.confAttr(trigger, 'ref') as attr:
+                refs = [make_regex(x, pcontext) for x in to_list(attr)]
+
+            ignore_deletes = trigger.get('ignore-deletes', True)
+
+            if 'require-approval' in trigger:
+                with pcontext.confAttr(trigger, 'require-approval'):
+                    pcontext.accumulator.addError(
+                        GerritRequireApprovalDeprecation())
+            if 'reject-approval' in trigger:
+                with pcontext.confAttr(trigger, 'reject-approval'):
+                    pcontext.accumulator.addError(
+                        GerritRejectApprovalDeprecation())
 
             f = GerritEventFilter(
                 connection_name=connection_name,
@@ -103,7 +106,7 @@ class GerritTrigger(BaseTrigger):
                 ignore_deletes=ignore_deletes,
                 require=trigger.get('require'),
                 reject=trigger.get('reject'),
-                error_accumulator=error_accumulator,
+                parse_context=parse_context,
             )
             efilters.append(f)
 

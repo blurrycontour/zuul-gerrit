@@ -140,7 +140,7 @@ class GitlabSource(BaseSource):
         """Get the git-web url for a project."""
         raise NotImplementedError()
 
-    def getRequireFilters(self, config, error_accumulator):
+    def getRequireFilters(self, config, parse_context):
         f = GitlabRefFilter(
             connection_name=self.connection.connection_name,
             open=config.get('open'),
@@ -150,7 +150,7 @@ class GitlabSource(BaseSource):
         )
         return [f]
 
-    def getRejectFilters(self, config, error_accumulator):
+    def getRejectFilters(self, config, parse_context):
         raise NotImplementedError()
 
     def getRefForChange(self, change):

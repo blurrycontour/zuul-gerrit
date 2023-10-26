@@ -5423,15 +5423,13 @@ class TestPCREDeprecationGerrit(ZuulTestCase):
         idx = 0
         self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
         self.assertEqual(errors[idx].name, 'Regex Deprecation')
-        self.assertIn('pipeline stanza', errors[idx].error)
-        self.assertIn('name: gate', errors[idx].error)
+        self.assertIn('"gate" pipeline stanza', errors[idx].error)
 
         # Pipeline gerrit require approval
         idx = 1
         self.assertEqual(errors[idx].severity, SEVERITY_WARNING)
         self.assertEqual(errors[idx].name, 'Regex Deprecation')
-        self.assertIn('pipeline stanza', errors[idx].error)
-        self.assertIn('name: post', errors[idx].error)
+        self.assertIn('"post" pipeline stanza', errors[idx].error)
 
 
 class TestPCREDeprecationGit(ZuulTestCase):
