@@ -181,6 +181,7 @@ class ZuulMark:
         end = start + (self.line_snippet_context * 2) + 1
         all_lines = self.snippet.splitlines()
         lines = all_lines[start:end]
+        print('JEB snip', start, end)
         if start > 0:
             lines.insert(0, '...')
         if end < len(all_lines):
@@ -3097,7 +3098,9 @@ class Job(ConfigObject):
     def __getattr__(self, name):
         v = self.__dict__.get(name)
         if v is None:
-            return self.attributes[name]
+            if name in self.attributes:
+                return self.attributes[name]
+            raise AttributeError
         return v
 
     def _get(self, name):

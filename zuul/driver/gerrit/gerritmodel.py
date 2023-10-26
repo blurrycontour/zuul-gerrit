@@ -258,7 +258,7 @@ class GerritEventFilter(EventFilter):
                  refs=[], event_approvals={}, comments=[], emails=[],
                  usernames=[], required_approvals=[], reject_approvals=[],
                  uuid=None, scheme=None, ignore_deletes=True,
-                 require=None, reject=None, error_accumulator=None):
+                 require=None, reject=None, parse_context=None):
 
         EventFilter.__init__(self, connection_name, trigger)
 
@@ -270,13 +270,13 @@ class GerritEventFilter(EventFilter):
 
         if require:
             self.require_filter = GerritRefFilter.requiresFromConfig(
-                connection_name, require, error_accumulator)
+                connection_name, require, parse_context)
         else:
             self.require_filter = None
 
         if reject:
             self.reject_filter = GerritRefFilter.rejectFromConfig(
-                connection_name, reject, error_accumulator)
+                connection_name, reject, parse_context)
         else:
             self.reject_filter = None
 
@@ -438,7 +438,7 @@ class GerritEventFilter(EventFilter):
 
 class GerritRefFilter(RefFilter):
     def __init__(self, connection_name,
-                 error_accumulator,
+                 parse_context,
                  open=None, reject_open=None,
                  current_patchset=None, reject_current_patchset=None,
                  wip=None, reject_wip=None,
@@ -448,10 +448,10 @@ class GerritRefFilter(RefFilter):
 
         self._required_approvals = copy.deepcopy(required_approvals)
         self.required_approvals = self._tidy_approvals(
-            self._required_approvals, error_accumulator)
+            self._required_approvals, parse_context)
         self._reject_approvals = copy.deepcopy(reject_approvals)
         self.reject_approvals = self._tidy_approvals(
-            self._reject_approvals, error_accumulator)
+            self._reject_approvals, parse_context)
         self.statuses = statuses
         self.reject_statuses = reject_statuses
 
@@ -469,10 +469,10 @@ class GerritRefFilter(RefFilter):
             self.current_patchset = current_patchset
 
     @classmethod
-    def requiresFromConfig(cls, connection_name, config, error_accumulator):
+    def requiresFromConfig(cls, connection_name, config, parse_context):
         return cls(
             connection_name=connection_name,
-            error_accumulator=error_accumulator,
+            parse_context=parse_context,
             open=config.get('open'),
             current_patchset=config.get('current-patchset'),
             wip=config.get('wip'),
@@ -481,10 +481,10 @@ class GerritRefFilter(RefFilter):
         )
 
     @classmethod
-    def rejectFromConfig(cls, connection_name, config, error_accumulator):
+    def rejectFromConfig(cls, connection_name, config, parse_context):
         return cls(
             connection_name=connection_name,
-            error_accumulator=error_accumulator,
+            parse_context=parse_context,
             reject_open=config.get('open'),
             reject_current_patchset=config.get('current-patchset'),
             reject_wip=config.get('wip'),
@@ -565,13 +565,15 @@ class GerritRefFilter(RefFilter):
 
         return True
 
-    def _tidy_approvals(self, approvals, error_accumulator):
+    def _tidy_approvals(self, approvals, parse_context):
         for a in approvals:
             for k, v in a.items():
                 if k == 'username':
-                    a['username'] = make_regex(v, error_accumulator)
+                    with parse_context.errorContext(attr=k):
+                        a['username'] = make_regex(v)
                 elif k == 'email':
-                    a['email'] = make_regex(v, error_accumulator)
+                    with parse_context.errorContext(attr=k):
+                        a['email'] = make_regex(v)
                 elif k == 'newer-than':
                     a[k] = time_to_seconds(v)
                 elif k == 'older-than':

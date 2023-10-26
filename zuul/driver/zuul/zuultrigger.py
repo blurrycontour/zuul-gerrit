@@ -30,13 +30,16 @@ class ZuulTrigger(BaseTrigger):
         self._handle_project_change_merged_events = False
 
     def getEventFilters(self, connection_name, trigger_conf,
-                        error_accumulator):
+                        parse_context):
         efilters = []
+        pcontext = parse_context
         for trigger in to_list(trigger_conf):
-            types = [make_regex(x, error_accumulator)
-                     for x in to_list(trigger['event'])]
-            pipelines = [make_regex(x, error_accumulator)
-                         for x in to_list(trigger.get('pipeline'))]
+            with pcontext.confAttr(trigger, 'event') as attr:
+                types = [make_regex(x, pcontext)
+                         for x in to_list(attr)]
+            with pcontext.confAttr(trigger, 'pipeline') as attr:
+                pipelines = [make_regex(x, pcontext)
+                             for x in to_list(attr)]
             f = ZuulEventFilter(
                 connection_name=connection_name,
                 trigger=self,

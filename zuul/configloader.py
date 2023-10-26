@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import abc
 import collections
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -26,12 +25,13 @@ import re
 import re2
 import subprocess
 import textwrap
+import threading
+import types
 
 import voluptuous as vs
 
 from zuul import change_matcher
 from zuul import model
-from zuul.connection import ReadOnlyBranchCacheError
 from zuul.lib import yamlutil as yaml
 import zuul.manager.dependent
 import zuul.manager.independent
@@ -85,18 +85,18 @@ def check_config_path(path):
                          "allowed in extra-config-paths")
 
 
-def make_regex(data, error_accumulator=None):
+def make_regex(data, parse_context=None):
     if isinstance(data, dict):
         regex = ZuulRegex(data['regex'],
                           negate=data.get('negate', False))
     else:
         regex = ZuulRegex(data)
-    if error_accumulator and regex.re2_failure:
+    if parse_context and regex.re2_failure:
         if regex.re2_failure_message:
-            error_accumulator.addError(RegexDeprecation(
+            parse_context.accumulator.addError(RegexDeprecation(
                 regex.re2_failure_message))
         else:
-            error_accumulator.addError(RegexDeprecation())
+            parse_context.accumulator.addError(RegexDeprecation())
     return regex
 
 
@@ -105,12 +105,12 @@ def indent(s):
 
 
 class ConfigurationSyntaxError(Exception):
-    pass
-
-
-class NodeFromGroupNotFoundError(Exception):
-    zuul_error_name = 'Node From Group Not Found'
+    zuul_error_name = 'Unknown Configuration Error'
     zuul_error_severity = model.SEVERITY_ERROR
+
+
+class NodeFromGroupNotFoundError(ConfigurationSyntaxError):
+    zuul_error_name = 'Node From Group Not Found'
 
     def __init__(self, nodeset, node, group):
         message = textwrap.dedent("""\
@@ -121,9 +121,8 @@ class NodeFromGroupNotFoundError(Exception):
         super(NodeFromGroupNotFoundError, self).__init__(message)
 
 
-class DuplicateNodeError(Exception):
+class DuplicateNodeError(ConfigurationSyntaxError):
     zuul_error_name = 'Duplicate Node'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self, nodeset, node):
         message = textwrap.dedent("""\
@@ -134,9 +133,8 @@ class DuplicateNodeError(Exception):
         super(DuplicateNodeError, self).__init__(message)
 
 
-class UnknownConnection(Exception):
+class UnknownConnection(ConfigurationSyntaxError):
     zuul_error_name = 'Unknown Connection'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self, connection_name):
         message = textwrap.dedent("""\
@@ -145,21 +143,8 @@ class UnknownConnection(Exception):
         super(UnknownConnection, self).__init__(message)
 
 
-class MultipleProjectConfigurations(Exception):
-    zuul_error_name = 'Multiple Project Configurations'
-    zuul_error_severity = model.SEVERITY_WARNING
-
-    def __init__(self, source_context):
-        message = textwrap.dedent(f"""\
-        Configuration in {source_context.path} ignored because project-branch
-        is already configured.""")
-        message = textwrap.fill(message)
-        super().__init__(message)
-
-
-class LabelForbiddenError(Exception):
+class LabelForbiddenError(ConfigurationSyntaxError):
     zuul_error_name = 'Label Forbidden'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self, label, allowed_labels, disallowed_labels):
         message = textwrap.dedent("""\
@@ -179,9 +164,8 @@ class LabelForbiddenError(Exception):
         super(LabelForbiddenError, self).__init__(message)
 
 
-class MaxTimeoutError(Exception):
+class MaxTimeoutError(ConfigurationSyntaxError):
     zuul_error_name = 'Max Timeout Exceeded'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self, job, tenant):
         message = textwrap.dedent("""\
@@ -191,9 +175,8 @@ class MaxTimeoutError(Exception):
         super(MaxTimeoutError, self).__init__(message)
 
 
-class DuplicateGroupError(Exception):
+class DuplicateGroupError(ConfigurationSyntaxError):
     zuul_error_name = 'Duplicate Nodeset Group'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self, nodeset, group):
         message = textwrap.dedent("""\
@@ -204,9 +187,8 @@ class DuplicateGroupError(Exception):
         super(DuplicateGroupError, self).__init__(message)
 
 
-class ProjectNotFoundError(Exception):
+class ProjectNotFoundError(ConfigurationSyntaxError):
     zuul_error_name = 'Project Not Found'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self, project):
         message = textwrap.dedent("""\
@@ -218,9 +200,8 @@ class ProjectNotFoundError(Exception):
         super(ProjectNotFoundError, self).__init__(message)
 
 
-class TemplateNotFoundError(Exception):
+class TemplateNotFoundError(ConfigurationSyntaxError):
     zuul_error_name = 'Template Not Found'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self, template):
         message = textwrap.dedent("""\
@@ -230,9 +211,8 @@ class TemplateNotFoundError(Exception):
         super(TemplateNotFoundError, self).__init__(message)
 
 
-class NodesetNotFoundError(Exception):
+class NodesetNotFoundError(ConfigurationSyntaxError):
     zuul_error_name = 'Nodeset Not Found'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self, nodeset):
         message = textwrap.dedent("""\
@@ -242,9 +222,8 @@ class NodesetNotFoundError(Exception):
         super(NodesetNotFoundError, self).__init__(message)
 
 
-class PipelineNotPermittedError(Exception):
+class PipelineNotPermittedError(ConfigurationSyntaxError):
     zuul_error_name = 'Pipeline Forbidden'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self):
         message = textwrap.dedent("""\
@@ -254,9 +233,8 @@ class PipelineNotPermittedError(Exception):
         super(PipelineNotPermittedError, self).__init__(message)
 
 
-class ProjectNotPermittedError(Exception):
+class ProjectNotPermittedError(ConfigurationSyntaxError):
     zuul_error_name = 'Project Forbidden'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self):
         message = textwrap.dedent("""\
@@ -266,9 +244,8 @@ class ProjectNotPermittedError(Exception):
         super(ProjectNotPermittedError, self).__init__(message)
 
 
-class GlobalSemaphoreNotFoundError(Exception):
+class GlobalSemaphoreNotFoundError(ConfigurationSyntaxError):
     zuul_error_name = 'Global Semaphore Not Found'
-    zuul_error_severity = model.SEVERITY_ERROR
 
     def __init__(self, semaphore):
         message = textwrap.dedent("""\
@@ -280,102 +257,38 @@ class GlobalSemaphoreNotFoundError(Exception):
 
 
 class YAMLDuplicateKeyError(ConfigurationSyntaxError):
-    def __init__(self, key, node, context, start_mark):
-        intro = textwrap.fill(textwrap.dedent("""\
-        Zuul encountered a syntax error while parsing its configuration in the
-        repo {repo} on branch {branch}.  The error was:""".format(
-            repo=context.project_name,
-            branch=context.branch,
-        )))
-
-        e = textwrap.fill(textwrap.dedent("""\
-        The key "{key}" appears more than once; duplicate keys are not
-        permitted.
-        """.format(
-            key=key,
-        )))
-
-        m = textwrap.dedent("""\
-        {intro}
-
-        {error}
-
-        The error appears in the following stanza:
-
-        {content}
-
-        {start_mark}""")
-
-        m = m.format(intro=intro,
-                     error=indent(str(e)),
-                     content=indent(start_mark.snippet.rstrip()),
-                     start_mark=str(start_mark))
-        super(YAMLDuplicateKeyError, self).__init__(m)
+    def __init__(self, key, source_context, start_mark):
+        self.source_context = source_context
+        self.start_mark = start_mark
+        message = (f'The key "{key}" appears more than once; '
+                   'duplicate keys are not permitted.')
+        super(YAMLDuplicateKeyError, self).__init__(message)
 
 
-class ConfigurationSyntaxWarning(object, metaclass=abc.ABCMeta):
+class ConfigurationSyntaxWarning:
     zuul_error_name = 'Unknown Configuration Warning'
     zuul_error_severity = model.SEVERITY_WARNING
     zuul_error_message = 'Unknown Configuration Warning'
 
-    @abc.abstractmethod
-    def makeConfigurationError(self, stanza, conf, attr=None):
-        "Return a ConfigurationError object"
+    def __init__(self, message=None):
+        if message:
+            self.zuul_error_message = message
+
+
+class MultipleProjectConfigurations(ConfigurationSyntaxWarning):
+    zuul_error_name = 'Multiple Project Configurations'
+    zuul_error_problem = 'configuration error'
+
+    def __init__(self, source_context):
+        message = textwrap.dedent(f"""\
+        Configuration in {source_context.path} ignored because project-branch
+        is already configured.""")
+        message = textwrap.fill(message)
+        super().__init__(message)
 
 
 class DeprecationWarning(ConfigurationSyntaxWarning):
-    def makeConfigurationError(self, stanza, conf, attr=None):
-        context = conf.get('_source_context')
-        start_mark = conf.get('_start_mark')
-        snippet = None
-        name = conf.get('name')
-        line = start_mark.line
-        if name:
-            name = f'"{name}"'
-        else:
-            name = 'following'
-        if attr is not None:
-            pointer = (
-                f'The problem appears in the "{attr}" attribute\n'
-                f'of the {name} {stanza} stanza:'
-            )
-            line = getattr(attr, 'line', line)
-        else:
-            pointer = (
-                f'The problem appears in the the {name} {stanza} stanza:'
-            )
-        snippet = start_mark.getLineSnippet(line).rstrip()
-        location = start_mark.getLineLocation(line)
-        intro = textwrap.fill(textwrap.dedent("""\
-        Zuul encountered a deprecated syntax while parsing its
-        configuration in the repo {repo} on branch {branch}.  The
-        problem was:""".format(
-            repo=context.project_name,
-            branch=context.branch,
-        )))
-
-        m = textwrap.dedent("""\
-        {intro}
-
-        {error}
-
-        {pointer}
-
-        {content}
-
-        {location}""")
-
-        m = m.format(intro=intro,
-                     error=indent(self.zuul_error_message),
-                     pointer=pointer,
-                     content=indent(snippet),
-                     location=location)
-
-        return model.ConfigurationError(
-            context, start_mark, m,
-            short_error=self.zuul_error_message,
-            severity=self.zuul_error_severity,
-            name=self.zuul_error_name)
+    zuul_error_problem = 'deprecated syntax'
 
 
 class RegexDeprecation(DeprecationWarning):
@@ -385,190 +298,145 @@ All regular expressions must conform to RE2 syntax, but an
 expression using the deprecated Perl-style syntax has been detected.
 Adjust the configuration to conform to RE2 syntax."""
 
-    def __init__(self, msg=None):
-        super().__init__()
-        if msg:
-            self.zuul_error_message += f"""
-
-The RE2 syntax error is: {msg}"""
-
-
-@contextmanager
-def project_configuration_exceptions(context, accumulator):
-    try:
-        yield
-    except ConfigurationSyntaxError:
-        raise
-    except ReadOnlyBranchCacheError:
-        raise
-    except Exception as e:
-        intro = textwrap.fill(textwrap.dedent("""\
-        Zuul encountered an error while accessing the repo {repo}.  The error
-        was:""".format(
-            repo=context.project_name,
-        )))
-
-        m = textwrap.dedent("""\
-        {intro}
-
-        {error}""")
-
-        m = m.format(intro=intro,
-                     error=indent(str(e)))
-        accumulator.makeError(
-            context, None, m,
-            short_error=str(e),
-            severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
-            name=getattr(e, 'zuul_error_name', 'Unknown'))
-
-
-@contextmanager
-def early_configuration_exceptions(context, accumulator):
-    try:
-        yield
-    # Note: we catch ConfigurationSyntaxErrors here.
-    except Exception as e:
-        intro = textwrap.fill(textwrap.dedent("""\
-        Zuul encountered a syntax error while parsing its configuration in the
-        repo {repo} on branch {branch}.  The error was:""".format(
-            repo=context.project_name,
-            branch=context.branch,
-        )))
-
-        m = textwrap.dedent("""\
-        {intro}
-
-        {error}""")
-
-        m = m.format(intro=intro,
-                     error=indent(str(e)))
-        accumulator.makeError(
-            context, None, m,
-            short_error=str(e),
-            severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
-            name=getattr(e, 'zuul_error_name', 'Unknown'))
-
-
-@contextmanager
-def configuration_exceptions(local_accumulator):
-    try:
-        yield
-    except ConfigurationSyntaxError:
-        raise
-    except Exception as e:
-        conf = copy.deepcopy(local_accumulator.conf)
-        context = conf.pop('_source_context')
-        start_mark = conf.pop('_start_mark')
-        intro = textwrap.fill(textwrap.dedent("""\
-        Zuul encountered a syntax error while parsing its configuration in the
-        repo {repo} on branch {branch}.  The error was:""".format(
-            repo=context.project_name,
-            branch=context.branch,
-        )))
-
-        m = textwrap.dedent("""\
-        {intro}
-
-        {error}
-
-        The error appears in the following {stanza} stanza:
-
-        {content}
-
-        {start_mark}""")
-
-        m = m.format(intro=intro,
-                     error=indent(str(e)),
-                     stanza=local_accumulator.stanza,
-                     content=indent(start_mark.snippet.rstrip()),
-                     start_mark=str(start_mark))
-
-        # Get a LoadingErrors object
-        accumulator = local_accumulator.accumulator
-        accumulator.makeError(
-            context, start_mark, m,
-            short_error=str(e),
-            severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
-            name=getattr(e, 'zuul_error_name', 'Unknown'))
-
-
-@contextmanager
-def reference_exceptions(stanza, obj, accumulator):
-    try:
-        yield
-    except ConfigurationSyntaxError:
-        raise
-    except Exception as e:
-        context = obj.source_context
-        start_mark = obj.start_mark
-        intro = textwrap.fill(textwrap.dedent("""\
-        Zuul encountered a syntax error while parsing its configuration in the
-        repo {repo} on branch {branch}.  The error was:""".format(
-            repo=context.project_name,
-            branch=context.branch,
-        )))
-
-        m = textwrap.dedent("""\
-        {intro}
-
-        {error}
-
-        The error appears in the following {stanza} stanza:
-
-        {content}
-
-        {start_mark}""")
-
-        m = m.format(intro=intro,
-                     error=indent(str(e)),
-                     stanza=stanza,
-                     content=indent(start_mark.snippet.rstrip()),
-                     start_mark=str(start_mark))
-
-        accumulator.makeError(
-            context, start_mark, m,
-            short_error=str(e),
-            severity=getattr(e, 'zuul_error_severity', model.SEVERITY_ERROR),
-            name=getattr(e, 'zuul_error_name', 'Unknown'))
+    def __init__(self, message=None):
+        if message:
+            message = (self.zuul_error_message +
+                       f"\n\nThe RE2 syntax error is: {message}")
+        super().__init__(message)
 
 
 class LocalAccumulator:
     """An error accumulator that wraps another accumulator (like
     LoadingErrors) while holding local context information.
     """
-    def __init__(self, accumulator, stanza, conf, attr=None):
+    def __init__(self, accumulator, source_context=None, stanza=None,
+                 conf=None, attr=None):
         self.accumulator = accumulator
+        self.source_context = source_context
         self.stanza = stanza
         self.conf = conf
         self.attr = attr
 
-    def extend(self, attr=None):
+    def extend(self, source_context=None, stanza=None,
+               conf=None, attr=None):
         """Return a new accumulator that extends this one with additional
         info"""
-        return LocalAccumulator(self.accumulator, self.stanza, self.conf, attr)
+        if conf:
+            if isinstance(conf, (types.MappingProxyType, dict)):
+                conf_context = conf.get('_source_context')
+            else:
+                conf_context = getattr(conf, 'source_context', None)
+            source_context = source_context or conf_context
+        return LocalAccumulator(self.accumulator,
+                                source_context or self.source_context,
+                                stanza or self.stanza,
+                                conf or self.conf,
+                                attr or self.attr)
+
+    @contextmanager
+    def catchErrors(self):
+        try:
+            yield
+        except Exception as exc:
+            self.addError(exc)
 
     def addError(self, error):
-        """Add an error to the accumulator with the local context info.
+        """Adds the error or warning to the accumulator.
 
-        This method currently expects that the input error object is a
-        subclass of ConfigurationSyntaxWarning and has an addError
-        method that returns a fully populated ConfigurationError.
-        Currently all "error" severity level errors are handled by
-        exception handlers, so this method doesn't expect them.
+        The input can be any exception or any object with the
+        zuul_error attributes.
+
+        If the error has a source_context or start_mark attribute,
+        this method will use those.
+
+        This method will produce the most detailed error message it
+        can with the data supplied by the error and the most recent
+        error context.
         """
 
-        e = error.makeConfigurationError(self.stanza, self.conf, self.attr)
-        self.accumulator.addError(e)
+        # A list of paragraphs
+        msg = []
 
+        repo = branch = None
 
-def get_conf_attr(conf, attr, accumulator=None):
-    found = None
-    for k in conf.keys():
-        if k == attr:
-            found = k
-            break
-    acc = accumulator.extend(found) if accumulator else None
-    return acc, conf.get(found)
+        source_context = getattr(error, 'source_context', self.source_context)
+        if source_context:
+            repo = source_context.project_name
+            branch = source_context.branch
+        stanza = self.stanza
+
+        problem = getattr(error, 'zuul_error_problem', 'syntax error')
+        if problem[0] in 'aoeui':
+            a_an = 'an'
+        else:
+            a_an = 'a'
+
+        if repo and branch:
+            intro = f"""\
+            Zuul encountered {a_an} {problem} while parsing its
+            configuration in the repo {repo} on branch {branch}.  The
+            problem was:"""
+        elif repo:
+            intro = f"""\
+            Zuul encountered an error while accessing the repo {repo}.
+            The error was:"""
+        else:
+            intro = "Zuul encountered an error:"
+
+        msg.append(textwrap.dedent(intro))
+
+        error_text = getattr(error, 'zuul_error_message', str(error))
+        msg.append(indent(error_text))
+
+        snippet = start_mark = name = line = location = None
+        attr = self.attr
+        if self.conf:
+            if isinstance(self.conf, (types.MappingProxyType, dict)):
+                name = self.conf.get('name')
+                start_mark = self.conf.get('_start_mark')
+            else:
+                name = getattr(self.conf, 'name', None)
+                start_mark = getattr(self.conf, 'start_mark', None)
+        if start_mark is None:
+            start_mark = getattr(error, 'start_mark', None)
+        if start_mark:
+            line = start_mark.line
+            if attr is not None:
+                line = getattr(attr, 'line', line)
+            snippet = start_mark.getLineSnippet(line).rstrip()
+            location = start_mark.getLineLocation(line)
+        if name:
+            name = f'"{name}"'
+        else:
+            name = 'following'
+        if stanza:
+            if attr is not None:
+                pointer = (
+                    f'The problem appears in the "{attr}" attribute\n'
+                    f'of the {name} {stanza} stanza:'
+                )
+            else:
+                pointer = (
+                    f'The problem appears in the the {name} {stanza} stanza:'
+                )
+            msg.append(pointer)
+
+        if snippet:
+            msg.append(indent(snippet))
+        if location:
+            msg.append(location)
+
+        error_message = '\n\n'.join(msg)
+        error_severity = getattr(error, 'zuul_error_severity',
+                                 model.SEVERITY_ERROR)
+        error_name = getattr(error, 'zuul_error_name', 'Unknown')
+
+        config_error = model.ConfigurationError(
+            source_context, start_mark, error_message,
+            short_error=error_text,
+            severity=error_severity,
+            name=error_name)
+        self.accumulator.addError(config_error)
 
 
 class ZuulSafeLoader(yaml.EncryptedLoader):
@@ -576,12 +444,12 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
                                  'project', 'project-template',
                                  'semaphore', 'queue', 'pragma'))
 
-    def __init__(self, stream, context):
+    def __init__(self, stream, source_context):
         wrapped_stream = io.StringIO(stream)
-        wrapped_stream.name = str(context)
+        wrapped_stream.name = str(source_context)
         super(ZuulSafeLoader, self).__init__(wrapped_stream)
-        self.name = str(context)
-        self.zuul_context = context
+        self.name = str(source_context)
+        self.zuul_context = source_context
         self.zuul_stream = stream
 
     def construct_mapping(self, node, deep=False):
@@ -601,7 +469,7 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
             if k.value in keys:
                 mark = model.ZuulMark(node.start_mark, node.end_mark,
                                       self.zuul_stream)
-                raise YAMLDuplicateKeyError(k.value, node, self.zuul_context,
+                raise YAMLDuplicateKeyError(k.value, self.zuul_context,
                                             mark)
             keys.add(k.value)
             if k.tag == 'tag:yaml.org,2002:str':
@@ -618,21 +486,10 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
         return r
 
 
-def safe_load_yaml(stream, context):
-    loader = ZuulSafeLoader(stream, context)
+def safe_load_yaml(stream, source_context):
+    loader = ZuulSafeLoader(stream, source_context)
     try:
         return loader.get_single_data()
-    except yaml.YAMLError as e:
-        m = """
-Zuul encountered a syntax error while parsing its configuration in the
-repo {repo} on branch {branch}.  The error was:
-
-  {error}
-"""
-        m = m.format(repo=context.project_name,
-                     branch=context.branch,
-                     error=str(e))
-        raise ConfigurationSyntaxError(m)
     finally:
         loader.dispose()
 
@@ -687,7 +544,7 @@ class PragmaParser(object):
         self.log = logging.getLogger("zuul.PragmaParser")
         self.pcontext = pcontext
 
-    def fromYaml(self, conf, error_accumulator):
+    def fromYaml(self, conf):
         conf = copy_safe_config(conf)
         self.schema(conf)
         bm = conf.get('implied-branch-matchers')
@@ -696,17 +553,16 @@ class PragmaParser(object):
         if bm is not None:
             source_context.implied_branch_matchers = bm
 
-        acc, branches = get_conf_attr(conf, 'implied-branches',
-                                      error_accumulator)
-        if branches is not None:
-            # This is a BranchMatcher (not an ImpliedBranchMatcher)
-            # because as user input, we allow/expect this to be
-            # regular expressions.  Only truly implicit branch names
-            # (automatically generated from source file branches) are
-            # ImpliedBranchMatchers.
-            source_context.implied_branches = [
-                change_matcher.BranchMatcher(make_regex(x, acc))
-                for x in as_list(branches)]
+        with self.pcontext.confAttr(conf, 'implied-branches') as branches:
+            if branches is not None:
+                # This is a BranchMatcher (not an ImpliedBranchMatcher)
+                # because as user input, we allow/expect this to be
+                # regular expressions.  Only truly implicit branch names
+                # (automatically generated from source file branches) are
+                # ImpliedBranchMatchers.
+                source_context.implied_branches = [
+                    change_matcher.BranchMatcher(make_regex(x, self.pcontext))
+                    for x in as_list(branches)]
 
 
 class NodeSetParser(object):
@@ -962,7 +818,7 @@ class JobParser(object):
         self.log = logging.getLogger("zuul.JobParser")
         self.pcontext = pcontext
 
-    def fromYaml(self, conf, error_accumulator,
+    def fromYaml(self, conf,
                  project_pipeline=False, name=None, validate=True):
         conf = copy_safe_config(conf)
         if validate:
@@ -1257,13 +1113,12 @@ class JobParser(object):
 
         branches = None
         if 'branches' in conf:
-            acc, conf_branches = get_conf_attr(conf, 'branches',
-                                               error_accumulator)
-            branches = [
-                change_matcher.BranchMatcher(
-                    make_regex(x, acc))
-                for x in as_list(conf['branches'])
-            ]
+            with self.pcontext.confAttr(conf, 'branches') as conf_branches:
+                branches = [
+                    change_matcher.BranchMatcher(
+                        make_regex(x, self.pcontext))
+                    for x in as_list(conf_branches)
+                ]
         elif not project_pipeline:
             branches = self.pcontext.getImpliedBranches(job.source_context)
         if branches:
@@ -1334,7 +1189,7 @@ class ProjectTemplateParser(object):
 
         return vs.Schema(project)
 
-    def fromYaml(self, conf, error_accumulator, validate=True, freeze=True):
+    def fromYaml(self, conf, validate=True, freeze=True):
         conf = copy_safe_config(conf)
         if validate:
             self.schema(conf)
@@ -1354,7 +1209,7 @@ class ProjectTemplateParser(object):
             project_pipeline.fail_fast = conf_pipeline.get(
                 'fail-fast')
             self.parseJobList(
-                conf_pipeline.get('jobs', []), error_accumulator,
+                conf_pipeline.get('jobs', []),
                 source_context, start_mark, project_pipeline.job_list)
 
         # If this project definition is in a place where it
@@ -1375,8 +1230,7 @@ class ProjectTemplateParser(object):
             project_template.freeze()
         return project_template
 
-    def parseJobList(self, conf, error_accumulator, source_context,
-                     start_mark, job_list):
+    def parseJobList(self, conf, source_context, start_mark, job_list):
         for conf_job in conf:
             if isinstance(conf_job, str):
                 jobname = conf_job
@@ -1390,7 +1244,7 @@ class ProjectTemplateParser(object):
             attrs['_start_mark'] = start_mark
 
             job_list.addJob(self.pcontext.job_parser.fromYaml(
-                attrs, error_accumulator, project_pipeline=True,
+                attrs, project_pipeline=True,
                 name=jobname, validate=False))
 
 
@@ -1427,7 +1281,7 @@ class ProjectParser(object):
 
         return vs.Schema(project)
 
-    def fromYaml(self, conf, error_accumulator):
+    def fromYaml(self, conf):
         conf = copy_safe_config(conf)
         self.schema(conf)
 
@@ -1447,7 +1301,7 @@ class ProjectParser(object):
             # Parse the project as a template since they're mostly the
             # same.
             project_config = self.pcontext.project_template_parser. \
-                fromYaml(conf, error_accumulator, validate=False, freeze=False)
+                fromYaml(conf, validate=False, freeze=False)
 
             project_config.name = project_name
         else:
@@ -1463,7 +1317,7 @@ class ProjectParser(object):
             # Parse the project as a template since they're mostly the
             # same.
             project_config = self.pcontext.project_template_parser.\
-                fromYaml(conf, error_accumulator, validate=False, freeze=False)
+                fromYaml(conf, validate=False, freeze=False)
 
             project_config.name = project.canonical_name
 
@@ -1701,33 +1555,37 @@ class PipelineParser(object):
 
         pipeline.setManager(manager)
 
-        local_accumulator = LocalAccumulator(self.pcontext.loading_errors,
-                                             'pipeline', conf)
+        with self.pcontext.errorContext(stanza='pipeline', conf=conf):
+            with self.pcontext.confAttr(conf, 'require', {}) as require_dict:
+                for source_name, require_config in require_dict.items():
+                    source = self.pcontext.connections.getSource(source_name)
+                    manager.ref_filters.extend(
+                        source.getRequireFilters(
+                            require_config, self.pcontext))
+                    seen_connections.add(source_name)
 
-        for source_name, require_config in conf.get('require', {}).items():
-            source = self.pcontext.connections.getSource(source_name)
-            manager.ref_filters.extend(
-                source.getRequireFilters(require_config, local_accumulator))
-            seen_connections.add(source_name)
+            with self.pcontext.confAttr(conf, 'reject', {}) as reject_dict:
+                for source_name, reject_config in reject_dict.items():
+                    source = self.pcontext.connections.getSource(source_name)
+                    manager.ref_filters.extend(
+                        source.getRejectFilters(reject_config, self.pcontext))
+                    seen_connections.add(source_name)
 
-        for source_name, reject_config in conf.get('reject', {}).items():
-            source = self.pcontext.connections.getSource(source_name)
-            manager.ref_filters.extend(
-                source.getRejectFilters(reject_config, local_accumulator))
-            seen_connections.add(source_name)
-
-        for connection_name, trigger_config in conf.get('trigger').items():
-            if self.pcontext.tenant.allowed_triggers is not None and \
-               connection_name not in self.pcontext.tenant.allowed_triggers:
-                raise UnknownConnection(connection_name)
-            trigger = self.pcontext.connections.getTrigger(
-                connection_name, trigger_config)
-            pipeline.triggers.append(trigger)
-            manager.event_filters.extend(
-                trigger.getEventFilters(connection_name,
-                                        conf['trigger'][connection_name],
-                                        local_accumulator))
-            seen_connections.add(connection_name)
+            with self.pcontext.confAttr(conf, 'trigger', {}) as trigger_dict:
+                for connection_name, trigger_config in trigger_dict.items():
+                    if (self.pcontext.tenant.allowed_triggers is not None and
+                        (connection_name not in
+                         self.pcontext.tenant.allowed_triggers)):
+                        raise UnknownConnection(connection_name)
+                    trigger = self.pcontext.connections.getTrigger(
+                        connection_name, trigger_config)
+                    pipeline.triggers.append(trigger)
+                    manager.event_filters.extend(
+                        trigger.getEventFilters(
+                            connection_name,
+                            conf['trigger'][connection_name],
+                            self.pcontext))
+                    seen_connections.add(connection_name)
 
         pipeline.connections = list(seen_connections)
         # Pipelines don't get frozen
@@ -1887,6 +1745,45 @@ class ParseContext(object):
         self.queue_parser = QueueParser(self)
         self.project_template_parser = ProjectTemplateParser(self)
         self.project_parser = ProjectParser(self)
+        acc = LocalAccumulator(self.loading_errors)
+        # Currently we use thread local storage to ensure that we
+        # don't accidentally use the error context stack from one of
+        # our threadpool workers.  In the future, we may be able to
+        # refactor so that the workers branch it whenever they start
+        # work.
+        self._thread_local = threading.local()
+        self._thread_local.accumulators = [acc]
+
+    @property
+    def accumulator(self):
+        return self._thread_local.accumulators[-1]
+
+    @contextmanager
+    def errorContext(self, source_context=None, stanza=None,
+                     conf=None, attr=None):
+        acc = self.accumulator.extend(source_context=source_context,
+                                      stanza=stanza,
+                                      conf=conf,
+                                      attr=attr)
+        self._thread_local.accumulators.append(acc)
+        try:
+            yield
+        finally:
+            if len(self._thread_local.accumulators) > 1:
+                self._thread_local.accumulators.pop()
+
+    @contextmanager
+    def confAttr(self, conf, attr, default=None):
+        found = None
+        for k in conf.keys():
+            if k == attr:
+                found = k
+                break
+        if found is not None:
+            with self.errorContext(attr=found):
+                yield conf[found]
+        else:
+            yield default
 
     def getImpliedBranches(self, source_context):
         # If the user has set a pragma directive for this, use the
@@ -2065,10 +1962,11 @@ class TenantParser(object):
             source_context = model.SourceContext(
                 tpc.project.canonical_name, tpc.project.name,
                 tpc.project.connection_name, None, None, trusted)
-            with project_configuration_exceptions(source_context,
-                                                  pcontext.loading_errors):
-                self._getProjectBranches(tenant, tpc, branch_cache_min_ltimes)
-                self._resolveShadowProjects(tenant, tpc)
+            with pcontext.errorContext(source_context=source_context):
+                with pcontext.accumulator.catchErrors():
+                    self._getProjectBranches(tenant, tpc,
+                                             branch_cache_min_ltimes)
+                    self._resolveShadowProjects(tenant, tpc)
 
         # Set default ansible version
         default_ansible_version = conf.get('default-ansible-version')
@@ -2084,13 +1982,13 @@ class TenantParser(object):
         # Start by fetching any YAML needed by this tenant which isn't
         # already cached.  Full reconfigurations start with an empty
         # cache.
-        self._cacheTenantYAML(abide, tenant, pcontext.loading_errors,
+        self._cacheTenantYAML(abide, tenant, pcontext,
                               min_ltimes, executor, ignore_cat_exception)
 
         # Then collect the appropriate YAML based on this tenant
         # config.
         config_projects_config, untrusted_projects_config = \
-            self._loadTenantYAML(abide, tenant, pcontext.loading_errors)
+            self._loadTenantYAML(abide, tenant, pcontext)
 
         # Then convert the YAML to configuration objects which we
         # cache on the tenant.
@@ -2109,7 +2007,7 @@ class TenantParser(object):
         self.cacheConfig(tenant, parsed_config)
 
         tenant.layout = self._parseLayout(
-            tenant, parsed_config, pcontext.loading_errors, layout_uuid)
+            tenant, parsed_config, pcontext, layout_uuid)
 
         tenant.semaphore_handler = SemaphoreHandler(
             self.zk_client, self.statsd, tenant.name, tenant.layout, abide,
@@ -2327,7 +2225,7 @@ class TenantParser(object):
             f.result()
         return config_projects, untrusted_projects
 
-    def _cacheTenantYAML(self, abide, tenant, loading_errors, min_ltimes,
+    def _cacheTenantYAML(self, abide, tenant, parse_context, min_ltimes,
                          executor, ignore_cat_exception=True):
         # min_ltimes can be the following: None (that means that we
         # should not use the file cache at all) or a nested dict of
@@ -2407,7 +2305,8 @@ class TenantParser(object):
                     # request any getFiles jobs.
                     continue
                 futures.append(executor.submit(self._cacheTenantYAMLBranch,
-                                               abide, tenant, loading_errors,
+                                               abide, tenant,
+                                               parse_context.accumulator,
                                                min_ltimes, tpc, project,
                                                branch, jobs))
         for future in futures:
@@ -2416,7 +2315,7 @@ class TenantParser(object):
         for i, job in enumerate(jobs, start=1):
             try:
                 try:
-                    self._processCatJob(abide, tenant, loading_errors, job,
+                    self._processCatJob(abide, tenant, parse_context, job,
                                         min_ltimes)
                 except TimeoutError:
                     self.merger.cancel(job)
@@ -2434,8 +2333,8 @@ class TenantParser(object):
                                 "Unable to cancel job %s", cancel_job)
                     raise
 
-    def _cacheTenantYAMLBranch(self, abide, tenant, loading_errors, min_ltimes,
-                               tpc, project, branch, jobs):
+    def _cacheTenantYAMLBranch(self, abide, tenant, error_accumulator,
+                               min_ltimes, tpc, project, branch, jobs):
         # This is the middle section of _cacheTenantYAML, called for
         # each project-branch.  It's a separate method so we can
         # execute it in parallel.  The "jobs" argument is mutated and
@@ -2444,6 +2343,9 @@ class TenantParser(object):
             project.canonical_name, project.name,
             project.connection_name, branch, '', False,
             tpc.implied_branch_matchers)
+        # We keep a local accumulator here because we're in a
+        # threadpool so we can't use the parse context stack.
+        error_accumulator = error_accumulator.extend(source_context)
         if min_ltimes is not None:
             files_cache = self.unparsed_config_cache.getFilesCache(
                 project.canonical_name, branch)
@@ -2473,18 +2375,17 @@ class TenantParser(object):
                         list(files_cache.keys()))
                     self._updateUnparsedBranchCache(
                         abide, tenant, source_context, files_cache,
-                        loading_errors, files_cache.ltime,
+                        error_accumulator, files_cache.ltime,
                         min_ltimes)
                     return
 
         extra_config_files = abide.getExtraConfigFiles(project.name)
         extra_config_dirs = abide.getExtraConfigDirs(project.name)
         if not self.merger:
-            with project_configuration_exceptions(source_context,
-                                                  loading_errors):
-                raise Exception(
-                    "Configuration files missing from cache. "
-                    "Check Zuul scheduler logs for more information.")
+            err = Exception(
+                "Configuration files missing from cache. "
+                "Check Zuul scheduler logs for more information.")
+            error_accumulator.addError(err)
             return
         ltime = self.zk_client.getCurrentLtime()
         job = self.merger.getFiles(
@@ -2502,7 +2403,7 @@ class TenantParser(object):
         job.source_context = source_context
         jobs.append(job)
 
-    def _processCatJob(self, abide, tenant, loading_errors, job, min_ltimes):
+    def _processCatJob(self, abide, tenant, parse_context, job, min_ltimes):
         # Called at the end of _cacheTenantYAML after all cat jobs
         # have been submitted
         self.log.debug("Waiting for cat job %s" % (job,))
@@ -2516,9 +2417,11 @@ class TenantParser(object):
         self.log.debug("Cat job %s got files %s" %
                        (job, job.files.keys()))
 
-        self._updateUnparsedBranchCache(abide, tenant, job.source_context,
-                                        job.files, loading_errors,
-                                        job.ltime, min_ltimes)
+        with parse_context.errorContext(source_context=job.source_context):
+            self._updateUnparsedBranchCache(
+                abide, tenant, job.source_context,
+                job.files, parse_context.accumulator,
+                job.ltime, min_ltimes)
 
         # Save all config files in Zookeeper (not just for the current tpc)
         files_cache = self.unparsed_config_cache.getFilesCache(
@@ -2546,7 +2449,7 @@ class TenantParser(object):
                                     job.ltime)
 
     def _updateUnparsedBranchCache(self, abide, tenant, source_context, files,
-                                   loading_errors, ltime, min_ltimes):
+                                   error_accumulator, ltime, min_ltimes):
         loaded = False
         tpc = tenant.project_configs[source_context.project_canonical_name]
         branch_cache = abide.getUnparsedBranchCache(
@@ -2570,9 +2473,8 @@ class TenantParser(object):
                 fn_root = fn.split('/')[0]
                 if (fn_root in ZUUL_CONF_ROOT):
                     if (loaded and loaded != conf_root):
-                        with project_configuration_exceptions(
-                                source_context, loading_errors):
-                            raise MultipleProjectConfigurations(source_context)
+                        err = MultipleProjectConfigurations(source_context)
+                        error_accumulator.addError(err)
                     loaded = conf_root
                 # Create a new source_context so we have unique filenames.
                 source_context = source_context.copy()
@@ -2580,15 +2482,19 @@ class TenantParser(object):
                 self.log.info(
                     "Loading configuration from %s" %
                     (source_context,))
+                # Make a new error accumulator; we may be in a threadpool
+                # so we can't use the stack.
+                local_accumulator = error_accumulator.extend(
+                    source_context=source_context)
                 incdata = self.loadProjectYAML(
-                    files[fn], source_context, loading_errors)
+                    files[fn], source_context, local_accumulator)
                 branch_cache.put(source_context.path, incdata, ltime)
         branch_cache.setValidFor(tpc, ZUUL_CONF_ROOT, ltime)
         if min_ltimes is not None:
             min_ltimes[source_context.project_canonical_name][
                 source_context.branch] = ltime
 
-    def _loadTenantYAML(self, abide, tenant, loading_errors):
+    def _loadTenantYAML(self, abide, tenant, parse_context):
         config_projects_config = model.UnparsedConfig()
         untrusted_projects_config = model.UnparsedConfig()
 
@@ -2615,14 +2521,14 @@ class TenantParser(object):
                 unparsed_branch_config = branch_cache.get(tpc, ZUUL_CONF_ROOT)
                 if unparsed_branch_config:
                     unparsed_branch_config = self.filterUntrustedProjectYAML(
-                        unparsed_branch_config, loading_errors)
+                        unparsed_branch_config, parse_context)
 
                     untrusted_projects_config.extend(unparsed_branch_config)
         return config_projects_config, untrusted_projects_config
 
-    def loadProjectYAML(self, data, source_context, loading_errors):
+    def loadProjectYAML(self, data, source_context, error_accumulator):
         config = model.UnparsedConfig()
-        with early_configuration_exceptions(source_context, loading_errors):
+        with error_accumulator.catchErrors():
             r = safe_load_yaml(data, source_context)
             config.extend(r)
         return config
@@ -2631,12 +2537,11 @@ class TenantParser(object):
         # Any config object may appear in a config project.
         return data.copy(trusted=True)
 
-    def filterUntrustedProjectYAML(self, data, loading_errors):
+    def filterUntrustedProjectYAML(self, data, parse_context):
         if data and data.pipelines:
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'pipeline', data.pipelines[0])
-            with configuration_exceptions(local_accumulator):
-                raise PipelineNotPermittedError()
+            with parse_context.errorContext(stanza='pipeline',
+                                            conf=data.pipelines[0]):
+                parse_context.accumulator.addError(PipelineNotPermittedError())
         return data.copy(trusted=False)
 
     def _getLoadClasses(self, tenant, conf_object):
@@ -2646,106 +2551,97 @@ class TenantParser(object):
 
     def parseConfig(self, tenant, unparsed_config, pcontext):
         parsed_config = model.ParsedConfig()
-        loading_errors = pcontext.loading_errors
 
         # Handle pragma items first since they modify the source context
         # used by other classes.
         for config_pragma in unparsed_config.pragmas:
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'pragma', config_pragma)
-            with configuration_exceptions(local_accumulator):
-                pcontext.pragma_parser.fromYaml(
-                    config_pragma, local_accumulator)
+            with pcontext.errorContext(stanza='pragma', conf=config_pragma):
+                with pcontext.accumulator.catchErrors():
+                    pcontext.pragma_parser.fromYaml(config_pragma)
 
         for config_pipeline in unparsed_config.pipelines:
             classes = self._getLoadClasses(tenant, config_pipeline)
             if 'pipeline' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'pipeline', config_pipeline)
-            with configuration_exceptions(local_accumulator):
-                parsed_config.pipelines.append(
-                    pcontext.pipeline_parser.fromYaml(config_pipeline))
+            with pcontext.errorContext(stanza='pipeline',
+                                       conf=config_pipeline):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.pipelines.append(
+                        pcontext.pipeline_parser.fromYaml(config_pipeline))
 
         for config_nodeset in unparsed_config.nodesets:
             classes = self._getLoadClasses(tenant, config_nodeset)
             if 'nodeset' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'nodeset', config_nodeset)
-            with configuration_exceptions(local_accumulator):
-                parsed_config.nodesets.append(
-                    pcontext.nodeset_parser.fromYaml(config_nodeset))
+            with pcontext.errorContext(stanza='nodeset', conf=config_nodeset):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.nodesets.append(
+                        pcontext.nodeset_parser.fromYaml(config_nodeset))
 
         for config_secret in unparsed_config.secrets:
             classes = self._getLoadClasses(tenant, config_secret)
             if 'secret' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'secret', config_secret)
-            with configuration_exceptions(local_accumulator):
-                parsed_config.secrets.append(
-                    pcontext.secret_parser.fromYaml(config_secret))
+            with pcontext.errorContext(stanza='secret', conf=config_secret):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.secrets.append(
+                        pcontext.secret_parser.fromYaml(config_secret))
 
         for config_job in unparsed_config.jobs:
             classes = self._getLoadClasses(tenant, config_job)
             if 'job' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'job', config_job)
-            with configuration_exceptions(local_accumulator):
-                parsed_config.jobs.append(
-                    pcontext.job_parser.fromYaml(
-                        config_job, local_accumulator))
+            with pcontext.errorContext(stanza='job', conf=config_job):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.jobs.append(
+                        pcontext.job_parser.fromYaml(config_job))
 
         for config_semaphore in unparsed_config.semaphores:
             classes = self._getLoadClasses(tenant, config_semaphore)
             if 'semaphore' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'semaphore', config_semaphore)
-            with configuration_exceptions(local_accumulator):
-                parsed_config.semaphores.append(
-                    pcontext.semaphore_parser.fromYaml(config_semaphore))
+            with pcontext.errorContext(stanza='semaphore',
+                                       conf=config_semaphore):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.semaphores.append(
+                        pcontext.semaphore_parser.fromYaml(config_semaphore))
 
         for config_queue in unparsed_config.queues:
             classes = self._getLoadClasses(tenant, config_queue)
             if 'queue' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'queue', config_queue)
-            with configuration_exceptions(local_accumulator):
-                parsed_config.queues.append(
-                    pcontext.queue_parser.fromYaml(config_queue))
+            with pcontext.errorContext(stanza='queue', conf=config_queue):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.queues.append(
+                        pcontext.queue_parser.fromYaml(config_queue))
 
         for config_template in unparsed_config.project_templates:
             classes = self._getLoadClasses(tenant, config_template)
             if 'project-template' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'project-template', config_template)
-            with configuration_exceptions(local_accumulator):
-                parsed_config.project_templates.append(
-                    pcontext.project_template_parser.fromYaml(
-                        config_template, local_accumulator))
+            with pcontext.errorContext(stanza='project-template',
+                                       conf=config_template):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.project_templates.append(
+                        pcontext.project_template_parser.fromYaml(
+                            config_template))
 
         for config_project in unparsed_config.projects:
             classes = self._getLoadClasses(tenant, config_project)
             if 'project' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'project', config_project)
-            with configuration_exceptions(local_accumulator):
-                # we need to separate the regex projects as they are
-                # processed differently later
-                name = config_project.get('name')
-                parsed_project = pcontext.project_parser.fromYaml(
-                    config_project, local_accumulator)
-                if name and name.startswith('^'):
-                    parsed_config.projects_by_regex.setdefault(
-                        name, []).append(parsed_project)
-                else:
-                    parsed_config.projects.append(parsed_project)
+            with pcontext.errorContext(stanza='project', conf=config_project):
+                with pcontext.accumulator.catchErrors():
+                    # we need to separate the regex projects as they are
+                    # processed differently later
+                    name = config_project.get('name')
+                    parsed_project = pcontext.project_parser.fromYaml(
+                        config_project)
+                    if name and name.startswith('^'):
+                        parsed_config.projects_by_regex.setdefault(
+                            name, []).append(parsed_project)
+                    else:
+                        parsed_config.projects.append(parsed_project)
 
         return parsed_config
 
@@ -2790,46 +2686,51 @@ class TenantParser(object):
             _cache('projects', project_config)
 
     def _addLayoutItems(self, layout, tenant, parsed_config,
-                        skip_pipelines=False, skip_semaphores=False):
+                        parse_context, skip_pipelines=False,
+                        skip_semaphores=False):
         # TODO(jeblair): make sure everything needing
         # reference_exceptions has it; add tests if needed.
         if not skip_pipelines:
             for pipeline in parsed_config.pipelines:
-                with reference_exceptions(
-                        'pipeline', pipeline, layout.loading_errors):
-                    layout.addPipeline(pipeline)
+                with parse_context.errorContext(stanza='pipeline',
+                                                conf=pipeline):
+                    with parse_context.accumulator.catchErrors():
+                        layout.addPipeline(pipeline)
 
         for nodeset in parsed_config.nodesets:
-            with reference_exceptions(
-                    'nodeset', nodeset, layout.loading_errors):
-                layout.addNodeSet(nodeset)
+            with parse_context.errorContext(stanza='nodeset', conf=nodeset):
+                with parse_context.accumulator.catchErrors():
+                    layout.addNodeSet(nodeset)
 
         for secret in parsed_config.secrets:
-            with reference_exceptions('secret', secret, layout.loading_errors):
-                layout.addSecret(secret)
+            with parse_context.errorContext(stanza='secret', conf=secret):
+                with parse_context.accumulator.catchErrors():
+                    layout.addSecret(secret)
 
         for job in parsed_config.jobs:
-            with reference_exceptions('job', job, layout.loading_errors):
-                added = layout.addJob(job)
-            if not added:
-                self.log.debug(
-                    "Skipped adding job %s which shadows an existing job" %
-                    (job,))
+            with parse_context.errorContext(stanza='job', conf=job):
+                with parse_context.accumulator.catchErrors():
+                    added = layout.addJob(job)
+                    if not added:
+                        self.log.debug(
+                            "Skipped adding job %s which shadows "
+                            "an existing job", job)
 
         # Now that all the jobs are loaded, verify references to other
         # config objects.
         for nodeset in layout.nodesets.values():
-            with reference_exceptions('nodeset', nodeset,
-                                      layout.loading_errors):
-                nodeset.validateReferences(layout)
+            with parse_context.errorContext(stanza='nodeset', conf=nodeset):
+                with parse_context.accumulator.catchErrors():
+                    nodeset.validateReferences(layout)
         for jobs in layout.jobs.values():
             for job in jobs:
-                with reference_exceptions('job', job, layout.loading_errors):
-                    job.validateReferences(layout)
+                with parse_context.errorContext(stanza='job', conf=job):
+                    with parse_context.accumulator.catchErrors():
+                        job.validateReferences(layout)
         for pipeline in layout.pipelines.values():
-            with reference_exceptions(
-                    'pipeline', pipeline, layout.loading_errors):
-                pipeline.validateReferences(layout)
+            with parse_context.errorContext(stanza='pipeline', conf=pipeline):
+                with parse_context.accumulator.catchErrors():
+                    pipeline.validateReferences(layout)
 
         if skip_semaphores:
             # We should not actually update the layout with new
@@ -2840,18 +2741,21 @@ class TenantParser(object):
         else:
             semaphore_layout = layout
         for semaphore in parsed_config.semaphores:
-            with reference_exceptions(
-                    'semaphore', semaphore, layout.loading_errors):
-                semaphore_layout.addSemaphore(semaphore)
+            with parse_context.errorContext(stanza='semaphore',
+                                            conf=semaphore):
+                with parse_context.accumulator.catchErrors():
+                    semaphore_layout.addSemaphore(semaphore)
 
         for queue in parsed_config.queues:
-            with reference_exceptions('queue', queue, layout.loading_errors):
-                layout.addQueue(queue)
+            with parse_context.errorContext(stanza='queue', conf=queue):
+                with parse_context.accumulator.catchErrors():
+                    layout.addQueue(queue)
 
         for template in parsed_config.project_templates:
-            with reference_exceptions(
-                    'project-template', template, layout.loading_errors):
-                layout.addProjectTemplate(template)
+            with parse_context.errorContext(stanza='project-template',
+                                            conf=template):
+                with parse_context.accumulator.catchErrors():
+                    layout.addProjectTemplate(template)
 
         # The project stanzas containing a regex are separated from the normal
         # project stanzas and organized by regex. We need to loop over each
@@ -2874,9 +2778,9 @@ class TenantParser(object):
 
         # Now that all the project pipelines are loaded, fixup and
         # verify references to other config objects.
-        self._validateProjectPipelineConfigs(tenant, layout)
+        self._validateProjectPipelineConfigs(tenant, layout, parse_context)
 
-    def _validateProjectPipelineConfigs(self, tenant, layout):
+    def _validateProjectPipelineConfigs(self, tenant, layout, parse_context):
         # Validate references to other config objects
         def inner_validate_ppcs(ppc):
             for jobs in ppc.job_list.jobs.values():
@@ -2889,21 +2793,24 @@ class TenantParser(object):
 
         for project_name in layout.project_configs:
             for project_config in layout.project_configs[project_name]:
-                with reference_exceptions(
-                        'project', project_config, layout.loading_errors):
-                    for template_name in project_config.templates:
-                        if template_name not in layout.project_templates:
-                            raise TemplateNotFoundError(template_name)
-                        project_templates = layout.getProjectTemplates(
-                            template_name)
-                        for p_tmpl in project_templates:
-                            with reference_exceptions(
-                                    'project-template', p_tmpl,
-                                    layout.loading_errors):
-                                for ppc in p_tmpl.pipelines.values():
-                                    inner_validate_ppcs(ppc)
-                    for ppc in project_config.pipelines.values():
-                        inner_validate_ppcs(ppc)
+                with parse_context.errorContext(stanza='project',
+                                                conf=project_config):
+                    with parse_context.accumulator.catchErrors():
+                        for template_name in project_config.templates:
+                            if template_name not in layout.project_templates:
+                                raise TemplateNotFoundError(template_name)
+                            project_templates = layout.getProjectTemplates(
+                                template_name)
+                            for p_tmpl in project_templates:
+                                with parse_context.errorContext(
+                                        stanza='project-template',
+                                        conf=p_tmpl):
+                                    acc = parse_context.accumulator
+                                    with acc.catchErrors():
+                                        for ppc in p_tmpl.pipelines.values():
+                                            inner_validate_ppcs(ppc)
+                        for ppc in project_config.pipelines.values():
+                            inner_validate_ppcs(ppc)
             # Set a merge mode if we don't have one for this project.
             # This can happen if there are only regex project stanzas
             # but no specific project stanzas.
@@ -2921,24 +2828,25 @@ class TenantParser(object):
                 source_context = model.SourceContext(
                     project.canonical_name, project.name,
                     project.connection_name, None, None, trusted)
-                with project_configuration_exceptions(source_context,
-                                                      layout.loading_errors):
+                with parse_context.errorContext(
+                        source_context=source_context):
                     if project_metadata.merge_mode not in tpc.merge_modes:
                         mode = model.get_merge_mode_name(
                             project_metadata.merge_mode)
                         allowed_modes = list(map(model.get_merge_mode_name,
                                                  tpc.merge_modes))
-                        raise Exception(f'Merge mode {mode} not supported '
+                        err = Exception(f'Merge mode {mode} not supported '
                                         f'by project {project_name}. '
                                         f'Supported modes: {allowed_modes}.')
+                        parse_context.accumulator.addError(err)
 
-    def _parseLayout(self, tenant, data, loading_errors, layout_uuid=None):
+    def _parseLayout(self, tenant, data, parse_context, layout_uuid=None):
         # Don't call this method from dynamic reconfiguration because
         # it interacts with drivers and connections.
         layout = model.Layout(tenant, layout_uuid)
-        layout.loading_errors = loading_errors
+        layout.loading_errors = parse_context.loading_errors
         self.log.debug("Created layout id %s", layout.uuid)
-        self._addLayoutItems(layout, tenant, data)
+        self._addLayoutItems(layout, tenant, data, parse_context)
         return layout
 
 
@@ -3215,40 +3123,40 @@ class ConfigLoader(object):
                         project.canonical_name, project.name,
                         project.connection_name, branch, fn, trusted,
                         tpc.implied_branch_matchers)
-                    # Prevent mixing configuration source
-                    conf_root = fn.split('/')[0]
+                    with pcontext.errorContext(source_context=source_context):
+                        # Prevent mixing configuration source
+                        conf_root = fn.split('/')[0]
 
-                    # Don't load from more than one configuration in a
-                    # project-branch (unless an "extra" file/dir).
-                    if (conf_root in ZUUL_CONF_ROOT):
-                        if loaded and loaded != conf_root:
-                            self.log.warning(
-                                "Configuration in %s ignored because "
-                                "project-branch is already configured",
-                                source_context)
-                            item.warning(
-                                "Configuration in %s ignored because "
-                                "project-branch is already configured" %
-                                source_context)
-                            continue
-                        loaded = conf_root
+                        # Don't load from more than one configuration in a
+                        # project-branch (unless an "extra" file/dir).
+                        if (conf_root in ZUUL_CONF_ROOT):
+                            if loaded and loaded != conf_root:
+                                self.log.warning(
+                                    "Configuration in %s ignored because "
+                                    "project-branch is already configured",
+                                    source_context)
+                                item.warning(
+                                    "Configuration in %s ignored because "
+                                    "project-branch is already configured" %
+                                    source_context)
+                                continue
+                            loaded = conf_root
 
-                    self.log.info(
-                        "Loading configuration dynamically from %s" %
-                        (source_context,))
-                    incdata = self.tenant_parser.loadProjectYAML(
-                        data, source_context, pcontext.loading_errors)
+                        self.log.info(
+                            "Loading configuration dynamically from %s" %
+                            (source_context,))
+                        incdata = self.tenant_parser.loadProjectYAML(
+                            data, source_context, pcontext.accumulator)
 
-                    if trusted:
-                        incdata = self.tenant_parser.filterConfigProjectYAML(
-                            incdata)
-                    else:
-                        incdata = self.tenant_parser.\
-                            filterUntrustedProjectYAML(incdata,
-                                                       pcontext.loading_errors)
+                        if trusted:
+                            incdata = self.tenant_parser.\
+                                filterConfigProjectYAML(incdata)
+                        else:
+                            incdata = self.tenant_parser.\
+                                filterUntrustedProjectYAML(incdata, pcontext)
 
-                    config.extend(self.tenant_parser.parseConfig(
-                        tenant, incdata, pcontext))
+                        config.extend(self.tenant_parser.parseConfig(
+                            tenant, incdata, pcontext))
 
     def createDynamicLayout(self, item, files,
                             additional_project_branches,
@@ -3297,6 +3205,7 @@ class ConfigLoader(object):
             skip_pipelines = skip_semaphores = False
 
         self.tenant_parser._addLayoutItems(layout, tenant, config,
+                                           pcontext,
                                            skip_pipelines=skip_pipelines,
                                            skip_semaphores=skip_semaphores)
         return layout

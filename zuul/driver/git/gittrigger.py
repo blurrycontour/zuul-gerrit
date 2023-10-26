@@ -25,12 +25,13 @@ class GitTrigger(BaseTrigger):
     log = logging.getLogger("zuul.GitTrigger")
 
     def getEventFilters(self, connection_name, trigger_conf,
-                        error_accumulator):
+                        parse_context):
         efilters = []
+        pcontext = parse_context
         for trigger in to_list(trigger_conf):
-
-            refs = [make_regex(x, error_accumulator)
-                    for x in to_list(trigger.get('ref'))]
+            with pcontext.confAttr(trigger, 'ref') as attr:
+                refs = [make_regex(x, pcontext)
+                        for x in to_list(attr)]
 
             f = GitEventFilter(
                 connection_name=connection_name,
