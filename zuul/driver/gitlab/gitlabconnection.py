@@ -442,11 +442,18 @@ class GitlabAPIClient():
             # endpoint the second call return 401.
             # 409 is returned when current HEAD of the merge request doesn't
             # match the 'sha' parameter.
-            if resp[1] not in (401, 409):
+            # 404 is returned when trying to unapprove when there is no
+            # existing approval.
+            if resp[1] not in (401, 404, 409):
                 raise
             elif approve == 'approve' and resp[1] == 409:
                 log = get_annotated_logger(self.log, zuul_event_id)
                 log.error('Fail to approve the merge request: %s' % resp[0])
+                return
+            elif approve == 'unapprove' and resp[1] == 404:
+                log = get_annotated_logger(self.log, zuul_event_id)
+                log.debug('Merge request %s/%s already unapproved',
+                          project_name, number)
                 return
         return resp[0]
 
