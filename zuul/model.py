@@ -149,6 +149,19 @@ def filter_severity(error_list, errors=True, warnings=True):
             )]
 
 
+class ZuulConfigKey(str):
+    def __new__(cls, s, line):
+        self = super().__new__(cls, s)
+        self.line = line
+        return self
+
+    def __copy__(self):
+        return ZuulConfigKey(self, self.line)
+
+    def __deepcopy__(self, memo):
+        return self.__copy__()
+
+
 class ZuulMark:
     # The yaml mark class differs between the C and python versions.
     # The C version does not provide a snippet, and also appears to
@@ -173,6 +186,25 @@ class ZuulMark:
     def __eq__(self, other):
         return (self.line == other.line and
                 self.snippet == other.snippet)
+
+    line_snippet_context = 4
+
+    def getLineSnippet(self, line):
+        start = max(line - self.line - self.line_snippet_context, 0)
+        end = start + (self.line_snippet_context * 2) + 1
+        all_lines = self.snippet.splitlines()
+        lines = all_lines[start:end]
+        if start > 0:
+            lines.insert(0, '...')
+        if end < len(all_lines):
+            lines.append('...')
+        return '\n'.join(lines)
+
+    def getLineLocation(self, line):
+        return '  in "{name}", line {line}'.format(
+            name=self.name,
+            line=line + 1,
+        )
 
     def serialize(self):
         return {
