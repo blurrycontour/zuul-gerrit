@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70df6608_0888aab7",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-10-26T11:06:59Z",
+      "side": 1,
+      "message": "From the failing tests it seems like accumulator can be `None`, which makes line 570 raise an exception.",
+      "revId": "567b0879c0b66fa0770f617ded7678c3b80abfb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
