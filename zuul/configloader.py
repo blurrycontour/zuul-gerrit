@@ -319,14 +319,33 @@ class ConfigurationSyntaxWarning(object, metaclass=abc.ABCMeta):
     zuul_error_message = 'Unknown Configuration Warning'
 
     @abc.abstractmethod
-    def makeConfigurationError(self, stanza, conf):
+    def makeConfigurationError(self, stanza, conf, attr=None):
         "Return a ConfigurationError object"
 
 
 class DeprecationWarning(ConfigurationSyntaxWarning):
-    def makeConfigurationError(self, stanza, conf):
+    def makeConfigurationError(self, stanza, conf, attr=None):
         context = conf.get('_source_context')
         start_mark = conf.get('_start_mark')
+        snippet = None
+        name = conf.get('name')
+        line = start_mark.line
+        if name:
+            name = f'"{name}"'
+        else:
+            name = 'following'
+        if attr is not None:
+            pointer = (
+                f'The problem appears in the "{attr}" attribute\n'
+                f'of the {name} {stanza} stanza:'
+            )
+            line = getattr(attr, 'line', line)
+        else:
+            pointer = (
+                f'The problem appears in the the {name} {stanza} stanza:'
+            )
+        snippet = start_mark.getLineSnippet(line).rstrip()
+        location = start_mark.getLineLocation(line)
         intro = textwrap.fill(textwrap.dedent("""\
         Zuul encountered a deprecated syntax while parsing its
         configuration in the repo {repo} on branch {branch}.  The
@@ -340,17 +359,17 @@ class DeprecationWarning(ConfigurationSyntaxWarning):
 
         {error}
 
-        The problem appears in the following {stanza} stanza:
+        {pointer}
 
         {content}
 
-        {start_mark}""")
+        {location}""")
 
         m = m.format(intro=intro,
                      error=indent(self.zuul_error_message),
-                     stanza=stanza,
-                     content=indent(start_mark.snippet.rstrip()),
-                     start_mark=str(start_mark))
+                     pointer=pointer,
+                     content=indent(snippet),
+                     location=location)
 
         return model.ConfigurationError(
             context, start_mark, m,
@@ -517,10 +536,16 @@ class LocalAccumulator:
     """An error accumulator that wraps another accumulator (like
     LoadingErrors) while holding local context information.
     """
-    def __init__(self, accumulator, stanza, conf):
+    def __init__(self, accumulator, stanza, conf, attr=None):
         self.accumulator = accumulator
         self.stanza = stanza
         self.conf = conf
+        self.attr = attr
+
+    def extend(self, attr=None):
+        """Return a new accumulator that extends this one with additional
+        info"""
+        return LocalAccumulator(self.accumulator, self.stanza, self.conf, attr)
 
     def addError(self, error):
         """Add an error to the accumulator with the local context info.
@@ -532,8 +557,18 @@ class LocalAccumulator:
         exception handlers, so this method doesn't expect them.
         """
 
-        e = error.makeConfigurationError(self.stanza, self.conf)
+        e = error.makeConfigurationError(self.stanza, self.conf, self.attr)
         self.accumulator.addError(e)
+
+
+def get_conf_attr(conf, attr, accumulator):
+    found = None
+    for k in conf.keys():
+        if k == attr:
+            found = k
+            break
+    acc = accumulator.extend(found)
+    return acc, conf.get(found)
 
 
 class ZuulSafeLoader(yaml.EncryptedLoader):
@@ -569,6 +604,8 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
                 raise YAMLDuplicateKeyError(k.value, node, self.zuul_context,
                                             mark)
             keys.add(k.value)
+            if k.tag == 'tag:yaml.org,2002:str':
+                k.value = model.ZuulConfigKey(k.value, node.start_mark.line)
         r = super(ZuulSafeLoader, self).construct_mapping(node, deep)
         keys = frozenset(r.keys())
         if len(keys) == 1 and keys.intersection(self.zuul_node_types):
@@ -659,7 +696,8 @@ class PragmaParser(object):
         if bm is not None:
             source_context.implied_branch_matchers = bm
 
-        branches = conf.get('implied-branches')
+        acc, branches = get_conf_attr(conf, 'implied-branches',
+                                      error_accumulator)
         if branches is not None:
             # This is a BranchMatcher (not an ImpliedBranchMatcher)
             # because as user input, we allow/expect this to be
@@ -667,7 +705,7 @@ class PragmaParser(object):
             # (automatically generated from source file branches) are
             # ImpliedBranchMatchers.
             source_context.implied_branches = [
-                change_matcher.BranchMatcher(make_regex(x, error_accumulator))
+                change_matcher.BranchMatcher(make_regex(x, acc))
                 for x in as_list(branches)]
 
 
@@ -1219,9 +1257,11 @@ class JobParser(object):
 
         branches = None
         if 'branches' in conf:
+            acc, conf_branches = get_conf_attr(conf, 'branches',
+                                               error_accumulator)
             branches = [
                 change_matcher.BranchMatcher(
-                    make_regex(x, error_accumulator))
+                    make_regex(x, acc))
                 for x in as_list(conf['branches'])
             ]
         elif not project_pipeline:
