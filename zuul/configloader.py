@@ -85,18 +85,18 @@ def check_config_path(path):
                          "allowed in extra-config-paths")
 
 
-def make_regex(data, error_accumulator=None):
+def make_regex(data, parse_context=None):
     if isinstance(data, dict):
         regex = ZuulRegex(data['regex'],
                           negate=data.get('negate', False))
     else:
         regex = ZuulRegex(data)
-    if error_accumulator and regex.re2_failure:
+    if parse_context and regex.re2_failure:
         if regex.re2_failure_message:
-            error_accumulator.addError(RegexDeprecation(
+            parse_context.accumulator.addError(RegexDeprecation(
                 regex.re2_failure_message))
         else:
-            error_accumulator.addError(RegexDeprecation())
+            parse_context.accumulator.addError(RegexDeprecation())
     return regex
 
 
@@ -456,6 +456,7 @@ def configuration_exceptions(local_accumulator):
     except ConfigurationSyntaxError:
         raise
     except Exception as e:
+        raise
         conf = copy.deepcopy(local_accumulator.conf)
         context = conf.pop('_source_context')
         start_mark = conf.pop('_start_mark')
@@ -536,16 +537,19 @@ class LocalAccumulator:
     """An error accumulator that wraps another accumulator (like
     LoadingErrors) while holding local context information.
     """
-    def __init__(self, accumulator, stanza, conf, attr=None):
+    def __init__(self, accumulator, stanza=None, conf=None, attr=None):
         self.accumulator = accumulator
         self.stanza = stanza
         self.conf = conf
         self.attr = attr
 
-    def extend(self, attr=None):
+    def extend(self, stanza=None, conf=None, attr=None):
         """Return a new accumulator that extends this one with additional
         info"""
-        return LocalAccumulator(self.accumulator, self.stanza, self.conf, attr)
+        return LocalAccumulator(self.accumulator,
+                                stanza or self.stanza,
+                                conf or self.conf,
+                                attr or self.attr)
 
     def addError(self, error):
         """Add an error to the accumulator with the local context info.
@@ -559,16 +563,6 @@ class LocalAccumulator:
 
         e = error.makeConfigurationError(self.stanza, self.conf, self.attr)
         self.accumulator.addError(e)
-
-
-def get_conf_attr(conf, attr, accumulator=None):
-    found = None
-    for k in conf.keys():
-        if k == attr:
-            found = k
-            break
-    acc = accumulator.extend(found) if accumulator else None
-    return acc, conf.get(found)
 
 
 class ZuulSafeLoader(yaml.EncryptedLoader):
@@ -687,7 +681,7 @@ class PragmaParser(object):
         self.log = logging.getLogger("zuul.PragmaParser")
         self.pcontext = pcontext
 
-    def fromYaml(self, conf, error_accumulator):
+    def fromYaml(self, conf):
         conf = copy_safe_config(conf)
         self.schema(conf)
         bm = conf.get('implied-branch-matchers')
@@ -696,17 +690,16 @@ class PragmaParser(object):
         if bm is not None:
             source_context.implied_branch_matchers = bm
 
-        acc, branches = get_conf_attr(conf, 'implied-branches',
-                                      error_accumulator)
-        if branches is not None:
-            # This is a BranchMatcher (not an ImpliedBranchMatcher)
-            # because as user input, we allow/expect this to be
-            # regular expressions.  Only truly implicit branch names
-            # (automatically generated from source file branches) are
-            # ImpliedBranchMatchers.
-            source_context.implied_branches = [
-                change_matcher.BranchMatcher(make_regex(x, acc))
-                for x in as_list(branches)]
+        with self.pcontext.confAttr(conf, 'implied-branches') as branches:
+            if branches is not None:
+                # This is a BranchMatcher (not an ImpliedBranchMatcher)
+                # because as user input, we allow/expect this to be
+                # regular expressions.  Only truly implicit branch names
+                # (automatically generated from source file branches) are
+                # ImpliedBranchMatchers.
+                source_context.implied_branches = [
+                    change_matcher.BranchMatcher(make_regex(x, self.pcontext))
+                    for x in as_list(branches)]
 
 
 class NodeSetParser(object):
@@ -962,7 +955,7 @@ class JobParser(object):
         self.log = logging.getLogger("zuul.JobParser")
         self.pcontext = pcontext
 
-    def fromYaml(self, conf, error_accumulator,
+    def fromYaml(self, conf,
                  project_pipeline=False, name=None, validate=True):
         conf = copy_safe_config(conf)
         if validate:
@@ -1257,13 +1250,12 @@ class JobParser(object):
 
         branches = None
         if 'branches' in conf:
-            acc, conf_branches = get_conf_attr(conf, 'branches',
-                                               error_accumulator)
-            branches = [
-                change_matcher.BranchMatcher(
-                    make_regex(x, acc))
-                for x in as_list(conf['branches'])
-            ]
+            with self.pcontext.confAttr(conf, 'branches') as conf_branches:
+                branches = [
+                    change_matcher.BranchMatcher(
+                        make_regex(x, self.pcontext))
+                    for x in as_list(conf_branches)
+                ]
         elif not project_pipeline:
             branches = self.pcontext.getImpliedBranches(job.source_context)
         if branches:
@@ -1334,7 +1326,7 @@ class ProjectTemplateParser(object):
 
         return vs.Schema(project)
 
-    def fromYaml(self, conf, error_accumulator, validate=True, freeze=True):
+    def fromYaml(self, conf, validate=True, freeze=True):
         conf = copy_safe_config(conf)
         if validate:
             self.schema(conf)
@@ -1354,7 +1346,7 @@ class ProjectTemplateParser(object):
             project_pipeline.fail_fast = conf_pipeline.get(
                 'fail-fast')
             self.parseJobList(
-                conf_pipeline.get('jobs', []), error_accumulator,
+                conf_pipeline.get('jobs', []),
                 source_context, start_mark, project_pipeline.job_list)
 
         # If this project definition is in a place where it
@@ -1375,8 +1367,7 @@ class ProjectTemplateParser(object):
             project_template.freeze()
         return project_template
 
-    def parseJobList(self, conf, error_accumulator, source_context,
-                     start_mark, job_list):
+    def parseJobList(self, conf, source_context, start_mark, job_list):
         for conf_job in conf:
             if isinstance(conf_job, str):
                 jobname = conf_job
@@ -1390,7 +1381,7 @@ class ProjectTemplateParser(object):
             attrs['_start_mark'] = start_mark
 
             job_list.addJob(self.pcontext.job_parser.fromYaml(
-                attrs, error_accumulator, project_pipeline=True,
+                attrs, project_pipeline=True,
                 name=jobname, validate=False))
 
 
@@ -1427,7 +1418,7 @@ class ProjectParser(object):
 
         return vs.Schema(project)
 
-    def fromYaml(self, conf, error_accumulator):
+    def fromYaml(self, conf):
         conf = copy_safe_config(conf)
         self.schema(conf)
 
@@ -1447,7 +1438,7 @@ class ProjectParser(object):
             # Parse the project as a template since they're mostly the
             # same.
             project_config = self.pcontext.project_template_parser. \
-                fromYaml(conf, error_accumulator, validate=False, freeze=False)
+                fromYaml(conf, validate=False, freeze=False)
 
             project_config.name = project_name
         else:
@@ -1463,7 +1454,7 @@ class ProjectParser(object):
             # Parse the project as a template since they're mostly the
             # same.
             project_config = self.pcontext.project_template_parser.\
-                fromYaml(conf, error_accumulator, validate=False, freeze=False)
+                fromYaml(conf, validate=False, freeze=False)
 
             project_config.name = project.canonical_name
 
@@ -1701,33 +1692,37 @@ class PipelineParser(object):
 
         pipeline.setManager(manager)
 
-        local_accumulator = LocalAccumulator(self.pcontext.loading_errors,
-                                             'pipeline', conf)
+        with self.pcontext.errorContext('pipeline', conf):
+            with self.pcontext.confAttr(conf, 'require', {}) as require_dict:
+                for source_name, require_config in require_dict.items():
+                    source = self.pcontext.connections.getSource(source_name)
+                    manager.ref_filters.extend(
+                        source.getRequireFilters(
+                            require_config, self.pcontext))
+                    seen_connections.add(source_name)
 
-        for source_name, require_config in conf.get('require', {}).items():
-            source = self.pcontext.connections.getSource(source_name)
-            manager.ref_filters.extend(
-                source.getRequireFilters(require_config, local_accumulator))
-            seen_connections.add(source_name)
+            with self.pcontext.confAttr(conf, 'reject', {}) as reject_dict:
+                for source_name, reject_config in reject_dict.items():
+                    source = self.pcontext.connections.getSource(source_name)
+                    manager.ref_filters.extend(
+                        source.getRejectFilters(reject_config, self.pcontext))
+                    seen_connections.add(source_name)
 
-        for source_name, reject_config in conf.get('reject', {}).items():
-            source = self.pcontext.connections.getSource(source_name)
-            manager.ref_filters.extend(
-                source.getRejectFilters(reject_config, local_accumulator))
-            seen_connections.add(source_name)
-
-        for connection_name, trigger_config in conf.get('trigger').items():
-            if self.pcontext.tenant.allowed_triggers is not None and \
-               connection_name not in self.pcontext.tenant.allowed_triggers:
-                raise UnknownConnection(connection_name)
-            trigger = self.pcontext.connections.getTrigger(
-                connection_name, trigger_config)
-            pipeline.triggers.append(trigger)
-            manager.event_filters.extend(
-                trigger.getEventFilters(connection_name,
-                                        conf['trigger'][connection_name],
-                                        local_accumulator))
-            seen_connections.add(connection_name)
+            with self.pcontext.confAttr(conf, 'trigger', {}) as trigger_dict:
+                for connection_name, trigger_config in trigger_dict.items():
+                    if (self.pcontext.tenant.allowed_triggers is not None and
+                        (connection_name not in
+                         self.pcontext.tenant.allowed_triggers)):
+                        raise UnknownConnection(connection_name)
+                    trigger = self.pcontext.connections.getTrigger(
+                        connection_name, trigger_config)
+                    pipeline.triggers.append(trigger)
+                    manager.event_filters.extend(
+                        trigger.getEventFilters(
+                            connection_name,
+                            conf['trigger'][connection_name],
+                            self.pcontext))
+                    seen_connections.add(connection_name)
 
         pipeline.connections = list(seen_connections)
         # Pipelines don't get frozen
@@ -1887,6 +1882,36 @@ class ParseContext(object):
         self.queue_parser = QueueParser(self)
         self.project_template_parser = ProjectTemplateParser(self)
         self.project_parser = ProjectParser(self)
+        acc = LocalAccumulator(self.loading_errors)
+        self._error_accumulators = [acc]
+
+    @property
+    def accumulator(self):
+        return self._error_accumulators[-1]
+
+    @contextmanager
+    def errorContext(self, stanza=None, conf=None, attr=None):
+        acc = self.accumulator.extend(stanza, conf, attr)
+        self._error_accumulators.append(acc)
+        try:
+            yield
+            # TODO: config error exception handling here
+        finally:
+            if len(self._error_accumulators) > 1:
+                self._error_accumulators.pop()
+
+    @contextmanager
+    def confAttr(self, conf, attr, default=None):
+        found = None
+        for k in conf.keys():
+            if k == attr:
+                found = k
+                break
+        if found is not None:
+            with self.errorContext(attr=found):
+                yield conf[found]
+        else:
+            yield default
 
     def getImpliedBranches(self, source_context):
         # If the user has set a pragma directive for this, use the
@@ -2651,21 +2676,19 @@ class TenantParser(object):
         # Handle pragma items first since they modify the source context
         # used by other classes.
         for config_pragma in unparsed_config.pragmas:
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'pragma', config_pragma)
-            with configuration_exceptions(local_accumulator):
-                pcontext.pragma_parser.fromYaml(
-                    config_pragma, local_accumulator)
+            with pcontext.errorContext('pragma', config_pragma):
+                # TODO drop this
+                with configuration_exceptions(pcontext.accumulator):
+                    pcontext.pragma_parser.fromYaml(config_pragma)
 
         for config_pipeline in unparsed_config.pipelines:
             classes = self._getLoadClasses(tenant, config_pipeline)
             if 'pipeline' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'pipeline', config_pipeline)
-            with configuration_exceptions(local_accumulator):
-                parsed_config.pipelines.append(
-                    pcontext.pipeline_parser.fromYaml(config_pipeline))
+            with pcontext.errorContext('pipeline', config_pipeline):
+                with configuration_exceptions(pcontext.accumulator):
+                    parsed_config.pipelines.append(
+                        pcontext.pipeline_parser.fromYaml(config_pipeline))
 
         for config_nodeset in unparsed_config.nodesets:
             classes = self._getLoadClasses(tenant, config_nodeset)
@@ -2691,12 +2714,10 @@ class TenantParser(object):
             classes = self._getLoadClasses(tenant, config_job)
             if 'job' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'job', config_job)
-            with configuration_exceptions(local_accumulator):
-                parsed_config.jobs.append(
-                    pcontext.job_parser.fromYaml(
-                        config_job, local_accumulator))
+            with pcontext.errorContext('job', config_job):
+                with configuration_exceptions(pcontext.accumulator):
+                    parsed_config.jobs.append(
+                        pcontext.job_parser.fromYaml(config_job))
 
         for config_semaphore in unparsed_config.semaphores:
             classes = self._getLoadClasses(tenant, config_semaphore)
@@ -2733,19 +2754,18 @@ class TenantParser(object):
             classes = self._getLoadClasses(tenant, config_project)
             if 'project' not in classes:
                 continue
-            local_accumulator = LocalAccumulator(
-                loading_errors, 'project', config_project)
-            with configuration_exceptions(local_accumulator):
-                # we need to separate the regex projects as they are
-                # processed differently later
-                name = config_project.get('name')
-                parsed_project = pcontext.project_parser.fromYaml(
-                    config_project, local_accumulator)
-                if name and name.startswith('^'):
-                    parsed_config.projects_by_regex.setdefault(
-                        name, []).append(parsed_project)
-                else:
-                    parsed_config.projects.append(parsed_project)
+            with pcontext.errorContext('project', config_project):
+                with configuration_exceptions(pcontext.accumulator):
+                    # we need to separate the regex projects as they are
+                    # processed differently later
+                    name = config_project.get('name')
+                    parsed_project = pcontext.project_parser.fromYaml(
+                        config_project)
+                    if name and name.startswith('^'):
+                        parsed_config.projects_by_regex.setdefault(
+                            name, []).append(parsed_project)
+                    else:
+                        parsed_config.projects.append(parsed_project)
 
         return parsed_config
 
