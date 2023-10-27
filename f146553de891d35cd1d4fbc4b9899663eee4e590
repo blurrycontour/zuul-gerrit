@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "f146553de891d35cd1d4fbc4b9899663eee4e590",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ade45d1d_3730aa03",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-10-27T10:27:31Z",
+      "side": 1,
+      "message": "Thanks, I added a test asserting that we only issue the expected merge requests.\n\nRe. you point on always-dynamic-branches: According to the docs[0] we only support pre-merge and gating jobs for those branches. This is also the current behavior and I added a test for that as well.\n\nhttps://zuul-ci.org/docs/zuul/latest/tenants.html#attr-tenant.untrusted-projects.%3Cproject%3E.always-dynamic-branches",
+      "revId": "f146553de891d35cd1d4fbc4b9899663eee4e590",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
