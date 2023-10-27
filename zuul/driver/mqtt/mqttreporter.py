@@ -91,7 +91,7 @@ class MQTTReporter(BaseReporter):
                 retry_builds = item.current_build_set.getRetryBuildsForJob(
                     job.name)
                 for build in retry_builds:
-                    (result, url) = item.formatJobResult(job, build)
+                    (result, web_url) = item.formatJobResult(job, build)
                     retry_build_information = {
                         'job_name': job.name,
                         'voting': job.voting,
@@ -99,7 +99,8 @@ class MQTTReporter(BaseReporter):
                         'start_time': build.start_time,
                         'end_time': build.end_time,
                         'execute_time': build.execute_time,
-                        'log_url': url,
+                        'log_url': build.log_url,
+                        'web_url': web_url,
                         'result': result,
                     }
                     message['buildset']['retry_builds'].append(
