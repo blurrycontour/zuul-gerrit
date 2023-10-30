@@ -107,6 +107,46 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9b85a14c_eb788029",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-10-30T14:50:43Z",
+      "side": 1,
+      "message": "I know this is just code that moved here, but I\u0027m wondering if the the error header format is correct? It looks like this should be a comma separated list of attribute-value pairs.",
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47010d83_46e39754",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-10-30T14:50:43Z",
+      "side": 1,
+      "message": "nit: typo",
+      "range": {
+        "startLine": 407,
+        "startChar": 22,
+        "endLine": 407,
+        "endChar": 29
+      },
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2ea1d636_7eafb891",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 2
