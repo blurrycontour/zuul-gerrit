@@ -158,6 +158,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8f0eb6f_3a6d5f70",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-10-30T18:41:22Z",
+      "side": 1,
+      "message": "Right, I saw that; just pointing out the inconsistency with the mozilla docs, and the lack of clarity in the rfc text.  For example, rfc 6750 references rfc 2617 for the definition of the www-authenticate header format, and that deals exclusively with digest authentication leaving us to make some leaps of inference to apply it to oauth.  While section 1.2 of 2617 mentions commas, the actual BNF in section 3.2.1 doesn\u0027t include them.\n\nI agree with you that it\u0027s more probable than not that including commas is the most correct behavior.  But it\u0027s unclear enough that I think we should take care and validate any changes with several browsers and environments.",
+      "parentUuid": "b11a25a8_003528ca",
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47010d83_46e39754",
