@@ -1,4 +1,5 @@
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -32,16 +33,19 @@ from zuul.lib.statsd import normalize_statsd_name
 import tests.base
 from tests.base import iterate_timeout, ZuulWebFixture, FIXTURE_DIR
 
+import jwt
 from ws4py.client import WebSocketBaseClient
 
 
 class WSClient(WebSocketBaseClient):
-    def __init__(self, port, build_uuid):
+    def __init__(self, port, build_uuid, tenant='tenant-one', token=None):
         self.port = port
         self.build_uuid = build_uuid
+        self.token = token
         self.results = ''
+        self.close_results = None
         self.event = threading.Event()
-        uri = 'ws://[::1]:%s/api/tenant/tenant-one/console-stream' % port
+        uri = f'ws://[::1]:{port}/api/tenant/{tenant}/console-stream'
         super(WSClient, self).__init__(uri)
 
         self.thread = threading.Thread(target=self.run)
@@ -51,9 +55,15 @@ class WSClient(WebSocketBaseClient):
         if message.is_text:
             self.results += message.data.decode('utf-8')
 
+    def closed(self, code, reason=None):
+        self.close_results = (code, reason)
+        super().closed(code, reason)
+
     def run(self):
         self.connect()
         req = {'uuid': self.build_uuid, 'logfile': None}
+        if self.token:
+            req['token'] = self.token
         self.send(json.dumps(req))
         self.event.set()
         super(WSClient, self).run()
@@ -225,6 +235,11 @@ class TestStreamingBase(tests.base.AnsibleZuulTestCase):
         gateway_port = gateway.server.socket.getsockname()[1]
         return gateway, (self.host, gateway_port)
 
+    def runWSClient(self, *args, **kw):
+        client = WSClient(*args, **kw)
+        client.event.wait()
+        return client
+
 
 class TestStreaming(TestStreamingBase):
 
@@ -303,11 +318,6 @@ class TestStreaming(TestStreamingBase):
         pattern = r'ok: "(one|two|three)"'
         m = re.search(pattern, self.streaming_data[None])
         self.assertNotEqual(m, None)
-
-    def runWSClient(self, port, build_uuid):
-        client = WSClient(port, build_uuid)
-        client.event.wait()
-        return client
 
     def test_decode_boundaries(self):
         '''
@@ -628,6 +638,104 @@ class TestStreaming(TestStreamingBase):
         self.log.debug("\n\nFile contents: %s\n\n", file_contents)
         self.log.debug("\n\nStreamed: %s\n\n", self.streaming_data[None])
         self.assertEqual(file_contents, self.streaming_data[None])
+
+
+class TestAuthWebsocketStreaming(TestStreamingBase):
+    config_file = 'zuul-admin-web.conf'
+    tenant_config_file = 'config/auth-streamer/main.yaml'
+
+    def test_auth_websocket_streaming(self):
+        # Start the web server
+        web = self.useFixture(
+            ZuulWebFixture(self.changes, self.config,
+                           self.additional_event_queues, self.upstream_root,
+                           self.poller_events,
+                           self.git_url_with_auth, self.addCleanup,
+                           self.test_root))
+
+        # Start the finger streamer daemon
+        streamer = zuul.lib.log_streamer.LogStreamer(
+            self.host, 0, self.executor_server.jobdir_root)
+        self.addCleanup(streamer.stop)
+
+        # Need to set the streaming port before submitting the job
+        finger_port = streamer.server.socket.getsockname()[1]
+        self.executor_server.log_streaming_port = finger_port
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+        # We don't have any real synchronization for the ansible jobs, so
+        # just wait until we get our running build.
+        for x in iterate_timeout(30, "build"):
+            if len(self.builds):
+                break
+        build = self.builds[0]
+        self.assertEqual(build.name, 'python27')
+
+        build_dir = os.path.join(self.executor_server.jobdir_root, build.uuid)
+        for x in iterate_timeout(30, "build dir"):
+            if os.path.exists(build_dir):
+                break
+
+        # Need to wait to make sure that jobdir gets set
+        for x in iterate_timeout(30, "jobdir"):
+            if build.jobdir is not None:
+                break
+            build = self.builds[0]
+
+        # Wait for the job to begin running and create the ansible log file.
+        # The job waits to complete until the flag file exists, so we can
+        # safely access the log here. We only open it (to force a file handle
+        # to be kept open for it after the job finishes) but wait to read the
+        # contents until the job is done.
+        ansible_log = os.path.join(build.jobdir.log_root, 'job-output.txt')
+        for x in iterate_timeout(30, "ansible log"):
+            if os.path.exists(ansible_log):
+                break
+        logfile = open(ansible_log, 'r')
+        self.addCleanup(logfile.close)
+
+        # Attempt to stream the log without an authz token
+        client1 = self.runWSClient(web.port, build.uuid)
+        client1.thread.join()
+        self.assertEqual(
+            (4000, b'Missing "Authorization" header'),
+            client1.close_results)
+
+        # Attempt to bypass authz by using a valid token with a
+        # different tenant
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'groups': ['users'],
+                 'exp': int(time.time()) + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        client2 = self.runWSClient(web.port, build.uuid, tenant='tenant-two',
+                                   token=token)
+        client2.thread.join()
+        self.assertEqual(
+            (4011, b'Build not found'),
+            client2.close_results)
+
+        # Finally, use a valid token
+        client3 = self.runWSClient(web.port, build.uuid, token=token)
+
+        # Allow the job to complete
+        flag_file = os.path.join(build_dir, 'test_wait')
+        open(flag_file, 'w').close()
+
+        # Wait for the websocket client to complete, which it should when
+        # it's received the full log.
+        client3.thread.join()
+
+        self.waitUntilSettled()
+
+        file_contents = logfile.read()
+        self.log.debug("\n\nFile contents: %s\n\n", file_contents)
+        self.log.debug("\n\nStreamed: %s\n\n", client3.results)
+        self.assertEqual(file_contents, client3.results)
 
 
 class CountingFingerRequestHandler(zuul.lib.fingergw.RequestHandler):

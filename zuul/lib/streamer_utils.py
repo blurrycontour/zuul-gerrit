@@ -176,7 +176,8 @@ class CustomThreadingTCPServer(socketserver.ThreadingTCPServer):
         return sock, addr
 
 
-def getJobLogStreamAddress(executor_api, uuid, source_zone):
+def getJobLogStreamAddress(executor_api, uuid, source_zone,
+                           tenant_name=None):
     """
     Looks up the log stream address for the given build UUID.
 
@@ -194,6 +195,11 @@ def getJobLogStreamAddress(executor_api, uuid, source_zone):
     build_request, zk_worker_zone = executor_api.getByUuid(uuid)
 
     if build_request is None:
+        raise StreamingError("Build not found")
+
+    if tenant_name is not None and build_request.tenant_name != tenant_name:
+        # Intentionally the same error as above to avoid leaking
+        # out-of-tenant build information.
         raise StreamingError("Build not found")
 
     worker_info = build_request.worker_info
