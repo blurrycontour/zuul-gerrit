@@ -122,6 +122,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b11a25a8_003528ca",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-10-30T15:05:57Z",
+      "side": 1,
+      "message": "Excellent question.  https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/WWW-Authenticate indicates that the header is a comma-separated series of challenges each with their own format schemes.  That seems to match what we\u0027re doing.\n\nhttps://datatracker.ietf.org/doc/html/rfc6750 and the other RFCs it reference do not seem to make it clear at quick glance how to combine multiple challenges.  However, they do show examples where a single challenge uses comma-separated tokens.\n\nI\u0027m not sure we should change this here and now, but I agree it\u0027s worth further investigation.",
+      "parentUuid": "9b85a14c_eb788029",
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47010d83_46e39754",
