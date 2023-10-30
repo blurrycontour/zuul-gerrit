@@ -140,6 +140,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f978328b_049b33a9",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-10-30T15:10:49Z",
+      "side": 1,
+      "message": "In the OAuth2 bearer token RFC at the end of section 3 there is an example using `error` and `error_description` https://www.rfc-editor.org/rfc/rfc6750#section-3",
+      "parentUuid": "b11a25a8_003528ca",
+      "revId": "18fb324f1ee49d41ed50d2dc9ba1ff127eda3ddf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47010d83_46e39754",
