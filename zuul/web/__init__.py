@@ -1491,6 +1491,67 @@ class ZuulWebAPI(object):
         data = self.buildToDict(data[0], data[0].buildset)
         return data
 
+    def buildTimeToDict(self, build):
+        start_time = self._datetimeToString(build.start_time)
+        end_time = self._datetimeToString(build.end_time)
+        if build.start_time and build.end_time:
+            duration = (build.end_time -
+                        build.start_time).total_seconds()
+        else:
+            duration = None
+
+        ret = {
+            '_id': build.id,
+            'uuid': build.uuid,
+            'job_name': build.job_name,
+            'result': build.result,
+            'start_time': start_time,
+            'end_time': end_time,
+            'duration': duration,
+            'final': build.final,
+            'project': build.ref.project,
+            'branch': build.ref.branch,
+            'pipeline': build.buildset.pipeline,
+            'ref': build.ref.ref,
+        }
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.check_tenant_auth()
+    def build_times(self, tenant_name, tenant, auth, project=None,
+                    pipeline=None, branch=None,
+                    ref=None, job_name=None,
+                    final=None,
+                    start_time=None, end_time=None,
+                    limit=50, skip=0,
+                    exclude_result=None):
+        connection = self._get_connection()
+
+        if tenant_name not in self.zuulweb.abide.tenants.keys():
+            raise cherrypy.HTTPError(
+                404,
+                f'Tenant {tenant_name} does not exist.')
+
+        # If final is None, we return all builds, both final and non-final
+        if final is not None:
+            final = final.lower() == "true"
+
+        build_times = connection.getBuildTimes(
+            tenant=tenant_name, project=project, pipeline=pipeline,
+            branch=branch, ref=ref,
+            job_name=job_name,
+            final=final,
+            limit=limit, offset=skip,
+            exclude_result=exclude_result,
+            start_time=start_time,
+            end_time=end_time,
+            query_timeout=self.query_timeout)
+
+        return [self.buildTimeToDict(b) for b in build_times]
+
     def buildsetToDict(self, buildset, builds=[]):
         event_timestamp = self._datetimeToString(buildset.event_timestamp)
         start = self._datetimeToString(buildset.first_build_start_time)
@@ -2075,6 +2136,8 @@ class ZuulWeb(object):
                           controller=api, action='buildsets')
         route_map.connect('api', '/api/tenant/{tenant_name}/buildset/{uuid}',
                           controller=api, action='buildset')
+        route_map.connect('api', '/api/tenant/{tenant_name}/build-times',
+                          controller=api, action='build_times')
         route_map.connect('api', '/api/tenant/{tenant_name}/config-errors',
                           controller=api, action='config_errors')
 
