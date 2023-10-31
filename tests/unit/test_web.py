@@ -1974,6 +1974,16 @@ class TestBuildInfo(BaseTestWeb):
                                        "idx_min=%i" % idx_max).json()
         self.assertEqual(len(buildsets_query), 1, buildsets_query)
 
+    def test_web_list_build_times(self):
+        # Generate some build records in the db.
+        self.add_base_changes()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        builds = self.get_url("api/tenant/tenant-one/build-times").json()
+        self.assertEqual(len(builds), 6)
+
     @simple_layout('layouts/empty-check.yaml')
     def test_build_error(self):
         conf = textwrap.dedent(

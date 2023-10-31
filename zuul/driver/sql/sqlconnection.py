@@ -255,6 +255,66 @@ class DatabaseSession(object):
         except sqlalchemy.orm.exc.MultipleResultsFound:
             raise Exception("Multiple builds found with uuid %s", uuid)
 
+    def getBuildTimes(self, tenant=None, project=None, pipeline=None,
+                      branch=None,
+                      ref=None,
+                      start_time=None,
+                      end_time=None,
+                      job_name=None,
+                      final=None,
+                      sort_by_buildset=False,
+                      limit=50,
+                      offset=0,
+                      exclude_result=None,
+                      query_timeout=None):
+
+        ref_table = self.connection.zuul_ref_table
+        build_table = self.connection.zuul_build_table
+        buildset_table = self.connection.zuul_buildset_table
+
+        # contains_eager allows us to perform eager loading on the
+        # buildset *and* use that table in filters (unlike
+        # joinedload).
+        q = self.session().query(self.connection.buildModel).\
+            join(self.connection.buildSetModel).\
+            join(self.connection.refModel).\
+            options(orm.contains_eager(self.connection.buildModel.buildset),
+                    orm.contains_eager(self.connection.buildModel.ref))
+
+        if query_timeout:
+            # For MySQL, we can add a query hint directly.
+            q = q.prefix_with(
+                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
+                dialect='mysql')
+            # For Postgres, we add a comment that we parse in our
+            # event handler.
+            q = q.with_statement_hint(
+                f'/* statement_timeout={query_timeout} */',
+                dialect_name='postgresql')
+
+        q = self.listFilter(q, buildset_table.c.tenant, tenant)
+        q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
+        q = self.listFilter(q, ref_table.c.project, project)
+        q = self.listFilter(q, ref_table.c.branch, branch)
+        q = self.listFilter(q, ref_table.c.ref, ref)
+        q = self.listFilter(q, build_table.c.job_name, job_name)
+        q = self.exListFilter(q, build_table.c.result, exclude_result)
+        q = self.listFilter(q, build_table.c.final, final)
+        if start_time:
+            # Intentionally using end_time here
+            q = q.filter(build_table.c.end_time >= start_time)
+        if end_time:
+            q = q.filter(build_table.c.end_time <= end_time)
+        # Only complete builds
+        q = q.filter(build_table.c.result != None)  # noqa
+        q = q.order_by(build_table.c.end_time.desc())
+        q = q.limit(limit).offset(offset)
+
+        try:
+            return q.all()
+        except sqlalchemy.orm.exc.NoResultFound:
+            return []
+
     def createBuildSet(self, *args, **kw):
         bs = self.connection.buildSetModel(*args, **kw)
         self.session().add(bs)
@@ -527,6 +587,7 @@ class SQLConnection(BaseConnection):
                 RefModel,
                 secondary=self.table_prefix + BUILDSET_REF_TABLE)
             sa.Index(self.table_prefix + 'zuul_buildset_uuid_idx', uuid)
+            sa.Index(self.table_prefix + 'zuul_buildset_tenant_idx', tenant)
 
             def createBuild(self, ref, *args, **kw):
                 session = orm.session.Session.object_session(self)
@@ -582,6 +643,7 @@ class SQLConnection(BaseConnection):
             buildset = orm.relationship(BuildSetModel,
                                         backref=orm.backref(
                                             "builds",
+                                            order_by=id,
                                             cascade="all, delete-orphan"))
             ref = orm.relationship(RefModel)
 
@@ -593,6 +655,8 @@ class SQLConnection(BaseConnection):
                      buildset_id)
             sa.Index(self.table_prefix + 'zuul_build_ref_id_idx',
                      ref_id)
+            sa.Index(self.table_prefix + 'zuul_build_end_time_idx',
+                     end_time)
 
             @property
             def duration(self):
@@ -731,3 +795,8 @@ class SQLConnection(BaseConnection):
         """Delete buildsets"""
         with self.getSession() as db:
             return db.deleteBuildsets(*args, **kw)
+
+    def getBuildTimes(self, *args, **kw):
+        """Return a list of Build objects"""
+        with self.getSession() as db:
+            return db.getBuildTimes(*args, **kw)
