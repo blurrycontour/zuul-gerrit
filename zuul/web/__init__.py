@@ -1271,6 +1271,8 @@ class ZuulWebAPI(object):
                 (severity is None or e.severity == severity) and
                 (name is None or e.name == name)):
                 continue
+            if e.name == "Regex Deprecation":
+                continue
             count += 1
             if count <= skip:
                 continue
