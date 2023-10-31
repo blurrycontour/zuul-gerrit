@@ -1267,6 +1267,7 @@ class ZuulWebAPI(object):
                 'name': e.name,
             }
             for e in tenant.layout.loading_errors.errors
+            if e.name != "Regex Deprecation"
         ]
         return ret
 
