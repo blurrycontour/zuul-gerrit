@@ -171,6 +171,8 @@ class ZuulMark:
         )
 
     def __eq__(self, other):
+        if not isinstance(other, ZuulMark):
+            return False
         return (self.line == other.line and
                 self.snippet == other.snippet)
 
