@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e8d4ca3_a34c85ef",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 4561,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-06T22:14:20Z",
+      "side": 1,
+      "message": "Nit: this could probably use a MODEL \u003c 18 tag so we remember to clean up the job_name later.",
+      "revId": "369f4c9a3a9cf1f99ee170cf250db45ebbc0f960",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
