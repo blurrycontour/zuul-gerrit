@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "756aea9c_9db5882a",
+        "filename": "zuul/driver/gerrit/gerrittrigger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-06T22:33:11Z",
+      "side": 1,
+      "message": "Are we not get_conf_attr\u0027ing these items in order to keep the scope down on the initial implementation?",
+      "revId": "a29b7e75af47631c4149491bfd84ef416cda3dc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9992ce9_e3495de7",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-06T22:33:11Z",
+      "side": 1,
+      "message": "It looks like line and self.line may be the same value? When we call getLineSnippet() the input line value is retrieved from _start_mark.line or get_attr(FancyString, \"line\") both of which I think roughly correspond to self.line.\n\nIs it a bug to substract that value twice here? we should always end up with negative values in that case resulting in a start of 0?",
+      "range": {
+        "startLine": 180,
+        "startChar": 20,
+        "endLine": 180,
+        "endChar": 36
+      },
+      "revId": "a29b7e75af47631c4149491bfd84ef416cda3dc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
