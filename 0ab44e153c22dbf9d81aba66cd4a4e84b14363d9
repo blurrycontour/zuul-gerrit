@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77622426_36014857",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2350,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-06T23:46:44Z",
+      "side": 1,
+      "message": "Aren\u0027t we keeping the accumulators in thread local memory to avoid this problem?",
+      "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ceb7af97_9136b782",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2480,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-06T23:46:44Z",
+      "side": 1,
+      "message": "The change of code in this block illustrates something I\u0027m a little concerned with in this change. Previously we would raise exceptions which would cause execution to bubble up for some exceptions. But now we\u0027re accumulating the errors in the accumulator without raising in all cases. I think in the long run not having as much conditional behavior is easier to understand, but it does make it difficult to know if in each individual instance we\u0027ve got new control flow.\n\nRelated: it feels a little weird to use Exceptions without raising them. Why not raise in all cases and have the context managers add the resulting errors to the accumulators? I guess because of the control flow problem above where we may not want to short circuit?",
+      "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0cfbafa1_52537d1f",
+        "filename": "zuul/driver/timer/timertrigger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-06T23:46:44Z",
+      "side": 1,
+      "message": "We are dropping the error_accumulator/parse_context here because \u0027timer\u0027 is always a valid regex?",
+      "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
