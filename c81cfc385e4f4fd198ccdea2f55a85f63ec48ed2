@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "40c2137b_e088da56",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-06T22:38:22Z",
+      "side": 1,
+      "message": "This probably warrants a release note.",
+      "revId": "c81cfc385e4f4fd198ccdea2f55a85f63ec48ed2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "38557e6a_e473881b",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 12
@@ -14,6 +31,40 @@
       "writtenOn": "2023-11-02T14:33:54Z",
       "side": 1,
       "message": "PS12 resolved a merge conflict",
+      "revId": "c81cfc385e4f4fd198ccdea2f55a85f63ec48ed2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5019b3f_ee59a4f2",
+        "filename": "doc/source/developer/model-changelog.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-06T22:38:22Z",
+      "side": 1,
+      "message": "I think it would be useful to note that this \"Affects schedulers and executors.\"",
+      "revId": "c81cfc385e4f4fd198ccdea2f55a85f63ec48ed2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb50d49e_ed404828",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 1079,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-06T22:38:22Z",
+      "side": 1,
+      "message": "This is essentially equivalent to the \"combined_vars\" before, which was named to indicate that it was parent variables plus job variables.  Seeing it here next to \"secret_vars\" makes me wonder if it\u0027s a superset of secret_vars (it\u0027s not).  Granted, the name \"combined_vars\" isn\u0027t much better in that regard, but it\u0027s not as definitive as \"all\".\n\nIf you want to rename it, maybe we could name it \"normal_vars\"?\n\nBoth of these methods are \"combined\" (ie, parent + job), so I don\u0027t think it\u0027s useful to add that descriptor anymore.",
       "revId": "c81cfc385e4f4fd198ccdea2f55a85f63ec48ed2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
