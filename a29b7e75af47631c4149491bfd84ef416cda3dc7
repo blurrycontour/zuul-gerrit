@@ -75,6 +75,24 @@
       "parentUuid": "f9992ce9_e3495de7",
       "revId": "a29b7e75af47631c4149491bfd84ef416cda3dc7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "452bb88d_bd899fc9",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-07T16:26:41Z",
+      "side": 1,
+      "message": "Thank you. Having the example here helps a lot.",
+      "parentUuid": "01a41718_ab4bad78",
+      "revId": "a29b7e75af47631c4149491bfd84ef416cda3dc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
