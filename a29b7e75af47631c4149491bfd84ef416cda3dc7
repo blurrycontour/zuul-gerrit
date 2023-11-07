@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d461f0d_8415162d",
+        "filename": "zuul/driver/gerrit/gerrittrigger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-07T00:05:21Z",
+      "side": 1,
+      "message": "Exactly; I think once this (and followup) change are in, we can update other attributes piecemeal.  They will stay status quo (low-resolution error messages) in the mean time.",
+      "parentUuid": "756aea9c_9db5882a",
+      "revId": "a29b7e75af47631c4149491bfd84ef416cda3dc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9992ce9_e3495de7",
@@ -37,6 +55,24 @@
         "endLine": 180,
         "endChar": 36
       },
+      "revId": "a29b7e75af47631c4149491bfd84ef416cda3dc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01a41718_ab4bad78",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-07T00:05:21Z",
+      "side": 1,
+      "message": "There are two cases for line:\n1) The start line of this config object (example, a zuul \"job\" defn); this is _start_mark.line\n2) The start line of this attribute (example, the \"branches\" attr of the job defn); this is get_attr\n\nIn the first case, that works out to:  max(N-N-4, 0) -\u003e max(-4, 0) -\u003e 0.  That means we start our snippet at the start of the object definition.  Then we end the snippet 9 lines later.  That\u0027s basically what we would do today, except we\u0027d include the whole config object, even if it\u0027s 1000 lines long (exception: we truncate it when reporting to gerrit because gerrit has an api message length limit).\n\nThe second case is more new behavior.  Let\u0027s say our \"branches\" attribute is 15 lines into the config object (and the config object starts at line 0):  max(15 - 0 - 4, 0) -\u003e max(11, 0) -\u003e 11.  So we start the snippet on line 11, and include the next 9 lines.  That puts our error line (15) exactly in the center of the snippet.",
+      "parentUuid": "f9992ce9_e3495de7",
       "revId": "a29b7e75af47631c4149491bfd84ef416cda3dc7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
