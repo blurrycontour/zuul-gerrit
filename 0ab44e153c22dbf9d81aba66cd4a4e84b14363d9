@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4a7df5b7_acb5d871",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2350,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-07T00:27:09Z",
+      "side": 1,
+      "message": "The thread-local storage on the parse context is a safety to make sure we don\u0027t accidentally use that value in places like this.  So it should actually be None since it was never set by this thread (only the \"main\" thread which is driving the config loading).  If we touched it, we\u0027d throw a null dereference error.  That\u0027s the safety.\n\nInstead, the main thread passes in the accumulator as a parameter to this method and we use local references for it.  Each thread in the threadpool will do the same.  They\u0027ll all ultimately append to the same actual accumulator object, and that\u0027s fine.  They just each need to extend it with their own sounce_context since they will be different.\n\nPut another way: the main thread uses the parse context object to maintain its accumulator and push new contexts onto the stack as it goes deeper into the config.  But these threadpool methods operate in parallel with no place to put a context stack, so they just pass around local variables as they extend the context.\n\nThe comment in the other location about maybe enhanging the thread-local storage is basically about the idea of extending the context stack management we have in the main thread to threadpool functions like this.  It would almost be straightforward, except that these are thread *pool* executors, which means the threads stick around for a while, so we would need to make sure to re-initialize the context stack for each individual thread every time it starts running a threadpool executor function.  There isn\u0027t an automatic way to do that with the standard library (the \"init\" method there is for creating a new thread, not checking out an existing thread from the pool), so it\u0027s a bit too much work for now.  But I\u0027m pretty sure we could do it eventually, then this code and the main thread code can look the same.",
+      "parentUuid": "77622426_36014857",
+      "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ceb7af97_9136b782",
         "filename": "zuul/configloader.py",
         "patchSetId": 3
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a1972a22_c7171e58",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2480,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-07T00:27:09Z",
+      "side": 1,
+      "message": "I agree with you, so let me share why I think this pattern is actually the most clear way to do what we want:\n\nThe old code here added an exception handler with a single statement inside of the try block, and that single statement was to raise an exception.  That seems like such an unusual pattern to me that whenever I see it (and I wrote it!), I think we\u0027re raising the exception to be handled by something outside the block.  I do a double take and remind myself that \"with project_configuration_exceptions\" actually means \"note the exception and continue\".\n\nThis change refactors that into a method called \"catchErrors\".  So we could rewrite this as:\n\n  with error_accumulator.catchErrors():\n      raise MultipleProjectConfigurations(source_context)\n\nWhich is at least slightly more clear, but it still has the weird raise-and-immediate-catch pattern.\n\nI like the code as written here because now we can use two very distinct patterns depending on what we want to do.  If we\u0027re in a situation where we want to bail out to a higher level, then we just \"raise\" the exception and let the nearest catchErrors handle it.\n\nBut if, like in this case, we just noted some anomaly and want to continue processing in this method without bailing out to a higher level, then we can just add our error or warning to the accumulator and move on.  It seems to me that this flow expresses the intent more deliberately.",
+      "parentUuid": "ceb7af97_9136b782",
+      "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0cfbafa1_52537d1f",
         "filename": "zuul/driver/timer/timertrigger.py",
         "patchSetId": 3
@@ -48,6 +84,24 @@
       "writtenOn": "2023-11-06T23:46:44Z",
       "side": 1,
       "message": "We are dropping the error_accumulator/parse_context here because \u0027timer\u0027 is always a valid regex?",
+      "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2843c07c_a0e948fc",
+        "filename": "zuul/driver/timer/timertrigger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-07T00:27:09Z",
+      "side": 1,
+      "message": "Yes.",
+      "parentUuid": "0cfbafa1_52537d1f",
       "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
