@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3160e13_b8e878d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-07T23:23:35Z",
+      "side": 1,
+      "message": "This looks ok to me. I think my only remaining concern is that with big structural refactors like this python makes it difficult to be super confident simply due to its flexibility. However, we have fairly extensive testing of Zuul in CI and I believe that covers a variety of conf error cases as well. Basically the overall restructuring makes sense and I don\u0027t see any obvious errors.",
+      "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77622426_36014857",
@@ -36,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "871d4f08_cc0c88dd",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2350,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-07T23:23:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4a7df5b7_acb5d871",
+      "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ceb7af97_9136b782",
@@ -67,6 +102,24 @@
       "side": 1,
       "message": "I agree with you, so let me share why I think this pattern is actually the most clear way to do what we want:\n\nThe old code here added an exception handler with a single statement inside of the try block, and that single statement was to raise an exception.  That seems like such an unusual pattern to me that whenever I see it (and I wrote it!), I think we\u0027re raising the exception to be handled by something outside the block.  I do a double take and remind myself that \"with project_configuration_exceptions\" actually means \"note the exception and continue\".\n\nThis change refactors that into a method called \"catchErrors\".  So we could rewrite this as:\n\n  with error_accumulator.catchErrors():\n      raise MultipleProjectConfigurations(source_context)\n\nWhich is at least slightly more clear, but it still has the weird raise-and-immediate-catch pattern.\n\nI like the code as written here because now we can use two very distinct patterns depending on what we want to do.  If we\u0027re in a situation where we want to bail out to a higher level, then we just \"raise\" the exception and let the nearest catchErrors handle it.\n\nBut if, like in this case, we just noted some anomaly and want to continue processing in this method without bailing out to a higher level, then we can just add our error or warning to the accumulator and move on.  It seems to me that this flow expresses the intent more deliberately.",
       "parentUuid": "ceb7af97_9136b782",
+      "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09db29a7_a4d44e73",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2480,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-07T23:23:35Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a1972a22_c7171e58",
       "revId": "0ab44e153c22dbf9d81aba66cd4a4e84b14363d9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
