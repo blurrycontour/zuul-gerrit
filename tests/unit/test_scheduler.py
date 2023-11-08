@@ -640,6 +640,41 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(self.getJobFromHistory('project-test1').result,
                          'SUCCESS')
 
+    @simple_layout('layouts/branch-repo-state.yaml')
+    def test_branch_repo_state(self):
+        """
+        Test that we schedule no initial merge for branch/ref events
+        and the the global repo state only if there are jobs to run.
+        """
+        del self.merge_job_history
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        # No merge expected as there are not jobs for project1 in the
+        # post pipeline.
+        self.assertIsNone(self.merge_job_history.get(
+            zuul.model.MergeRequest.REF_STATE))
+
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        B.setMerged()
+        self.fake_gerrit.addEvent(B.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        # One refstate merge request for the global repo state since
+        # there are jobs configured for project2 in the post pipeline.
+        refstate_jobs = self.merge_job_history.get(
+            zuul.model.MergeRequest.REF_STATE)
+        self.assertEqual(len(refstate_jobs), 1)
+
+        merge_request = refstate_jobs[0]
+        merge_items = {i["project"] for i in merge_request.payload["items"]}
+        self.assertEqual(
+            merge_items,
+            {"org/project1", "org/project2", "org/common-config"})
+
     def test_parallel_changes(self):
         "Test that changes are tested in parallel and merged in series"
 
