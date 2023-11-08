@@ -16,7 +16,7 @@
     "d3-graphviz": "2.6.1",
     "js-yaml": "^3.13.0",
     "lodash": "^4.17.10",
-    "moment": "^2.22.2",
+    "moment": "^2.29.4",
     "moment-duration-format": "2.3.2",
     "moment-timezone": "^0.5.28",
     "oidc-client": "^1.10.1",
