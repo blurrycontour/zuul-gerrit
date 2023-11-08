@@ -199,6 +199,17 @@ class TestTracing(ZuulTestCase):
         self.log.debug("Received:\n%s", build)
         jobexec = self.getSpan('JobExecution')
         self.log.debug("Received:\n%s", jobexec)
+
+        build_update_lock = self.getSpan('BuildRepoUpdateLock')
+        self.log.debug("Received:\n%s", build_update_lock)
+        build_update = self.getSpan('BuildRepoUpdate')
+        self.log.debug("Received:\n%s", build_update)
+        build_merge = self.getSpan('BuildMergeChanges')
+        self.log.debug("Received:\n%s", build_merge)
+        # BuildSetRepoState not exercised in this test
+        build_checkout = self.getSpan('BuildCheckout')
+        self.log.debug("Received:\n%s", build_checkout)
+
         self.assertEqual(item.trace_id, buildset.trace_id)
         self.assertEqual(item.trace_id, node_request.trace_id)
         self.assertEqual(item.trace_id, build.trace_id)
@@ -221,6 +232,16 @@ class TestTracing(ZuulTestCase):
                          buildset.span_id)
         self.assertEqual(buildset.parent_span_id,
                          item.span_id)
+
+        self.assertEqual(build_update_lock.parent_span_id,
+                         jobexec.span_id)
+        self.assertEqual(build_update.parent_span_id,
+                         jobexec.span_id)
+        self.assertEqual(build_merge.parent_span_id,
+                         jobexec.span_id)
+        self.assertEqual(build_checkout.parent_span_id,
+                         jobexec.span_id)
+
         item_attrs = attributes_to_dict(item.attributes)
         self.assertTrue(item_attrs['ref_number'] == "1")
         self.assertTrue(item_attrs['ref_patchset'] == "1")

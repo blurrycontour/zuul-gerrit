@@ -1,5 +1,5 @@
 # Copyright 2014 OpenStack Foundation
-# Copyright 2021-2022 Acme Gating, LLC
+# Copyright 2021-2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import contextlib
 import collections
 import copy
 import datetime
@@ -38,6 +39,7 @@ from kazoo.retry import KazooRetry
 
 import git
 from urllib.parse import urlsplit
+from opentelemetry import trace
 
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.result_data import get_warnings_from_result_data
@@ -776,7 +778,7 @@ class JobDir(object):
 
 class UpdateTask(object):
     def __init__(self, connection_name, project_name, repo_state=None,
-                 zuul_event_id=None, build=None):
+                 zuul_event_id=None, build=None, span_context=None):
         self.connection_name = connection_name
         self.project_name = project_name
         self.repo_state = repo_state
@@ -789,6 +791,7 @@ class UpdateTask(object):
         # These variables are used for log annotation
         self.zuul_event_id = zuul_event_id
         self.build = build
+        self.span_context = span_context
 
     def __eq__(self, other):
         if (other and other.connection_name == self.connection_name and
@@ -1128,8 +1131,10 @@ class AnsibleJob(object):
         with tracing.startSpanInContext(
                 self.build_request.span_context,
                 'JobExecution',
-                attributes={'hostname': self.executor_server.hostname}):
-            self.do_execute()
+                attributes={'hostname': self.executor_server.hostname}
+        ) as span:
+            with trace.use_span(span):
+                self.do_execute()
 
     def do_execute(self):
         try:
@@ -1300,6 +1305,7 @@ class AnsibleJob(object):
         self.executor_server.completeBuild(self.build_request, result)
 
     def _execute(self):
+        tracer = trace.get_tracer("zuul")
         args = self.arguments
         self.log.info(
             "Beginning job %s for ref %s (change %s)" % (
@@ -1321,7 +1327,10 @@ class AnsibleJob(object):
                 project['connection'], project['name'],
                 repo_state=self.repo_state,
                 zuul_event_id=self.zuul_event_id,
-                build=self.build_request.uuid))
+                build=self.build_request.uuid,
+                span_context=tracing.getSpanContext(
+                    trace.get_current_span()),
+            ))
             projects.add((project['connection'], project['name']))
 
         # ...as well as all playbook and role projects.
@@ -1340,7 +1349,10 @@ class AnsibleJob(object):
                 tasks.append(self.executor_server.update(
                     *key, repo_state=self.repo_state,
                     zuul_event_id=self.zuul_event_id,
-                    build=self.build_request.uuid))
+                    build=self.build_request.uuid,
+                    span_context=tracing.getSpanContext(
+                        trace.get_current_span()),
+                ))
                 projects.add(key)
 
         for task in tasks:
@@ -1413,8 +1425,12 @@ class AnsibleJob(object):
 
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
-            item_commit = self.doMergeChanges(
-                merger, merge_items, self.repo_state, restored_repos)
+            with tracer.start_as_current_span(
+                    'BuildMergeChanges',
+                    attributes={'connection': task.connection_name,
+                                'project': task.project_name}):
+                item_commit = self.doMergeChanges(
+                    merger, merge_items, self.repo_state, restored_repos)
             if item_commit is None:
                 # There was a merge conflict and we have already sent
                 # a work complete result, don't run any jobs
@@ -1428,9 +1444,13 @@ class AnsibleJob(object):
         for project in args['projects']:
             if (project['connection'], project['name']) in restored_repos:
                 continue
-            merger.setRepoState(
-                project['connection'], project['name'], self.repo_state,
-                process_worker=self.executor_server.process_worker)
+            with tracer.start_as_current_span(
+                    'BuildSetRepoState',
+                    attributes={'connection': project['connection'],
+                                'project': project['name']}):
+                merger.setRepoState(
+                    project['connection'], project['name'], self.repo_state,
+                    process_worker=self.executor_server.process_worker)
 
         # Early abort if abort requested
         if self.aborted:
@@ -1460,7 +1480,11 @@ class AnsibleJob(object):
             self.log.info("Checking out %s %s %s",
                           project['canonical_name'], selected_desc,
                           selected_ref)
-            commit = repo.checkout(selected_ref)
+            with tracer.start_as_current_span(
+                    'BuildCheckout',
+                    attributes={'connection': project['connection'],
+                                'project': project['name']}):
+                commit = repo.checkout(selected_ref)
 
             # Update the inventory variables to indicate the ref we
             # checked out
@@ -3692,9 +3716,25 @@ class ExecutorServer(BaseMergeServer):
         log = get_annotated_logger(
             self.log, task.zuul_event_id, build=task.build)
         try:
+            if task.span_context:
+                # We're inside of a TPE so we have to restore the
+                # parent span (we can't just "start_span").
+                lock_span = tracing.startSpanInContext(
+                    task.span_context,
+                    'BuildRepoUpdateLock',
+                    attributes={'connection': task.connection_name,
+                                'project': task.project_name})
+                update_span = tracing.startSpanInContext(
+                    task.span_context,
+                    'BuildRepoUpdate',
+                    attributes={'connection': task.connection_name,
+                                'project': task.project_name})
+            else:
+                lock_span = contextlib.nullcontext()
+                update_span = contextlib.nullcontext()
             lock = self.repo_locks.getRepoLock(
                 task.connection_name, task.project_name)
-            with lock:
+            with lock_span, lock, update_span:
                 log.info("Updating repo %s/%s",
                          task.connection_name, task.project_name)
                 self.merger.updateRepo(
@@ -3725,11 +3765,12 @@ class ExecutorServer(BaseMergeServer):
             task.setComplete()
 
     def update(self, connection_name, project_name, repo_state=None,
-               zuul_event_id=None, build=None):
+               zuul_event_id=None, build=None, span_context=None):
         # Update a repository in the main merger
 
         task = UpdateTask(connection_name, project_name, repo_state=repo_state,
-                          zuul_event_id=zuul_event_id, build=build)
+                          zuul_event_id=zuul_event_id, build=build,
+                          span_context=span_context)
         task = self.update_queue.put(task)
         return task
 
