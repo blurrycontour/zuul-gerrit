@@ -17,7 +17,7 @@
 
 import voluptuous as vs
 
-from zuul.configloader import ZUUL_REGEX, make_regex, get_conf_attr  # noqa
+from zuul.configloader import ZUUL_REGEX, make_regex  # noqa
 
 
 def time_to_seconds(s):

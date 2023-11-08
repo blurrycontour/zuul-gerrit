@@ -27,7 +27,7 @@ class BaseTrigger(object, metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def getEventFilters(self, connection_name, trigger_conf,
-                        error_accumulator):
+                        parse_context):
         """Return a list of EventFilter's for the scheduler to match against.
         """
 

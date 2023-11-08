@@ -25,10 +25,10 @@ class TimerTrigger(BaseTrigger):
     name = 'timer'
 
     def getEventFilters(self, connection_name, trigger_conf,
-                        error_accumulator):
+                        parse_context):
         efilters = []
         for trigger in to_list(trigger_conf):
-            types = [make_regex('timer', error_accumulator)]
+            types = [make_regex('timer')]
             f = TimerEventFilter(connection_name=connection_name,
                                  trigger=self,
                                  types=types,

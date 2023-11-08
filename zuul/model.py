@@ -3099,7 +3099,9 @@ class Job(ConfigObject):
     def __getattr__(self, name):
         v = self.__dict__.get(name)
         if v is None:
-            return self.attributes[name]
+            if name in self.attributes:
+                return self.attributes[name]
+            raise AttributeError
         return v
 
     def _get(self, name):

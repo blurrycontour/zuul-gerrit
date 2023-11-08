@@ -233,10 +233,10 @@ class TestGerritWeb(ZuulTestCase):
             """
             - job:
                 name: garbage-job
-                %s
+                description: %s
                 garbage: True
             """
-        ) % ('\n' * 16384)
+        ) % ('x' * 16384)
 
         file_dict = {'.zuul.yaml': in_repo_conf}
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',

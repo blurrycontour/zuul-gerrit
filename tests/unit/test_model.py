@@ -225,7 +225,7 @@ class TestJob(BaseTestCase):
                                   'run': 'playbooks/python27.yaml'}}
                 ]
             }
-        }, None)
+        })
         self.layout.addProjectConfig(project_config)
 
         change = model.Change(self.project)
@@ -290,7 +290,7 @@ class TestJob(BaseTestCase):
                     'python27',
                 ]
             }
-        }, None)
+        })
         self.layout.addProjectConfig(project_config)
 
         change = model.Change(self.project)
@@ -363,7 +363,7 @@ class TestJob(BaseTestCase):
                     'job'
                 ]
             }
-        }, None)
+        })
 
         self.layout.addProjectConfig(project_config)
 
@@ -442,7 +442,7 @@ class TestJob(BaseTestCase):
             'gate': {
                 'jobs': ['python27'],
             }
-        }, None)
+        })
         self.layout.addProjectConfig(project_config)
 
         change = model.Change(self.project)

@@ -25,15 +25,19 @@ class PagureTrigger(BaseTrigger):
     log = logging.getLogger("zuul.trigger.PagureTrigger")
 
     def getEventFilters(self, connection_name, trigger_config,
-                        error_accumulator):
+                        parse_context):
         efilters = []
+        pcontext = parse_context
         for trigger in to_list(trigger_config):
-            types = [make_regex(x, error_accumulator)
-                     for x in to_list(trigger['event'])]
-            refs = [make_regex(x, error_accumulator)
-                    for x in to_list(trigger.get('ref'))]
-            comments = [make_regex(x, error_accumulator)
-                        for x in to_list(trigger.get('comment'))]
+            with pcontext.confAttr(trigger, 'event') as attr:
+                types = [make_regex(x, pcontext)
+                         for x in to_list(attr)]
+            with pcontext.confAttr(trigger, 'ref') as attr:
+                refs = [make_regex(x, pcontext)
+                        for x in to_list(attr)]
+            with pcontext.confAttr(trigger, 'comment') as attr:
+                comments = [make_regex(x, pcontext)
+                            for x in to_list(attr)]
 
             f = PagureEventFilter(
                 connection_name=connection_name,
