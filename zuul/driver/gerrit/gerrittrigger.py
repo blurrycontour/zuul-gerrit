@@ -18,7 +18,13 @@ import voluptuous as v
 from zuul.trigger import BaseTrigger
 from zuul.driver.gerrit.gerritmodel import GerritEventFilter
 from zuul.driver.gerrit import gerritsource
-from zuul.driver.util import scalar_or_list, to_list, make_regex, ZUUL_REGEX
+from zuul.driver.util import (
+    scalar_or_list,
+    to_list,
+    make_regex,
+    ZUUL_REGEX,
+    get_conf_attr,
+)
 from zuul.configloader import DeprecationWarning
 
 
@@ -58,11 +64,13 @@ class GerritTrigger(BaseTrigger):
                 usernames = to_list(trigger.get('username_filter'))
             ignore_deletes = trigger.get('ignore-deletes', True)
             if 'require-approval' in trigger:
-                error_accumulator.addError(
-                    GerritRequireApprovalDeprecation())
+                acc, _ = get_conf_attr(trigger, 'require-approval',
+                                       error_accumulator)
+                acc.addError(GerritRequireApprovalDeprecation())
             if 'reject-approval' in trigger:
-                error_accumulator.addError(
-                    GerritRejectApprovalDeprecation())
+                acc, _ = get_conf_attr(trigger, 'reject-approval',
+                                       error_accumulator)
+                acc.addError(GerritRejectApprovalDeprecation())
 
             types = [make_regex(x, error_accumulator)
                      for x in to_list(trigger['event'])]

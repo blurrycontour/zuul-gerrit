@@ -176,6 +176,25 @@ class ZuulMark:
         return (self.line == other.line and
                 self.snippet == other.snippet)
 
+    line_snippet_context = 4
+
+    def getLineSnippet(self, line):
+        start = max(line - self.line - self.line_snippet_context, 0)
+        end = start + (self.line_snippet_context * 2) + 1
+        all_lines = self.snippet.splitlines()
+        lines = all_lines[start:end]
+        if start > 0:
+            lines.insert(0, '...')
+        if end < len(all_lines):
+            lines.append('...')
+        return '\n'.join(lines)
+
+    def getLineLocation(self, line):
+        return '  in "{name}", line {line}'.format(
+            name=self.name,
+            line=line + 1,
+        )
+
     def serialize(self):
         return {
             "name": self.name,

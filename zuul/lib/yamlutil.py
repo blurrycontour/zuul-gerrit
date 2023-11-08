@@ -77,6 +77,24 @@ class EncryptedPKCS1_OAEP:
                                                  private_key).decode('utf8')
 
 
+class ZuulConfigKey(str):
+    def __new__(cls, s, line):
+        self = super().__new__(cls, s)
+        self.line = line
+        return self
+
+    def __copy__(self):
+        return ZuulConfigKey(self, self.line)
+
+    def __deepcopy__(self, memo):
+        return self.__copy__()
+
+    @classmethod
+    def to_yaml(cls, dumper, data):
+        return yaml.representer.SafeRepresenter.represent_str(
+            dumper, str(data))
+
+
 def safe_load(stream, *args, **kwargs):
     return yaml.load(stream, *args, Loader=SafeLoader, **kwargs)
 
@@ -102,6 +120,9 @@ EncryptedLoader.add_constructor(EncryptedPKCS1_OAEP.yaml_tag,
 EncryptedDumper.add_representer(
     types.MappingProxyType,
     yaml.representer.SafeRepresenter.represent_dict)
+EncryptedDumper.add_representer(
+    ZuulConfigKey,
+    ZuulConfigKey.to_yaml)
 
 
 def encrypted_dump(data, *args, **kwargs):
