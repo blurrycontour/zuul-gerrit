@@ -52,6 +52,41 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d35bb74a_5c6ed064",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 984,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T21:08:02Z",
+      "side": 1,
+      "message": "This handles the case where a scheduler has previously written a buildrequest with no top-level \u0027artifacts\u0027 entry.  in that case, we expect the data to be on [\u0027zuul\u0027][\u0027artifacts\u0027].  So basically, we\u0027re setting the top level artifacts entry to either be the artifacts from the old data format or the current location.  (This is basically the read-side complement to the write-side behavior change in executor/common.py)\n\nIt\u0027s not really about overwriting -- only one of these should be set at a time.",
+      "parentUuid": "70fe42e0_b401ccf4",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb6ef83a_bcd5e3ab",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1086,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T21:08:02Z",
+      "side": 1,
+      "message": "We use this in two places -- maybe instead of making this a property, we should set it in the initializer so that we\u0027re not calling the deepUpdate multiple times?",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b77fd41_6928fef2",
@@ -65,6 +100,24 @@
       "writtenOn": "2023-11-09T20:10:25Z",
       "side": 1,
       "message": "It isnt clear to me why we can avoid checking the combined info in normal_vars here and just rely on variables. Is that a lossy change and we might select auto when a parent overrided previously?\n\nThere are test updates that make a similar conversion. I suspect those are fine because they verify behavior not set it like do here.",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13e0312d_c56db11e",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 2020,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T21:08:02Z",
+      "side": 1,
+      "message": "This is a behavior change, and perhaps we should make it normal_vars for consistency -- especially if we make normal_vars an attribute not a property.\n\nHowever, I will say that this is a reasonable change, in that it would be really weird for a dependent job to get its ansible interpreter location from it\u0027s dependency.  (Like, when we say parent data here, we\u0027re not talking job inheritance here, we\u0027re talking the \"test\" job depending on the \"build\" job in the job graph.)\n\nIt\u0027s probably worth switching back, but it\u0027s not a -1 from me since it\u0027s a super edgy edge case.",
+      "parentUuid": "7b77fd41_6928fef2",
       "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -103,6 +156,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e93edf12_07352e23",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 5434,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T21:08:02Z",
+      "side": 1,
+      "message": "It\u0027s not possible, and we could make it an elif.  But I like it the way it\u0027s written because it doesn\u0027t assume the relationship.  It\u0027s just two different things.  We do something above if it\u0027s not live.  And we do something below if we have a job graph.  It keeps it simple.\n\n(We do need to fall through to the item ahead stuff at the bottom.)",
+      "parentUuid": "3a3f3972_1116f1e2",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "796496a2_2ec63f2f",
@@ -116,6 +187,24 @@
       "writtenOn": "2023-11-09T20:10:25Z",
       "side": 1,
       "message": "Will we need to rebase this onto https://review.opendev.org/c/zuul/zuul/+/896501 (or vice versa) in order to find the proper builds which may have the same name?",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ad2d8fd_04de9601",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 5650,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T21:08:02Z",
+      "side": 1,
+      "message": "We\u0027re still assuming (even in the other change) that there\u0027s only one job with a given name, so they are independent in that respect.  They do need to be sequenced because of the model revision though.",
+      "parentUuid": "796496a2_2ec63f2f",
       "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -137,6 +226,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b770aa8_89dab780",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1757,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T21:08:02Z",
+      "side": 1,
+      "message": "The good news is that it\u0027s impossible for the freeze job api to return anything for parent data since there can be no \"parent\" job.",
+      "parentUuid": "cc8c0c37_e3c93b0d",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26c1fcdc_94348910",
@@ -150,6 +257,24 @@
       "writtenOn": "2023-11-09T20:10:25Z",
       "side": 1,
       "message": "Previously combined_variables included parent_data which is now excluded above and no longer included here. Is this API change worth a release note?",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e7a1e36_20acdd0d",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1773,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T21:08:02Z",
+      "side": 1,
+      "message": "Same as above -- it doesn\u0027t actually matter here.",
+      "parentUuid": "26c1fcdc_94348910",
       "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
