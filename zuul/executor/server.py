@@ -996,6 +996,7 @@ class AnsibleJob(object):
         # TODO(corvus): Remove default setting after 4.3.0; this is to handle
         # scheduler/executor version skew.
         self.scheme = self.job.workspace_scheme or zuul.model.SCHEME_GOLANG
+        self.workspace_merger = None
         self.log = get_annotated_logger(
             logger, self.zuul_event_id, build=build_request.uuid
         )
@@ -1277,12 +1278,25 @@ class AnsibleJob(object):
             extra_repo_state = extra_rs_path and ExtraRepoState.fromZK(
                 ctx, extra_rs_path)
         d = {}
+        # Combine the two
         for rs in (merge_repo_state, extra_repo_state):
             if not rs:
                 continue
             for connection in rs.state.keys():
                 d.setdefault(connection, {}).update(
                     rs.state.get(connection, {}))
+        # Ensure that we have an origin ref for every local branch.
+        # Some of these will be overwritten later as we merge changes,
+        # but for starters, we can use the current head of each
+        # branch.
+        for connection_state in d.values():
+            for project_state in connection_state.values():
+                for path, hexsha in list(project_state.items()):
+                    if path.startswith('refs/heads/'):
+                        name = path[11:]
+                        remote_name = f'refs/remotes/origin/{name}'
+                        if remote_name not in connection_state:
+                            project_state[remote_name] = hexsha
         self.repo_state = d
 
     def _base_job_data(self):
@@ -1402,7 +1416,7 @@ class AnsibleJob(object):
             job_output.write("{now} | Preparing job workspace\n".format(
                 now=datetime.datetime.now()
             ))
-        merger = self.executor_server._getMerger(
+        self.workspace_merger = self.executor_server._getMerger(
             self.jobdir.src_root,
             self.executor_server.merge_root,
             logger=self.log,
@@ -1415,7 +1429,7 @@ class AnsibleJob(object):
                     'BuildCloneRepo',
                     attributes={'connection': project['connection'],
                                 'project': project['name']}):
-                repo = merger.getRepo(
+                repo = self.workspace_merger.getRepo(
                     project['connection'],
                     project['name'],
                     process_worker=self.executor_server.process_worker)
@@ -1432,7 +1446,7 @@ class AnsibleJob(object):
             with tracer.start_as_current_span(
                     'BuildMergeChanges'):
                 item_commit = self.doMergeChanges(
-                    merger, merge_items, self.repo_state, restored_repos)
+                    merge_items, self.repo_state, restored_repos)
             if item_commit is None:
                 # There was a merge conflict and we have already sent
                 # a work complete result, don't run any jobs
@@ -1450,7 +1464,7 @@ class AnsibleJob(object):
                     'BuildSetRepoState',
                     attributes={'connection': project['connection'],
                                 'project': project['name']}):
-                merger.setRepoState(
+                self.workspace_merger.setRepoState(
                     project['connection'], project['name'], self.repo_state,
                     process_worker=self.executor_server.process_worker)
 
@@ -1555,7 +1569,7 @@ class AnsibleJob(object):
             result = 'DISK_FULL'
         data, secret_data = self.getResultData()
         warnings = []
-        self.mapLines(merger, args, data, item_commit, warnings)
+        self.mapLines(args, data, item_commit, warnings)
         warnings.extend(get_warnings_from_result_data(data, logger=self.log))
         result_data = dict(result=result,
                            error_detail=error_detail,
@@ -1587,7 +1601,7 @@ class AnsibleJob(object):
             self.log.exception("Unable to load result data:")
         return data, secret_data
 
-    def mapLines(self, merger, args, data, commit, warnings):
+    def mapLines(self, args, data, commit, warnings):
         # The data and warnings arguments are mutated in this method.
 
         # If we received file comments, map the line numbers before
@@ -1612,8 +1626,8 @@ class AnsibleJob(object):
             if (project['canonical_name'] !=
                 args['zuul']['project']['canonical_name']):
                 continue
-            repo = merger.getRepo(project['connection'],
-                                  project['name'])
+            repo = self.workspace_merger.getRepo(project['connection'],
+                                                 project['name'])
         # If the repo doesn't exist, abort
         if not repo:
             return
@@ -1661,9 +1675,9 @@ class AnsibleJob(object):
 
         filecomments.updateLines(fc, new_lines)
 
-    def doMergeChanges(self, merger, items, repo_state, restored_repos):
+    def doMergeChanges(self, items, repo_state, restored_repos):
         try:
-            ret = merger.mergeChanges(
+            ret = self.workspace_merger.mergeChanges(
                 items, repo_state=repo_state,
                 process_worker=self.executor_server.process_worker)
         except ValueError:
@@ -1698,7 +1712,7 @@ class AnsibleJob(object):
             repo_state_commit = project_repo_state.get(
                 'refs/heads/%s' % branch)
             if repo_state_commit != commit:
-                repo = merger.getRepo(connection, project)
+                repo = self.workspace_merger.getRepo(connection, project)
                 repo.setRef('refs/heads/' + branch, commit)
         return orig_commit
 
@@ -2248,19 +2262,32 @@ class AnsibleJob(object):
                         logger=self.log,
                         scheme=zuul.model.SCHEME_GOLANG,
                         cache_scheme=self.scheme)
+                    # Since we're not restoring the repo state and
+                    # we're skipping the ref setup after cloning, we
+                    # do need to at least ensure the branch we're
+                    # going to check out exists.
+                    repo = self.workspace_merger.getRepo(p['connection'],
+                                                         p['name'])
+                    repo_state = {
+                        p['connection']: {
+                            p['name']: {
+                                f'refs/heads/{branch}':
+                                repo.getBranchHead(branch).hexsha
+                            }
+                        }
+                    }
                     break
 
-            repo_state = None
             if merger is None:
                 merger = self.executor_server._getMerger(
                     pi.root,
                     self.executor_server.merge_root,
                     logger=self.log,
                     scheme=zuul.model.SCHEME_GOLANG)
-
-                # If we don't have this repo yet prepared we need to restore
-                # the repo state. Otherwise we have speculative merges in the
-                # repo and must not restore the repo state again.
+                # If we don't have this repo yet prepared we need to
+                # restore the repo state. Otherwise we have
+                # speculative merges in the repo and must not restore
+                # the repo state again.
                 repo_state = self.repo_state
 
             self.log.debug("Cloning %s@%s into new untrusted space %s",
