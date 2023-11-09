@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4a560b6_4d9d948a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T19:25:58Z",
+      "side": 1,
+      "message": "Looking at this change I\u0027m not seeing a clear transition point for the data in ZK after updating to the new model API version. The reason for this is if you\u0027ve already loaded existing jobs under the old model api and they don\u0027t change we\u0027ll continue to use them under the old paths. At some point we\u0027ll need to make a more explicit hard cutover.\n\nDo we want a release note suggesting operators do a full zuul restart after updating to model api 18 to reduce reliance on the old code path? Or are we maybe waiting for these code paths to become mandatory for the circular dependencies work to do that?",
+      "revId": "9898a82d7ce95f8a9a8db8b3d61d65ac5f16910b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35452e56_bcbc72bb",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 2434,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T19:25:58Z",
+      "side": 1,
+      "message": "Side note I think we can use python\u0027s match case statement if we find that more readable since Zuul is python3.11 or newer now.",
+      "revId": "9898a82d7ce95f8a9a8db8b3d61d65ac5f16910b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14c8c747_414b330c",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 3679,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T19:25:58Z",
+      "side": 1,
+      "message": "This will need to be modified eventually when we\u0027re using UUIDs to handle duplicate job names right? Otherwise we would get the first index of the first job with that name and always return that uuid.",
+      "revId": "9898a82d7ce95f8a9a8db8b3d61d65ac5f16910b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb1975cf_5c0ece22",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 4562,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T19:25:58Z",
+      "side": 1,
+      "message": "Nit this code is also for the MODEL_API\u003d\u003d18 path right? We\u0027re creating a FrozenJob when it isn\u0027t already in the jobs dict and that needs to occur in both model versions.",
+      "revId": "9898a82d7ce95f8a9a8db8b3d61d65ac5f16910b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
