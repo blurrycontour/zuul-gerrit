@@ -69,6 +69,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4225843_4cd6f7f6",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 3679,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T20:20:45Z",
+      "side": 1,
+      "message": "Yes, it\u0027s likely that the signature would need to change to getUuidForJob(self, job_name, change)",
+      "parentUuid": "14c8c747_414b330c",
+      "revId": "9898a82d7ce95f8a9a8db8b3d61d65ac5f16910b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eb1975cf_5c0ece22",
@@ -82,6 +100,24 @@
       "writtenOn": "2023-11-09T19:25:58Z",
       "side": 1,
       "message": "Nit this code is also for the MODEL_API\u003d\u003d18 path right? We\u0027re creating a FrozenJob when it isn\u0027t already in the jobs dict and that needs to occur in both model versions.",
+      "revId": "9898a82d7ce95f8a9a8db8b3d61d65ac5f16910b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "657772de_74d610c0",
+        "filename": "zuul/model.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 4562,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T20:20:45Z",
+      "side": 1,
+      "message": "That\u0027s right -- I aksed for this comment on a previous revision because when we drop support for model_api \u003c 18 this can change to remove the default below.  Ie, \"job_uuid or job_name\" can just change to \"job_uuid\".  It would probably be more clear 2 lines lower, but it\u0027s enough to get us to the neighborhood.",
+      "parentUuid": "eb1975cf_5c0ece22",
       "revId": "9898a82d7ce95f8a9a8db8b3d61d65ac5f16910b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
