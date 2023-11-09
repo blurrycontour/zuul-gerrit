@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1fa0880_3dc51815",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T19:31:26Z",
+      "side": 1,
+      "message": "Also reviewing https://review.opendev.org/c/zuul/zuul/+/897664/13/doc/source/developer/model-changelog.rst I notice this chagne doesn\u0027t modify the model api changelog but probably should.",
+      "revId": "9898a82d7ce95f8a9a8db8b3d61d65ac5f16910b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35452e56_bcbc72bb",
