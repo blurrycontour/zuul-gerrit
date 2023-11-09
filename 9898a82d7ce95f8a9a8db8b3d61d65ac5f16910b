@@ -35,6 +35,42 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8222aae3_c7ae7563",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T20:24:19Z",
+      "side": 1,
+      "message": "In general, our upgrade strategy assumes that operators will spend some time on a given major version before upgrading to a new major version that drops model api support.  Ie, at least a complete turnover in pipeline content.  As long as that still happens here, that should be fine.  This change alters frozen jobs, and they are associated with specific queue items.",
+      "parentUuid": "f4a560b6_4d9d948a",
+      "revId": "9898a82d7ce95f8a9a8db8b3d61d65ac5f16910b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d9c1cfb_3a57a348",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-09T20:24:19Z",
+      "side": 1,
+      "message": "Agreed.",
+      "parentUuid": "c1fa0880_3dc51815",
+      "revId": "9898a82d7ce95f8a9a8db8b3d61d65ac5f16910b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35452e56_bcbc72bb",
