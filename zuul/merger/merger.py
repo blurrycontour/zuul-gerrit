@@ -14,8 +14,6 @@
 # under the License.
 
 from contextlib import contextmanager
-from logging import Logger
-from typing import Optional
 from urllib.parse import urlsplit, urlunsplit, urlparse
 import hashlib
 import logging
@@ -29,7 +27,6 @@ from concurrent.futures.process import BrokenProcessPool
 import git
 import gitdb
 import paramiko
-from zuul.zk import ZooKeeperClient
 from zuul.lib import strings
 
 import zuul.model
@@ -75,12 +72,13 @@ class Repo(object):
 
     def __init__(self, remote, local, email, username, speed_limit, speed_time,
                  sshkey=None, cache_path=None, logger=None, git_timeout=300,
-                 zuul_event_id=None, retry_timeout=None):
+                 zuul_event_id=None, retry_timeout=None, skip_refs=False):
         if logger is None:
             self.log = logging.getLogger("zuul.Repo")
         else:
             self.log = logger
         log = get_annotated_logger(self.log, zuul_event_id)
+        self.skip_refs = skip_refs
         self.env = {
             'GIT_HTTP_LOW_SPEED_LIMIT': speed_limit,
             'GIT_HTTP_LOW_SPEED_TIME': speed_time,
@@ -174,8 +172,10 @@ class Repo(object):
 
         repo = git.Repo(self.local_path)
         repo.git.update_environment(**self.env)
-        # Create local branches corresponding to all the remote branches
-        if not repo_is_cloned:
+        # Create local branches corresponding to all the remote
+        # branches.  Skip this when cloning the workspace repo since
+        # we will restore the refs there.
+        if not repo_is_cloned and not self.skip_refs:
             origin = repo.remotes.origin
             for ref in origin.refs:
                 if ref.remote_head == 'HEAD':
@@ -237,11 +237,19 @@ class Repo(object):
         mygit = git.cmd.Git(os.getcwd())
         mygit.update_environment(**self.env)
 
+        kwargs = dict(kill_after_timeout=self.git_timeout)
+        if self.skip_refs:
+            # We will recreate all of these when we restore the repo state.
+            kwargs.update(dict(
+                single_branch=True,
+                no_tags=True,
+                no_checkout=True,
+            ))
         for attempt in range(1, self.retry_attempts + 1):
             try:
                 with timeout_handler(self.local_path):
                     mygit.clone(git.cmd.Git.polish_url(url), self.local_path,
-                                kill_after_timeout=self.git_timeout)
+                                **kwargs)
                 break
             except Exception:
                 if attempt < self.retry_attempts:
@@ -379,7 +387,12 @@ class Repo(object):
                 else:
                     messages.append("Unable to detach HEAD to %s" % ref)
         else:
-            raise Exception("Couldn't detach HEAD to any existing commit")
+            # There are no remote refs; proceed with the assumption we
+            # don't have a checkout yet.
+            if log:
+                log.debug("Couldn't detach HEAD to any existing commit")
+            else:
+                messages.append("Couldn't detach HEAD to any existing commit")
 
         # Delete local heads that no longer exist on the remote end
         zuul_refs_to_keep = [
@@ -882,27 +895,16 @@ class MergerTree:
 
 class Merger(object):
 
-    def __init__(
-        self,
-        working_root: str,
-        connections,
-        zk_client: ZooKeeperClient,
-        email: str,
-        username: str,
-        speed_limit: str,
-        speed_time: str,
-        cache_root: Optional[str] = None,
-        logger: Optional[Logger] = None,
-        execution_context: bool = False,
-        git_timeout: int = 300,
-        scheme: str = None,
-        cache_scheme: str = None,
-    ):
+    def __init__(self, working_root, connections, zk_client, email,
+                 username, speed_limit, speed_time, cache_root=None,
+                 logger=None, execution_context=False, git_timeout=300,
+                 scheme=None, cache_scheme=None, skip_refs=False):
         self.logger = logger
         if logger is None:
             self.log = logging.getLogger("zuul.Merger")
         else:
             self.log = logger
+        self.skip_refs = skip_refs
         self.repos = {}
         self.working_root = working_root
         os.makedirs(working_root, exist_ok=True)
@@ -969,7 +971,8 @@ class Merger(object):
                 url, path, self.email, self.username, self.speed_limit,
                 self.speed_time, sshkey=sshkey, cache_path=cache_path,
                 logger=self.logger, git_timeout=self.git_timeout,
-                zuul_event_id=zuul_event_id, retry_timeout=retry_timeout)
+                zuul_event_id=zuul_event_id, retry_timeout=retry_timeout,
+                skip_refs=self.skip_refs)
 
             self.repos[key] = repo
         except Exception:

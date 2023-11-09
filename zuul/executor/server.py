@@ -1406,7 +1406,8 @@ class AnsibleJob(object):
             self.jobdir.src_root,
             self.executor_server.merge_root,
             logger=self.log,
-            scheme=self.scheme)
+            scheme=self.scheme,
+            skip_refs=True)
         repos = {}
         for project in args['projects']:
             self.log.debug("Cloning %s/%s" % (project['connection'],
