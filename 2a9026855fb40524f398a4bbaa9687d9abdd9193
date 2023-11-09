@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02e7bb6f_80e3ec2f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T20:10:25Z",
+      "side": 1,
+      "message": "Because this model change affects control flow in different places I think we should prioritize the cleanup of this code after the transition is accomplished. I think it has a lot of potential to be confusing otherwise and since it deals with secret data I think we want to make it as simple to avoid problems as possible.",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d5cd96a_a24e8e40",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T20:10:25Z",
+      "side": 1,
+      "message": "We\u0027re going from 18 -\u003e 19 here so this value should probably be 18 instead of 17. Functionally it should be the same but I\u0027m not positive of that and for bookkeeping purposes keeping everything aligned seems useful.",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70fe42e0_b401ccf4",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 984,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T20:10:25Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand this statement. Previously we would always overwrite the artifacts from job_zuul_params into self.arguments. Now we allow self.arguments to override the data in job_zuul_params. Is this because self.arguments would include the data under model api 19? If so I wonder if the comment above needs to be reworded as we are handling both \u003c19 and 19 here.",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b77fd41_6928fef2",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 2020,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T20:10:25Z",
+      "side": 1,
+      "message": "It isnt clear to me why we can avoid checking the combined info in normal_vars here and just rely on variables. Is that a lossy change and we might select auto when a parent overrided previously?\n\nThere are test updates that make a similar conversion. I suspect those are fine because they verify behavior not set it like do here.",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74d06914_7c6b1201",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 5409,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T20:10:25Z",
+      "side": 1,
+      "message": "Maybe update this comment to reflect the new behavior for when data is None (no mutatation of data in that case because the artifact info is coming from teh build request side of things elsewhere).",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a3f3972_1116f1e2",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 5434,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T20:10:25Z",
+      "side": 1,
+      "message": "Unrelated to this change but I\u0027m curious: is hasJobGraph() only true when self.live is true? In that case we could make this an elif case? It isn\u0027t clear to me why we would want the non live case to fall through into this block but maybe that isn\u0027t possible due to the disjoint properties of having a job graph and being live.",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "796496a2_2ec63f2f",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 5650,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T20:10:25Z",
+      "side": 1,
+      "message": "Will we need to rebase this onto https://review.opendev.org/c/zuul/zuul/+/896501 (or vice versa) in order to find the proper builds which may have the same name?",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc8c0c37_e3c93b0d",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1757,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T20:10:25Z",
+      "side": 1,
+      "message": "This seems fragile. If we dont explicitly remove data from api requests then we can expose secrets? Should we consider lower level filtration that occurs by default to try and avoid future exposure?",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26c1fcdc_94348910",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1773,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-09T20:10:25Z",
+      "side": 1,
+      "message": "Previously combined_variables included parent_data which is now excluded above and no longer included here. Is this API change worth a release note?",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
