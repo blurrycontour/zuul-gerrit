@@ -496,6 +496,14 @@ class TestGithubModelUpgrade(ZuulTestCase):
             if component_registry.model_api == 18:
                 break
 
+        # Test that we can still process changes with the project branch
+        # cache not containing the new default merge mode.
+        A = self.fake_github.openFakePullRequest('org/project1', 'master', 'A',
+                                                 files={"zuul.yaml": ""})
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 1)
+
         # Perform a full reconfiguration which should cause us to
         # re-fetch the merge modes.
         self.scheds.first.fullReconfigure()
