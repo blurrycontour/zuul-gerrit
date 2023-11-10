@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bf6e0d8_97a0668a",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-10T06:58:49Z",
+      "side": 1,
+      "message": "Yep, there was another bump of the model API version in the meantime. Given that there is also https://review.opendev.org/c/zuul/zuul/+/896501 I\u0027ll rebase this change on 896501 and change it to 20.",
+      "parentUuid": "5d5cd96a_a24e8e40",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70fe42e0_b401ccf4",
@@ -87,6 +105,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fcbaaaf_7c3d804a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 1086,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-10T06:58:49Z",
+      "side": 1,
+      "message": "I switched it to a `functools.cached_property()` (per instance caching)",
+      "parentUuid": "cb6ef83a_bcd5e3ab",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b77fd41_6928fef2",
@@ -122,6 +158,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "10e3bc60_a262fe66",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 2020,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-10T06:58:49Z",
+      "side": 1,
+      "message": "I changed it to use `self.normal_vars` to avoid any unrelated behavior change.",
+      "parentUuid": "13e0312d_c56db11e",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74d06914_7c6b1201",
@@ -135,6 +189,24 @@
       "writtenOn": "2023-11-09T20:10:25Z",
       "side": 1,
       "message": "Maybe update this comment to reflect the new behavior for when data is None (no mutatation of data in that case because the artifact info is coming from teh build request side of things elsewhere).",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f240be3_2a54801d",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 5409,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-10T06:58:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74d06914_7c6b1201",
       "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -205,6 +277,24 @@
       "side": 1,
       "message": "We\u0027re still assuming (even in the other change) that there\u0027s only one job with a given name, so they are independent in that respect.  They do need to be sequenced because of the model revision though.",
       "parentUuid": "796496a2_2ec63f2f",
+      "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f53986de_3628cebb",
+        "filename": "zuul/model.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 5650,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-10T06:58:49Z",
+      "side": 1,
+      "message": "Rebased it onto https://review.opendev.org/c/zuul/zuul/+/896501",
+      "parentUuid": "6ad2d8fd_04de9601",
       "revId": "2a9026855fb40524f398a4bbaa9687d9abdd9193",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
