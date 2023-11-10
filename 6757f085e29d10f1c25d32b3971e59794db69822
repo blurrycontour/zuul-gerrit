@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a97ce2a_9cb2b8be",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-10T07:00:53Z",
+      "side": 1,
+      "message": "Comments addressed in PS14 + rebased onto https://review.opendev.org/c/zuul/zuul/+/896501 in PS15",
+      "revId": "6757f085e29d10f1c25d32b3971e59794db69822",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
