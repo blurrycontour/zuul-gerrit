@@ -16,7 +16,6 @@
 import collections
 import copy
 import datetime
-import functools
 import json
 import logging
 import multiprocessing
@@ -1076,23 +1075,18 @@ class AnsibleJob(object):
             max_attempts = self.arguments["max_attempts"]
         self.retry_limit = self.arguments["zuul"]["attempts"] >= max_attempts
 
-    @functools.cached_property
-    def normal_vars(self):
         try:
             parent_data = self.arguments["parent_data"]
         except KeyError:
             # MODEL_API < 20
             parent_data = self.job.parent_data or {}
-
-        return Job._deepUpdate(parent_data.copy(), self.job.variables)
-
-    @property
-    def secret_vars(self):
+        self.normal_vars = Job._deepUpdate(parent_data.copy(),
+                                           self.job.variables)
         try:
-            return self.arguments["secret_parent_data"]
+            self.secret_vars = self.arguments["secret_parent_data"]
         except KeyError:
             # MODEL_API < 20
-            return self.job.secret_parent_data or {}
+            self.secret_vars = self.job.secret_parent_data or {}
 
     def run(self):
         self.running = True
