@@ -20,7 +20,7 @@ import time
 import voluptuous as v
 
 from zuul.source import BaseSource
-from zuul.model import Project
+from zuul.model import MERGER_MAP, Project
 from zuul.driver.github.githubmodel import GithubRefFilter
 from zuul.driver.util import scalar_or_list
 from zuul.zk.change_cache import ChangeKey
@@ -164,8 +164,16 @@ class GithubSource(BaseSource):
             return 'merge'
         github_version = self.connection._github_client_manager._github_version
         if github_version and github_version < (3, 8):
-            return 'merge-recursive'
-        return 'merge-ort'
+            merge_mode = 'merge-recursive'
+        else:
+            merge_mode = 'merge-ort'
+        try:
+            valid_modes = self.getProjectMergeModes(project, tenant=None)
+            if MERGER_MAP[merge_mode] in valid_modes:
+                return merge_mode
+        except Exception:
+            self.log.exception("Failed to get valid merge modes:")
+        return 'merge'
 
     def updateChange(self, change, history=None):
         """Update information for a change."""
