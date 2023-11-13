@@ -34,6 +34,24 @@
       "parentUuid": "5a534149_f8b4a922",
       "revId": "07e28cca57bfe33b433ece81ce92cb365952f655",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd3b9d88_38b75644",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1136,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-13T14:59:40Z",
+      "side": 1,
+      "message": "Ah right, `tracer.start_span()` is not using the span. That was `tracer.start_as_current_span()`. Thanks!",
+      "parentUuid": "eefe1246_6adb3e27",
+      "revId": "07e28cca57bfe33b433ece81ce92cb365952f655",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
