@@ -16,6 +16,24 @@
       "message": "Isn\u0027t `trace.startSpanInContext()` already using the span?",
       "revId": "07e28cca57bfe33b433ece81ce92cb365952f655",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eefe1246_6adb3e27",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1136,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-13T14:51:11Z",
+      "side": 1,
+      "message": "Unpacking everything, we need to:\n1. restore the span context of the build request\n2. create a dummy non-recording span to use an the build request span\n  (because there is already a real build request span created earlier; we don\u0027t need to do anything to it, we just need it to be a parent; we don\u0027t want this code to actually emit the start and end events for the parent span, thus the fake).\n3. \"use\" the non-recording parent span (make it current)\n4. create a new JobExecution child span under the parent\n5. \"use\" the JobExecution span (make it current)\n\nstartSpanInContext performs steps 1-4.  In particular, the \"use\" call inside of startSpanInContext is the one from step 3, not step 5.\n\nI\u0027m not 100% sure why we decided not to put #5 inside that method; it does seem like that would be a useful method.  Maybe we should analyze our usage and see if we always end up with this pattern and refactor.",
+      "parentUuid": "5a534149_f8b4a922",
+      "revId": "07e28cca57bfe33b433ece81ce92cb365952f655",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
