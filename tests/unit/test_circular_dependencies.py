@@ -2124,6 +2124,57 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
 
+    @simple_layout('layouts/job-dedup-multi-sched-complete.yaml')
+    def test_job_deduplication_multi_scheduler_complete(self):
+        # Test that a second scheduler can correctly refresh
+        # deduplicated builds after the first scheduler has completed
+        # the builds for one item.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.executor_server.release('common-job')
+        self.executor_server.release('project1-job')
+        self.waitUntilSettled()
+
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
+        # Hold the lock on the first scheduler so that only the second
+        # will act.
+        with self.scheds.first.sched.run_handler_lock:
+            self.executor_server.hold_jobs_in_build = False
+
+            # Make sure we go through an extra pipeline cycle so that
+            # the cleanup method runs.
+            self.executor_server.release('project2-job2')
+            self.waitUntilSettled(matcher=[app])
+
+            self.executor_server.release()
+            self.waitUntilSettled(matcher=[app])
+
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job2", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+
     @simple_layout('layouts/job-dedup-noop.yaml')
     def test_job_deduplication_noop(self):
         # Test that we don't deduplicate noop (there's no good reason
@@ -2840,6 +2891,56 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+
+    @simple_layout('layouts/job-dedup-multi-sched-complete.yaml')
+    def test_job_deduplication_check_multi_scheduler_complete(self):
+        # Test that a second scheduler can correctly refresh
+        # deduplicated builds after the first scheduler has completed
+        # the builds for one item.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.release('common-job')
+        self.executor_server.release('project1-job')
+        self.waitUntilSettled()
+
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
+        # Hold the lock on the first scheduler so that only the second
+        # will act.
+        with self.scheds.first.sched.run_handler_lock:
+            self.executor_server.hold_jobs_in_build = False
+
+            # Make sure we go through an extra pipeline cycle so that
+            # the cleanup method runs.
+            self.executor_server.release('project2-job2')
+            self.waitUntilSettled(matcher=[app])
+
+            self.executor_server.release()
+            self.waitUntilSettled(matcher=[app])
+
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job2", result="SUCCESS", changes="1,1 2,1"),
         ], ordered=False)
 
     @simple_layout('layouts/job-dedup-noop.yaml')

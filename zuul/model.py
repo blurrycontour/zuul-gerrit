@@ -909,10 +909,36 @@ class PipelineState(zkobject.ZKObject):
             context.build_references = False
         return data
 
+    def _resurrectBuild(self, context, build_path, build_map, item_map):
+        # See if we have the old build
+        orig_build = build_map.get(build_path)
+        if orig_build is not None:
+            return orig_build
+
+        # Load it from ZK.  If we're here, then the containing queue
+        # item is no longer enqueued.  We need to deserialize the item
+        # (which is no longer in any queue).
+
+        parts = build_path.split('/')
+        item_uuid = parts[7]
+        orig_item = item_map.get(item_uuid)
+        if orig_item is None:
+            item_path = '/'.join(parts[:8])
+            queue = FakeQueue(self.pipeline)
+            orig_item = QueueItem.fromZK(context, item_path, queue=queue)
+            item_map[item_uuid] = orig_item
+
+        for orig_build in orig_item.current_build_set.builds.values():
+            if orig_build.getPath() == build_path:
+                build_map[build_path] = orig_build
+                return orig_build
+        return None
+
     def _fixBuildReferences(self, data, context):
         # Reconcile duplicate builds; if we find any BuildReference
         # objects, look up the actual builds and replace
         log = context.log
+        item_map = {}
         build_map = {}
         to_replace_dicts = []
         to_replace_lists = []
@@ -937,7 +963,8 @@ class PipelineState(zkobject.ZKObject):
                         else:
                             build_map[build.getPath()] = build
         for (item, build_dict, build_job, build_path) in to_replace_dicts:
-            orig_build = build_map.get(build_path)
+            orig_build = self._resurrectBuild(context, build_path,
+                                              build_map, item_map)
             if orig_build:
                 build_dict[build_job] = orig_build
             else:
@@ -946,7 +973,8 @@ class PipelineState(zkobject.ZKObject):
                 del build_dict[build_job]
         for (item, build_list, build, build_path) in to_replace_lists:
             idx = build_list.index(build)
-            orig_build = build_map.get(build_path)
+            orig_build = self._resurrectBuild(context, build_path,
+                                              build_map, item_map)
             if orig_build:
                 build_list[idx] = build_map[build_path]
             else:
@@ -1136,6 +1164,20 @@ class PipelineSummary(zkobject.ShardedZKObject):
         except Exception:
             self.log.exception("Failed to refresh data")
         return self.status
+
+
+class FakeQueue:
+    """This is a stopgap measure until we finish the circular dependency
+    refactoring, at which point this will no longer be necessary.
+    This allows us to deserialize queue items which are not in any
+    queue (because they have completed all their builds) but are still
+    retained in ZK because their builds are referenced by other queue
+    items.
+
+    """
+
+    def __init__(self, pipeline):
+        self.pipeline = pipeline
 
 
 class ChangeQueue(zkobject.ZKObject):
@@ -4124,8 +4166,14 @@ class Build(zkobject.ZKObject):
         return super()._save(context, *args, **kw)
 
     def __repr__(self):
+        if self.job:
+            name = self.job.name
+            voting = self.job.voting
+        else:
+            name = 'unknown'
+            voting = 'unknown'
         return ('<Build %s of %s voting:%s>' %
-                (self.uuid, self.job.name, self.job.voting))
+                (self.uuid, name, voting))
 
     def _getJobData(self, name):
         val = getattr(self, name)
