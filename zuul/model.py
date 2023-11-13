@@ -5717,6 +5717,7 @@ class QueueItem(zkobject.ZKObject):
                 log.info("Deduplicating request of bundle job %s for item %s "
                          "with item %s", job, self, other_item)
                 build_set.setJobNodeRequestDuplicate(job.name, other_item)
+                job._set(_ready_to_run=True)
 
             # Handle provisioned nodes
             other_nodeset = other_build_set.getJobNodeSetInfo(job.name)
@@ -5729,6 +5730,7 @@ class QueueItem(zkobject.ZKObject):
                 log.info("Deduplicating nodeset of bundle job %s for item %s "
                          "with item %s", job, self, other_item)
                 build_set.setJobNodeSetInfoDuplicate(job.name, other_item)
+                job._set(_ready_to_run=True)
 
             # Handle builds
             other_build = other_build_set.getBuild(job.name)
