@@ -909,6 +909,27 @@ class PipelineState(zkobject.ZKObject):
             context.build_references = False
         return data
 
+    def _resurrectBuild(self, context, build_path, build_map):
+        # See if we have the old build
+        orig_build = build_map.get(build_path)
+        if orig_build is not None:
+            return orig_build
+
+        # Load it from ZK.  If we're here, then the containing queue
+        # item is no longer enqueued.  Our use of the build is
+        # limited, we only need to read some attributes off of it, so
+        # here we do not restore the queue item, buildset, etc.  We do
+        # set the path in order for the "isMyBuild" method to work so
+        # that when we serialize later, we don't try to reserialize
+        # it.
+        try:
+            orig_build = Build.fromZK(context, build_path, _path=build_path)
+        except NoNodeError:
+            return None
+
+        build_map[build_path] = orig_build
+        return orig_build
+
     def _fixBuildReferences(self, data, context):
         # Reconcile duplicate builds; if we find any BuildReference
         # objects, look up the actual builds and replace
@@ -937,7 +958,7 @@ class PipelineState(zkobject.ZKObject):
                         else:
                             build_map[build.getPath()] = build
         for (item, build_dict, build_job, build_path) in to_replace_dicts:
-            orig_build = build_map.get(build_path)
+            orig_build = self._resurrectBuild(context, build_path, build_map)
             if orig_build:
                 build_dict[build_job] = orig_build
             else:
@@ -946,7 +967,7 @@ class PipelineState(zkobject.ZKObject):
                 del build_dict[build_job]
         for (item, build_list, build, build_path) in to_replace_lists:
             idx = build_list.index(build)
-            orig_build = build_map.get(build_path)
+            orig_build = self._resurrectBuild(context, build_path, build_map)
             if orig_build:
                 build_list[idx] = build_map[build_path]
             else:
@@ -4021,6 +4042,8 @@ class Build(zkobject.ZKObject):
             # A list of build events like paused, resume, ...
             events=[],
             pre_fail=False,
+            # Not serialized
+            _path=None,
         )
 
     def serialize(self, context):
@@ -4115,6 +4138,8 @@ class Build(zkobject.ZKObject):
         return data
 
     def getPath(self):
+        if self._path:
+            return self._path
         return f"{self.job.getPath()}/build/{self.uuid}"
 
     def _save(self, context, *args, **kw):
@@ -4124,8 +4149,14 @@ class Build(zkobject.ZKObject):
         return super()._save(context, *args, **kw)
 
     def __repr__(self):
+        if self.job:
+            name = self.job.name
+            voting = self.job.voting
+        else:
+            name = 'unknown'
+            voting = 'unknown'
         return ('<Build %s of %s voting:%s>' %
-                (self.uuid, self.job.name, self.job.voting))
+                (self.uuid, name, voting))
 
     def _getJobData(self, name):
         val = getattr(self, name)
