@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fc45df4_874cc06b",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-13T17:14:32Z",
+      "side": 1,
+      "message": "Something seems weird about this error handling scheme even before this patch:\n\n1) What happens if approve!\u003d\u0027approve\u0027 and we get a 409?  We return resp[0].  Does that make any sense?  Maybe it can never happen so we don\u0027t have to worry about it.\n\nBut...\n\n2) Getting a 404 when approve !\u003d \u0027unapprove\u0027 seems very plausible.  So even if the handling in #1 is okay, I\u0027m not sure it\u0027s sufficient here.  You could just fix that part of it, or if you want to redo the error handling to be a bit more explicit, that would be fine too.  Something like:\n\nif approve\u003d\u003dapprove and 409:\n  return\nelif approve\u003d\u003dunapprove and 404:\n  return\nelse:\n  raise",
+      "revId": "5d7315bbcbd9cdfff777ccdc89faea5ed9ac146e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
