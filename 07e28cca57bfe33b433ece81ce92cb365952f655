@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a534149_f8b4a922",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1136,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-13T07:50:26Z",
+      "side": 1,
+      "message": "Isn\u0027t `trace.startSpanInContext()` already using the span?",
+      "revId": "07e28cca57bfe33b433ece81ce92cb365952f655",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
