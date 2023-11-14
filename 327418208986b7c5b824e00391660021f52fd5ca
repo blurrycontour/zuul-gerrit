@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "836d4d18_20c211a9",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2128,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-14T23:54:20Z",
+      "side": 1,
+      "message": "Yes, and that is expected.  Several of these tests are like that.  However, we run them anyway because we have learned that we need to exercise the behavior in both check and gate.\n\nThe check test is the important one.",
+      "parentUuid": "4f2fc53d_963e244e",
+      "revId": "327418208986b7c5b824e00391660021f52fd5ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a99b6b0_1eea583d",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-11-14T13:51:48Z",
       "side": 1,
       "message": "This code path restores a build w/o setting the buildset. Isn\u0027t that a problem at least for the pipeline state cleanup?\n\nIt looks like we might get an `AttributeError` there https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L985 (or cleanup the item that holds the referenced build).",
+      "revId": "327418208986b7c5b824e00391660021f52fd5ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea6ca058_910038a2",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-14T23:54:20Z",
+      "side": 1,
+      "message": "Yep, I\u0027ve extended the test to exercise that and fixed it in the next ps.",
+      "parentUuid": "7a99b6b0_1eea583d",
       "revId": "327418208986b7c5b824e00391660021f52fd5ca",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
