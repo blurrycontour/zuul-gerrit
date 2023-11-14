@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05658de4_83692f52",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-14T21:28:03Z",
+      "side": 1,
+      "message": "I guess we don\u0027t need a model_version 19 test because that exists elsewhere on line 375 above? Just wondering if we should have an explicit check for the backward compatible code in this change.",
+      "revId": "7483f7cef4166170b5a9dd7d377be4e60c804261",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
