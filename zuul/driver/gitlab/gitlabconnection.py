@@ -427,6 +427,10 @@ class GitlabAPIClient():
     # https://docs.gitlab.com/ee/api/merge_request_approvals.html#approve-merge-request
     def approve_mr(self, project_name, number, patchset, approve=True,
                    zuul_event_id=None):
+        """
+        Returns the JSON-decoded body of the response, or None if the
+        merge request was already previously approved or unapproved.
+        """
         approve = 'approve' if approve else 'unapprove'
         path = "/projects/%s/merge_requests/%s/%s" % (
             quote_plus(project_name), number, approve)
@@ -434,21 +438,37 @@ class GitlabAPIClient():
         resp = self.post(
             self.baseurl + path, params=params,
             zuul_event_id=zuul_event_id)
+        res, code = resp[0], resp[1]
         try:
             self._manage_error(*resp, zuul_event_id=zuul_event_id)
         except GitlabAPIClientException:
-            # approve and unapprove endpoint could return code 401 whether the
-            # actual state of the Merge Request approval. Two call on approve
-            # endpoint the second call return 401.
+            log = get_annotated_logger(self.log, zuul_event_id)
+
+            # Attempting to approve a merge request more than once by
+            # the same user will result in a 401 Unauthorized
+            # response.
+            if approve == 'approve' and code == 401:
+                log.debug('Merge request %s/%s is already approved' %
+                          (project_name, number))
+                return None
+            # Attempting to unapprove an already unapproved a merge request
+            # will result in a 404 response.
+            if approve == 'unapprove' and code == 404:
+                log.debug('Merge request %s/%s is already unapproved' %
+                          (project_name, number))
+                return None
+
+            log.error('Failed to %s the merge request %s/%s: %s' %
+                      (approve, project_name, number, res))
+
             # 409 is returned when current HEAD of the merge request doesn't
             # match the 'sha' parameter.
-            if resp[1] not in (401, 409):
-                raise
-            elif approve == 'approve' and resp[1] == 409:
-                log = get_annotated_logger(self.log, zuul_event_id)
-                log.error('Fail to approve the merge request: %s' % resp[0])
-                return
-        return resp[0]
+            if approve == 'approve' and code == 409:
+                return res
+
+            # Unhandled
+            raise
+        return res
 
     # https://docs.gitlab.com/ee/api/merge_request_approvals.html#get-configuration-1
     def get_mr_approvals_status(self, project_name, number,
