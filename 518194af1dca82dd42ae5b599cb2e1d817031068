@@ -58,6 +58,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb9b565c_d9afa274",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1419,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-14T22:26:08Z",
+      "side": 1,
+      "message": "This actually is for each job execution.  This class is AnsibleJob, so self is basically \"everything related to a single job execution\" and \"workspace_merger\" is the \"merger rooted at the job workspace root (ie .../work)\".\n\nSetting it as an instance attribute here just means we don\u0027t have to keep passing it to other methods.  We currently pass it to the line mapper, and we\u0027re about to pass it to another one, so that\u0027s a pattern we can refactor out.\n\nI think it\u0027s more clear and less error-prone to acknowledge that for the life of the job, we\u0027re going to have methods that touch the workspace git repos, so let\u0027s keep that merger configuration around.",
+      "parentUuid": "b5572050_8090dcc1",
+      "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c8770d0_cff4b231",
@@ -77,6 +95,24 @@
         "endLine": 2265,
         "endChar": 62
       },
+      "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32c0875a_b223c834",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2265,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-14T22:26:08Z",
+      "side": 1,
+      "message": "This is a hyper-optimized case: we\u0027re about to clone a repo into a private directory that is solely used to run the ansible playbook (it is not intended to be addressible by the job; it\u0027s mounted read-only in bwrap).  So there is no possibility of needing anything other than the branch we\u0027re going to checkout to run the playbook.\n\nKeep in mind that the merger variable contains a new merger rooted at the private directory that uses the workspace root as a cache.  That means when we \"getRepo\" below, we\u0027re saying \"clone the prepared workspace repo into the private directory\".  We then need to checkout a specific branch (which may not be the the one currently checked out).  That leaves us two options: copy all the refs (which is what we used to do, and we\u0027re trying not to do now), or just the single ref we know we\u0027re going to use.\n\nWe do the latter, but we don\u0027t actually know what that ref should be.  We know the name of the branch, but in this case (an untrusted project) we don\u0027t want what\u0027s in the job\u0027s repo_state variable, because that\u0027s the contents before speculative merging.  So a few lines belowe here, we ask the workspace repo what sha is at the branch we\u0027re going to check out, then we make a new repo_state object with just that sha and tell git to checkout that branch/sha on the new repo in the private dir.\n\nIn the other case, a config-project, we don\u0027t want the results of speculative execution, so we just stick with what\u0027s in the repo_state variable.",
+      "parentUuid": "1c8770d0_cff4b231",
       "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -104,6 +140,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa75e2aa_a6177f2d",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-14T22:26:08Z",
+      "side": 1,
+      "message": "Heh, 2 patchsets ago this was 3 lines long and this looked reasonable.  Then the other 2 lines were deleted one by one.  I agree it makes more sense the other way now, but probably not worth a respin.",
+      "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "658a5d00_9af106a1",
@@ -117,6 +170,24 @@
       "writtenOn": "2023-11-14T22:00:18Z",
       "side": 1,
       "message": "I have a hunch that git\u0027s implementation of this is a bit more atomic and we should write out the packed-refs entirely into a tmp file and then move them into place. While that may not be as necessary here since zuul is controlling all of the git interaction with the repo at this point I would be more comfortable with trying to be as atomic as possible and maybe even add an fsync? Mostly because I think if this does create problems debugging will be difficult.\n\nAs an alternative can we run the pack-refs command after cleaning the loose refs below?\n\nAnother concern I have is that we aren\u0027t checking the hexsha is valid here when setting it into the refs list. I think git would do that for us as well.",
+      "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d945855_7730f952",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-14T22:26:08Z",
+      "side": 1,
+      "message": "I do agree with you there, however, I went with this approach for now because it equates to the tried-and-tested behavior we\u0027re currently getting from gitpython.  I would like to change it to make it more atomic (there also might be some extra locking that should be done), but I\u0027d like to consider that an optional future improvement to be done after we confirm everything else about this change is good.\n\nPut another way: I\u0027m trying to keep this behavior as close as possible to gitpython\u0027s behavior (and this is how it deletes refs from packed-refs) for this change, even though I agree it\u0027s probably not optimal git.",
+      "parentUuid": "658a5d00_9af106a1",
       "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
