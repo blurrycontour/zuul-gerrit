@@ -16,6 +16,23 @@
       "message": "I have confirmed that the modified codepath is exercised by tests.unit.test_gitlab_driver.TestGitlabDriver.test_merge_request_commented",
       "revId": "b302129e433d812b64cebf5a715869257b81bee2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc8f4ec8_c635b6cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 36489
+      },
+      "writtenOn": "2023-11-14T22:49:35Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "b302129e433d812b64cebf5a715869257b81bee2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
