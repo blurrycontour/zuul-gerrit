@@ -69,6 +69,24 @@
       "message": "Similar to the discussion with Simon above: Do we need to use_span() on lock_span and update_span here since startSpanInContext() starts them but doesn\u0027t use them?",
       "revId": "07e28cca57bfe33b433ece81ce92cb365952f655",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4dcb565_e0b322e7",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3739,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-14T19:01:46Z",
+      "side": 1,
+      "message": "Not necessarily -- only if we were planning on starting more child spans inside these.",
+      "parentUuid": "583c8111_7ac3ad41",
+      "revId": "07e28cca57bfe33b433ece81ce92cb365952f655",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
