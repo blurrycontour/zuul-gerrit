@@ -33,6 +33,92 @@
       "message": "recheck",
       "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5572050_8090dcc1",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1419,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-14T22:00:18Z",
+      "side": 1,
+      "message": "This is a performance improvement because we are not creating a new merger object for each job execution? Do we need to worry about multiple jobs running at the same time? I don\u0027t think we do and we didn\u0027t seem to lock the mergers around specific repos previously either. Mostly want to call that out in case there is concern we need distinct objects or a lock.",
+      "range": {
+        "startLine": 1419,
+        "startChar": 8,
+        "endLine": 1419,
+        "endChar": 29
+      },
+      "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c8770d0_cff4b231",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2265,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-14T22:00:18Z",
+      "side": 1,
+      "message": "I thought the reason that we could skip ref setup after cloning was that we would restore the repo ref state? Don\u0027t we need more than just the default checkout to exist in the repo?",
+      "range": {
+        "startLine": 2265,
+        "startChar": 22,
+        "endLine": 2265,
+        "endChar": 62
+      },
+      "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c091c5bb_e6c80c03",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 244,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-14T22:00:18Z",
+      "side": 1,
+      "message": "Is there a reason for using kwargs.update here instead of:\n\n```\nkwargs[\u0027no_checkout\u0027] \u003d True\n```\n?\n\nSome quick local testing indicates that going through extra dict creation and then doing a dict update is slower. It probably doesn\u0027t matter in this case though since its a single iteration per repo.",
+      "range": {
+        "startLine": 244,
+        "startChar": 12,
+        "endLine": 244,
+        "endChar": 25
+      },
+      "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "658a5d00_9af106a1",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-14T22:00:18Z",
+      "side": 1,
+      "message": "I have a hunch that git\u0027s implementation of this is a bit more atomic and we should write out the packed-refs entirely into a tmp file and then move them into place. While that may not be as necessary here since zuul is controlling all of the git interaction with the repo at this point I would be more comfortable with trying to be as atomic as possible and maybe even add an fsync? Mostly because I think if this does create problems debugging will be difficult.\n\nAs an alternative can we run the pack-refs command after cleaning the loose refs below?\n\nAnother concern I have is that we aren\u0027t checking the hexsha is valid here when setting it into the refs list. I think git would do that for us as well.",
+      "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
