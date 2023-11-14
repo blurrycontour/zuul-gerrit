@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f2fc53d_963e244e",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2128,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-14T13:51:48Z",
+      "side": 1,
+      "message": "This test also succeeds for me w/o the proposed fix.",
+      "revId": "327418208986b7c5b824e00391660021f52fd5ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a99b6b0_1eea583d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-14T13:51:48Z",
+      "side": 1,
+      "message": "This code path restores a build w/o setting the buildset. Isn\u0027t that a problem at least for the pipeline state cleanup?\n\nIt looks like we might get an `AttributeError` there https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L985 (or cleanup the item that holds the referenced build).",
+      "revId": "327418208986b7c5b824e00391660021f52fd5ca",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
