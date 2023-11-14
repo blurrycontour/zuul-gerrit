@@ -13,6 +13,7 @@
     start:
       gitlab:
         comment: True
+        approval: False
     success:
       gitlab:
         comment: True

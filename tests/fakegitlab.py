@@ -237,13 +237,19 @@ class GitlabWebServer(object):
                     return self.send_data(
                         {'message': 'SHA does not match HEAD of source '
                          'branch: <new_sha>'}, code=409)
+                if mr.approved:
+                    return self.send_data(
+                        {'message': '401 Unauthorized'}, code=401)
                 mr.approved = True
-                self.send_data({})
+                self.send_data({}, code=201)
 
             def post_mr_unapprove(self, data, project, mr):
                 mr = self._get_mr(project, mr)
+                if not mr.approved:
+                    return self.send_data(
+                        {'message': "404 Not Found"}, code=404)
                 mr.approved = False
-                self.send_data({})
+                self.send_data({}, code=201)
 
             def put_mr_merge(self, data, project, mr):
                 mr = self._get_mr(project, mr)
