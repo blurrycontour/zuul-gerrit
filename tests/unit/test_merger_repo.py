@@ -231,7 +231,10 @@ class TestMergerRepo(ZuulTestCase):
         repo = git.Repo(self.workspace_root)
         new_sha = repo.heads.foobar.commit.hexsha
 
-        work_repo.setRefs({'refs/heads/master': new_sha}, True)
+        work_repo.setRefs({
+            'refs/heads/master': new_sha,
+            'refs/remotes/origin/master': new_sha,
+        })
         self.assertEqual(work_repo.getBranchHead('master').hexsha, new_sha)
         self.assertIn('master', repo.remotes.origin.refs)
 

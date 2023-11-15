@@ -1,5 +1,6 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2013-2014 OpenStack Foundation
+# Copyright 2021-2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,12 +15,11 @@
 # under the License.
 
 from contextlib import contextmanager
-from logging import Logger
-from typing import Optional
 from urllib.parse import urlsplit, urlunsplit, urlparse
 import hashlib
 import logging
 import math
+import sys
 import os
 import re
 import shutil
@@ -29,7 +29,6 @@ from concurrent.futures.process import BrokenProcessPool
 import git
 import gitdb
 import paramiko
-from zuul.zk import ZooKeeperClient
 from zuul.lib import strings
 
 import zuul.model
@@ -75,12 +74,13 @@ class Repo(object):
 
     def __init__(self, remote, local, email, username, speed_limit, speed_time,
                  sshkey=None, cache_path=None, logger=None, git_timeout=300,
-                 zuul_event_id=None, retry_timeout=None):
+                 zuul_event_id=None, retry_timeout=None, skip_refs=False):
         if logger is None:
             self.log = logging.getLogger("zuul.Repo")
         else:
             self.log = logger
         log = get_annotated_logger(self.log, zuul_event_id)
+        self.skip_refs = skip_refs
         self.env = {
             'GIT_HTTP_LOW_SPEED_LIMIT': speed_limit,
             'GIT_HTTP_LOW_SPEED_TIME': speed_time,
@@ -174,8 +174,10 @@ class Repo(object):
 
         repo = git.Repo(self.local_path)
         repo.git.update_environment(**self.env)
-        # Create local branches corresponding to all the remote branches
-        if not repo_is_cloned:
+        # Create local branches corresponding to all the remote
+        # branches.  Skip this when cloning the workspace repo since
+        # we will restore the refs there.
+        if not repo_is_cloned and not self.skip_refs:
             origin = repo.remotes.origin
             for ref in origin.refs:
                 if ref.remote_head == 'HEAD':
@@ -237,11 +239,16 @@ class Repo(object):
         mygit = git.cmd.Git(os.getcwd())
         mygit.update_environment(**self.env)
 
+        kwargs = dict(kill_after_timeout=self.git_timeout)
+        if self.skip_refs:
+            kwargs.update(dict(
+                no_checkout=True,
+            ))
         for attempt in range(1, self.retry_attempts + 1):
             try:
                 with timeout_handler(self.local_path):
                     mygit.clone(git.cmd.Git.polish_url(url), self.local_path,
-                                kill_after_timeout=self.git_timeout)
+                                **kwargs)
                 break
             except Exception:
                 if attempt < self.retry_attempts:
@@ -379,7 +386,12 @@ class Repo(object):
                 else:
                     messages.append("Unable to detach HEAD to %s" % ref)
         else:
-            raise Exception("Couldn't detach HEAD to any existing commit")
+            # There are no remote refs; proceed with the assumption we
+            # don't have a checkout yet.
+            if log:
+                log.debug("Couldn't detach HEAD to any existing commit")
+            else:
+                messages.append("Couldn't detach HEAD to any existing commit")
 
         # Delete local heads that no longer exist on the remote end
         zuul_refs_to_keep = [
@@ -502,40 +514,43 @@ class Repo(object):
         return 'Created reference %s at %s in %s' % (
             path, hexsha, repo.git_dir)
 
-    def setRefs(self, refs, keep_remotes=False, zuul_event_id=None):
+    def setRefs(self, refs, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
         ref_log = get_annotated_logger(
             logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
-        self._setRefs(repo, refs, keep_remotes=keep_remotes, log=ref_log)
+        self._setRefs(repo, refs, log=ref_log)
 
     @staticmethod
-    def setRefsAsync(local_path, refs, keep_remotes=False):
+    def setRefsAsync(local_path, refs):
         repo = git.Repo(local_path)
-        messages = Repo._setRefs(repo, refs, keep_remotes=keep_remotes)
+        messages = Repo._setRefs(repo, refs)
         return messages
 
     @staticmethod
-    def _setRefs(repo, refs, keep_remotes=False, log=None):
+    def _setRefs(repo, refs, log=None):
         messages = []
-        current_refs = {}
-        for ref in repo.refs:
-            current_refs[ref.path] = ref
-        unseen = set(current_refs.keys())
-        for path, hexsha in refs.items():
-            if log:
-                log.debug("Create reference %s at %s in %s",
-                          path, hexsha, repo.git_dir)
-            message = Repo._setRef(path, hexsha, repo)
-            messages.append(message)
-            unseen.discard(path)
-            ref = current_refs.get(path)
-            if keep_remotes and ref:
-                unseen.discard('refs/remotes/origin/{}'.format(ref.name))
-        for path in unseen:
-            if log:
-                log.debug("Delete reference %s", path)
-            message = Repo._deleteRef(path, repo)
-            messages.append(message)
+
+        # Rewrite packed refs with our content.  In practice, this
+        # should take care of almost every ref in the repo, except
+        # maybe HEAD and master.
+        refs_path = f"{repo.git_dir}/packed-refs"
+        encoding = sys.getfilesystemencoding()
+        with open(refs_path, 'wb') as f:
+            f.write(b'# pack-refs with: peeled fully-peeled sorted \n')
+            sorted_paths = sorted(refs.keys())
+            for path in sorted_paths:
+                hexsha = refs[path]
+                f.write(f'{hexsha} {path}\n'.encode(encoding))
+                if log:
+                    log.debug("Set reference %s at %s in %s",
+                              path, hexsha, repo.git_dir)
+
+        # Delete all the loose refs
+        for dname in ('remotes', 'tags', 'heads'):
+            path = f"{repo.git_dir}/refs/{dname}"
+            if os.path.exists(path):
+                shutil.rmtree(path)
+
         return messages
 
     def setRemoteRef(self, branch, rev, zuul_event_id=None):
@@ -882,22 +897,10 @@ class MergerTree:
 
 class Merger(object):
 
-    def __init__(
-        self,
-        working_root: str,
-        connections,
-        zk_client: ZooKeeperClient,
-        email: str,
-        username: str,
-        speed_limit: str,
-        speed_time: str,
-        cache_root: Optional[str] = None,
-        logger: Optional[Logger] = None,
-        execution_context: bool = False,
-        git_timeout: int = 300,
-        scheme: str = None,
-        cache_scheme: str = None,
-    ):
+    def __init__(self, working_root, connections, zk_client, email,
+                 username, speed_limit, speed_time, cache_root=None,
+                 logger=None, execution_context=False, git_timeout=300,
+                 scheme=None, cache_scheme=None):
         self.logger = logger
         if logger is None:
             self.log = logging.getLogger("zuul.Merger")
@@ -969,7 +972,8 @@ class Merger(object):
                 url, path, self.email, self.username, self.speed_limit,
                 self.speed_time, sshkey=sshkey, cache_path=cache_path,
                 logger=self.logger, git_timeout=self.git_timeout,
-                zuul_event_id=zuul_event_id, retry_timeout=retry_timeout)
+                zuul_event_id=zuul_event_id, retry_timeout=retry_timeout,
+                skip_refs=self.execution_context)
 
             self.repos[key] = repo
         except Exception:
@@ -1100,12 +1104,10 @@ class Merger(object):
         log.debug("Restore repo state for project %s/%s",
                   connection_name, project_name)
         if process_worker is None:
-            repo.setRefs(project, keep_remotes=self.execution_context,
-                         zuul_event_id=zuul_event_id)
+            repo.setRefs(project, zuul_event_id=zuul_event_id)
         else:
             job = process_worker.submit(
-                Repo.setRefsAsync, repo.local_path, project,
-                keep_remotes=self.execution_context)
+                Repo.setRefsAsync, repo.local_path, project)
             messages = job.result()
             ref_log = get_annotated_logger(
                 logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
@@ -1285,10 +1287,6 @@ class Merger(object):
         """
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
-
-        # TODO: why is reset required here?
-        repo.reset(zuul_event_id=zuul_event_id,
-                   process_worker=process_worker)
 
         self._restoreRepoState(connection_name, project_name, repo,
                                repo_state, zuul_event_id)
