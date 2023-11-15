@@ -16,6 +16,24 @@
       "message": "I guess we don\u0027t need a model_version 19 test because that exists elsewhere on line 375 above? Just wondering if we should have an explicit check for the backward compatible code in this change.",
       "revId": "7483f7cef4166170b5a9dd7d377be4e60c804261",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4234f94_0847c8f9",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 16
+      },
+      "lineNbr": 649,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-15T06:27:53Z",
+      "side": 1,
+      "message": "Good point! That should have been the backward compatibility test for v19. I think I messed this up during rebase onto 896501.\n\nFixed.",
+      "parentUuid": "05658de4_83692f52",
+      "revId": "7483f7cef4166170b5a9dd7d377be4e60c804261",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
