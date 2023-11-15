@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e082a55_12c124f7",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2934,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T15:06:54Z",
+      "side": 1,
+      "message": "This is where we trigger the extra pipeline run to cause cleanup to run.",
+      "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "428f30f8_e7c2a046",
@@ -102,6 +119,24 @@
       "writtenOn": "2023-11-15T14:56:35Z",
       "side": 1,
       "message": "for example, by rechecking the first change while the second build set is still running.",
+      "parentUuid": "c3aec31f_2eeafe35",
+      "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b02f3176_5d68207f",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T15:06:54Z",
+      "side": 1,
+      "message": "I\u0027ll point out in the test where that\u0027s handled.",
       "parentUuid": "c3aec31f_2eeafe35",
       "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
