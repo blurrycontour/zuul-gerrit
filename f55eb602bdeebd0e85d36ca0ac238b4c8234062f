@@ -33,6 +33,24 @@
       "message": "This does not set the `build.build_set`, i.e. it would be still None. Here is the exception I got when I tested this change (Note the line number is not consistent with this change because of other patches):\n```\n2023-11-15 08:45:45,889 ERROR zuul.Scheduler: Exception in pipeline processing:\nTraceback (most recent call last):\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/scheduler.py\", line 2364, in _process_pipeline\n    pipeline.state.cleanup(ctx)\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/model.py\", line 1011, in cleanup\n    items_referenced_by_builds.add(build.build_set.item.uuid)\n                                   ^^^^^^^^^^^^^^^^^^^^\nAttributeError: \u0027NoneType\u0027 object has no attribute \u0027item\u0027\n```\n\nMean while, there is another exception in refreshing pipeline change list:\n```\n2023-11-15 08:45:45,875 ERROR zuul.Scheduler: Unable to refresh pipeline change list for check\nTraceback (most recent call last):\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/scheduler.py\", line 2426, in process_tenant_trigger_queue\n    pipeline.change_list.refresh(ctx, allow_init\u003dFalse)\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/model.py\", line 1061, in refresh\n    self._retry(context, super().refresh,\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/zk/zkobject.py\", line 341, in _retry\n    return kazoo_retry(func, *args, **kw)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/zuul/lib/python3.11/site-packages/kazoo/retry.py\", line 126, in __call__\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/zk/zkobject.py\", line 249, in refresh\n    self._load(context)\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/zk/zkobject.py\", line 474, in _load\n    data, compressed_size \u003d self._retry(context, self._retryableLoad,\n                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/zk/zkobject.py\", line 341, in _retry\n    return kazoo_retry(func, *args, **kw)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/zuul/lib/python3.11/site-packages/kazoo/retry.py\", line 126, in __call__\n    return func(*args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/zk/zkobject.py\", line 464, in _retryableLoad\n    raise NoNodeError\nkazoo.exceptions.NoNodeError\n```\nAnd mean while, there is no",
       "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88758c0b_204a5c58",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-15T10:08:54Z",
+      "side": 1,
+      "message": "The exception re. `Unable to refresh pipeline change list for check` is expected when the change list is updated at the same time.",
+      "parentUuid": "428f30f8_e7c2a046",
+      "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
