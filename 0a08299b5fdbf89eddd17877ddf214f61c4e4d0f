@@ -41,6 +41,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb37b670_de5c724f",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T23:52:38Z",
+      "side": 1,
+      "message": "Certainly none that zuul currently supports do, so I think this is safe and makes sense.",
+      "parentUuid": "eb2d66f6_47258451",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b0ed3a3d_e4897c4e",
@@ -98,6 +116,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "061b8323_0958b4a4",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T23:52:38Z",
+      "side": 1,
+      "message": "We could; if you\u0027re curious why I didn\u0027t in the first place, it\u0027s because in my mind the hint is part of the joins, so this is all one stanza.",
+      "parentUuid": "9abdd9df_0cfa9a8d",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df8e94cf_acb4baff",
@@ -111,6 +147,24 @@
       "writtenOn": "2023-11-15T22:08:19Z",
       "side": 1,
       "message": "Is the move of _setup_models() important? Its a bit mysterious as to why this is happening.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ea3251c_ec45e020",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T23:52:38Z",
+      "side": 1,
+      "message": "I believe it is not strictly required.  What it does is facilitate some changes to the engine call that make for easier debugging and generation of test scripts, so I\u0027d like to leave it for easier maintenance on this and future changes.  Maybe in the future we can add some debug flags, but I promise I am trying to keep this change minimal.  :)",
+      "parentUuid": "df8e94cf_acb4baff",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -132,6 +186,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66d09d2b_388a7892",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T23:52:38Z",
+      "side": 1,
+      "message": "Yes.  :(",
+      "parentUuid": "24e4e589_134b742b",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6aa51aa8_271c9006",
@@ -149,6 +221,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a7e0df0_06acb249",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T23:52:38Z",
+      "side": 1,
+      "message": "Unique constaints have an implicit index and it is length limited.  This one just fits with mb4 encoding.  The columns in an index can be used in the order of the index (So this is an effective index for \"project\" and \u0027project, ref\" and \"project, ref, change\", etc, but not \"project, newrev\").",
+      "parentUuid": "6aa51aa8_271c9006",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d5d0bdd_b15128c4",
@@ -162,6 +252,24 @@
       "writtenOn": "2023-11-15T22:08:19Z",
       "side": 1,
       "message": "I guess as long as you have a single foreign key to the RefModel table (ref_id) above sqlalchemy knows to use that mapping automatically. At least that seems implied by https://docs.sqlalchemy.org/en/20/orm/join_conditions.html#handling-multiple-join-paths which requires extra setup when there are ambiguous foreign keys.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f275aa1_27ca723a",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T23:52:38Z",
+      "side": 1,
+      "message": "Yes, the foreign key definition makes that automatic.",
+      "parentUuid": "4d5d0bdd_b15128c4",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -229,6 +337,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "069e74d5_f2cb3c33",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1402,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T23:52:38Z",
+      "side": 1,
+      "message": "This method is called a couple different ways.  If it\u0027s being called from the /buildset api endpoint, then buildset will be None (I know that sounds weird) because the calling context is creating a return dict representing the buildset and this method is being used only to supply the builds that hang off of that buildset.  In this case we don\u0027t supply duplicate information since the project/branch/etc are the same for every build.\n\nIn the future, at the completion of the bundle refactoring, those things will not be the same for every build, and to implement the corrective action for that, we should simply remove this condition and always return this data for every build, even the ones that hang off of a buildset dictionary.\n\nWe don\u0027t need to check for null here, if that kind of error exists the db shouldn\u0027t return any data.",
+      "parentUuid": "4948cd60_816979b8",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9e2443d_c0d121d6",
@@ -248,6 +374,24 @@
         "endLine": 1503,
         "endChar": 39
       },
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "446ab25e_075b293e",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1503,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T23:52:38Z",
+      "side": 1,
+      "message": "Yep.  What to do here is less clear.  We might chose to drop these attributes in favor of relying on the ones for the builds.  Or maybe we make a list of refs that are involved in this buildset.",
+      "parentUuid": "a9e2443d_c0d121d6",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
