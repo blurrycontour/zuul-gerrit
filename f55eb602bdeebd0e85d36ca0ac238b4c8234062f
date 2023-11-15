@@ -69,6 +69,24 @@
       "parentUuid": "428f30f8_e7c2a046",
       "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3aec31f_2eeafe35",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-11-15T14:53:52Z",
+      "side": 1,
+      "message": "I think that line set item.current_build_set, but does not set build.build_set.\nI forgot to mention, to reproduce the issue, you need to create a trigger event to have the `_process_pipeline()` to be triggered, so the `cleanup()` to be triggered.\nI think same applies to the test case.",
+      "parentUuid": "824ed0c2_0b1acfec",
+      "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
