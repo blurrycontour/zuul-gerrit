@@ -149,3 +149,9 @@ Version 18
 :Prior Zuul version: 9.2.0
 :Description: Adds new merge modes 'recursive' and 'ort' for the Github
               driver.
+
+Version 19
+----------
+:Prior Zuul version: 9.2.0
+:Description: Changes the storage path of a frozen job to use the job's UUID
+              instead of the name as identifier.

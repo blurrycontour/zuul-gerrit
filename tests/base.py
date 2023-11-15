@@ -3531,13 +3531,9 @@ class TestingExecutorApi(HoldableExecutorApi):
             self._test_build_request_job_map = {}
         if build_request.uuid in self._test_build_request_job_map:
             return self._test_build_request_job_map[build_request.uuid]
-        d = self.getParams(build_request)
-        if d:
-            data = d.get('job_ref', '').split('/')[-1]
-        else:
-            data = ''
-        self._test_build_request_job_map[build_request.uuid] = data
-        return data
+        job_name = build_request.job_name
+        self._test_build_request_job_map[build_request.uuid] = job_name
+        return build_request.job_name
 
     def release(self, what=None):
         """
