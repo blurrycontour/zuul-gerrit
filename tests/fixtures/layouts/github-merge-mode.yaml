@@ -6,6 +6,9 @@
         - event: pull_request_review
           action: submitted
           state: approve
+        - event: pull_request
+          action:
+            - opened
     start:
       github: {}
     success:
@@ -13,15 +16,32 @@
     failure:
       github: {}
 
+- job:
+    name: base
+    parent: null
+    run: playbooks/base.yaml
+
+- job:
+    name: project-job
+
+- job:
+    name: project1-job
+
 - project:
     name: org/project
     merge-mode: rebase
+    check:
+      jobs:
+        - project-job
     gate:
       jobs:
-        - noop
+        - project-job
 
 - project:
     name: org/project1
+    check:
+      jobs:
+        - project1-job
     gate:
       jobs:
-        - noop
+        - project1-job
