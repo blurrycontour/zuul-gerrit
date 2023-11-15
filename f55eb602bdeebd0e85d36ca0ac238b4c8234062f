@@ -87,6 +87,24 @@
       "parentUuid": "824ed0c2_0b1acfec",
       "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19986592_286c66ad",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-11-15T14:56:35Z",
+      "side": 1,
+      "message": "for example, by rechecking the first change while the second build set is still running.",
+      "parentUuid": "c3aec31f_2eeafe35",
+      "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
