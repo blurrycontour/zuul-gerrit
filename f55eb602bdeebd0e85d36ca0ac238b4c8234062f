@@ -51,6 +51,24 @@
       "parentUuid": "428f30f8_e7c2a046",
       "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "824ed0c2_0b1acfec",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 928,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-15T14:44:31Z",
+      "side": 1,
+      "message": "This change against the current master branch does not reproduce that behavior.\n\nHere is how it gets set:\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L5076\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L4584\n\nThough in looking up those references, I did see another case we\u0027re not handling, so I\u0027m updating the change with a new patchset.",
+      "parentUuid": "428f30f8_e7c2a046",
+      "revId": "f55eb602bdeebd0e85d36ca0ac238b4c8234062f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
