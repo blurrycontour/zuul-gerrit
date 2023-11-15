@@ -117,6 +117,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15da73a4_a63739cf",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2265,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T00:19:32Z",
+      "side": 1,
+      "message": "\u003e Keep in mind that the merger variable contains a new merger rooted at the private directory that uses the workspace root as a cache.  That means when we \"getRepo\" below, we\u0027re saying \"clone the prepared workspace repo into the private directory\".\n\nWe call getRepo() against self.workspace_merger not the new merger created on line 2259. I think that means we\u0027re cloning into self.jobdir.src_root when getRepo is called() and no pi.root? Then later when we call merger.checkoutBranch that will clone into pi.root using self.jobdir.src_root as the cache whcih we\u0027ve just setup via workspace_merger?\n\n\u003e We then need to checkout a specific branch (which may not be the the one currently checked out).  That leaves us two options: copy all the refs (which is what we used to do, and we\u0027re trying not to do now), or just the single ref we know we\u0027re going to use.\n\nThis part makes sense to me. Just trying to sort out the repo relationships.\n\n\u003e \n\u003e We do the latter, but we don\u0027t actually know what that ref should be.  We know the name of the branch, but in this case (an untrusted project) we don\u0027t want what\u0027s in the job\u0027s repo_state variable, because that\u0027s the contents before speculative merging.  So a few lines belowe here, we ask the workspace repo what sha is at the branch we\u0027re going to check out, then we make a new repo_state object with just that sha and tell git to checkout that branch/sha on the new repo in the private dir.\n\u003e \n\u003e In the other case, a config-project, we don\u0027t want the results of speculative execution, so we just stick with what\u0027s in the repo_state variable.\n\nThis happens in checkoutTrustedProject right? The repo_state \u003d self.repo_state assignment on 2291 below is just a default value that we\u0027ll override later for the untrusted project case?",
+      "parentUuid": "32c0875a_b223c834",
+      "revId": "518194af1dca82dd42ae5b599cb2e1d817031068",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c091c5bb_e6c80c03",
