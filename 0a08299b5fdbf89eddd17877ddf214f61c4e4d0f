@@ -1,0 +1,255 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "263944b0_033d27b3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "This is a partial review. I\u0027ve reviewed everything but the tests and the alembic migration. I want to post this now before I\u0027ve reviewed the rest of it because its a big change and I need to pop out for a bit.\n\nOne other observation I\u0027ve made is that we seem to be mixing together some logically distinct updates to the database. There is the addition of the refs table and the refs association table and all of the FKs for that. Then separately we seem to be updating the sizes of some existing columns and renaming indexes/foreign keys/etc.\n\nI suspect we may do the width change here because it is more efficient to do that since we are copying the data anyway? But maybe the renames of existing indexes and foreign keys should be a distinct migration?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb2d66f6_47258451",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "Thinking out loud here I suppose it is possible for some code review system to 0 index their changes. It might be slightly safer to use -1 instead? That said I don\u0027t know of any that zero index today so that is probably not worth worrying about. And worst case for that system you just make a dummy 0 change and have zuul start processing at 1.",
+      "range": {
+        "startLine": 72,
+        "startChar": 19,
+        "endLine": 72,
+        "endChar": 20
+      },
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0ed3a3d_e4897c4e",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "Nit this comment is now a bit incomplete as we\u0027re doing the eager loading for buildset and ref.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09b8e885_fe152b00",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "Note sqla indicates flush should only move data from python to the db\u0027s transaction buffer. It won\u0027t actually commit things. We rely on on our sessionc context managers exit path to commit things for us.",
+      "range": {
+        "startLine": 286,
+        "startChar": 23,
+        "endLine": 286,
+        "endChar": 28
+      },
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9abdd9df_0cfa9a8d",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "Nit not sure if you want to add a comment here about the contains_eager call and move the hint comment below to where we use with_hint?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df8e94cf_acb4baff",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 424,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "Is the move of _setup_models() important? Its a bit mysterious as to why this is happening.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24e4e589_134b742b",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "With the Github driver patchset is the commit sha rather than an incremented counter right? Just thinking it would be nice if we could get away with a simple integer but I don\u0027t think we can.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6aa51aa8_271c9006",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "Does a unique constraint impose the rules of index widths in mysql? Otherwise it doesn\u0027t look like we\u0027re using patchset, oldrev, and newrev in an index.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d5d0bdd_b15128c4",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 586,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "I guess as long as you have a single foreign key to the RefModel table (ref_id) above sqlalchemy knows to use that mapping automatically. At least that seems implied by https://docs.sqlalchemy.org/en/20/orm/join_conditions.html#handling-multiple-join-paths which requires extra setup when there are ambiguous foreign keys.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4576b5e7_7963d7ba",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "db is a sqla session created by reportBuildsetStart() and used as a context manager. I believe that means the now multiple operations within this method are occuring within a single db transaction so we don\u0027t need to worry about that within this function. The data should be consistent despite multiple writes (either due to a single commit or a rollback).",
+      "range": {
+        "startLine": 48,
+        "startChar": 30,
+        "endLine": 48,
+        "endChar": 32
+      },
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bf9581d_aaff1be4",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "Similar story with db here as above in _createBuildset().",
+      "range": {
+        "startLine": 188,
+        "startChar": 27,
+        "endLine": 188,
+        "endChar": 29
+      },
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4948cd60_816979b8",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1402,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand this TODO (or the condition for that matter). We\u0027re creating a dict that represents a build and a build will always have a buildset right? Additionally a build should always have a ref (even when it is run for a periodic timer). That should mean build buildset.event_id, buildset.uuid, and all of build.ref.* are valid here so we dno\u0027t need to guard against buildset being null?\n\nGiven the code was written this way do we also need to check that build.ref is not null if we are checking things?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9e2443d_c0d121d6",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1503,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-15T22:08:19Z",
+      "side": 1,
+      "message": "This will change when we start supporting multiple refs per buildset right?",
+      "range": {
+        "startLine": 1503,
+        "startChar": 36,
+        "endLine": 1503,
+        "endChar": 39
+      },
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
