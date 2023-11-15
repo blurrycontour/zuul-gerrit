@@ -136,6 +136,8 @@ services:
       - "nodessh:/root/.ssh:z"
     networks:
       - zuul
+    cap_add:
+      - SYS_CHROOT
   launcher:
     depends_on:
       - zk
