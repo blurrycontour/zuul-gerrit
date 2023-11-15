@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import os
 import re
 import subprocess
 
@@ -226,8 +227,9 @@ class TestPostgresqlDatabase(DBBaseTestCase):
     def test_migration(self):
         # Test that SQLAlchemy create_all produces the same output as
         # a full migration run.
+        pg_dump = os.environ.get("ZUUL_TEST_PG_DUMP", "pg_dump")
         sqlalchemy_out = subprocess.check_output(
-            f"pg_dump -h {self.db.host} -U {self.db.name} -s {self.db.name}",
+            f"{pg_dump} -h {self.db.host} -U {self.db.name} -s {self.db.name}",
             shell=True,
             env={'PGPASSWORD': self.db.passwd}
         )
@@ -246,7 +248,7 @@ class TestPostgresqlDatabase(DBBaseTestCase):
         self.connection.onLoad(self.zk_client)
 
         alembic_out = subprocess.check_output(
-            f"pg_dump -h {self.db.host} -U {self.db.name} -s {self.db.name}",
+            f"{pg_dump} -h {self.db.host} -U {self.db.name} -s {self.db.name}",
             shell=True,
             env={'PGPASSWORD': self.db.passwd}
         )
