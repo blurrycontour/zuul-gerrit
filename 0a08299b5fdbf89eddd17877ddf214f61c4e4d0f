@@ -784,6 +784,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "392a2f0f_3deb7b5e",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T17:00:24Z",
+      "side": 1,
+      "message": "We should consider 3072 the effective max.  The smaller limits apply to non-default row formats (zuul never specified a format, so we would expect the default).  And the dynamic format (which allows for 3072) has been the default for longer than Zuul has existed (2005).  Opendev\u0027s database uses the dynamic format.\n\nOpendev is actually in a better place than most in terms of headroom.  It uses mb3 encoding since it predates mb4 being the default, meaning that it can fit more characters into the 3072 bytes available.  This change, however, is designed for mb4, the current default, and what Opendev should migrate to at some point in the future.  Fewer characters can fit in the bytes available.  But the indexes we specify here do fit using mb4, and that is what the current unit testing uses too, so we won\u0027t accidentally break that upgrade path.\n\nI have personally tested migrating Opendev\u0027s data set locally on mb3 tables to confirm that it will work in production, and have also tested a migration of Opendev starting with an mb4 encoding as well, in order to use it as a proxy for other similar systems.",
+      "parentUuid": "b07c4ebd_3a7c394f",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4d5d0bdd_b15128c4",
         "filename": "zuul/driver/sql/sqlconnection.py",
         "patchSetId": 6
