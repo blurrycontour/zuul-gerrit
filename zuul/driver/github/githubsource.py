@@ -159,7 +159,7 @@ class GithubSource(BaseSource):
         """Get the open changes for a project."""
         raise NotImplementedError()
 
-    def getProjectDefaultMergeMode(self, project):
+    def getProjectDefaultMergeMode(self, project, valid_modes=None):
         if COMPONENT_REGISTRY.model_api < 18:
             return 'merge'
         github_version = self.connection._github_client_manager._github_version
@@ -168,10 +168,7 @@ class GithubSource(BaseSource):
         else:
             merge_mode = 'merge-ort'
         try:
-            # MODEL_API < 18; needed during the transition phase until
-            # the project branch cache contains the new merge modes.
-            valid_modes = self.getProjectMergeModes(project, tenant=None)
-            if MERGER_MAP[merge_mode] in valid_modes:
+            if valid_modes and MERGER_MAP[merge_mode] in valid_modes:
                 return merge_mode
         except Exception:
             self.log.exception("Failed to get valid merge modes:")

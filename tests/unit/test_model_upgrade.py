@@ -535,9 +535,19 @@ class TestGithubModelUpgrade(ZuulTestCase):
     @model_version(17)
     @simple_layout('layouts/github-merge-mode.yaml', driver='github')
     def test_default_merge_mode(self):
-        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
-        md = layout.getProjectMetadata('github.com/org/project1')
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        md = tenant.layout.getProjectMetadata('github.com/org/project1')
         self.assertEqual(model.MERGER_MERGE, md.merge_mode)
+
+        tpc = tenant.project_configs['github.com/org/project1']
+        # Force a re-fetch of the project branches, which also updates
+        # the supported merge modes.
+        gh = tpc.project.source.connection
+        gh.updateProjectBranches(tpc.project)
+        merge_modes = tpc.project.source.getProjectMergeModes(
+            tpc.project, tenant)
+        # Branch cache shouldn't contain new merge modes for model API < 18
+        self.assertEqual([1, 2, 4, 5], merge_modes)
 
         # Upgrade our component
         self.model_test_component_info.model_api = 18
@@ -547,6 +557,11 @@ class TestGithubModelUpgrade(ZuulTestCase):
             if component_registry.model_api == 18:
                 break
 
+        merge_modes = tpc.project.source.getProjectMergeModes(
+            tpc.project, tenant)
+        # Branch cache still contains only the old merge modes
+        self.assertEqual([1, 2, 4, 5], merge_modes)
+
         # Test that we can still process changes with the project branch
         # cache not containing the new default merge mode.
         A = self.fake_github.openFakePullRequest('org/project1', 'master', 'A',
@@ -555,10 +570,31 @@ class TestGithubModelUpgrade(ZuulTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
 
+        # Re-fetch the project branches once more. The cache should now
+        # contain the new merge modes, but not the TPC.
+        gh.updateProjectBranches(tpc.project)
+        merge_modes = tpc.project.source.getProjectMergeModes(
+            tpc.project, tenant)
+
+        # The cache should now contain the new merge modes, but not the TPC.
+        self.assertEqual([1, 2, 6, 7, 4, 5], merge_modes)
+        self.assertEqual([1, 2, 4, 5], tpc.merge_modes)
+
+        # Test that we can still process changes with the TPC not using the
+        # new supported merge modes.
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(len(self.history), 2)
+
         # Perform a full reconfiguration which should cause us to
         # re-fetch the merge modes.
         self.scheds.first.fullReconfigure()
         self.waitUntilSettled()
+
+        # Now the TPC should also contain the new merge modes.
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        tpc = tenant.project_configs['github.com/org/project1']
+        self.assertEqual([1, 2, 6, 7, 4, 5], tpc.merge_modes)
 
         layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
         md = layout.getProjectMetadata('github.com/org/project1')

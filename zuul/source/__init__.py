@@ -145,13 +145,19 @@ class BaseSource(object, metaclass=abc.ABCMeta):
     def getProjectOpenChanges(self, project):
         """Get the open changes for a project."""
 
-    def getProjectDefaultMergeMode(self, project):
+    def getProjectDefaultMergeMode(self, project, valid_modes=None):
         """Return the default merge mode for this project.
 
         If users do not specify the merge mode for a project, this
         mode will be used.  It may be a driver-specific default,
         or the driver may use data from the remote system to provide
         a project-specific default.
+
+        Since the driver's default mode might change to a mode not yet
+        supported by the project (e.g. during dynamic layout creation
+        where we don't update the merge modes) the driver should select
+        the most appropriate default base on the list of valid modes,
+        if provided.
         """
         return 'merge'
 
