@@ -20,6 +20,279 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b1320929_d0108028",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "Nit the old test is organized this way too but why not check all of buildsets[0] attriutes then do buildsets[1] after? Instead they are smushed together and it reads a bit weird.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b87c5eea_cd8554c5",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "I don\u0027t recall cascading deletes anywhere (but maybe that is implicit?). Does this mean the zuul_ref table will grow indefinitely?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db5f3755_43c5df0f",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "Do we add all of these project column inserts as a sanity check that the old versions of the db are being used? We no longer keep that info in zuul_buildset (it goes in the refs table) and if we error then we know we are at the wrong db version?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b9a83a4_ba13922b",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "Nit maybe read back the invalid data and ensure it is present to ensure the table contents themselves haven\u0027t been modified.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef6b15f1_b679f4f9",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "Should this test exist in the postgresql test class below as well?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c879994d_29de382f",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "See above about checking the data that would be invalid if migrations succeeded.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c12a2b4_30343a7a",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "Nit this is repetition in the comment (possibly copy paste error?).",
+      "range": {
+        "startLine": 115,
+        "startChar": 8,
+        "endLine": 115,
+        "endChar": 20
+      },
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1da7950a_8b3f6afc",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "Do we not need an AS statement? For example:\n\n```\nfrom {prefixed_buildset} as bs\n```",
+      "range": {
+        "startLine": 162,
+        "startChar": 12,
+        "endLine": 162,
+        "endChar": 39
+      },
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fe85faa_c0c1669f",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "We quote change here because it is a sql keyword?",
+      "range": {
+        "startLine": 191,
+        "startChar": 22,
+        "endLine": 191,
+        "endChar": 39
+      },
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d83c8ed_35052bfb",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "I think we have the default value of 1 here because MAX(id) may be null if there are no rows at all. In that case is MAX(id)+1 a valid statement? Or will we end up erroring anyway? I worry that the default fallback here won\u0027t actually help us. Instead we might need something like:\n\n```\nselect setval(\n     \u0027{prefixed_buildset_new}_id_seq\u0027,\n     COALESCE(SELECT MAX(id) FROM {prefixed_buildset_new}, 0)+1, false)\n```",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6e46b1a_5bc85309",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2977f95_72182a7e",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "The set foreign_key_checks\u003d0 we did previously should only be for the current session right? And if we are in a rollback we are on our way out of the session. Is this rollback of the foreign_key_checks\u003d0 necessary?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bb32153_e759d9e7",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "Seems like we might be able to rename the old table to a new name that doesn\u0027t collide with the name we\u0027ll rename the new table to and then drop tables at the very end to avoid data loss with mysql?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ce74ad0_8c340a24",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "These are new indexes instead of renames because we didn\u0027t create the index at all on prefix_build_new earlier?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9baa8fd6_bd3dc8b2",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 542,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "Similar question to my previous one. We recreate rather than rename the index beacuse we didn\u0027t end up creating it on the new table earlier?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eb2d66f6_47258451",
         "filename": "zuul/driver/sql/sqlconnection.py",
         "patchSetId": 6
@@ -293,6 +566,23 @@
         "endLine": 48,
         "endChar": 32
       },
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "345cc743_fddc2c68",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T00:28:15Z",
+      "side": 1,
+      "message": "We run getOrCreateRef above to get access to ref. Is it possible that we will append duplicate refs to the buildset here as a result? I believe the unique constraints in the db will cause this to error if so?",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
