@@ -800,6 +800,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eaea3b8b_c3e7bec7",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T17:01:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "392a2f0f_3deb7b5e",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4d5d0bdd_b15128c4",
