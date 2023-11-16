@@ -350,6 +350,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bec191b1_9e59be12",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T16:37:08Z",
+      "side": 1,
+      "message": "This must be one of those SQL things that just works because it makes our lives easier even if NULL+1 makes no sense.",
+      "parentUuid": "f0866ca5_bfb258ce",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6e46b1a_5bc85309",
@@ -742,6 +760,24 @@
       "side": 1,
       "message": "Unique constaints have an implicit index and it is length limited.  This one just fits with mb4 encoding.  The columns in an index can be used in the order of the index (So this is an effective index for \"project\" and \u0027project, ref\" and \"project, ref, change\", etc, but not \"project, newrev\").",
       "parentUuid": "6aa51aa8_271c9006",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b07c4ebd_3a7c394f",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-16T16:37:08Z",
+      "side": 1,
+      "message": "Looks like MySQL + InnoDB actually has variable limits for indexes depending on other factors like table row format and page size [0]. The range is 767 - 3072. We dont\u0027 really have control of that so probably want to fit under 767? I think just having project or ref in the index is enough to bump over that limit because 255 * 4bytes for utf8 \u003d 1020?\n\nThat said we may have preexisting indexes that are wider than 767 elsewhere that would mean our real limit for Zuul is already higher? Mostly I\u0027m worried about OpenDev\u0027s DB since it is older and may haev lower limits, but in theory I think other users may have small limits?\n\n[0] https://dev.mysql.com/doc/refman/8.0/en/innodb-limits.html",
+      "parentUuid": "0a7e0df0_06acb249",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
