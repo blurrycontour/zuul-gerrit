@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80ad3e0a_36e8b4ef",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "No good reason I can think of.",
+      "parentUuid": "b1320929_d0108028",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b87c5eea_cd8554c5",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-11-16T00:28:15Z",
       "side": 1,
       "message": "I don\u0027t recall cascading deletes anywhere (but maybe that is implicit?). Does this mean the zuul_ref table will grow indefinitely?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea80c853_409977af",
+        "filename": "tests/unit/test_connection.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "We don\u0027t have cascading deletes on the zuul_ref table because of the many-to-many relationship there.  It will grow without bounds for now; at some point we should add some kind of garbage collection for it to the db prune commands.  It\u0027ll need to be GC-style since we can only remove a ref after the last build or buildset referencing it is deleted.  I don\u0027t think that\u0027s urgent.",
+      "parentUuid": "b87c5eea_cd8554c5",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -69,6 +105,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5854b5ad_39870148",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "That too but mostly this is some minimal data in the old format to make sure that after the migration we still have buildsets.\n\nThis test only really needs to change because we now require a bit more data in order to make the query below.  Nothing really changes here other than just fleshing out the test data more.",
+      "parentUuid": "db5f3755_43c5df0f",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b9a83a4_ba13922b",
@@ -86,6 +140,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "da4901a3_3df71342",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "Not a bad idea, but I think as long as we don\u0027t change the migration structure in this change we probably don\u0027t need to do that, since the rollback strategy is just to drop tables.",
+      "parentUuid": "5b9a83a4_ba13922b",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef6b15f1_b679f4f9",
@@ -99,6 +171,24 @@
       "writtenOn": "2023-11-16T00:28:15Z",
       "side": 1,
       "message": "Should this test exist in the postgresql test class below as well?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95fb5363_d15419b3",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 315,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "Wouldn\u0027t hurt but I don\u0027t think we need it for this change -- there should be plenty of coverage of this functionality.  This is mostly a smoketest.",
+      "parentUuid": "ef6b15f1_b679f4f9",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -166,6 +256,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e7c5640_7f2c8f83",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "This works with both dbmss.",
+      "parentUuid": "1da7950a_8b3f6afc",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2fe85faa_c0c1669f",
@@ -189,6 +297,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "07a3dd30_db395644",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "mysql specifically yes",
+      "parentUuid": "2fe85faa_c0c1669f",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d83c8ed_35052bfb",
@@ -202,6 +328,24 @@
       "writtenOn": "2023-11-16T00:28:15Z",
       "side": 1,
       "message": "I think we have the default value of 1 here because MAX(id) may be null if there are no rows at all. In that case is MAX(id)+1 a valid statement? Or will we end up erroring anyway? I worry that the default fallback here won\u0027t actually help us. Instead we might need something like:\n\n```\nselect setval(\n     \u0027{prefixed_buildset_new}_id_seq\u0027,\n     COALESCE(SELECT MAX(id) FROM {prefixed_buildset_new}, 0)+1, false)\n```",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0866ca5_bfb258ce",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "This is fine, and is one of the accepted cantrips for this:\n\nopenstack_citest\u003d# create table foo(id serial);\nCREATE TABLE\nopenstack_citest\u003d# select COALESCE((SELECT MAX(id)+1 FROM foo), 1);\n coalesce \n----------\n        1",
+      "parentUuid": "3d83c8ed_35052bfb",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -223,6 +367,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e4860a8_93a1dcd8",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "It\u0027s fine.",
+      "parentUuid": "d6e46b1a_5bc85309",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2977f95_72182a7e",
@@ -236,6 +398,24 @@
       "writtenOn": "2023-11-16T00:28:15Z",
       "side": 1,
       "message": "The set foreign_key_checks\u003d0 we did previously should only be for the current session right? And if we are in a rollback we are on our way out of the session. Is this rollback of the foreign_key_checks\u003d0 necessary?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "372b29a5_c7bf191d",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "Yes and it\u0027s not necessary but I like it anyway because in case we change something about this it\u0027s more future proof and doesn\u0027t leave a land-mine.",
+      "parentUuid": "c2977f95_72182a7e",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -257,6 +437,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d8fa1a4_02b50478",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "What we\u0027re doing here is as close as we can get to that, because renaming the indexes, etc, isn\u0027t automatic or atomic.",
+      "parentUuid": "6bb32153_e759d9e7",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4ce74ad0_8c340a24",
@@ -274,6 +472,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "005e716d_58f43868",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "Yes, which avoided extra renames.",
+      "parentUuid": "4ce74ad0_8c340a24",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9baa8fd6_bd3dc8b2",
@@ -287,6 +503,24 @@
       "writtenOn": "2023-11-16T00:28:15Z",
       "side": 1,
       "message": "Similar question to my previous one. We recreate rather than rename the index beacuse we didn\u0027t end up creating it on the new table earlier?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b313210_3699136b",
+        "filename": "zuul/driver/sql/alembic/versions/f7843ddf1552_bundle_refactor.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 542,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "Yep, this is more efficient.",
+      "parentUuid": "9baa8fd6_bd3dc8b2",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -583,6 +817,24 @@
       "writtenOn": "2023-11-16T00:28:15Z",
       "side": 1,
       "message": "We run getOrCreateRef above to get access to ref. Is it possible that we will append duplicate refs to the buildset here as a result? I believe the unique constraints in the db will cause this to error if so?",
+      "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bbe0c97_6a9fc1ab",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-16T01:01:24Z",
+      "side": 1,
+      "message": "Yes; this might need to be tweaked once we support more than one.",
+      "parentUuid": "345cc743_fddc2c68",
       "revId": "0a08299b5fdbf89eddd17877ddf214f61c4e4d0f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
