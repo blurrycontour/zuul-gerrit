@@ -1246,8 +1246,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
         self.assertEqual(len(vars_builds), 1)
-        self.assertEqual(vars_builds[0].job.combined_variables["test_var"],
-                         "pass")
+        self.assertEqual(vars_builds[0].job.variables["test_var"], "pass")
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -1261,8 +1260,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
         self.assertEqual(len(vars_builds), 1)
-        self.assertEqual(vars_builds[0].job.combined_variables["test_var"],
-                         "pass")
+        self.assertEqual(vars_builds[0].job.variables["test_var"], "pass")
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -1276,8 +1274,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
         self.assertEqual(len(vars_builds), 1)
-        self.assertEqual(vars_builds[0].job.combined_variables["test_var"],
-                         "pass")
+        self.assertEqual(vars_builds[0].job.variables["test_var"], "pass")
 
         self.executor_server.release()
         self.waitUntilSettled()
@@ -1298,8 +1295,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
         self.assertEqual(len(vars_builds), 3)
         for build in vars_builds:
-            self.assertEqual(build.job.combined_variables["test_var"],
-                             "pass")
+            self.assertEqual(build.job.variables["test_var"], "pass")
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -1857,7 +1853,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
     def test_job_deduplication_child_of_diff_parent_diff_data(self):
         # This is the more realistic test of the above, where we
         # return different data from the non-deduplicated parent job,
-        # which causes the child job not to be deduplicated.
+        # which should still causes the child job to be deduplicated.
 
         # The child job uses auto deduplication.
         self.executor_server.returnData(
@@ -1876,8 +1872,6 @@ class TestGerritCircularDependencies(ZuulTestCase):
                  ref='refs/changes/01/1/1'),
             dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/02/2/1'),
-            dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/01/1/1'),
         ], ordered=False)
 
     @simple_layout('layouts/job-dedup-paused-parent.yaml')
@@ -2582,7 +2576,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
     def test_job_deduplication_check_child_of_diff_parent_diff_data(self):
         # This is the more realistic test of the above, where we
         # return different data from the non-deduplicated parent job,
-        # which causes the child job not to be deduplicated.
+        # which should still cause the child job to be deduplicated.
 
         # The child job uses auto deduplication.
         self.executor_server.returnData(
@@ -2601,8 +2595,6 @@ class TestGerritCircularDependencies(ZuulTestCase):
                  ref='refs/changes/02/2/1'),
             dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/01/1/1'),
-            dict(name="child-job", result="SUCCESS", changes="1,1 2,1",
-                 ref='refs/changes/02/2/1'),
         ], ordered=False)
         self._assert_job_deduplication_check()
 
