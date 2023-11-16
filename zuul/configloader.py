@@ -2819,14 +2819,15 @@ class TenantParser(object):
             # but no specific project stanzas.
             (trusted, project) = tenant.getProject(project_name)
             project_metadata = layout.getProjectMetadata(project_name)
+            tpc = tenant.project_configs[project.canonical_name]
             if project_metadata.merge_mode is None:
-                mode = project.source.getProjectDefaultMergeMode(project)
+                mode = project.source.getProjectDefaultMergeMode(
+                    project, valid_modes=tpc.merge_modes)
                 project_metadata.merge_mode = model.MERGER_MAP[mode]
             if project_metadata.default_branch is None:
                 default_branch = project.source.getProjectDefaultBranch(
                     project, tenant)
                 project_metadata.default_branch = default_branch
-            tpc = tenant.project_configs[project.canonical_name]
             if tpc.merge_modes is not None:
                 source_context = model.SourceContext(
                     project.canonical_name, project.name,
