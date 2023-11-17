@@ -467,8 +467,8 @@ def upgrade2(connection, table_prefix):
     # keeps the code simpler and more consistent, and is still fast).
     statement = f"""
         alter table {prefixed_build}
-        drop constraint {prefixed_build_new}_buildset_id_fkey,
-        drop constraint {prefixed_build_new}_ref_id_fkey,
+        drop foreign key {prefixed_build_new}_buildset_id_fkey,
+        drop foreign key {prefixed_build_new}_ref_id_fkey,
         add constraint {prefixed_build}_buildset_id_fkey
             foreign key(buildset_id)
             references {prefixed_buildset_new} (id),
