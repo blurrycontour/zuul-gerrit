@@ -16,6 +16,24 @@
       "message": "Additional information regarding my comment about the exception, I logged the req_id here, it turns out it is `None` for the deduplicated job, so it does not enter the if statement.",
       "revId": "f63a5800124cc96da1b6bfbfc036eb662b07ce16",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "060a68f5_aa68830b",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-11-17T12:40:25Z",
+      "side": 0,
+      "message": "This happens when the second build set started, the original job of the first build set for deduplication is completed, but other jobs were still running. So the node request of the job in second build set is not deduplicated, but None. (i.e. only build and nodeset are deduplicated)",
+      "parentUuid": "96362992_e7ccac96",
+      "revId": "f63a5800124cc96da1b6bfbfc036eb662b07ce16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
