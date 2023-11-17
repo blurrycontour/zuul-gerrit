@@ -870,7 +870,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "NEW")
 
-        buildsets = {bs.change: bs for bs in
+        buildsets = {bs.refs[0].change: bs for bs in
                      self.scheds.first.connections.connections[
                          'database'].getBuildsets()}
         self.assertEqual(buildsets[2].result, 'MERGE_FAILURE')
