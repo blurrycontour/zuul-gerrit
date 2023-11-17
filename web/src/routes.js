@@ -114,7 +114,7 @@ const routes = (info) => {
       component: ProjectPage
     },
     {
-      to: '/job/:jobName',
+      to: '/job/:jobName*',
       component: JobPage
     },
     {
@@ -151,7 +151,7 @@ const routes = (info) => {
       component: AutoholdPage
     },
     {
-      to: '/semaphore/:semaphoreName',
+      to: '/semaphore/:semaphoreName*',
       component: SemaphorePage
     },
     {
