@@ -16,6 +16,23 @@
       "message": "In testing the patch, there is still a traceback as bellow.  The job would be retried and finished later, but the exception should be fixed:\n```\n2023-11-17 10:45:55,304 ERROR zuul.AnsibleJob: [e: f068b960-8535-11ee-9cea-deea19ed8ba0] [build: d1c4b4f101c44955a3b9ba13deb37ee5] Exception while executing job\nTraceback (most recent call last):\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/executor/server.py\", line 1159, in do_execute\n    self._execute()\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/executor/server.py\", line 1502, in _execute\n    zuul_resources \u003d self.prepareNodes(args)  # set self.host_list\n                     ^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/executor/server.py\", line 2493, in prepareNodes\n    self.host_list \u003d self.getHostList(args, inventory_nodes)\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/executor/server.py\", line 1977, in getHostList\n    cloud\u003dnode.cloud,\n          ^^^^^^^^^^\nAttributeError: \u0027Node\u0027 object has no attribute \u0027cloud\u0027\n```",
       "revId": "dd60903a95fbb93224238778b3cab3d52f8d0f35",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c0eb704_5e13860e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-11-17T14:29:39Z",
+      "side": 1,
+      "message": "remove the -1, as the remaining issue can be fixed in a different change.",
+      "revId": "dd60903a95fbb93224238778b3cab3d52f8d0f35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
