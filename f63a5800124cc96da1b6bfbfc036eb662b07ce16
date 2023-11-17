@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96362992_e7ccac96",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2023-11-17T12:31:28Z",
+      "side": 0,
+      "message": "Additional information regarding my comment about the exception, I logged the req_id here, it turns out it is `None` for the deduplicated job, so it does not enter the if statement.",
+      "revId": "f63a5800124cc96da1b6bfbfc036eb662b07ce16",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
