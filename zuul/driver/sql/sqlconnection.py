@@ -485,6 +485,9 @@ class SQLConnection(BaseConnection):
                 self.log.error(
                     "Unable to connect to the database or establish the "
                     "required tables: %s", e)
+            except Exception:
+                self.log.exception("Error setting up database:")
+                raise
             time.sleep(10)
 
     def _setup_models(self):
