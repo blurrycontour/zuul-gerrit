@@ -465,7 +465,20 @@ def upgrade2(connection, table_prefix):
     # did so with checks disabled, but postgres was able to validate
     # them.  We could have skipped the earlier add for mysql, but this
     # keeps the code simpler and more consistent, and is still fast).
-    statement = f"""
+    if dialect_name == 'mysql':
+        statement = f"""
+        alter table {prefixed_build}
+        drop foreign key {prefixed_build_new}_buildset_id_fkey,
+        drop foreign key {prefixed_build_new}_ref_id_fkey,
+        add constraint {prefixed_build}_buildset_id_fkey
+            foreign key(buildset_id)
+            references {prefixed_buildset_new} (id),
+        add constraint {prefixed_build}_ref_id_fkey
+            foreign key(ref_id)
+            references {prefixed_ref} (id)
+        """
+    elif dialect_name == 'postgresql':
+        statement = f"""
         alter table {prefixed_build}
         drop constraint {prefixed_build_new}_buildset_id_fkey,
         drop constraint {prefixed_build_new}_ref_id_fkey,
@@ -475,7 +488,9 @@ def upgrade2(connection, table_prefix):
         add constraint {prefixed_build}_ref_id_fkey
             foreign key(ref_id)
             references {prefixed_ref} (id)
-    """
+        """
+    else:
+        raise Exception(f"Unsupported dialect {dialect_name}")
     connection.execute(sa.text(statement))
 
     # Re-add the referencing FK constraints
