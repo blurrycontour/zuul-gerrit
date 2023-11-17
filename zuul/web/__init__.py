@@ -33,7 +33,6 @@ import ssl
 import threading
 import uuid
 import prometheus_client
-import urllib.parse
 
 import zuul.executor.common
 from zuul import exceptions
@@ -1288,7 +1287,6 @@ class ZuulWebAPI(object):
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
     def job(self, tenant_name, tenant, auth, job_name):
-        job_name = urllib.parse.unquote_plus(job_name)
         job_variants = tenant.layout.jobs.get(job_name)
         result = []
         for job in job_variants:
@@ -2054,7 +2052,7 @@ class ZuulWeb(object):
                           controller=api, action='semaphores')
         route_map.connect('api', '/api/tenant/{tenant_name}/jobs',
                           controller=api, action='jobs')
-        route_map.connect('api', '/api/tenant/{tenant_name}/job/{job_name}',
+        route_map.connect('api', '/api/tenant/{tenant_name}/job/{job_name:.*}',
                           controller=api, action='job')
         # if no auth configured, deactivate admin routes
         if self.authenticators.authenticators:
@@ -2117,7 +2115,7 @@ class ZuulWeb(object):
             'api',
             '/api/tenant/{tenant_name}/pipeline/{pipeline_name}'
             '/project/{project_name:.*}/branch/{branch_name:.*}'
-            '/freeze-job/{job_name}',
+            '/freeze-job/{job_name:.*}',
             controller=api, action='project_freeze_job'
         )
         route_map.connect('api', '/api/tenant/{tenant_name}/pipelines',
