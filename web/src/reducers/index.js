@@ -16,7 +16,6 @@ import { combineReducers } from 'redux'
 
 import auth from './auth'
 import autoholds from './autoholds'
-import configErrors from './configErrors'
 import change from './change'
 import component from './component'
 import freezejob from './freezejob'
@@ -38,6 +37,7 @@ import semaphores from './semaphores'
 import status from './status'
 import tenant from './tenant'
 import tenants from './tenants'
+import tenantStatus from './tenantStatus'
 import timezone from './timezone'
 import user from './user'
 
@@ -47,7 +47,7 @@ const reducers = {
   build,
   change,
   component,
-  configErrors,
+  tenantStatus,
   freezejob,
   notifications,
   info,

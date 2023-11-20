@@ -62,7 +62,7 @@ import SelectTz from './containers/timezone/SelectTz'
 import ConfigModal from './containers/config/Config'
 import logo from './images/logo.svg'
 import { clearNotification } from './actions/notifications'
-import { fetchConfigErrorsAction, clearConfigErrorsAction } from './actions/configErrors'
+import { fetchTenantStatusAction, clearTenantStatusAction } from './actions/tenantStatus'
 import { fetchTenantsIfNeeded } from './actions/tenants'
 import { routes } from './routes'
 import { setTenantAction } from './actions/tenant'
@@ -74,8 +74,8 @@ import AuthRequiredPage from './pages/AuthRequired'
 class App extends React.Component {
   static propTypes = {
     notifications: PropTypes.array,
-    configErrors: PropTypes.array,
-    configErrorsReady: PropTypes.bool,
+    tenantStatus: PropTypes.array,
+    tenantStatusReady: PropTypes.bool,
     info: PropTypes.object,
     tenant: PropTypes.object,
     tenants: PropTypes.object,
@@ -185,7 +185,7 @@ class App extends React.Component {
 
   componentDidUpdate() {
     // This method is called when info property is updated
-    const { tenant, info, auth, user, configErrorsReady } = this.props
+    const { tenant, info, auth, user, tenantStatusReady } = this.props
     if (info.ready) {
       let tenantName = null
       let whiteLabel
@@ -211,7 +211,7 @@ class App extends React.Component {
         const tenantAction = setTenantAction(tenantName, whiteLabel)
         this.props.dispatch(tenantAction)
         if (tenantName) {
-          this.props.dispatch(clearConfigErrorsAction())
+          this.props.dispatch(clearTenantStatusAction())
         }
         if (whiteLabel || !tenantName) {
           // The app info endpoint was already a tenant info
@@ -222,11 +222,11 @@ class App extends React.Component {
           this.props.dispatch(configureAuthFromTenant(tenantName))
         }
       }
-      if (tenant && tenant.name && !configErrorsReady && this.isAuthReady() &&
+      if (tenant && tenant.name && !tenantStatusReady && this.isAuthReady() &&
           (!auth.info.read_protected || user.data)) {
         // This will happen after the tenant action is complete, so we
         // can use the "old" tenant now.
-        this.props.dispatch(fetchConfigErrorsAction(tenant))
+        this.props.dispatch(fetchTenantStatusAction(tenant))
       }
     }
   }
@@ -386,7 +386,7 @@ class App extends React.Component {
 
   render() {
     const { isKebabDropdownOpen } = this.state
-    const { notifications, configErrors, tenant, info, auth } = this.props
+    const { notifications, tenantStatus, tenant, info, auth } = this.props
 
     const nav = this.renderMenu()
 
@@ -477,7 +477,7 @@ class App extends React.Component {
             />
           </PageHeaderToolsItem>
         </PageHeaderToolsGroup>
-        {configErrors.length > 0 &&
+        {tenantStatus.config_error_count > 0 &&
           <NotificationBadge
             isRead={false}
             aria-label="Notifications"
@@ -523,8 +523,8 @@ class App extends React.Component {
 export default withRouter(connect(
   state => ({
     notifications: state.notifications,
-    configErrors: state.configErrors.errors,
-    configErrorsReady: state.configErrors.ready,
+    tenantStatus: state.tenantStatus.tenant_status,
+    tenantStatusReady: state.tenantStatus.ready,
     info: state.info,
     tenant: state.tenant,
     tenants: state.tenants,
