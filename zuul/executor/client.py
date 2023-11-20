@@ -121,10 +121,34 @@ class ExecutorClient(object):
         # on the executor side to lock the nodes.
         req_id = build.build_set.getJobNodeRequestID(job.name)
         if isinstance(req_id, dict):
-            # This should never happen
-            raise Exception(
+            # This is a stop-gap.  It is possible for this to happen
+            # if a queue item completes all its builds and is removed
+            # while one of its builds is deduplicated in another queue
+            # item in an independent pipeline.  The bundle refactor
+            # work will remove this possibility at which point this
+            # code can be removed.  In the mean time, if we encounter
+            # this case, restart the build to try to keep things
+            # moving.
+            self.log.error(
                 "Attempt to start build with deduplicated node request ID "
                 f"{req_id}")
+            data = {"start_time": time.time()}
+            started_event = BuildStartedEvent(
+                build.uuid, build.build_set.uuid, job.name, None, data,
+                zuul_event_id=build.zuul_event_id)
+            self.result_events[pipeline.tenant.name][pipeline.name].put(
+                started_event
+            )
+
+            result = {"result": None, "end_time": time.time()}
+            completed_event = BuildCompletedEvent(
+                build.uuid, build.build_set.uuid, job.name, None, result,
+                zuul_event_id=build.zuul_event_id)
+            self.result_events[pipeline.tenant.name][pipeline.name].put(
+                completed_event
+            )
+            return
+
         if req_id:
             params["noderequest_id"] = req_id
 
