@@ -1398,10 +1398,7 @@ class ZuulWebAPI(object):
             # This returns all nodes; some of which may not be
             # intended for use by Zuul, so be extra careful checking
             # user_data.
-            if not (node.user_data and
-                    isinstance(node.user_data, dict) and
-                    node.user_data.get('zuul_system') ==
-                    self.system.system_id and
+            if not (node.requestor == self.system_id and
                     node.tenant_name == tenant_name):
                 continue
             node_data = {}

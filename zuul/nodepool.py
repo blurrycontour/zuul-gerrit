@@ -477,9 +477,7 @@ class Nodepool(object):
         """
         for node_id in self.zk_nodepool.getNodes(cached=True):
             node = self.zk_nodepool.getNode(node_id)
-            if (node.user_data and
-                isinstance(node.user_data, dict) and
-                node.user_data.get('zuul_system') == self.system_id):
+            if node.requestor == self.system_id:
                 yield node
 
     def emitStatsTotals(self, abide):
@@ -519,13 +517,12 @@ class Nodepool(object):
                 tenant=tenant)
 
         # Count nodes
-        for node in self.zk_nodepool.nodeIterator(cached=True):
+        for node in self.getNodes():
             if not node.resources:
                 continue
 
             tenant_name = node.tenant_name
-            if tenant_name in total_resources_by_tenant and \
-               node.requestor == self.system_id:
+            if tenant_name in total_resources_by_tenant:
                 self.addResources(
                     total_resources_by_tenant[tenant_name],
                     node.resources)
@@ -536,11 +533,8 @@ class Nodepool(object):
                                   model.STATE_USED,
                                   model.STATE_HOLD}:
                 continue
-            if not node.user_data:
-                continue
-            if not isinstance(node.user_data, dict):
-                continue
-            if node.user_data.get('zuul_system') != self.system_id:
+            if not (node.user_data and
+                    isinstance(node.user_data, dict)):
                 continue
 
             if tenant_name in in_use_resources_by_tenant:
