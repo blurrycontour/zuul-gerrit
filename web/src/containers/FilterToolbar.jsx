@@ -121,6 +121,9 @@ function FilterToolbar(props) {
         filterDict[category.key] = []
         return filterDict
       }, {})
+      if (filters.limit !== undefined) {
+        newFilters.limit = filters.limit
+      }
     }
 
     // Notify the parent component about the filter change
@@ -328,24 +331,17 @@ function writeFiltersToUrl(filters, location, history) {
   })
 }
 
-function buildQueryString(filters, excludeResults) {
-  let queryString = '&complete=true'
-  let resultFilter = false
+function makeQueryString(filters) {
+  let queryString = ''
   if (filters) {
     Object.keys(filters).map((key) => {
       filters[key].forEach((value) => {
-        if (key === 'result') {
-          resultFilter = true
-        }
         queryString += '&' + key + '=' + value
       })
       return queryString
     })
   }
-  if (excludeResults && !resultFilter) {
-      queryString += '&exclude_result=SKIPPED'
-  }
   return queryString
 }
 
-export { buildQueryString, FilterToolbar, getFiltersFromUrl, writeFiltersToUrl }
+export { makeQueryString, FilterToolbar, getFiltersFromUrl, writeFiltersToUrl }
