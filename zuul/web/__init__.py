@@ -1257,17 +1257,32 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
-    def config_errors(self, tenant_name, tenant, auth):
-        ret = [
-            {
+    def config_errors(self, tenant_name, tenant, auth,
+                      project=None, branch=None, severity=None, name=None,
+                      limit=50, skip=0):
+        skip = int(skip)
+        limit = int(limit)
+        count = 0
+        ret = []
+        for e in tenant.layout.loading_errors.errors:
+            if not (
+                (project is None or e.key.context.project_name == project) and
+                (branch is None or e.key.context.branch == branch) and
+                (severity is None or e.severity == severity) and
+                (name is None or e.name == name)):
+                continue
+            count += 1
+            if count <= skip:
+                continue
+            ret.append({
                 'source_context': e.key.context.toDict(),
                 'error': e.error,
                 'short_error': e.short_error,
                 'severity': e.severity,
                 'name': e.name,
-            }
-            for e in tenant.layout.loading_errors.errors
-        ]
+            })
+            if len(ret) >= limit:
+                break
         return ret
 
     @cherrypy.expose
