@@ -14,54 +14,54 @@
 // under the License.
 
 import {
-  CONFIGERRORS_FETCH_FAIL,
-  CONFIGERRORS_FETCH_REQUEST,
-  CONFIGERRORS_FETCH_SUCCESS,
-  CONFIGERRORS_CLEAR
-} from '../actions/configErrors'
+  TENANT_STATUS_FETCH_FAIL,
+  TENANT_STATUS_FETCH_REQUEST,
+  TENANT_STATUS_FETCH_SUCCESS,
+  TENANT_STATUS_CLEAR
+} from '../actions/tenantStatus'
 
 export default (state = {
-  errors: [],
+  tenant_status: {},
   isFetching: false,
   ready: false,
   tenant: '',
 }, action) => {
   switch (action.type) {
-    case CONFIGERRORS_FETCH_REQUEST:
+    case TENANT_STATUS_FETCH_REQUEST:
       return {
         isFetching: true,
         ready: false,
         tenant: action.tenant,
-        errors: state.errors,
+        tenant_status: state.tenant_status,
       }
-    case CONFIGERRORS_FETCH_SUCCESS:
+    case TENANT_STATUS_FETCH_SUCCESS:
       if (action.tenant === state.tenant) {
         return {
           isFetching: false,
           ready: true,
           tenant: action.tenant,
-          errors: action.errors,
+          tenant_status: action.tenant_status,
         }
       } else {
         return state
       }
-    case CONFIGERRORS_FETCH_FAIL:
+    case TENANT_STATUS_FETCH_FAIL:
       if (action.tenant === state.tenant) {
         return {
           isFetching: false,
           ready: false,
           tenant: action.tenant,
-          errors: state.errors,
+          tenant_status: state.tenant_status,
         }
       } else {
         return state
       }
-    case CONFIGERRORS_CLEAR:
+    case TENANT_STATUS_CLEAR:
       return {
         isFetching: false,
         ready: false,
         tenant: '',
-        errors: [],
+        tenant_status: {},
       }
     default:
       return state
