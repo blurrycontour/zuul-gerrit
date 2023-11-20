@@ -538,6 +538,8 @@ class Nodepool(object):
                 continue
             if not node.user_data:
                 continue
+            if not isinstance(node.user_data, dict):
+                continue
             if node.user_data.get('zuul_system') != self.system_id:
                 continue
 
