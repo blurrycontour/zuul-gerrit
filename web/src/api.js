@@ -148,8 +148,12 @@ function fetchTenants() {
   return makeRequest(apiUrl + 'tenants')
 }
 
-function fetchConfigErrors(apiPrefix) {
-  return makeRequest(apiPrefix + 'config-errors')
+function fetchConfigErrors(apiPrefix, queryString) {
+  let path = 'config-errors'
+  if (queryString) {
+    path += '?' + queryString.slice(1)
+  }
+  return makeRequest(apiPrefix + path)
 }
 
 function fetchStatus(apiPrefix) {
