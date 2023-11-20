@@ -234,6 +234,7 @@ class TestMergerRepo(ZuulTestCase):
         work_repo.setRefs({
             'refs/heads/master': new_sha,
             'refs/remotes/origin/master': new_sha,
+            'refs/heads/broken': 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
         })
         self.assertEqual(work_repo.getBranchHead('master').hexsha, new_sha)
         self.assertIn('master', repo.remotes.origin.refs)

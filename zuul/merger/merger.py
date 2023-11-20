@@ -308,6 +308,12 @@ class Repo(object):
                         # object files the repository is essentially broken and
                         # needs to be cloned cleanly.
                         shutil.rmtree(self.local_path)
+                    elif 'bad object' in e.stderr.lower():
+                        # If we get here the git.Repo object was happy with its
+                        # lightweight way of checking if this is a valid git
+                        # repository. However if git reports a bad object, then
+                        # we may have written the repo refs with bad data.
+                        shutil.rmtree(self.local_path)
                     else:
                         time.sleep(self.retry_interval)
                     log.exception("Retry %s: Fetch %s %s %s" % (
@@ -540,10 +546,19 @@ class Repo(object):
             sorted_paths = sorted(refs.keys())
             for path in sorted_paths:
                 hexsha = refs[path]
-                f.write(f'{hexsha} {path}\n'.encode(encoding))
-                if log:
-                    log.debug("Set reference %s at %s in %s",
-                              path, hexsha, repo.git_dir)
+                try:
+                    # Attempt a lookup for the side effect of
+                    # verifying the object exists.
+                    binsha = gitdb.util.to_bin_sha(hexsha)
+                    info = repo.odb.info(binsha)
+                    f.write(f'{hexsha} {path}\n'.encode(encoding))
+                    if log:
+                        log.debug("Set reference %s at %s in %s",
+                                  path, hexsha, repo.git_dir)
+                except ValueError:
+                    # If the object does not exist, skip setting it.
+                    log.warning("Unable to resolve reference %s at %s in %s",
+                                path, hexsha, repo.git_dir)
 
         # Delete all the loose refs
         for dname in ('remotes', 'tags', 'heads'):
