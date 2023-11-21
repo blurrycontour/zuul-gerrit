@@ -922,6 +922,7 @@ class PipelineState(zkobject.ZKObject):
                 for build_job, build in buildset.builds.items():
                     if isinstance(build, BuildReference):
                         to_replace_dicts.append((item,
+                                                 buildset,
                                                  buildset.builds,
                                                  build_job,
                                                  build._path))
@@ -931,12 +932,14 @@ class PipelineState(zkobject.ZKObject):
                     for build in build_list:
                         if isinstance(build, BuildReference):
                             to_replace_lists.append((item,
+                                                     None,
                                                      build_list,
                                                      build,
                                                      build._path))
                         else:
                             build_map[build.getPath()] = build
-        for (item, build_dict, build_job, build_path) in to_replace_dicts:
+        for (item, buildset, build_dict, build_job, build_path
+             ) in to_replace_dicts:
             orig_build = build_map.get(build_path)
             if orig_build:
                 build_dict[build_job] = orig_build
@@ -944,7 +947,16 @@ class PipelineState(zkobject.ZKObject):
                 log.warning("Unable to find deduplicated build %s for %s",
                             build_path, item)
                 del build_dict[build_job]
-        for (item, build_list, build, build_path) in to_replace_lists:
+                # We're not going to be able to use the results of
+                # this deduplication, which means we're going to try
+                # to launch the job again.  To make sure that happens
+                # cleanly, go ahead and remove any nodeset information
+                # that we copied when we thought we were going to
+                # deduplicate it.
+                buildset.nodeset_info.pop(build_job, None)
+                buildset.node_requests.pop(build_job, None)
+        for (item, buildset, build_list, build, build_path
+             ) in to_replace_lists:
             idx = build_list.index(build)
             orig_build = build_map.get(build_path)
             if orig_build:
