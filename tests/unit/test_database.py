@@ -312,6 +312,50 @@ class TestMysqlDatabase(DBBaseTestCase):
             self.assertNotIn('zuul_buildset_new', tables)
             self.assertIn('zuul_buildset', tables)
 
+    def test_migration_d0a269345a22(self):
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("set foreign_key_checks=0")
+            for table in connection.exec_driver_sql("show tables"):
+                table = table[0]
+                connection.exec_driver_sql(f"drop table {table}")
+            connection.exec_driver_sql("set foreign_key_checks=1")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('f7843ddf1552')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("""
+            insert into zuul_ref
+            (id, project, ref, ref_url, `change`,
+            patchset, oldrev, newrev, branch)
+            values
+            (473951, 'openstack/neutron', 'refs/heads/master',
+            'https://git.openstack.org/cgit/openstack/neutron/commit/?id=None',
+            0, '', '', '', ''),
+            (473958, 'openstack/neutron', 'refs/heads/master',
+            'https://git.openstack.org/cgit/openstack/neutron/commit/'
+            '?id=fd024ac468456561918e02d32f55eabada102fd3',
+            0, '',
+            '0017b625ddb64cb3f383e1a4b7f20b7a62153705',
+            'fd024ac468456561918e02d32f55eabada102fd3',
+            ''),
+            (481941, 'openstack/neutron', 'refs/heads/stable/zed',
+            'https://opendev.org/openstack/neutron/commit/'
+            'd6ee668cc32725cb7d15d2e08fdb50a761f91fe4',
+            0, '',
+            'fdba20b27a1b97459db1e83f9b235149fe7fd1f7',
+            'd6ee668cc32725cb7d15d2e08fdb50a761f91fe4',
+            'stable/zed');
+            """)
+        self.connection._migrate()
+        with self.connection.engine.begin() as connection:
+            results = [r for r in connection.exec_driver_sql(
+                "select id, ref, branch from zuul_ref order by id")]
+            self.assertEqual(results, [
+                (473951, 'refs/heads/master', 'master'),
+                (473958, 'refs/heads/master', 'master'),
+                (481941, 'refs/heads/stable/zed', 'stable/zed'),
+            ])
+
     def test_buildsets(self):
         tenant = 'tenant1',
         buildset_uuid = 'deadbeef'
@@ -546,3 +590,50 @@ class TestPostgresqlDatabase(DBBaseTestCase):
             # Make sure we rolled back the buildset_new table creation
             self.assertNotIn('zuul_buildset_new', tables)
             self.assertIn('zuul_buildset', tables)
+
+    def test_migration_d0a269345a22(self):
+        with self.connection.engine.begin() as connection:
+            tables = [x[0] for x in connection.exec_driver_sql(
+                "select tablename from pg_catalog.pg_tables "
+                "where schemaname='public'"
+            ).all()]
+
+            self.assertTrue(len(tables) > 0)
+            for table in tables:
+                connection.exec_driver_sql(f"drop table {table} cascade")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('f7843ddf1552')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("""
+            insert into zuul_ref
+            (id, project, ref, ref_url, change,
+            patchset, oldrev, newrev, branch)
+            values
+            (473951, 'openstack/neutron', 'refs/heads/master',
+            'https://git.openstack.org/cgit/openstack/neutron/commit/?id=None',
+            0, '', '', '', ''),
+            (473958, 'openstack/neutron', 'refs/heads/master',
+            'https://git.openstack.org/cgit/openstack/neutron/commit/'
+            '?id=fd024ac468456561918e02d32f55eabada102fd3',
+            0, '',
+            '0017b625ddb64cb3f383e1a4b7f20b7a62153705',
+            'fd024ac468456561918e02d32f55eabada102fd3',
+            ''),
+            (481941, 'openstack/neutron', 'refs/heads/stable/zed',
+            'https://opendev.org/openstack/neutron/commit/'
+            'd6ee668cc32725cb7d15d2e08fdb50a761f91fe4',
+            0, '',
+            'fdba20b27a1b97459db1e83f9b235149fe7fd1f7',
+            'd6ee668cc32725cb7d15d2e08fdb50a761f91fe4',
+            'stable/zed');
+            """)
+        self.connection._migrate()
+        with self.connection.engine.begin() as connection:
+            results = [r for r in connection.exec_driver_sql(
+                "select id, ref, branch from zuul_ref order by id")]
+            self.assertEqual(results, [
+                (473951, 'refs/heads/master', 'master'),
+                (473958, 'refs/heads/master', 'master'),
+                (481941, 'refs/heads/stable/zed', 'stable/zed'),
+            ])
