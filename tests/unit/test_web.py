@@ -1771,6 +1771,28 @@ class TestTenantInfoConfigBroken(BaseTestWeb):
         self.assertIn('Zuul encountered a syntax error',
                       config_errors[1]['error'])
 
+        config_errors = self.get_url(
+            "api/tenant/tenant-broken/"
+            "config-errors?project=org/project2").json()
+        self.assertEqual(
+            len(config_errors), 1)
+        config_errors = self.get_url(
+            "api/tenant/tenant-broken/config-errors?branch=master").json()
+        self.assertEqual(
+            len(config_errors), 1)
+        config_errors = self.get_url(
+            "api/tenant/tenant-broken/config-errors?severity=error").json()
+        self.assertEqual(
+            len(config_errors), 2)
+        config_errors = self.get_url(
+            "api/tenant/tenant-broken/config-errors?name=Unknown").json()
+        self.assertEqual(
+            len(config_errors), 2)
+        config_errors = self.get_url(
+            "api/tenant/tenant-broken/config-errors?skip=1&limit=1").json()
+        self.assertEqual(
+            len(config_errors), 1)
+
         resp = self.get_url("api/tenant/non-tenant/config-errors")
         self.assertEqual(404, resp.status_code)
 
