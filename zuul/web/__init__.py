@@ -1186,7 +1186,7 @@ class ZuulWebAPI(object):
         if tenant_name not in self.zuulweb.unparsed_abide.tenants:
             raise cherrypy.HTTPError(404, "Unknown tenant")
         self.log.warning("Tenant %s isn't loaded", tenant_name)
-        raise cherrypy.HTTPError(204, f"Tenant {tenant_name} isn't ready")
+        raise cherrypy.HTTPError(422, f"Tenant {tenant_name} isn't ready")
 
     def _getProjectOrRaise(self, tenant, project_name):
         _, project = tenant.getProject(project_name)
