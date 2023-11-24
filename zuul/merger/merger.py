@@ -520,20 +520,20 @@ class Repo(object):
         return 'Created reference %s at %s in %s' % (
             path, hexsha, repo.git_dir)
 
-    def setRefs(self, refs, zuul_event_id=None):
+    def setRefs(self, refs, create_remote_heads=False, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
         ref_log = get_annotated_logger(
             logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
-        self._setRefs(repo, refs, log=ref_log)
+        self._setRefs(repo, refs, create_remote_heads, log=ref_log)
 
     @staticmethod
-    def setRefsAsync(local_path, refs):
+    def setRefsAsync(local_path, refs, create_remote_heads=False):
         repo = git.Repo(local_path)
-        messages = Repo._setRefs(repo, refs)
+        messages = Repo._setRefs(repo, refs, create_remote_heads)
         return messages
 
     @staticmethod
-    def _setRefs(repo, refs, log=None):
+    def _setRefs(repo, refs, create_remote_heads=False, log=None):
         messages = []
 
         # Rewrite packed refs with our content.  In practice, this
@@ -552,6 +552,10 @@ class Repo(object):
                     binsha = gitdb.util.to_bin_sha(hexsha)
                     repo.odb.info(binsha)
                     f.write(f'{hexsha} {path}\n'.encode(encoding))
+                    if create_remote_heads and path.startswith("refs/heads/"):
+                        f.write(
+                            f'{hexsha} refs/remotes/origin/{path[11:]}\n'
+                            .encode(encoding))
                     if log:
                         log.debug("Set reference %s at %s in %s",
                                   path, hexsha, repo.git_dir)
@@ -1119,10 +1123,12 @@ class Merger(object):
         log.debug("Restore repo state for project %s/%s",
                   connection_name, project_name)
         if process_worker is None:
-            repo.setRefs(project, zuul_event_id=zuul_event_id)
+            repo.setRefs(project, create_remote_heads=self.execution_context,
+                         zuul_event_id=zuul_event_id)
         else:
             job = process_worker.submit(
-                Repo.setRefsAsync, repo.local_path, project)
+                Repo.setRefsAsync, repo.local_path, project,
+                create_remote_heads=self.execution_context,)
             messages = job.result()
             ref_log = get_annotated_logger(
                 logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
