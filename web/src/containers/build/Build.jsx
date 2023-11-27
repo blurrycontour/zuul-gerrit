@@ -34,6 +34,7 @@ import {
   LockIcon,
 } from '@patternfly/react-icons'
 import * as moment from 'moment'
+import * as moment_tz from 'moment-timezone'
 import 'moment-duration-format'
 
 import { BuildResultBadge, BuildResultWithIcon } from './Misc'
@@ -174,13 +175,13 @@ function Build({ build, tenant, timezone, user }) {
                 value={
                   <span>
                     <strong>Started at </strong>
-                    {moment
+                    {moment_tz
                       .utc(build.start_time)
                       .tz(timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}
                     <br />
                     <strong>Completed at </strong>
-                    {moment
+                    {moment_tz
                       .utc(build.end_time)
                       .tz(timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}

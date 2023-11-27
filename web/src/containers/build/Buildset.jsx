@@ -38,6 +38,7 @@ import {
   RedoAltIcon,
 } from '@patternfly/react-icons'
 import * as moment from 'moment'
+import * as moment_tz from 'moment-timezone'
 import 'moment-duration-format'
 
 import { buildExternalLink, IconProperty } from '../../Misc'
@@ -59,12 +60,12 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
       !cur.end_time || prev.end_time > cur.end_time ? prev : cur
     )
     const totalDuration =
-      (moment.utc(lastEndBuild.end_time).tz(timezone) -
-        moment.utc(firstStartBuild.start_time).tz(timezone)) /
+      (moment_tz.utc(lastEndBuild.end_time).tz(timezone) -
+        moment_tz.utc(firstStartBuild.start_time).tz(timezone)) /
       1000
     const overallDuration =
-      (moment.utc(lastEndBuild.end_time).tz(timezone) -
-        moment.utc(
+      (moment_tz.utc(lastEndBuild.end_time).tz(timezone) -
+        moment_tz.utc(
           buildset.event_timestamp != null
             ? buildset.event_timestamp : firstStartBuild.start_time
         ).tz(timezone)
@@ -91,7 +92,7 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
                   {firstStartLink} <br />
                   <i>
                     (started{' '}
-                    {moment
+                    {moment_tz
                       .utc(firstStartBuild.start_time)
                       .tz(timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}
@@ -102,7 +103,7 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
                   {lastEndLink} <br />
                   <i>
                     (ended{' '}
-                    {moment
+                    {moment_tz
                       .utc(lastEndBuild.end_time)
                       .tz(timezone)
                       .format('YYYY-MM-DD HH:mm:ss')}

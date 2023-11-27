@@ -45,6 +45,7 @@ import {
 } from '@patternfly/react-table'
 import 'moment-duration-format'
 import * as moment from 'moment'
+import * as moment_tz from 'moment-timezone'
 
 import { BuildResult, BuildResultWithIcon } from './Misc'
 import { buildExternalTableLink, IconProperty } from '../../Misc'
@@ -141,7 +142,7 @@ function BuildTable({
             .format('h [hr] m [min] s [sec]'),
         },
         {
-          title: moment
+          title: moment_tz
             .utc(build.start_time)
             .tz(timezone)
             .format('YYYY-MM-DD HH:mm:ss'),

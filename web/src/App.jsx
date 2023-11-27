@@ -25,7 +25,7 @@ import {
   TimedToastNotification,
   ToastNotificationList,
 } from 'patternfly-react'
-import * as moment from 'moment'
+import * as moment_tz from 'moment-timezone'
 import {
   Brand,
   Button,
@@ -288,7 +288,7 @@ class App extends React.Component {
               type={notification.type}
               onDismiss={() => { this.props.dispatch(clearNotification(notification.id)) }}
             >
-              <span title={moment.utc(notification.date).tz(this.props.timezone).format()}>
+              <span title={moment_tz.utc(notification.date).tz(this.props.timezone).format()}>
                 {notificationBody}
               </span>
             </TimedToastNotification>

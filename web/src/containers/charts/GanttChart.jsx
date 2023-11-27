@@ -18,6 +18,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import * as moment from 'moment'
+import * as moment_tz from 'moment-timezone'
 import 'moment-duration-format'
 
 import { Chart, ChartBar, ChartAxis, ChartLegend, ChartTooltip } from '@patternfly/react-charts'
@@ -36,18 +37,18 @@ function BuildsetGanttChart(props) {
         }
         return 0
     })
-    const origin = moment.utc(sortedByStartTime[builds.length - 1].start_time).tz(timezone)
+    const origin = moment_tz.utc(sortedByStartTime[builds.length - 1].start_time).tz(timezone)
 
     const longestJobName = builds.reduce((a, build) => (a.length < build.job_name.length ? build.job_name : a), '')
 
     const data = sortedByStartTime.map((build) => {
         return {
             x: build.job_name,
-            y0: build.start_time ? (moment.utc(build.start_time).tz(timezone) - origin) / 1000 : 0,
-            y: build.end_time ? (moment.utc(build.end_time).tz(timezone) - origin) / 1000 : 0,
+            y0: build.start_time ? (moment_tz.utc(build.start_time).tz(timezone) - origin) / 1000 : 0,
+            y: build.end_time ? (moment_tz.utc(build.end_time).tz(timezone) - origin) / 1000 : 0,
             result: build.result,
-            started: moment.utc(build.start_time).tz(timezone).format('YYYY-MM-DD HH:mm:ss'),
-            ended: moment.utc(build.end_time).tz(timezone).format('YYYY-MM-DD HH:mm:ss'),
+            started: moment_tz.utc(build.start_time).tz(timezone).format('YYYY-MM-DD HH:mm:ss'),
+            ended: moment_tz.utc(build.end_time).tz(timezone).format('YYYY-MM-DD HH:mm:ss'),
         }
     })
 

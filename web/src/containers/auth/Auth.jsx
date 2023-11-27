@@ -35,7 +35,7 @@ import {
   HatWizardIcon
 } from '@patternfly/react-icons'
 
-import * as moment from 'moment'
+import * as moment_tz from 'moment-timezone'
 
 import { apiUrl } from '../../api'
 import { fetchUserACL } from '../../actions/user'
@@ -169,7 +169,7 @@ class AuthContainer extends React.Component {
     const { user, tenant, timezone } = this.props
     const { isModalOpen, showZuulClientConfig } = this.state
     let config = this.ZuulClientConfig(tenant, user.data)
-    let valid_until = moment.unix(user.data.expires_at).tz(timezone).format('YYYY-MM-DD HH:mm:ss')
+    let valid_until = moment_tz.unix(user.data.expires_at).tz(timezone).format('YYYY-MM-DD HH:mm:ss')
     return (
       <React.Fragment>
         <Modal
