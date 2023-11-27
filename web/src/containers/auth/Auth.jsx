@@ -35,7 +35,7 @@ import {
   HatWizardIcon
 } from '@patternfly/react-icons'
 
-import * as moment from 'moment'
+import * as moment from 'moment-timezone'
 
 import { apiUrl } from '../../api'
 import { fetchUserACL } from '../../actions/user'

@@ -25,7 +25,7 @@ import {
   TimedToastNotification,
   ToastNotificationList,
 } from 'patternfly-react'
-import * as moment from 'moment'
+import * as moment from 'moment-timezone'
 import {
   Brand,
   Button,

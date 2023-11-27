@@ -49,7 +49,7 @@ import {
   cellWidth,
 } from '@patternfly/react-table'
 import 'moment-duration-format'
-import * as moment from 'moment'
+import * as moment from 'moment-timezone'
 
 import { BuildResult, BuildResultWithIcon } from './Misc'
 import { buildExternalTableLink, IconProperty } from '../../Misc'

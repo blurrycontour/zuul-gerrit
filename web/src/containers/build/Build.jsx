@@ -33,7 +33,7 @@ import {
   ThumbtackIcon,
   LockIcon,
 } from '@patternfly/react-icons'
-import * as moment from 'moment'
+import * as moment from 'moment-timezone'
 import 'moment-duration-format'
 
 import { BuildResultBadge, BuildResultWithIcon } from './Misc'
