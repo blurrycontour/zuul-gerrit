@@ -162,3 +162,9 @@ Version 20
 :Description: Send (secret) job parent and artifact data via build request
               parameters instead of updating the job.
               Affects schedulers and executors.
+
+Version 21
+----------
+:Prior Zuul version: 9.2.0
+:Description: Add job_dependencies and job_dependents fields to job graphs.
+              Affects schedulers.
