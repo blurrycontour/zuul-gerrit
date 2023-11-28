@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "234174cb_aa307ad7",
+        "filename": "web/src/containers/BuildQuery.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-28T17:17:32Z",
+      "side": 1,
+      "message": "Do we need this inner forEach? we are checking only the key value below which is set by the outer forEach.",
+      "revId": "312709f7346174414c3842eb7977960ce069fbfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9e1096b_c8ec1b49",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-28T17:17:32Z",
+      "side": 1,
+      "message": "Why do we use lists for the skip and limit info? Aren\u0027t they both singletons?",
+      "revId": "312709f7346174414c3842eb7977960ce069fbfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1be6224_e26bc789",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-28T17:17:32Z",
+      "side": 1,
+      "message": "Minor nit. I believe that other state objects within the zuul web app uses errors to track errors within the app itself not config errors. Maybe call this configErrors or similar to disambiguate.",
+      "revId": "312709f7346174414c3842eb7977960ce069fbfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06653fec_b395294f",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-28T17:17:32Z",
+      "side": 1,
+      "message": "Minor nit: why not 0 index pageNumber if we are operating on it zero indexed? Elsewhere we also have to +1 the page number only to -1 it here.",
+      "range": {
+        "startLine": 209,
+        "startChar": 46,
+        "endLine": 209,
+        "endChar": 49
+      },
+      "revId": "312709f7346174414c3842eb7977960ce069fbfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af6bfc2c_fca3a733",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-28T17:17:32Z",
+      "side": 1,
+      "message": "Maybe the pagination system expects things to be one indexed so we just deal with that elsewhere?",
+      "revId": "312709f7346174414c3842eb7977960ce069fbfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
