@@ -1017,7 +1017,7 @@ class PipelineManager(metaclass=ABCMeta):
     def _getPausedParent(self, build_set, job):
         job_graph = build_set.job_graph
         if job_graph:
-            for parent in job_graph.getParentJobsRecursively(job.name):
+            for parent in job_graph.getParentJobsRecursively(job):
                 build = build_set.getBuild(parent.name)
                 if build.paused:
                     return build
@@ -1940,10 +1940,19 @@ class PipelineManager(metaclass=ABCMeta):
             child_builds = []
             for item in self._getItemsWithBuild(build):
                 job_graph = item.current_build_set.job_graph
+                # TODO: The "this_job" indirection can be removed
+                # when the circular dependency refactor is complete.
+                # Until then, we can't assume that the build (and
+                # therefore job) is within the current buildset (if it
+                # has been deduplicated).
+                _this_uuid = item.current_build_set.job_graph.getUuidForJob(
+                    build.job.name)
+                _this_job = item.current_build_set.job_graph.getJobFromUuid(
+                    _this_uuid)
                 child_builds += [
                     item.current_build_set.builds.get(x.name)
                     for x in job_graph.getDependentJobsRecursively(
-                        build.job.name)]
+                        _this_job)]
             all_completed = True
             for child_build in child_builds:
                 if not child_build or not child_build.result:
@@ -1962,7 +1971,13 @@ class PipelineManager(metaclass=ABCMeta):
     def _resetDependentBuilds(self, build_set, build):
         job_graph = build_set.job_graph
 
-        for job in job_graph.getDependentJobsRecursively(build.job.name):
+        # TODO: The "this_job" indirection can be removed when the
+        # circular dependency refactor is complete.  Until then, we
+        # can't assume that the build (and therefore job) is within
+        # the current buildset (if it has been deduplicated).
+        _this_uuid = job_graph.getUuidForJob(build.job.name)
+        _this_job = job_graph.getJobFromUuid(_this_uuid)
+        for job in job_graph.getDependentJobsRecursively(_this_job):
             self.sched.cancelJob(build_set, job)
             build = build_set.getBuild(job.name)
             if build:
