@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7337b8b1_6fd80453",
+        "filename": "web/src/containers/BuildQuery.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-28T17:41:38Z",
+      "side": 1,
+      "message": "Yeah, this seems to have been refactored to not be necessary.  I\u0027ll update.",
+      "parentUuid": "234174cb_aa307ad7",
+      "revId": "312709f7346174414c3842eb7977960ce069fbfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9e1096b_c8ec1b49",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfc4b9f6_ed14d423",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-28T17:41:38Z",
+      "side": 1,
+      "message": "This is copypasta so i\u0027m not 100% sure, but I *think* it\u0027s to mimic how we get data from the query string where ?foo\u003d1 shows up as foo\u003d[1], and ?foo\u003d1\u0026foo\u003d2 shows up as foo\u003d[1,2].  The pagination info does get imported/exported to the query string.",
+      "parentUuid": "a9e1096b_c8ec1b49",
+      "revId": "312709f7346174414c3842eb7977960ce069fbfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e1be6224_e26bc789",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-11-28T17:17:32Z",
       "side": 1,
       "message": "Minor nit. I believe that other state objects within the zuul web app uses errors to track errors within the app itself not config errors. Maybe call this configErrors or similar to disambiguate.",
+      "revId": "312709f7346174414c3842eb7977960ce069fbfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd2155fe_57890e79",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-28T17:41:38Z",
+      "side": 1,
+      "message": "I think you might be thinking of the redux store and especially the action objects, and I agree with that and we call them configErrors there.  This setState is effectively just a local variable for this component.  We don\u0027t normally store lists of errors on components, and this component is the configErrors page so I think this is unambiguous.",
+      "parentUuid": "e1be6224_e26bc789",
       "revId": "312709f7346174414c3842eb7977960ce069fbfe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -75,6 +129,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3af8e3b6_550874c3",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-28T17:41:38Z",
+      "side": 1,
+      "message": "Copypasta and I think it\u0027s worth keeping it consistent.  Since this interacts with the patternfly pagination component, it is possible that it uses one-indexed natively, but I haven\u0027t confirmed.",
+      "parentUuid": "06653fec_b395294f",
+      "revId": "312709f7346174414c3842eb7977960ce069fbfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af6bfc2c_fca3a733",
@@ -88,6 +160,24 @@
       "writtenOn": "2023-11-28T17:17:32Z",
       "side": 1,
       "message": "Maybe the pagination system expects things to be one indexed so we just deal with that elsewhere?",
+      "revId": "312709f7346174414c3842eb7977960ce069fbfe",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ca63d26_a6178820",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-28T17:41:38Z",
+      "side": 1,
+      "message": "Yes that\u0027s my guess.",
+      "parentUuid": "af6bfc2c_fca3a733",
       "revId": "312709f7346174414c3842eb7977960ce069fbfe",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
