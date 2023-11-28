@@ -1017,7 +1017,7 @@ class PipelineManager(metaclass=ABCMeta):
     def _getPausedParent(self, build_set, job):
         job_graph = build_set.job_graph
         if job_graph:
-            for parent in job_graph.getParentJobsRecursively(job.name):
+            for parent in job_graph.getParentJobsRecursively(job):
                 build = build_set.getBuild(parent.name)
                 if build.paused:
                     return build
@@ -1929,6 +1929,27 @@ class PipelineManager(metaclass=ABCMeta):
         self._resumeBuilds(build.build_set)
         return True
 
+    def _legacyGetJob(self, item, job):
+        # TODO (model_api<21): The "this_job" indirection can be
+        # removed when the circular dependency refactor is complete.
+        # Until then, we can't assume that the build (and therefore
+        # job) is within the current buildset (if it has been
+        # deduplicated).
+        try:
+            this_uuid = item.current_build_set.job_graph.getUuidForJob(
+                job.name)
+        except ValueError:
+            # This doesn't currently raise a ValueError, it just
+            # returns None, but that could easily change during
+            # refactoring so let's go ahead and handle both.
+            this_uuid = None
+        if this_uuid is None:
+            # This is the model_api < 18 case, we're going to end up
+            # looking up dependencies by name anyway so the specific
+            # frozen job object doesn't matter.
+            return job
+        return item.current_build_set.job_graph.getJobFromUuid(this_uuid)
+
     def _resumeBuilds(self, build_set):
         """
         Resumes all paused builds of a buildset that may be resumed.
@@ -1940,10 +1961,11 @@ class PipelineManager(metaclass=ABCMeta):
             child_builds = []
             for item in self._getItemsWithBuild(build):
                 job_graph = item.current_build_set.job_graph
+                _this_job = self._legacyGetJob(item, build.job)
                 child_builds += [
                     item.current_build_set.builds.get(x.name)
                     for x in job_graph.getDependentJobsRecursively(
-                        build.job.name)]
+                        _this_job)]
             all_completed = True
             for child_build in child_builds:
                 if not child_build or not child_build.result:
@@ -1962,7 +1984,8 @@ class PipelineManager(metaclass=ABCMeta):
     def _resetDependentBuilds(self, build_set, build):
         job_graph = build_set.job_graph
 
-        for job in job_graph.getDependentJobsRecursively(build.job.name):
+        _this_job = self._legacyGetJob(build_set.item, build.job)
+        for job in job_graph.getDependentJobsRecursively(_this_job):
             self.sched.cancelJob(build_set, job)
             build = build_set.getBuild(job.name)
             if build:

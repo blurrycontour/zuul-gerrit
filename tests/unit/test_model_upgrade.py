@@ -401,6 +401,55 @@ class TestModelUpgrade(ZuulTestCase):
                  result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    @model_version(20)
+    def test_model_20_21(self):
+        # Test backwards compat for job graph dependency freezing.
+        # Note that these jobs have a dependency on project-merge.
+        # First test the entire lifecycle under the old api.
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        # Then repeat the test with a mid-cycle upgrade.
+        self.executor_server.hold_jobs_in_build = True
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 21
+        component_registry = ComponentRegistry(self.zk_client)
+        for _ in iterate_timeout(30, "model api to update"):
+            if component_registry.model_api == 21:
+                break
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='1,1'),
+            dict(name='project-merge', result='SUCCESS', changes='2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='2,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+
 
 class TestGithubModelUpgrade(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
@@ -669,3 +718,58 @@ class TestDataReturn(AnsibleZuulTestCase):
                       A.messages[-1])
         self.assertIn('- data-return-relative https://zuul.example.com',
                       A.messages[-1])
+
+    @model_version(20)
+    def test_model_20_21(self):
+        self._test_circ_dep_refactor()
+
+    @model_version(18)
+    def test_model_18_21(self):
+        self._test_circ_dep_refactor()
+
+    def _test_circ_dep_refactor(self):
+        # Test backwards compat for job graph dependency freezing.
+        # First test the entire lifecycle under the old api.
+        A = self.fake_gerrit.addFakeChange('org/project6', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='data-return', result='SUCCESS', changes='1,1'),
+            dict(name='paused-data-return-child-jobs',
+                 result='SUCCESS', changes='1,1'),
+        ], ordered=True)
+        self.assertEqual(set(['data-return', 'child']),
+                         set(self.history[1].parameters['zuul']['child_jobs']))
+
+        # Then repeat the test with a mid-cycle upgrade.
+        self.executor_server.hold_jobs_in_build = True
+        B = self.fake_gerrit.addFakeChange('org/project6', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 21
+        component_registry = ComponentRegistry(self.zk_client)
+        for _ in iterate_timeout(30, "model api to update"):
+            if component_registry.model_api == 21:
+                break
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='data-return', result='SUCCESS', changes='1,1'),
+            dict(name='paused-data-return-child-jobs',
+                 result='SUCCESS', changes='1,1'),
+            dict(name='data-return', result='SUCCESS', changes='2,1'),
+            dict(name='paused-data-return-child-jobs',
+                 result='SUCCESS', changes='2,1'),
+        ], ordered=True)
+        self.assertEqual(set(['data-return', 'child']),
+                         set(self.history[1].parameters['zuul']['child_jobs']))
+        self.assertEqual(set(['data-return', 'child']),
+                         set(self.history[3].parameters['zuul']['child_jobs']))

@@ -485,6 +485,11 @@ class FakeFrozenJob(model.Job):
 
 
 class TestGraph(BaseTestCase):
+    def setUp(self):
+        COMPONENT_REGISTRY.registry = Dummy()
+        COMPONENT_REGISTRY.registry.model_api = MODEL_API
+        super().setUp()
+
     def test_job_graph_disallows_multiple_jobs_with_same_name(self):
         graph = model.JobGraph({})
         job1 = FakeFrozenJob('job')
@@ -495,52 +500,64 @@ class TestGraph(BaseTestCase):
             graph.addJob(job2)
 
     def test_job_graph_disallows_circular_dependencies(self):
-        graph = model.JobGraph({})
         jobs = [FakeFrozenJob('job%d' % i) for i in range(0, 10)]
-        prevjob = None
-        for j in jobs[:3]:
-            if prevjob:
-                j.dependencies = frozenset([
-                    model.JobDependency(prevjob.name)])
-            graph.addJob(j)
-            prevjob = j
-        # 0 triggers 1 triggers 2 triggers 3...
+
+        def setup_graph():
+            graph = model.JobGraph({})
+            prevjob = None
+            for j in jobs[:3]:
+                if prevjob:
+                    j.dependencies = frozenset([
+                        model.JobDependency(prevjob.name)])
+                graph.addJob(j)
+                prevjob = j
+            # 0 triggers 1 triggers 2 triggers 3...
+            return graph
 
         # Cannot depend on itself
+        graph = setup_graph()
+        j = FakeFrozenJob('jobX')
+        j.dependencies = frozenset([model.JobDependency(j.name)])
+        graph.addJob(j)
         with testtools.ExpectedException(
                 Exception,
                 "Dependency cycle detected in job jobX"):
-            j = FakeFrozenJob('jobX')
-            j.dependencies = frozenset([model.JobDependency(j.name)])
-            graph.addJob(j)
+            graph.freezeDependencies()
 
         # Disallow circular dependencies
+        graph = setup_graph()
+        jobs[3].dependencies = frozenset([model.JobDependency(jobs[4].name)])
+        graph.addJob(jobs[3])
+        jobs[4].dependencies = frozenset([model.JobDependency(jobs[3].name)])
+        graph.addJob(jobs[4])
         with testtools.ExpectedException(
                 Exception,
                 "Dependency cycle detected in job job3"):
-            jobs[4].dependencies = frozenset([
-                model.JobDependency(jobs[3].name)])
-            graph.addJob(jobs[4])
-            jobs[3].dependencies = frozenset([
-                model.JobDependency(jobs[4].name)])
-            graph.addJob(jobs[3])
+            graph.freezeDependencies()
 
+        graph = setup_graph()
+        jobs[3].dependencies = frozenset([model.JobDependency(jobs[5].name)])
+        graph.addJob(jobs[3])
+        jobs[4].dependencies = frozenset([model.JobDependency(jobs[3].name)])
+        graph.addJob(jobs[4])
         jobs[5].dependencies = frozenset([model.JobDependency(jobs[4].name)])
         graph.addJob(jobs[5])
 
         with testtools.ExpectedException(
                 Exception,
                 "Dependency cycle detected in job job3"):
-            jobs[3].dependencies = frozenset([
-                model.JobDependency(jobs[5].name)])
-            graph.addJob(jobs[3])
+            graph.freezeDependencies()
 
-        jobs[3].dependencies = frozenset([
-            model.JobDependency(jobs[2].name)])
+        graph = setup_graph()
+        jobs[3].dependencies = frozenset([model.JobDependency(jobs[2].name)])
         graph.addJob(jobs[3])
-        jobs[6].dependencies = frozenset([
-            model.JobDependency(jobs[2].name)])
+        jobs[4].dependencies = frozenset([model.JobDependency(jobs[3].name)])
+        graph.addJob(jobs[4])
+        jobs[5].dependencies = frozenset([model.JobDependency(jobs[4].name)])
+        graph.addJob(jobs[5])
+        jobs[6].dependencies = frozenset([model.JobDependency(jobs[2].name)])
         graph.addJob(jobs[6])
+        graph.freezeDependencies()
 
     def test_job_graph_allows_soft_dependencies(self):
         parent = FakeFrozenJob('parent')
@@ -552,13 +569,15 @@ class TestGraph(BaseTestCase):
         graph = model.JobGraph({})
         graph.addJob(parent)
         graph.addJob(child)
-        self.assertEqual(graph.getParentJobsRecursively(child.name),
+        graph.freezeDependencies()
+        self.assertEqual(graph.getParentJobsRecursively(child),
                          [parent])
 
         # Skip the parent
         graph = model.JobGraph({})
         graph.addJob(child)
-        self.assertEqual(graph.getParentJobsRecursively(child.name), [])
+        graph.freezeDependencies()
+        self.assertEqual(graph.getParentJobsRecursively(child), [])
 
     def test_job_graph_allows_soft_dependencies4(self):
         # A more complex scenario with multiple parents at each level
@@ -578,7 +597,8 @@ class TestGraph(BaseTestCase):
         for j in parents:
             graph.addJob(j)
         graph.addJob(child)
-        self.assertEqual(set(graph.getParentJobsRecursively(child.name)),
+        graph.freezeDependencies()
+        self.assertEqual(set(graph.getParentJobsRecursively(child)),
                          set(parents))
 
         # Skip first parent, therefore its recursive dependencies don't appear
@@ -587,7 +607,8 @@ class TestGraph(BaseTestCase):
             if j is not parents[0]:
                 graph.addJob(j)
         graph.addJob(child)
-        self.assertEqual(set(graph.getParentJobsRecursively(child.name)),
+        graph.freezeDependencies()
+        self.assertEqual(set(graph.getParentJobsRecursively(child)),
                          set(parents) -
                          set([parents[0], parents[2], parents[3]]))
 
@@ -597,7 +618,8 @@ class TestGraph(BaseTestCase):
             if j is not parents[3]:
                 graph.addJob(j)
         graph.addJob(child)
-        self.assertEqual(set(graph.getParentJobsRecursively(child.name)),
+        graph.freezeDependencies()
+        self.assertEqual(set(graph.getParentJobsRecursively(child)),
                          set(parents) - set([parents[3]]))
 
 
