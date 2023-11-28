@@ -552,13 +552,13 @@ class TestGraph(BaseTestCase):
         graph = model.JobGraph({})
         graph.addJob(parent)
         graph.addJob(child)
-        self.assertEqual(graph.getParentJobsRecursively(child.name),
+        self.assertEqual(graph.getParentJobsRecursively(child),
                          [parent])
 
         # Skip the parent
         graph = model.JobGraph({})
         graph.addJob(child)
-        self.assertEqual(graph.getParentJobsRecursively(child.name), [])
+        self.assertEqual(graph.getParentJobsRecursively(child), [])
 
     def test_job_graph_allows_soft_dependencies4(self):
         # A more complex scenario with multiple parents at each level
@@ -578,7 +578,7 @@ class TestGraph(BaseTestCase):
         for j in parents:
             graph.addJob(j)
         graph.addJob(child)
-        self.assertEqual(set(graph.getParentJobsRecursively(child.name)),
+        self.assertEqual(set(graph.getParentJobsRecursively(child)),
                          set(parents))
 
         # Skip first parent, therefore its recursive dependencies don't appear
@@ -587,7 +587,7 @@ class TestGraph(BaseTestCase):
             if j is not parents[0]:
                 graph.addJob(j)
         graph.addJob(child)
-        self.assertEqual(set(graph.getParentJobsRecursively(child.name)),
+        self.assertEqual(set(graph.getParentJobsRecursively(child)),
                          set(parents) -
                          set([parents[0], parents[2], parents[3]]))
 
@@ -597,7 +597,7 @@ class TestGraph(BaseTestCase):
             if j is not parents[3]:
                 graph.addJob(j)
         graph.addJob(child)
-        self.assertEqual(set(graph.getParentJobsRecursively(child.name)),
+        self.assertEqual(set(graph.getParentJobsRecursively(child)),
                          set(parents) - set([parents[3]]))
 
 

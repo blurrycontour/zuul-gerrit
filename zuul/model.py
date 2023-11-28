@@ -3632,6 +3632,18 @@ class JobGraph(object):
         self.job_uuids = []
         # dependent_job_name -> dict(parent_job_name -> soft)
         self._dependencies = {}
+        # The correct terminology is "dependencies" and "dependents",
+        # which is confusing, but it's not appropriate to use terms
+        # like "parent" and "child" since we use those for
+        # inheritance.  This is another dimension.  But to clarify the
+        # correct terminology using the wrong terms: dependency ~=
+        # parent and dependent ~= child.  So if job A must run to
+        # completion before job B, then job A is a dependency of job
+        # B, and job B is a dependent of job A.
+        # Dict of {job_uuid: {parent_uuid: {soft: bool}}}
+        self.job_dependencies = {}
+        # Dict of {job_uuid: {child_uuid: {soft: bool}}}
+        self.job_dependents = {}
         self.project_metadata = {}
 
     def __repr__(self):
@@ -3642,6 +3654,8 @@ class JobGraph(object):
             "jobs": self.jobs,
             "job_uuids": self.job_uuids,
             "dependencies": self._dependencies,
+            "job_dependencies": self.job_dependencies,
+            "job_dependents": self.job_dependents,
             "project_metadata": {
                 k: v.toDict() for (k, v) in self.project_metadata.items()
             },
@@ -3660,6 +3674,9 @@ class JobGraph(object):
             k: ProjectMetadata.fromDict(v)
             for (k, v) in data['project_metadata'].items()
         }
+        # MODEL_API < 21
+        self.job_dependencies = data.get('job_dependencies')
+        self.job_dependents = data.get('job_dependents')
         return self
 
     def addJob(self, job):
@@ -3672,23 +3689,8 @@ class JobGraph(object):
         self.job_uuids.append(job.uuid)
         # Append the dependency information
         self._dependencies.setdefault(job.name, {})
-        try:
-            for dependency in job.dependencies:
-                # Make sure a circular dependency is never created
-                ancestor_jobs = self._getParentJobNamesRecursively(
-                    dependency.name, soft=True)
-                ancestor_jobs.add(dependency.name)
-                if any((job.name == anc_job) for anc_job in ancestor_jobs):
-                    raise Exception("Dependency cycle detected in job %s" %
-                                    (job.name,))
-                self._dependencies[job.name][dependency.name] = \
-                    dependency.soft
-        except Exception:
-            del self._job_map[job.name]
-            self.jobs.pop()
-            self.job_uuids.pop()
-            del self._dependencies[job.name]
-            raise
+        for dependency in job.dependencies:
+            self._dependencies[job.name][dependency.name] = dependency.soft
 
     def getJobs(self):
         # Report in the order of layout cfg
@@ -3697,7 +3699,27 @@ class JobGraph(object):
     def getUuidForJob(self, job_name):
         return self.job_uuids[self.jobs.index(job_name)]
 
-    def getDirectDependentJobs(self, parent_job, skip_soft=False):
+    def getJobFromUuid(self, job_uuid):
+        # TODO: remove when self.job_map is indexed by uuid
+        index = self.job_uuids.index(job_uuid)
+        name = self.jobs[index]
+        return self._job_map[name]
+
+    def getDirectDependentJobs(self, job):
+        # First, are we able to support the new method?
+        if self._dependencies and not self.job_dependencies:
+            # MODEL_API < 21
+            return [self._job_map[name]
+                    for name in self._legacyGetDirectDependentJobNames(
+                        job.name, skip_soft=False)]
+        ret = []
+        for dependent_uuid, dependent_data in \
+            self.job_dependents.get(job.uuid, {}).items():
+            ret.append(self.getJobFromUuid(dependent_uuid))
+        return ret
+
+    # MODEL_API < 21
+    def _legacyGetDirectDependentJobNames(self, parent_job, skip_soft=False):
         ret = set()
         for dependent_name, parents in self._dependencies.items():
             part = parent_job in parents \
@@ -3706,27 +3728,105 @@ class JobGraph(object):
                 ret.add(dependent_name)
         return ret
 
-    def getDependentJobsRecursively(self, parent_job, skip_soft=False):
+    def getDependentJobsRecursively(self, job, skip_soft=False):
+        if self._dependencies and not self.job_dependents:
+            # MODEL_API < 21
+            return self._legacyGetDependentJobsRecursively(job,
+                                                           skip_soft=skip_soft)
+        all_dependent_uuids = set()
+        uuids_to_iterate = set([(job.uuid, False)])
+        while len(uuids_to_iterate) > 0:
+            (current_uuid, current_data) = uuids_to_iterate.pop()
+            current_dependent_uuids = self.job_dependents.get(current_uuid, {})
+            if skip_soft:
+                hard_dependent_uuids = {
+                    j: d for j, d in current_dependent_uuids.items()
+                    if not d['soft']
+                }
+                current_dependent_uuids = hard_dependent_uuids
+            if job.uuid != current_uuid:
+                all_dependent_uuids.add(current_uuid)
+            new_dependent_uuids = (set(current_dependent_uuids.keys()) -
+                                   all_dependent_uuids)
+            for u in new_dependent_uuids:
+                uuids_to_iterate.add((u, current_dependent_uuids[u]['soft']))
+        return [self.getJobFromUuid(u) for u in all_dependent_uuids]
+
+    # MODEL_API < 21
+    def _legacyGetDependentJobsRecursively(self, parent_job, skip_soft=False):
         all_dependent_jobs = set()
         jobs_to_iterate = set([parent_job])
         while len(jobs_to_iterate) > 0:
             current_job = jobs_to_iterate.pop()
-            current_dependent_jobs = self.getDirectDependentJobs(current_job,
-                                                                 skip_soft)
+            current_dependent_jobs = self._legacyGetDirectDependentJobNames(
+                current_job, skip_soft)
             new_dependent_jobs = current_dependent_jobs - all_dependent_jobs
             jobs_to_iterate |= new_dependent_jobs
             all_dependent_jobs |= new_dependent_jobs
         return [self._job_map[name] for name in all_dependent_jobs]
 
-    def getParentJobsRecursively(self, dependent_job, layout=None,
-                                 skip_soft=False):
-        return [self._job_map[name] for name in
-                self._getParentJobNamesRecursively(dependent_job,
-                                                   layout=layout,
-                                                   skip_soft=skip_soft)]
+    def freezeDependencies(self):
+        for dependent_name, parents in self._dependencies.items():
+            dependent_uuid = self.getUuidForJob(dependent_name)
+            dependencies = self.job_dependencies.setdefault(dependent_uuid, {})
+            for parent_name, parent_soft in parents.items():
+                if parent_name not in self._job_map:
+                    raise Exception("Job %s depends on %s which was not run." %
+                                    (dependent_name, parent_name))
+                # TODO: when we support multiple jobs with the same
+                # name, this lookup will be indexed by (name, ref), so
+                # that we typically depend on jobs with the same ref
+                # (but this could be modified by deduplication).
+                parent_job = self._job_map[parent_name]
+                dependencies[parent_job.uuid] = dict(soft=parent_soft)
+                dependents = self.job_dependents.setdefault(
+                    parent_job.uuid, {})
+                dependents[dependent_uuid] = dict(soft=parent_soft)
+        for dependent_name, parents in self._dependencies.items():
+            dependent_uuid = self.getUuidForJob(dependent_name)
+            dependent_job = self.getJobFromUuid(dependent_uuid)
+            # For the side effect of verifying no cycles
+            self.getParentJobsRecursively(dependent_job)
+        if (COMPONENT_REGISTRY.model_api < 21):
+            # Now that we have verified the dependency structure, we
+            # empty it so we follow a consistent code path before
+            # upgrading.
+            self.job_dependencies = {}
+            self.job_dependents = {}
 
-    def _getParentJobNamesRecursively(self, dependent_job, soft=False,
-                                      layout=None, skip_soft=False):
+    def getParentJobsRecursively(self, job, skip_soft=False):
+        if self._dependencies and not self.job_dependencies:
+            # MODEL_API < 21
+            return [self._job_map[name] for name in
+                    self._legacyGetParentJobNamesRecursively(
+                        job.name, skip_soft=skip_soft)]
+        all_dependency_uuids = set()
+        uuids_to_iterate = set([(job.uuid, False)])
+        while len(uuids_to_iterate) > 0:
+            (current_uuid, current_data) = uuids_to_iterate.pop()
+            current_dependency_uuids = self.job_dependencies.get(
+                current_uuid, {})
+            if skip_soft:
+                hard_dependency_uuids = {
+                    j: d for j, d in current_dependency_uuids.items()
+                    if not d['soft']
+                }
+                current_dependency_uuids = hard_dependency_uuids
+            if current_dependency_uuids is None:
+                current_job = self.getJobFromUuid(current_uuid)
+                raise Exception("Job %s depends on %s which was not run." %
+                                (job, current_job.name))
+            elif job.uuid != current_uuid:
+                all_dependency_uuids.add(current_uuid)
+            new_dependency_uuids = (set(current_dependency_uuids.keys()) -
+                                    all_dependency_uuids)
+            for u in new_dependency_uuids:
+                uuids_to_iterate.add((u, current_dependency_uuids[u]['soft']))
+        return [self.getJobFromUuid(u) for u in all_dependency_uuids]
+
+    # MODEL_API < 21
+    def _legacyGetParentJobNamesRecursively(self, dependent_job,
+                                            skip_soft=False):
         all_parent_jobs = set()
         jobs_to_iterate = set([(dependent_job, False)])
         while len(jobs_to_iterate) > 0:
@@ -3737,16 +3837,8 @@ class JobGraph(object):
                     {d: s for d, s in current_parent_jobs.items() if not s}
                 current_parent_jobs = hard_parent_jobs
             if current_parent_jobs is None:
-                if soft or current_soft:
-                    if layout:
-                        # If the caller supplied a layout, verify that
-                        # the job exists to provide a helpful error
-                        # message.  Called for exception side effect:
-                        layout.getJob(current_job)
-                    current_parent_jobs = {}
-                else:
-                    raise Exception("Job %s depends on %s which was not run." %
-                                    (dependent_job, current_job))
+                raise Exception("Job %s depends on %s which was not run." %
+                                (dependent_job, current_job))
             elif dependent_job != current_job:
                 all_parent_jobs.add(current_job)
             new_parent_jobs = set(current_parent_jobs.keys()) - all_parent_jobs
@@ -5184,10 +5276,6 @@ class QueueItem(zkobject.ZKObject):
             job_graph = layout.createJobGraph(
                 context, self, ppc, skip_file_matcher, redact_secrets_and_keys,
                 debug_messages)
-            for job in job_graph.getJobs():
-                # Ensure that each jobs's dependencies are fully
-                # accessible.  This will raise an exception if not.
-                job_graph.getParentJobsRecursively(job.name, layout)
 
             # Copy project metadata to job_graph since this must be independent
             # of the layout as we need it in order to prepare the context for
@@ -5647,8 +5735,7 @@ class QueueItem(zkobject.ZKObject):
                 continue
             all_parent_jobs_successful = True
             parent_builds_with_data = {}
-            for parent_job in job_graph.getParentJobsRecursively(
-                    job.name):
+            for parent_job in job_graph.getParentJobsRecursively(job):
                 if parent_job.name in unexecuted_job_names \
                         or parent_job.name in failed_job_names:
                     all_parent_jobs_successful = False
@@ -5658,7 +5745,7 @@ class QueueItem(zkobject.ZKObject):
                     parent_builds_with_data[parent_job.name] = parent_build
 
             for parent_job in job_graph.getParentJobsRecursively(
-                    job.name, skip_soft=True):
+                    job, skip_soft=True):
                 if parent_job.name in ignored_job_names:
                     all_parent_jobs_successful = False
                     break
@@ -5702,7 +5789,7 @@ class QueueItem(zkobject.ZKObject):
     def getJobParentData(self, job):
         job_graph = self.current_build_set.job_graph
         parent_builds_with_data = {}
-        for parent_job in job_graph.getParentJobsRecursively(job.name):
+        for parent_job in job_graph.getParentJobsRecursively(job):
             parent_build = self.current_build_set.getBuild(parent_job.name)
             if parent_build and parent_build.result_data:
                 parent_builds_with_data[parent_job.name] = parent_build
@@ -5886,11 +5973,11 @@ class QueueItem(zkobject.ZKObject):
             # Every parent job (dependency), whether soft or hard:
             all_dep_job_names = set(
                 [x.name for x in
-                 job_graph.getParentJobsRecursively(job.name)])
+                 job_graph.getParentJobsRecursively(job)])
             # Only the hard deps:
             hard_dep_job_names = set(
                 [x.name for x in job_graph.getParentJobsRecursively(
-                    job.name, skip_soft=True)])
+                    job, skip_soft=True)])
             # Any dep that hasn't finished (or started) running
             unexecuted_dep_job_names = unexecuted_job_names & all_dep_job_names
             # Any dep that has finished and failed
@@ -5930,7 +6017,6 @@ class QueueItem(zkobject.ZKObject):
             self.removeBuild(build)
             return
 
-        buildset = self.current_build_set
         job_graph = self.current_build_set.job_graph
         skipped = []
         # We may skip several jobs, but if we do, they will all be for
@@ -5944,22 +6030,22 @@ class QueueItem(zkobject.ZKObject):
             skipped_reason = ('Skipped due to child_jobs return value in job '
                               + build.job.name)
             zuul_return = build_result.get('child_jobs', [])
-            dependent_jobs = job_graph.getDirectDependentJobs(
-                build.job.name)
+            dependent_jobs = set(job_graph.getDirectDependentJobs(build.job))
 
             if not zuul_return:
                 # If zuul.child_jobs exists and is empty, the user
                 # wants to skip all child jobs.
                 to_skip = job_graph.getDependentJobsRecursively(
-                    build.job.name, skip_soft=True)
+                    build.job, skip_soft=True)
                 skipped += to_skip
             else:
                 # The user supplied a list of jobs to run.
-                intersect_jobs = dependent_jobs.intersection(zuul_return)
+                intersect_jobs = set([
+                    j for j in dependent_jobs if j.name in zuul_return
+                ])
 
                 for skip in (dependent_jobs - intersect_jobs):
-                    s = buildset.jobs.get(skip)
-                    skipped.append(s)
+                    skipped.append(skip)
                     to_skip = job_graph.getDependentJobsRecursively(
                         skip, skip_soft=True)
                     skipped += to_skip
@@ -5967,7 +6053,7 @@ class QueueItem(zkobject.ZKObject):
         elif build.result not in ('SUCCESS', 'SKIPPED') and not build.paused:
             skipped_reason = 'Skipped due to failed job ' + build.job.name
             to_skip = job_graph.getDependentJobsRecursively(
-                build.job.name)
+                build.job)
             skipped += to_skip
 
         for job in skipped:
@@ -8653,6 +8739,7 @@ class Layout(object):
             self._createJobGraph(context, item, ppc, job_graph,
                                  skip_file_matcher, redact_secrets_and_keys,
                                  debug_messages)
+        job_graph.freezeDependencies()
         return job_graph
 
 

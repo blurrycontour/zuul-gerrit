@@ -83,8 +83,10 @@ def construct_build_params(uuid, connections, job, item, pipeline,
 
     zuul_params['projects'] = {}  # Set below
     zuul_params['items'] = dependent_changes
-    zuul_params['child_jobs'] = list(item.current_build_set.job_graph.
-                                     getDirectDependentJobs(job.name))
+    zuul_params['child_jobs'] = [
+        x.name for x in item.current_build_set.job_graph.
+        getDirectDependentJobs(job)
+    ]
 
     params = dict()
     if COMPONENT_REGISTRY.model_api >= 19:
