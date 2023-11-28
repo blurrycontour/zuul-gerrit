@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8317a079_f4088b52",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-28T17:25:51Z",
+      "side": 1,
+      "message": "Nit: this change results in a web app that knows how many errors there are ahead of time but still reports `1-50 of many` until you page through all results.",
+      "revId": "fe6c58f5540e34b3fac68b8ed48968726e92eadc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
