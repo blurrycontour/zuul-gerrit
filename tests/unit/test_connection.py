@@ -114,7 +114,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
         indexes_provides = insp.get_indexes(provides_table)
         indexes_build_event = insp.get_indexes(build_event_table)
 
-        self.assertEqual(3, len(indexes_ref))
+        self.assertEqual(8, len(indexes_ref))
         self.assertEqual(1, len(indexes_buildset))
         self.assertEqual(2, len(indexes_buildset_ref))
         self.assertEqual(4, len(indexes_build))
