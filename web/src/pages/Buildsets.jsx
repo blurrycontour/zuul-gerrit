@@ -20,11 +20,11 @@ import { PageSection, PageSectionVariants, Pagination } from '@patternfly/react-
 
 import { fetchBuildsets } from '../api'
 import {
-  buildQueryString,
   FilterToolbar,
   getFiltersFromUrl,
   writeFiltersToUrl,
 } from '../containers/FilterToolbar'
+import { makeBuildQueryString } from '../containers/BuildQuery'
 import BuildsetTable from '../containers/build/BuildsetTable'
 
 class BuildsetsPage extends React.Component {
@@ -115,7 +115,7 @@ class BuildsetsPage extends React.Component {
       limit: filters.limit.length > 0 ? filters.limit : [50,]
     }
     let _filters = { ...filters, ...paginationOptions }
-    const queryString = buildQueryString(_filters)
+    const queryString = makeBuildQueryString(_filters)
     this.setState({ fetching: true })
     fetchBuildsets(this.props.tenant.apiPrefix, queryString).then(
       (response) => {
