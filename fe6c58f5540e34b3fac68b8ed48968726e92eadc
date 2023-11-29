@@ -52,6 +52,24 @@
       "parentUuid": "8317a079_f4088b52",
       "revId": "fe6c58f5540e34b3fac68b8ed48968726e92eadc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e48c91ed_f339e36b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2023-11-29T08:45:28Z",
+      "side": 1,
+      "message": "Could we pass that value from the redux store to the config errors page as prop somehow. I think this would be the way in react, or? The tenant status is always loaded upfront, so the value should be available, right?",
+      "parentUuid": "9f2bfac0_b4dbc68c",
+      "revId": "fe6c58f5540e34b3fac68b8ed48968726e92eadc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
