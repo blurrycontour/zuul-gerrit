@@ -53,8 +53,6 @@ function FilterableText(props) {
 
   return (
     <>
-      <span>{value}</span>
-      &#32;
       {value &&
        <Tooltip content={<div>Add filter</div>}>
          <SearchPlusIcon color='var(--pf-global--Color--200)'
@@ -62,6 +60,8 @@ function FilterableText(props) {
          />
        </Tooltip>
       }
+      &#32;
+      <span>{value}</span>
     </>
   )
 }
