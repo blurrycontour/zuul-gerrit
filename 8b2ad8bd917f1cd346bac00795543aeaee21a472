@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d04a27d_d6443ec4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-29T20:41:51Z",
+      "side": 1,
+      "message": "I\u0027m a fan of this. I think it could be useful in build and buildset listing pages as well.",
+      "revId": "8b2ad8bd917f1cd346bac00795543aeaee21a472",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
