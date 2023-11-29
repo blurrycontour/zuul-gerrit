@@ -24,6 +24,7 @@ import {
   EmptyStateSecondaryActions,
   Spinner,
   Title,
+  DropdownToggle,
 } from '@patternfly/react-core'
 import {
   InfoCircleIcon,
@@ -32,6 +33,7 @@ import {
   CubeIcon,
   StreamIcon,
   FlagIcon,
+  SearchPlusIcon,
 } from '@patternfly/react-icons'
 import {
   Table,
@@ -51,6 +53,7 @@ function ConfigErrorTable({
   fetching,
   onClearFilters,
   preferences,
+  addFilter,
 }) {
 
   const [expandedRows, setExpandedRows] = React.useState([])
@@ -102,15 +105,19 @@ function ConfigErrorTable({
       cells: [
         {
           title: error.source_context.project,
+          filterCategory: 'project'
         },
         {
           title: error.source_context.branch,
+          filterCategory: 'branch'
         },
         {
           title: error.severity,
+          filterCategory: 'severity'
         },
         {
           title: error.name,
+          filterCategory: 'name'
         },
         {
           title: error.short_error,
@@ -167,6 +174,27 @@ function ConfigErrorTable({
     })
   }
 
+  const actionResolver = (rowData) => {
+    if (rowData.parent !== undefined) {
+      return []
+    }
+    const cells = rowData.cells.filter(cell =>
+      cell.filterCategory
+    )
+    return cells.map(cell => {
+      return {
+        title: `Filter by ${cell.filterCategory}: ${cell.title} `,
+        onClick: () => {addFilter(cell.filterCategory, cell.title)}
+      }
+    })
+  }
+
+  const filterToggle = (filterProps) => (
+    <DropdownToggle toggleIndicator={null} onToggle={filterProps.onToggle}>
+      <SearchPlusIcon color='var(--pf-global--Color--200)'/>
+    </DropdownToggle>
+  )
+
   return (
     <>
       <Table
@@ -174,11 +202,11 @@ function ConfigErrorTable({
         variant={TableVariant.compact}
         cells={columns}
         rows={rows}
-        className="zuul-table"
+        actionResolver={actionResolver}
         onCollapse={(_event, rowIndex, isOpen) => {
           setRowExpanded(rowIndex, isOpen)
         }}
-        expandId="expandable-table-toggle" contentId="expandable-table-content"
+        actionsToggle={filterToggle}
       >
         <TableHeader />
         <TableBody />
@@ -210,6 +238,7 @@ ConfigErrorTable.propTypes = {
   fetching: PropTypes.bool.isRequired,
   onClearFilters: PropTypes.func.isRequired,
   preferences: PropTypes.object.isRequired,
+  addFilter: PropTypes.func.isRequired,
 }
 
 export default connect((state) => ({

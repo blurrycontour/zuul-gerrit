@@ -178,6 +178,18 @@ class ConfigErrorsPage extends React.Component {
     return null
   }
 
+  addFilter = (category, value) => {
+    // Used by the table search-add icon
+    const prevFilters = this.state.filters[category]
+    const newFilters = {
+      ...this.state.filters,
+      [category]: prevFilters.includes(value)
+        ? prevFilters
+        : [...prevFilters, value],
+    }
+    this.handleFilterChange(newFilters)
+  }
+
   handleFilterChange = (newFilters) => {
     const { location, history } = this.props
     const { filters, itemCount } = this.state
@@ -275,6 +287,7 @@ class ConfigErrorsPage extends React.Component {
           errors={errors}
           fetching={fetching}
           onClearFilters={this.handleClearFilters}
+          addFilter={this.addFilter}
           history={history}
         />
       </PageSection>
