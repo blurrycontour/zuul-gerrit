@@ -37,11 +37,10 @@ import ConfigErrorTable from '../containers/configerrors/ConfigErrorTable'
 
 class ConfigErrorsPage extends React.Component {
   static propTypes = {
-    configErrors: PropTypes.array,
-    configErrorsReady: PropTypes.bool,
     tenant: PropTypes.object,
-    dispatch: PropTypes.func,
     preferences: PropTypes.object,
+    tenantStatus: PropTypes.object,
+    tenantStatusReady: PropTypes.bool,
     history: PropTypes.object,
     location: PropTypes.object,
     timezone: PropTypes.string,
@@ -107,6 +106,14 @@ class ConfigErrorsPage extends React.Component {
     ) {
       this.updateData(this.state.filters)
     }
+    if (this.state.itemCount === null && this.props.tenantStatusReady) {
+      const newItemCount = this.getDefaultItemCount(this.state.filters)
+      if (newItemCount !== null) {
+        this.setState({
+          itemCount: newItemCount
+        })
+      }
+    }
   }
 
   updateData = (filters) => {
@@ -117,11 +124,11 @@ class ConfigErrorsPage extends React.Component {
     // passed as prop and doesn't change since the page itself wasn't
     // re-rendered.
     const { itemCount } = this.state
-    let paginationOptions = {
+    const paginationOptions = {
       skip: filters.skip.length > 0 ? filters.skip : [0,],
       limit: filters.limit.length > 0 ? filters.limit : [50,]
     }
-    let _filters = { ...filters, ...paginationOptions }
+    const _filters = { ...filters, ...paginationOptions }
     const queryString = makeQueryString(_filters)
     this.setState({ fetching: true })
     // TODO (felix): What happens in case of a broken network connection? Is the
@@ -130,11 +137,11 @@ class ConfigErrorsPage extends React.Component {
     fetchConfigErrors(this.props.tenant.apiPrefix, queryString).then((response) => {
       // if we have already an itemCount for this query (ie we're scrolling backwards through results)
       // keep this value. Otherwise, check if we've got all the results.
-      let finalItemCount = itemCount
+      const finalItemCount = itemCount
         ? itemCount
         : (response.data.length < paginationOptions.limit[0]
           ? parseInt(paginationOptions.skip[0]) + response.data.length
-          : null)
+           : this.getDefaultItemCount(filters))
       this.setState({
         errors: response.data,
         fetching: false,
@@ -157,25 +164,39 @@ class ConfigErrorsPage extends React.Component {
     }
   }
 
+  getDefaultItemCount = (filters) => {
+    const filterCount = Object.keys(filters)
+          .filter((x) => (x !== 'skip' && x !== 'limit'))
+          .map((x) => filters[x].length)
+          .reduce((ret, v) => ret + v, 0)
+    if (filterCount > 0) {
+      return null
+    }
+    if (this.props.tenantStatusReady && this.props.tenantStatus.config_error_count > 0) {
+      return this.props.tenantStatus.config_error_count
+    }
+    return null
+  }
+
   handleFilterChange = (newFilters) => {
     const { location, history } = this.props
     const { filters, itemCount } = this.state
     /*eslint no-unused-vars: ["error", { "ignoreRestSiblings": true }]*/
-    let { 'skip': x1, 'limit': y1, ..._oldFilters } = filters
-    let { 'skip': x2, 'limit': y2, ..._newFilters } = newFilters
+    const { 'skip': x1, 'limit': y1, ..._oldFilters } = filters
+    const { 'skip': x2, 'limit': y2, ..._newFilters } = newFilters
 
     // If filters have changed, reinitialize skip
-    let equalTest = isEqual(_oldFilters, _newFilters)
-    let finalFilters = equalTest ? newFilters : { ...newFilters, skip: [0,] }
+    const equalTest = isEqual(_oldFilters, _newFilters)
+    const finalFilters = equalTest ? newFilters : { ...newFilters, skip: [0,] }
 
     // We must update the URL parameters before the state. Otherwise, the URL
     // will always be one filter selection behind the state. But as the URL
     // reflects our state this should be ok.
     writeFiltersToUrl(finalFilters, location, history)
-    let newState = {
+    const newState = {
       filters: finalFilters,
       // if filters haven't changed besides skip or limit, keep our itemCount and currentPage
-      itemCount: equalTest ? itemCount : null,
+      itemCount: equalTest ? itemCount : this.getDefaultItemCount(_newFilters),
     }
     if (!equalTest) {
       newState.currentPage = 1
@@ -239,7 +260,7 @@ class ConfigErrorsPage extends React.Component {
               &nbsp;
               of
               &nbsp;
-              <b>{itemCount ? itemCount : 'many'}</b>
+              <b>{itemCount !== null ? itemCount : 'many'}</b>
             </React.Fragment>
           )}
           itemCount={itemCount}
@@ -264,4 +285,6 @@ class ConfigErrorsPage extends React.Component {
 export default connect(state => ({
   tenant: state.tenant,
   preferences: state.preferences,
+  tenantStatus: state.tenantStatus.tenant_status,
+  tenantStatusReady: state.tenantStatus.ready,
 }))(ConfigErrorsPage)
