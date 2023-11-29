@@ -33,6 +33,24 @@
       "message": "Where do these x1, x2, ... variables come from? I don\u0027t fully understand what we are doing here, only that it\u0027s about comparing the filters.",
       "revId": "40999191676b8a0059ea3101fd4a22c4447335f8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c74e3f4_abb9efdd",
+        "filename": "web/src/pages/ConfigErrors.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-29T14:38:26Z",
+      "side": 1,
+      "message": "This is an unpacking assingment, so it\u0027s equivalent to:\noldFilters \u003d filters\nx1 \u003d oldFilters.pop(\u0027skip\u0027)\ny1 \u003d oldFilters.pop(\u0027limit\u0027)\nWe ignore x1 and y1 because we only want to compare the query filters without the pagination (see below about reinitializing skip if they change).",
+      "parentUuid": "a24d6978_5a25a801",
+      "revId": "40999191676b8a0059ea3101fd4a22c4447335f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
