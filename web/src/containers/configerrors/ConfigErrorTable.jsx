@@ -24,6 +24,7 @@ import {
   EmptyStateSecondaryActions,
   Spinner,
   Title,
+  Tooltip,
 } from '@patternfly/react-core'
 import {
   InfoCircleIcon,
@@ -32,6 +33,7 @@ import {
   CubeIcon,
   StreamIcon,
   FlagIcon,
+  SearchPlusIcon,
 } from '@patternfly/react-icons'
 import {
   Table,
@@ -46,11 +48,37 @@ import {
 
 import { IconProperty } from '../../Misc'
 
+function FilterableText(props) {
+  const { addFilter, category, value } = props
+
+  return (
+    <>
+      <span>{value}</span>
+      &#32;
+      {value &&
+       <Tooltip content={<div>Add filter</div>}>
+         <SearchPlusIcon color='var(--pf-global--Color--200)'
+                         onClick={() => addFilter(category, value)}
+         />
+       </Tooltip>
+      }
+    </>
+  )
+}
+
+FilterableText.propTypes = {
+  category: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  addFilter: PropTypes.func.isRequired,
+}
+
+
 function ConfigErrorTable({
   errors,
   fetching,
   onClearFilters,
   preferences,
+  addFilter,
 }) {
 
   const [expandedRows, setExpandedRows] = React.useState([])
@@ -101,16 +129,20 @@ function ConfigErrorTable({
       isOpen: isRowExpanded(rows.length),
       cells: [
         {
-          title: error.source_context.project,
+          title: <FilterableText addFilter={addFilter} category='project'
+                                 value={error.source_context.project}/>
         },
         {
-          title: error.source_context.branch,
+          title: <FilterableText addFilter={addFilter} category='branch'
+                                 value={error.source_context.branch}/>
         },
         {
-          title: error.severity,
+          title: <FilterableText addFilter={addFilter} category='severity'
+                                 value={error.severity}/>
         },
         {
-          title: error.name,
+          title: <FilterableText addFilter={addFilter} category='name'
+                                 value={error.name}/>
         },
         {
           title: error.short_error,
@@ -210,6 +242,7 @@ ConfigErrorTable.propTypes = {
   fetching: PropTypes.bool.isRequired,
   onClearFilters: PropTypes.func.isRequired,
   preferences: PropTypes.object.isRequired,
+  addFilter: PropTypes.func.isRequired,
 }
 
 export default connect((state) => ({
