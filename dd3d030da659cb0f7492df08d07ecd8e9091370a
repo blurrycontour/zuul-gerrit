@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0df371bc_83b74f67",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-30T14:08:40Z",
+      "side": 1,
+      "message": "We might want to go from 18 -\u003e 21 as job UUIDs were added with v19.",
+      "revId": "dd3d030da659cb0f7492df08d07ecd8e9091370a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ddf41e1_5a263299",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1948,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-11-30T14:08:40Z",
+      "side": 1,
+      "message": "If there is a job graph w/o UUIDs this method will probably throw a `ValueError`.\n\nIt looks like this code path (and also the one below in `_resetDependentBuilds()`) is not covered by the model upgrade test.",
+      "revId": "dd3d030da659cb0f7492df08d07ecd8e9091370a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
