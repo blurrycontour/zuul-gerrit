@@ -38,11 +38,7 @@ from zuul.executor.server import squash_variables
 from zuul.model import NodeSet, Group
 
 
-class TestExecutorRepos(ZuulTestCase):
-    tenant_config_file = 'config/single-tenant/main.yaml'
-
-    log = logging.getLogger("zuul.test.executor")
-
+class ExecutorReposMixin:
     def assertRepoState(self, repo, state, project, build, number):
         if 'branch' in state:
             self.assertFalse(repo.head.is_detached,
@@ -55,7 +51,7 @@ class TestExecutorRepos(ZuulTestCase):
                              'be on the correct branch' % (
                                  project, build, number))
             # Remote 'origin' needs to be kept intact with a bogus URL
-            self.assertEqual(repo.remotes.origin.url, 'file:///dev/null')
+            self.assertEqual('file:///dev/null', repo.remotes.origin.url)
             self.assertIn(state['branch'], repo.remotes.origin.refs)
         if 'commit' in state:
             self.assertEqual(state['commit'],
@@ -93,6 +89,12 @@ class TestExecutorRepos(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
+
+
+class TestExecutorRepos(ZuulTestCase, ExecutorReposMixin):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    log = logging.getLogger("zuul.test.executor")
 
     @simple_layout('layouts/repo-checkout-two-project.yaml')
     def test_one_branch(self):
@@ -425,6 +427,70 @@ class TestExecutorRepos(ZuulTestCase):
              p2: dict(commit=str(upstream[p2].commit('test-tag')),
                       absent=[A]),
              },
+        ]
+
+        self.assertBuildStates(states, projects)
+
+
+class TestExecutorRepoRoles(ZuulTestCase, ExecutorReposMixin):
+    tenant_config_file = 'config/executor-repos/main.yaml'
+
+    def test_repo_checkout_roles_branch(self):
+        self.executor_server.hold_jobs_in_build = True
+        p0 = "review.example.com/org/project"
+        p1 = "review.example.com/org/project1"
+        p2 = "review.example.com/org/project2"
+        projects = [p0, p1, p2]
+        upstream = self.getUpstreamRepos(projects)
+
+        self.create_branch('org/project1', 'test-branch')
+        self.create_branch('org/project2', 'test-branch')
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files={'branch': 'run branch'})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        states = [
+            {
+                p0: dict(present=[A], branch='master'),
+                p1: dict(absent=[A], branch='test-branch'),
+                p2: dict(absent=[A], branch='test-branch'),
+             },
+        ]
+
+        self.assertBuildStates(states, projects)
+
+    def test_repo_checkout_roles_tag(self):
+        self.executor_server.hold_jobs_in_build = True
+        p0 = "review.example.com/org/project"
+        p1 = "review.example.com/org/project1"
+        p2 = "review.example.com/org/project2"
+        projects = [p0, p1, p2]
+        upstream = self.getUpstreamRepos(projects)
+
+        self.create_branch('org/project1', 'unused-branch')
+        files = {'README': 'tagged readme'}
+        self.addCommitToRepo('org/project1', 'tagged commit',
+                             files, branch='unused-branch', tag='test-tag')
+        self.create_branch('org/project2', 'unused-branch')
+        files = {'README': 'tagged readme'}
+        self.addCommitToRepo('org/project2', 'tagged commit',
+                             files, branch='unused-branch', tag='test-tag')
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files={'tag': 'run tag'})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        states = [
+            {
+                p0: dict(present=[A], branch='master'),
+                p1: dict(commit=str(upstream[p1].commit('test-tag')),
+                         absent=[A]),
+                p2: dict(commit=str(upstream[p2].commit('test-tag')),
+                         absent=[A]),
+            },
         ]
 
         self.assertBuildStates(states, projects)
