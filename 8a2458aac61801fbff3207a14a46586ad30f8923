@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddf0ea88_f883b8e3",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2275,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-30T19:42:40Z",
+      "side": 1,
+      "message": "Why are we providing bearer tokens for these requests now? as far as I can tell the config for these tests didn\u0027t change in a way that would require the token.",
+      "revId": "8a2458aac61801fbff3207a14a46586ad30f8923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd870cb7_2cfcd347",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2941,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-11-30T19:42:40Z",
+      "side": 1,
+      "message": "In this case tenant-whatever doesn\u0027t actually exist so there is no auth config for that tenant. I think the correct thing to do in that situation is to return an authorization error instead of say a 404 to avoid disclosing too much info. However, should we have a test to ensure we get authorization failures back when the tenant does exist but with an auth config that doesn\u0027t give the testuser access?",
+      "revId": "8a2458aac61801fbff3207a14a46586ad30f8923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
