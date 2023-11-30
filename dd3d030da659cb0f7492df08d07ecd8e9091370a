@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aaaa3a14_1b14e4dd",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-30T14:25:41Z",
+      "side": 1,
+      "message": "I agree that should be tested, but as I learned while writing this, every test in this file \u003c19 exercises that code path.  Do you think that addresses your concern, or is there a specific 18-\u003e21 scenario you think we should cover?\n\n(Looks like the other comment has an idea for one.)",
+      "parentUuid": "0df371bc_83b74f67",
+      "revId": "dd3d030da659cb0f7492df08d07ecd8e9091370a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ddf41e1_5a263299",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2023-11-30T14:08:40Z",
       "side": 1,
       "message": "If there is a job graph w/o UUIDs this method will probably throw a `ValueError`.\n\nIt looks like this code path (and also the one below in `_resetDependentBuilds()`) is not covered by the model upgrade test.",
+      "revId": "dd3d030da659cb0f7492df08d07ecd8e9091370a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b44dc90_77acb6a3",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1948,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-30T14:25:41Z",
+      "side": 1,
+      "message": "Agree on both points.  Seems like we should add an 18-\u003e21 with a paused job.\n\nMaybe we can refactor the other usage into a method so we only have to test once.",
+      "parentUuid": "0ddf41e1_5a263299",
       "revId": "dd3d030da659cb0f7492df08d07ecd8e9091370a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
