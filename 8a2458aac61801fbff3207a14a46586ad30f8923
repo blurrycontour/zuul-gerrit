@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb03d9ed_6e4e8e83",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2275,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-30T20:10:59Z",
+      "side": 1,
+      "message": "The new subclass adds access rules (ie, \"read only authz required\"), so we need to send the token even when reading in that case.  Since this class is meant to test access with an admin token anyway, it seemed appropriate to have the test use the token for the read check as well (it\u0027s not really the point of the test, and if it were, we\u0027re testing a scenario where the token will always be sent anyway, so it\u0027s more realistic).",
+      "parentUuid": "ddf0ea88_f883b8e3",
+      "revId": "8a2458aac61801fbff3207a14a46586ad30f8923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd870cb7_2cfcd347",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-11-30T19:42:40Z",
       "side": 1,
       "message": "In this case tenant-whatever doesn\u0027t actually exist so there is no auth config for that tenant. I think the correct thing to do in that situation is to return an authorization error instead of say a 404 to avoid disclosing too much info. However, should we have a test to ensure we get authorization failures back when the tenant does exist but with an auth config that doesn\u0027t give the testuser access?",
+      "revId": "8a2458aac61801fbff3207a14a46586ad30f8923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0941a144_5343855d",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2941,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-11-30T20:10:59Z",
+      "side": 1,
+      "message": "Because of the way the tenant override is implemented: \n\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/web/__init__.py#L973-L975\n\nwhere it just checks whether \u0027tenant-whatever\u0027 matches the tenant in the url below (\u0027tenant-one\u0027), and doesn\u0027t do anything like look up the config of tenant-whatever, I don\u0027t think that test is necessary (or rather, that it is effectively the same as this test).  The other tests of that functionality in this file are written the same way too.\n\nIf you think it\u0027s risky not to have it, we can add it, but it\u0027s not trivial to write (it needs to be run in a multi-tenant config and these are all single-tenant so far).  It\u0027s not hard, but it\u0027s not like just 3 more lines to test that case.  If you do want to add it, we should do it in another change.",
+      "parentUuid": "fd870cb7_2cfcd347",
       "revId": "8a2458aac61801fbff3207a14a46586ad30f8923",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
