@@ -481,12 +481,12 @@ class Repo(object):
         repo = self.createRepoObject(zuul_event_id)
         return [x.name for x in repo.heads]
 
-    def getCommitFromRef(self, refname, zuul_event_id=None):
+    def getRef(self, refname, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
         if refname not in repo.refs:
             return None
         ref = repo.refs[refname]
-        return ref.commit
+        return ref
 
     def getRefs(self, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
@@ -998,7 +998,8 @@ class Merger(object):
         return repo
 
     def getRepo(self, connection_name, project_name,
-                zuul_event_id=None, process_worker=None):
+                zuul_event_id=None, process_worker=None,
+                keep_remote_url=False):
         source = self.connections.getSource(connection_name)
         project = source.getProject(project_name)
         hostname = project.canonical_hostname
@@ -1007,7 +1008,8 @@ class Merger(object):
         key = '/'.join([hostname, project_name])
         if key in self.repos:
             repo = self.repos[key]
-            repo.setRemoteUrl(url)
+            if not keep_remote_url:
+                repo.setRemoteUrl(url)
             return repo
         sshkey = self.connections.connections.get(connection_name).\
             connection_config.get('sshkey')
