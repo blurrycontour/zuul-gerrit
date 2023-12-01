@@ -70,6 +70,24 @@
       "parentUuid": "40fb89f6_92f2c5bf",
       "revId": "0ba0c651568ea36acdb49bc5ade6f6057ed6a1f0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87447c75_de22b85e",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5271,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-01T18:08:39Z",
+      "side": 0,
+      "message": "Thanks.  The general direction has been to split join from stop; I believe that is complete for all the \"real\" service threads, but I don\u0027t think we put much effort into the fake statsd.  Ideally they would match to reduce cognitive overhead, but we don\u0027t need to fix that now.",
+      "parentUuid": "40fb89f6_92f2c5bf",
+      "revId": "0ba0c651568ea36acdb49bc5ade6f6057ed6a1f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
