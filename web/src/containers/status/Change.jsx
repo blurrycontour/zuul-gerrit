@@ -203,6 +203,7 @@ class Change extends React.Component {
         }}
         dropdownItems={dropdownCommands}
         isPlain
+        position='right'
         toggle={
           <KebabToggle
             onToggle={(showAdminActions) => {
