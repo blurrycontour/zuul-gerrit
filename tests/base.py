@@ -3111,10 +3111,10 @@ class FakeStatsd(threading.Thread):
         self.stats = []
 
     def run(self):
+        poll = select.poll()
+        poll.register(self.sock, select.POLLIN)
+        poll.register(self.wake_read, select.POLLIN)
         while True:
-            poll = select.poll()
-            poll.register(self.sock, select.POLLIN)
-            poll.register(self.wake_read, select.POLLIN)
             ret = poll.poll()
             for (fd, event) in ret:
                 if fd == self.sock.fileno():
@@ -3130,6 +3130,8 @@ class FakeStatsd(threading.Thread):
         os.write(self.wake_write, b'1\n')
         self.join()
         self.sock.close()
+        os.close(self.wake_read)
+        os.close(self.wake_write)
 
 
 class FakeBuild(object):
