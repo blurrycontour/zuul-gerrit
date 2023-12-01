@@ -2287,12 +2287,18 @@ class AnsibleJob(object):
                     # do need to at least ensure the branch we're
                     # going to check out exists.
                     repo = self.workspace_merger.getRepo(p['connection'],
-                                                         p['name'])
+                                                         p['name'],
+                                                         keep_remote_url=True)
+                    # We call it a branch, but it can actually be any
+                    # ref including a tag.  Get the ref object so we
+                    # can duplicate the full path.
+                    ref_obj = repo.getRef(branch)
+                    ref_path = ref_obj.path
+                    ref_sha = ref_obj.commit.hexsha
                     repo_state = {
                         p['connection']: {
                             p['name']: {
-                                f'refs/heads/{branch}':
-                                repo.getBranchHead(branch).hexsha
+                                ref_path: ref_sha,
                             }
                         }
                     }
