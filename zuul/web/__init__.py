@@ -1866,6 +1866,8 @@ class StreamManager(object):
             self._stopped = True
             os.write(self.wake_write, b'\n')
             self.thread.join()
+            os.close(self.wake_read)
+            os.close(self.wake_write)
 
     def run(self):
         while not self._stopped:

@@ -1623,7 +1623,7 @@ class FakePagurePullRequest(object):
         self.url = "https://%s/%s/pull-request/%s" % (
             self.pagure.server, self.project, self.number)
         self.is_merged = False
-        self.pr_ref = self._createPRRef()
+        self._createPRRef()
         self._addCommitInPR(files=files)
         self._updateTimeStamp()
 
@@ -1800,7 +1800,7 @@ class FakePagurePullRequest(object):
             self.commit_start = self.commit_stop
 
         repo.create_head(self.getPRReference(), self.commit_stop, force=True)
-        self.pr_ref.set_commit(self.commit_stop)
+        repo.references[self.getPRReference()].set_commit(self.commit_stop)
         repo.head.reference = 'master'
         repo.git.clean('-x', '-f', '-d')
         repo.heads['master'].checkout()
@@ -2202,7 +2202,7 @@ class FakeGitlabMergeRequest(object):
             self.gitlab.server, self.project, self.number)
         self.base_sha = base_sha
         self.approved = False
-        self.mr_ref = self._createMRRef(base_sha=base_sha)
+        self._createMRRef(base_sha=base_sha)
         self._addCommitInMR(files=files)
 
     def _getRepo(self):
@@ -2278,7 +2278,7 @@ class FakeGitlabMergeRequest(object):
         self.sha = repo.index.commit(msg).hexsha
 
         repo.create_head(self.getMRReference(), self.sha, force=True)
-        self.mr_ref.set_commit(self.sha)
+        repo.references[self.getMRReference()].set_commit(self.sha)
         repo.head.reference = 'master'
         repo.git.clean('-x', '-f', '-d')
         repo.heads['master'].checkout()
@@ -2424,7 +2424,7 @@ class FakeGithubPullRequest(object):
         self.state = 'open'
         self.url = 'https://%s/%s/pull/%s' % (github.server, project, number)
         self.base_sha = base_sha
-        self.pr_ref = self._createPRRef(base_sha=base_sha)
+        self._createPRRef(base_sha=base_sha)
         self._addCommitToRepo(files=files)
         self._updateTimeStamp()
 
@@ -2641,7 +2641,7 @@ class FakeGithubPullRequest(object):
 
         self.head_sha = repo.index.commit(msg).hexsha
         repo.create_head(self.getPRReference(), self.head_sha, force=True)
-        self.pr_ref.set_commit(self.head_sha)
+        repo.references[self.getPRReference()].set_commit(self.head_sha)
         # Create an empty set of statuses for the given sha,
         # each sha on a PR may have a status set on it
         self.statuses[self.head_sha] = []
@@ -3111,10 +3111,10 @@ class FakeStatsd(threading.Thread):
         self.stats = []
 
     def run(self):
+        poll = select.poll()
+        poll.register(self.sock, select.POLLIN)
+        poll.register(self.wake_read, select.POLLIN)
         while True:
-            poll = select.poll()
-            poll.register(self.sock, select.POLLIN)
-            poll.register(self.wake_read, select.POLLIN)
             ret = poll.poll()
             for (fd, event) in ret:
                 if fd == self.sock.fileno():
@@ -3130,6 +3130,8 @@ class FakeStatsd(threading.Thread):
         os.write(self.wake_write, b'1\n')
         self.join()
         self.sock.close()
+        os.close(self.wake_read)
+        os.close(self.wake_write)
 
 
 class FakeBuild(object):
@@ -5268,7 +5270,6 @@ class ZuulTestCase(BaseTestCase):
         self.scheds.execute(lambda app: app.sched.stop())
         self.scheds.execute(lambda app: app.sched.join())
         self.statsd.stop()
-        self.statsd.join()
         self.fake_nodepool.stop()
         self.zk_client.disconnect()
         self.printHistory()
