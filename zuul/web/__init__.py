@@ -257,10 +257,10 @@ class AuthContext:
         token_header = self.headers.get('Authorization', None)
         # Add basic checks here
         if token_header is None:
-            e = 'Missing "Authorization" header'
-            e_desc = e
+            e = 'MissingAuthError'
+            e_desc = 'Missing "Authorization" header'
         elif not token_header.lower().startswith('bearer '):
-            e = 'Invalid Authorization header format'
+            e = 'InvalidAuthFormat'
             e_desc = '"Authorization" header must start with "Bearer"'
         else:
             token = token_header[len('Bearer '):]
