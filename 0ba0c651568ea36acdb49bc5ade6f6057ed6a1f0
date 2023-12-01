@@ -34,6 +34,24 @@
       "parentUuid": "64e11c5d_1edba5a5",
       "revId": "0ba0c651568ea36acdb49bc5ade6f6057ed6a1f0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40fb89f6_92f2c5bf",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5271,
+      "author": {
+        "id": 36489
+      },
+      "writtenOn": "2023-12-01T18:01:20Z",
+      "side": 0,
+      "message": "The stop() method already calls join() so this additional call is redundant.",
+      "parentUuid": "64e11c5d_1edba5a5",
+      "revId": "0ba0c651568ea36acdb49bc5ade6f6057ed6a1f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
