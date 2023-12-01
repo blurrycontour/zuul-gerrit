@@ -400,6 +400,8 @@ class Scheduler(threading.Thread):
         self.log.debug("Stopping stats thread")
         self.stats_election.cancel()
         self.stats_thread.join()
+        if self.statsd:
+            self.statsd.close()
         self.stopRepl()
         self._command_running = False
         self.log.debug("Stopping command socket")
