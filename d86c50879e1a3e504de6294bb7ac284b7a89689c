@@ -34,6 +34,24 @@
       "parentUuid": "224ac710_d1b686ff",
       "revId": "d86c50879e1a3e504de6294bb7ac284b7a89689c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad7bf052_08b13b75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 36489
+      },
+      "writtenOn": "2023-12-01T18:39:22Z",
+      "side": 1,
+      "message": "Confirming that the changes broke the tests.  Looking into it.",
+      "parentUuid": "c8102729_76807e2b",
+      "revId": "d86c50879e1a3e504de6294bb7ac284b7a89689c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
