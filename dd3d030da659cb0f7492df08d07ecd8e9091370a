@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "99f9f6bc_efe91af1",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-12-01T13:31:57Z",
+      "side": 1,
+      "message": "I was thinking about cases where the jobs don\u0027t have UUIDs yet and we\u0027d have a list of None values: https://opendev.org/zuul/zuul/src/branch/master/zuul/model.py#L3669\n\nGoing from 18 -\u003e 21 we would make sure to exercise the new code paths with a job graph w/o job UUIDs. I\u0027m not sure if the existing tests for the 18-\u003e19 upgrade cover all those cases.\n\nI think at least this case is now handled in `_legacyGetJob()`.",
+      "parentUuid": "aaaa3a14_1b14e4dd",
+      "revId": "dd3d030da659cb0f7492df08d07ecd8e9091370a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ddf41e1_5a263299",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 2
