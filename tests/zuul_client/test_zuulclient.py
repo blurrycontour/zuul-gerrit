@@ -57,13 +57,18 @@ class TestZuulClientEncrypt(BaseTestWeb):
                 secrets.append({})
         return secrets
 
+    def _getClientCommand(self, *args):
+        return ['zuul-client',
+                '--zuul-url', self.base_url,
+                *args]
+
     def test_encrypt_large_secret(self):
         """Test that we can use zuul-client to encrypt a large secret"""
         p = subprocess.Popen(
-            ['zuul-client',
-             '--zuul-url', self.base_url,
-             'encrypt', '--tenant', 'tenant-one', '--project', 'org/project2',
-             '--secret-name', 'my_secret', '--field-name', 'key'],
+            self._getClientCommand(
+                'encrypt',
+                '--tenant', 'tenant-one', '--project', 'org/project2',
+                '--secret-name', 'my_secret', '--field-name', 'key'),
             stdout=subprocess.PIPE, stdin=subprocess.PIPE)
         p.stdin.write(
             str.encode(self.large_secret['key'])
@@ -75,10 +80,10 @@ class TestZuulClientEncrypt(BaseTestWeb):
     def test_encrypt(self):
         """Test that we can use zuul-client to generate a project secret"""
         p = subprocess.Popen(
-            ['zuul-client',
-             '--zuul-url', self.base_url,
-             'encrypt', '--tenant', 'tenant-one', '--project', 'org/project2',
-             '--secret-name', 'my_secret', '--field-name', 'password'],
+            self._getClientCommand(
+                'encrypt',
+                '--tenant', 'tenant-one', '--project', 'org/project2',
+                '--secret-name', 'my_secret', '--field-name', 'password'),
             stdout=subprocess.PIPE, stdin=subprocess.PIPE)
         p.stdin.write(
             str.encode(self.secret['password'])
@@ -92,11 +97,11 @@ class TestZuulClientEncrypt(BaseTestWeb):
         file"""
         outfile = tempfile.NamedTemporaryFile(delete=False)
         p = subprocess.Popen(
-            ['zuul-client',
-             '--zuul-url', self.base_url,
-             'encrypt', '--tenant', 'tenant-one', '--project', 'org/project2',
-             '--secret-name', 'my_secret', '--field-name', 'password',
-             '--outfile', outfile.name],
+            self._getClientCommand(
+                'encrypt',
+                '--tenant', 'tenant-one', '--project', 'org/project2',
+                '--secret-name', 'my_secret', '--field-name', 'password',
+                '--outfile', outfile.name),
             stdout=subprocess.PIPE, stdin=subprocess.PIPE)
         p.stdin.write(
             str.encode(self.secret['password'])
@@ -115,11 +120,11 @@ class TestZuulClientEncrypt(BaseTestWeb):
         )
         infile.close()
         p = subprocess.Popen(
-            ['zuul-client',
-             '--zuul-url', self.base_url,
-             'encrypt', '--tenant', 'tenant-one', '--project', 'org/project2',
-             '--secret-name', 'my_secret', '--field-name', 'password',
-             '--infile', infile.name],
+            self._getClientCommand(
+                'encrypt',
+                '--tenant', 'tenant-one', '--project', 'org/project2',
+                '--secret-name', 'my_secret', '--field-name', 'password',
+                '--infile', infile.name),
             stdout=subprocess.PIPE)
         output, error = p.communicate()
         os.unlink(infile.name)
@@ -201,7 +206,8 @@ class TestZuulClientAdmin(BaseTestWeb):
         self.assertEqual(p.returncode, 0, output)
         # Check result
         resp = self.get_url(
-            "api/tenant/tenant-one/autohold")
+            "api/tenant/tenant-one/autohold",
+            headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(200, resp.status_code, resp.text)
         autohold_requests = resp.json()
         self.assertNotEqual([], autohold_requests)
@@ -718,3 +724,29 @@ class TestZuulClientFreezeJob(BaseTestWeb):
                  '@master [trusted]'),
         ]:
             self.assertIn(s, output)
+
+
+class TestZuulClientAdminWithAccessRules(TestZuulClientAdmin):
+    """Test the admin commands of zuul-client with access rules"""
+    config_file = 'zuul-admin-web.conf'
+    tenant_config_file = 'config/single-tenant/main-access-rules.yaml'
+
+
+class TestZuulClientEncryptWithAccessRules(TestZuulClientEncrypt):
+    """Test using zuul-client to encrypt secrets"""
+    tenant_config_file = 'config/secrets/main-access-rules.yaml'
+
+    def _getClientCommand(self, *args):
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': int(time.time()) + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        return ['zuul-client',
+                '--zuul-url', self.base_url,
+                '--auth-token', token, '-v',
+                *args]

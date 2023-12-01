@@ -2259,7 +2259,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
             json=args)
         self.assertEqual(200, req.status_code, req.text)
         resp = self.get_url(
-            "api/tenant/tenant-one/autohold")
+            "api/tenant/tenant-one/autohold",
+            headers={'Authorization': 'Bearer %s' % good_token})
         self.assertEqual(200, resp.status_code, resp.text)
         autohold_requests = resp.json()
         self.assertNotEqual([], autohold_requests)
@@ -2292,7 +2293,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
 
         # Check result
         resp = self.get_url(
-            "api/tenant/tenant-one/autohold")
+            "api/tenant/tenant-one/autohold",
+            headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(200, resp.status_code, resp.text)
         autohold_requests = resp.json()
         self.assertNotEqual([], autohold_requests)
@@ -2374,7 +2376,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
 
         # Use autohold-list API to retrieve request ID
         resp = self.get_url(
-            "api/tenant/tenant-one/autohold")
+            "api/tenant/tenant-one/autohold",
+            headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(200, resp.status_code, resp.text)
         autohold_requests = resp.json()
         self.assertNotEqual([], autohold_requests)
@@ -2440,7 +2443,8 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(204, resp.status_code, resp.text)
         # autohold-list should be empty now
         resp = self.get_url(
-            "api/tenant/tenant-one/autohold")
+            "api/tenant/tenant-one/autohold",
+            headers={'Authorization': 'Bearer %s' % token})
         self.assertEqual(200, resp.status_code, resp.text)
         autohold_requests = resp.json()
         self.assertEqual([], autohold_requests)
@@ -2922,6 +2926,45 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertTrue('zuul' in data)
         self.assertTrue(data['zuul']['admin'] is False, data)
         self.assertTrue(data['zuul']['scope'] == ['tenant-one'], data)
+
+
+class TestTenantScopedWebApiWithAccessRules(TestTenantScopedWebApi):
+    config_file = 'zuul-admin-web.conf'
+    tenant_config_file = 'config/single-tenant/main-access-rules.yaml'
+
+    def test_tenant_authorizations_override(self):
+        """Test that user gets overriden tenant authz if allowed"""
+        # This test behaves differently than the one in the superclass
+        # (see below).
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one'],
+                 },
+                 'exp': int(time.time()) + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        req = self.get_url(
+            'api/tenant/tenant-one/authorizations',
+            headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(200, req.status_code, req.text)
+        data = req.json()
+        self.assertTrue('zuul' in data)
+        self.assertTrue(data['zuul']['admin'], data)
+        self.assertTrue(data['zuul']['scope'] == ['tenant-one'], data)
+        # change tenant
+        authz['zuul']['admin'] = ['tenant-whatever', ]
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        # The superclass verifies that the authorizations returned
+        # correctly do not include the new tenant.  However in this
+        # case, we expect a 403 because our token doesn't match the
+        # user access rule.
+        req = self.get_url(
+            'api/tenant/tenant-one/authorizations',
+            headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(403, req.status_code, req.text)
 
 
 class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
