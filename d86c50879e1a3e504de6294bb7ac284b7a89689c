@@ -52,6 +52,24 @@
       "parentUuid": "c8102729_76807e2b",
       "revId": "d86c50879e1a3e504de6294bb7ac284b7a89689c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b140ce6a_4034016e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 36489
+      },
+      "writtenOn": "2023-12-01T20:33:17Z",
+      "side": 1,
+      "message": "I removed the changes that are causing problems, leaving the basic fixes. They\u0027re ready to merge.",
+      "parentUuid": "ad7bf052_08b13b75",
+      "revId": "d86c50879e1a3e504de6294bb7ac284b7a89689c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
