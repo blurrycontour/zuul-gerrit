@@ -124,6 +124,24 @@
       "parentUuid": "a8d80faa_cd7b44b1",
       "revId": "0ba0c651568ea36acdb49bc5ade6f6057ed6a1f0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c28aa98_09de415d",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5271,
+      "author": {
+        "id": 36489
+      },
+      "writtenOn": "2023-12-01T18:26:52Z",
+      "side": 0,
+      "message": "Understood. :-)  Your question was a good reminder that I should keep the changes in this commit tightly focused.",
+      "parentUuid": "e325bc90_625f090b",
+      "revId": "0ba0c651568ea36acdb49bc5ade6f6057ed6a1f0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
