@@ -36,7 +36,9 @@ import { addNotification } from '../../actions/notifications'
 import { fetchStatusIfNeeded } from '../../actions/status'
 
 import LineAngleImage from '../../images/line-angle.png'
+import LineAngleImageDark from '../../images/line-angle-dark.png'
 import LineTImage from '../../images/line-t.png'
+import LineTImageDark from '../../images/line-t.png'
 import ChangePanel from './ChangePanel'
 
 
@@ -253,10 +255,19 @@ class Change extends React.Component {
   }
 
   renderLineImg(change, i) {
-    let image = LineTImage
+    let image = null
+    if (this.props.preferences.darkMode) {
+      image = LineTImageDark
+    } else {
+      image = LineTImage
+    }
     if (change._tree_branches.indexOf(i) === change._tree_branches.length - 1) {
       // Angle line
-      image = LineAngleImage
+      if (this.props.preferences.darkMode) {
+        image = LineAngleImageDark
+      } else {
+        image = LineAngleImage
+      }
     }
     return <img alt="Line" src={image} style={{ verticalAlign: 'baseline' }} />
   }
