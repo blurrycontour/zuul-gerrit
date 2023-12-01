@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29e0eb58_3e8da075",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2275,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-01T16:24:00Z",
+      "side": 1,
+      "message": "Aha I missed these tests were also running as part of the new class.",
+      "parentUuid": "eb03d9ed_6e4e8e83",
+      "revId": "8a2458aac61801fbff3207a14a46586ad30f8923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd870cb7_2cfcd347",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Because of the way the tenant override is implemented: \n\nhttps://opendev.org/zuul/zuul/src/branch/master/zuul/web/__init__.py#L973-L975\n\nwhere it just checks whether \u0027tenant-whatever\u0027 matches the tenant in the url below (\u0027tenant-one\u0027), and doesn\u0027t do anything like look up the config of tenant-whatever, I don\u0027t think that test is necessary (or rather, that it is effectively the same as this test).  The other tests of that functionality in this file are written the same way too.\n\nIf you think it\u0027s risky not to have it, we can add it, but it\u0027s not trivial to write (it needs to be run in a multi-tenant config and these are all single-tenant so far).  It\u0027s not hard, but it\u0027s not like just 3 more lines to test that case.  If you do want to add it, we should do it in another change.",
       "parentUuid": "fd870cb7_2cfcd347",
+      "revId": "8a2458aac61801fbff3207a14a46586ad30f8923",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a8997cf_95187f05",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2941,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-01T16:24:00Z",
+      "side": 1,
+      "message": "Considering code coverage doesn\u0027t change I don\u0027t think we need to add the extra test. I was mostly concerned the case hadn\u0027t been considered. Sounds like it had been and is covered so we should be good.",
+      "parentUuid": "0941a144_5343855d",
       "revId": "8a2458aac61801fbff3207a14a46586ad30f8923",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
