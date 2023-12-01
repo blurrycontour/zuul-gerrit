@@ -16,6 +16,24 @@
       "message": "Do we need to treat this case separately or would that also be handled by the condition in line #3785?",
       "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34d1284e_5bff6e19",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3782,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-01T20:00:21Z",
+      "side": 1,
+      "message": "I believe this case is necessary for model 20 to 21, and 3785 handles the direct upgrade from model 18 to 21.",
+      "parentUuid": "1458eb0f_3e9c54ad",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
