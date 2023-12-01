@@ -54,6 +54,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "17c847c0_529b8509",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-01T20:00:32Z",
+      "side": 1,
+      "message": "Yes, I think we\u0027re in agreement here.",
+      "parentUuid": "aaaa3a14_1b14e4dd",
+      "revId": "dd3d030da659cb0f7492df08d07ecd8e9091370a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ddf41e1_5a263299",
