@@ -429,6 +429,22 @@ Trigger Configuration
       comments containing ``retrigger`` somewhere in the comment text
       are added to a change.
 
+   .. attr:: added
+
+      This is only used for ``hashtags-changed`` events.  It accepts a
+      regex or list of regexes that are searched for in the list of
+      hashtags added to the change in this event.  If any of these
+      regexes match a portion of any of the added hashtags, the
+      trigger is matched.
+
+   .. attr:: removed
+
+      This is only used for ``hashtags-changed`` events.  It accepts a
+      regex or list of regexes that are searched for in the list of
+      hashtags removed from the change in this event.  If any of these
+      regexes match a portion of any of the removed hashtags, the
+      trigger is matched.
+
    .. attr:: require-approval
 
       .. warning:: This is deprecated and will be removed in a future
@@ -589,6 +605,12 @@ order to be enqueued into the pipeline.
       A string value that corresponds with the status of the change
       reported by Gerrit.
 
+   .. attr:: hashtags
+
+      A regex or list of regexes.  Each of these must match at least
+      one of the hashtags present on the change in order for the
+      change to be enqueued.
+
 .. attr:: pipeline.reject.<gerrit source>
 
    The `reject` attribute is the mirror of the `require` attribute.  It
@@ -660,6 +682,11 @@ order to be enqueued into the pipeline.
 
       A string value that corresponds with the status of the change
       reported by Gerrit.
+
+   .. attr:: hashtags
+
+      A regex or list of regexes.  If any of these match at least
+      one of the hashtags present on the change, it will be rejected.
 
 
 Reference Pipelines Configuration

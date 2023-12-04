@@ -304,6 +304,8 @@ class GerritEventConnector(threading.Thread):
                 for patchsetcomment in patchsetcomments:
                     event.patchsetcomments.append(
                         patchsetcomment.get('message'))
+            event.added = data.get('added')
+            event.removed = data.get('removed')
         refupdate = data.get('refUpdate')
         if refupdate:
             event.project_name = refupdate.get('project')
@@ -338,6 +340,7 @@ class GerritEventConnector(threading.Thread):
             'ref-updated': 'submitter',
             'reviewer-added': 'reviewer',  # Gerrit 2.5/2.6
             'topic-changed': 'changer',
+            'hashtags-changed': 'editor',
             'vote-deleted': 'deleter',
             'project-created': None,  # Gerrit 2.14
             'pending-check': None,  # Gerrit 3.0+
