@@ -100,7 +100,8 @@ class ZooKeeperNodepool(ZooKeeperBase):
             self._node_tree = None
 
     def _onSuspended(self):
-        self.connection_suspended_callback()
+        if self.connection_suspended_callback:
+            self.connection_suspended_callback()
 
     def _nodePath(self, node):
         return "%s/%s" % (self.NODES_ROOT, node)
