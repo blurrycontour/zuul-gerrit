@@ -368,7 +368,10 @@ class GerritEventConnector(threading.Thread):
 
             self.connection.clearConnectionCacheOnBranchEvent(event)
 
-        self._getChange(event, connection_event.zuul_event_ltime)
+        change = self._getChange(event, connection_event.zuul_event_ltime)
+        if (change and change.patchset and
+            event.change_number and event.patch_number is None):
+            event.patch_number = str(change.patchset)
         self.connection.logEvent(event)
         self.connection.sched.addTriggerEvent(
             self.connection.driver_name, event
@@ -377,6 +380,7 @@ class GerritEventConnector(threading.Thread):
     def _getChange(self, event, connection_event_ltime):
         # Grab the change if we are managing the project or if it exists in the
         # cache as it may be a dependency
+        change = None
         if event.change_number:
             refresh = True
             change_key = self.connection.source.getChangeKey(event)
@@ -411,8 +415,10 @@ class GerritEventConnector(threading.Thread):
                 # we need to update those objects by reference so that they
                 # have the correct/new information and also avoid hitting
                 # gerrit multiple times.
-                self.connection._getChange(change_key,
-                                           refresh=True, event=event)
+                change = self.connection._getChange(
+                    change_key, refresh=True, event=event,
+                    allow_key_update=True)
+        return change
 
 
 class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
@@ -648,7 +654,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             return self._getRef(change_key, refresh=refresh, event=event)
 
     def _getChange(self, change_key, refresh=False, history=None,
-                   event=None):
+                   event=None, allow_key_update=False):
         # Ensure number and patchset are str
         change = self._change_cache.get(change_key)
         if change and not refresh:
@@ -660,7 +666,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             change = GerritChange(None)
             change.number = change_key.stable_id
             change.patchset = change_key.revision
-        return self._updateChange(change_key, change, event, history)
+        return self._updateChange(change_key, change, event, history,
+                                  allow_key_update)
 
     def _getTag(self, change_key, refresh=False, event=None):
         tag = change_key.stable_id
@@ -797,7 +804,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             ret.append((dep_change, dep_ps))
         return ret
 
-    def _updateChange(self, key, change, event, history):
+    def _updateChange(self, key, change, event, history,
+                      allow_key_update=False):
         log = get_annotated_logger(self.log, event)
 
         # In case this change is already in the history we have a
@@ -831,10 +839,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         data = self.queryChange(change.number, event=event)
 
         def _update_change(c):
-            c.update(data, self)
+            return c.update(data, self)
 
-        change = self._change_cache.updateChangeWithRetry(key, change,
-                                                          _update_change)
+        change = self._change_cache.updateChangeWithRetry(
+            key, change, _update_change, allow_key_update=allow_key_update)
 
         if not change.is_merged:
             self._updateChangeDependencies(log, change, data, event, history)

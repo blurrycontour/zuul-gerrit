@@ -61,8 +61,8 @@ class GerritSource(BaseSource):
         if event.change_number:
             return ChangeKey(connection_name, None,
                              'GerritChange',
-                             str(event.change_number),
-                             str(event.patch_number))
+                             event.change_number,
+                             event.patch_number)
         revision = f'{event.oldrev}..{event.newrev}'
         if event.ref and event.ref.startswith('refs/tags/'):
             tag = event.ref[len('refs/tags/'):]
