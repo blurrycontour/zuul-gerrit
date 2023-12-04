@@ -73,6 +73,10 @@ class GerritTrigger(BaseTrigger):
                 branches = [make_regex(x, pcontext) for x in to_list(attr)]
             with pcontext.confAttr(trigger, 'ref') as attr:
                 refs = [make_regex(x, pcontext) for x in to_list(attr)]
+            with pcontext.confAttr(trigger, 'added') as attr:
+                added = [make_regex(x, pcontext) for x in to_list(attr)]
+            with pcontext.confAttr(trigger, 'removed') as attr:
+                removed = [make_regex(x, pcontext) for x in to_list(attr)]
 
             ignore_deletes = trigger.get('ignore-deletes', True)
 
@@ -101,6 +105,8 @@ class GerritTrigger(BaseTrigger):
                 reject_approvals=to_list(
                     trigger.get('reject-approval')
                 ),
+                added=added,
+                removed=removed,
                 uuid=trigger.get('uuid'),
                 scheme=trigger.get('scheme'),
                 ignore_deletes=ignore_deletes,
@@ -133,6 +139,7 @@ def getSchema():
                                  'ref-updated',
                                  'pending-check',
                                  'vote-deleted',
+                                 'hashtags-changed',
                                  'wip-state-changed')),
         'uuid': str,
         'scheme': str,
@@ -148,6 +155,8 @@ def getSchema():
         'approval': scalar_or_list(variable_dict),
         'require-approval': scalar_or_list(approval),
         'reject-approval': scalar_or_list(approval),
+        'added': scalar_or_list(v.Any(ZUUL_REGEX, str)),
+        'removed': scalar_or_list(v.Any(ZUUL_REGEX, str)),
         'require': gerritsource.getRequireSchema(),
         'reject': gerritsource.getRejectSchema(),
     }

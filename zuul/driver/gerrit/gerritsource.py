@@ -21,7 +21,10 @@ from urllib.parse import urlparse
 from zuul.source import BaseSource
 from zuul.model import Project
 from zuul.driver.gerrit.gerritmodel import GerritRefFilter
-from zuul.driver.util import scalar_or_list
+from zuul.driver.util import (
+    scalar_or_list,
+    ZUUL_REGEX,
+)
 from zuul.lib.dependson import find_dependency_headers
 from zuul.zk.change_cache import ChangeKey
 
@@ -257,6 +260,7 @@ def getRequireSchema():
                'open': bool,
                'current-patchset': bool,
                'wip': bool,
+               'hashtags': scalar_or_list(vs.Any(ZUUL_REGEX, str)),
                'status': scalar_or_list(str)}
     return require
 
@@ -266,5 +270,6 @@ def getRejectSchema():
               'open': bool,
               'current-patchset': bool,
               'wip': bool,
+              'hashtags': scalar_or_list(vs.Any(ZUUL_REGEX, str)),
               'status': scalar_or_list(str)}
     return reject

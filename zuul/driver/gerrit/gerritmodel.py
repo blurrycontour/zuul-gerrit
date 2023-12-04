@@ -38,6 +38,7 @@ class GerritChange(Change):
         self.missing_labels = set()
         self.submit_requirements = []
         self.commit = None
+        self.hashtags = []
         self.zuul_query_ltime = None
 
     def update(self, data, connection):
@@ -60,6 +61,7 @@ class GerritChange(Change):
             "missing_labels": list(self.missing_labels),
             "submit_requirements": self.submit_requirements,
             "commit": self.commit,
+            "hashtags": self.hashtags,
             "zuul_query_ltime": self.zuul_query_ltime,
         })
         return d
@@ -73,6 +75,7 @@ class GerritChange(Change):
         self.missing_labels = set(data["missing_labels"])
         self.submit_requirements = data.get("submit_requirements", [])
         self.commit = data.get("commit")
+        self.hashtags = data.get("hashtags", [])
         self.zuul_query_ltime = data.get("zuul_query_ltime")
 
     def updateFromSSH(self, data, connection):
@@ -127,6 +130,7 @@ class GerritChange(Change):
         self.owner = data['owner'].get('username')
         self.message = data['commitMessage']
         self.topic = data.get('topic')
+        self.hashtags = data.get('hashtags', [])
 
         self.missing_labels = set()
         for sr in data.get('submitRecords', []):
@@ -204,6 +208,7 @@ class GerritChange(Change):
         self.owner = data['owner'].get('username')
         self.message = current_revision['commit']['message']
         self.topic = data.get('topic')
+        self.hashtags = data.get('hashtags', [])
 
 
 class GerritTriggerEvent(TriggerEvent):
@@ -214,6 +219,8 @@ class GerritTriggerEvent(TriggerEvent):
         self.uuid = None
         self.scheme = None
         self.patchsetcomments = None
+        self.added = None  # Used by hashtags-changed event
+        self.removed = None  # Used by hashtags-changed event
         self.default_branch_changed = None
 
     def toDict(self):
@@ -222,6 +229,8 @@ class GerritTriggerEvent(TriggerEvent):
         d["uuid"] = self.uuid
         d["scheme"] = self.scheme
         d["patchsetcomments"] = self.patchsetcomments
+        d["added"] = self.added
+        d["removed"] = self.removed
         d["default_branch_changed"] = self.default_branch_changed
         return d
 
@@ -231,6 +240,8 @@ class GerritTriggerEvent(TriggerEvent):
         self.uuid = d["uuid"]
         self.scheme = d["scheme"]
         self.patchsetcomments = d["patchsetcomments"]
+        self.added = d.get("added")
+        self.removed = d.get("removed")
         self.default_branch_changed = d.get("default_branch_changed")
 
     def __repr__(self):
@@ -244,6 +255,10 @@ class GerritTriggerEvent(TriggerEvent):
         if self.approvals:
             ret += ' ' + ', '.join(
                 ['%s:%s' % (a['type'], a['value']) for a in self.approvals])
+        if self.added:
+            ret += f" added {self.added}"
+        if self.removed:
+            ret += f" removed {self.removed}"
         ret += '>'
 
         return ret
@@ -262,6 +277,7 @@ class GerritEventFilter(EventFilter):
     def __init__(self, connection_name, trigger, types=[], branches=[],
                  refs=[], event_approvals={}, comments=[], emails=[],
                  usernames=[], required_approvals=[], reject_approvals=[],
+                 added=[], removed=[],
                  uuid=None, scheme=None, ignore_deletes=True,
                  require=None, reject=None, parse_context=None):
 
@@ -291,12 +307,16 @@ class GerritEventFilter(EventFilter):
         self._comments = [x.pattern for x in comments]
         self._emails = [x.pattern for x in emails]
         self._usernames = [x.pattern for x in usernames]
+        self._added = [x.pattern for x in added]
+        self._removed = [x.pattern for x in removed]
         self.types = types
         self.branches = branches
         self.refs = refs
         self.comments = comments
         self.emails = emails
         self.usernames = usernames
+        self.added = added
+        self.removed = removed
         self.event_approvals = event_approvals
         self.uuid = uuid
         self.scheme = scheme
@@ -327,6 +347,10 @@ class GerritEventFilter(EventFilter):
             ret += ' emails: %s' % ', '.join(self._emails)
         if self._usernames:
             ret += ' usernames: %s' % ', '.join(self._usernames)
+        if self._added:
+            ret += ' added: %s' % ', '.join(self._added)
+        if self._removed:
+            ret += ' removed: %s' % ', '.join(self._removed)
         if self.require_filter:
             ret += ' require: %s' % repr(self.require_filter)
         if self.reject_filter:
@@ -428,6 +452,34 @@ class GerritEventFilter(EventFilter):
                 return FalseWithReason("Approvals %s do not match %s" % (
                     self.event_approvals, event.approvals))
 
+        # hashtags are ORed
+        if self.added:
+            matches_token = False
+            event_added = event.added or []
+            for action_re in self.added:
+                if matches_token:
+                    break
+                for token in event_added:
+                    if action_re.search(token):
+                        matches_token = True
+                        break
+            if not matches_token:
+                return FalseWithReason("Added %s does not match %s" % (
+                    self.added, event.added))
+        if self.removed:
+            matches_token = False
+            event_removed = event.removed or []
+            for action_re in self.removed:
+                if matches_token:
+                    break
+                for token in event_removed:
+                    if action_re.search(token):
+                        matches_token = True
+                        break
+            if not matches_token:
+                return FalseWithReason("Removed %s does not match %s" % (
+                    self.removed, event.removed))
+
         if self.require_filter:
             require_filter_result = self.require_filter.matches(change)
             if not require_filter_result:
@@ -448,7 +500,8 @@ class GerritRefFilter(RefFilter):
                  current_patchset=None, reject_current_patchset=None,
                  wip=None, reject_wip=None,
                  statuses=[], reject_statuses=[],
-                 required_approvals=[], reject_approvals=[]):
+                 required_approvals=[], reject_approvals=[],
+                 required_hashtags=[], reject_hashtags=[]):
         RefFilter.__init__(self, connection_name)
 
         self._required_approvals = copy.deepcopy(required_approvals)
@@ -459,6 +512,8 @@ class GerritRefFilter(RefFilter):
             self._reject_approvals, parse_context)
         self.statuses = statuses
         self.reject_statuses = reject_statuses
+        self.required_hashtags = required_hashtags
+        self.reject_hashtags = reject_hashtags
 
         if reject_open is not None:
             self.open = not reject_open
@@ -475,6 +530,8 @@ class GerritRefFilter(RefFilter):
 
     @classmethod
     def requiresFromConfig(cls, connection_name, config, parse_context):
+        with parse_context.confAttr(config, 'hashtags') as attr:
+            hashtags = [make_regex(x, parse_context) for x in to_list(attr)]
         return cls(
             connection_name=connection_name,
             parse_context=parse_context,
@@ -483,10 +540,13 @@ class GerritRefFilter(RefFilter):
             wip=config.get('wip'),
             statuses=to_list(config.get('status')),
             required_approvals=to_list(config.get('approval')),
+            required_hashtags=hashtags,
         )
 
     @classmethod
     def rejectFromConfig(cls, connection_name, config, parse_context):
+        with parse_context.confAttr(config, 'hashtags') as attr:
+            hashtags = [make_regex(x, parse_context) for x in to_list(attr)]
         return cls(
             connection_name=connection_name,
             parse_context=parse_context,
@@ -495,6 +555,7 @@ class GerritRefFilter(RefFilter):
             reject_wip=config.get('wip'),
             reject_statuses=to_list(config.get('status')),
             reject_approvals=to_list(config.get('approval')),
+            reject_hashtags=hashtags,
         )
 
     def __repr__(self):
@@ -517,6 +578,12 @@ class GerritRefFilter(RefFilter):
         if self.reject_approvals:
             ret += (' reject-approvals: %s' %
                     str(self.reject_approvals))
+        if self.required_hashtags:
+            ret += (' required-hashtags: %s' %
+                    [x.pattern for x in self.required_hashtags])
+        if self.reject_hashtags:
+            ret += (' reject-hashtags: %s' %
+                    [x.pattern for x in self.reject_hashtags])
         ret += '>'
 
         return ret
@@ -562,6 +629,25 @@ class GerritRefFilter(RefFilter):
                 return FalseWithReason(
                     "Reject statuses %s match %s" % (
                         self.reject_statuses, change.status))
+
+        for hashtag_re in self.required_hashtags:
+            matches_hashtag = False
+            for token in change.hashtags:
+                if hashtag_re.search(token):
+                    matches_hashtag = True
+                    break
+            if not matches_hashtag:
+                return FalseWithReason(
+                    "Required hashtags %s do not match %s" % (
+                        [x.pattern for x in self.required_hashtags],
+                        change.hashtags))
+        for hashtag_re in self.reject_hashtags:
+            for token in change.hashtags:
+                if hashtag_re.search(token):
+                    return FalseWithReason(
+                        "Reject hashtags %s match %s" % (
+                            [x.pattern for x in self.reject_hashtags],
+                            change.hashtags))
 
         # required approvals are ANDed (reject approvals are ORed)
         matches_approvals_result = self.matchesApprovals(change)
