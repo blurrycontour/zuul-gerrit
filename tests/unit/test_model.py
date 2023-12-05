@@ -231,6 +231,7 @@ class TestJob(BaseTestCase):
 
         change = model.Change(self.project)
         change.branch = 'master'
+        change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
         item = self.queue.enqueueChange(change, None)
 
         self.assertTrue(base.changeMatchesBranch(change))
@@ -247,6 +248,7 @@ class TestJob(BaseTestCase):
         self.assertEqual(job.timeout, 70)
 
         change.branch = 'stable/diablo'
+        change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
         item = self.queue.enqueueChange(change, None)
 
         self.assertTrue(base.changeMatchesBranch(change))
@@ -296,6 +298,7 @@ class TestJob(BaseTestCase):
 
         change = model.Change(self.project)
         change.branch = 'master'
+        change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
         change.files = ['/COMMIT_MSG', 'ignored-file']
         item = self.queue.enqueueChange(change, None)
 
@@ -371,6 +374,7 @@ class TestJob(BaseTestCase):
         change = model.Change(self.project)
         # Test master
         change.branch = 'master'
+        change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
         item = self.queue.enqueueChange(change, None)
         with testtools.ExpectedException(
                 Exception,
@@ -448,6 +452,7 @@ class TestJob(BaseTestCase):
 
         change = model.Change(self.project)
         change.branch = 'master'
+        change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
         item = self.queue.enqueueChange(change, None)
 
         self.assertTrue(base.changeMatchesBranch(change))
@@ -482,6 +487,7 @@ class FakeFrozenJob(model.Job):
     def __init__(self, name):
         super().__init__(name)
         self.uuid = uuid.uuid4().hex
+        self.ref = 'fake reference'
 
 
 class TestGraph(BaseTestCase):
@@ -489,15 +495,6 @@ class TestGraph(BaseTestCase):
         COMPONENT_REGISTRY.registry = Dummy()
         COMPONENT_REGISTRY.registry.model_api = MODEL_API
         super().setUp()
-
-    def test_job_graph_disallows_multiple_jobs_with_same_name(self):
-        graph = model.JobGraph({})
-        job1 = FakeFrozenJob('job')
-        job2 = FakeFrozenJob('job')
-        graph.addJob(job1)
-        with testtools.ExpectedException(Exception,
-                                         "Job job already added"):
-            graph.addJob(job2)
 
     def test_job_graph_disallows_circular_dependencies(self):
         jobs = [FakeFrozenJob('job%d' % i) for i in range(0, 10)]
