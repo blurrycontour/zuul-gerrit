@@ -1762,7 +1762,7 @@ class ZuulWebAPI(object):
         # would return the job with any in-change modifications.
         item = self._freeze_jobs(
             tenant, pipeline_name, project_name, branch_name)
-        job = item.current_build_set.jobs.get(job_name)
+        job = item.current_build_set.job_graph.getJobFromName(job_name)
         if not job:
             raise cherrypy.HTTPError(404)
 
@@ -1808,6 +1808,7 @@ class ZuulWebAPI(object):
 
         change = Branch(project)
         change.branch = branch_name or "master"
+        change.cache_stat = FakeCacheKey()
         with LocalZKContext(self.log) as context:
             queue = ChangeQueue.new(context, pipeline=pipeline)
             item = QueueItem.new(context, queue=queue, change=change)
@@ -1932,6 +1933,15 @@ class StreamManager(object):
                     self.log.exception("Error unregistering streamer:")
             streamer.closeSocket()
         self.emitStats()
+
+
+class FakeCacheKey:
+    class Dummy():
+        pass
+
+    def __init__(self):
+        self.key = self.Dummy()
+        self.key.reference = uuid.uuid4().hex
 
 
 class ZuulWeb(object):
