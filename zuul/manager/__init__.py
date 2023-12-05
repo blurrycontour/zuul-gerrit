@@ -1936,7 +1936,7 @@ class PipelineManager(metaclass=ABCMeta):
         # job) is within the current buildset (if it has been
         # deduplicated).
         try:
-            this_uuid = item.current_build_set.job_graph.getUuidForJob(
+            this_uuid = item.current_build_set.job_graph.getUuidForJobName(
                 job.name)
         except ValueError:
             # This doesn't currently raise a ValueError, it just
