@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd14b7d4_ec98fb4c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "A rollback would involve delete-state regardless.  But we can do a release so as to avoid needing to deal with the recent sql migration.",
+      "parentUuid": "a913dfa7_2c58e650",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7732b3c0_5b0d0502",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-12-06T01:05:51Z",
       "side": 1,
       "message": "These two new tests use the TestDataReturn class because this test config sets up job dependencies already? Or are we specifically concered with job pausing and the interaction between jobs with pausing and dependencies?",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9034b3b4_6f8c82b8",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 722,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "The second (see comments on previous PS).",
+      "parentUuid": "7732b3c0_5b0d0502",
       "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2557fc2a_244cdc16",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 766,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "Yes; maybe if we add a third we can do it then.",
+      "parentUuid": "a0142a87_ae625013",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2660e4b9_72748733",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-12-06T01:05:51Z",
       "side": 1,
       "message": "This is the MODEL_API \u003c 21 dict right? Should we put a comment here?",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8ea48f8_2bf9a89d",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3634,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "This is still used; no plan for removal yet.",
+      "parentUuid": "2660e4b9_72748733",
       "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -86,6 +158,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4b57838_230d722c",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3642,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "The rule in this change is: anything new uses the new terms.  Anything copied from the old code uses the old terms.  That way it\u0027s easy to see that a particular \"legacy\" method is a copy of an old method with minimal changes.  They will all be removed later and we\u0027ll be left with mostly new terms.",
+      "parentUuid": "8429b1aa_d5bcec80",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "33b0b98f_e47c01a1",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-12-06T01:05:51Z",
       "side": 1,
       "message": "Nit: elsewhere (even in model_api \u003c 21 cases) we seem to default to {} and check general truthyness rather than \u003d\u003d {} or is None. Should we set defaults here to {} as well rather than setting them to None?",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a69033f7_2390ca3e",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3679,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "I don\u0027t think it matters, but I\u0027ll change it since I\u0027m updating anyway.",
+      "parentUuid": "33b0b98f_e47c01a1",
       "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -122,6 +230,24 @@
         "endLine": 3734,
         "endChar": 62
       },
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcbace1e_f05a94a6",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3734,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "Yes, this is a bug.  I\u0027ve fixed it and the test.",
+      "parentUuid": "4cee8a3b_617938db",
       "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -196,6 +322,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2d94f76_d22c5cd5",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3782,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "Yes; at this point we\u0027re more concerned with the data format than the components.  We\u0027ll start using this code once the fully upgraded system starts writing the new format.",
+      "parentUuid": "34d1284e_5bff6e19",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a28bcef_c1a69417",
@@ -209,6 +353,24 @@
       "writtenOn": "2023-12-06T01:05:51Z",
       "side": 1,
       "message": "Will this raise an exception we don\u0027t want in the soft depedency case because the job doesn\u0027t exist? Its ok for a soft dep to not exist aiui.",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "265c2aa4_ee691334",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3798,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "It is not okay for a soft dep to not exist.  If you write a change that says \"dependencies: this-job-does-not-exist\" Zuul will report that as an error because of this code (and the equivalent old code).  It\u0027s okay to have a soft dep on a job that doesn\u0027t run.",
+      "parentUuid": "0a28bcef_c1a69417",
       "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -230,6 +392,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d07305c9_8d3afc36",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3812,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "It stays for the moment.",
+      "parentUuid": "35763b0a_43083e3b",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6330b50f_f4c13698",
@@ -243,6 +423,24 @@
       "writtenOn": "2023-12-06T01:05:51Z",
       "side": 1,
       "message": "current_dependency_uuids is either {} (lines 3834+3935 or line 3841) or a dict of job_uuid: { dependency_uuid: {soft: bool} }. I\u0027m not sure how it would ever match is None as a result. Is this condition correct?\n\nEven if we compared to basic truthyness of an empty dict I\u0027m not sure if that implies the dependency didn\u0027t run beacuse we may have filted out a soft dep that did run? I\u0027m not quite sure what the correct thing is here but I have a hunch is None is not it.",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74165bd3_919c96dc",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3842,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-06T02:52:33Z",
+      "side": 1,
+      "message": "You\u0027re right, this can\u0027t match.  This was ported from the legacy method, but I believe we can\u0027t actually get into this state any more because of the check in freezeJobs.  I\u0027ll remove this.",
+      "parentUuid": "6330b50f_f4c13698",
       "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
