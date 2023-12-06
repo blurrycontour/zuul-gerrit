@@ -3,6 +3,148 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a913dfa7_2c58e650",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "This has me wondering if we shouldn\u0027t cut a zuul release sooner than later if for no other reason than to have a point in time that we think is generally safe to jump through for upgrades (or rollbacks).",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7732b3c0_5b0d0502",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 722,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "These two new tests use the TestDataReturn class because this test config sets up job dependencies already? Or are we specifically concered with job pausing and the interaction between jobs with pausing and dependencies?",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0142a87_ae625013",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 766,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "Minor nit should the content of these two new tests be a single function then we can decorate a test method that calls that function with the different starting model version? A bit less repetitive but these tests also don\u0027t tend to change much as they test specific paths through the model versions.",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2660e4b9_72748733",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3634,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "This is the MODEL_API \u003c 21 dict right? Should we put a comment here?",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8429b1aa_d5bcec80",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3642,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "I\u0027m a fan of this comment clarifying the difference. That said we do seem to refer to parents in functions that were added/modified below. I think I personally find that more readable (its shorter and words aren\u0027t so similar). But it does seem at odds with this comment.",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33b0b98f_e47c01a1",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3679,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "Nit: elsewhere (even in model_api \u003c 21 cases) we seem to default to {} and check general truthyness rather than \u003d\u003d {} or is None. Should we set defaults here to {} as well rather than setting them to None?",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4cee8a3b_617938db",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3734,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "job is now a job object but the legacy methods appear to take a job name. Do we need to pass job.name here?",
+      "range": {
+        "startLine": 3734,
+        "startChar": 59,
+        "endLine": 3734,
+        "endChar": 62
+      },
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e26b44d_4bce85cf",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3753,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "I can\u0027t help but notice this \"Recursively\" method doesn\u0027t rely on recursion :)",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1458eb0f_3e9c54ad",
         "filename": "zuul/model.py",
         "patchSetId": 3
@@ -32,6 +174,75 @@
       "side": 1,
       "message": "I believe this case is necessary for model 20 to 21, and 3785 handles the direct upgrade from model 18 to 21.",
       "parentUuid": "1458eb0f_3e9c54ad",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "509ceccf_3b7bf261",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3782,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "But we return early if Model API is 18 on line 3782. Not sure how we\u0027d fall through here. Is it a case of having old data in the db but the model api has moved ahead?",
+      "parentUuid": "34d1284e_5bff6e19",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a28bcef_c1a69417",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3798,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "Will this raise an exception we don\u0027t want in the soft depedency case because the job doesn\u0027t exist? Its ok for a soft dep to not exist aiui.",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35763b0a_43083e3b",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3812,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "Does this need a MODEL_API \u003c 21 comment? I think it is operating on the old datastructure? Or do we intend on keeping this datastructure around long term?",
+      "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6330b50f_f4c13698",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3842,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T01:05:51Z",
+      "side": 1,
+      "message": "current_dependency_uuids is either {} (lines 3834+3935 or line 3841) or a dict of job_uuid: { dependency_uuid: {soft: bool} }. I\u0027m not sure how it would ever match is None as a result. Is this condition correct?\n\nEven if we compared to basic truthyness of an empty dict I\u0027m not sure if that implies the dependency didn\u0027t run beacuse we may have filted out a soft dep that did run? I\u0027m not quite sure what the correct thing is here but I have a hunch is None is not it.",
       "revId": "8f9ebf1f9e820820c311a17abc73ab062faa02fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
