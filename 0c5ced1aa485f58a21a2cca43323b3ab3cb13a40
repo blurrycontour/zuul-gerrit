@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c26e58e7_47828a3c",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-06T16:51:08Z",
+      "side": 1,
+      "message": "It took me a second to realize the paused job occurs after the data-return job even those data-return is a child of the paused job because the child is started after the parent pauses not after it completes. Just an observation should anyone else come across this in the future and wonder about it.",
+      "revId": "0c5ced1aa485f58a21a2cca43323b3ab3cb13a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
