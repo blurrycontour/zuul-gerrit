@@ -16,6 +16,24 @@
       "message": "Is this change backwards compatible?",
       "revId": "3b9704d21e529b047e99aaf904e5aee87e70fd4a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc5c9bbc_6473e50f",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-07T15:04:41Z",
+      "side": 1,
+      "message": "It should be because the event.change_number is always set to a string, but since the types of these has historically been confusing, we could probably be more defensive here and have these pass through None if that is the value, otherwise coerce to string.  (The important thing here is that we currently set the patch_number to the string \"None\" instead of actual null, and that\u0027s what we need to fix.  We don\u0027t need to worry about backwards compat for that, since as described in the commit message, it never gets used for very long.)",
+      "parentUuid": "924ba621_ae67bf68",
+      "revId": "3b9704d21e529b047e99aaf904e5aee87e70fd4a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
