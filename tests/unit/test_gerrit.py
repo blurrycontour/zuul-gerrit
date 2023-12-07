@@ -1223,3 +1223,32 @@ class TestGerritDriver(ZuulTestCase):
         self.assertEqual('tag-job', zuulvars['job'])
         self.assertEqual(tagsha, zuulvars['newrev'])
         self.assertEqual(tagsha, zuulvars['commit_id'])
+
+    @simple_layout('layouts/gerrit-hashtags.yaml')
+    def test_hashtags_event(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.data['hashtags'] = ['check']
+        self.fake_gerrit.addEvent(A.getHashtagsChangedEvent(added=['check']))
+        self.waitUntilSettled()
+
+        # Does not meet pipeline requirement
+        self.assertHistory([])
+
+        A.data['hashtags'] = ['okay', 'check']
+        self.fake_gerrit.addEvent(A.getHashtagsChangedEvent(added=['check']))
+        self.waitUntilSettled()
+
+        # This should work
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ])
+
+        # Matches reject
+        A.data['hashtags'] = ['okay', 'check', 'nope']
+        self.fake_gerrit.addEvent(A.getHashtagsChangedEvent(
+            removed=['nocheck']))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ])

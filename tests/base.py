@@ -421,6 +421,7 @@ class FakeGerritChange(object):
             'status': status,
             'subject': subject,
             'submitRecords': [],
+            'hashtags': [],
             'url': '%s/%s' % (self.gerrit.baseurl.rstrip('/'), number)}
 
         if topic:
@@ -704,6 +705,33 @@ class FakeGerritChange(object):
                 "project": self.project,
             }
         }
+        return event
+
+    def getHashtagsChangedEvent(self, added=None, removed=None):
+        event = {
+            'type': 'hashtags-changed',
+            'change': {'branch': self.branch,
+                       'commitMessage': self.data['commitMessage'],
+                       'createdOn': 1689442009,
+                       'id': 'I254acfc54f9942394ff924a806cd87c70cec2f4d',
+                       'number': int(self.number),
+                       'owner': self.data['owner'],
+                       'project': self.project,
+                       'status': self.data['status'],
+                       'subject': self.subject,
+                       'url': 'https://hostname/3'},
+            'changeKey': {'id': 'I254acfc54f9942394ff924a806cd87c70cec2f4d'},
+            'editor': {'email': 'user@example.com',
+                       'name': 'User Name',
+                       'username': 'user'},
+            'eventCreatedOn': 1701711038,
+            'project': self.project,
+            'refName': self.branch,
+        }
+        if added:
+            event['added'] = added
+        if removed:
+            event['removed'] = removed
         return event
 
     def addApproval(self, category, value, username='reviewer_john',
