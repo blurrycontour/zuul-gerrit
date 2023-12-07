@@ -26,6 +26,12 @@ from zuul.lib.dependson import find_dependency_headers
 from zuul.zk.change_cache import ChangeKey
 
 
+def noneOrStr(val):
+    if val is None:
+        return None
+    return str(val)
+
+
 class GerritSource(BaseSource):
     name = 'gerrit'
     log = logging.getLogger("zuul.source.Gerrit")
@@ -62,7 +68,7 @@ class GerritSource(BaseSource):
             return ChangeKey(connection_name, None,
                              'GerritChange',
                              str(event.change_number),
-                             str(event.patch_number))
+                             noneOrStr(event.patch_number))
         revision = f'{event.oldrev}..{event.newrev}'
         if event.ref and event.ref.startswith('refs/tags/'):
             tag = event.ref[len('refs/tags/'):]

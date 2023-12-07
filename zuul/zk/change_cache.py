@@ -425,11 +425,14 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                 compressed_size, uncompressed_size)
             self._change_cache[key._hash] = change
 
-    def updateChangeWithRetry(self, key, change, update_func, retry_count=5):
+    def updateChangeWithRetry(self, key, change, update_func, retry_count=5,
+                              allow_key_update=False):
         for attempt in range(1, retry_count + 1):
             try:
                 version = change.cache_version
-                update_func(change)
+                newkey = update_func(change)
+                if allow_key_update and newkey:
+                    key = newkey
                 self.set(key, change, version)
                 break
             except ConcurrentUpdateError:

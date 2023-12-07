@@ -22,6 +22,8 @@ from zuul.model import EventFilter, RefFilter
 from zuul.model import Change, TriggerEvent, FalseWithReason
 from zuul.driver.util import time_to_seconds, to_list, make_regex
 from zuul import exceptions
+from zuul.zk.change_cache import ChangeKey
+
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
@@ -44,6 +46,9 @@ class GerritChange(Change):
             self.updateFromSSH(data.data, connection)
         else:
             self.updateFromHTTP(data.data, data.files, connection)
+        key = ChangeKey(connection.connection_name, None,
+                        'GerritChange', str(self.number), str(self.patchset))
+        return key
 
     def serialize(self):
         d = super().serialize()
