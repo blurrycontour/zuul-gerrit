@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "924ba621_ae67bf68",
+        "filename": "zuul/driver/gerrit/gerritsource.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2023-12-07T08:16:05Z",
+      "side": 1,
+      "message": "Is this change backwards compatible?",
+      "revId": "3b9704d21e529b047e99aaf904e5aee87e70fd4a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
