@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51b9aa6b_81f34596",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3697,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-12-07T15:37:42Z",
+      "side": 1,
+      "message": "I think this needs to use `get()` as we will have job graphs w/o the model version in Zookeeper.",
+      "revId": "8f92fb4d865da4aba2f9785c9fa0a2976127099d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d5373d2_929bb198",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3732,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2023-12-07T15:37:42Z",
+      "side": 1,
+      "message": "nit: there is no need for `list()` around the list comprehension (also applies to the branch above)",
+      "revId": "8f92fb4d865da4aba2f9785c9fa0a2976127099d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
