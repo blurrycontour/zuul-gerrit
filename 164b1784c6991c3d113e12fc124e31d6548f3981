@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e67d9c7_a9d49744",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-07T20:26:28Z",
+      "side": 1,
+      "message": "Our general approach is to place a thin of a layer as possible on top of the source, and I think that serves to do what you accomplish.  For example, a config to trigger on a hashtag-added event would look like:\n\ntrigger:\n  gerrit:\n    - event: hashtags-changed\n      added: gate\n\nIf later gerrit adds some other event with an \"added\" attribute, we may end up with:\n\ntrigger:\n  gerrit:\n    - event: hashtags-changed\n      added: gate\n    - event: foobar-changed\n      added: frob\n\nAnd let\u0027s assume that the new event uses something other than scalars; there\u0027s no reason we can\u0027t have:\n\ntrigger:\n  gerrit:\n    - event: hashtags-changed\n      added: gate\n    - event: foobar-mutated\n      added: { foo: {bar: 1}}\n\nBasically, whetever gerrit thows at us, the current system can handle.",
+      "parentUuid": "d1c1087b_4c52be59",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d85c2cd4_e943d4f6",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-12-07T19:57:14Z",
       "side": 1,
       "message": "Is it possible to add and remove hashtags at the same time? I don\u0027t think the UI supports this but maybe the API does.",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbcc9cec_a82a6e98",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 734,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-07T20:26:28Z",
+      "side": 1,
+      "message": "The API does, and Gertty uses it:\n\n{\"editor\":{\"name\":\"James E. Blair\",\"email\":\"jim@acmegating.com\",\"username\":\"corvus\"},\"added\":[\"othertag\"],\"removed\":[\"testtag\"],\"hashtags\":[\"othertag\"],\"change\":{\"project\":\"zuul/zuul\",\"branch\":\"master\",\"id\":\"I1f6628d7c227d12355f651c3c822b06e2d5c5562\",\"number\":902602,\"subject\":\"Add gerrit hashtags support\",\"owner\":{\"name\":\"James E. Blair\",\"email\":\"jim@acmegating.com\",\"username\":\"corvus\"},\"url\":\"https://review.opendev.org/c/zuul/zuul/+/902602\",\"commitMessage\":\"Add gerrit hashtags support\\n\\nThis adds support for the hashtags-changed trigger event as well\\nas using hashtags as pipeline and trigger requirements.\\n\\nChange-Id: I1f6628d7c227d12355f651c3c822b06e2d5c5562\\n\",\"hashtags\":[\"othertag\"],\"createdOn\":1701730480,\"status\":\"NEW\"},\"project\":\"zuul/zuul\",\"refName\":\"refs/heads/master\",\"changeKey\":{\"id\":\"I1f6628d7c227d12355f651c3c822b06e2d5c5562\"},\"type\":\"hashtags-changed\",\"eventCreatedOn\":1701980244}",
+      "parentUuid": "d85c2cd4_e943d4f6",
       "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "533df0ef_b5f16262",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-07T20:26:28Z",
+      "side": 1,
+      "message": "I believe if that happens it would only be an evolving documentation bug (as in, we should just update our docs to match).  But in general, I think this is in keeping with the \"thin layer\" approach.",
+      "parentUuid": "c5a74b88_b120e357",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f8eaba8_ca07ecd3",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-12-07T19:57:14Z",
       "side": 1,
       "message": "This should be sufficient to handle the lack of hashtags without a model api version bump. Older code will continue to write out changes without the hashtag info and we\u0027ll ignore it until that point.\n\nChange triggering behavior might be weird if all schedulers are not restarted within a short time frame but I don\u0027t think many people run zuul that way so this should be fine.",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bdc66d4_eac9b690",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-07T20:26:28Z",
+      "side": 1,
+      "message": "Agreed, you\u0027d have to try pretty hard to make this a problem in practice.",
+      "parentUuid": "0f8eaba8_ca07ecd3",
       "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -86,6 +158,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "005d4b51_5ccd0f25",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-07T20:26:28Z",
+      "side": 1,
+      "message": "I think it should stay as-is under the \"thin layer\" approach.",
+      "parentUuid": "0b96db99_8e2a77e1",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "900f6af6_f4090229",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-12-07T19:57:14Z",
       "side": 1,
       "message": "See above.",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d073f3c_fb960c93",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-07T20:26:28Z",
+      "side": 1,
+      "message": "Same.",
+      "parentUuid": "900f6af6_f4090229",
       "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -120,6 +228,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5baa064a_74f03fe8",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-07T20:26:28Z",
+      "side": 1,
+      "message": "I matched this to other strings (see line 452), and it\u0027s almost always obvious in context.  Only if you know neither the change involved or the pipeline configuration involved (unlikely during actual debugging) would you need to suss out which is which.\n\nI do agree that it could probably be more clear with little cost to us, but that could be its own change and I think under the circumstances consistency is valuable.",
+      "parentUuid": "a548b73b_c34bf247",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a6b8a3eb_0cdc737d",
@@ -137,6 +263,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f45010c3_ff18ff81",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-07T20:26:28Z",
+      "side": 1,
+      "message": "Same.",
+      "parentUuid": "a6b8a3eb_0cdc737d",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee821aac_e93a9731",
@@ -150,6 +294,24 @@
       "writtenOn": "2023-12-07T19:57:14Z",
       "side": 1,
       "message": "I think these strings are less ambiguous about which comes from zuul and which is gerrit. (Because Zuul requires hashtags foo and that doesn\u0027t match what gerrit sent us)",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "719607b3_8cf569bb",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 641,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-07T20:26:28Z",
+      "side": 1,
+      "message": "Yeah, this section has been refactored relatively recently.",
+      "parentUuid": "ee821aac_e93a9731",
       "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
