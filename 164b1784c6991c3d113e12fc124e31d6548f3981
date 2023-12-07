@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1c1087b_4c52be59",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-07T19:57:14Z",
+      "side": 1,
+      "message": "I wonder if the structure of this should be more explicitly tied to hashtags so that we can support other attributes being added and removed later. For example maybe the keys should be hashtag-added/hashtag removed or we could do something with a datastructure like:\n\n  added:\n    - { hashtag: ^foobar$ }",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d85c2cd4_e943d4f6",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 734,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-07T19:57:14Z",
+      "side": 1,
+      "message": "Is it possible to add and remove hashtags at the same time? I don\u0027t think the UI supports this but maybe the API does.",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5a74b88_b120e357",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-07T19:57:14Z",
+      "side": 1,
+      "message": "Do we need to check that the event.type is hashtag-added here? Otherwise we could add these fields for other events if they grow the attributes.",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f8eaba8_ca07ecd3",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-07T19:57:14Z",
+      "side": 1,
+      "message": "This should be sufficient to handle the lack of hashtags without a model api version bump. Older code will continue to write out changes without the hashtag info and we\u0027ll ignore it until that point.\n\nChange triggering behavior might be weird if all schedulers are not restarted within a short time frame but I don\u0027t think many people run zuul that way so this should be fine.",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b96db99_8e2a77e1",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-07T19:57:14Z",
+      "side": 1,
+      "message": "Related to my other comments about being more explicit about hashtags being added/removed. Maybe this should say `added hashtag {self.added}`.",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "900f6af6_f4090229",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-07T19:57:14Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a548b73b_c34bf247",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 467,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-07T19:57:14Z",
+      "side": 1,
+      "message": "Small nit: I don\u0027t think the sentence here makes it clear which list was provided by gerrit in the event and which is in the config. Checking the code to figure this out or cross checking with your zuul configs should make that more clear but I wonder if we can edit this string to be more explicit. Otherwse we get two lists of strings I think.",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6b8a3eb_0cdc737d",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-07T19:57:14Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee821aac_e93a9731",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 641,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-07T19:57:14Z",
+      "side": 1,
+      "message": "I think these strings are less ambiguous about which comes from zuul and which is gerrit. (Because Zuul requires hashtags foo and that doesn\u0027t match what gerrit sent us)",
+      "revId": "164b1784c6991c3d113e12fc124e31d6548f3981",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
