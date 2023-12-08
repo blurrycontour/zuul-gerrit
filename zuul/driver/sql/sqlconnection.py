@@ -505,9 +505,13 @@ class SQLConnection(BaseConnection):
             newrev = sa.Column(SHAType(40), nullable=False)
             branch = sa.Column(sa.String(255), nullable=False)
 
-            sa.Index(self.table_prefix + 'zuul_ref_project_change_idx',
-                     project, change)
+            sa.Index(self.table_prefix + 'zuul_ref_project_idx', project)
+            sa.Index(self.table_prefix + 'zuul_ref_ref_idx', ref)
             sa.Index(self.table_prefix + 'zuul_ref_change_idx', change)
+            sa.Index(self.table_prefix + 'zuul_ref_patchset_idx', patchset)
+            sa.Index(self.table_prefix + 'zuul_ref_oldrev_idx', oldrev)
+            sa.Index(self.table_prefix + 'zuul_ref_newrev_idx', newrev)
+            sa.Index(self.table_prefix + 'zuul_ref_branch_idx', branch)
             sa.UniqueConstraint(
                 project, ref, change, patchset, oldrev, newrev,
                 name=self.table_prefix + 'zuul_ref_unique')
