@@ -960,6 +960,10 @@ class ZuulWebAPI(object):
         return ret
 
     def _isAuthorized(self, tenant, claims):
+        if '__zuul_uid_claim' in claims:
+            uid = claims['__zuul_uid_claim']
+        else:
+            uid = json.dumps(claims)
         # First, check for zuul.admin override
         if tenant:
             tenant_name = tenant.name
@@ -970,9 +974,23 @@ class ZuulWebAPI(object):
             admin_rules = []
             access_rules = self.zuulweb.abide.api_root.access_rules
         override = claims.get('zuul', {}).get('admin', [])
-        if (override == '*' or
-            (isinstance(override, list) and tenant_name in override)):
+        if override == '*':
+            self.log.info(
+                '%s authorized by wildcard override' % json.dumps(claims)
+            )
             return (True, True)
+        if (isinstance(override, list) and len(override) > 0):
+            if tenant_name in override:
+                self.log.info(
+                    '%s authorized by tenant rules override'
+                    % json.dumps(claims)
+                )
+                return (True, True)
+            else:
+                self.log.info(
+                    '%s auth override attempt rejected: tenants do not match'
+                    % json.dumps(claims)
+                )
 
         if not tenant:
             tenant_name = '<root>'
@@ -991,10 +1009,6 @@ class ZuulWebAPI(object):
                            rule_name, tenant_name, json.dumps(claims))
             authorized = rule(claims, tenant)
             if authorized:
-                if '__zuul_uid_claim' in claims:
-                    uid = claims['__zuul_uid_claim']
-                else:
-                    uid = json.dumps(claims)
                 self.log.info('%s authorized access on '
                               'tenant "%s" by rule "%s"',
                               uid, tenant_name, rule_name)
@@ -1012,15 +1026,13 @@ class ZuulWebAPI(object):
                            rule_name, tenant_name, json.dumps(claims))
             authorized = rule(claims, tenant)
             if authorized:
-                if '__zuul_uid_claim' in claims:
-                    uid = claims['__zuul_uid_claim']
-                else:
-                    uid = json.dumps(claims)
                 self.log.info('%s authorized admin on '
                               'tenant "%s" by rule "%s"',
                               uid, tenant_name, rule_name)
                 access = admin = True
                 break
+        self.log.debug('%s does not match any admin rules on tenant "%s"',
+                       uid, tenant_name)
         return (access, admin)
 
     @cherrypy.expose
