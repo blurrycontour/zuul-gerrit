@@ -356,6 +356,8 @@ Work Items
 
 * Index the build dictionary on the BuildSet by job uuid.
 
+* NodeRequests and Build*Events should also refer to job uuids.
+
 * Update items to support multiple changes.  This is likely to be a
   large change where we simultaneously update anything where we can't
   support both systems ahead of time.

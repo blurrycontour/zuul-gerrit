@@ -278,7 +278,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         jobs_fields = []
         skipped = 0
         for job in item.getJobs():
-            build = item.current_build_set.getBuild(job.name)
+            build = item.current_build_set.getBuild(job)
             (result, url) = item.formatJobResult(job)
             # If child_jobs is being used to skip jobs, then the user
             # probably has an expectation that some jobs will be

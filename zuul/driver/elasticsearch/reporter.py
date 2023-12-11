@@ -56,7 +56,7 @@ class ElasticsearchReporter(BaseReporter):
         }
 
         for job in item.getJobs():
-            build = item.current_build_set.getBuild(job.name)
+            build = item.current_build_set.getBuild(job)
             if not build:
                 continue
             # Ensure end_time is defined

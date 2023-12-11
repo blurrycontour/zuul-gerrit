@@ -1699,19 +1699,7 @@ class Scheduler(threading.Thread):
                             log = get_annotated_logger(self.log, item.event)
                             log.exception(
                                 "Exception while re-enqueing item %s", item)
-                if reenqueued:
-                    for build in item.current_build_set.getBuilds():
-                        new_job = item.getJob(build.job.name)
-                        if not new_job:
-                            item.removeBuild(build)
-                            builds_to_cancel.append(build)
-                    for request_job, request in \
-                        item.current_build_set.getNodeRequests():
-                        new_job = item.getJob(request_job)
-                        if not new_job:
-                            requests_to_cancel.append(
-                                (item.current_build_set, request))
-                else:
+                if not reenqueued:
                     items_to_remove.append(item)
 
             # Attempt to keep window sizes from shrinking where possible
@@ -1733,7 +1721,7 @@ class Scheduler(threading.Thread):
                     (
                         item.current_build_set,
                         request,
-                        item.getJob(request_job),
+                        request_job,
                     )
                 )
             try:
@@ -1880,7 +1868,7 @@ class Scheduler(threading.Thread):
                     (
                         item.current_build_set,
                         request,
-                        item.getJob(request_job),
+                        request_job,
                     )
                 )
             try:
@@ -2798,7 +2786,8 @@ class Scheduler(threading.Thread):
         if not build_set:
             return
 
-        build = build_set.getBuild(event.job_name)
+        job = build_set.item.getJob(event.job_name)
+        build = build_set.getBuild(job)
         # Verify that the build uuid matches the one of the result
         if not build:
             log.debug(
@@ -2951,8 +2940,7 @@ class Scheduler(threading.Thread):
                 # distinguish from RETRY_LIMIT which normally indicates pre
                 # playbook failures we keep the build result after the max
                 # attempts.
-                if build.build_set.getTries(
-                        build.job.name) < build.job.attempts:
+                if build.build_set.getTries(build.job) < build.job.attempts:
                     build.retry = True
 
             if build.retry:
@@ -2999,7 +2987,7 @@ class Scheduler(threading.Thread):
             # request does still exist, so we have to make sure it is
             # removed from ZK.
             request_id = build.build_set.getJobNodeRequestID(
-                build.job.name, ignore_deduplicate=True)
+                build.job, ignore_deduplicate=True)
             if request_id:
                 self.nodepool.deleteNodeRequest(
                     request_id, event_id=build.zuul_event_id)
@@ -3007,7 +2995,7 @@ class Scheduler(threading.Thread):
             # The build is completed and the nodes were already returned
             # by the executor. For consistency, also remove the node
             # request from the build set.
-            build.build_set.removeJobNodeRequestID(build.job.name)
+            build.build_set.removeJobNodeRequestID(build.job)
 
         # The test suite expects the build to be removed from the
         # internal dict after it's added to the report queue.
@@ -3075,7 +3063,8 @@ class Scheduler(threading.Thread):
 
         nodeset = self.nodepool.getNodeSet(request, job.nodeset)
 
-        if build_set.getJobNodeSetInfo(request.job_name) is None:
+        job = build_set.item.getJob(request.job_name)
+        if build_set.getJobNodeSetInfo(job) is None:
             pipeline.manager.onNodesProvisioned(request, nodeset, build_set)
         else:
             self.log.warning("Duplicate nodes provisioned event: %s",
@@ -3095,19 +3084,18 @@ class Scheduler(threading.Thread):
         """
         item = buildset.item
         log = get_annotated_logger(self.log, item.event)
-        job_name = job.name
         try:
             # Cancel node request if needed
-            req_id = buildset.getJobNodeRequestID(job_name)
+            req_id = buildset.getJobNodeRequestID(job)
             if req_id:
                 if not isinstance(req_id, dict):
                     req = self.nodepool.zk_nodepool.getNodeRequest(req_id)
                     if req:
                         self.nodepool.cancelRequest(req)
-                buildset.removeJobNodeRequestID(job_name)
+                buildset.removeJobNodeRequestID(job)
 
             # Cancel build if needed
-            build = build or buildset.getBuild(job_name)
+            build = build or buildset.getBuild(job)
             if build:
                 try:
                     self.executor.cancel(build)
@@ -3119,9 +3107,9 @@ class Scheduler(threading.Thread):
                 # In the unlikely case that a build is removed and
                 # later added back, make sure we clear out the nodeset
                 # so it gets requested again.
-                req_info = buildset.getJobNodeSetInfo(job_name)
+                req_info = buildset.getJobNodeSetInfo(job)
                 if req_info:
-                    buildset.removeJobNodeSetInfo(job_name)
+                    buildset.removeJobNodeSetInfo(job)
 
                 if build.result is None:
                     build.updateAttributes(
@@ -3150,7 +3138,7 @@ class Scheduler(threading.Thread):
                         buildset.item.pipeline.manager.current_context,
                         job=job, build_set=item.current_build_set,
                         result='CANCELED')
-                    buildset.addBuild(fakebuild)
+                    buildset.addBuild(job, fakebuild)
         finally:
             # Release the semaphore in any case
             pipeline = buildset.item.pipeline

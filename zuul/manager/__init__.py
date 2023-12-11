@@ -1007,10 +1007,11 @@ class PipelineManager(metaclass=ABCMeta):
             priority, relative_priority, event=item.event)
         log.debug("Adding node request %s for job %s to item %s",
                   req, job, item)
-        build_set.setJobNodeRequestID(job.name, req.id)
+        build_set.setJobNodeRequestID(job, req.id)
         if req.fulfilled:
             nodeset = self.sched.nodepool.getNodeSet(req, job.nodeset)
-            build_set.jobNodeRequestComplete(req.job_name, nodeset)
+            job = build_set.item.getJob(req.job_name)
+            build_set.jobNodeRequestComplete(job, nodeset)
         else:
             job.setWaitingStatus(f'node request: {req.id}')
 
@@ -1018,7 +1019,7 @@ class PipelineManager(metaclass=ABCMeta):
         job_graph = build_set.job_graph
         if job_graph:
             for parent in job_graph.getParentJobsRecursively(job):
-                build = build_set.getBuild(parent.name)
+                build = build_set.getBuild(parent)
                 if build.paused:
                     return build
         return None
@@ -1026,7 +1027,7 @@ class PipelineManager(metaclass=ABCMeta):
     def _getPausedParentProvider(self, build_set, job):
         parent_build = self._getPausedParent(build_set, job)
         if parent_build:
-            return build_set.getJobNodeProvider(parent_build.job.name)
+            return build_set.getJobNodeProvider(parent_build.job)
         return None
 
     def _calculateNodeRequestPriority(self, build_set, job):
@@ -1044,8 +1045,8 @@ class PipelineManager(metaclass=ABCMeta):
         for job in jobs:
             log.debug("Found job %s for change %s", job, item.change)
             try:
-                zone = build_set.getJobNodeExecutorZone(job.name)
-                nodes = build_set.getJobNodeList(job.name)
+                zone = build_set.getJobNodeExecutorZone(job)
+                nodes = build_set.getJobNodeList(job)
                 self.sched.executor.execute(
                     job, nodes, item, self.pipeline, zone,
                     build_set.dependent_changes,
@@ -1954,7 +1955,7 @@ class PipelineManager(metaclass=ABCMeta):
         """
         Resumes all paused builds of a buildset that may be resumed.
         """
-        for build in build_set.builds.values():
+        for build in build_set.getBuilds():
             if not build.paused:
                 continue
             # check if all child jobs are finished
@@ -1963,7 +1964,7 @@ class PipelineManager(metaclass=ABCMeta):
                 job_graph = item.current_build_set.job_graph
                 _this_job = self._legacyGetJob(item, build.job)
                 child_builds += [
-                    item.current_build_set.builds.get(x.name)
+                    item.current_build_set.getBuild(x)
                     for x in job_graph.getDependentJobsRecursively(
                         _this_job)]
             all_completed = True
@@ -1987,7 +1988,7 @@ class PipelineManager(metaclass=ABCMeta):
         _this_job = self._legacyGetJob(build_set.item, build.job)
         for job in job_graph.getDependentJobsRecursively(_this_job):
             self.sched.cancelJob(build_set, job)
-            build = build_set.getBuild(job.name)
+            build = build_set.getBuild(job)
             if build:
                 build_set.removeBuild(build)
 
@@ -2000,7 +2001,7 @@ class PipelineManager(metaclass=ABCMeta):
     def _cancelRunningBuilds(self, build_set):
         item = build_set.item
         for job in item.getJobs():
-            build = build_set.getBuild(job.name)
+            build = build_set.getBuild(job)
             if not build or not build.result:
                 self.sched.cancelJob(build_set, job, final=True)
 
@@ -2014,9 +2015,7 @@ class PipelineManager(metaclass=ABCMeta):
             for other_item in bundle.items:
                 if other_item in build_in_items:
                     continue
-                other_build = other_item.current_build_set.getBuild(
-                    build.job.name)
-                if other_build is not None and other_build is build:
+                if build in other_item.current_build_set.getBuilds():
                     build_in_items.append(other_item)
 
         return build_in_items
@@ -2041,7 +2040,7 @@ class PipelineManager(metaclass=ABCMeta):
             # We don't care about some actions below if this build
             # isn't in the current buildset, so determine that before
             # it is potentially removed with setResult.
-            if item.current_build_set.getBuild(build.job.name) is not build:
+            if build not in item.current_build_set.getBuilds():
                 current = False
             else:
                 current = True
@@ -2053,8 +2052,8 @@ class PipelineManager(metaclass=ABCMeta):
             build_set = item.current_build_set
 
             if build.retry:
-                if build_set.getJobNodeSetInfo(build.job.name):
-                    build_set.removeJobNodeSetInfo(build.job.name)
+                if build_set.getJobNodeSetInfo(build.job):
+                    build_set.removeJobNodeSetInfo(build.job)
 
                 # in case this was a paused build we need to retry all
                 # child jobs
@@ -2155,7 +2154,7 @@ class PipelineManager(metaclass=ABCMeta):
                  f"{job.name} of item {build_set.item} "
                  f"with nodeset alternative {job.nodeset_index}")
 
-        build_set.removeJobNodeRequestID(job.name)
+        build_set.removeJobNodeRequestID(job)
 
         # Make a new request
         if self.sched.globals.use_relative_priority:
@@ -2179,7 +2178,7 @@ class PipelineManager(metaclass=ABCMeta):
                 return
         # No more fallbacks -- tell the buildset the request is complete
         if nodeset is not None:
-            build_set.jobNodeRequestComplete(request.job_name, nodeset)
+            build_set.jobNodeRequestComplete(job, nodeset)
         # Put a fake build through the cycle to clean it up.
         if not request.fulfilled:
             build_set.item.setNodeRequestFailure(

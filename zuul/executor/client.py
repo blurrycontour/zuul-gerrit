@@ -88,7 +88,7 @@ class ExecutorClient(object):
 
         log.debug("Adding build %s of job %s to item %s",
                   build, job, item)
-        item.addBuild(build)
+        item.addBuild(job, build)
 
         if job.name == 'noop':
             data = {"start_time": time.time()}
@@ -111,7 +111,7 @@ class ExecutorClient(object):
 
         # Update zuul attempts after addBuild above to ensure build_set
         # is up to date.
-        attempts = build.build_set.getTries(job.name)
+        attempts = build.build_set.getTries(job)
         params["zuul"]['attempts'] = attempts
         params['zuul']['max_attempts'] = job.attempts
         # TODO (swestphahl): Remove deprecated 'max_attempts' parameter
@@ -119,7 +119,7 @@ class ExecutorClient(object):
 
         # Store the NodeRequest ID in the job arguments, so we can look it up
         # on the executor side to lock the nodes.
-        req_id = build.build_set.getJobNodeRequestID(job.name)
+        req_id = build.build_set.getJobNodeRequestID(job)
         if isinstance(req_id, dict):
             # This is a stop-gap.  It is possible for this to happen
             # if a queue item completes all its builds and is removed

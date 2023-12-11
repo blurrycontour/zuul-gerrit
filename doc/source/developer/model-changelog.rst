@@ -174,3 +174,9 @@ Version 22
 :Prior Zuul version: 9.3.0
 :Description: Add model_version field to job graphs and index jobs by uuid.
               Affects schedulers.
+
+Version 23
+----------
+:Prior Zuul version: 9.3.0
+:Description: Add model_version field to bulid sets.
+              Affects schedulers.
