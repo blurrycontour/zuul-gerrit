@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "930d316a_89b72e68",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2023-12-12T22:02:11Z",
+      "side": 1,
+      "message": "Nit: This is likely to trigger knee-jerk responses from some security scanners that naively assume any use of a PRNG is in a sensitive context. A comment here stating it\u0027s not used for security purposes might help people who bother to glance at the source code.",
+      "revId": "be4ab1bb38345f3e83d042d86c5495586ea1f12f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
