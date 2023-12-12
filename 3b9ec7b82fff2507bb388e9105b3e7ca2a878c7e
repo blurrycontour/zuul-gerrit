@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "3b9ec7b82fff2507bb388e9105b3e7ca2a878c7e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd52550a_f8671336",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2023-12-12T15:56:14Z",
+      "side": 1,
+      "message": "malloc_trim() returns 0 if no memory was released and returns 1 if memory was released. It might be a good idea to log whether or not memory was released to aid in debugging.\n\nSeparately, should we pass in a value larger than 0 (which will result in at most one page retained)? Huge pages on Linux are 2MB (unless configured to be 1GB). Maybe we ask to keep 8MB or so around? This won\u0027t have a big impact on memory starved systems but may help keep zuul more responsive when allocating memory.",
+      "revId": "3b9ec7b82fff2507bb388e9105b3e7ca2a878c7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
