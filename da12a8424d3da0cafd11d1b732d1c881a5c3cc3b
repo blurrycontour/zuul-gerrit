@@ -24,6 +24,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf6375a9_8795e8eb",
+        "filename": "doc/source/drivers/timer.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-12T21:22:34Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "c393ed2e_96058dda",
+      "revId": "da12a8424d3da0cafd11d1b732d1c881a5c3cc3b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91cb0a47_61655b84",
@@ -37,6 +55,24 @@
       "writtenOn": "2023-10-16T08:11:16Z",
       "side": 1,
       "message": "This relies on the list of projects and the branches being the same and in the same order each time. If there is a new branch in any of those projects, a new project or any of the lists is not sorted the same, it will produce different values for all following projects/branches.\n\nGiven that, I think fungi\u0027s proposal of using a PRNG per branch makes sense to me.",
+      "revId": "da12a8424d3da0cafd11d1b732d1c881a5c3cc3b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6757bfe_cafcf86f",
+        "filename": "zuul/driver/timer/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2023-12-12T21:22:34Z",
+      "side": 1,
+      "message": "Yes.  The probability of it happening in practice is vanishingly small, as we would have to be adding a new project during a tenant reconfiguration while the timer was running.  But we can make it even more deterministic.  I\u0027ll do that in the next ps.",
+      "parentUuid": "91cb0a47_61655b84",
       "revId": "da12a8424d3da0cafd11d1b732d1c881a5c3cc3b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
