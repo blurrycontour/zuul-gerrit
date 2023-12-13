@@ -1,5 +1,5 @@
 # Copyright 2021 BMW Group
-# Copyright 2021 Acme Gating, LLC
+# Copyright 2021-2023 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,6 +12,8 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+
+import time
 
 import zuul.model
 
@@ -608,6 +610,56 @@ class TestScaleOutScheduler(ZuulTestCase):
             self.assertEqual(reqs[2]['relative_priority'], 1)
 
         self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+    @simple_layout('layouts/timer-jitter.yaml')
+    def test_timer_multi_scheduler(self):
+        # Test that two schedulers create exactly the same timer jobs
+        # including jitter.
+        self.create_branch('org/project', 'stable')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable'))
+        self.waitUntilSettled()
+
+        timer1 = self.scheds.first.sched.connections.drivers['timer']
+        timer1_jobs = timer1.apsched.get_jobs()
+
+        sched2 = self.createScheduler()
+        sched2.start()
+        self.assertEqual(len(self.scheds), 2)
+
+        timer1.stop()
+        self.waitUntilSettled(matcher=[sched2])
+
+        timer2 = sched2.connections.drivers['timer']
+
+        for _ in iterate_timeout(10, "until jobs registered"):
+            timer2_jobs = timer2.apsched.get_jobs()
+            if timer2_jobs:
+                break
+
+        for x in range(len(timer1_jobs)):
+            self.log.debug("Timer jitter: %s %s",
+                           timer1_jobs[x].trigger._zuul_jitter,
+                           timer2_jobs[x].trigger._zuul_jitter)
+            self.assertEqual(timer1_jobs[x].trigger._zuul_jitter,
+                             timer2_jobs[x].trigger._zuul_jitter)
+            if x:
+                # Assert that we're not applying the same jitter to
+                # every job.  Since we're dealing with a PRNG here,
+                # this could fail and be a false negative, but that's
+                # unlikely to happen often.
+                self.assertNotEqual(timer1_jobs[x - 1].trigger._zuul_jitter,
+                                    timer1_jobs[x].trigger._zuul_jitter)
+
+        self.commitConfigUpdate('org/common-config', 'layouts/no-timer.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+        # If APScheduler is in mid-event when we remove the job, we
+        # can end up with one more event firing, so give it an extra
+        # second to settle.
+        time.sleep(1)
         self.waitUntilSettled()
 
 
