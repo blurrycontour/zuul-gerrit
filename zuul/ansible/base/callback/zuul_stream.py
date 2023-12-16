@@ -511,12 +511,15 @@ class CallbackModule(default.CallbackModule):
         if not is_localhost and is_task:
             self._stop_streamers()
         if result._task.action in ('command', 'shell',
-                                   'win_command', 'win_shell'):
+                                   'win_command', 'win_shell',
+                                   'ansible.windows.win_command',
+                                   'ansible.windows.win_shell'):
             stdout_lines = zuul_filter_result(result_dict)
             # We don't have streaming for localhost and windows modules so get
             # standard out after the fact.
             if is_localhost or result._task.action in (
-                    'win_command', 'win_shell'):
+                    'win_command', 'win_shell', 'ansible.windows.win_command',
+                    'ansible.windows.win_shell'):
                 for line in stdout_lines:
                     hostname = self._get_hostname(result)
                     self._log("%s | %s " % (hostname, line))
@@ -692,7 +695,9 @@ class CallbackModule(default.CallbackModule):
         if to_text(result_dict.get('msg', '')).startswith('MODULE FAILURE'):
             self._log_module_failure(result, result_dict)
         elif result._task.action not in ('command', 'shell',
-                                         'win_command', 'win_shell'):
+                                         'win_command', 'win_shell',
+                                         'ansible.windows.win_command',
+                                         'ansible.windows.win_shell'):
             if 'msg' in result_dict:
                 self._log_message(
                     result=result, msg=result_dict['msg'], status=status)
@@ -735,7 +740,9 @@ class CallbackModule(default.CallbackModule):
         if to_text(result_dict.get('msg', '')).startswith('MODULE FAILURE'):
             self._log_module_failure(result, result_dict)
         elif result._task.action not in ('command', 'shell',
-                                         'win_command', 'win_shell'):
+                                         'win_command', 'win_shell',
+                                         'ansible.windows.win_command',
+                                         'ansible.windows.win_shell'):
             self._log_message(
                 result=result,
                 msg="Item: {loop_var}".format(loop_var=result_dict[loop_var]),
