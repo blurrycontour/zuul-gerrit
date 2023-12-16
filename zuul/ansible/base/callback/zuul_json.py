@@ -207,7 +207,8 @@ orig_find_plugin = PluginLoader.find_plugin
 
 def mp_get(self, name, *args, **kwargs):
     if (name.startswith('ansible.builtin.') or
-        name.startswith('ansible.legacy.')):
+        name.startswith('ansible.legacy.') or
+        name.startswith('ansible.windows.')):
         name = name.rsplit('.', 1)[-1]
     ret = orig_get(self, name, *args, **kwargs)
     return ret
@@ -215,7 +216,8 @@ def mp_get(self, name, *args, **kwargs):
 
 def mp_find_plugin(self, name, *args, **kwargs):
     if (name.startswith('ansible.builtin.') or
-        name.startswith('ansible.legacy.')):
+        name.startswith('ansible.legacy.') or
+        name.startswith('ansible.windows.')):
         name = name.rsplit('.', 1)[-1]
     ret = orig_find_plugin(self, name, *args, **kwargs)
     return ret
