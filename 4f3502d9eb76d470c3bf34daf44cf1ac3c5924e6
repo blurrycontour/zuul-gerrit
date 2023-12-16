@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99458ca4_9dcc6d02",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 36622
+      },
+      "writtenOn": "2023-12-16T22:56:17Z",
+      "side": 1,
+      "message": "add zuul/ansible/6/callback/zuul_stream.py and zuul/ansible/8/callback/zuul_stream.py once checks let me know if this is formatted okay or not",
+      "revId": "4f3502d9eb76d470c3bf34daf44cf1ac3c5924e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
