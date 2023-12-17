@@ -124,8 +124,9 @@ class TimerDriver(Driver, TriggerInterface):
                     try:
                         cron_args = dict(
                             minute=parts[0],
-                            hour=parts[2],
-                            day=parts[3],
+                            hour=parts[1],
+                            day=parts[2],
+                            month=parts[3],
                             day_of_week=parts[4],
                             second=None,
                         )
