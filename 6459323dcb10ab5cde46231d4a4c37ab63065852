@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a91b598b_64f088d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 36622
+      },
+      "writtenOn": "2023-12-17T17:27:27Z",
+      "side": 1,
+      "message": "Hello, I\u0027ve observed that console logging on windows nodes differs when using the FQCN names for win_shell and win_command.\n\nMy understanding is that these checks for linux shell and command actions don\u0027t necessarily need to compare against their FQCNs because of the monkeypatching happening here: https://review.opendev.org/c/zuul/zuul/+/903809\n\nI don\u0027t think https://review.opendev.org/c/zuul/zuul/+/903809 is a better approach for this, and I\u0027m happy to abandon that change if asked to. I just wasn\u0027t sure if it might also be needed.",
+      "revId": "6459323dcb10ab5cde46231d4a4c37ab63065852",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e826f75_a525b543",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 36622
+      },
+      "writtenOn": "2023-12-17T17:27:27Z",
+      "side": 1,
+      "message": "Another related question I have how are we getting into this block of code we use win_shell or win_command? From what I can tell, this is the only way in to _read_log() and streamer.start() happening.\n\nIn the console stream during a win_shell or win_command task, we see \"Waiting on logger\", and sometimes also see \"Timeout exception waiting for the logger.\".\n\nWe probably wouldn\u0027t have noticed this if we were connecting with winrm, since that connection type bails out in this block, but was the need to add that on line 385 because they were using shell: or command: on windows? Kind of confusing 😊",
+      "revId": "6459323dcb10ab5cde46231d4a4c37ab63065852",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
