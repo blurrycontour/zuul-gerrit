@@ -631,7 +631,63 @@ class Repo(object):
         repo.git.clean('-x', '-f', '-d')
         repo.git.checkout(ref)
 
-    def cherryPick(self, ref, zuul_event_id=None):
+    @staticmethod
+    def _getTimestampEnv(timestamp):
+        if timestamp:
+            return {
+                'GIT_COMMITTER_DATE': str(int(timestamp)) + '+0000',
+                'GIT_AUTHOR_DATE': str(int(timestamp)) + '+0000',
+            }
+        return {}
+
+    def merge(self, ref, strategy=None, zuul_event_id=None, timestamp=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        repo = self.createRepoObject(zuul_event_id)
+        args = []
+        if strategy:
+            args += ['-s', strategy]
+        args.append('FETCH_HEAD')
+        self.fetch(ref, zuul_event_id=zuul_event_id)
+        log.debug("Merging %s with args %s", ref, args)
+        with repo.git.custom_environment(**self._getTimestampEnv(timestamp)):
+            # Use a custom message to avoid introducing
+            # merger/executor path details
+            repo.git.merge(message=f"Merge '{ref}'", *args)
+        return repo.head.commit
+
+    def squashMerge(self, item, zuul_event_id=None, timestamp=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        repo = self.createRepoObject(zuul_event_id)
+        args = ['--squash', 'FETCH_HEAD']
+        ref = item['ref']
+        self.fetch(ref, zuul_event_id=zuul_event_id)
+        log.debug("Squash-Merging %s with args %s", ref, args)
+        with repo.git.custom_environment(**self._getTimestampEnv(timestamp)):
+            repo.git.merge(*args)
+            # Use a custom message to avoid introducing
+            # merger/executor path details
+            repo.git.commit(
+                message='Merge change %s,%s' % (
+                    item['number'], item['patchset']))
+        return repo.head.commit
+
+    def rebaseMerge(self, item, base, zuul_event_id=None, timestamp=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        repo = self.createRepoObject(zuul_event_id)
+        args = [base]
+        ref = item['ref']
+        self.fetch(ref, zuul_event_id=zuul_event_id)
+        log.debug("Rebasing %s with args %s", ref, args)
+        repo.git.checkout('FETCH_HEAD')
+        with repo.git.custom_environment(**self._getTimestampEnv(timestamp)):
+            try:
+                repo.git.rebase(*args)
+            except Exception:
+                repo.git.rebase(abort=True)
+                raise
+        return repo.head.commit
+
+    def cherryPick(self, ref, zuul_event_id=None, timestamp=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
         self.fetch(ref, zuul_event_id=zuul_event_id)
@@ -640,14 +696,20 @@ class Repo(object):
             args = ["-s", "resolve", "FETCH_HEAD"]
             log.debug("Merging %s with args %s instead of cherry-picking",
                       ref, args)
-            repo.git.merge(*args)
+            with repo.git.custom_environment(
+                    **self._getTimestampEnv(timestamp)):
+                # Use a custom message to avoid introducing
+                # merger/executor path details
+                repo.git.merge(message=f"Merge '{ref}'", *args)
         else:
             log.debug("Cherry-picking %s", ref)
             # Git doesn't have an option to ignore commits that are already
             # applied to the working tree when cherry-picking, so pass the
             # --keep-redundant-commits option, which will cause it to make an
             # empty commit
-            repo.git.cherry_pick("FETCH_HEAD", keep_redundant_commits=True)
+            with repo.git.custom_environment(
+                    **self._getTimestampEnv(timestamp)):
+                repo.git.cherry_pick("FETCH_HEAD", keep_redundant_commits=True)
 
             # If the newly applied commit is empty, it means either:
             #  1) The commit being cherry-picked was empty, in which the empty
@@ -661,45 +723,6 @@ class Repo(object):
                 log.debug("%s was already applied. Removing it", ref)
                 self._checkout(repo, parent)
 
-        return repo.head.commit
-
-    def merge(self, ref, strategy=None, zuul_event_id=None):
-        log = get_annotated_logger(self.log, zuul_event_id)
-        repo = self.createRepoObject(zuul_event_id)
-        args = []
-        if strategy:
-            args += ['-s', strategy]
-        args.append('FETCH_HEAD')
-        self.fetch(ref, zuul_event_id=zuul_event_id)
-        log.debug("Merging %s with args %s", ref, args)
-        repo.git.merge(*args)
-        return repo.head.commit
-
-    def squashMerge(self, item, zuul_event_id=None):
-        log = get_annotated_logger(self.log, zuul_event_id)
-        repo = self.createRepoObject(zuul_event_id)
-        args = ['--squash', 'FETCH_HEAD']
-        ref = item['ref']
-        self.fetch(ref, zuul_event_id=zuul_event_id)
-        log.debug("Squash-Merging %s with args %s", ref, args)
-        repo.git.merge(*args)
-        repo.index.commit(
-            'Merge change %s,%s' % (item['number'], item['patchset']))
-        return repo.head.commit
-
-    def rebaseMerge(self, item, base, zuul_event_id=None):
-        log = get_annotated_logger(self.log, zuul_event_id)
-        repo = self.createRepoObject(zuul_event_id)
-        args = [base]
-        ref = item['ref']
-        self.fetch(ref, zuul_event_id=zuul_event_id)
-        log.debug("Rebasing %s with args %s", ref, args)
-        repo.git.checkout('FETCH_HEAD')
-        try:
-            repo.git.rebase(*args)
-        except Exception:
-            repo.git.rebase(abort=True)
-            raise
         return repo.head.commit
 
     def fetch(self, ref, zuul_event_id=None):
@@ -1149,28 +1172,36 @@ class Merger(object):
             log.exception("Unable to checkout %s", base)
             return None, None
 
+        timestamp = item.get('configured_time')
         try:
             mode = item['merge_mode']
             if mode == zuul.model.MERGER_MERGE:
-                commit = repo.merge(item['ref'], zuul_event_id=zuul_event_id)
+                commit = repo.merge(item['ref'], zuul_event_id=zuul_event_id,
+                                    timestamp=timestamp)
             elif mode == zuul.model.MERGER_MERGE_RESOLVE:
                 commit = repo.merge(item['ref'], 'resolve',
-                                    zuul_event_id=zuul_event_id)
+                                    zuul_event_id=zuul_event_id,
+                                    timestamp=timestamp)
             elif mode == zuul.model.MERGER_MERGE_RECURSIVE:
                 commit = repo.merge(item['ref'], 'recursive',
-                                    zuul_event_id=zuul_event_id)
+                                    zuul_event_id=zuul_event_id,
+                                    timestamp=timestamp)
             elif mode == zuul.model.MERGER_MERGE_ORT:
                 commit = repo.merge(item['ref'], 'ort',
-                                    zuul_event_id=zuul_event_id)
+                                    zuul_event_id=zuul_event_id,
+                                    timestamp=timestamp)
             elif mode == zuul.model.MERGER_CHERRY_PICK:
                 commit = repo.cherryPick(item['ref'],
-                                         zuul_event_id=zuul_event_id)
+                                         zuul_event_id=zuul_event_id,
+                                         timestamp=timestamp)
             elif mode == zuul.model.MERGER_SQUASH_MERGE:
                 commit = repo.squashMerge(
-                    item, zuul_event_id=zuul_event_id)
+                    item, zuul_event_id=zuul_event_id,
+                    timestamp=timestamp)
             elif mode == zuul.model.MERGER_REBASE:
                 commit = repo.rebaseMerge(
-                    item, base, zuul_event_id=zuul_event_id)
+                    item, base, zuul_event_id=zuul_event_id,
+                    timestamp=timestamp)
             else:
                 raise Exception("Unsupported merge mode: %s" % mode)
         except git.GitCommandError:
