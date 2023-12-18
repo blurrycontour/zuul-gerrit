@@ -795,6 +795,111 @@ class TestMergerRepo(ZuulTestCase):
         self.assertEqual(work_repo.remote_url, parent_path)
         self.assertTrue(os.path.exists(work_repo.local_path))
 
+    def test_reproducible_merges(self):
+        """Test that we can use the Repo class to create
+        identical/reproducible merges"""
+
+        # A customized version of init_repo from the test base
+        repo_time = "Tue May 29 14:49:32 2012 -0700"
+        project = 'testrepo'
+        path = os.path.join(self.upstream_root, project)
+        repo = git.Repo.init(path)
+        env = {
+            'GIT_COMMITTER_DATE': repo_time,
+            'GIT_AUTHOR_DATE': repo_time,
+        }
+        repo.git.update_environment(**env)
+        with repo.config_writer() as config_writer:
+            config_writer.set_value('user', 'email', 'user@example.com')
+            config_writer.set_value('user', 'name', 'User Name')
+        repo.git.commit('--allow-empty', '-m', 'initial commit')
+        master = repo.create_head('master')
+        repo.head.reference = master
+        repo.head.reset(working_tree=True)
+        repo.git.clean('-x', '-f', '-d')
+
+        # A customized create_commit method that uses our timestamp
+        def _create_commit(project, files, head, message):
+            repo.head.reference = repo.heads[head]
+            repo.head.reset(index=True, working_tree=True)
+
+            for name, content in files.items():
+                file_name = os.path.join(path, name)
+                with open(file_name, 'a') as f:
+                    f.write(content)
+                repo.index.add([file_name])
+
+            repo.git.commit('-m', message)
+
+        # Now we use the merger api
+        parent_path = os.path.join(self.upstream_root, project)
+        parent_repo = git.Repo(parent_path)
+        parent_repo.create_head("one")
+        parent_repo.create_head("two")
+
+        files = {"one.txt": "one"}
+        _create_commit(project, files=files, head="one",
+                       message="Add file one")
+
+        files = {"two.txt": "two"}
+        _create_commit(project, files=files, head="two",
+                       message="Add file two")
+
+        work_repo = Repo(parent_path, self.workspace_root,
+                         "none@example.org", "User Name", "0", "0")
+
+        # We expect the rebase to fail because of a conflict, but the
+        # rebase will be aborted.
+        work_repo.merge("refs/heads/one", timestamp=1338328172.0)
+        work_repo.merge("refs/heads/two", timestamp=1338328172.0)
+        work = work_repo.createRepoObject(None)
+        actual = [
+            {
+                'message': c.message,
+                'author': c.author.email,
+                'committer': c.committer.email,
+                'authored_date': c.authored_date,
+                'committed_date': c.committed_date,
+                'hexsha': c.hexsha,
+            }
+            for c in work.iter_commits()
+        ]
+        expected = [
+            {
+                'message': "Merge 'refs/heads/one'\n",
+                'author': 'none@example.org',
+                'committer': 'none@example.org',
+                'authored_date': 1338328172,
+                'committed_date': 1338328172,
+                'hexsha': '6a0819bece012053df94163d01cd208ae8faa66c',
+            },
+            {
+                'message': 'Add file two\n',
+                'author': 'user@example.com',
+                'committer': 'user@example.com',
+                'authored_date': 1338328172,
+                'committed_date': 1338328172,
+                'hexsha': '814ba22a3b725c389ece9d669aefa6bd40004764'
+            },
+            {
+                'message': 'Add file one\n',
+                'author': 'user@example.com',
+                'committer': 'user@example.com',
+                'authored_date': 1338328172,
+                'committed_date': 1338328172,
+                'hexsha': 'fe8758283c2d25beb950b7d0a0cc59d5dd8bc76c'
+            },
+            {
+                'message': 'initial commit\n',
+                'author': 'user@example.com',
+                'committer': 'user@example.com',
+                'authored_date': 1338328172,
+                'committed_date': 1338328172,
+                'hexsha': '5df83a14bdf0eaefaac82df8bf17d377c413a11f'
+            }
+        ]
+        self.assertEqual(expected, actual)
+
 
 class TestMergerWithAuthUrl(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
