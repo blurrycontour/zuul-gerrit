@@ -898,6 +898,11 @@ class TestMergerRepo(ZuulTestCase):
                 'hexsha': '5df83a14bdf0eaefaac82df8bf17d377c413a11f'
             }
         ]
+        commit = list(work.iter_commits())[0]
+        for k in dir(commit):
+            if k.startswith('_'):
+                continue
+            print(k, getattr(commit, k))
         self.assertEqual(expected, actual)
 
 
