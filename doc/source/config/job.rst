@@ -1070,10 +1070,12 @@ Here is an example of two job definitions:
       .. warning::
 
          File filters will be ignored for refs that don't have any
-         files. This will be the case for merge commits (e.g. in a post
-         pipeline) or empty commits created with
-         ``git commit --allow-empty`` (which can be used in order to
-         run all jobs).
+         files. This will be the case for branch heads and tags
+         (e.g. in a post, periodic or release pipeline).  Howover,
+         empty commits created with ``git commit --allow-empty`` will
+         behave normally and will not match.  Merge commits will match
+         or not based on the files changed by their underlying child
+         commits.
 
    .. attr:: irrelevant-files
 
@@ -1081,16 +1083,18 @@ Here is an example of two job definitions:
       the job should run unless *all* of the files changed match this
       list.  In other words, if the regular expression ``docs/.*`` is
       supplied, then this job will not run if the only files changed
-      are in the docs directory.  A :ref:`regular expression <regex>`
-      or list of regular expressions.
+      are in the docs directory.  This is a :ref:`regular expression
+      <regex>` or list of regular expressions.
 
       .. warning::
 
          File filters will be ignored for refs that don't have any
-         files. This will be the case for merge commits (e.g. in a post
-         pipeline) or empty commits created with
-         ``git commit --allow-empty`` (which can be used in order to
-         run all jobs).
+         files. This will be the case for branch heads and tags
+         (e.g. in a post, periodic or release pipeline).  Howover,
+         empty commits created with ``git commit --allow-empty`` will
+         behave normally and will not match.  Merge commits will match
+         or not based on the files changed by their underlying child
+         commits.
 
    .. attr:: match-on-config-updates
       :default: true

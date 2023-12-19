@@ -1,0 +1,14 @@
+---
+fixes:
+  - |
+    Changes with no files will no longer match the :attr:`job.files` matcher.
+
+    Previously a change with no files (only a commit message) attached
+    would nevertheless match all ``files`` matchers.  This was
+    originally an attempt to avoid a situation where no jobs ran when
+    merge commit was used for a Change.  More recently, Zuul is able
+    to determine what files were changed by the child commits of merge
+    commits and therefore files matchers work as expected.  Adjusting
+    the behavior of the ``files`` matcher to not match empty commits
+    allows for a more intuitive behavior, and an improved workflow for
+    users creating changes in the Gerrit web UI.
