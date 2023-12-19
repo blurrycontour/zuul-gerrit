@@ -899,6 +899,11 @@ class TestMergerRepo(ZuulTestCase):
             }
         ]
         self.assertEqual(expected, actual)
+        commit = list(work.iter_commits())[0]
+        for k in dir(commit):
+            if k.startswith('_'):
+                continue
+            print(k, getattr(commit, k))
 
 
 class TestMergerWithAuthUrl(ZuulTestCase):
