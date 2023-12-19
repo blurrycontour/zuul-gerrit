@@ -185,6 +185,7 @@ class TimerDriver(Driver, TriggerInterface):
                         prng_seed = json.dumps(prng_init, sort_keys=True)
                         prng = random.Random(prng_seed)
                         job_jitter = prng.uniform(0, jitter)
+                        self.log.debug("PRNG init %s", prng_init)
                     else:
                         job_jitter = None
 

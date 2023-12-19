@@ -624,6 +624,7 @@ class TestScaleOutScheduler(ZuulTestCase):
 
         timer1 = self.scheds.first.sched.connections.drivers['timer']
         timer1_jobs = timer1.apsched.get_jobs()
+        self.log.debug("PRNG get jobs 1 %s", len(timer1_jobs))
 
         sched2 = self.createScheduler()
         sched2.start()
@@ -636,6 +637,7 @@ class TestScaleOutScheduler(ZuulTestCase):
 
         for _ in iterate_timeout(10, "until jobs registered"):
             timer2_jobs = timer2.apsched.get_jobs()
+            self.log.debug("PRNG get jobs 2 %s", len(timer2_jobs))
             if timer2_jobs:
                 break
 
