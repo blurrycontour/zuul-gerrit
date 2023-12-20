@@ -4118,13 +4118,16 @@ class BuildRequest(JobRequest):
 
     ALL_STATES = JobRequest.ALL_STATES + (PAUSED,)
 
-    def __init__(self, uuid, zone, build_set_uuid, job_name, tenant_name,
-                 pipeline_name, event_id, precedence=None, state=None,
-                 result_path=None, span_context=None):
+    def __init__(self, uuid, zone, build_set_uuid, job_name, job_uuid,
+                 tenant_name, pipeline_name, event_id,
+                 precedence=None, state=None, result_path=None,
+                 span_context=None):
         super().__init__(uuid, precedence, state, result_path, span_context)
         self.zone = zone
         self.build_set_uuid = build_set_uuid
+        # MODEL_API < 25
         self.job_name = job_name
+        self.job_uuid = job_uuid
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
         self.event_id = event_id
@@ -4132,6 +4135,12 @@ class BuildRequest(JobRequest):
         # request so that zuul web can use this information to
         # build the url for the live log stream.
         self.worker_info = None
+
+    @property
+    def _job_id(self):
+        # MODEL_API < 25
+        # Remove this after circular dep refactor
+        return self.job_uuid or self.job_name
 
     def toDict(self):
         d = super().toDict()
@@ -4144,6 +4153,8 @@ class BuildRequest(JobRequest):
             "event_id": self.event_id,
             "worker_info": self.worker_info,
         })
+        if (COMPONENT_REGISTRY.model_api >= 25):
+            d['job_uuid'] = self.job_uuid
         return d
 
     @classmethod
@@ -4153,6 +4164,7 @@ class BuildRequest(JobRequest):
             data["zone"],
             data["build_set_uuid"],
             data["job_name"],
+            data.get("job_uuid"),
             data["tenant_name"],
             data["pipeline_name"],
             data["event_id"],
@@ -7376,22 +7388,31 @@ class BuildResultEvent(ResultEvent):
     :arg str build_set_uuid: The UUID of the buildset of which the build
                              is part of.
     :arg str job_name: The name of the job the build is executed for.
+    :arg str job_uuid: The uuid of the job the build is executed for.
     :arg str build_request_ref: The path to the build request that is
                                 stored in ZooKeeper.
     :arg dict data: The event data.
     """
 
-    def __init__(self, build_uuid, build_set_uuid, job_name, build_request_ref,
-                 data, zuul_event_id=None):
+    def __init__(self, build_uuid, build_set_uuid, job_name, job_uuid,
+                 build_request_ref, data, zuul_event_id=None):
         self.build_uuid = build_uuid
         self.build_set_uuid = build_set_uuid
+        # MODEL_API < 25
         self.job_name = job_name
+        self.job_uuid = job_uuid
         self.build_request_ref = build_request_ref
         self.data = data
         self.zuul_event_id = zuul_event_id
 
+    @property
+    def _job_id(self):
+        # MODEL_API < 25
+        # Remove this after circular dep refactor
+        return self.job_uuid or self.job_name
+
     def toDict(self):
-        return {
+        d = {
             "build_uuid": self.build_uuid,
             "build_set_uuid": self.build_set_uuid,
             "job_name": self.job_name,
@@ -7399,13 +7420,17 @@ class BuildResultEvent(ResultEvent):
             "data": self.data,
             "zuul_event_id": self.zuul_event_id,
         }
+        if (COMPONENT_REGISTRY.model_api >= 25):
+            d['job_uuid'] = self.job_uuid
+        return d
 
     @classmethod
     def fromDict(cls, data):
         return cls(
             data.get("build_uuid"), data.get("build_set_uuid"),
-            data.get("job_name"), data.get("build_request_ref"),
-            data.get("data"), data.get("zuul_event_id"))
+            data.get("job_name"), data.get("job_uuid"),
+            data.get("build_request_ref"), data.get("data"),
+            data.get("zuul_event_id"))
 
     def __repr__(self):
         return (

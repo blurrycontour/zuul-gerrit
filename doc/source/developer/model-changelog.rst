@@ -186,3 +186,9 @@ Version 24
 :Prior Zuul version: 9.3.0
 :Description: Add job_uuid to NodeRequests.
               Affects schedulers.
+
+Version 25
+----------
+:Prior Zuul version: 9.3.0
+:Description: Add job_uuid to BuildRequests and BuildResultEvents.
+              Affects schedulers and executors.
