@@ -1746,13 +1746,15 @@ class NodeRequest(object):
     """A request for a set of nodes."""
 
     def __init__(self, requestor, build_set_uuid, tenant_name, pipeline_name,
-                 job_name, labels, provider, relative_priority,
+                 job_name, job_uuid, labels, provider, relative_priority,
                  event_id=None, span_info=None):
         self.requestor = requestor
         self.build_set_uuid = build_set_uuid
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
+        # MODEL_API < 24
         self.job_name = job_name
+        self.job_uuid = job_uuid
         self.labels = labels
         self.nodes = []
         self._state = STATE_REQUESTED
@@ -1797,6 +1799,12 @@ class NodeRequest(object):
         self._state = value
         self.state_time = time.time()
 
+    @property
+    def _job_id(self):
+        # MODEL_API < 24
+        # Remove this after circular dep refactor
+        return self.job_uuid or self.job_name
+
     def __repr__(self):
         return '<NodeRequest %s %s>' % (self.id, self.labels)
 
@@ -1818,6 +1826,8 @@ class NodeRequest(object):
             "job_name": self.job_name,
             "span_info": self.span_info,
         }
+        if (COMPONENT_REGISTRY.model_api >= 24):
+            d["requestor_data"]['job_uuid'] = self.job_uuid
         d.setdefault('node_types', self.labels)
         d.setdefault('requestor', self.requestor)
         d.setdefault('created_time', self.created_time)
@@ -1862,6 +1872,7 @@ class NodeRequest(object):
             tenant_name=requestor_data.get("tenant_name"),
             pipeline_name=requestor_data.get("pipeline_name"),
             job_name=requestor_data.get("job_name"),
+            job_uuid=requestor_data.get("job_uuid"),
             labels=data["node_types"],
             provider=data["provider"],
             relative_priority=data.get("relative_priority", 0),
@@ -5470,8 +5481,15 @@ class QueueItem(zkobject.ZKObject):
             return []
         return self.current_build_set.job_graph.getJobs()
 
-    def getJob(self, name):
-        return self.current_build_set.job_graph.getJobFromName(name)
+    def getJob(self, job_id):
+        # MODEL_API < 24
+        job_graph = self.current_build_set.job_graph
+        try:
+            job = job_graph.getJobFromUuid(job_id)
+            if job is not None:
+                return job
+        except (KeyError, ValueError):
+            return job_graph.getJobFromName(job_id)
 
     @property
     def items_ahead(self):

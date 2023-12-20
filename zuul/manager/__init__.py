@@ -1010,7 +1010,7 @@ class PipelineManager(metaclass=ABCMeta):
         build_set.setJobNodeRequestID(job, req.id)
         if req.fulfilled:
             nodeset = self.sched.nodepool.getNodeSet(req, job.nodeset)
-            job = build_set.item.getJob(req.job_name)
+            job = build_set.item.getJob(req._job_id)
             build_set.jobNodeRequestComplete(job, nodeset)
         else:
             job.setWaitingStatus(f'node request: {req.id}')
@@ -2169,11 +2169,11 @@ class PipelineManager(metaclass=ABCMeta):
         log = get_annotated_logger(self.log, request.event_id)
 
         self.reportPipelineTiming('node_request_time', request.created_time)
-        job = build_set.item.getJob(request.job_name)
+        job = build_set.item.getJob(request._job_id)
         # First see if we need to retry the request
         if not request.fulfilled:
             log.info("Node request %s: failure for %s",
-                     request, request.job_name)
+                     request, job.name)
             if self._handleNodeRequestFallback(log, build_set, job, request):
                 return
         # No more fallbacks -- tell the buildset the request is complete
@@ -2193,7 +2193,7 @@ class PipelineManager(metaclass=ABCMeta):
 
         log.info("Completed node request %s for job %s of item %s "
                  "with nodes %s",
-                 request, request.job_name, build_set.item, request.nodes)
+                 request, job.name, build_set.item, request.nodes)
 
     def reportItem(self, item, phase1=True, phase2=True):
         log = get_annotated_logger(self.log, item.event)
