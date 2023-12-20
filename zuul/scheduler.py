@@ -2786,7 +2786,7 @@ class Scheduler(threading.Thread):
         if not build_set:
             return
 
-        job = build_set.item.getJob(event.job_name)
+        job = build_set.item.getJob(event._job_id)
         build = build_set.getBuild(job)
         # Verify that the build uuid matches the one of the result
         if not build:
@@ -2878,8 +2878,12 @@ class Scheduler(threading.Thread):
             # allows reporting the build via SQL and cleaning up build
             # resources.
             build = Build()
+            job = Job(event.job_name)
+            job.uuid = event.job_uuid
+            # MODEL_API < 25
+            job._job_id = job.uuid or job.name
             build._set(
-                job=Job(event.job_name),
+                job=job,
                 uuid=event.build_uuid,
                 zuul_event_id=event.zuul_event_id,
 

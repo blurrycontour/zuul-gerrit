@@ -22,6 +22,9 @@ from zuul import model
 from zuul.driver import Driver, TriggerInterface
 from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import ZooKeeperClient, event_queues, sharding
+from zuul.zk.components import (
+    ComponentRegistry, COMPONENT_REGISTRY
+)
 
 from tests.base import BaseTestCase, iterate_timeout
 
@@ -40,6 +43,10 @@ class EventQueueBaseTestCase(BaseTestCase):
         )
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
+        self.component_registry = ComponentRegistry(self.zk_client)
+        # We don't have any other component to initialize the global
+        # registry in these tests, so we do it ourselves.
+        COMPONENT_REGISTRY.create(self.zk_client)
 
         self.connections = ConnectionRegistry()
         self.addCleanup(self.connections.stop)
@@ -551,7 +558,7 @@ class TestResultEventQueue(EventQueueBaseTestCase):
         self.assertFalse(queue.hasEvents())
 
         event = model.BuildStartedEvent(
-            "build", "buildset", "job", "build_request_path", {})
+            "build", "buildset", "job", "job_uuid", "build_request_path", {})
         queue.put(event)
 
         self.assertEqual(len(queue), 1)
@@ -633,7 +640,7 @@ class TestEventWatchers(EventQueueBaseTestCase):
         event.clear()
 
         result_event = model.BuildStartedEvent(
-            "build", "buildset", "job", "build_request_path", {})
+            "build", "buildset", "job", "job_uuid", "build_request_path", {})
         result_queues["other-tenant"]["post"].put(result_event)
         self._wait_for_event(event)
 
