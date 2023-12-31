@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "70a1e40b_531d420f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 36622
+      },
+      "writtenOn": "2023-12-31T02:25:49Z",
+      "side": 1,
+      "message": "moving comment to resolved since it isn\u0027t necessary to resolve with action in this change.",
+      "revId": "6459323dcb10ab5cde46231d4a4c37ab63065852",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e826f75_a525b543",
@@ -48,6 +65,24 @@
       "writtenOn": "2023-12-17T17:27:27Z",
       "side": 1,
       "message": "Another related question I have how are we getting into this block of code we use win_shell or win_command? From what I can tell, this is the only way in to _read_log() and streamer.start() happening.\n\nIn the console stream during a win_shell or win_command task, we see \"Waiting on logger\", and sometimes also see \"Timeout exception waiting for the logger.\".\n\nWe probably wouldn\u0027t have noticed this if we were connecting with winrm, since that connection type bails out in this block, but was the need to add that on line 385 because they were using shell: or command: on windows? Kind of confusing 😊",
+      "revId": "6459323dcb10ab5cde46231d4a4c37ab63065852",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16d0e4be_ac59ccf9",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 36622
+      },
+      "writtenOn": "2023-12-31T02:25:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4e826f75_a525b543",
       "revId": "6459323dcb10ab5cde46231d4a4c37ab63065852",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
