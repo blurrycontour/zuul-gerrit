@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "738dc210_918cbc42",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-02T21:27:29Z",
+      "side": 1,
+      "message": "Based on the test behavior this case will return a json document with a message about the failure. However where we call approve_mr we don\u0027t log that message.\n\nDo we need to retain the old behavior of logging an error for this case and returning None?",
+      "range": {
+        "startLine": 467,
+        "startChar": 16,
+        "endLine": 468,
+        "endChar": 1
+      },
+      "revId": "74215ca9ecd138277847af3037c6d1b9ef714a5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
