@@ -67,6 +67,24 @@
       "message": "Previously this method would return None in the only \"noop\" case that it handled: the one below where HEAD moved.  In that case, the calling site would avoid logging a misleading message that it set an approval.\n\nI think that would be a good behavior to retain here.  The current code in this change would result in:\n\nDEBUG: Merge request X is already approved\nINFO: Set approval: True on MR X\n\nWhich is confusing.  I\u0027m open to other ideas, but I think the original behavior works here too (that behavior is to emit only the first log line).  To restore that, you could just change all of these \"return res\" to \"return\" (or \"return None\" if you like being explicit).\n\n(Also, FTR, the return value is unused other than as a signifier for what I described here, so these may as well be True/False rather than object/None from the standpoint of the calling method -- at least, assuming that we always get a non-empty response when something actually happens in gitlab -- I haven\u0027t checked that).",
       "revId": "b302129e433d812b64cebf5a715869257b81bee2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b747a941_1b97709d",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 452,
+      "author": {
+        "id": 36489
+      },
+      "writtenOn": "2024-01-02T20:14:06Z",
+      "side": 1,
+      "message": "Makes sense.  I went with the `Return None` approach.",
+      "parentUuid": "f16ca425_eb3726aa",
+      "revId": "b302129e433d812b64cebf5a715869257b81bee2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
