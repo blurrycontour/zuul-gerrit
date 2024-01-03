@@ -611,6 +611,11 @@ class SQLConnection(BaseConnection):
                      buildset_id)
             sa.Index(self.table_prefix + 'zuul_build_ref_id_idx',
                      ref_id)
+            # This index is intended to make build time queries faster
+            # by providing a covering index for the build table
+            # selects that also includes the buildset_id.
+            sa.Index(self.table_prefix + 'zuul_build_timings_idx',
+                     job_name, result, final, buildset_id)
 
             @property
             def duration(self):
