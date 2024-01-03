@@ -265,6 +265,7 @@ class DatabaseSession(object):
                       sort_by_buildset=False,
                       limit=50,
                       offset=0,
+                      result=None,
                       exclude_result=None,
                       query_timeout=None):
 
@@ -298,6 +299,7 @@ class DatabaseSession(object):
         q = self.listFilter(q, ref_table.c.branch, branch)
         q = self.listFilter(q, ref_table.c.ref, ref)
         q = self.listFilter(q, build_table.c.job_name, job_name)
+        q = self.listFilter(q, build_table.c.result, result)
         q = self.exListFilter(q, build_table.c.result, exclude_result)
         q = self.listFilter(q, build_table.c.final, final)
         if start_time:
@@ -305,8 +307,11 @@ class DatabaseSession(object):
             q = q.filter(build_table.c.end_time >= start_time)
         if end_time:
             q = q.filter(build_table.c.end_time <= end_time)
-        # Only complete builds
-        q = q.filter(build_table.c.result != None)  # noqa
+        # Only complete builds (but if we specify a result, then it's
+        # obviously complete and this extra filter is not necessary)
+        if result is None:
+            q = q.filter(build_table.c.result != None)  # noqa
+
         q = q.order_by(build_table.c.end_time.desc())
         q = q.limit(limit).offset(offset)
 
