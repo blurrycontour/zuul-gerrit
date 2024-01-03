@@ -38,15 +38,14 @@ class Times:
 
     def _getTime(self, key):
         tenant, project, branch, job = key
-        previous_builds = self.sql.getBuilds(
+        previous_builds = self.sql.getBuildTimes(
             tenant=tenant,
             project=project,
             branch=branch,
             job_name=job,
             final=True,
             result='SUCCESS',
-            limit=10,
-            sort_by_buildset=True)
+            limit=10)
         times = [x.duration for x in previous_builds if x.duration]
         if times:
             estimate = float(sum(times)) / len(times)
