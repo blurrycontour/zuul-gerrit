@@ -22,6 +22,30 @@
       },
       "revId": "74215ca9ecd138277847af3037c6d1b9ef714a5b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1cf7c1e_ec9a21f2",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 36489
+      },
+      "writtenOn": "2024-01-03T16:48:57Z",
+      "side": 1,
+      "message": "Fixed to return None in patchset 5.  Note that the logging part happens on line 461.",
+      "parentUuid": "738dc210_918cbc42",
+      "range": {
+        "startLine": 467,
+        "startChar": 16,
+        "endLine": 468,
+        "endChar": 1
+      },
+      "revId": "74215ca9ecd138277847af3037c6d1b9ef714a5b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
