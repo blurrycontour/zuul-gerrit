@@ -152,13 +152,23 @@ class DatabaseSession(object):
         # contains_eager allows us to perform eager loading on the
         # buildset *and* use that table in filters (unlike
         # joinedload).
-        q = self.session().query(self.connection.buildModel).\
-            join(self.connection.buildSetModel).\
-            join(self.connection.refModel).\
-            outerjoin(self.connection.providesModel).\
-            options(orm.contains_eager(self.connection.buildModel.buildset),
+        if provides is not None:
+            q = self.session().query(self.connection.buildModel).\
+                join(self.connection.buildSetModel).\
+                join(self.connection.refModel).\
+                outerjoin(self.connection.providesModel).\
+                options(
+                    orm.contains_eager(self.connection.buildModel.buildset),
                     orm.contains_eager(self.connection.buildModel.ref),
                     orm.selectinload(self.connection.buildModel.provides),
+                    orm.selectinload(self.connection.buildModel.artifacts))
+        else:
+            q = self.session().query(self.connection.buildModel).\
+                join(self.connection.buildSetModel).\
+                join(self.connection.refModel).\
+                options(
+                    orm.contains_eager(self.connection.buildModel.buildset),
+                    orm.contains_eager(self.connection.buildModel.ref),
                     orm.selectinload(self.connection.buildModel.artifacts))
         # If the query planner isn't able to reduce either the number
         # of rows returned by the buildset or build tables, then it
@@ -210,7 +220,8 @@ class DatabaseSession(object):
             q = q.filter(build_table.c.result != None)  # noqa
         elif complete is False:
             q = q.filter(build_table.c.result == None)  # noqa
-        q = self.listFilter(q, provides_table.c.name, provides)
+        if provides is not None:
+            q = self.listFilter(q, provides_table.c.name, provides)
         q = self.listFilter(q, build_table.c.held, held)
         if idx_min:
             q = q.filter(build_table.c.id >= idx_min)
