@@ -1,5 +1,23 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fb68dfd_5571ade5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 36489
+      },
+      "writtenOn": "2024-01-03T18:41:43Z",
+      "side": 1,
+      "message": "Thanks for the reviews/merge!",
+      "revId": "e916f151ffe360591f0aadb80f02ee9ab063b801",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ],
   "submitRequirementResults": [
     {
       "submitRequirement": {
