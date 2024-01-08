@@ -1,4 +1,5 @@
 # Copyright 2018 Red Hat, Inc.
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -36,33 +37,39 @@ class PagureReporter(BaseReporter):
 
     def report(self, item, phase1=True, phase2=True):
         """Report on an event."""
+        for change in item.changes:
+            self._reportChange(item, change, phase1, phase2)
+        return []
+
+    def _reportChange(self, item, change, phase1=True, phase2=True):
+        """Report on an event."""
 
         # If the source is not PagureSource we cannot report anything here.
-        if not isinstance(item.change.project.source, PagureSource):
+        if not isinstance(change.project.source, PagureSource):
             return
 
         # For supporting several Pagure connections we also must filter by
         # the canonical hostname.
-        if item.change.project.source.connection.canonical_hostname != \
+        if change.project.source.connection.canonical_hostname != \
                 self.connection.canonical_hostname:
             return
 
         if phase1:
             if self._commit_status is not None:
-                if (hasattr(item.change, 'patchset') and
-                        item.change.patchset is not None):
-                    self.setCommitStatus(item)
-                elif (hasattr(item.change, 'newrev') and
-                        item.change.newrev is not None):
-                    self.setCommitStatus(item)
-            if hasattr(item.change, 'number'):
+                if (hasattr(change, 'patchset') and
+                        change.patchset is not None):
+                    self.setCommitStatus(item, change)
+                elif (hasattr(change, 'newrev') and
+                        change.newrev is not None):
+                    self.setCommitStatus(item, change)
+            if hasattr(change, 'number'):
                 if self._create_comment:
-                    self.addPullComment(item)
+                    self.addPullComment(item, change)
         if phase2 and self._merge:
-            self.mergePull(item)
-            if not item.change.is_merged:
+            self.mergePull(item, change)
+            if not change.is_merged:
                 msg = self._formatItemReportMergeConflict(item)
-                self.addPullComment(item, msg)
+                self.addPullComment(item, change, msg)
 
     def _formatItemReportJobs(self, item):
         # Return the list of jobs portion of the report
@@ -75,23 +82,23 @@ class PagureReporter(BaseReporter):
             ret += 'Skipped %i %s\n' % (skipped, jobtext)
         return ret
 
-    def addPullComment(self, item, comment=None):
+    def addPullComment(self, item, change, comment=None):
         message = comment or self._formatItemReport(item)
-        project = item.change.project.name
-        pr_number = item.change.number
+        project = change.project.name
+        pr_number = change.number
         self.log.debug(
             'Reporting change %s, params %s, message: %s' %
-            (item.change, self.config, message))
+            (change, self.config, message))
         self.connection.commentPull(project, pr_number, message)
 
-    def setCommitStatus(self, item):
-        project = item.change.project.name
-        if hasattr(item.change, 'patchset'):
-            sha = item.change.patchset
-        elif hasattr(item.change, 'newrev'):
-            sha = item.change.newrev
+    def setCommitStatus(self, item, change):
+        project = change.project.name
+        if hasattr(change, 'patchset'):
+            sha = change.patchset
+        elif hasattr(change, 'newrev'):
+            sha = change.newrev
         state = self._commit_status
-        change_number = item.change.number
+        change_number = change.number
 
         url_pattern = self.config.get('status-url')
         sched_config = self.connection.sched.config
@@ -106,30 +113,30 @@ class PagureReporter(BaseReporter):
         self.log.debug(
             'Reporting change %s, params %s, '
             'context: %s, state: %s, description: %s, url: %s' %
-            (item.change, self.config,
+            (change, self.config,
              self.context, state, description, url))
 
         self.connection.setCommitStatus(
             project, change_number, state, url, description, self.context)
 
-    def mergePull(self, item):
-        project = item.change.project.name
-        pr_number = item.change.number
+    def mergePull(self, item, change):
+        project = change.project.name
+        pr_number = change.number
 
         for i in [1, 2]:
             try:
                 self.connection.mergePull(project, pr_number)
-                item.change.is_merged = True
+                change.is_merged = True
                 return
             except MergeFailure:
                 self.log.exception(
                     'Merge attempt of change %s  %s/2 failed.' %
-                    (item.change, i), exc_info=True)
+                    (change, i), exc_info=True)
                 if i == 1:
                     time.sleep(2)
         self.log.warning(
             'Merge of change %s failed after 2 attempts, giving up' %
-            item.change)
+            change)
 
     def getSubmitAllowNeeds(self):
         return []
