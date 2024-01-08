@@ -1,5 +1,5 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
-# Copyright 2021-2023 Acme Gating, LLC
+# Copyright 2021-2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -904,75 +904,12 @@ class PipelineState(zkobject.ZKObject):
             "queues": queues,
             "old_queues": old_queues,
         })
-        if context.build_references:
-            self._fixBuildReferences(data, context)
-            context.build_references = False
         return data
-
-    def _fixBuildReferences(self, data, context):
-        # Reconcile duplicate builds; if we find any BuildReference
-        # objects, look up the actual builds and replace
-        log = context.log
-        build_map = {}
-        to_replace_dicts = []
-        to_replace_lists = []
-        for queue in data['queues'] + data['old_queues']:
-            for item in queue.queue:
-                buildset = item.current_build_set
-                for build_job, build in buildset.builds.items():
-                    if isinstance(build, BuildReference):
-                        to_replace_dicts.append((item,
-                                                 buildset,
-                                                 buildset.builds,
-                                                 build_job,
-                                                 build._path))
-                    else:
-                        build_map[build.getPath()] = build
-                for job_name, build_list in buildset.retry_builds.items():
-                    for build in build_list:
-                        if isinstance(build, BuildReference):
-                            to_replace_lists.append((item,
-                                                     None,
-                                                     build_list,
-                                                     build,
-                                                     build._path))
-                        else:
-                            build_map[build.getPath()] = build
-        for (item, buildset, build_dict, build_job, build_path
-             ) in to_replace_dicts:
-            orig_build = build_map.get(build_path)
-            if orig_build:
-                build_dict[build_job] = orig_build
-            else:
-                log.warning("Unable to find deduplicated build %s for %s",
-                            build_path, item)
-                del build_dict[build_job]
-                # We're not going to be able to use the results of
-                # this deduplication, which means we're going to try
-                # to launch the job again.  To make sure that happens
-                # cleanly, go ahead and remove any nodeset information
-                # that we copied when we thought we were going to
-                # deduplicate it.
-                buildset.nodeset_info.pop(build_job, None)
-                buildset.node_requests.pop(build_job, None)
-        for (item, buildset, build_list, build, build_path
-             ) in to_replace_lists:
-            idx = build_list.index(build)
-            orig_build = build_map.get(build_path)
-            if orig_build:
-                build_list[idx] = build_map[build_path]
-            else:
-                log.warning("Unable to find deduplicated build %s for %s",
-                            build_path, item)
-                del build_list[idx]
 
     def _getKnownItems(self):
         items = []
         for queue in (*self.old_queues, *self.queues):
             items.extend(queue.queue)
-            for item in queue.queue:
-                if item.bundle:
-                    items.extend(item.bundle.items)
         return items
 
     def cleanup(self, context):
@@ -1214,10 +1151,6 @@ class ChangeQueue(zkobject.ZKObject):
         existing_items = {}
         for item in self.queue:
             existing_items[item.getPath()] = item
-            if item.bundle:
-                existing_items.update({
-                    i.getPath(): i for i in item.bundle.items
-                })
 
         items_by_path = OrderedDict()
         # This is a tuple of (x, Future), where x is None if no action
@@ -1253,15 +1186,6 @@ class ChangeQueue(zkobject.ZKObject):
                 item_ahead=items_by_path.get(item._item_ahead),
                 items_behind=[items_by_path[p] for p in item._items_behind
                               if p in items_by_path])
-
-        bundle_by_uuid = {}
-        for item in items_by_path.values():
-            if not item.bundle:
-                continue
-            bundle_data = item.bundle
-            item._set(bundle=bundle_by_uuid.setdefault(
-                bundle_data["uuid"],
-                Bundle.deserialize(context, self, items_by_path, bundle_data)))
 
         data.update({
             "_jobs": set(data["_jobs"]),
@@ -1307,12 +1231,13 @@ class ChangeQueue(zkobject.ZKObject):
     def matches(self, project_cname, branch):
         return (project_cname, branch) in self.project_branches
 
-    def enqueueChange(self, change, event, span_info=None, enqueue_time=None):
+    def enqueueChanges(self, changes, event, span_info=None,
+                       enqueue_time=None):
         if enqueue_time is None:
             enqueue_time = time.time()
         item = QueueItem.new(self.zk_context,
                              queue=self,
-                             change=change,
+                             changes=changes,
                              event=event,
                              span_info=span_info,
                              enqueue_time=enqueue_time)
@@ -1340,20 +1265,10 @@ class ChangeQueue(zkobject.ZKObject):
             item_behind.updateAttributes(self.zk_context,
                                          item_ahead=item.item_ahead)
 
-        if item.bundle:
-            # This item may have builds referenced by other items in
-            # the bundle, or even other bundles (in the case of
-            # independent pipelines).  Rather than trying to figure
-            # that out here, we will just let PipelineState.cleanup
-            # handle garbage collecting these items when done.
-            item.updateAttributes(
-                self.zk_context, item_ahead=None, items_behind=[],
-                dequeue_time=time.time())
-        else:
-            item.delete(self.zk_context)
-            # We use the dequeue time for stats reporting, but the queue
-            # item will no longer be in Zookeeper at this point.
-            item._set(dequeue_time=time.time())
+        item.delete(self.zk_context)
+        # We use the dequeue time for stats reporting, but the queue
+        # item will no longer be in Zookeeper at this point.
+        item._set(dequeue_time=time.time())
 
     def moveItem(self, item, item_ahead):
         if item.item_ahead == item_ahead:
@@ -1380,13 +1295,7 @@ class ChangeQueue(zkobject.ZKObject):
     def isActionable(self, item):
         if not self.window:
             return True
-        # Ignore done items waiting for bundle dependencies to finish
-        num_waiting_items = len([
-            i for i in self.queue
-            if i.bundle and i.areAllJobsComplete()
-        ])
-        window = self.window + num_waiting_items
-        return item in self.queue[:window]
+        return item in self.queue[:self.window]
 
     def increaseWindowSize(self):
         if not self.window:
@@ -1746,14 +1655,12 @@ class NodeRequest(object):
     """A request for a set of nodes."""
 
     def __init__(self, requestor, build_set_uuid, tenant_name, pipeline_name,
-                 job_name, job_uuid, labels, provider, relative_priority,
+                 job_uuid, labels, provider, relative_priority,
                  event_id=None, span_info=None):
         self.requestor = requestor
         self.build_set_uuid = build_set_uuid
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
-        # MODEL_API < 24
-        self.job_name = job_name
         self.job_uuid = job_uuid
         self.labels = labels
         self.nodes = []
@@ -1799,12 +1706,6 @@ class NodeRequest(object):
         self._state = value
         self.state_time = time.time()
 
-    @property
-    def _job_id(self):
-        # MODEL_API < 24
-        # Remove this after circular dep refactor
-        return self.job_uuid or self.job_name
-
     def __repr__(self):
         return '<NodeRequest %s %s>' % (self.id, self.labels)
 
@@ -1823,11 +1724,9 @@ class NodeRequest(object):
             "build_set_uuid": self.build_set_uuid,
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
-            "job_name": self.job_name,
+            "job_uuid": self.job_uuid,
             "span_info": self.span_info,
         }
-        if (COMPONENT_REGISTRY.model_api >= 24):
-            d["requestor_data"]['job_uuid'] = self.job_uuid
         d.setdefault('node_types', self.labels)
         d.setdefault('requestor', self.requestor)
         d.setdefault('created_time', self.created_time)
@@ -1871,7 +1770,6 @@ class NodeRequest(object):
             build_set_uuid=requestor_data.get("build_set_uuid"),
             tenant_name=requestor_data.get("tenant_name"),
             pipeline_name=requestor_data.get("pipeline_name"),
-            job_name=requestor_data.get("job_name"),
             job_uuid=requestor_data.get("job_uuid"),
             labels=data["node_types"],
             provider=data["provider"],
@@ -2304,13 +2202,14 @@ class JobData(zkobject.ShardedZKObject):
         return self._path
 
     @classmethod
-    def new(klass, context, **kw):
+    def new(klass, context, create=True, **kw):
         """Create a new instance and save it in ZooKeeper"""
         obj = klass()
         kw['hash'] = JobData.getHash(kw['data'])
         obj._set(**kw)
-        data = obj._trySerialize(context)
-        obj._save(context, data, create=True)
+        if create:
+            data = obj._trySerialize(context)
+            obj._save(context, data, create=True)
         return obj
 
     @staticmethod
@@ -2398,7 +2297,9 @@ class FrozenJob(zkobject.ZKObject):
 
     def __init__(self):
         super().__init__()
-        self._set(_ready_to_run=False)
+        self._set(_ready_to_run=False,
+                  ref=None,
+                  other_refs=[])
 
     def __repr__(self):
         name = getattr(self, 'name', '<UNKNOWN>')
@@ -2426,35 +2327,40 @@ class FrozenJob(zkobject.ZKObject):
 
     @classmethod
     def new(klass, context, **kw):
-        obj = klass()
-        if (COMPONENT_REGISTRY.model_api < 19):
-            obj._set(uuid=None)
-        else:
-            obj._set(uuid=uuid4().hex)
+        raise NotImplementedError()
 
-        # Convert these to JobData after creation.
-        job_data_vars = {}
+    @classmethod
+    def createInMemory(klass, **kw):
+        obj = klass()
+        obj._set(uuid=uuid4().hex)
+
         for k in klass.job_data_attributes:
             v = kw.pop(k, None)
-            if v:
-                # If the value is long, we need to make this a JobData;
-                # otherwise we can use the dict as-is.
-                if (len(json_dumps(v, sort_keys=True).encode('utf8')) >
-                    klass.MAX_DATA_LEN):
-                    job_data_vars[k] = v
-                    v = None
             kw['_' + k] = v
         obj._set(**kw)
-        data = obj._trySerialize(context)
-        obj._save(context, data, create=True)
+        return obj
+
+    def internalCreate(self, context):
+        # Convert these to JobData after creation.
+        job_data_vars = []
+        for k in self.job_data_attributes:
+            v = getattr(self, '_' + k)
+            if v:
+                # If the value is long, we need to make this a
+                # JobData; otherwise we can use the value as-is.
+                # TODO(jeblair): if we apply the same createInMemory
+                # approach to JobData creation, we can avoid this
+                # serialization test as well as rewriting the
+                # frozenjob object below.
+                v = self._makeJobData(context, k, v, create=False)
+                self._set(**{'_' + k: v})
+                if isinstance(v, JobData):
+                    job_data_vars.append(v)
+        super().internalCreate(context)
 
         # If we need to make any JobData entries, do that now.
-        update_kw = {}
-        for (k, v) in job_data_vars.items():
-            update_kw['_' + k] = obj._makeJobData(context, k, v)
-        if update_kw:
-            obj.updateAttributes(context, **update_kw)
-        return obj
+        for v in job_data_vars:
+            v.internalCreate(context)
 
     def isBase(self):
         return self.parent is None
@@ -2467,14 +2373,11 @@ class FrozenJob(zkobject.ZKObject):
         return f"{parent_path}/job/{safe_id}"
 
     def getPath(self):
-        # MODEL_API < 19
-        job_id = self.uuid or self.name
-        return self.jobPath(job_id, self.buildset.getPath())
+        return self.jobPath(self.uuid, self.buildset.getPath())
 
-    # MODEL_API < 19
     @property
-    def _job_id(self):
-        return self.uuid or self.name
+    def all_refs(self):
+        return [self.ref, *self.other_refs]
 
     def serialize(self, context):
         # Ensure that any special handling in this method is matched
@@ -2516,6 +2419,9 @@ class FrozenJob(zkobject.ZKObject):
         if (COMPONENT_REGISTRY.model_api < 9):
             data['nodeset'] = data['nodeset_alternatives'][0]
 
+        data['ref'] = self.ref
+        data['other_refs'] = self.other_refs
+
         # Use json_dumps to strip any ZuulMark entries
         return json_dumps(data, sort_keys=True).encode("utf8")
 
@@ -2545,12 +2451,6 @@ class FrozenJob(zkobject.ZKObject):
 
         # MODEL_API < 19
         data.setdefault("uuid", None)
-
-        # MODEL_API < 22
-        if 'ref' not in data and hasattr(self, 'buildset'):
-            # buildset is provided on the scheduler, but not on the
-            # executor; but we don't need the ref on the executor.
-            data['ref'] = self.buildset.item.change.cache_key
 
         if hasattr(self, 'nodeset_alternatives'):
             alts = self.nodeset_alternatives
@@ -2700,7 +2600,7 @@ class FrozenJob(zkobject.ZKObject):
         artifact_data = artifact_data[:]
         for a in artifacts:
             # Change here may be any ref type (tag, change, etc)
-            ref = other_build.build_set.item.change
+            ref = other_build.build_set.item.changes[0]
             a.update({'project': ref.project.name,
                       'job': other_build.job.name})
             # Change is a Branch
@@ -2720,12 +2620,12 @@ class FrozenJob(zkobject.ZKObject):
                 artifact_data.append(a)
         return parent_data, secret_parent_data, artifact_data
 
-    def _makeJobData(self, context, name, data):
+    def _makeJobData(self, context, name, data, create=True):
         # If the data is large, store it in another object
         if (len(json_dumps(data, sort_keys=True).encode('utf8')) >
             self.MAX_DATA_LEN):
             return JobData.new(
-                context, _path=self.getPath() + '/' + name,
+                context, create=create, _path=self.getPath() + '/' + name,
                 data=data)
         # Otherwise we can store it as a local dict
         return data
@@ -3035,7 +2935,7 @@ class Job(ConfigObject):
             ns = nodeset
         return ns.flattenAlternatives(layout)
 
-    def freezeJob(self, context, tenant, layout, item,
+    def freezeJob(self, context, tenant, layout, item, change,
                   redact_secrets_and_keys):
         buildset = item.current_build_set
         kw = {}
@@ -3087,10 +2987,14 @@ class Job(ConfigObject):
         kw['dependencies'] = frozenset(kw['dependencies'])
         kw['semaphores'] = list(kw['semaphores'])
         kw['failure_output'] = list(kw['failure_output'])
-        kw['ref'] = item.change.cache_key
+        kw['ref'] = change.cache_key
         # Don't add buildset to attributes since it's not serialized
         kw['buildset'] = buildset
-        return FrozenJob.new(context, **kw)
+        # This creates the frozen job in memory but does not write it
+        # to ZK yet.  We may end up combining the job with other jobs
+        # before we finalize the job graph.  We will write all
+        # remaining jobs to zk at that point.
+        return FrozenJob.createInMemory(**kw)
 
     def getConfigHash(self, tenant):
         # Make a hash of the job configuration for determining whether
@@ -3662,8 +3566,6 @@ class JobGraph(object):
         # BuildSet (either the real list of jobs, or a cached list of
         # "old" jobs for comparison).
         self._job_map = job_map
-        # An ordered list of jobs
-        self.jobs = []
         # An ordered list of job UUIDs
         self.job_uuids = []
         # dependent_job_uuid -> dict(parent_job_name -> soft)
@@ -3681,19 +3583,12 @@ class JobGraph(object):
         # Dict of {job_uuid: {child_uuid: {soft: bool}}}
         self.job_dependents = {}
         self.project_metadata = {}
-        # A temporary model version to help with the circular dep refactor
-        self.model_version = 0
-        # Store the model version at the time this object was instantiated
-        # so we don't change behavior while freezing.
-        if COMPONENT_REGISTRY.model_api >= 22:
-            self.model_version = 22
 
     def __repr__(self):
-        return '<JobGraph %s>' % (self.jobs)
+        return '<JobGraph %s>' % (self.job_uuids)
 
     def toDict(self):
         data = {
-            "jobs": self.jobs,
             "job_uuids": self.job_uuids,
             "dependencies": self._dependencies,
             "job_dependencies": self.job_dependencies,
@@ -3701,123 +3596,59 @@ class JobGraph(object):
             "project_metadata": {
                 k: v.toDict() for (k, v) in self.project_metadata.items()
             },
-            "model_version": self.model_version,
         }
         return data
 
     @classmethod
     def fromDict(klass, data, job_map):
         self = klass(job_map)
-        self.model_version = data.get('model_version', self.model_version)
-        self.jobs = data['jobs']
-        # MODEL_API < 19: if job uuids is not set, we default the
-        # UUID for all jobs to None.
-        self.job_uuids = data.get('job_uuids', [None] * len(self.jobs))
+        self.job_uuids = data['job_uuids']
         self._dependencies = data['dependencies']
         self.project_metadata = {
             k: ProjectMetadata.fromDict(v)
             for (k, v) in data['project_metadata'].items()
         }
-        # MODEL_API < 21
-        self.job_dependencies = data.get('job_dependencies', {})
-        self.job_dependents = data.get('job_dependents', {})
+        self.job_dependencies = data['job_dependencies']
+        self.job_dependents = data['job_dependents']
         return self
 
     def addJob(self, job):
         # A graph must be created after the job list is frozen,
         # therefore we should only get one job with the same name.
-        if (self.model_version < 22):
-            job_id = job.name
-        else:
-            job_id = job.uuid
-        self._job_map[job_id] = job
-        self.jobs.append(job.name)
+        self._job_map[job.uuid] = job
         self.job_uuids.append(job.uuid)
         # Append the dependency information
-        self._dependencies.setdefault(job_id, {})
+        self._dependencies.setdefault(job.uuid, {})
         for dependency in job.dependencies:
-            self._dependencies[job_id][dependency.name] = dependency.soft
+            self._dependencies[job.uuid][dependency.name] = dependency.soft
+
+    def _removeJob(self, job):
+        # This should only be called internally during deduplication
+        del self._job_map[job.uuid]
+        self.job_uuids.remove(job.uuid)
+        # Append the dependency information
+        del self._dependencies[job.uuid]
 
     def getJobs(self):
         # Report in the order of layout cfg
-        if (self.model_version < 22):
-            return [self._job_map[x] for x in self.jobs]
-        else:
-            return [self._job_map[x] for x in self.job_uuids]
-
-    def getJobIds(self):
-        if (self.model_version < 22):
-            return self.jobs
-        else:
-            return self.job_uuids
-
-    def getUuidForJobName(self, job_name):
-        return self.job_uuids[self.jobs.index(job_name)]
-
-    def getUuidForJobId(self, job_id):
-        if (self.model_version < 22):
-            return self.job_uuids[self.jobs.index(job_id)]
-        return job_id
-
-    def getNameForJobId(self, job_id):
-        if (self.model_version < 22):
-            return job_id
-        return self.jobs[self.job_uuids.index(job_id)]
+        return [self._job_map[x] for x in self.job_uuids]
 
     def getJobFromUuid(self, job_uuid):
-        if (self.model_version < 22):
-            index = self.job_uuids.index(job_uuid)
-            name = self.jobs[index]
-            return self._job_map[name]
-        else:
-            return self._job_map[job_uuid]
-
-    def getJobFromName(self, job_name):
-        # TODO: this must be removed by completion of circular
-        # dependency refactor.
-        if (self.model_version < 22):
-            return self._job_map.get(job_name)
-        else:
-            try:
-                index = self.jobs.index(job_name)
-            except ValueError:
-                return None
-            uuid = self.job_uuids[index]
-            return self._job_map[uuid]
+        return self._job_map[job_uuid]
 
     def getJob(self, name, ref):
         for job in self._job_map.values():
-            if job.name == name and job.ref == ref:
+            if job.name == name and ref in job.all_refs:
                 return job
 
     def getDirectDependentJobs(self, job):
-        # First, are we able to support the new method?
-        if self._dependencies and not self.job_dependencies:
-            # MODEL_API < 21
-            return [self._job_map[name]
-                    for name in self._legacyGetDirectDependentJobNames(
-                        job.name, skip_soft=False)]
         ret = []
         for dependent_uuid, dependent_data in \
             self.job_dependents.get(job.uuid, {}).items():
             ret.append(self.getJobFromUuid(dependent_uuid))
         return ret
 
-    # MODEL_API < 21
-    def _legacyGetDirectDependentJobNames(self, parent_job, skip_soft=False):
-        ret = set()
-        for dependent_name, parents in self._dependencies.items():
-            part = parent_job in parents \
-                and (not skip_soft or not parents[parent_job])
-            if part:
-                ret.add(dependent_name)
-        return ret
-
     def getDependentJobsRecursively(self, job, skip_soft=False):
-        if self._dependencies and not self.job_dependents:
-            # MODEL_API < 21
-            return self._legacyGetDependentJobsRecursively(job.name,
-                                                           skip_soft=skip_soft)
         all_dependent_uuids = set()
         uuids_to_iterate = set([(job.uuid, False)])
         while len(uuids_to_iterate) > 0:
@@ -3837,73 +3668,38 @@ class JobGraph(object):
                 uuids_to_iterate.add((u, current_dependent_uuids[u]['soft']))
         return [self.getJobFromUuid(u) for u in all_dependent_uuids]
 
-    # MODEL_API < 21
-    def _legacyGetDependentJobsRecursively(self, parent_job, skip_soft=False):
-        all_dependent_jobs = set()
-        jobs_to_iterate = set([parent_job])
-        while len(jobs_to_iterate) > 0:
-            current_job = jobs_to_iterate.pop()
-            current_dependent_jobs = self._legacyGetDirectDependentJobNames(
-                current_job, skip_soft)
-            new_dependent_jobs = current_dependent_jobs - all_dependent_jobs
-            jobs_to_iterate |= new_dependent_jobs
-            all_dependent_jobs |= new_dependent_jobs
-        return [self._job_map[name] for name in all_dependent_jobs]
-
-    def _legacyCheckDependencies(self, layout=None):
-        for dependent_name, parents in self._dependencies.items():
-            # For the side effect of verifying no cycles
-            self._legacyGetParentJobNamesRecursively(dependent_name)
-        if layout:
-            for dependent_name, parents in self._dependencies.items():
-                for parent_name, parent_soft in parents.items():
-                    # If the caller spplied a layout, verify that the
-                    # job exists to provide a helpful error message.
-                    # Called for exception side effect:
-                    layout.getJob(parent_name)
-
     def freezeDependencies(self, layout=None):
-        if (COMPONENT_REGISTRY.model_api < 21):
-            return self._legacyCheckDependencies(layout)
-        for dependent_id, parents in self._dependencies.items():
-            dependent_uuid = self.getUuidForJobId(dependent_id)
-            if dependent_uuid is None:
-                # MODEL_API < 21
-                self.job_dependencies = {}
-                self.job_dependents = {}
-                return self._legacyCheckDependencies(layout)
+        for dependent_uuid, parents in self._dependencies.items():
             dependencies = self.job_dependencies.setdefault(dependent_uuid, {})
             for parent_name, parent_soft in parents.items():
-                dependent_job = self._job_map[dependent_id]
-                # We typically depend on jobs with the same ref (but
-                # this could later be modified by deduplication).
-                parent_job = self.getJob(parent_name, dependent_job.ref)
-                if parent_job is None:
-                    if parent_soft:
-                        if layout:
-                            # If the caller spplied a layout, verify that the
-                            # job exists to provide a helpful error message.
-                            # Called for exception side effect:
-                            layout.getJob(parent_name)
-                        continue
-                    raise Exception(
-                        "Job %s depends on %s which was not run." %
-                        (dependent_job.name, parent_name))
-                dependencies[parent_job.uuid] = dict(soft=parent_soft)
-                dependents = self.job_dependents.setdefault(
-                    parent_job.uuid, {})
-                dependents[dependent_uuid] = dict(soft=parent_soft)
-        for dependent_id, parents in self._dependencies.items():
-            dependent_job = self._job_map[dependent_id]
+                dependent_job = self._job_map[dependent_uuid]
+                # We typically depend on jobs with the same ref, but
+                # if we have been deduplicated, then we depend on
+                # every job-ref for the given parent job.
+                for ref in dependent_job.all_refs:
+                    parent_job = self.getJob(parent_name, ref)
+                    if parent_job is None:
+                        if parent_soft:
+                            if layout:
+                                # If the caller spplied a layout,
+                                # verify that the job exists to
+                                # provide a helpful error message.
+                                # Called for exception side effect:
+                                layout.getJob(parent_name)
+                            continue
+                        raise Exception(
+                            "Job %s depends on %s which was not run." %
+                            (dependent_job.name, parent_name))
+                    dependencies[parent_job.uuid] = dict(soft=parent_soft)
+                    dependents = self.job_dependents.setdefault(
+                        parent_job.uuid, {})
+                    dependents[dependent_uuid] = dict(soft=parent_soft)
+        for dependent_uuid, parents in self._dependencies.items():
+            dependent_job = self._job_map[dependent_uuid]
             # For the side effect of verifying no cycles
             self.getParentJobsRecursively(dependent_job)
 
     def getParentJobsRecursively(self, job, skip_soft=False):
-        if self._dependencies and not self.job_dependencies:
-            # MODEL_API < 21
-            return [self._job_map[name] for name in
-                    self._legacyGetParentJobNamesRecursively(
-                        job.name, skip_soft=skip_soft)]
         all_dependency_uuids = set()
         uuids_to_iterate = set([(job.uuid, False)])
         ancestor_uuids = set()
@@ -3930,40 +3726,48 @@ class JobGraph(object):
                 uuids_to_iterate.add((u, current_dependency_uuids[u]['soft']))
         return [self.getJobFromUuid(u) for u in all_dependency_uuids]
 
-    # MODEL_API < 21
-    def _legacyGetParentJobNamesRecursively(self, dependent_job,
-                                            skip_soft=False):
-        all_parent_jobs = set()
-        jobs_to_iterate = set([(dependent_job, False)])
-        ancestor_jobs = set()
-        while len(jobs_to_iterate) > 0:
-            (current_job, current_soft) = jobs_to_iterate.pop()
-            if current_job in ancestor_jobs:
-                raise Exception("Dependency cycle detected in job %s" %
-                                current_job)
-            ancestor_jobs.add(current_job)
-            current_parent_jobs = self._dependencies.get(current_job)
-            if skip_soft:
-                hard_parent_jobs = \
-                    {d: s for d, s in current_parent_jobs.items() if not s}
-                current_parent_jobs = hard_parent_jobs
-            if current_parent_jobs is None:
-                if current_soft:
-                    current_parent_jobs = {}
-                else:
-                    raise Exception("Job %s depends on %s which was not run." %
-                                    (dependent_job, current_job))
-            elif dependent_job != current_job:
-                all_parent_jobs.add(current_job)
-            new_parent_jobs = set(current_parent_jobs.keys()) - all_parent_jobs
-            for j in new_parent_jobs:
-                jobs_to_iterate.add((j, current_parent_jobs[j]))
-        return all_parent_jobs
-
     def getProjectMetadata(self, name):
         if name in self.project_metadata:
             return self.project_metadata[name]
         return None
+
+    def deduplicateJobs(self, log):
+        # Jobs are deduplicated before they start, so returned data
+        # are not considered at all.
+        #
+        # If a to-be-deduplicated job depends on a non-deduplicated
+        # job, it will treat each (job, ref) instance as a parent.
+        #
+        # Otherwise, each job will depend only on jobs for the same
+        # ref.
+        job_list = list(self._job_map.values())
+        while job_list:
+            job = job_list.pop(0)
+            if job.deduplicate is False:
+                continue
+            removed = []
+            for other_job in job_list[:]:
+                if other_job.deduplicate is False:
+                    continue
+                if not other_job.isEqual(job):
+                    continue
+                job_change = job.buildset.item.getChangeForJob(job)
+                other_job_change = other_job.buildset.item.getChangeForJob(
+                    other_job)
+                if job.deduplicate == 'auto':
+                    # Deduplicate if there are required projects
+                    # or the item project is the same.
+                    if (not job.required_projects and
+                        job_change.project !=
+                        other_job_change.project):
+                        continue
+                # Deduplicate!
+                log.info("Deduplicating %s for %s into %s for %s",
+                         other_job, other_job_change, job, job_change)
+                job.other_refs.append(other_job.ref)
+                self._removeJob(other_job)
+                removed.append(other_job)
+                job_list.remove(other_job)
 
 
 @total_ordering
@@ -4119,15 +3923,13 @@ class BuildRequest(JobRequest):
 
     ALL_STATES = JobRequest.ALL_STATES + (PAUSED,)
 
-    def __init__(self, uuid, zone, build_set_uuid, job_name, job_uuid,
+    def __init__(self, uuid, zone, build_set_uuid, job_uuid,
                  tenant_name, pipeline_name, event_id,
                  precedence=None, state=None, result_path=None,
                  span_context=None):
         super().__init__(uuid, precedence, state, result_path, span_context)
         self.zone = zone
         self.build_set_uuid = build_set_uuid
-        # MODEL_API < 25
-        self.job_name = job_name
         self.job_uuid = job_uuid
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
@@ -4137,25 +3939,17 @@ class BuildRequest(JobRequest):
         # build the url for the live log stream.
         self.worker_info = None
 
-    @property
-    def _job_id(self):
-        # MODEL_API < 25
-        # Remove this after circular dep refactor
-        return self.job_uuid or self.job_name
-
     def toDict(self):
         d = super().toDict()
         d.update({
             "zone": self.zone,
             "build_set_uuid": self.build_set_uuid,
-            "job_name": self.job_name,
+            "job_uuid": self.job_uuid,
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
             "event_id": self.event_id,
             "worker_info": self.worker_info,
         })
-        if (COMPONENT_REGISTRY.model_api >= 25):
-            d['job_uuid'] = self.job_uuid
         return d
 
     @classmethod
@@ -4164,8 +3958,7 @@ class BuildRequest(JobRequest):
             data["uuid"],
             data["zone"],
             data["build_set_uuid"],
-            data["job_name"],
-            data.get("job_uuid"),
+            data["job_uuid"],
             data["tenant_name"],
             data["pipeline_name"],
             data["event_id"],
@@ -4181,7 +3974,7 @@ class BuildRequest(JobRequest):
 
     def __repr__(self):
         return (
-            f"<BuildRequest {self.uuid}, job={self.job_name}, "
+            f"<BuildRequest {self.uuid}, job={self.job_uuid}, "
             f"state={self.state}, path={self.path} zone={self.zone}>"
         )
 
@@ -4537,16 +4330,12 @@ class BuildSet(zkobject.ZKObject):
 
     def __init__(self):
         super().__init__()
-        model_version = 0
-        if COMPONENT_REGISTRY.model_api >= 23:
-            model_version = 23
         self._set(
             item=None,
             builds={},
             retry_builds={},
             result=None,
             uuid=uuid4().hex,
-            commit=None,
             dependent_changes=None,
             merger_items=None,
             unable_to_merge=False,
@@ -4571,14 +4360,11 @@ class BuildSet(zkobject.ZKObject):
             fail_fast=False,
             job_graph=None,
             jobs={},
-            deduplicated_jobs=[],
             job_versions={},
             build_versions={},
             # Cached job graph of previous layout; not serialized
             _old_job_graph=None,
             _old_jobs={},
-            # A temporary model version to help with the circular dep refactor
-            model_version=model_version,
         )
 
     def setFiles(self, items):
@@ -4667,7 +4453,6 @@ class BuildSet(zkobject.ZKObject):
                              for j, l in self.retry_builds.items()},
             "result": self.result,
             "uuid": self.uuid,
-            "commit": self.commit,
             "dependent_changes": self.dependent_changes,
             "merger_items": self.merger_items,
             "unable_to_merge": self.unable_to_merge,
@@ -4697,17 +4482,9 @@ class BuildSet(zkobject.ZKObject):
             "repo_state_request_time": self.repo_state_request_time,
             "job_versions": self.job_versions,
             "build_versions": self.build_versions,
-            "model_version": self.model_version,
             # jobs (serialize as separate objects)
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
-
-    def _isMyBuild(self, build_path):
-        parts = build_path.split('/')
-        buildset_uuid = parts[-5]
-        if buildset_uuid == self.uuid:
-            return True
-        return False
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -4775,7 +4552,7 @@ class BuildSet(zkobject.ZKObject):
         existing_retry_builds = {b.getPath(): b
                                  for bl in self.retry_builds.values()
                                  for b in bl}
-        # This is a tuple of (kind, job_id, job_build_key, Future),
+        # This is a tuple of (kind, job_uuid, Future),
         # where kind is None if no action needs to be taken, or a
         # string to indicate which kind of job it was.  This structure
         # allows us to execute async ZK reads and perform local data
@@ -4786,88 +4563,65 @@ class BuildSet(zkobject.ZKObject):
         build_versions = data.get('build_versions', {})
         # jobs (deserialize as separate objects)
         if job_graph := data['job_graph']:
-            for job_id in job_graph.getJobIds():
+            for job_uuid in job_graph.job_uuids:
                 # If we have a current build before refreshing, we may
                 # be able to skip refreshing some items since they
                 # will not have changed.
-
-                # TODO: after circular dependency refactor, we can
-                # just use job_id (or job.uuid) for everything.  Until
-                # then, the index for the job graph and the index for
-                # the build dict may each either be name or id.
-                job_name = job_graph.getNameForJobId(job_id)
-                if self.model_version < 23:
-                    job_build_key = job_graph.getNameForJobId(job_id)
-                else:
-                    job_build_key = job_graph.getUuidForJobId(job_id)
-                build_path = data["builds"].get(job_build_key)
-                old_build = self.builds.get(job_build_key)
+                build_path = data["builds"].get(job_uuid)
+                old_build = self.builds.get(job_uuid)
                 old_build_exists = (old_build
                                     and old_build.getPath() == build_path)
 
-                if job_id in self.jobs:
-                    job = self.jobs[job_id]
+                if job_uuid in self.jobs:
+                    job = self.jobs[job_uuid]
                     if ((not old_build_exists) or
                         self.shouldRefreshJob(job, job_versions)):
-                        tpe_jobs.append((None, job_id, job_build_key,
+                        tpe_jobs.append((None, job_uuid,
                                          tpe.submit(job.refresh, context)))
                 else:
-                    job_uuid = job_graph.getUuidForJobId(job_id)
-                    # MODEL_API < 19; use job_name if job_uuid is None
-                    job_path = FrozenJob.jobPath(
-                        job_uuid or job_name, self.getPath())
-                    tpe_jobs.append(('job', job_id, job_build_key, tpe.submit(
+                    job_path = FrozenJob.jobPath(job_uuid, self.getPath())
+                    tpe_jobs.append(('job', job_uuid, tpe.submit(
                         FrozenJob.fromZK, context, job_path, buildset=self)))
 
                 if build_path:
-                    build = self.builds.get(job_build_key)
-                    builds[job_build_key] = build
+                    build = self.builds.get(job_uuid)
+                    builds[job_uuid] = build
                     if build and build.getPath() == build_path:
                         if self.shouldRefreshBuild(build, build_versions):
                             tpe_jobs.append((
-                                None, job_id, job_build_key, tpe.submit(
+                                None, job_uuid, tpe.submit(
                                     build.refresh, context)))
                     else:
-                        if not self._isMyBuild(build_path):
-                            build = BuildReference(build_path)
-                            context.build_references = True
-                            builds[job_build_key] = build
-                        else:
-                            tpe_jobs.append((
-                                'build', job_id, job_build_key, tpe.submit(
-                                    Build.fromZK, context, build_path,
-                                    build_set=self)))
+                        tpe_jobs.append((
+                            'build', job_uuid, tpe.submit(
+                                Build.fromZK, context, build_path,
+                                build_set=self)))
 
-                for retry_path in data["retry_builds"].get(job_build_key, []):
+                for retry_path in data["retry_builds"].get(job_uuid, []):
                     retry_build = existing_retry_builds.get(retry_path)
                     if retry_build and retry_build.getPath() == retry_path:
                         # Retry builds never change.
-                        retry_builds[job_build_key].append(retry_build)
+                        retry_builds[job_uuid].append(retry_build)
                     else:
-                        if not self._isMyBuild(retry_path):
-                            retry_build = BuildReference(retry_path)
-                            context.build_references = True
-                            retry_builds[job_build_key].append(retry_build)
-                        else:
-                            tpe_jobs.append((
-                                'retry', job_id, job_build_key, tpe.submit(
-                                    Build.fromZK, context, retry_path,
-                                    build_set=self)))
+                        tpe_jobs.append((
+                            'retry', job_uuid, tpe.submit(
+                                Build.fromZK, context, retry_path,
+                                build_set=self)))
 
-        for (kind, job_id, job_build_key, future) in tpe_jobs:
+        for (kind, job_uuid, future) in tpe_jobs:
             result = future.result()
             if kind == 'job':
-                self.jobs[job_id] = result
+                self.jobs[job_uuid] = result
             elif kind == 'build':
                 # We normally set the job on the constructor, but we
                 # may not have had it in time.  At this point though,
                 # the job future is guaranteed to have completed, so
                 # we can look it up now.
-                result._set(job=self.jobs[job_id])
-                builds[job_build_key] = result
+                result._set(job=self.jobs[job_uuid])
+                builds[job_uuid] = result
             elif kind == 'retry':
-                result._set(job=self.jobs[job_id])
-                retry_builds[job_build_key].append(result)
+                result._set(job=self.jobs[job_uuid])
+                retry_builds[job_uuid].append(result)
 
         data.update({
             "builds": builds,
@@ -4901,7 +4655,7 @@ class BuildSet(zkobject.ZKObject):
 
         version = job.getZKVersion()
         if version is not None:
-            self.job_versions[self._getJobId(job)] = version + 1
+            self.job_versions[job.uuid] = version + 1
             self.updateAttributes(context, job_versions=self.job_versions)
 
     def shouldRefreshBuild(self, build, build_versions):
@@ -4917,7 +4671,7 @@ class BuildSet(zkobject.ZKObject):
         if (COMPONENT_REGISTRY.model_api < 12):
             return True
         current = job.getZKVersion()
-        expected = job_versions.get(self._getJobId(job), 0)
+        expected = job_versions.get(job.uuid, 0)
         return expected != current
 
     @property
@@ -4939,27 +4693,26 @@ class BuildSet(zkobject.ZKObject):
             # so we don't know what the other changes ahead will be
             # until jobs start.
             if self.dependent_changes is None:
-                items = []
-                if self.item.bundle:
-                    items.extend(reversed(self.item.bundle.items))
-                else:
-                    items.append(self.item)
-
+                items = [self.item]
                 items.extend(i for i in self.item.items_ahead
                              if i not in items)
                 items.reverse()
 
-                self.dependent_changes = [self._toChangeDict(i) for i in items]
-                self.merger_items = [i.makeMergerItem() for i in items]
+                self.dependent_changes = [
+                    self._toChangeDict(i, c) for i in items for c in i.changes
+                ]
+                self.merger_items = [
+                    i.makeMergerItem(c) for i in items for c in i.changes
+                ]
             self.configured = True
             self.configured_time = time.time()
 
-    def _toChangeDict(self, item):
+    def _toChangeDict(self, item, change):
         # Inject bundle_id to dict if available, this can be used to decide
         # if changes belongs to the same bunbdle
-        change_dict = item.change.toDict()
-        if item.bundle:
-            change_dict['bundle_id'] = item.bundle.uuid
+        change_dict = change.toDict()
+        if len(item.changes) > 1:
+            change_dict['bundle_id'] = item.uuid
         return change_dict
 
     def getStateName(self, state_num):
@@ -4971,48 +4724,22 @@ class BuildSet(zkobject.ZKObject):
         # refactor is complete at which point the build and its linked
         # job should be 1:1.
         with self.activeContext(self.item.pipeline.manager.current_context):
-            job_id = self._getJobId(job)
-            self.builds[job_id] = build
-            if job_id not in self.tries:
-                self.tries[job_id] = 1
+            self.builds[job.uuid] = build
+            if job.uuid not in self.tries:
+                self.tries[job.uuid] = 1
 
     def addRetryBuild(self, build):
         with self.activeContext(self.item.pipeline.manager.current_context):
             self.retry_builds.setdefault(
-                self._getJobId(build.job), []).append(build)
+                build.job.uuid, []).append(build)
 
     def removeBuild(self, build):
-        # Temporarily for circular dependency refactoring, we remove
-        # all builds with the same job name as the supplied build (in
-        # case they have been deduplicated).
-        job_id = None
-        for my_job_id, my_build in self.builds.items():
-            if my_build.job.name == build.job.name:
-                job_id = my_job_id
-        if job_id is None:
-            return
         with self.activeContext(self.item.pipeline.manager.current_context):
-            self.tries[job_id] += 1
-            del self.builds[job_id]
-
-    # MODEL_API < 23
-    def _getJobId(self, job):
-        if self.model_version < 23:
-            return job.name
-        return job.uuid
-
-    def _getJobById(self, job_id):
-        if self.model_version < 23:
-            for job in self.job_graph.getJobs():
-                if job.name == job_id:
-                    return job
-        for job in self.job_graph.getJobs():
-            if job.uuid == job_id:
-                return job
-        return None
+            self.tries[build.job.uuid] += 1
+            del self.builds[build.job.uuid]
 
     def getBuild(self, job):
-        return self.builds.get(self._getJobId(job))
+        return self.builds.get(job.uuid)
 
     def getBuilds(self):
         builds = list(self.builds.values())
@@ -5020,13 +4747,11 @@ class BuildSet(zkobject.ZKObject):
         return builds
 
     def getRetryBuildsForJob(self, job):
-        job_id = self._getJobId(job)
-        return self.retry_builds.get(job_id, [])
+        return self.retry_builds.get(job.uuid, [])
 
     def getJobNodeSetInfo(self, job):
         # Return None if not provisioned; dict of info about nodes otherwise
-        job_id = self._getJobId(job)
-        return self.nodeset_info.get(job_id)
+        return self.nodeset_info.get(job.uuid)
 
     def getJobNodeProvider(self, job):
         info = self.getJobNodeSetInfo(job)
@@ -5044,58 +4769,32 @@ class BuildSet(zkobject.ZKObject):
             return info.get('nodes')
 
     def removeJobNodeSetInfo(self, job):
-        job_id = self._getJobId(job)
-        if job_id not in self.nodeset_info:
+        if job.uuid not in self.nodeset_info:
             raise Exception("No job nodeset for %s" % (job.name))
         with self.activeContext(self.item.pipeline.manager.current_context):
-            del self.nodeset_info[job_id]
+            del self.nodeset_info[job.uuid]
 
     def setJobNodeRequestID(self, job, request_id):
-        job_id = self._getJobId(job)
-        if job_id in self.node_requests:
+        if job.uuid in self.node_requests:
             raise Exception("Prior node request for %s" % (job.name))
         with self.activeContext(self.item.pipeline.manager.current_context):
-            self.node_requests[job_id] = request_id
+            self.node_requests[job.uuid] = request_id
 
-    def getJobNodeRequestID(self, job, ignore_deduplicate=False):
-        job_id = self._getJobId(job)
-        r = self.node_requests.get(job_id)
-        if ignore_deduplicate and isinstance(r, dict):
-            return None
-        return r
+    def getJobNodeRequestID(self, job):
+        return self.node_requests.get(job.uuid)
 
     def getNodeRequests(self):
-        # This ignores deduplicated node requests
-        for job_id, request in self.node_requests.items():
-            if isinstance(request, dict):
-                continue
-            yield self._getJobById(job_id), request
+        for job_uuid, request in self.node_requests.items():
+            yield self.job_graph.getJobFromUuid(job_uuid), request
 
     def removeJobNodeRequestID(self, job):
-        job_id = self._getJobId(job)
-        if job_id in self.node_requests:
+        if job.uuid in self.node_requests:
             with self.activeContext(
                     self.item.pipeline.manager.current_context):
-                del self.node_requests[job_id]
-
-    def setJobNodeRequestDuplicate(self, job, other_item):
-        job_id = self._getJobId(job)
-        with self.activeContext(
-                self.item.pipeline.manager.current_context):
-            self.node_requests[job_id] = {
-                'deduplicated_item': other_item.uuid}
-
-    def setJobNodeSetInfoDuplicate(self, job, other_item):
-        # Nothing uses this value yet; we just need an entry in the
-        # nodset_info dict.
-        job_id = self._getJobId(job)
-        with self.activeContext(self.item.pipeline.manager.current_context):
-            self.nodeset_info[job_id] = {
-                'deduplicated_item': other_item.uuid}
+                del self.node_requests[job.uuid]
 
     def jobNodeRequestComplete(self, job, nodeset):
-        job_id = self._getJobId(job)
-        if job_id in self.nodeset_info:
+        if job.uuid in self.nodeset_info:
             raise Exception("Prior node request for %s" % (job.name))
         info = {}
         if nodeset.nodes:
@@ -5107,13 +4806,12 @@ class BuildSet(zkobject.ZKObject):
             info['provider'] = node.provider
             info['nodes'] = [n.id for n in nodeset.getNodes()]
         with self.activeContext(self.item.pipeline.manager.current_context):
-            self.nodeset_info[job_id] = info
+            self.nodeset_info[job.uuid] = info
 
     def getTries(self, job):
-        job_id = self._getJobId(job)
-        return self.tries.get(job_id, 0)
+        return self.tries.get(job.uuid, 0)
 
-    def getMergeMode(self):
+    def getMergeMode(self, change):
         # We may be called before this build set has a shadow layout
         # (ie, we are called to perform the merge to create that
         # layout).  It's possible that the change we are merging will
@@ -5123,7 +4821,7 @@ class BuildSet(zkobject.ZKObject):
         # or if that fails, the current live layout, or if that fails,
         # use the default: merge-resolve.
         item = self.item
-        project = self.item.change.project
+        project = change.project
         project_metadata = None
         while item:
             if item.current_build_set.job_graph:
@@ -5194,7 +4892,7 @@ class QueueItem(zkobject.ZKObject):
         self._set(
             uuid=uuid4().hex,
             queue=None,
-            change=None,  # a ref
+            changes=[],  # a list of refs
             dequeued_needing_change=None,
             dequeued_missing_requirements=False,
             current_build_set=None,
@@ -5217,11 +4915,6 @@ class QueueItem(zkobject.ZKObject):
             # Additional container for connection specifig information to be
             # used by reporters throughout the lifecycle
             dynamic_state=defaultdict(dict),
-
-            # A bundle holds other queue items that have to be successful
-            # for the current queue item to succeed
-            bundle=None,
-            dequeued_bundle_failing=False
         )
 
     @property
@@ -5229,20 +4922,6 @@ class QueueItem(zkobject.ZKObject):
         if self.queue:
             return self.queue.pipeline
         return None
-
-    @property
-    def bundle_build_set(self):
-        if self.bundle:
-            for item in self.bundle.items:
-                if item.live:
-                    return item.current_build_set
-        return self.current_build_set
-
-    @property
-    def bundle_items(self):
-        if self.bundle:
-            return self.bundle.items
-        return [self]
 
     @classmethod
     def new(klass, context, **kw):
@@ -5256,10 +4935,10 @@ class QueueItem(zkobject.ZKObject):
         # Skip the initial merge for branch/ref items as we don't need it in
         # order to build a job graph. The merger items will be included as
         # part of the extra repo state if there are jobs to run.
-        merge_state = (BuildSet.NEW if isinstance(obj.change, (Change, Tag))
-                       else BuildSet.COMPLETE)
-        files_state = (BuildSet.COMPLETE if obj.change.files is not None
-                       else BuildSet.NEW)
+        should_merge = any(isinstance(o, (Change, Tag)) for o in obj.changes)
+        merge_state = (BuildSet.NEW if should_merge else BuildSet.COMPLETE)
+        should_files = any(o.files is None for o in obj.changes)
+        files_state = (BuildSet.NEW if should_files else BuildSet.COMPLETE)
 
         with trace.use_span(tracing.restoreSpan(obj.span_info)):
             buildset_span_info = tracing.startSavedSpan("BuildSet")
@@ -5303,7 +4982,7 @@ class QueueItem(zkobject.ZKObject):
             # TODO: we need to also store some info about the change in
             # Zookeeper in order to show the change info on the status page.
             # This needs change cache and the API to resolve change by key.
-            "change": self.change.cache_key,
+            "changes": [c.cache_key for c in self.changes],
             "dequeued_needing_change": self.dequeued_needing_change,
             "dequeued_missing_requirements":
             self.dequeued_missing_requirements,
@@ -5326,8 +5005,6 @@ class QueueItem(zkobject.ZKObject):
                 "data": self.event.toDict(),
             },
             "dynamic_state": self.dynamic_state,
-            "bundle": self.bundle and self.bundle.serialize(),
-            "dequeued_bundle_failing": self.dequeued_bundle_failing,
             "first_job_start_time": self.first_job_start_time,
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
@@ -5356,12 +5033,8 @@ class QueueItem(zkobject.ZKObject):
                 f"Event type {event_type} not deserializable")
 
         event = event_class.fromDict(data["event"]["data"])
-        change = self.pipeline.manager.resolveChangeReferences(
-            [data["change"]])[0]
-        # MODEL_API < 22: This can be removed once we remove the
-        # backwards-compat setting of FrozenJob.ref
-        self._set(change=change)
-
+        changes = self.pipeline.manager.resolveChangeReferences(
+            data["changes"])
         build_set = self.current_build_set
         if build_set and build_set.getPath() == data["current_build_set"]:
             build_set.refresh(context)
@@ -5372,7 +5045,7 @@ class QueueItem(zkobject.ZKObject):
 
         data.update({
             "event": event,
-            "change": change,
+            "changes": changes,
             "log": get_annotated_logger(self.log, event),
             "dynamic_state": defaultdict(dict, data["dynamic_state"]),
             "current_build_set": build_set,
@@ -5395,13 +5068,13 @@ class QueueItem(zkobject.ZKObject):
         else:
             live = 'non-live'
         return '<QueueItem %s %s for %s in %s>' % (
-            self.uuid, live, self.change, pipeline)
+            self.uuid, live, self.changes, pipeline)
 
     def resetAllBuilds(self):
         context = self.pipeline.manager.current_context
         old_build_set = self.current_build_set
-        files_state = (BuildSet.COMPLETE if self.change.files is not None
-                       else BuildSet.NEW)
+        have_all_files = all(c.files is not None for c in self.changes)
+        files_state = (BuildSet.COMPLETE if have_all_files else BuildSet.NEW)
 
         with trace.use_span(tracing.restoreSpan(self.span_info)):
             old_buildset_span = tracing.restoreSpan(old_build_set.span_info)
@@ -5443,43 +5116,28 @@ class QueueItem(zkobject.ZKObject):
                 self.current_build_set.warning_messages.append(msg)
                 self.log.info(msg)
 
+    def getChangeForJob(self, job):
+        for change in self.changes:
+            if change.cache_key == job.ref:
+                return change
+        return None
+
     def freezeJobGraph(self, layout, context,
                        skip_file_matcher,
                        redact_secrets_and_keys):
         """Find or create actual matching jobs for this item's change and
         store the resulting job tree."""
 
-        # TODO: move this and related methods to BuildSet
-        ppc = layout.getProjectPipelineConfig(self)
         try:
-            if ppc and ppc.debug:
-                debug_messages = ppc.debug_messages.copy()
-            else:
-                debug_messages = None
-            job_graph = layout.createJobGraph(
-                context, self, ppc, skip_file_matcher, redact_secrets_and_keys,
-                debug_messages)
+            results = layout.createJobGraph(context, self, skip_file_matcher,
+                                            redact_secrets_and_keys)
+            job_graph = results['job_graph']
 
-            # Copy project metadata to job_graph since this must be independent
-            # of the layout as we need it in order to prepare the context for
-            # job execution.
-            # The layout might be no longer available at this point, as the
-            # scheduler submitting the job can be different from the one that
-            # created the layout.
-            job_graph.project_metadata = layout.project_metadata
+            # Write the jobs out to ZK
+            for frozen_job in job_graph._job_map.values():
+                frozen_job.internalCreate(context)
 
-            if debug_messages is None:
-                debug_messages = self.current_build_set.debug_messages
-
-            if ppc:
-                fail_fast = ppc.fail_fast
-            else:
-                fail_fast = self.current_build_set.fail_fast
-            self.current_build_set.updateAttributes(
-                context, job_graph=job_graph,
-                fail_fast=fail_fast,
-                debug_messages=debug_messages)
-
+            self.current_build_set.updateAttributes(context, **results)
         except Exception:
             self.current_build_set.updateAttributes(
                 context, job_graph=None, _old_job_graph=None)
@@ -5494,15 +5152,8 @@ class QueueItem(zkobject.ZKObject):
             return []
         return self.current_build_set.job_graph.getJobs()
 
-    def getJob(self, job_id):
-        # MODEL_API < 24
-        job_graph = self.current_build_set.job_graph
-        try:
-            job = job_graph.getJobFromUuid(job_id)
-            if job is not None:
-                return job
-        except (KeyError, ValueError):
-            return job_graph.getJobFromName(job_id)
+    def getJob(self, job_uuid):
+        return self.current_build_set.job_graph.getJobFromUuid(job_uuid)
 
     @property
     def items_ahead(self):
@@ -5510,6 +5161,12 @@ class QueueItem(zkobject.ZKObject):
         while item_ahead:
             yield item_ahead
             item_ahead = item_ahead.item_ahead
+
+    def areAllChangesMerged(self):
+        for change in self.changes:
+            if not getattr(change, 'is_merged', True):
+                return False
+        return True
 
     def haveAllJobsStarted(self):
         if not self.hasJobGraph():
@@ -5586,36 +5243,6 @@ class QueueItem(zkobject.ZKObject):
                 return True
         return False
 
-    def isBundleFailing(self):
-        if self.bundle:
-            # We are only checking other items that share the same change
-            # queue, since we don't need to wait for changes in other change
-            # queues.
-            return self.bundle.failed_reporting or any(
-                i.hasAnyJobFailed() or i.didMergerFail()
-                for i in self.bundle.items
-                if i.live and i.queue == self.queue)
-        return False
-
-    def didBundleFinish(self):
-        if self.bundle:
-            # We are only checking other items that share the same change
-            # queue, since we don't need to wait for changes in other change
-            # queues.
-            return all(i.areAllJobsComplete() for i in self.bundle.items if
-                       i.live and i.queue == self.queue)
-        return True
-
-    def didBundleStartReporting(self):
-        if self.bundle:
-            return self.bundle.started_reporting
-        return False
-
-    def cannotMergeBundle(self):
-        if self.bundle:
-            return bool(self.bundle.cannot_merge)
-        return False
-
     def didMergerFail(self):
         return self.current_build_set.unable_to_merge
 
@@ -5632,38 +5259,44 @@ class QueueItem(zkobject.ZKObject):
         return self.dequeued_missing_requirements
 
     def includesConfigUpdates(self):
+        """Returns whether the changes include updates to the
+        trusted and untrusted configs"""
         includes_trusted = False
         includes_untrusted = False
         tenant = self.pipeline.tenant
         item = self
 
-        if item.bundle:
-            # Check all items in the bundle for config updates
-            for bundle_item in item.bundle.items:
-                if bundle_item.change.updatesConfig(tenant):
-                    trusted, project = tenant.getProject(
-                        bundle_item.change.project.canonical_name)
+        while item:
+            for change in item.changes:
+                if change.updatesConfig(tenant):
+                    (trusted, project) = tenant.getProject(
+                        change.project.canonical_name)
                     if trusted:
                         includes_trusted = True
                     else:
                         includes_untrusted = True
                 if includes_trusted and includes_untrusted:
                     # We're done early
-                    return includes_trusted, includes_untrusted
-
-        while item:
-            if item.change.updatesConfig(tenant):
-                (trusted, project) = tenant.getProject(
-                    item.change.project.canonical_name)
-                if trusted:
-                    includes_trusted = True
-                else:
-                    includes_untrusted = True
-            if includes_trusted and includes_untrusted:
-                # We're done early
-                return (includes_trusted, includes_untrusted)
+                    return (includes_trusted, includes_untrusted)
             item = item.item_ahead
         return (includes_trusted, includes_untrusted)
+
+    def updatesConfig(self):
+        """Returns whether the changes update the config"""
+        for change in self.changes:
+            if change.updatesConfig(self.pipeline.tenant):
+                tenant_project = self.pipeline.tenant.getProject(
+                    change.project.canonical_name
+                )[1]
+                # If the cycle doesn't update the config or a change
+                # in the cycle updates the config but the that
+                # change's project is not part of the tenant
+                # (e.g. when dealing w/ cross-tenant cycles), return
+                # False.
+                if tenant_project is None:
+                    continue
+                return True
+        return False
 
     def isHoldingFollowingChanges(self):
         if not self.live:
@@ -5691,14 +5324,17 @@ class QueueItem(zkobject.ZKObject):
         if requirements_tuple not in self._cached_sql_results:
             conn = self.pipeline.manager.sched.connections.getSqlConnection()
             if conn:
-                builds = conn.getBuilds(
-                    tenant=self.pipeline.tenant.name,
-                    project=self.change.project.name,
-                    pipeline=self.pipeline.name,
-                    change=self.change.number,
-                    branch=self.change.branch,
-                    patchset=self.change.patchset,
-                    provides=requirements_tuple)
+                for change in self.changes:
+                    builds = conn.getBuilds(
+                        tenant=self.pipeline.tenant.name,
+                        project=change.project.name,
+                        pipeline=self.pipeline.name,
+                        change=change.number,
+                        branch=change.branch,
+                        patchset=change.patchset,
+                        provides=requirements_tuple)
+                    if builds:
+                        break
             else:
                 builds = []
             # Just look at the most recent buildset.
@@ -5751,7 +5387,8 @@ class QueueItem(zkobject.ZKObject):
             item = None
             found = False
             for item in self.pipeline.getAllItems():
-                if item.live and item.change == self.change:
+                if item.live and set(item.changes).intersection(
+                        set(self.changes)):
                     found = True
                     break
             if found:
@@ -5780,9 +5417,10 @@ class QueueItem(zkobject.ZKObject):
                             build.result_data,
                             logger=self.log)
                         for a in artifacts:
-                            a.update({'project': self.change.project.name,
-                                      'change': self.change.number,
-                                      'patchset': self.change.patchset,
+                            change = self.getChangeForJob(_job)
+                            a.update({'project': change.project.name,
+                                      'change': change.number,
+                                      'patchset': change.patchset,
                                       'job': build.job.name})
                         self.log.debug(
                             "Found live artifacts: %s", repr(artifacts))
@@ -5818,86 +5456,6 @@ class QueueItem(zkobject.ZKObject):
             self.setResult(fakebuild)
         return False
 
-    def findDuplicateBundles(self):
-        """
-        Find other bundles in the pipeline that are equivalent to ours.
-        """
-        if not self.bundle:
-            return []
-
-        if len([i for i in self.bundle.items if i.live]) > 1:
-            # We are in a queue that has multiple live items, so we
-            # will only check our own bundle.
-            return [self.bundle]
-
-        ret = []
-        for item in self.queue.pipeline.getAllItems():
-            if not item.live:
-                continue
-            if item is self:
-                continue
-            if not item.bundle:
-                continue
-            other_bundle_changes = {i.change for i in item.bundle.items}
-            this_bundle_changes = {i.change for i in self.bundle.items}
-            if other_bundle_changes != this_bundle_changes:
-                continue
-            other_item_queue = {i.change for i in item.queue.queue}
-            this_item_queue = {i.change for i in self.queue.queue}
-            if other_item_queue != this_item_queue:
-                continue
-            if item.bundle not in ret:
-                ret.append(item.bundle)
-        return ret
-
-    def findDuplicateJob(self, job, other_bundles):
-        """
-        If another item in the bundle has a duplicate job,
-        return the other item
-        """
-        # A note on some of the checks below:
-        #
-        # A possible difference between jobs could be the dependent
-        # job tree under this one.  Because that is passed to the job
-        # as zuul.child_jobs, that could be a different input to the
-        # job, and therefore produce a different output.  However, a
-        # very common pattern is to build a common artifact in a
-        # parent job and then do something different with it in a
-        # child job.  The utility of automatic deduplication in that
-        # case is very compelling, so we do not check child_jobs when
-        # deduplicating.  Users can set deduplicate:false if that
-        # behavior is important.
-        #
-        # Theoretically, it would be okay to deduplicate a job with
-        # different parents as long as the inputs are the same.  But
-        # that won't happen because the job's dependencies are checked
-        # in isEqual.  Similarly, it would be okay to deduplicate the
-        # same job with a deduplicated parent as long as the returned
-        # data are the same.  However, in practice, that will never be
-        # the case since all Zuul jobs return artifacts (the
-        # manifest), and those will be different.  No special handling
-        # is done here, that is a natural consequence of parent_data
-        # being different.
-
-        if not self.bundle:
-            return None
-        if job.deduplicate is False:
-            return None
-        for other_bundle in other_bundles:
-            for other_item in other_bundle.items:
-                if other_item is self:
-                    continue
-                for other_job in other_item.getJobs():
-                    if other_job.isEqual(job):
-                        if job.deduplicate == 'auto':
-                            # Deduplicate if there are required projects
-                            # or the item project is the same.
-                            if (not job.required_projects and
-                                self.change.project !=
-                                other_item.change.project):
-                                continue
-                        return other_item
-
     def updateJobParentData(self):
         job_graph = self.current_build_set.job_graph
         failed_job_ids = set()  # Jobs that run and failed
@@ -5911,11 +5469,11 @@ class QueueItem(zkobject.ZKObject):
                 if build.result == 'SUCCESS' or build.paused:
                     pass
                 elif build.result == 'SKIPPED':
-                    ignored_job_ids.add(job._job_id)
+                    ignored_job_ids.add(job.uuid)
                 else:  # elif build.result in ('FAILURE', 'CANCELED', ...):
-                    failed_job_ids.add(job._job_id)
+                    failed_job_ids.add(job.uuid)
             else:
-                unexecuted_job_ids.add(job._job_id)
+                unexecuted_job_ids.add(job.uuid)
                 jobs_not_started.add(job)
 
         for job in job_graph.getJobs():
@@ -5926,17 +5484,17 @@ class QueueItem(zkobject.ZKObject):
             all_parent_jobs_successful = True
             parent_builds_with_data = {}
             for parent_job in job_graph.getParentJobsRecursively(job):
-                if parent_job._job_id in unexecuted_job_ids \
-                        or parent_job._job_id in failed_job_ids:
+                if parent_job.uuid in unexecuted_job_ids \
+                        or parent_job.uuid in failed_job_ids:
                     all_parent_jobs_successful = False
                     break
                 parent_build = self.current_build_set.getBuild(parent_job)
                 if parent_build.result_data:
-                    parent_builds_with_data[parent_job._job_id] = parent_build
+                    parent_builds_with_data[parent_job.uuid] = parent_build
 
             for parent_job in job_graph.getParentJobsRecursively(
                     job, skip_soft=True):
-                if parent_job._job_id in ignored_job_ids:
+                if parent_job.uuid in ignored_job_ids:
                     all_parent_jobs_successful = False
                     break
 
@@ -5956,7 +5514,7 @@ class QueueItem(zkobject.ZKObject):
                     new_artifact_data = job.artifact_data or []
                     for parent_job in job_graph.getJobs():
                         parent_build = parent_builds_with_data.get(
-                            parent_job._job_id)
+                            parent_job.uuid)
                         if parent_build:
                             (new_parent_data,
                              new_secret_parent_data,
@@ -5982,7 +5540,7 @@ class QueueItem(zkobject.ZKObject):
         for parent_job in job_graph.getParentJobsRecursively(job):
             parent_build = self.current_build_set.getBuild(parent_job)
             if parent_build and parent_build.result_data:
-                parent_builds_with_data[parent_job._job_id] = parent_build
+                parent_builds_with_data[parent_job.uuid] = parent_build
 
         parent_data = {}
         secret_parent_data = {}
@@ -5994,7 +5552,7 @@ class QueueItem(zkobject.ZKObject):
         # in sorted config order) and apply parent data of the jobs we
         # already found.
         for parent_job in job_graph.getJobs():
-            parent_build = parent_builds_with_data.get(parent_job._job_id)
+            parent_build = parent_builds_with_data.get(parent_job.uuid)
             if not parent_build:
                 continue
             (parent_data, secret_parent_data, artifact_data
@@ -6004,87 +5562,6 @@ class QueueItem(zkobject.ZKObject):
                     artifact_data,
                     parent_build)
         return parent_data, secret_parent_data, artifact_data
-
-    def deduplicateJobs(self, log):
-        """Sync node request and build info with deduplicated jobs
-
-        Returns a boolean indicating whether a build was deduplicated.
-        """
-        deduplicated = False
-        if not self.live:
-            return False
-        if not self.current_build_set.job_graph:
-            return False
-        if self.item_ahead:
-            # Only run jobs if any 'hold' jobs on the change ahead
-            # have completed successfully.
-            if self.item_ahead.isHoldingFollowingChanges():
-                return False
-
-        self.updateJobParentData()
-
-        if COMPONENT_REGISTRY.model_api < 8:
-            return False
-
-        if not self.bundle:
-            return False
-
-        build_set = self.current_build_set
-        job_graph = build_set.job_graph
-        other_bundles = self.findDuplicateBundles()
-        for job in job_graph.getJobs():
-            this_request = build_set.getJobNodeRequestID(job)
-            this_nodeset = build_set.getJobNodeSetInfo(job)
-            this_build = build_set.getBuild(job)
-
-            if this_build:
-                # Nothing more possible for this job
-                continue
-
-            other_item = self.findDuplicateJob(job, other_bundles)
-            if not other_item:
-                continue
-            other_build_set = other_item.current_build_set
-            # TODO: this lookup of the other job by name will be
-            # refactored out as part of the circular dependency
-            # refactor.
-            other_job = other_build_set.job_graph.getJobFromName(job.name)
-
-            # Handle node requests
-            other_request = other_build_set.getJobNodeRequestID(other_job)
-            if (isinstance(other_request, dict) and
-                other_request.get('deduplicated_item') == self.uuid):
-                # We're the original, but we're probably in the middle
-                # of a retry
-                return False
-            if other_request is not None and this_request is None:
-                log.info("Deduplicating request of bundle job %s for item %s "
-                         "with item %s", job, self, other_item)
-                build_set.setJobNodeRequestDuplicate(job, other_item)
-                job._set(_ready_to_run=False)
-
-            # Handle provisioned nodes
-            other_nodeset = other_build_set.getJobNodeSetInfo(other_job)
-            if (isinstance(other_nodeset, dict) and
-                other_nodeset.get('deduplicated_item') == self.uuid):
-                # We're the original, but we're probably in the middle
-                # of a retry
-                return False
-            if other_nodeset is not None and this_nodeset is None:
-                log.info("Deduplicating nodeset of bundle job %s for item %s "
-                         "with item %s", job, self, other_item)
-                build_set.setJobNodeSetInfoDuplicate(job, other_item)
-                job._set(_ready_to_run=False)
-
-            # Handle builds
-            other_build = other_build_set.getBuild(other_job)
-            if other_build and not this_build:
-                log.info("Deduplicating build of bundle job %s for item %s "
-                         "with item %s", job, self, other_item)
-                self.addBuild(job, other_build)
-                job._set(_ready_to_run=False)
-                deduplicated = True
-        return deduplicated
 
     def findJobsToRun(self, semaphore_handler):
         torun = []
@@ -6133,11 +5610,11 @@ class QueueItem(zkobject.ZKObject):
             if build and (build.result == 'SUCCESS' or build.paused):
                 pass
             elif build and build.result == 'SKIPPED':
-                ignored_job_ids.add(job._job_id)
+                ignored_job_ids.add(job.uuid)
             elif build and build.result in ('FAILURE', 'CANCELED'):
-                failed_job_ids.add(job._job_id)
+                failed_job_ids.add(job.uuid)
             else:
-                unexecuted_job_ids.add(job._job_id)
+                unexecuted_job_ids.add(job.uuid)
                 nodeset = build_set.getJobNodeSetInfo(job)
                 if nodeset is None:
                     req_id = build_set.getJobNodeRequestID(job)
@@ -6166,11 +5643,11 @@ class QueueItem(zkobject.ZKObject):
             all_dep_jobs_successful = True
             # Every parent job (dependency), whether soft or hard:
             all_dep_job_ids = set(
-                [x._job_id for x in
+                [x.uuid for x in
                  job_graph.getParentJobsRecursively(job)])
             # Only the hard deps:
             hard_dep_job_ids = set(
-                [x._job_id for x in job_graph.getParentJobsRecursively(
+                [x.uuid for x in job_graph.getParentJobsRecursively(
                     job, skip_soft=True)])
             # Any dep that hasn't finished (or started) running
             unexecuted_dep_job_ids = unexecuted_job_ids & all_dep_job_ids
@@ -6187,7 +5664,7 @@ class QueueItem(zkobject.ZKObject):
                 failed_dep_job_ids |
                 ignored_hard_dep_job_ids)
             if required_dep_job_ids:
-                deps = [build_set._getJobById(i).name
+                deps = [self.getJob(i).name
                         for i in required_dep_job_ids]
                 job.setWaitingStatus('dependencies: {}'.format(
                     ', '.join(deps)))
@@ -6295,12 +5772,6 @@ class QueueItem(zkobject.ZKObject):
             dequeued_missing_requirements=True)
         self._setAllJobsSkipped('Missing pipeline requirements')
 
-    def setDequeuedBundleFailing(self, msg):
-        self.updateAttributes(
-            self.pipeline.manager.current_context,
-            dequeued_bundle_failing=True)
-        self._setMissingJobsSkipped(msg)
-
     def setUnableToMerge(self, errors=None):
         with self.current_build_set.activeContext(
                 self.pipeline.manager.current_context):
@@ -6358,16 +5829,17 @@ class QueueItem(zkobject.ZKObject):
                 tenant=self.pipeline.tenant.name,
                 final=True)
 
-    def getNodePriority(self):
-        return self.pipeline.manager.getNodePriority(self)
-
     def formatUrlPattern(self, url_pattern, job=None, build=None):
         url = None
         # Produce safe versions of objects which may be useful in
         # result formatting, but don't allow users to crawl through
         # the entire data structure where they might be able to access
         # secrets, etc.
-        safe_change = self.change.getSafeAttributes()
+        if job:
+            change = self.getChangeForJob(job)
+            safe_change = change.getSafeAttributes()
+        else:
+            safe_change = self.changes[0].getSafeAttributes()
         safe_pipeline = self.pipeline.getSafeAttributes()
         safe_tenant = self.pipeline.tenant.getSafeAttributes()
         safe_buildset = self.current_build_set.getSafeAttributes()
@@ -6437,37 +5909,43 @@ class QueueItem(zkobject.ZKObject):
         ret = {}
         ret['active'] = self.active
         ret['live'] = self.live
-        if hasattr(self.change, 'url') and self.change.url is not None:
-            ret['url'] = self.change.url
-        else:
-            ret['url'] = None
-        if hasattr(self.change, 'ref') and self.change.ref is not None:
-            ret['ref'] = self.change.ref
-        else:
-            ret['ref'] = None
-        ret['id'] = self.change._id()
+        changes = []
+        for change in self.changes:
+            ret_change = {}
+            if hasattr(change, 'url') and change.url is not None:
+                ret_change['url'] = change.url
+            else:
+                ret_change['url'] = None
+            if hasattr(change, 'ref') and change.ref is not None:
+                ret_change['ref'] = change.ref
+            else:
+                ret_change['ref'] = None
+            if change.project:
+                ret_change['project'] = change.project.name
+                ret_change['project_canonical'] = change.project.canonical_name
+            else:
+                # For cross-project dependencies with the depends-on
+                # project not known to zuul, the project is None
+                # Set it to a static value
+                ret_change['project'] = "Unknown Project"
+                ret_change['project_canonical'] = "Unknown Project"
+            if hasattr(change, 'owner'):
+                ret_change['owner'] = change.owner
+            else:
+                ret_change['owner'] = None
+            ret_change['id'] = change._id()
+            changes.append(ret_change)
+        ret['id'] = self.uuid
+        ret['changes'] = changes
         if self.item_ahead:
-            ret['item_ahead'] = self.item_ahead.change._id()
+            ret['item_ahead'] = self.item_ahead.uuid
         else:
             ret['item_ahead'] = None
-        ret['items_behind'] = [i.change._id() for i in self.items_behind]
+        ret['items_behind'] = [i.uuid for i in self.items_behind]
         ret['failing_reasons'] = self.current_build_set.failing_reasons
         ret['zuul_ref'] = self.current_build_set.ref
-        if self.change.project:
-            ret['project'] = self.change.project.name
-            ret['project_canonical'] = self.change.project.canonical_name
-        else:
-            # For cross-project dependencies with the depends-on
-            # project not known to zuul, the project is None
-            # Set it to a static value
-            ret['project'] = "Unknown Project"
-            ret['project_canonical'] = "Unknown Project"
         ret['enqueue_time'] = int(self.enqueue_time * 1000)
         ret['jobs'] = []
-        if hasattr(self.change, 'owner'):
-            ret['owner'] = self.change.owner
-        else:
-            ret['owner'] = None
         max_remaining = 0
         for job in self.getJobs():
             now = time.time()
@@ -6538,21 +6016,12 @@ class QueueItem(zkobject.ZKObject):
             ret['remaining_time'] = None
         return ret
 
-    def formatStatus(self, indent=0, html=False):
+    def formatStatus(self, indent=0):
         indent_str = ' ' * indent
-        ret = ''
-        if html and getattr(self.change, 'url', None) is not None:
-            ret += '%sProject %s change <a href="%s">%s</a>\n' % (
-                indent_str,
-                self.change.project.name,
-                self.change.url,
-                self.change._id())
-        else:
-            ret += '%sProject %s change %s based on %s\n' % (
-                indent_str,
-                self.change.project.name,
-                self.change._id(),
-                self.item_ahead)
+        ret = '%s%s based on %s\n' % (
+            indent_str,
+            self,
+            self.item_ahead)
         for job in self.getJobs():
             build = self.current_build_set.getBuild(job)
             if build:
@@ -6564,18 +6033,11 @@ class QueueItem(zkobject.ZKObject):
                 voting = ' (non-voting)'
             else:
                 voting = ''
-            if html:
-                if build:
-                    url = build.url
-                else:
-                    url = None
-                if url is not None:
-                    job_name = '<a href="%s">%s</a>' % (url, job_name)
             ret += '%s  %s: %s%s' % (indent_str, job_name, result, voting)
             ret += '\n'
         return ret
 
-    def makeMergerItem(self):
+    def makeMergerItem(self, change):
         # Create a dictionary with all info about the item needed by
         # the merger.
         number = None
@@ -6583,23 +6045,23 @@ class QueueItem(zkobject.ZKObject):
         oldrev = None
         newrev = None
         branch = None
-        if hasattr(self.change, 'number'):
-            number = self.change.number
-            patchset = self.change.patchset
-        if hasattr(self.change, 'newrev'):
-            oldrev = self.change.oldrev
-            newrev = self.change.newrev
-        if hasattr(self.change, 'branch'):
-            branch = self.change.branch
+        if hasattr(change, 'number'):
+            number = change.number
+            patchset = change.patchset
+        if hasattr(change, 'newrev'):
+            oldrev = change.oldrev
+            newrev = change.newrev
+        if hasattr(change, 'branch'):
+            branch = change.branch
 
-        source = self.change.project.source
+        source = change.project.source
         connection_name = source.connection.connection_name
-        project = self.change.project
+        project = change.project
 
         return dict(project=project.name,
                     connection=connection_name,
-                    merge_mode=self.current_build_set.getMergeMode(),
-                    ref=self.change.ref,
+                    merge_mode=self.current_build_set.getMergeMode(change),
+                    ref=change.ref,
                     branch=branch,
                     buildset_uuid=self.current_build_set.uuid,
                     number=number,
@@ -6608,7 +6070,7 @@ class QueueItem(zkobject.ZKObject):
                     newrev=newrev,
                     )
 
-    def updatesJobConfig(self, job, layout):
+    def updatesJobConfig(self, job, change, layout):
         log = self.annotateLogger(self.log)
         layout_ahead = None
         if self.pipeline.manager:
@@ -6618,15 +6080,14 @@ class QueueItem(zkobject.ZKObject):
             # would be if the layout had not changed.
             if self.current_build_set._old_job_graph is None:
                 try:
-                    ppc = layout_ahead.getProjectPipelineConfig(self)
                     log.debug("Creating job graph for config change detection")
+                    results = layout_ahead.createJobGraph(
+                        None, self,
+                        skip_file_matcher=True,
+                        redact_secrets_and_keys=False,
+                        old=True)
                     self.current_build_set._set(
-                        _old_job_graph=layout_ahead.createJobGraph(
-                            None, self, ppc,
-                            skip_file_matcher=True,
-                            redact_secrets_and_keys=False,
-                            debug_messages=None,
-                            old=True))
+                        _old_job_graph=results['job_graph'])
                     log.debug("Done creating job graph for "
                               "config change detection")
                 except Exception:
@@ -6637,8 +6098,8 @@ class QueueItem(zkobject.ZKObject):
                     # which jobs have changed, so rather than run them
                     # all, just rely on the file matchers as-is.
                     return False
-            old_job = self.current_build_set._old_job_graph.getJobFromName(
-                job.name)
+            old_job = self.current_build_set._old_job_graph.getJob(
+                job.name, change.cache_key)
             if old_job is None:
                 log.debug("Found a newly created job")
                 return True  # A newly created job
@@ -6661,48 +6122,6 @@ class QueueItem(zkobject.ZKObject):
                     if isinstance(secret, dict) and 'blob' in secret:
                         keys.add(secret['blob'])
         return keys
-
-
-class Bundle:
-    """Identifies a collection of changes that must be treated as one unit."""
-
-    def __init__(self, uuid=None):
-        self.uuid = uuid or uuid4().hex
-        self.items = []
-        self.started_reporting = False
-        self.failed_reporting = False
-        self.cannot_merge = None
-
-    def __repr__(self):
-        return '<Bundle 0x{:x} {}'.format(id(self), self.items)
-
-    def add_item(self, item):
-        if item not in self.items:
-            self.items.append(item)
-
-    def updatesConfig(self, tenant):
-        return any(i.change.updatesConfig(tenant) for i in self.items)
-
-    def serialize(self):
-        return {
-            "uuid": self.uuid,
-            "items": [i.getPath() for i in self.items],
-            "started_reporting": self.started_reporting,
-            "failed_reporting": self.failed_reporting,
-            "cannot_merge": self.cannot_merge,
-        }
-
-    @classmethod
-    def deserialize(cls, context, queue, items_by_path, data):
-        bundle = cls(data["uuid"])
-        bundle.items = [
-            items_by_path.get(p) or QueueItem.fromZK(context, p, queue=queue)
-            for p in data["items"]
-        ]
-        bundle.started_reporting = data["started_reporting"]
-        bundle.failed_reporting = data["failed_reporting"]
-        bundle.cannot_merge = data["cannot_merge"]
-        return bundle
 
 
 # Cache info of a ref
@@ -7388,55 +6807,44 @@ class BuildResultEvent(ResultEvent):
                          emitted.
     :arg str build_set_uuid: The UUID of the buildset of which the build
                              is part of.
-    :arg str job_name: The name of the job the build is executed for.
     :arg str job_uuid: The uuid of the job the build is executed for.
     :arg str build_request_ref: The path to the build request that is
                                 stored in ZooKeeper.
     :arg dict data: The event data.
     """
 
-    def __init__(self, build_uuid, build_set_uuid, job_name, job_uuid,
+    def __init__(self, build_uuid, build_set_uuid, job_uuid,
                  build_request_ref, data, zuul_event_id=None):
         self.build_uuid = build_uuid
         self.build_set_uuid = build_set_uuid
-        # MODEL_API < 25
-        self.job_name = job_name
         self.job_uuid = job_uuid
         self.build_request_ref = build_request_ref
         self.data = data
         self.zuul_event_id = zuul_event_id
 
-    @property
-    def _job_id(self):
-        # MODEL_API < 25
-        # Remove this after circular dep refactor
-        return self.job_uuid or self.job_name
-
     def toDict(self):
         d = {
             "build_uuid": self.build_uuid,
             "build_set_uuid": self.build_set_uuid,
-            "job_name": self.job_name,
+            "job_uuid": self.job_uuid,
             "build_request_ref": self.build_request_ref,
             "data": self.data,
             "zuul_event_id": self.zuul_event_id,
         }
-        if (COMPONENT_REGISTRY.model_api >= 25):
-            d['job_uuid'] = self.job_uuid
         return d
 
     @classmethod
     def fromDict(cls, data):
         return cls(
             data.get("build_uuid"), data.get("build_set_uuid"),
-            data.get("job_name"), data.get("job_uuid"),
+            data.get("job_uuid"),
             data.get("build_request_ref"), data.get("data"),
             data.get("zuul_event_id"))
 
     def __repr__(self):
         return (
             f"<{self.__class__.__name__} build={self.build_uuid} "
-            f"job={self.job_name}>"
+            f"job={self.job_uuid}>"
         )
 
 
@@ -7576,7 +6984,6 @@ class NodesProvisionedEvent(ResultEvent):
     """Nodes have been provisioned for a build_set
 
     :arg int request_id: The id of the fulfilled node request.
-    :arg str job_name: The name of the job this node request belongs to.
     :arg str build_set_uuid: UUID of the buildset this node request belongs to
     """
 
@@ -8649,7 +8056,7 @@ class Layout(object):
             return self.project_metadata[name]
         return None
 
-    def getProjectPipelineConfig(self, item):
+    def getProjectPipelineConfig(self, item, change):
         log = item.annotateLogger(self.log)
         # Create a project-pipeline config for the given item, taking
         # its branch (if any) into consideration.  If the project does
@@ -8662,8 +8069,8 @@ class Layout(object):
         # item).
         ppc = ProjectPipelineConfig()
         project_in_pipeline = False
-        for pc in self.getProjectConfigs(item.change.project.canonical_name):
-            if not pc.changeMatches(item.change):
+        for pc in self.getProjectConfigs(change.project.canonical_name):
+            if not pc.changeMatches(change):
                 msg = "Project %s did not match" % (pc,)
                 ppc.addDebug(msg)
                 log.debug("%s item %s", msg, item)
@@ -8676,7 +8083,7 @@ class Layout(object):
                 for template in templates:
                     template_ppc = template.pipelines.get(item.pipeline.name)
                     if template_ppc:
-                        if not template.changeMatches(item.change):
+                        if not template.changeMatches(change):
                             msg = "Project template %s did not match" % (
                                 template,)
                             ppc.addDebug(msg)
@@ -8803,18 +8210,17 @@ class Layout(object):
             raise NoMatchingParentError()
         return jobs
 
-    def _createJobGraph(self, context, item, ppc, job_graph,
-                        skip_file_matcher, redact_secrets_and_keys,
-                        debug_messages):
+    def extendJobGraph(self, context, item, change, ppc, job_graph,
+                       skip_file_matcher, redact_secrets_and_keys,
+                       debug_messages):
         log = item.annotateLogger(self.log)
         semaphore_handler = item.pipeline.tenant.semaphore_handler
         job_list = ppc.job_list
-        change = item.change
         pipeline = item.pipeline
         add_debug_line(debug_messages, "Freezing job graph")
         for jobname in job_list.jobs:
             # This is the final job we are constructing
-            frozen_job = None
+            final_job = None
             log.debug("Collecting jobs %s for %s", jobname, change)
             add_debug_line(debug_messages,
                            "Freezing job {jobname}".format(
@@ -8843,22 +8249,22 @@ class Layout(object):
                                    jobname=jobname), indent=2)
                 continue
             for variant in variants:
-                if frozen_job is None:
-                    frozen_job = variant.copy()
-                    frozen_job.setBase(self, semaphore_handler)
+                if final_job is None:
+                    final_job = variant.copy()
+                    final_job.setBase(self, semaphore_handler)
                 else:
-                    frozen_job.applyVariant(variant, self, semaphore_handler)
-                    frozen_job.name = variant.name
-            frozen_job.name = jobname
+                    final_job.applyVariant(variant, self, semaphore_handler)
+                    final_job.name = variant.name
+            final_job.name = jobname
 
             # Now merge variables set from this parent ppc
             # (i.e. project+templates) directly into the job vars
-            frozen_job.updateProjectVariables(ppc.variables)
+            final_job.updateProjectVariables(ppc.variables)
 
             # If the job does not specify an ansible version default to the
             # tenant default.
-            if not frozen_job.ansible_version:
-                frozen_job.ansible_version = \
+            if not final_job.ansible_version:
+                final_job.ansible_version = \
                     self.tenant.default_ansible_version
 
             log.debug("Froze job %s for %s", jobname, change)
@@ -8867,7 +8273,7 @@ class Layout(object):
             matched = False
             for variant in job_list.jobs[jobname]:
                 if variant.changeMatchesBranch(change):
-                    frozen_job.applyVariant(variant, self, semaphore_handler)
+                    final_job.applyVariant(variant, self, semaphore_handler)
                     matched = True
                     log.debug("Pipeline variant %s matched %s",
                               repr(variant), change)
@@ -8889,11 +8295,11 @@ class Layout(object):
                 continue
             updates_job_config = False
             if not skip_file_matcher and \
-               not frozen_job.changeMatchesFiles(change):
+               not final_job.changeMatchesFiles(change):
                 matched_files = False
-                if frozen_job.match_on_config_updates:
+                if final_job.match_on_config_updates:
                     updates_job_config = item.updatesJobConfig(
-                        frozen_job, self)
+                        final_job, change, self)
             else:
                 matched_files = True
             if not matched_files:
@@ -8901,43 +8307,49 @@ class Layout(object):
                     # Log the reason we're ignoring the file matcher
                     log.debug("The configuration of job %s is "
                               "changed by %s; ignoring file matcher",
-                              repr(frozen_job), change)
+                              repr(final_job), change)
                     add_debug_line(debug_messages,
                                    "The configuration of job {jobname} is "
                                    "changed; ignoring file matcher".
                                    format(jobname=jobname), indent=2)
                 else:
                     log.debug("Job %s did not match files in %s",
-                              repr(frozen_job), change)
+                              repr(final_job), change)
                     add_debug_line(debug_messages,
                                    "Job {jobname} did not match files".
                                    format(jobname=jobname), indent=2)
                     continue
-            if frozen_job.abstract:
+            if final_job.abstract:
                 raise Exception("Job %s is abstract and may not be "
                                 "directly run" %
-                                (frozen_job.name,))
-            if (not frozen_job.ignore_allowed_projects and
-                frozen_job.allowed_projects is not None and
-                change.project.name not in frozen_job.allowed_projects):
+                                (final_job.name,))
+            if (not final_job.ignore_allowed_projects and
+                final_job.allowed_projects is not None and
+                change.project.name not in final_job.allowed_projects):
                 raise Exception("Project %s is not allowed to run job %s" %
-                                (change.project.name, frozen_job.name))
-            if ((not pipeline.post_review) and frozen_job.post_review):
+                                (change.project.name, final_job.name))
+            if ((not pipeline.post_review) and final_job.post_review):
                 raise Exception("Pre-review pipeline %s does not allow "
                                 "post-review job %s" % (
-                                    pipeline.name, frozen_job.name))
-            if not frozen_job.run:
+                                    pipeline.name, final_job.name))
+            if not final_job.run:
                 raise Exception("Job %s does not specify a run playbook" % (
-                    frozen_job.name,))
+                    final_job.name,))
 
-            job_graph.addJob(frozen_job.freezeJob(
-                context, self.tenant, self, item,
+            job_graph.addJob(final_job.freezeJob(
+                context, self.tenant, self, item, change,
                 redact_secrets_and_keys))
 
-    def createJobGraph(self, context, item, ppc, skip_file_matcher,
-                       redact_secrets_and_keys, debug_messages, old=False):
-        # NOTE(pabelanger): It is possible for a foreign project not to have a
-        # configured pipeline, if so return an empty JobGraph.
+    def createJobGraph(self, context, item,
+                       skip_file_matcher,
+                       redact_secrets_and_keys,
+                       old=False):
+        """Find or create actual matching jobs for this item's change and
+        store the resulting job tree."""
+
+        enable_debug = False
+        fail_fast = item.current_build_set.fail_fast
+        debug_messages = []
         if old:
             job_map = item.current_build_set._old_jobs
             if context is not None:
@@ -8946,12 +8358,42 @@ class Layout(object):
         else:
             job_map = item.current_build_set.jobs
         job_graph = JobGraph(job_map)
-        if ppc:
-            self._createJobGraph(context, item, ppc, job_graph,
-                                 skip_file_matcher, redact_secrets_and_keys,
-                                 debug_messages)
+        for change in item.changes:
+            ppc = self.getProjectPipelineConfig(item, change)
+            if not ppc:
+                continue
+            if ppc.debug:
+                debug_messages.extend(ppc.debug_messages)
+            self.extendJobGraph(
+                context, item, change, ppc, job_graph, skip_file_matcher,
+                redact_secrets_and_keys, debug_messages)
+            if ppc.debug:
+                # Any ppc that sets debug=True enables debugging
+                enable_debug = True
+            if ppc.fail_fast is not None:
+                # Any explicit setting of fail_fast takes effect,
+                # last one wins.
+                fail_fast = ppc.fail_fast
+
+        job_graph.deduplicateJobs(self.log)
         job_graph.freezeDependencies(self)
-        return job_graph
+
+        # Copy project metadata to job_graph since this must be independent
+        # of the layout as we need it in order to prepare the context for
+        # job execution.
+        # The layout might be no longer available at this point, as the
+        # scheduler submitting the job can be different from the one that
+        # created the layout.
+        job_graph.project_metadata = self.project_metadata
+
+        if not enable_debug:
+            debug_messages = item.current_build_set.debug_messages
+
+        return dict(
+            debug_messages=debug_messages,
+            fail_fast=fail_fast,
+            job_graph=job_graph,
+        )
 
 
 class Semaphore(ConfigObject):

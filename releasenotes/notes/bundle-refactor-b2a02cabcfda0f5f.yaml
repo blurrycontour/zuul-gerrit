@@ -1,0 +1,88 @@
+---
+prelude: >
+    Replace this text with content to appear at the top of the section for this
+    release. All of the prelude content is merged together and then rendered
+    separately from the items listed in other parts of the file, so the text
+    needs to be worded so that both the prelude and the other items make sense
+    when read independently. This may mean repeating some details. Not every
+    release note requires a prelude. Usually only notes describing major
+    features or adding release theme details should have a prelude.
+features:
+  - |
+    List new features here, or remove this section.  All of the list items in
+    this section are combined when the release notes are rendered, so the text
+    needs to be worded so that it does not depend on any information only
+    available in another section, such as the prelude. This may mean repeating
+    some details.
+issues:
+  - |
+    List known issues here, or remove this section.  All of the list items in
+    this section are combined when the release notes are rendered, so the text
+    needs to be worded so that it does not depend on any information only
+    available in another section, such as the prelude. This may mean repeating
+    some details.
+upgrade:
+  - |
+    List upgrade notes here, or remove this section.  All of the list items in
+    this section are combined when the release notes are rendered, so the text
+    needs to be worded so that it does not depend on any information only
+    available in another section, such as the prelude. This may mean repeating
+    some details.
+deprecations:
+  - |
+    The syntax of string substitution in pipeline reporter messages
+    has changed.  Since queue items may now represent more than one
+    change, the `{change}` substitution in messages is deprecated and
+    will be removed in a future version.  To maintain backwards
+    compatability, it currently refers to the arbitrary first change
+    in the list of changes for a queue item.  Please upgrade your
+    usage to use the new `{changes}` substitution which is a list.
+  - |
+    The syntax of string substitution in SMTP reporter messages
+    has changed.  Since queue items may now represent more than one
+    change, the `{change}` substitution in messages is deprecated and
+    will be removed in a future version.  To maintain backwards
+    compatability, it currently refers to the arbitrary first change
+    in the list of changes for a queue item.  Please upgrade your
+    usage to use the new `{changes}` substitution which is a list.
+  - |
+    The MQTT and Elasticsearch reporters now include a `changes` field
+    which is a list of dictionaries representing the changes included
+    in an item.  The correspending scalar fields describing what was
+    previously the only change associated with an item remain for
+    backwards compatability and refer to the arbitrary first change is
+    the list of changes for a queue item.  These scalar values will be
+    removed in a future version of Zuul.  Please upgrade yur usage to
+    use the new `changes` entries.
+  - |
+    The `zuul.bundle_id` variable is deprecated and will be removed in
+    a future version.  For backwards compatability, it currently
+    duplicates the item uuid.
+critical:
+  - |
+    Add critical notes here, or remove this section.  All of the list items in
+    this section are combined when the release notes are rendered, so the text
+    needs to be worded so that it does not depend on any information only
+    available in another section, such as the prelude. This may mean repeating
+    some details.
+security:
+  - |
+    Add security notes here, or remove this section.  All of the list items in
+    this section are combined when the release notes are rendered, so the text
+    needs to be worded so that it does not depend on any information only
+    available in another section, such as the prelude. This may mean repeating
+    some details.
+fixes:
+  - |
+    Add normal bug fixes here, or remove this section.  All of the list items
+    in this section are combined when the release notes are rendered, so the
+    text needs to be worded so that it does not depend on any information only
+    available in another section, such as the prelude. This may mean repeating
+    some details.
+other:
+  - |
+    Add other notes here, or remove this section.  All of the list items in
+    this section are combined when the release notes are rendered, so the text
+    needs to be worded so that it does not depend on any information only
+    available in another section, such as the prelude. This may mean repeating
+    some details.

@@ -1,4 +1,5 @@
 # Copyright 2019 Red Hat, Inc.
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -51,62 +52,68 @@ class GitlabReporter(BaseReporter):
 
     def report(self, item, phase1=True, phase2=True):
         """Report on an event."""
-        if not isinstance(item.change.project.source, GitlabSource):
+        for change in item.changes:
+            self._reportChange(item, change, phase1, phase2)
+        return []
+
+    def _reportChange(self, item, change, phase1=True, phase2=True):
+        """Report on an event."""
+        if not isinstance(change.project.source, GitlabSource):
             return
 
-        if item.change.project.source.connection.canonical_hostname != \
+        if change.project.source.connection.canonical_hostname != \
                 self.connection.canonical_hostname:
             return
 
-        if hasattr(item.change, 'number'):
+        if hasattr(change, 'number'):
             if phase1:
                 if self._create_comment:
-                    self.addMRComment(item)
+                    self.addMRComment(item, change)
                 if self._approval is not None:
-                    self.setApproval(item)
+                    self.setApproval(item, change)
                 if self._labels or self._unlabels:
-                    self.setLabels(item)
+                    self.setLabels(item, change)
             if phase2 and self._merge:
-                self.mergeMR(item)
-                if not item.change.is_merged:
+                self.mergeMR(item, change)
+                if not change.is_merged:
                     msg = self._formatItemReportMergeConflict(item)
-                    self.addMRComment(item, msg)
+                    self.addMRComment(item, change, msg)
 
-    def addMRComment(self, item, comment=None):
+    def addMRComment(self, item, change, comment=None):
         log = get_annotated_logger(self.log, item.event)
         message = comment or self._formatItemReport(item)
-        project = item.change.project.name
-        mr_number = item.change.number
+        project = change.project.name
+        mr_number = change.number
         log.debug('Reporting change %s, params %s, message: %s',
-                  item.change, self.config, message)
+                  change, self.config, message)
         self.connection.commentMR(project, mr_number, message,
                                   event=item.event)
 
-    def setApproval(self, item):
+    def setApproval(self, item, change):
         log = get_annotated_logger(self.log, item.event)
-        project = item.change.project.name
-        mr_number = item.change.number
-        patchset = item.change.patchset
+        project = change.project.name
+        mr_number = change.number
+        patchset = change.patchset
         log.debug('Reporting change %s, params %s, approval: %s',
-                  item.change, self.config, self._approval)
+                  change, self.config, self._approval)
         self.connection.approveMR(project, mr_number, patchset,
                                   self._approval, event=item.event)
 
-    def setLabels(self, item):
+    def setLabels(self, item, change):
         log = get_annotated_logger(self.log, item.event)
-        project = item.change.project.name
-        mr_number = item.change.number
+        project = change.project.name
+        mr_number = change.number
         log.debug('Reporting change %s, params %s, labels: %s, unlabels: %s',
-                  item.change, self.config, self._labels, self._unlabels)
+                  change, self.config, self._labels, self._unlabels)
         self.connection.updateMRLabels(project, mr_number,
                                        self._labels, self._unlabels,
                                        zuul_event_id=item.event)
 
-    def mergeMR(self, item):
-        project = item.change.project.name
-        mr_number = item.change.number
+    def mergeMR(self, item, change):
+        project = change.project.name
+        mr_number = change.number
 
-        merge_mode = item.current_build_set.getMergeMode()
+        merge_mode = item.current_build_set.getMergeMode(change)
 
         if merge_mode not in self.merge_modes:
             mode = model.get_merge_mode_name(merge_mode)
@@ -118,17 +125,17 @@ class GitlabReporter(BaseReporter):
         for i in [1, 2]:
             try:
                 self.connection.mergeMR(project, mr_number, merge_mode)
-                item.change.is_merged = True
+                change.is_merged = True
                 return
             except MergeFailure:
                 self.log.exception(
                     'Merge attempt of change %s  %s/2 failed.' %
-                    (item.change, i), exc_info=True)
+                    (change, i), exc_info=True)
                 if i == 1:
                     time.sleep(2)
         self.log.warning(
             'Merge of change %s failed after 2 attempts, giving up' %
-            item.change)
+            change)
 
     def getSubmitAllowNeeds(self):
         return []

@@ -4196,7 +4196,7 @@ class ExecutorServer(BaseMergeServer):
 
         event = BuildStartedEvent(
             build_request.uuid, build_request.build_set_uuid,
-            build_request.job_name, build_request.job_uuid,
+            build_request.job_uuid,
             build_request.path, data, build_request.event_id)
         self.result_events[build_request.tenant_name][
             build_request.pipeline_name].put(event)
@@ -4204,7 +4204,7 @@ class ExecutorServer(BaseMergeServer):
     def updateBuildStatus(self, build_request, data):
         event = BuildStatusEvent(
             build_request.uuid, build_request.build_set_uuid,
-            build_request.job_name, build_request.job_uuid,
+            build_request.job_uuid,
             build_request.path, data, build_request.event_id)
         self.result_events[build_request.tenant_name][
             build_request.pipeline_name].put(event)
@@ -4219,7 +4219,7 @@ class ExecutorServer(BaseMergeServer):
 
         event = BuildPausedEvent(
             build_request.uuid, build_request.build_set_uuid,
-            build_request.job_name, build_request.job_uuid,
+            build_request.job_uuid,
             build_request.path, data, build_request.event_id)
         self.result_events[build_request.tenant_name][
             build_request.pipeline_name].put(event)
@@ -4286,7 +4286,7 @@ class ExecutorServer(BaseMergeServer):
         updater = self.executor_api.getRequestUpdater(build_request)
         event = BuildCompletedEvent(
             build_request.uuid, build_request.build_set_uuid,
-            build_request.job_name, build_request.job_uuid,
+            build_request.job_uuid,
             build_request.path, result, build_request.event_id)
         build_request.state = BuildRequest.COMPLETED
         updated = False

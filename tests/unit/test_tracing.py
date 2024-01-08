@@ -23,7 +23,11 @@ from opentelemetry import trace
 def attributes_to_dict(attrlist):
     ret = {}
     for attr in attrlist:
-        ret[attr.key] = attr.value.string_value
+        if attr.value.string_value:
+            ret[attr.key] = attr.value.string_value
+        else:
+            ret[attr.key] = [v.string_value
+                             for v in attr.value.array_value.values]
     return ret
 
 
@@ -247,8 +251,8 @@ class TestTracing(ZuulTestCase):
                          jobexec.span_id)
 
         item_attrs = attributes_to_dict(item.attributes)
-        self.assertTrue(item_attrs['ref_number'] == "1")
-        self.assertTrue(item_attrs['ref_patchset'] == "1")
+        self.assertTrue(item_attrs['ref_number'] == ["1"])
+        self.assertTrue(item_attrs['ref_patchset'] == ["1"])
         self.assertTrue('zuul_event_id' in item_attrs)
 
     def getSpan(self, name):
