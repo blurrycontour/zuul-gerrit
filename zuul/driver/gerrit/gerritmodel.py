@@ -160,9 +160,12 @@ class GerritChange(Change):
             '%s/c/%s/+/%s' % (baseurl, self.project.name, self.number),
         ]
 
+        for rev_commit, revision in data['revisions'].items():
+            if str(revision['_number']) == self.patchset:
+                self.ref = revision['ref']
+                self.commit = rev_commit
+
         if str(current_revision['_number']) == self.patchset:
-            self.ref = current_revision['ref']
-            self.commit = data['current_revision']
             self.is_current_patchset = True
         else:
             self.is_current_patchset = False

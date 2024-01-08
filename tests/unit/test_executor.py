@@ -1165,7 +1165,7 @@ class TestExecutorFailure(ZuulTestCase):
         self.waitUntilSettled()
 
         job = items[0].current_build_set.job_graph.getJob(
-            'project-merge', items[0].change.cache_key)
+            'project-merge', items[0].changes[0].cache_key)
         build_retries = items[0].current_build_set.getRetryBuildsForJob(job)
         self.assertEqual(len(build_retries), 1)
         self.assertIsNotNone(build_retries[0].error_detail)
