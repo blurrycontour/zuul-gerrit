@@ -1,4 +1,5 @@
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -32,21 +33,35 @@ class MQTTReporter(BaseReporter):
             return
         include_returned_data = self.config.get('include-returned-data')
         log = get_annotated_logger(self.log, item.event)
-        log.debug("Report change %s, params %s", item.change, self.config)
+        log.debug("Report %s, params %s", item, self.config)
+        changes = [
+            {
+                'project': change.project.name,
+                'branch': getattr(change, 'branch', ''),
+                'change_url': change.url,
+                'change': getattr(change, 'number', ''),
+                'patchset': getattr(change, 'patchset', ''),
+                'commit_id': getattr(change, 'commit_id', ''),
+                'owner': getattr(change, 'owner', ''),
+                'ref': getattr(change, 'ref', ''),
+            }
+            for change in item.changes
+        ]
         message = {
             'timestamp': time.time(),
             'action': self._action,
             'tenant': item.pipeline.tenant.name,
             'zuul_ref': item.current_build_set.ref,
             'pipeline': item.pipeline.name,
-            'project': item.change.project.name,
-            'branch': getattr(item.change, 'branch', ''),
-            'change_url': item.change.url,
-            'change': getattr(item.change, 'number', ''),
-            'patchset': getattr(item.change, 'patchset', ''),
-            'commit_id': getattr(item.change, 'commit_id', ''),
-            'owner': getattr(item.change, 'owner', ''),
-            'ref': getattr(item.change, 'ref', ''),
+            'changes': changes,
+            'project': item.changes[0].project.name,
+            'branch': getattr(item.changes[0], 'branch', ''),
+            'change_url': item.changes[0].url,
+            'change': getattr(item.changes[0], 'number', ''),
+            'patchset': getattr(item.changes[0], 'patchset', ''),
+            'commit_id': getattr(item.changes[0], 'commit_id', ''),
+            'owner': getattr(item.changes[0], 'owner', ''),
+            'ref': getattr(item.changes[0], 'ref', ''),
             'message': self._formatItemReport(
                 item, with_jobs=False),
             'trigger_time': item.event.timestamp,
@@ -69,7 +84,19 @@ class MQTTReporter(BaseReporter):
             if build:
                 # Report build data if available
                 (result, web_url) = item.formatJobResult(job)
+                change = item.getChangeForJob(job)
+                change_info = {
+                    'project': change.project.name,
+                    'branch': getattr(change, 'branch', ''),
+                    'change_url': change.url,
+                    'change': getattr(change, 'number', ''),
+                    'patchset': getattr(change, 'patchset', ''),
+                    'commit_id': getattr(change, 'commit_id', ''),
+                    'owner': getattr(change, 'owner', ''),
+                    'ref': getattr(change, 'ref', ''),
+                }
                 job_informations.update({
+                    'change': change_info,
                     'uuid': build.uuid,
                     'start_time': build.start_time,
                     'end_time': build.end_time,
@@ -112,11 +139,12 @@ class MQTTReporter(BaseReporter):
             topic = self.config['topic'].format(
                 tenant=item.pipeline.tenant.name,
                 pipeline=item.pipeline.name,
-                project=item.change.project.name,
-                branch=getattr(item.change, 'branch', None),
-                change=getattr(item.change, 'number', None),
-                patchset=getattr(item.change, 'patchset', None),
-                ref=getattr(item.change, 'ref', None))
+                changes=changes,
+                project=item.changes[0].project.name,
+                branch=getattr(item.changes[0], 'branch', None),
+                change=getattr(item.changes[0], 'number', None),
+                patchset=getattr(item.changes[0], 'patchset', None),
+                ref=getattr(item.changes[0], 'ref', None))
         except Exception:
             log.exception("Error while formatting MQTT topic %s:",
                           self.config['topic'])

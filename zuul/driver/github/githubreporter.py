@@ -1,4 +1,5 @@
 # Copyright 2015 Puppet Labs
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -59,36 +60,47 @@ class GithubReporter(BaseReporter):
 
     def report(self, item, phase1=True, phase2=True):
         """Report on an event."""
+        log = get_annotated_logger(self.log, item.event)
+
+        ret = []
+        for change in item.changes:
+            err = self._reportChange(item, change, log, phase1, phase2)
+            if err:
+                ret.append(err)
+        return ret
+
+    def _reportChange(self, item, change, log, phase1=True, phase2=True):
+        """Report on an event."""
         # If the source is not GithubSource we cannot report anything here.
-        if not isinstance(item.change.project.source, GithubSource):
+        if not isinstance(change.project.source, GithubSource):
             return
 
         # For supporting several Github connections we also must filter by
         # the canonical hostname.
-        if item.change.project.source.connection.canonical_hostname != \
+        if change.project.source.connection.canonical_hostname != \
                 self.connection.canonical_hostname:
             return
 
         # order is important for github branch protection.
         # A status should be set before a merge attempt
         if phase1 and self._commit_status is not None:
-            if (hasattr(item.change, 'patchset') and
-                    item.change.patchset is not None):
-                self.setCommitStatus(item)
-            elif (hasattr(item.change, 'newrev') and
-                    item.change.newrev is not None):
-                self.setCommitStatus(item)
+            if (hasattr(change, 'patchset') and
+                    change.patchset is not None):
+                self.setCommitStatus(item, change)
+            elif (hasattr(change, 'newrev') and
+                    change.newrev is not None):
+                self.setCommitStatus(item, change)
         # Comments, labels, and merges can only be performed on pull requests.
         # If the change is not a pull request (e.g. a push) skip them.
-        if hasattr(item.change, 'number'):
+        if hasattr(change, 'number'):
             errors_received = False
             if phase1:
                 if self._labels or self._unlabels:
-                    self.setLabels(item)
+                    self.setLabels(item, change)
                 if self._review:
-                    self.addReview(item)
+                    self.addReview(item, change)
                 if self._check:
-                    check_errors = self.updateCheck(item)
+                    check_errors = self.updateCheck(item, change)
                     # TODO (felix): We could use this mechanism to
                     # also report back errors from label and review
                     # actions
@@ -98,12 +110,12 @@ class GithubReporter(BaseReporter):
                         )
                         errors_received = True
                 if self._create_comment or errors_received:
-                    self.addPullComment(item)
+                    self.addPullComment(item, change)
             if phase2 and self._merge:
                 try:
-                    self.mergePull(item)
+                    self.mergePull(item, change)
                 except Exception as e:
-                    self.addPullComment(item, str(e))
+                    self.addPullComment(item, change, str(e))
 
     def _formatJobResult(self, job_fields):
         # We select different emojis to represents build results:
@@ -145,24 +157,24 @@ class GithubReporter(BaseReporter):
             ret += 'Skipped %i %s\n' % (skipped, jobtext)
         return ret
 
-    def addPullComment(self, item, comment=None):
+    def addPullComment(self, item, change, comment=None):
         log = get_annotated_logger(self.log, item.event)
         message = comment or self._formatItemReport(item)
-        project = item.change.project.name
-        pr_number = item.change.number
+        project = change.project.name
+        pr_number = change.number
         log.debug('Reporting change %s, params %s, message: %s',
-                  item.change, self.config, message)
+                  change, self.config, message)
         self.connection.commentPull(project, pr_number, message,
                                     zuul_event_id=item.event)
 
-    def setCommitStatus(self, item):
+    def setCommitStatus(self, item, change):
         log = get_annotated_logger(self.log, item.event)
 
-        project = item.change.project.name
-        if hasattr(item.change, 'patchset'):
-            sha = item.change.patchset
-        elif hasattr(item.change, 'newrev'):
-            sha = item.change.newrev
+        project = change.project.name
+        if hasattr(change, 'patchset'):
+            sha = change.patchset
+        elif hasattr(change, 'newrev'):
+            sha = change.newrev
         state = self._commit_status
 
         url = item.formatStatusUrl()
@@ -180,27 +192,27 @@ class GithubReporter(BaseReporter):
         log.debug(
             'Reporting change %s, params %s, '
             'context: %s, state: %s, description: %s, url: %s',
-            item.change, self.config, self.context, state, description, url)
+            change, self.config, self.context, state, description, url)
 
         self.connection.setCommitStatus(
             project, sha, state, url, description, self.context,
             zuul_event_id=item.event)
 
-    def mergePull(self, item):
+    def mergePull(self, item, change):
         log = get_annotated_logger(self.log, item.event)
-        merge_mode = item.current_build_set.getMergeMode()
+        merge_mode = item.current_build_set.getMergeMode(change)
 
         if merge_mode not in self.merge_modes:
             mode = model.get_merge_mode_name(merge_mode)
             self.log.warning('Merge mode %s not supported by Github', mode)
             raise MergeFailure('Merge mode %s not supported by Github' % mode)
 
-        project = item.change.project.name
-        pr_number = item.change.number
-        sha = item.change.patchset
+        project = change.project.name
+        pr_number = change.number
+        sha = change.patchset
         log.debug('Reporting change %s, params %s, merging via API',
-                  item.change, self.config)
-        message = self._formatMergeMessage(item.change, merge_mode)
+                  change, self.config)
+        message = self._formatMergeMessage(change, merge_mode)
         merge_mode = self.merge_modes[merge_mode]
 
         for i in [1, 2]:
@@ -208,26 +220,26 @@ class GithubReporter(BaseReporter):
                 self.connection.mergePull(project, pr_number, message, sha=sha,
                                           method=merge_mode,
                                           zuul_event_id=item.event)
-                self.connection.updateChangeAttributes(item.change,
+                self.connection.updateChangeAttributes(change,
                                                        is_merged=True)
                 return
             except MergeFailure as e:
                 log.exception('Merge attempt of change %s  %s/2 failed.',
-                              item.change, i, exc_info=True)
+                              change, i, exc_info=True)
                 error_message = str(e)
                 if i == 1:
                     time.sleep(2)
         log.warning('Merge of change %s failed after 2 attempts, giving up',
-                    item.change)
+                    change)
         raise MergeFailure(error_message)
 
-    def addReview(self, item):
+    def addReview(self, item, change):
         log = get_annotated_logger(self.log, item.event)
-        project = item.change.project.name
-        pr_number = item.change.number
-        sha = item.change.patchset
+        project = change.project.name
+        pr_number = change.number
+        sha = change.patchset
         log.debug('Reporting change %s, params %s, review:\n%s',
-                  item.change, self.config, self._review)
+                  change, self.config, self._review)
         self.connection.reviewPull(
             project,
             pr_number,
@@ -239,12 +251,12 @@ class GithubReporter(BaseReporter):
             self.connection.unlabelPull(project, pr_number, label,
                                         zuul_event_id=item.event)
 
-    def updateCheck(self, item):
+    def updateCheck(self, item, change):
         log = get_annotated_logger(self.log, item.event)
         message = self._formatItemReport(item)
-        project = item.change.project.name
-        pr_number = item.change.number
-        sha = item.change.patchset
+        project = change.project.name
+        pr_number = change.number
+        sha = change.patchset
 
         status = self._check
         # We declare a item as completed if it either has a result
@@ -260,13 +272,13 @@ class GithubReporter(BaseReporter):
 
         log.debug(
             "Updating check for change %s, params %s, context %s, message: %s",
-            item.change, self.config, self.context, message
+            change, self.config, self.context, message
         )
 
         details_url = item.formatStatusUrl()
 
         # Check for inline comments that can be reported via checks API
-        file_comments = self.getFileComments(item)
+        file_comments = self.getFileComments(item, change)
 
         # Github allows an external id to be added to a check run. We can use
         # this to identify the check run in any custom actions we define.
@@ -279,11 +291,13 @@ class GithubReporter(BaseReporter):
             {
                 "tenant": item.pipeline.tenant.name,
                 "pipeline": item.pipeline.name,
-                "change": item.change.number,
+                "change": change.number,
             }
         )
 
         state = item.dynamic_state[self.connection.connection_name]
+        check_run_ids = state.setdefault('check_run_ids', {})
+        check_run_id = check_run_ids.get(change.cache_key)
         check_run_id, errors = self.connection.updateCheck(
             project,
             pr_number,
@@ -296,27 +310,27 @@ class GithubReporter(BaseReporter):
             file_comments,
             external_id,
             zuul_event_id=item.event,
-            check_run_id=state.get('check_run_id')
+            check_run_id=check_run_id,
         )
 
         if check_run_id:
-            state['check_run_id'] = check_run_id
+            check_run_ids[change.cache_key] = check_run_id
 
         return errors
 
-    def setLabels(self, item):
+    def setLabels(self, item, change):
         log = get_annotated_logger(self.log, item.event)
-        project = item.change.project.name
-        pr_number = item.change.number
+        project = change.project.name
+        pr_number = change.number
         if self._labels:
             log.debug('Reporting change %s, params %s, labels:\n%s',
-                      item.change, self.config, self._labels)
+                      change, self.config, self._labels)
         for label in self._labels:
             self.connection.labelPull(project, pr_number, label,
                                       zuul_event_id=item.event)
         if self._unlabels:
             log.debug('Reporting change %s, params %s, unlabels:\n%s',
-                      item.change, self.config, self._unlabels)
+                      change, self.config, self._unlabels)
         for label in self._unlabels:
             self.connection.unlabelPull(project, pr_number, label,
                                         zuul_event_id=item.event)
