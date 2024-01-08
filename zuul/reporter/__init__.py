@@ -1,4 +1,5 @@
 # Copyright 2014 Rackspace Australia
+# Copyright 2021-2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -60,13 +61,14 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
     def postConfig(self):
         """Run tasks after configuration is reloaded"""
 
-    def addConfigurationErrorComments(self, item, comments):
+    def addConfigurationErrorComments(self, item, change, comments):
         """Add file comments for configuration errors.
 
         Updates the comments dictionary with additional file comments
-        for any relevant configuration errors for this item's change.
+        for any relevant configuration errors for the specified change.
 
         :arg QueueItem item: The queue item
+        :arg Ref change: One of the item's changes to check
         :arg dict comments: a file comments dictionary
 
         """
@@ -77,13 +79,13 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             if not (context and mark and err.short_error):
                 continue
             if context.project_canonical_name != \
-                    item.change.project.canonical_name:
+                    change.project.canonical_name:
                 continue
-            if not hasattr(item.change, 'branch'):
+            if not hasattr(change, 'branch'):
                 continue
-            if context.branch != item.change.branch:
+            if context.branch != change.branch:
                 continue
-            if context.path not in item.change.files:
+            if context.path not in change.files:
                 continue
             existing_comments = comments.setdefault(context.path, [])
             existing_comments.append(dict(line=mark.end_line,
@@ -94,36 +96,40 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
                                               end_line=mark.end_line,
                                               end_character=mark.end_column)))
 
-    def _getFileComments(self, item):
+    def _getFileComments(self, item, change):
         """Get the file comments from the zuul_return value"""
         ret = {}
         for build in item.current_build_set.getBuilds():
             fc = build.result_data.get("zuul", {}).get("file_comments")
             if not fc:
                 continue
+            # Only consider comments for this change
+            if change.cache_key not in build.job.all_refs:
+                continue
             for fn, comments in fc.items():
                 existing_comments = ret.setdefault(fn, [])
                 existing_comments.extend(comments)
-        self.addConfigurationErrorComments(item, ret)
+        self.addConfigurationErrorComments(item, change, ret)
         return ret
 
-    def getFileComments(self, item):
-        comments = self._getFileComments(item)
-        self.filterComments(item, comments)
+    def getFileComments(self, item, change):
+        comments = self._getFileComments(item, change)
+        self.filterComments(item, change, comments)
         return comments
 
-    def filterComments(self, item, comments):
+    def filterComments(self, item, change, comments):
         """Filter comments for files in change
 
         Remove any comments for files which do not appear in the
-        item's change.  Leave warning messages if this happens.
+        specified change.  Leave warning messages if this happens.
 
         :arg QueueItem item: The queue item
+        :arg Change change: The change
         :arg dict comments: a file comments dictionary (modified in place)
         """
 
         for fn in list(comments.keys()):
-            if fn not in item.change.files:
+            if fn not in change.files:
                 del comments[fn]
                 item.warning("Comments left for invalid file %s" % (fn,))
 
@@ -172,7 +178,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
         return item.pipeline.enqueue_message.format(
             pipeline=item.pipeline.getSafeAttributes(),
-            change=item.change.getSafeAttributes(),
+            change=item.changes[0].getSafeAttributes(),
+            changes=[c.getSafeAttributes() for c in item.changes],
             status_url=status_url)
 
     def _formatItemReportStart(self, item, with_jobs=True):
@@ -182,7 +189,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
         return item.pipeline.start_message.format(
             pipeline=item.pipeline.getSafeAttributes(),
-            change=item.change.getSafeAttributes(),
+            change=item.changes[0].getSafeAttributes(),
+            changes=[c.getSafeAttributes() for c in item.changes],
             status_url=status_url)
 
     def _formatItemReportSuccess(self, item, with_jobs=True):
@@ -195,23 +203,23 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         return msg
 
     def _formatItemReportFailure(self, item, with_jobs=True):
-        if item.cannotMergeBundle():
-            msg = 'This change is part of a bundle that can not merge.\n'
-            if isinstance(item.bundle.cannot_merge, str):
-                msg += '\n' + item.bundle.cannot_merge + '\n'
-        elif item.dequeued_needing_change:
-            msg = 'This change depends on a change that failed to merge.\n'
+        if len(item.changes) > 1:
+            change_text = 'These changes'
+        else:
+            change_text = 'This change'
+        if item.dequeued_needing_change:
+            msg = f'{change_text} depends on a change that failed to merge.\n'
             if isinstance(item.dequeued_needing_change, str):
                 msg += '\n' + item.dequeued_needing_change + '\n'
         elif item.dequeued_missing_requirements:
-            msg = ('This change is unable to merge '
+            msg = (f'{change_text} is unable to merge '
                    'due to a missing merge requirement.\n')
-        elif item.isBundleFailing():
-            msg = 'This change is part of a bundle that failed.\n'
+        elif len(item.changes) > 1:
+            msg = f'{change_text} is part of a dependency cycle that failed.\n'
             if with_jobs:
                 msg = '{}\n\n{}'.format(msg, self._formatItemReportJobs(item))
             msg = "{}\n\n{}".format(
-                msg, self._formatItemReportOtherBundleItems(item))
+                msg, self._formatItemReportOtherChanges(item))
         elif item.didMergerFail():
             msg = item.pipeline.merge_conflict_message
         elif item.current_build_set.has_blocking_errors:
@@ -247,7 +255,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
         return item.pipeline.no_jobs_message.format(
             pipeline=item.pipeline.getSafeAttributes(),
-            change=item.change.getSafeAttributes(),
+            change=item.changes[0].getSafeAttributes(),
+            changes=[c.getSafeAttributes() for c in item.changes],
             status_url=status_url)
 
     def _formatItemReportDisabled(self, item, with_jobs=True):
@@ -264,13 +273,9 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             msg += '\n\n' + self._formatItemReportJobs(item)
         return msg
 
-    def _formatItemReportOtherBundleItems(self, item):
-        related_changes = item.pipeline.manager.resolveChangeReferences(
-            item.change.getNeedsChanges(
-                item.pipeline.manager.useDependenciesByTopic(
-                    item.change.project)))
+    def _formatItemReportOtherChanges(self, item):
         return "Related changes:\n{}\n".format("\n".join(
-            f'  - {c.url}' for c in related_changes if c is not item.change))
+            f'  - {c.url}' for c in item.changes))
 
     def _getItemReportJobsFields(self, item):
         # Extract the report elements from an item

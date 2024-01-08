@@ -1,4 +1,5 @@
 # Copyright 2013 Rackspace Australia
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -43,44 +44,44 @@ class GerritReporter(BaseReporter):
         """Send a message to gerrit."""
         log = get_annotated_logger(self.log, item.event)
 
+        ret = []
+        for change in item.changes:
+            err = self._reportChange(item, change, log, phase1, phase2)
+            if err:
+                ret.append(err)
+        return ret
+
+    def _reportChange(self, item, change, log, phase1=True, phase2=True):
+        """Send a message to gerrit."""
         # If the source is no GerritSource we cannot report anything here.
-        if not isinstance(item.change.project.source, GerritSource):
+        if not isinstance(change.project.source, GerritSource):
             return
 
         # We can only report changes, not plain branches
-        if not isinstance(item.change, Change):
+        if not isinstance(change, Change):
             return
 
         # For supporting several Gerrit connections we also must filter by
         # the canonical hostname.
-        if item.change.project.source.connection.canonical_hostname != \
+        if change.project.source.connection.canonical_hostname != \
                 self.connection.canonical_hostname:
-            log.debug("Not reporting %s as this Gerrit reporter "
-                      "is for %s and the change is from %s",
-                      item, self.connection.canonical_hostname,
-                      item.change.project.source.connection.canonical_hostname)
             return
 
-        comments = self.getFileComments(item)
+        comments = self.getFileComments(item, change)
         if self._create_comment:
             message = self._formatItemReport(item)
         else:
             message = ''
 
         log.debug("Report change %s, params %s, message: %s, comments: %s",
-                  item.change, self.config, message, comments)
-        if phase2 and self._submit and not hasattr(item.change, '_ref_sha'):
+                  change, self.config, message, comments)
+        if phase2 and self._submit and not hasattr(change, '_ref_sha'):
             # If we're starting to submit a bundle, save the current
             # ref sha for every item in the bundle.
-            changes = set([item.change])
-            if item.bundle:
-                for i in item.bundle.items:
-                    changes.add(i.change)
-
             # Store a dict of project,branch -> sha so that if we have
             # duplicate project/branches, we only query once.
             ref_shas = {}
-            for other_change in changes:
+            for other_change in item.changes:
                 if not isinstance(other_change, GerritChange):
                     continue
                 key = (other_change.project, other_change.branch)
@@ -92,9 +93,10 @@ class GerritReporter(BaseReporter):
                     ref_shas[key] = ref_sha
                 other_change._ref_sha = ref_sha
 
-        return self.connection.review(item, message, self._submit,
-                                      self._labels, self._checks_api,
-                                      comments, phase1, phase2,
+        return self.connection.review(item, change, message,
+                                      self._submit, self._labels,
+                                      self._checks_api, comments,
+                                      phase1, phase2,
                                       zuul_event_id=item.event)
 
     def getSubmitAllowNeeds(self):
