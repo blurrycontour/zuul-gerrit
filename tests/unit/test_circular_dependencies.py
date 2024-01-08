@@ -1,5 +1,5 @@
 # Copyright 2019 BMW Group
-# Copyright 2023 Acme Gating, LLC
+# Copyright 2023-2024 Acme Gating, LLC
 #
 # This module is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -207,15 +207,15 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertHistory([
             # Change A (check + gate)
-            dict(name="project1-job", result="SUCCESS", changes="3,1 1,1 2,1"),
+            dict(name="project1-job", result="SUCCESS", changes="3,1 2,1 1,1"),
             dict(name="project-vars-job", result="SUCCESS",
-                 changes="3,1 1,1 2,1"),
-            dict(name="project1-job", result="SUCCESS", changes="3,1 1,1 2,1"),
+                 changes="3,1 2,1 1,1"),
+            dict(name="project1-job", result="SUCCESS", changes="3,1 2,1 1,1"),
             dict(name="project-vars-job", result="SUCCESS",
-                 changes="3,1 1,1 2,1"),
+                 changes="3,1 2,1 1,1"),
             # Change B (check + gate)
             dict(name="project-job", result="SUCCESS", changes="3,1 2,1 1,1"),
-            dict(name="project-job", result="SUCCESS", changes="3,1 1,1 2,1"),
+            dict(name="project-job", result="SUCCESS", changes="3,1 2,1 1,1"),
             # Change C (check + gate)
             dict(name="project2-job", result="SUCCESS", changes="3,1"),
             dict(name="project2-job", result="SUCCESS", changes="3,1"),
@@ -412,7 +412,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
         queue_change_numbers = []
         for queue in tenant.layout.pipelines["gate"].queues:
             for item in queue.queue:
-                queue_change_numbers.append(item.change.number)
+                for change in item.changes:
+                    queue_change_numbers.append(change.number)
         self.assertEqual(queue_change_numbers, ['2', '3', '1'])
 
         self.executor_server.hold_jobs_in_build = False
@@ -539,8 +540,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertEqual(A.reported, 3)
         self.assertEqual(B.reported, 3)
-        self.assertIn("bundle", A.messages[-1])
-        self.assertIn("bundle", B.messages[-1])
+        self.assertIn("cycle that failed", A.messages[-1])
+        self.assertIn("cycle that failed", B.messages[-1])
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "NEW")
 
@@ -578,8 +579,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 2)
-        self.assertIn("bundle", A.messages[-1])
-        self.assertIn("bundle", B.messages[-1])
+        self.assertIn("cycle that failed", A.messages[-1])
+        self.assertIn("cycle that failed", B.messages[-1])
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "NEW")
 
@@ -684,13 +685,13 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertFalse(re.search('Change .*? can not be merged',
                          A.messages[-1]))
 
-        self.assertIn("bundle that failed.", B.messages[-1])
+        self.assertIn("cycle that failed.", B.messages[-1])
         self.assertFalse(re.search('Change http://localhost:.*? is needed',
                          B.messages[-1]))
         self.assertFalse(re.search('Change .*? can not be merged',
                          B.messages[-1]))
 
-        self.assertIn("bundle that failed.", C.messages[-1])
+        self.assertIn("cycle that failed.", C.messages[-1])
         self.assertFalse(re.search('Change http://localhost:.*? is needed',
                          C.messages[-1]))
         self.assertFalse(re.search('Change .*? can not be merged',
@@ -826,8 +827,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
-        self.assertEqual(A.reported, 3)
-        self.assertEqual(B.reported, 3)
+        # Start, Dequeue (cycle abandoned), Start, Success
+        self.assertEqual(A.reported, 4)
+        self.assertEqual(B.reported, 4)
         self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "MERGED")
 
@@ -865,16 +867,15 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.reported, 3)
         self.assertEqual(A.patchsets[-1]["approvals"][-1]["value"], "-2")
         self.assertEqual(B.patchsets[-1]["approvals"][-1]["value"], "-2")
-        self.assertIn("bundle", A.messages[-1])
-        self.assertIn("bundle", B.messages[-1])
-        self.assertEqual(A.data["status"], "NEW")
+        self.assertIn("cycle that failed", A.messages[-1])
+        self.assertIn("cycle that failed", B.messages[-1])
+        self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "NEW")
 
-        buildsets = {bs.refs[0].change: bs for bs in
-                     self.scheds.first.connections.connections[
-                         'database'].getBuildsets()}
-        self.assertEqual(buildsets[2].result, 'MERGE_FAILURE')
-        self.assertEqual(buildsets[1].result, 'FAILURE')
+        buildsets = self.scheds.first.connections.connections[
+            'database'].getBuildsets()
+        self.assertEqual(len(buildsets), 1)
+        self.assertEqual(buildsets[0].result, 'MERGE_FAILURE')
 
     def test_cycle_reporting_partial_failure(self):
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
@@ -898,8 +899,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertEqual(A.reported, 3)
         self.assertEqual(B.reported, 3)
-        self.assertIn("bundle", A.messages[-1])
-        self.assertIn("bundle", B.messages[-1])
+        self.assertIn("cycle that failed", A.messages[-1])
+        self.assertIn("cycle that failed", B.messages[-1])
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "MERGED")
 
@@ -946,7 +947,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data["status"], "MERGED")
         self.assertEqual(C.data["status"], "NEW")
 
-    def test_independent_bundle_items(self):
+    def test_independent_cycle_items(self):
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
         B = self.fake_gerrit.addFakeChange("org/project", "master", "B")
@@ -964,11 +965,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.waitUntilSettled()
 
         tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
-        for queue in tenant.layout.pipelines["check"].queues:
-            for item in queue.queue:
-                self.assertIn(item, item.bundle.items)
-                self.assertEqual(len(item.bundle.items), 2)
+        self.assertEqual(len(tenant.layout.pipelines["check"].queues), 1)
+        queue = tenant.layout.pipelines["check"].queues[0].queue
+        self.assertEqual(len(queue), 1)
 
+        self.assertEqual(len(self.builds), 2)
         for build in self.builds:
             self.assertTrue(build.hasChanges(A, B))
 
@@ -1058,6 +1059,30 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "MERGED")
 
+    def test_cycle_git_dependency2(self):
+        # Reverse the enqueue order to make sure both cases are
+        # tested.
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        B = self.fake_gerrit.addFakeChange("org/project", "master", "B")
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        A.addApproval("Approved", 1)
+
+        # A -> B (via commit-depends)
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        # B -> A (via parent-child dependency)
+        B.setDependsOn(A, 1)
+
+        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 2)
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "MERGED")
+
     def test_cycle_git_dependency_failure(self):
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
         B = self.fake_gerrit.addFakeChange("org/project", "master", "B")
@@ -1107,7 +1132,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
         self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
-        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "-1")
+        self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "-1")
 
     def test_cycle_merge_conflict(self):
         self.hold_merge_jobs_in_queue = True
@@ -1142,7 +1170,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.merger_api.release()
         self.waitUntilSettled()
 
-        self.assertEqual(A.reported, 0)
+        self.assertEqual(A.reported, 1)
         self.assertEqual(B.reported, 1)
         self.assertEqual(A.data["status"], "NEW")
         self.assertEqual(B.data["status"], "NEW")
@@ -1183,10 +1211,6 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
         self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
         self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
-
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
         self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
         self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
         self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
@@ -1245,7 +1269,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.waitUntilSettled()
 
         vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
-        self.assertEqual(len(vars_builds), 1)
+        self.assertEqual(len(vars_builds), 3)
         self.assertEqual(vars_builds[0].job.variables["test_var"], "pass")
 
         self.executor_server.release()
@@ -1255,29 +1279,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
         self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
 
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
-        self.assertEqual(len(vars_builds), 1)
-        self.assertEqual(vars_builds[0].job.variables["test_var"], "pass")
-
-        self.executor_server.release()
-        self.waitUntilSettled()
-
         self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
         self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
         self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
-
-        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        vars_builds = [b for b in self.builds if b.name == "project-vars-job"]
-        self.assertEqual(len(vars_builds), 1)
-        self.assertEqual(vars_builds[0].job.variables["test_var"], "pass")
-
-        self.executor_server.release()
-        self.waitUntilSettled()
 
         self.assertEqual(len(C.patchsets[-1]["approvals"]), 1)
         self.assertEqual(C.patchsets[-1]["approvals"][0]["type"], "Verified")
@@ -1309,7 +1313,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(C.data["status"], "MERGED")
 
     def test_circular_config_change_single_merge_job(self):
-        """Regression tests to make sure that a bundle with non-live
+        """Regression tests to make sure that a cycle with non-live
         config changes only spawns one merge job (so that we avoid
         problems with multiple jobs arriving in the wrong order)."""
 
@@ -1347,7 +1351,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
-        # Assert that there is a single merge job for the bundle.
+        # Assert that there is a single merge job for the cycle.
         self.assertEqual(len(self.merger_api.queued()), 1)
 
         self.hold_merge_jobs_in_queue = False
@@ -1373,7 +1377,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.executor_server.hold_jobs_in_build = True
 
-        # bundle_id should be in check build of A
+        # bundle_id should be in check build of A,B
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         var_zuul_items = self.builds[0].parameters["zuul"]["items"]
@@ -1388,19 +1392,6 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
         self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
         self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "1")
-
-        # bundle_id should be in check build of B
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-        var_zuul_items = self.builds[0].parameters["zuul"]["items"]
-        self.assertEqual(len(var_zuul_items), 2)
-        self.assertIn("bundle_id", var_zuul_items[0])
-        bundle_id_0 = var_zuul_items[0]["bundle_id"]
-        self.assertIn("bundle_id", var_zuul_items[1])
-        bundle_id_1 = var_zuul_items[1]["bundle_id"]
-        self.assertEqual(bundle_id_0, bundle_id_1)
-        self.executor_server.release()
-        self.waitUntilSettled()
         self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
         self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
         self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "1")
@@ -1464,7 +1455,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
                         - project-vars-job
                 """)
         }
-        # Change zuul config so the bundle is considered updating config
+        # Change zuul config so the cycle is considered updating config
         A = self.fake_gerrit.addFakeChange("org/project2", "master", "A",
                                            files=org_project_files)
         B = self.fake_gerrit.addFakeChange("org/project1", "master", "B")
@@ -1532,9 +1523,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
         self.waitUntilSettled()
 
-        self.assertEqual(A.reported, 3)
-        self.assertEqual(B.reported, 3)
-        self.assertEqual(C.reported, 6)
+        # Two failures, and one success (start and end)
+        self.assertEqual(A.reported, 4)
+        self.assertEqual(B.reported, 4)
+        self.assertEqual(C.reported, 4)
         self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "MERGED")
         self.assertEqual(C.data["status"], "MERGED")
@@ -1829,40 +1821,17 @@ class TestGerritCircularDependencies(ZuulTestCase):
         ], ordered=False)
 
     @simple_layout('layouts/job-dedup-child-of-diff-parent.yaml')
-    def test_job_deduplication_child_of_diff_parent(self):
-        # This will never happen in practice, but it's theoretically
-        # possible, so we have a test to codify and exercise the
-        # behavior.
-
-        # The common job is forced to not deduplicate, but since there
-        # is no return data, the inputs to child-job are identical, so
-        # child-job is deduplicated.  In practice, there will always
-        # be different return data so this is unlikely to happen.
-
-        # The child job uses auto deduplication.
-        self._test_job_deduplication()
-        self.assertHistory([
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/02/2/1'),
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/01/1/1'),
-            dict(name="child-job", result="SUCCESS", changes="2,1 1,1"),
-        ], ordered=False)
-
-    @simple_layout('layouts/job-dedup-child-of-diff-parent.yaml')
     def test_job_deduplication_child_of_diff_parent_diff_data(self):
-        # This is the more realistic test of the above, where we
-        # return different data from the non-deduplicated parent job,
-        # which should still causes the child job to be deduplicated.
-
-        # The child job uses auto deduplication.
+        # The common job is forced to not deduplicate, and the child
+        # job is deduplicated.  The child job treats each of the
+        # common jobs as a parent.
         self.executor_server.returnData(
             'common-job', 'refs/changes/02/2/1',
             {'foo': 'a'}
         )
         self.executor_server.returnData(
             'common-job', 'refs/changes/01/1/1',
-            {'foo': 'b'}
+            {'bar': 'b'}
         )
         self._test_job_deduplication()
         self.assertHistory([
@@ -1873,6 +1842,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/02/2/1'),
         ], ordered=False)
+        job = self.getJobFromHistory('child-job')
+        self.assertEqual({'foo': 'a', 'bar': 'b'},
+                         job.parameters['parent_data'])
 
     @simple_layout('layouts/job-dedup-paused-parent.yaml')
     def test_job_deduplication_paused_parent(self):
@@ -1953,8 +1925,13 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.waitUntilSettled()
 
         # Fail the node request and unpause
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        pipeline = tenant.layout.pipelines['gate']
+        items = pipeline.getAllItems()
+        job = items[0].current_build_set.job_graph.getJob(
+            'common-job', items[0].changes[0].cache_key)
         for req in self.fake_nodepool.getNodeRequests():
-            if req['requestor_data']['job_name'] == 'common-job':
+            if req['requestor_data']['job_uuid'] == job.uuid:
                 self.fake_nodepool.addFailRequest(req)
 
         self.fake_nodepool.unpause()
@@ -1962,7 +1939,15 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(B.data['status'], 'NEW')
-        self.assertHistory([])
+        # This would previously fail both items in the bundle as soon
+        # as the bundle as a whole started failing.  The new/current
+        # behavior is more like non-bundle items, in that the item
+        # will continue running jobs even after one job fails.
+        # common-job does not appear in history due to the node failure
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 3)
 
     @simple_layout('layouts/job-dedup-auto-shared.yaml')
@@ -2046,14 +2031,6 @@ class TestGerritCircularDependencies(ZuulTestCase):
             raise Exception("Unable to find build")
         build.should_retry = True
 
-        # Store a reference to the queue items so we can inspect their
-        # internal attributes later to double check the retry build
-        # count is correct.
-        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
-        pipeline = tenant.layout.pipelines['gate']
-        items = pipeline.getAllItems()
-        self.assertEqual(len(items), 2)
-
         self.executor_server.release('project1-job')
         self.executor_server.release('project2-job')
         self.waitUntilSettled()
@@ -2071,10 +2048,6 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 5)
-        self.assertEqual(items[0].change.project.name, 'org/project2')
-        self.assertEqual(len(items[0].current_build_set.retry_builds), 0)
-        self.assertEqual(items[1].change.project.name, 'org/project1')
-        self.assertEqual(len(items[1].current_build_set.retry_builds), 1)
 
     @simple_layout('layouts/job-dedup-auto-shared.yaml')
     def test_job_deduplication_multi_scheduler(self):
@@ -2258,9 +2231,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # It's tricky to get info about a noop build, but the jobs in
         # the report have the build UUID, so we make sure it's
         # different.
-        a_noop = [l for l in A.messages[-1].split('\n') if 'noop' in l][0]
-        b_noop = [l for l in B.messages[-1].split('\n') if 'noop' in l][0]
-        self.assertNotEqual(a_noop, b_noop)
+        a_noop = [l for l in A.messages[-1].split('\n') if 'noop' in l]
+        b_noop = [l for l in B.messages[-1].split('\n') if 'noop' in l]
+        self.assertEqual(a_noop, b_noop)
+        self.assertNotEqual(a_noop[0], a_noop[1])
 
     @simple_layout('layouts/job-dedup-retry.yaml')
     def test_job_deduplication_retry(self):
@@ -2516,7 +2490,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is deduplicated
             # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
@@ -2529,9 +2503,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/01/1/1'),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is not deduplicated
-            dict(name="common-job", result="SUCCESS", changes="1,1 2,1",
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/02/2/1'),
         ], ordered=False)
         self._assert_job_deduplication_check()
@@ -2542,7 +2516,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is deduplicated
             # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
@@ -2553,9 +2527,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self._test_job_deduplication_check()
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="common-job", result="SUCCESS", changes="1,1 2,1",
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/02/2/1'),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is not deduplicated, though it would be under auto
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/01/1/1'),
@@ -2570,7 +2544,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is deduplicated
             # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
@@ -2601,7 +2575,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="child2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is deduplicated
             # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
@@ -2634,7 +2608,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="child2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is deduplicated
             # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
@@ -2650,61 +2624,40 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="child1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="child2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="child2-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is deduplicated
             # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
         self._assert_job_deduplication_check()
 
     @simple_layout('layouts/job-dedup-child-of-diff-parent.yaml')
-    def test_job_deduplication_check_child_of_diff_parent(self):
-        # This will never happen in practice, but it's theoretically
-        # possible, so we have a test to codify and exercise the
-        # behavior.
-
-        # The common job is forced to not deduplicate, but since there
-        # is no return data, the inputs to child-job are identical, so
-        # child-job is deduplicated.  In practice, there will always
-        # be different return data so this is unlikely to happen.
-
-        # The child job uses auto deduplication.
-        self._test_job_deduplication_check()
-        self.assertHistory([
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/01/1/1'),
-            dict(name="common-job", result="SUCCESS", changes="1,1 2,1",
-                 ref='refs/changes/02/2/1'),
-            dict(name="child-job", result="SUCCESS", changes="2,1 1,1"),
-        ], ordered=False)
-        self._assert_job_deduplication_check()
-
-    @simple_layout('layouts/job-dedup-child-of-diff-parent.yaml')
     def test_job_deduplication_check_child_of_diff_parent_diff_data(self):
-        # This is the more realistic test of the above, where we
-        # return different data from the non-deduplicated parent job,
-        # which should still cause the child job to be deduplicated.
-
-        # The child job uses auto deduplication.
+        # The common job is forced to not deduplicate, and the child
+        # job is deduplicated.  The child job treats each of the
+        # common jobs as a parent.
         self.executor_server.returnData(
             'common-job', 'refs/changes/02/2/1',
             {'foo': 'a'}
         )
         self.executor_server.returnData(
             'common-job', 'refs/changes/01/1/1',
-            {'foo': 'b'}
+            {'bar': 'b'}
         )
         self._test_job_deduplication_check()
         self.assertHistory([
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/01/1/1'),
-            dict(name="common-job", result="SUCCESS", changes="1,1 2,1",
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/02/2/1'),
             dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/01/1/1'),
+                 ref='refs/changes/02/2/1'),
         ], ordered=False)
         self._assert_job_deduplication_check()
+        job = self.getJobFromHistory('child-job')
+        self.assertEqual({'foo': 'a', 'bar': 'b'},
+                         job.parameters['parent_data'])
 
     @simple_layout('layouts/job-dedup-paused-parent.yaml')
     def test_job_deduplication_check_paused_parent(self):
@@ -2752,10 +2705,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.waitUntilSettled()
 
         self.assertHistory([
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/01/1/1'),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
         self._assert_job_deduplication_check()
 
@@ -2781,8 +2733,13 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.waitUntilSettled()
 
         # Fail the node request and unpause
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        pipeline = tenant.layout.pipelines['check']
+        items = pipeline.getAllItems()
+        job = items[0].current_build_set.job_graph.getJob(
+            'common-job', items[0].changes[0].cache_key)
         for req in self.fake_nodepool.getNodeRequests():
-            if req['requestor_data']['job_name'] == 'common-job':
+            if req['requestor_data']['job_uuid'] == job.uuid:
                 self.fake_nodepool.addFailRequest(req)
 
         self.fake_nodepool.unpause()
@@ -2792,7 +2749,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data['status'], 'NEW')
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 3)
 
@@ -2834,7 +2791,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="common-job", result="FAILURE", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is deduplicated
             # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
@@ -2843,9 +2800,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
     @simple_layout('layouts/job-dedup-false.yaml')
     def test_job_deduplication_check_false_failed_job(self):
         # Test that if we are *not* deduplicating jobs, we don't
-        # duplicate the result on two different builds.
-        # The way we check that is to retry the common-job between two
-        # items, but only once, and only on one item.  The other item
+        # duplicate the result on two different builds.  The way we
+        # check that is to retry the common-job between two changes,
+        # but only once, and only on one change.  The other change
         # should be unaffected.
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
@@ -2871,14 +2828,6 @@ class TestGerritCircularDependencies(ZuulTestCase):
             raise Exception("Unable to find build")
         build.should_retry = True
 
-        # Store a reference to the queue items so we can inspect their
-        # internal attributes later to double check the retry build
-        # count is correct.
-        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
-        pipeline = tenant.layout.pipelines['check']
-        items = pipeline.getAllItems()
-        self.assertEqual(len(items), 4)
-
         self.executor_server.release('project1-job')
         self.executor_server.release('project2-job')
         self.waitUntilSettled()
@@ -2889,21 +2838,16 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(B.data['status'], 'NEW')
         self.assertHistory([
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="common-job", result=None, changes="2,1 1,1"),
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="common-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="common-job", result=None, changes="2,1 1,1",
+                 ref='refs/changes/01/1/1'),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/01/1/1'),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
+                 ref='refs/changes/02/2/1'),
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 5)
-        self.assertEqual(items[0].change.project.name, 'org/project2')
-        self.assertEqual(len(items[0].current_build_set.retry_builds), 0)
-        self.assertEqual(items[1].change.project.name, 'org/project1')
-        self.assertEqual(len(items[1].current_build_set.retry_builds), 1)
-        self.assertEqual(items[2].change.project.name, 'org/project1')
-        self.assertEqual(len(items[2].current_build_set.retry_builds), 0)
-        self.assertEqual(items[3].change.project.name, 'org/project2')
-        self.assertEqual(len(items[3].current_build_set.retry_builds), 0)
 
     @simple_layout('layouts/job-dedup-auto-shared.yaml')
     def test_job_deduplication_check_multi_scheduler(self):
@@ -2985,14 +2929,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
             self.executor_server.release()
             self.waitUntilSettled(matcher=[app])
 
-        # We expect common-job to be "un-deduplicated" due to the
-        # "Attempt to start build with deduplicated node request ID" error.
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
-            dict(name="common-job", result="SUCCESS", changes="1,1 2,1"),
-            dict(name="project2-job2", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job2", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
 
     @simple_layout('layouts/job-dedup-multi-sched-complete.yaml')
@@ -3042,13 +2983,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
             self.executor_server.release()
             self.waitUntilSettled(matcher=[app])
 
-        # We expect common-job to be "un-deduplicated".
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
-            dict(name="common-job", result="SUCCESS", changes="1,1 2,1"),
-            dict(name="project2-job2", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job2", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
 
     @simple_layout('layouts/job-dedup-noop.yaml')
@@ -3082,9 +3021,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # It's tricky to get info about a noop build, but the jobs in
         # the report have the build UUID, so we make sure it's
         # different.
-        a_noop = [l for l in A.messages[-1].split('\n') if 'noop' in l][0]
-        b_noop = [l for l in B.messages[-1].split('\n') if 'noop' in l][0]
-        self.assertNotEqual(a_noop, b_noop)
+        a_noop = [l for l in A.messages[-1].split('\n') if 'noop' in l]
+        b_noop = [l for l in B.messages[-1].split('\n') if 'noop' in l]
+        self.assertEqual(a_noop, b_noop)
+        self.assertNotEqual(a_noop[0], a_noop[1])
 
     @simple_layout('layouts/job-dedup-retry.yaml')
     def test_job_deduplication_check_retry(self):
@@ -3112,7 +3052,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # There should be exactly 3 runs of the job (not 6)
             dict(name="common-job", result=None, changes="2,1 1,1"),
             dict(name="common-job", result=None, changes="2,1 1,1"),
@@ -3176,10 +3116,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="parent-job", result="ABORTED", changes="2,1 1,1"),
             dict(name="project1-job", result="ABORTED", changes="2,1 1,1"),
-            dict(name="project2-job", result="ABORTED", changes="1,1 2,1"),
+            dict(name="project2-job", result="ABORTED", changes="2,1 1,1"),
             dict(name="parent-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 6)
 
@@ -3232,13 +3172,13 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="parent-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # Only one run of the common job since it's the same
             dict(name="common-child-job", result="SUCCESS", changes="2,1 1,1"),
             # The forked job depends on different parents
             # so it should run twice
             dict(name="forked-child-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="forked-child-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="forked-child-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 6)
 
@@ -3292,9 +3232,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertHistory([
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/01/1/1'),
+                 ref='refs/changes/02/2/1'),
             dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/01/1/1'),
+                 ref='refs/changes/02/2/1'),
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/01/1/1'),
         ], ordered=False)
@@ -3336,7 +3276,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
             # This is deduplicated
             # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
         ], ordered=False)
@@ -3470,9 +3410,47 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(G.queried, 8)
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS",
-                 changes="7,1 6,1 5,1 4,1 1,1 2,1 3,1"),
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/01/1/1"),
+            dict(name="project1-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/02/2/1"),
+            dict(name="project1-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/03/3/1"),
+            dict(name="project1-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/04/4/1"),
+            dict(name="project1-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/05/5/1"),
+            dict(name="project1-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/06/6/1"),
+            dict(name="project1-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/07/7/1"),
             dict(name="project-vars-job", result="SUCCESS",
-                 changes="7,1 6,1 5,1 4,1 1,1 2,1 3,1"),
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/01/1/1"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/02/2/1"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/03/3/1"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/04/4/1"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/05/5/1"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/06/6/1"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
+                 ref="refs/changes/07/7/1"),
         ], ordered=False)
 
     @simple_layout('layouts/submitted-together-per-branch.yaml')
@@ -3623,12 +3601,20 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(2))
         self.waitUntilSettled()
 
-        self.assertHistory([
-            dict(name="check-job", result="SUCCESS",
-                 changes="4,2 4,1 3,1 2,2 2,1 1,1"),
-            dict(name="check-job", result="SUCCESS",
-                 changes="4,2 2,2 2,1 1,1 4,1 3,1"),
-        ], ordered=False)
+        # This used to run jobs with some very unlikely changes
+        # merged.  That passed the test because we didn't actually get
+        # a ref for the outdated commits, so when the merger merged
+        # them, that was a noop.  Since we now have correct refs for
+        # the outdated changes, we hit a merge conflict, which is a
+        # reasonable and likely error.  It's not likely that we can
+        # make this test run a job with correct data.
+        # self.assertHistory([
+        #     dict(name="check-job", result="SUCCESS",
+        #          changes="4,2 4,1 3,1 2,2 2,1 1,1"),
+        #     dict(name="check-job", result="SUCCESS",
+        #          changes="4,2 2,2 2,1 1,1 4,1 3,1"),
+        # ], ordered=False)
+        self.assertHistory([], ordered=False)
 
     @simple_layout('layouts/deps-by-topic.yaml')
     def test_deps_by_topic_new_patchset(self):
@@ -3653,8 +3639,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertHistory([
             dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="check-job", result="SUCCESS", changes="1,1 2,1"),
-        ], ordered=False)
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
+        ])
 
         A.addPatchset()
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
@@ -3663,8 +3649,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertHistory([
             # Original check run
             dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="check-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
             # Second check run
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,2"),
             dict(name="check-job", result="SUCCESS", changes="2,1 1,2"),
         ], ordered=False)
 
@@ -3711,7 +3698,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="project5-job-t1", result="SUCCESS", changes="1,1"),
             dict(name="project6-job-t1", result="SUCCESS", changes="2,1"),
             dict(name="project5-job-t2", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project6-job-t2", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="project6-job-t2", result="SUCCESS", changes="2,1 1,1"),
             # Gate
             dict(name="project5-job-t2", result="SUCCESS", changes="1,1 2,1"),
             dict(name="project6-job-t2", result="SUCCESS", changes="1,1 2,1"),
@@ -3728,7 +3715,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # The first change:
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
+        self.waitUntilSettled("Stage 1")
 
         # Now that it has been uploaded, upload the second change and
         # point it at the first.
@@ -3738,7 +3725,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
             B.subject, A.data["url"]
         )
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
+        self.waitUntilSettled("Stage 2")
 
         # Now that the second change is known, update the first change
         # B <-> A
@@ -3747,16 +3734,16 @@ class TestGerritCircularDependencies(ZuulTestCase):
             A.subject, B.data["url"]
         )
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
-        self.waitUntilSettled()
+        self.waitUntilSettled("Stage 3")
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
-        self.waitUntilSettled()
+        self.waitUntilSettled("Stage 4")
 
         self.assertHistory([
             dict(name="project-job", result="ABORTED", changes="1,1"),
             dict(name="project-job", result="ABORTED", changes="1,1 2,1"),
-            dict(name="project-job", result="SUCCESS", changes="1,2 2,1"),
+            dict(name="project-job", result="SUCCESS", changes="2,1 1,2"),
             dict(name="project-job", result="SUCCESS", changes="2,1 1,2"),
         ], ordered=False)
 
@@ -3788,8 +3775,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertHistory([
             dict(name="check-job", result="ABORTED", changes="1,1"),
-            dict(name="check-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="check-job", result="SUCCESS", changes="1,1 2,1"),
+            dict(name="check-job", result="SUCCESS", changes="1,1 2,1",
+                 ref="refs/changes/01/1/1"),
+            dict(name="check-job", result="SUCCESS", changes="1,1 2,1",
+                 ref="refs/changes/02/2/1"),
         ], ordered=False)
 
     @simple_layout('layouts/deps-by-topic.yaml')
@@ -3827,9 +3816,16 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data["status"], "NEW")
         self.assertEqual(C.data["status"], "NEW")
         self.assertHistory([
-            dict(name="gate-job", result="ABORTED", changes="1,1 2,1"),
-            dict(name="gate-job", result="ABORTED", changes="1,1 2,1"),
-            dict(name="check-job", result="SUCCESS", changes="2,1 1,1 3,1"),
+            dict(name="gate-job", result="ABORTED", changes="1,1 2,1",
+                 ref="refs/changes/01/1/1"),
+            dict(name="gate-job", result="ABORTED", changes="1,1 2,1",
+                 ref="refs/changes/02/2/1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1 3,1",
+                 ref="refs/changes/02/2/1"),
+            dict(name="check-job", result="SUCCESS", changes="2,1 1,1 3,1",
+                 ref="refs/changes/01/1/1"),
+            # check-job for change 3 is deduplicated into change 1
+            # because they are the same repo.
         ], ordered=False)
 
     def test_dependency_refresh_config_error(self):
@@ -3891,6 +3887,7 @@ class TestGithubCircularDependencies(ZuulTestCase):
     scheduler_count = 1
 
     def test_cycle_not_ready(self):
+        # C is missing the approved label
         A = self.fake_github.openFakePullRequest("gh/project", "master", "A")
         B = self.fake_github.openFakePullRequest("gh/project1", "master", "B")
         C = self.fake_github.openFakePullRequest("gh/project1", "master", "C")
@@ -4059,7 +4056,7 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.assertFalse(A.is_merged)
         self.assertFalse(B.is_merged)
 
-        self.assertIn("part of a bundle that can not merge",
+        self.assertIn("failed to merge",
                       A.comments[-1])
         self.assertTrue(
             re.search("Change https://github.com/gh/project/pull/1 "
@@ -4068,7 +4065,7 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.assertFalse(re.search('Change .*? is needed',
                                    A.comments[-1]))
 
-        self.assertIn("part of a bundle that can not merge",
+        self.assertIn("failed to merge",
                       B.comments[-1])
         self.assertTrue(
             re.search("Change https://github.com/gh/project/pull/1 "
@@ -4088,7 +4085,7 @@ class TestGithubCircularDependencies(ZuulTestCase):
         # The first change:
         A = self.fake_github.openFakePullRequest("gh/project", "master", "A")
         self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
-        self.waitUntilSettled()
+        self.waitUntilSettled("Stage 1")
 
         # Now that it has been uploaded, upload the second change and
         # point it at the first.
@@ -4098,7 +4095,7 @@ class TestGithubCircularDependencies(ZuulTestCase):
             B.subject, A.url
         )
         self.fake_github.emitEvent(B.getPullRequestOpenedEvent())
-        self.waitUntilSettled()
+        self.waitUntilSettled("Stage 2")
 
         # Now that the second change is known, update the first change
         # B <-> A
@@ -4107,11 +4104,11 @@ class TestGithubCircularDependencies(ZuulTestCase):
         )
 
         self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.subject))
-        self.waitUntilSettled()
+        self.waitUntilSettled("Stage 3")
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
-        self.waitUntilSettled()
+        self.waitUntilSettled("Stage 4")
 
         self.assertHistory([
             dict(name="project-job", result="ABORTED",
@@ -4120,7 +4117,13 @@ class TestGithubCircularDependencies(ZuulTestCase):
             dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
             dict(name="project-job", result="SUCCESS",
-                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
+                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}",
+                 ref="refs/pull/1/head",
+                 ),
+            dict(name="project-job", result="SUCCESS",
+                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}",
+                 ref="refs/pull/2/head",
+                 ),
         ], ordered=False)
 
 
@@ -4184,7 +4187,11 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
             dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
             dict(name="project-job", result="SUCCESS",
-                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
+                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}",
+                 ref="refs/pull/1/head"),
+            dict(name="project-job", result="SUCCESS",
+                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}",
+                 ref="refs/pull/2/head"),
         ], ordered=False)
         # TODO: We shouldn't need this in the future, but for now,
         # verify that since we are issuing two check runs, they both
@@ -4195,6 +4202,15 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.assertEqual(check_run["status"], "completed")
         check_run = check_runs[1]
         self.assertEqual(check_run["status"], "completed")
+        self.assertNotEqual(check_runs[0]["id"], check_runs[1]["id"])
+
+        check_runs = self.fake_github.getCommitChecks("gh/project", B.head_sha)
+        self.assertEqual(len(check_runs), 2)
+        check_run = check_runs[0]
+        self.assertEqual(check_run["status"], "completed")
+        check_run = check_runs[1]
+        self.assertEqual(check_run["status"], "completed")
+        self.assertNotEqual(check_runs[0]["id"], check_runs[1]["id"])
 
     @skip("Disabled due to safety check")
     @simple_layout('layouts/dependency_removal_gate.yaml', driver='github')
@@ -4415,13 +4431,12 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.fake_github.emitEvent(C.addLabel("approved"))
         self.waitUntilSettled()
         expected_cycle = {A.number, B.number, C.number, E.number}
-        self.assertEqual(len(list(pipeline.getAllItems())), 4)
+        self.assertEqual(len(list(pipeline.getAllItems())), 1)
         for item in pipeline.getAllItems():
-            cycle = {i.change.number for i in item.bundle.items}
+            cycle = {c.number for c in item.changes}
             self.assertEqual(expected_cycle, cycle)
 
-        # Now we remove the dependency on E.  That ends up removing
-        # all the changes.
+        # Now we remove the dependency on E.  This re-enqueues ABC and E.
 
         # A->C, B->A, C->B
         A.body = "{}\n\nDepends-On: {}\n".format(
@@ -4429,7 +4444,7 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         )
         self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
         self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 0)
+        self.assertEqual(len(list(pipeline.getAllItems())), 2)
 
         # Now remove all dependencies for the three remaining changes,
         # and also E so that it doesn't get pulled back in as an
@@ -4447,7 +4462,7 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(list(pipeline.getAllItems())), 3)
         for item in pipeline.getAllItems():
-            self.assertIsNone(item.bundle)
+            self.assertEqual(len(item.changes), 1)
 
         # Remove the first change from the queue by forcing a
         # dependency on D.
@@ -4458,10 +4473,10 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(list(pipeline.getAllItems())), 2)
         for item in pipeline.getAllItems():
-            self.assertIsNone(item.bundle)
+            self.assertEqual(len(item.changes), 1)
 
-        # B and C are still in the queue.  Attempt to put them
-        # back into a bundle.  (We can't; they will be removed)
+        # B and C are still in the queue.  Put them
+        # back into a bundle.
         C.body = "{}\n\nDepends-On: {}\n".format(
             C.subject, B.url
         )
@@ -4472,15 +4487,22 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         )
         self.fake_github.emitEvent(B.getPullRequestEditedEvent(B.body))
         self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 0)
+        expected_cycle = {B.number, C.number}
+        self.assertEqual(len(list(pipeline.getAllItems())), 1)
+        for item in pipeline.getAllItems():
+            cycle = {c.number for c in item.changes}
+            self.assertEqual(expected_cycle, cycle)
 
         # All done.
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
 
-        for build in self.history:
+        for build in self.history[:-3]:
             self.assertEqual(build.result, 'ABORTED')
+        # Changes B, C in the end
+        for build in self.history[-3:]:
+            self.assertEqual(build.result, 'SUCCESS')
 
     @skip("Disabled due to safety check")
     @simple_layout('layouts/dependency_removal_gate.yaml', driver='github')
@@ -4566,7 +4588,7 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
 
         self.assertEqual(len(list(pipeline.getAllItems())), 1)
         for item in pipeline.getAllItems():
-            self.assertIsNone(item.bundle)
+            self.assertEqual(len(item.changes), 1)
 
         B.body = "{}\n\nDepends-On: {}\n".format(
             B.subject, A.url
@@ -4579,29 +4601,30 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         )
         self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
         self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 0)
+        self.assertEqual(len(list(pipeline.getAllItems())), 1)
+        expected_cycle = {A.number, B.number}
+        for item in pipeline.getAllItems():
+            cycle = {c.number for c in item.changes}
+            self.assertEqual(expected_cycle, cycle)
 
         # All done.
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
 
-        for build in self.history:
+        for build in self.history[:-3]:
             self.assertEqual(build.result, 'ABORTED')
+        # Changes A, B in the end
+        for build in self.history[-3:]:
+            self.assertEqual(build.result, 'SUCCESS')
 
-    def assertQueueBundles(self, pipeline, queue_index, bundles):
+    def assertQueueCycles(self, pipeline, queue_index, bundles):
         queue = pipeline.queues[queue_index]
         self.assertEqual(len(queue.queue), len(bundles))
 
         for x, item in enumerate(queue.queue):
-            if item.bundle is None:
-                cycle = None
-            else:
-                cycle = {i.change.number for i in item.bundle.items}
-            if bundles[x] is None:
-                expected_cycle = None
-            else:
-                expected_cycle = {c.number for c in bundles[x]}
+            cycle = {c.number for c in item.changes}
+            expected_cycle = {c.number for c in bundles[x]}
             self.assertEqual(expected_cycle, cycle)
 
     @skip("Disabled due to safety check")
@@ -4646,7 +4669,7 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.waitUntilSettled()
         abce = [A, B, C, E]
         self.assertEqual(len(pipeline.queues), 1)
-        self.assertQueueBundles(pipeline, 0, [abce, abce, abce, abce])
+        self.assertQueueCycles(pipeline, 0, [abce, abce, abce, abce])
 
         # Now we remove the dependency on E.
 
@@ -4659,9 +4682,9 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
 
         abc = [A, B, C]
         # A,B,C<live>
-        self.assertQueueBundles(pipeline, 0, [abc, abc, abc])
+        self.assertQueueCycles(pipeline, 0, [abc, abc, abc])
         # B,C,A<live>
-        self.assertQueueBundles(pipeline, 1, [abc, abc, abc])
+        self.assertQueueCycles(pipeline, 1, [abc, abc, abc])
 
         # Now remove all dependencies for the three remaining changes.
         A.body = A.subject
@@ -4677,9 +4700,9 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
 
         # A, B, C individually (not in that order)
         self.assertEqual(len(pipeline.queues), 3)
-        self.assertQueueBundles(pipeline, 0, [None])
-        self.assertQueueBundles(pipeline, 1, [None])
-        self.assertQueueBundles(pipeline, 2, [None])
+        self.assertQueueCycles(pipeline, 0, [None])
+        self.assertQueueCycles(pipeline, 1, [None])
+        self.assertQueueCycles(pipeline, 2, [None])
 
         # Remove the first change from the queue by forcing a
         # dependency on D.
@@ -4689,8 +4712,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
         self.waitUntilSettled()
         self.assertEqual(len(pipeline.queues), 2)
-        self.assertQueueBundles(pipeline, 0, [None])
-        self.assertQueueBundles(pipeline, 1, [None])
+        self.assertQueueCycles(pipeline, 0, [None])
+        self.assertQueueCycles(pipeline, 1, [None])
 
         # Verify that we can put B and C into a bundle.
         C.body = "{}\n\nDepends-On: {}\n".format(
@@ -4705,8 +4728,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.waitUntilSettled()
         self.assertEqual(len(pipeline.queues), 2)
         bc = [B, C]
-        self.assertQueueBundles(pipeline, 0, [bc, bc])
-        self.assertQueueBundles(pipeline, 1, [bc, bc])
+        self.assertQueueCycles(pipeline, 0, [bc, bc])
+        self.assertQueueCycles(pipeline, 1, [bc, bc])
 
         # All done.
         self.executor_server.hold_jobs_in_build = False
@@ -4803,7 +4826,7 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.waitUntilSettled()
         abce = [A, B, C, E]
         self.assertEqual(len(pipeline.queues), 1)
-        self.assertQueueBundles(pipeline, 0, [abce, abce, abce, abce])
+        self.assertQueueCycles(pipeline, 0, [abce])
 
         # Now we remove the dependency on E.
 
@@ -4815,8 +4838,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.waitUntilSettled()
 
         abc = [A, B, C]
-        # B,C,A<live>
-        self.assertQueueBundles(pipeline, 0, [abc, abc, abc])
+        # ABC<nonlive>, E<live>
+        self.assertQueueCycles(pipeline, 0, [abc, [E]])
 
         # Now remove all dependencies for the three remaining changes.
         A.body = A.subject
@@ -4830,10 +4853,13 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.fake_github.emitEvent(C.getPullRequestEditedEvent(C.body))
         self.waitUntilSettled()
 
-        # B, C individually (not in that order)
-        self.assertEqual(len(pipeline.queues), 2)
-        self.assertQueueBundles(pipeline, 0, [None])
-        self.assertQueueBundles(pipeline, 1, [None])
+        # A, B, C individually
+        # ABC<nonlive> E<live>, A<live>, B<live>, C<live>
+        self.assertEqual(len(pipeline.queues), 4)
+        self.assertQueueCycles(pipeline, 0, [abc, [E]])
+        self.assertQueueCycles(pipeline, 1, [[A]])
+        self.assertQueueCycles(pipeline, 2, [[B]])
+        self.assertQueueCycles(pipeline, 3, [[C]])
 
         # Verify that we can put B and C into a bundle.
         C.body = "{}\n\nDepends-On: {}\n".format(
@@ -4846,19 +4872,21 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         )
         self.fake_github.emitEvent(B.getPullRequestEditedEvent(B.body))
         self.waitUntilSettled()
-        self.assertEqual(len(pipeline.queues), 1)
+        self.assertEqual(len(pipeline.queues), 3)
         bc = [B, C]
-        self.assertQueueBundles(pipeline, 0, [bc, bc])
+        self.assertQueueCycles(pipeline, 0, [abc, [E]])
+        self.assertQueueCycles(pipeline, 1, [[A]])
+        self.assertQueueCycles(pipeline, 2, [bc])
 
         # All done.
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
 
-        for build in self.history[:-2]:
+        for build in self.history[:-7]:
             self.assertEqual(build.result, 'ABORTED')
-        # A single change in the end
-        for build in self.history[-2:]:
+        # Changes A, B, C in the end
+        for build in self.history[-7:]:
             self.assertEqual(build.result, 'SUCCESS')
 
     @skip("Disabled due to safety check")
@@ -4896,8 +4924,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.assertEqual(len(list(pipeline.getAllItems())), 4)
         self.assertEqual(len(pipeline.queues), 2)
         ab = [A, B]
-        self.assertQueueBundles(pipeline, 0, [ab, ab])
-        self.assertQueueBundles(pipeline, 1, [ab, ab])
+        self.assertQueueCycles(pipeline, 0, [ab, ab])
+        self.assertQueueCycles(pipeline, 1, [ab, ab])
 
         expected_cycle = {A.number, B.number}
         for item in pipeline.getAllItems():
@@ -4944,10 +4972,9 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
 
-        expected_cycle = {A.number}
         self.assertEqual(len(list(pipeline.getAllItems())), 1)
         for item in pipeline.getAllItems():
-            self.assertIsNone(item.bundle)
+            self.assertEqual(len(item.changes), 1)
 
         B.body = "{}\n\nDepends-On: {}\n".format(
             B.subject, A.url
@@ -4960,22 +4987,17 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         )
         self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
         self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 2)
+        self.assertEqual(len(list(pipeline.getAllItems())), 1)
         self.assertEqual(len(pipeline.queues), 1)
         ab = [A, B]
-        self.assertQueueBundles(pipeline, 0, [ab, ab])
-
-        expected_cycle = {A.number, B.number}
-        for item in pipeline.getAllItems():
-            cycle = {i.change.number for i in item.bundle.items}
-            self.assertEqual(expected_cycle, cycle)
+        self.assertQueueCycles(pipeline, 0, [ab])
 
         # All done.
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
 
-        for build in self.history[:-2]:
+        for build in self.history[:-4]:
             self.assertEqual(build.result, 'ABORTED')
         # A single change in the end
         for build in self.history[-2:]:
