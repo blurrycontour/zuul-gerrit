@@ -1,0 +1,10 @@
+Verified+2: Zuul
+Workflow+1: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: Simon Westphahl <simon.westphahl@bmw.de>
+Submitted-by: Zuul
+Submitted-at: Mon, 08 Jan 2024 23:27:48 +0000
+Reviewed-on: https://review.opendev.org/c/zuul/zuul/+/899766
+Comments-Total: 1
+Project: zuul/zuul
+Branch: refs/heads/master
