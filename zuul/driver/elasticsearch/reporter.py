@@ -1,4 +1,5 @@
 # Copyright 2019 Red Hat, Inc.
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -37,20 +38,34 @@ class ElasticsearchReporter(BaseReporter):
         docs = []
         index = '%s.%s-%s' % (self.index, item.pipeline.tenant.name,
                               time.strftime("%Y.%m.%d"))
+        changes = [
+            {
+                "project": change.project.name,
+                "change": getattr(change, 'number', None),
+                "patchset": getattr(change, 'patchset', None),
+                "ref": getattr(change, 'ref', ''),
+                "oldrev": getattr(change, 'oldrev', ''),
+                "newrev": getattr(change, 'newrev', ''),
+                "branch": getattr(change, 'branch', ''),
+                "ref_url": change.url,
+            }
+            for change in item.changes
+        ]
         buildset_doc = {
             "uuid": item.current_build_set.uuid,
             "build_type": "buildset",
             "tenant": item.pipeline.tenant.name,
             "pipeline": item.pipeline.name,
-            "project": item.change.project.name,
-            "change": getattr(item.change, 'number', None),
-            "patchset": getattr(item.change, 'patchset', None),
-            "ref": getattr(item.change, 'ref', ''),
-            "oldrev": getattr(item.change, 'oldrev', ''),
-            "newrev": getattr(item.change, 'newrev', ''),
-            "branch": getattr(item.change, 'branch', ''),
+            "changes": changes,
+            "project": item.changes[0].project.name,
+            "change": getattr(item.changes[0], 'number', None),
+            "patchset": getattr(item.changes[0], 'patchset', None),
+            "ref": getattr(item.changes[0], 'ref', ''),
+            "oldrev": getattr(item.changes[0], 'oldrev', ''),
+            "newrev": getattr(item.changes[0], 'newrev', ''),
+            "branch": getattr(item.changes[0], 'branch', ''),
             "zuul_ref": item.current_build_set.ref,
-            "ref_url": item.change.url,
+            "ref_url": item.changes[0].url,
             "result": item.current_build_set.result,
             "message": self._formatItemReport(item, with_jobs=False)
         }
@@ -80,8 +95,21 @@ class ElasticsearchReporter(BaseReporter):
             buildset_doc['duration'] = (
                 buildset_doc['end_time'] - buildset_doc['start_time'])
 
+            change = item.getChangeForJob(build.job)
+            change_doc = {
+                "project": change.project.name,
+                "change": getattr(change, 'number', None),
+                "patchset": getattr(change, 'patchset', None),
+                "ref": getattr(change, 'ref', ''),
+                "oldrev": getattr(change, 'oldrev', ''),
+                "newrev": getattr(change, 'newrev', ''),
+                "branch": getattr(change, 'branch', ''),
+                "ref_url": change.url,
+            }
+
             build_doc = {
                 "uuid": build.uuid,
+                "change": change_doc,
                 "build_type": "build",
                 "buildset_uuid": buildset_doc['uuid'],
                 "job_name": build.job.name,

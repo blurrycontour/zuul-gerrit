@@ -1,5 +1,5 @@
 # Copyright 2014 OpenStack Foundation
-# Copyright 2021-2022 Acme Gating, LLC
+# Copyright 2021-2022, 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -334,25 +334,36 @@ class BaseMergeServer(metaclass=ABCMeta):
         self.log.debug("Got fileschanges job: %s", merge_request.uuid)
         zuul_event_id = merge_request.event_id
 
-        connection_name = args['connection']
-        project_name = args['project']
+        # MODEL_API < 26:
+        changes = args.get('changes')
+        old_format = False
+        if changes is None:
+            changes = [args]
+            old_format = True
 
-        lock = self.repo_locks.getRepoLock(connection_name, project_name)
-        try:
-            self._update(connection_name, project_name,
-                         zuul_event_id=zuul_event_id)
-            with lock:
-                files = self.merger.getFilesChanges(
-                    connection_name, project_name,
-                    args['branch'], args['tosha'],
-                    zuul_event_id=zuul_event_id)
-        except Exception:
-            result = dict(update=False)
+        results = []
+        for change in changes:
+            connection_name = change['connection']
+            project_name = change['project']
+
+            lock = self.repo_locks.getRepoLock(connection_name, project_name)
+            try:
+                self._update(connection_name, project_name,
+                             zuul_event_id=zuul_event_id)
+                with lock:
+                    files = self.merger.getFilesChanges(
+                        connection_name, project_name,
+                        change['branch'], change['tosha'],
+                        zuul_event_id=zuul_event_id)
+                results.append(files)
+            except Exception:
+                return dict(updated=False)
+
+        if old_format:
+            # MODEL_API < 26:
+            return dict(updated=True, files=results[0])
         else:
-            result = dict(updated=True, files=files)
-
-        result['zuul_event_id'] = zuul_event_id
-        return result
+            return dict(updated=True, files=results)
 
     def completeMergeJob(self, merge_request, result):
         log = get_annotated_logger(self.log, merge_request.event_id)
