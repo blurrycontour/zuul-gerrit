@@ -905,13 +905,15 @@ class Scheduler(threading.Thread):
         try:
             if self.statsd and build.pipeline:
                 tenant = build.pipeline.tenant
-                jobname = build.job.name.replace('.', '_').replace('/', '_')
-                hostname = (build.build_set.item.change.project.
+                item = build.build_set.item
+                job = build.job
+                change = item.getChangeForJob(job)
+                jobname = job.name.replace('.', '_').replace('/', '_')
+                hostname = (change.project.
                             canonical_hostname.replace('.', '_'))
-                projectname = (build.build_set.item.change.project.name.
+                projectname = (change.project.name.
                                replace('.', '_').replace('/', '_'))
-                branchname = (getattr(build.build_set.item.change,
-                                      'branch', '').
+                branchname = (getattr(change, 'branch', '').
                               replace('.', '_').replace('/', '_'))
                 basekey = 'zuul.tenant.%s' % tenant.name
                 pipekey = '%s.pipeline.%s' % (basekey, build.pipeline.name)
@@ -1611,8 +1613,8 @@ class Scheduler(threading.Thread):
         log.info("Tenant reconfiguration complete for %s (duration: %s "
                  "seconds)", event.tenant_name, duration)
 
-    def _reenqueueGetProject(self, tenant, item):
-        project = item.change.project
+    def _reenqueueGetProject(self, tenant, item, change):
+        project = change.project
         # Attempt to get the same project as the one passed in.  If
         # the project is now found on a different connection or if it
         # is no longer available (due to a connection being removed),
@@ -1644,12 +1646,13 @@ class Scheduler(threading.Thread):
         if child is item:
             return None
         if child and child.live:
-            (child_trusted, child_project) = tenant.getProject(
-                child.change.project.canonical_name)
-            if child_project:
-                source = child_project.source
-                new_project = source.getProject(project.name)
-                return new_project
+            for child_change in child.changes:
+                (child_trusted, child_project) = tenant.getProject(
+                    child_change.project.canonical_name)
+                if child_project:
+                    source = child_project.source
+                    new_project = source.getProject(project.name)
+                    return new_project
 
         return None
 
@@ -1679,8 +1682,8 @@ class Scheduler(threading.Thread):
             for item in shared_queue.queue:
                 # If the old item ahead made it in, re-enqueue
                 # this one behind it.
-                new_project = self._reenqueueGetProject(
-                    tenant, item)
+                new_projects = [self._reenqueueGetProject(
+                    tenant, item, change) for change in item.changes]
                 if item.item_ahead in items_to_remove:
                     old_item_ahead = None
                     item_ahead_valid = False
@@ -1691,8 +1694,9 @@ class Scheduler(threading.Thread):
                     item.item_ahead = None
                     item.items_behind = []
                     reenqueued = False
-                    if new_project:
-                        item.change.project = new_project
+                    if all(new_projects):
+                        for change_index, change in enumerate(item.changes):
+                            change.project = new_projects[change_index]
                         item.queue = None
                         if not old_item_ahead or not last_head:
                             last_head = item
@@ -1945,12 +1949,13 @@ class Scheduler(threading.Thread):
                 for item in shared_queue.queue:
                     if not item.live:
                         continue
-                    if (item.change.number == number and
-                        item.change.patchset == patchset):
-                        promote_operations.setdefault(
-                            shared_queue, []).append(item)
-                        found = True
-                        break
+                    for item_change in item.changes:
+                        if (item_change.number == number and
+                            item_change.patchset == patchset):
+                            promote_operations.setdefault(
+                                shared_queue, []).append(item)
+                            found = True
+                            break
                 if found:
                     break
             if not found:
@@ -1981,11 +1986,12 @@ class Scheduler(threading.Thread):
                 pipeline.manager.dequeueItem(item)
 
             for item in items_to_enqueue:
-                pipeline.manager.addChange(
-                    item.change, item.event,
-                    enqueue_time=item.enqueue_time,
-                    quiet=True,
-                    ignore_requirements=True)
+                for item_change in item.changes:
+                    pipeline.manager.addChange(
+                        item_change, item.event,
+                        enqueue_time=item.enqueue_time,
+                        quiet=True,
+                        ignore_requirements=True)
             # Regardless, move this shared change queue to the head.
             pipeline.promoteQueue(change_queue)
 
@@ -2011,14 +2017,15 @@ class Scheduler(threading.Thread):
                             % (item, project.name))
         for shared_queue in pipeline.queues:
             for item in shared_queue.queue:
-                if item.change.project != change.project:
-                    continue
-                if (isinstance(item.change, Change) and
-                        item.change.number == change.number and
-                        item.change.patchset == change.patchset) or\
-                   (item.change.ref == change.ref):
-                    pipeline.manager.removeItem(item)
-                    return
+                for item_change in item.changes:
+                    if item_change.project != change.project:
+                        continue
+                    if (isinstance(item_change, Change) and
+                        item_change.number == change.number and
+                        item_change.patchset == change.patchset) or\
+                        (item_change.ref == change.ref):
+                        pipeline.manager.removeItem(item)
+                        return
         raise Exception("Unable to find shared change queue for %s:%s" %
                         (event.project_name,
                          event.change or event.ref))
@@ -2059,18 +2066,19 @@ class Scheduler(threading.Thread):
         change = project.source.getChange(change_key, event=event)
         for shared_queue in pipeline.queues:
             for item in shared_queue.queue:
-                if item.change.project != change.project:
-                    continue
                 if not item.live:
                     continue
-                if ((isinstance(item.change, Change)
-                     and item.change.number == change.number
-                     and item.change.patchset == change.patchset
-                    ) or (item.change.ref == change.ref)):
-                    log = get_annotated_logger(self.log, item.event)
-                    log.info("Item %s is superceded, dequeuing", item)
-                    pipeline.manager.removeItem(item)
-                    return
+                for item_change in item.changes:
+                    if item_change.project != change.project:
+                        continue
+                    if ((isinstance(item_change, Change)
+                         and item_change.number == change.number
+                         and item_change.patchset == change.patchset
+                        ) or (item_change.ref == change.ref)):
+                        log = get_annotated_logger(self.log, item.event)
+                        log.info("Item %s is superceded, dequeuing", item)
+                        pipeline.manager.removeItem(item)
+                        return
 
     def _doSemaphoreReleaseEvent(self, event, pipeline):
         tenant = pipeline.tenant
@@ -2791,7 +2799,7 @@ class Scheduler(threading.Thread):
         if not build_set:
             return
 
-        job = build_set.item.getJob(event._job_id)
+        job = build_set.item.getJob(event.job_uuid)
         build = build_set.getBuild(job)
         # Verify that the build uuid matches the one of the result
         if not build:
@@ -2824,12 +2832,14 @@ class Scheduler(threading.Thread):
             log = get_annotated_logger(
                 self.log, build.zuul_event_id, build=build.uuid)
             try:
-                change = build.build_set.item.change
+                item = build.build_set.item
+                job = build.job
+                change = item.getChangeForJob(job)
                 estimate = self.times.getEstimatedTime(
                     pipeline.tenant.name,
                     change.project.name,
                     getattr(change, 'branch', None),
-                    build.job.name)
+                    job.name)
                 if not estimate:
                     estimate = 0.0
                 build.estimated_time = estimate
@@ -2884,11 +2894,8 @@ class Scheduler(threading.Thread):
             # resources.
             build = Build()
             job = DummyFrozenJob()
-            job.name = event.job_name
             job.uuid = event.job_uuid
             job.provides = []
-            # MODEL_API < 25
-            job._job_id = job.uuid or job.name
             build._set(
                 job=job,
                 uuid=event.build_uuid,
@@ -2997,8 +3004,7 @@ class Scheduler(threading.Thread):
             # In case the build didn't show up on any executor, the node
             # request does still exist, so we have to make sure it is
             # removed from ZK.
-            request_id = build.build_set.getJobNodeRequestID(
-                build.job, ignore_deduplicate=True)
+            request_id = build.build_set.getJobNodeRequestID(build.job)
             if request_id:
                 self.nodepool.deleteNodeRequest(
                     request_id, event_id=build.zuul_event_id)
@@ -3058,11 +3064,11 @@ class Scheduler(threading.Thread):
             return
 
         log = get_annotated_logger(self.log, request.event_id)
-        job = build_set.item.getJob(request._job_id)
+        job = build_set.item.getJob(request.job_uuid)
         if job is None:
             log.warning("Item %s does not contain job %s "
                         "for node request %s",
-                        build_set.item, request._job_id, request)
+                        build_set.item, request.job_uuid, request)
             return
 
         # If the request failed, we must directly delete it as the nodes will
@@ -3073,7 +3079,7 @@ class Scheduler(threading.Thread):
 
         nodeset = self.nodepool.getNodeSet(request, job.nodeset)
 
-        job = build_set.item.getJob(request._job_id)
+        job = build_set.item.getJob(request.job_uuid)
         if build_set.getJobNodeSetInfo(job) is None:
             pipeline.manager.onNodesProvisioned(request, nodeset, build_set)
         else:
@@ -3111,8 +3117,8 @@ class Scheduler(threading.Thread):
                     self.executor.cancel(build)
                 except Exception:
                     log.exception(
-                        "Exception while canceling build %s for change %s",
-                        build, item.change)
+                        "Exception while canceling build %s for %s",
+                        build, item)
 
                 # In the unlikely case that a build is removed and
                 # later added back, make sure we clear out the nodeset

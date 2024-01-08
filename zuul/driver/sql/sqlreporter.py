@@ -1,4 +1,5 @@
 # Copyright 2015 Rackspace Australia
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -54,16 +55,6 @@ class SQLReporter(BaseReporter):
             event_timestamp = datetime.datetime.fromtimestamp(
                 item.event.timestamp, tz=datetime.timezone.utc)
 
-        ref = db.getOrCreateRef(
-            project=item.change.project.name,
-            change=getattr(item.change, 'number', None),
-            patchset=getattr(item.change, 'patchset', None),
-            ref_url=item.change.url,
-            ref=getattr(item.change, 'ref', ''),
-            oldrev=getattr(item.change, 'oldrev', ''),
-            newrev=getattr(item.change, 'newrev', ''),
-            branch=getattr(item.change, 'branch', ''),
-        )
         db_buildset = db.createBuildSet(
             uuid=buildset.uuid,
             tenant=item.pipeline.tenant.name,
@@ -72,7 +63,18 @@ class SQLReporter(BaseReporter):
             event_timestamp=event_timestamp,
             updated=datetime.datetime.utcnow(),
         )
-        db_buildset.refs.append(ref)
+        for change in item.changes:
+            ref = db.getOrCreateRef(
+                project=change.project.name,
+                change=getattr(change, 'number', None),
+                patchset=getattr(change, 'patchset', None),
+                ref_url=change.url,
+                ref=getattr(change, 'ref', ''),
+                oldrev=getattr(change, 'oldrev', ''),
+                newrev=getattr(change, 'newrev', ''),
+                branch=getattr(change, 'branch', ''),
+            )
+            db_buildset.refs.append(ref)
         return db_buildset
 
     def reportBuildsetStart(self, buildset):
@@ -200,15 +202,16 @@ class SQLReporter(BaseReporter):
         if db_buildset.first_build_start_time is None:
             db_buildset.first_build_start_time = start
         item = buildset.item
+        change = item.getChangeForJob(build.job)
         ref = db.getOrCreateRef(
-            project=item.change.project.name,
-            change=getattr(item.change, 'number', None),
-            patchset=getattr(item.change, 'patchset', None),
-            ref_url=item.change.url,
-            ref=getattr(item.change, 'ref', ''),
-            oldrev=getattr(item.change, 'oldrev', ''),
-            newrev=getattr(item.change, 'newrev', ''),
-            branch=getattr(item.change, 'branch', ''),
+            project=change.project.name,
+            change=getattr(change, 'number', None),
+            patchset=getattr(change, 'patchset', None),
+            ref_url=change.url,
+            ref=getattr(change, 'ref', ''),
+            oldrev=getattr(change, 'oldrev', ''),
+            newrev=getattr(change, 'newrev', ''),
+            branch=getattr(change, 'branch', ''),
         )
 
         db_build = db_buildset.createBuild(

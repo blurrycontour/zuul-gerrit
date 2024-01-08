@@ -717,7 +717,12 @@ class TestSOSCircularDependencies(ZuulTestCase):
             self.assertEqual(len(self.builds), 4)
             builds = self.builds[:]
             self.executor_server.failJob('job1', A)
+            # Since it's one queue item for the two changes, all 4
+            # builds need to complete.
             builds[0].release()
+            builds[1].release()
+            builds[2].release()
+            builds[3].release()
             app.sched.wake_event.set()
             self.waitUntilSettled(matcher=[app])
             self.assertEqual(A.reported, 2)

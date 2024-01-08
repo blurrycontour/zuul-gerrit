@@ -1730,8 +1730,8 @@ class TestInRepoConfig(ZuulTestCase):
         self.waitUntilSettled()
 
         items = check_pipeline.getAllItems()
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '1')
+        self.assertEqual(items[0].changes[0].number, '1')
+        self.assertEqual(items[0].changes[0].patchset, '1')
         self.assertTrue(items[0].live)
 
         in_repo_conf = textwrap.dedent(
@@ -1760,8 +1760,8 @@ class TestInRepoConfig(ZuulTestCase):
         self.waitUntilSettled()
 
         items = check_pipeline.getAllItems()
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '2')
+        self.assertEqual(items[0].changes[0].number, '1')
+        self.assertEqual(items[0].changes[0].patchset, '2')
         self.assertTrue(items[0].live)
 
         self.executor_server.hold_jobs_in_build = False
@@ -3438,9 +3438,9 @@ class TestExtraConfigInDependent(ZuulTestCase):
         # Jobs in both changes should be success
         self.assertHistory([
             dict(name='project2-private-extra-file', result='SUCCESS',
-                 changes='3,1 1,1 2,1'),
+                 changes='3,1 2,1 1,1'),
             dict(name='project2-private-extra-dir', result='SUCCESS',
-                 changes='3,1 1,1 2,1'),
+                 changes='3,1 2,1 1,1'),
             dict(name='project-test1', result='SUCCESS',
                  changes='3,1 2,1 1,1'),
             dict(name='project3-private-extra-file', result='SUCCESS',
@@ -3987,8 +3987,8 @@ class TestInRepoJoin(ZuulTestCase):
         self.waitUntilSettled()
 
         items = gate_pipeline.getAllItems()
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '1')
+        self.assertEqual(items[0].changes[0].number, '1')
+        self.assertEqual(items[0].changes[0].patchset, '1')
         self.assertTrue(items[0].live)
 
         self.executor_server.hold_jobs_in_build = False
