@@ -78,7 +78,7 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
         self.projects[project.name] = project
 
     def getChangeFilesUpdated(self, project_name, branch, tosha):
-        job = self.sched.merger.getFilesChanges(
+        job = self.sched.merger.getFilesChangesRaw(
             self.connection_name, project_name, branch, tosha,
             needs_result=True)
         self.log.debug("Waiting for fileschanges job %s" % job)
@@ -86,8 +86,8 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
         if not job.updated:
             raise Exception("Fileschanges job %s failed" % job)
         self.log.debug("Fileschanges job %s got changes on files %s" %
-                       (job, job.files))
-        return job.files
+                       (job, job.files[0]))
+        return job.files[0]
 
     def lsRemote(self, project):
         refs = {}

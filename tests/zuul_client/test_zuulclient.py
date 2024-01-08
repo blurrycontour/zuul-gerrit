@@ -356,7 +356,7 @@ class TestZuulClientAdmin(BaseTestWeb):
         items = tenant.layout.pipelines['gate'].getAllItems()
         enqueue_times = {}
         for item in items:
-            enqueue_times[str(item.change)] = item.enqueue_time
+            enqueue_times[str(item.changes[0])] = item.enqueue_time
 
         # Promote B and C using the cli
         authz = {'iss': 'zuul_operator',
@@ -382,7 +382,7 @@ class TestZuulClientAdmin(BaseTestWeb):
         items = tenant.layout.pipelines['gate'].getAllItems()
         for item in items:
             self.assertEqual(
-                enqueue_times[str(item.change)], item.enqueue_time)
+                enqueue_times[str(item.changes[0])], item.enqueue_time)
 
         self.waitUntilSettled()
         self.executor_server.release('.*-merge')
