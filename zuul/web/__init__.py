@@ -1,5 +1,5 @@
 # Copyright (c) 2017 Red Hat
-# Copyright 2021-2023 Acme Gating, LLC
+# Copyright 2021-2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -385,9 +385,14 @@ class ChangeFilter(object):
         for pipeline in payload['pipelines']:
             for change_queue in pipeline.get('change_queues', []):
                 for head in change_queue['heads']:
-                    for change in head:
-                        if self.wantChange(change):
-                            status.append(copy.deepcopy(change))
+                    for item in head:
+                        want_item = False
+                        for change in item['changes']:
+                            if self.wantChange(change):
+                                want_item = True
+                                break
+                        if want_item:
+                            status.append(copy.deepcopy(item))
         return status
 
     def wantChange(self, change):
@@ -1798,7 +1803,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.check_tenant_auth()
     def project_freeze_jobs(self, tenant_name, tenant, auth,
                             pipeline_name, project_name, branch_name):
-        item = self._freeze_jobs(
+        item, change = self._freeze_jobs(
             tenant, pipeline_name, project_name, branch_name)
 
         output = []
@@ -1822,9 +1827,10 @@ class ZuulWebAPI(object):
                            job_name):
         # TODO(jhesketh): Allow a canonical change/item to be passed in which
         # would return the job with any in-change modifications.
-        item = self._freeze_jobs(
+        item, change = self._freeze_jobs(
             tenant, pipeline_name, project_name, branch_name)
-        job = item.current_build_set.job_graph.getJobFromName(job_name)
+        job = item.current_build_set.job_graph.getJob(
+            job_name, change.cache_key)
         if not job:
             raise cherrypy.HTTPError(404)
 
@@ -1873,12 +1879,12 @@ class ZuulWebAPI(object):
         change.cache_stat = FakeCacheKey()
         with LocalZKContext(self.log) as context:
             queue = ChangeQueue.new(context, pipeline=pipeline)
-            item = QueueItem.new(context, queue=queue, change=change)
+            item = QueueItem.new(context, queue=queue, changes=[change])
             item.freezeJobGraph(tenant.layout, context,
                                 skip_file_matcher=True,
                                 redact_secrets_and_keys=True)
 
-        return item
+        return item, change
 
 
 class StaticHandler(object):

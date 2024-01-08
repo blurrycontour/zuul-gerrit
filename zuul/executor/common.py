@@ -30,22 +30,23 @@ def construct_build_params(uuid, connections, job, item, pipeline,
     environment - for example, a local runner.
     """
     tenant = pipeline.tenant
+    change = item.getChangeForJob(job)
     project = dict(
-        name=item.change.project.name,
-        short_name=item.change.project.name.split('/')[-1],
-        canonical_hostname=item.change.project.canonical_hostname,
-        canonical_name=item.change.project.canonical_name,
+        name=change.project.name,
+        short_name=change.project.name.split('/')[-1],
+        canonical_hostname=change.project.canonical_hostname,
+        canonical_name=change.project.canonical_name,
         src_dir=os.path.join('src',
                              strings.workspace_project_path(
-                                 item.change.project.canonical_hostname,
-                                 item.change.project.name,
+                                 change.project.canonical_hostname,
+                                 change.project.name,
                                  job.workspace_scheme)),
     )
 
     zuul_params = dict(
         build=uuid,
         buildset=item.current_build_set.uuid,
-        ref=item.change.ref,
+        ref=change.ref,
         pipeline=pipeline.name,
         post_review=pipeline.post_review,
         job=job.name,
@@ -54,30 +55,30 @@ def construct_build_params(uuid, connections, job, item, pipeline,
         event_id=item.event.zuul_event_id if item.event else None,
         jobtags=sorted(job.tags),
     )
-    if hasattr(item.change, 'branch'):
-        zuul_params['branch'] = item.change.branch
-    if hasattr(item.change, 'tag'):
-        zuul_params['tag'] = item.change.tag
-    if hasattr(item.change, 'number'):
-        zuul_params['change'] = str(item.change.number)
-    if hasattr(item.change, 'url'):
-        zuul_params['change_url'] = item.change.url
-    if hasattr(item.change, 'patchset'):
-        zuul_params['patchset'] = str(item.change.patchset)
-    if hasattr(item.change, 'message'):
-        zuul_params['message'] = strings.b64encode(item.change.message)
-        zuul_params['change_message'] = item.change.message
+    if hasattr(change, 'branch'):
+        zuul_params['branch'] = change.branch
+    if hasattr(change, 'tag'):
+        zuul_params['tag'] = change.tag
+    if hasattr(change, 'number'):
+        zuul_params['change'] = str(change.number)
+    if hasattr(change, 'url'):
+        zuul_params['change_url'] = change.url
+    if hasattr(change, 'patchset'):
+        zuul_params['patchset'] = str(change.patchset)
+    if hasattr(change, 'message'):
+        zuul_params['message'] = strings.b64encode(change.message)
+        zuul_params['change_message'] = change.message
     commit_id = None
-    if (hasattr(item.change, 'oldrev') and item.change.oldrev
-        and item.change.oldrev != '0' * 40):
-        zuul_params['oldrev'] = item.change.oldrev
-        commit_id = item.change.oldrev
-    if (hasattr(item.change, 'newrev') and item.change.newrev
-        and item.change.newrev != '0' * 40):
-        zuul_params['newrev'] = item.change.newrev
-        commit_id = item.change.newrev
-    if hasattr(item.change, 'commit_id'):
-        commit_id = item.change.commit_id
+    if (hasattr(change, 'oldrev') and change.oldrev
+        and change.oldrev != '0' * 40):
+        zuul_params['oldrev'] = change.oldrev
+        commit_id = change.oldrev
+    if (hasattr(change, 'newrev') and change.newrev
+        and change.newrev != '0' * 40):
+        zuul_params['newrev'] = change.newrev
+        commit_id = change.newrev
+    if hasattr(change, 'commit_id'):
+        commit_id = change.commit_id
     if commit_id:
         zuul_params['commit_id'] = commit_id
 
@@ -101,8 +102,8 @@ def construct_build_params(uuid, connections, job, item, pipeline,
     params['job_ref'] = job.getPath()
     params['items'] = merger_items
     params['projects'] = []
-    if hasattr(item.change, 'branch'):
-        params['branch'] = item.change.branch
+    if hasattr(change, 'branch'):
+        params['branch'] = change.branch
     else:
         params['branch'] = None
     merge_rs = item.current_build_set.merge_repo_state
@@ -116,8 +117,8 @@ def construct_build_params(uuid, connections, job, item, pipeline,
             params['ssh_keys'].append("REDACTED")
         else:
             params['ssh_keys'].append(dict(
-                connection_name=item.change.project.connection_name,
-                project_name=item.change.project.name))
+                connection_name=change.project.connection_name,
+                project_name=change.project.name))
     params['zuul'] = zuul_params
     projects = set()
     required_projects = set()

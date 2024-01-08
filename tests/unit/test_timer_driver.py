@@ -79,7 +79,7 @@ class TestTimerAlwaysDynamicBranches(ZuulTestCase):
         self.assertEqual(len(pipeline.queues), 2)
         for queue in pipeline.queues:
             item = queue.queue[0]
-            self.assertIn(item.change.branch, ['master', 'stable'])
+            self.assertIn(item.changes[0].branch, ['master', 'stable'])
 
         self.executor_server.hold_jobs_in_build = False
 
