@@ -691,7 +691,7 @@ class FakeGithubSession(object):
             if commit is None:
                 commit = FakeCommit(head_sha)
                 repo._commits[head_sha] = commit
-                repo.check_run_counter += 1
+            repo.check_run_counter += 1
             check_run = commit.set_check_run(
                 str(repo.check_run_counter),
                 json['name'],

@@ -465,53 +465,6 @@ class TestGithubModelUpgrade(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
     scheduler_count = 1
 
-    @model_version(3)
-    @simple_layout('layouts/gate-github.yaml', driver='github')
-    def test_status_checks_removal(self):
-        # This tests the old behavior -- that changes are not dequeued
-        # once their required status checks are removed -- since the
-        # new behavior requires a flag in ZK.
-        # Contrast with test_status_checks_removal.
-        github = self.fake_github.getGithubClient()
-        repo = github.repo_from_project('org/project')
-        repo._set_branch_protection(
-            'master', contexts=['something/check', 'tenant-one/gate'])
-
-        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
-        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
-        self.waitUntilSettled()
-
-        self.executor_server.hold_jobs_in_build = True
-        # Since the required status 'something/check' is not fulfilled,
-        # no job is expected
-        self.assertEqual(0, len(self.history))
-
-        # Set the required status 'something/check'
-        repo.create_status(A.head_sha, 'success', 'example.com', 'description',
-                           'something/check')
-
-        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
-        self.waitUntilSettled()
-
-        # Remove it and verify the change is not dequeued (old behavior).
-        repo.create_status(A.head_sha, 'failed', 'example.com', 'description',
-                           'something/check')
-        self.fake_github.emitEvent(A.getCommitStatusEvent('something/check',
-                                                          state='failed',
-                                                          user='foo'))
-        self.waitUntilSettled()
-
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        # the change should have entered the gate
-        self.assertHistory([
-            dict(name='project-test1', result='SUCCESS'),
-            dict(name='project-test2', result='SUCCESS'),
-        ], ordered=False)
-        self.assertTrue(A.is_merged)
-
     @model_version(10)
     @simple_layout('layouts/github-merge-mode.yaml', driver='github')
     def test_merge_method_syntax_check(self):
@@ -701,48 +654,6 @@ class TestDefaultBranchUpgrade(ZuulTestCase):
         md = layout.getProjectMetadata(
             'github.com/org/project-default')
         self.assertEqual('foobar', md.default_branch)
-
-
-class TestDeduplication(ZuulTestCase):
-    config_file = "zuul-gerrit-github.conf"
-    tenant_config_file = "config/circular-dependencies/main.yaml"
-    scheduler_count = 1
-
-    def _test_job_deduplication(self):
-        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
-        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
-
-        # A <-> B
-        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
-            A.subject, B.data["url"]
-        )
-        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
-            B.subject, A.data["url"]
-        )
-
-        A.addApproval('Code-Review', 2)
-        B.addApproval('Code-Review', 2)
-
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-
-        self.waitUntilSettled()
-
-        self.assertEqual(A.data['status'], 'MERGED')
-        self.assertEqual(B.data['status'], 'MERGED')
-
-    @simple_layout('layouts/job-dedup-auto-shared.yaml')
-    @model_version(7)
-    def test_job_deduplication_auto_shared(self):
-        self._test_job_deduplication()
-        self.assertHistory([
-            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
-            # This would be deduplicated
-            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
-        ], ordered=False)
-        self.assertEqual(len(self.fake_nodepool.history), 4)
 
 
 class TestDataReturn(AnsibleZuulTestCase):

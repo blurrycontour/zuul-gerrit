@@ -56,9 +56,9 @@ class ExecutorClient(object):
         tracer = trace.get_tracer("zuul")
         uuid = str(uuid4().hex)
         log.info(
-            "Execute job %s (uuid: %s) on nodes %s for change %s "
+            "Execute job %s (uuid: %s) on nodes %s for %s "
             "with dependent changes %s",
-            job, uuid, nodes, item.change, dependent_changes)
+            job, uuid, nodes, item, dependent_changes)
 
         params = zuul.executor.common.construct_build_params(
             uuid, self.sched.connections,
@@ -93,7 +93,7 @@ class ExecutorClient(object):
         if job.name == 'noop':
             data = {"start_time": time.time()}
             started_event = BuildStartedEvent(
-                build.uuid, build.build_set.uuid, job.name, job._job_id,
+                build.uuid, build.build_set.uuid, job.uuid,
                 None, data, zuul_event_id=build.zuul_event_id)
             self.result_events[pipeline.tenant.name][pipeline.name].put(
                 started_event
@@ -101,7 +101,7 @@ class ExecutorClient(object):
 
             result = {"result": "SUCCESS", "end_time": time.time()}
             completed_event = BuildCompletedEvent(
-                build.uuid, build.build_set.uuid, job.name, job._job_id,
+                build.uuid, build.build_set.uuid, job.uuid,
                 None, result, zuul_event_id=build.zuul_event_id)
             self.result_events[pipeline.tenant.name][pipeline.name].put(
                 completed_event
@@ -134,7 +134,7 @@ class ExecutorClient(object):
                 f"{req_id}")
             data = {"start_time": time.time()}
             started_event = BuildStartedEvent(
-                build.uuid, build.build_set.uuid, job.name, job._job_id,
+                build.uuid, build.build_set.uuid, job.uuid,
                 None, data, zuul_event_id=build.zuul_event_id)
             self.result_events[pipeline.tenant.name][pipeline.name].put(
                 started_event
@@ -142,7 +142,7 @@ class ExecutorClient(object):
 
             result = {"result": None, "end_time": time.time()}
             completed_event = BuildCompletedEvent(
-                build.uuid, build.build_set.uuid, job.name, job._job_id,
+                build.uuid, build.build_set.uuid, job.uuid,
                 None, result, zuul_event_id=build.zuul_event_id)
             self.result_events[pipeline.tenant.name][pipeline.name].put(
                 completed_event
@@ -173,8 +173,7 @@ class ExecutorClient(object):
             request = BuildRequest(
                 uuid=uuid,
                 build_set_uuid=build.build_set.uuid,
-                job_name=job.name,
-                job_uuid=job._job_id,
+                job_uuid=job.uuid,
                 tenant_name=build.build_set.item.pipeline.tenant.name,
                 pipeline_name=build.build_set.item.pipeline.name,
                 zone=executor_zone,
@@ -225,7 +224,7 @@ class ExecutorClient(object):
                     pipeline_name = build.build_set.item.pipeline.name
                     event = BuildCompletedEvent(
                         build_request.uuid, build_request.build_set_uuid,
-                        build_request.job_name, build_request.job_uuid,
+                        build_request.job_uuid,
                         build_request.path, result)
                     self.result_events[tenant_name][pipeline_name].put(event)
                 finally:
@@ -312,7 +311,7 @@ class ExecutorClient(object):
 
         event = BuildCompletedEvent(
             build_request.uuid, build_request.build_set_uuid,
-            build_request.job_name, build_request.job_uuid,
+            build_request.job_uuid,
             build_request.path, result)
         self.result_events[build_request.tenant_name][
             build_request.pipeline_name].put(event)
