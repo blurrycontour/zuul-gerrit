@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8755c66_4196999a",
+        "filename": "doc/source/developer/model-changelog.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-08T13:51:15Z",
+      "side": 1,
+      "message": "nit: typo",
+      "range": {
+        "startLine": 181,
+        "startChar": 41,
+        "endLine": 181,
+        "endChar": 46
+      },
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ed88aec_07ba12fa",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5801,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-08T13:51:15Z",
+      "side": 1,
+      "message": "nit: personal preference, but I think a list comp is a little more readable here\n\n        job \u003d [j for j in items[0].getJobs()\n               if j.name \u003d\u003d \u0027project-test1\u0027][0]",
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
