@@ -1,4 +1,5 @@
 # Copyright 2014 OpenStack Foundation
+# Copyright 2021-2022, 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -138,13 +139,43 @@ class MergeClient(object):
         )
         return job
 
-    def getFilesChanges(self, connection_name, project_name, branch,
-                        tosha=None, precedence=PRECEDENCE_HIGH,
-                        build_set=None, needs_result=False, event=None):
-        data = dict(connection=connection_name,
-                    project=project_name,
-                    branch=branch,
-                    tosha=tosha)
+    def getFilesChanges(self, changes, precedence=PRECEDENCE_HIGH,
+                        build_set=None, needs_result=False,
+                        event=None):
+        changes_data = []
+        for change in changes:
+            # if base_sha is not available, fallback to branch
+            tosha = getattr(change, "base_sha", None)
+            if tosha is None:
+                tosha = getattr(change, "branch", None)
+            changes_data.append(dict(
+                connection=change.project.connection_name,
+                project=change.project.name,
+                branch=change.ref,
+                tosha=tosha,
+            ))
+        data = dict(changes=changes_data)
+        job = self.submitJob(
+            MergeRequest.FILES_CHANGES,
+            data,
+            build_set,
+            precedence,
+            needs_result=needs_result,
+            event=event,
+        )
+        return job
+
+    def getFilesChangesRaw(self, connection_name, project_name, branch, tosha,
+                           precedence=PRECEDENCE_HIGH,
+                           build_set=None, needs_result=False,
+                           event=None):
+        changes_data = [dict(
+            connection=connection_name,
+            project=project_name,
+            branch=branch,
+            tosha=tosha,
+        )]
+        data = dict(changes=changes_data)
         job = self.submitJob(
             MergeRequest.FILES_CHANGES,
             data,

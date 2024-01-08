@@ -232,7 +232,7 @@ class TestJob(BaseTestCase):
         change = model.Change(self.project)
         change.branch = 'master'
         change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
-        item = self.queue.enqueueChange(change, None)
+        item = self.queue.enqueueChanges([change], None)
 
         self.assertTrue(base.changeMatchesBranch(change))
         self.assertTrue(python27.changeMatchesBranch(change))
@@ -249,7 +249,7 @@ class TestJob(BaseTestCase):
 
         change.branch = 'stable/diablo'
         change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
-        item = self.queue.enqueueChange(change, None)
+        item = self.queue.enqueueChanges([change], None)
 
         self.assertTrue(base.changeMatchesBranch(change))
         self.assertTrue(python27.changeMatchesBranch(change))
@@ -300,7 +300,7 @@ class TestJob(BaseTestCase):
         change.branch = 'master'
         change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
         change.files = ['/COMMIT_MSG', 'ignored-file']
-        item = self.queue.enqueueChange(change, None)
+        item = self.queue.enqueueChanges([change], None)
 
         self.assertTrue(base.changeMatchesFiles(change))
         self.assertFalse(python27.changeMatchesFiles(change))
@@ -375,7 +375,7 @@ class TestJob(BaseTestCase):
         # Test master
         change.branch = 'master'
         change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
-        item = self.queue.enqueueChange(change, None)
+        item = self.queue.enqueueChanges([change], None)
         with testtools.ExpectedException(
                 Exception,
                 "Pre-review pipeline gate does not allow post-review job"):
@@ -453,7 +453,7 @@ class TestJob(BaseTestCase):
         change = model.Change(self.project)
         change.branch = 'master'
         change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
-        item = self.queue.enqueueChange(change, None)
+        item = self.queue.enqueueChanges([change], None)
 
         self.assertTrue(base.changeMatchesBranch(change))
         self.assertTrue(python27.changeMatchesBranch(change))
@@ -488,6 +488,7 @@ class FakeFrozenJob(model.Job):
         super().__init__(name)
         self.uuid = uuid.uuid4().hex
         self.ref = 'fake reference'
+        self.all_refs = [self.ref]
 
 
 class TestGraph(BaseTestCase):
