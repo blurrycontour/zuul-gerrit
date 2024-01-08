@@ -1,3 +1,5 @@
+# Copyright 2021, 2023-2024 Acme Gating, LLC
+#
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
 # a copy of the License at
@@ -32,11 +34,11 @@ class SupercedentPipelineManager(PipelineManager):
         # Don't use Pipeline.getQueue to find an existing queue
         # because we're matching project and (branch or ref).
         for queue in self.pipeline.queues:
-            if (queue.queue[-1].change.project == change.project and
+            if (queue.queue[-1].changes[0].project == change.project and
                 ((hasattr(change, 'branch') and
-                  hasattr(queue.queue[-1].change, 'branch') and
-                  queue.queue[-1].change.branch == change.branch) or
-                queue.queue[-1].change.ref == change.ref)):
+                  hasattr(queue.queue[-1].changes[0], 'branch') and
+                  queue.queue[-1].changes[0].branch == change.branch) or
+                queue.queue[-1].changes[0].ref == change.ref)):
                 log.debug("Found existing queue %s", queue)
                 return DynamicChangeQueueContextManager(queue)
         change_queue = model.ChangeQueue.new(
@@ -65,6 +67,13 @@ class SupercedentPipelineManager(PipelineManager):
                 self.log.debug("Item %s is superceded by %s, removing" %
                                (item, queue.queue[-1]))
                 self.removeItem(item)
+
+    def cycleForChange(self, *args, **kw):
+        ret = super().cycleForChange(*args, **kw)
+        if len(ret) > 1:
+            raise Exception("Dependency cycles not supported "
+                            "in supercedent pipelines")
+        return ret
 
     def addChange(self, *args, **kw):
         ret = super(SupercedentPipelineManager, self).addChange(

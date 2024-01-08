@@ -246,10 +246,13 @@ class DatabaseSession(object):
         # joinedload).
         q = self.session().query(self.connection.buildModel).\
             join(self.connection.buildSetModel).\
+            join(self.connection.refModel).\
             outerjoin(self.connection.providesModel).\
-            options(orm.contains_eager(self.connection.buildModel.buildset),
+            options(orm.contains_eager(self.connection.buildModel.buildset).
+                    subqueryload(self.connection.buildSetModel.refs),
                     orm.selectinload(self.connection.buildModel.provides),
-                    orm.selectinload(self.connection.buildModel.artifacts))
+                    orm.selectinload(self.connection.buildModel.artifacts),
+                    orm.selectinload(self.connection.buildModel.ref))
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilter(q, build_table.c.uuid, uuid)
@@ -428,7 +431,9 @@ class DatabaseSession(object):
             options(orm.joinedload(self.connection.buildSetModel.builds).
                     subqueryload(self.connection.buildModel.artifacts)).\
             options(orm.joinedload(self.connection.buildSetModel.builds).
-                    subqueryload(self.connection.buildModel.provides))
+                    subqueryload(self.connection.buildModel.provides)).\
+            options(orm.joinedload(self.connection.buildSetModel.builds).
+                    subqueryload(self.connection.buildModel.ref))
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilter(q, buildset_table.c.uuid, uuid)
@@ -798,6 +803,11 @@ class SQLConnection(BaseConnection):
         """Return a list of Build objects"""
         with self.getSession() as db:
             return db.getBuilds(*args, **kw)
+
+    def getBuild(self, *args, **kw):
+        """Return a Build object"""
+        with self.getSession() as db:
+            return db.getBuild(*args, **kw)
 
     def getBuildsets(self, *args, **kw):
         """Return a list of BuildSet objects"""

@@ -1,5 +1,5 @@
 # Copyright (c) 2017 Red Hat
-# Copyright 2021-2023 Acme Gating, LLC
+# Copyright 2021-2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -385,9 +385,14 @@ class ChangeFilter(object):
         for pipeline in payload['pipelines']:
             for change_queue in pipeline.get('change_queues', []):
                 for head in change_queue['heads']:
-                    for change in head:
-                        if self.wantChange(change):
-                            status.append(copy.deepcopy(change))
+                    for item in head:
+                        want_item = False
+                        for change in item['changes']:
+                            if self.wantChange(change):
+                                want_item = True
+                                break
+                        if want_item:
+                            status.append(copy.deepcopy(item))
         return status
 
     def wantChange(self, change):
@@ -1455,7 +1460,19 @@ class ZuulWebAPI(object):
             return my_datetime.strftime('%Y-%m-%dT%H:%M:%S')
         return None
 
-    def buildToDict(self, build, buildset=None):
+    def refToDict(self, ref):
+        return {
+            'project': ref.project,
+            'branch': ref.branch,
+            'change': ref.change,
+            'patchset': ref.patchset,
+            'ref': ref.ref,
+            'oldrev': ref.oldrev,
+            'newrev': ref.newrev,
+            'ref_url': ref.ref_url,
+        }
+
+    def buildToDict(self, build, buildset=None, skip_refs=False):
         start_time = self._datetimeToString(build.start_time)
         end_time = self._datetimeToString(build.end_time)
         if build.start_time and build.end_time:
@@ -1480,28 +1497,25 @@ class ZuulWebAPI(object):
             'final': build.final,
             'artifacts': [],
             'provides': [],
+            'ref': self.refToDict(build.ref),
         }
-
-        # TODO: This should not be conditional in the future, when we
-        # can have multiple refs for a buildset.
         if buildset:
+            # We enter this branch if we're returning top-level build
+            # objects (ie, not builds under a buildset).
             event_timestamp = self._datetimeToString(buildset.event_timestamp)
             ret.update({
-                'project': build.ref.project,
-                'branch': build.ref.branch,
                 'pipeline': buildset.pipeline,
-                'change': build.ref.change,
-                'patchset': build.ref.patchset,
-                'ref': build.ref.ref,
-                'oldrev': build.ref.oldrev,
-                'newrev': build.ref.newrev,
-                'ref_url': build.ref.ref_url,
                 'event_id': buildset.event_id,
                 'event_timestamp': event_timestamp,
                 'buildset': {
                     'uuid': buildset.uuid,
                 },
             })
+            if not skip_refs:
+                ret['buildset']['refs'] = [
+                    self.refToDict(ref)
+                    for ref in buildset.refs
+                ]
 
         for artifact in build.artifacts:
             art = {
@@ -1560,7 +1574,8 @@ class ZuulWebAPI(object):
             idx_max=_idx_max, exclude_result=exclude_result,
             query_timeout=self.query_timeout)
 
-        return [self.buildToDict(b, b.buildset) for b in builds]
+        return [self.buildToDict(b, b.buildset, skip_refs=True)
+                for b in builds]
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1570,10 +1585,10 @@ class ZuulWebAPI(object):
     def build(self, tenant_name, tenant, auth, uuid):
         connection = self._get_connection()
 
-        data = connection.getBuilds(tenant=tenant_name, uuid=uuid, limit=1)
+        data = connection.getBuild(tenant_name, uuid)
         if not data:
             raise cherrypy.HTTPError(404, "Build not found")
-        data = self.buildToDict(data[0], data[0].buildset)
+        data = self.buildToDict(data, data.buildset)
         return data
 
     def buildTimeToDict(self, build):
@@ -1646,19 +1661,15 @@ class ZuulWebAPI(object):
             'uuid': buildset.uuid,
             'result': buildset.result,
             'message': buildset.message,
-            'project': buildset.refs[0].project,
-            'branch': buildset.refs[0].branch,
             'pipeline': buildset.pipeline,
-            'change': buildset.refs[0].change,
-            'patchset': buildset.refs[0].patchset,
-            'ref': buildset.refs[0].ref,
-            'oldrev': buildset.refs[0].oldrev,
-            'newrev': buildset.refs[0].newrev,
-            'ref_url': buildset.refs[0].ref_url,
             'event_id': buildset.event_id,
             'event_timestamp': event_timestamp,
             'first_build_start_time': start,
             'last_build_end_time': end,
+            'refs': [
+                self.refToDict(ref)
+                for ref in buildset.refs
+            ],
         }
         if builds:
             ret['builds'] = []
@@ -1798,7 +1809,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.check_tenant_auth()
     def project_freeze_jobs(self, tenant_name, tenant, auth,
                             pipeline_name, project_name, branch_name):
-        item = self._freeze_jobs(
+        item, change = self._freeze_jobs(
             tenant, pipeline_name, project_name, branch_name)
 
         output = []
@@ -1822,9 +1833,10 @@ class ZuulWebAPI(object):
                            job_name):
         # TODO(jhesketh): Allow a canonical change/item to be passed in which
         # would return the job with any in-change modifications.
-        item = self._freeze_jobs(
+        item, change = self._freeze_jobs(
             tenant, pipeline_name, project_name, branch_name)
-        job = item.current_build_set.job_graph.getJobFromName(job_name)
+        job = item.current_build_set.job_graph.getJob(
+            job_name, change.cache_key)
         if not job:
             raise cherrypy.HTTPError(404)
 
@@ -1873,12 +1885,12 @@ class ZuulWebAPI(object):
         change.cache_stat = FakeCacheKey()
         with LocalZKContext(self.log) as context:
             queue = ChangeQueue.new(context, pipeline=pipeline)
-            item = QueueItem.new(context, queue=queue, change=change)
+            item = QueueItem.new(context, queue=queue, changes=[change])
             item.freezeJobGraph(tenant.layout, context,
                                 skip_file_matcher=True,
                                 redact_secrets_and_keys=True)
 
-        return item
+        return item, change
 
 
 class StaticHandler(object):
