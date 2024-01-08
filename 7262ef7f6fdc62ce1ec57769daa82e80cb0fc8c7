@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ee5342e_5bfd69e3",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5490,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-08T15:57:24Z",
+      "side": 1,
+      "message": "I think this could be a simple `return job_graph.getJobFromUuid(job_id)` as we return `None` if the job is `None`.",
+      "range": {
+        "startLine": 5488,
+        "startChar": 0,
+        "endLine": 5490,
+        "endChar": 26
+      },
+      "revId": "7262ef7f6fdc62ce1ec57769daa82e80cb0fc8c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
