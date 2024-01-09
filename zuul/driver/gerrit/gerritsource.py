@@ -165,7 +165,7 @@ class GerritSource(BaseSource):
             history = []
         history.append(topic)
 
-        query = 'status:open topic:%s' % topic
+        query = 'status:open topic:"%s"' % topic
         results = self.connection.simpleQuery(query)
         for result in results:
             change_key = ChangeKey(self.connection.connection_name, None,

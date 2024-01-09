@@ -3499,9 +3499,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
     @simple_layout('layouts/deps-by-topic.yaml')
     def test_deps_by_topic(self):
         A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
-                                           topic='test-topic')
+                                           topic='test topic')
         B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
-                                           topic='test-topic')
+                                           topic='test topic')
 
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
