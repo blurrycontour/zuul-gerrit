@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
-import imp
+import importlib
 import os
 
 import ansible.plugins.action
@@ -44,10 +44,17 @@ def _import_ansible_action_plugin(name):
     # namespace, causing infinite recursion.  So we supply an
     # otherwise unused name for the module:
     # zuul.ansible.protected.action.foo.
-
-    return imp.load_module(
-        'zuul.ansible.protected.action.' + name,
-        *imp.find_module(name, ansible.plugins.action.__path__))
+    #
+    # From https://discuss.python.org/t/how-do-i-migrate-from-imp/27885/3
+    # for converting imp module loads to python3.12 compatible code.
+    spec = importlib.find_spec(name, ansible.plugins.action.__path__)
+    if not spec:
+        raise Exception("Could not find %s at module path %s" %
+                        (name, ansible.plugins.action.__path__))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    sys.modules['zuul.ansible.protected.action.' + name] = mod
+    return mod
 
 
 def _sanitize_filename(name):
