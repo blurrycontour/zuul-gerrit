@@ -30,6 +30,10 @@ libffi8 [platform:ubuntu-jammy platform:debian-bookworm]
 libffi7 [platform:ubuntu-focal platform:debian-bullseye]
 libffi6 [platform:dpkg !platform:ubuntu-focal !platform:ubuntu-jammy !platform:debian-bullseye !platform:debian-bookworm]
 libffi-devel [compile test platform:rpm]
+# These two compression libs are needed when installing python3.12 from
+# source using pyenv. We can drop them once we're using distro packages.
+liblzma-dev [test]
+libbz2-dev [test]
 libyaml-0-2 [platform:dpkg platform:suse]
 libyaml [platform:redhat]
 libyaml-dev [platform:dpkg compile test]
