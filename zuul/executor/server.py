@@ -3367,7 +3367,7 @@ class ExecutorServer(BaseMergeServer):
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
-        self.verbose = False
+        self.verbose = True
         self.command_map = {
             commandsocket.StopCommand.name: self.stop,
             commandsocket.PauseCommand.name: self.pause,

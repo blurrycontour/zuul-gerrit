@@ -121,7 +121,7 @@ services:
       - "logs:/srv/static/logs:z"
       - "certs:/var/certs:z"
       - "lib-zuul-executor:/var/lib/zuul:z"
-    command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zuul-executor -f'"
+    command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zuul-executor -f -d'"
     networks:
       - zuul
   node:
