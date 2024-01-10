@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cc7ec2b_b63a8342",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2393,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-10T23:33:20Z",
+      "side": 1,
+      "message": "Doesn\u0027t a job always have a name?",
+      "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40bc3199_b1ed5fa9",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3675,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-10T23:33:20Z",
+      "side": 1,
+      "message": "Can we simplify this by setting the model_version to COMPOINENT_REGISTRY.model_api? Then we can do checks of \u003c 22 and \u003e\u003d 22?\n\nIt isn\u0027t clear to me why we need to set initial_model_api at all as it appears unused except for here.\n\nIt looks like we\u0027ll (de)serialize objects created by this code before the model api update to have values of 0. But when we interact with old data we\u0027ll set a default of the current model api. For consistency I think we can just use the model api version everywhere?",
+      "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07105c63_50b56baf",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3751,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-10T23:33:20Z",
+      "side": 1,
+      "message": "For this function and the one above it I guess the assumption is that we\u0027ll only ever operate on \"converted\" values? Should we instead try to get the index() of job_id in the appropriate list and if not present then return job_id as is instead? This way you can provide either type and it should work?\n\nI\u0027m mostly thinking that it is hard to reason about whether we\u0027ll always provide the correct value type in generic terms since these functions could be called from values that don\u0027t originate in the jobgraph?",
+      "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
