@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "964b6273_1b69df04",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2393,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-10T23:52:00Z",
+      "side": 1,
+      "message": "Not during very early deserialization/construction.  When this gets used in error logs in those cases, it blows up.",
+      "parentUuid": "3cc7ec2b_b63a8342",
+      "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40bc3199_b1ed5fa9",
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "692e6b9a_d1d9e156",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3675,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-10T23:52:00Z",
+      "side": 1,
+      "message": "I agree that the initial model api line is unused.  I can clean that up.  It should read:\n\nif COMPONENT_REGISTRY.model_api \u003e\u003d 22:\n    self.model_version \u003d 22\n\nI wasn\u0027t necessarily thinking that the model version of objects would always be tied to the model api version.  And we would only bump this when we actually changed something, which is why I hardcoded the value.  I agree that setting it to the model_api would also be fine.  I don\u0027t think it makes a significant difference, and I plan on deleting all of this in a few commits anyway.  We only need this temporarily.",
+      "parentUuid": "40bc3199_b1ed5fa9",
+      "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "07105c63_50b56baf",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -48,6 +84,24 @@
       "writtenOn": "2024-01-10T23:33:20Z",
       "side": 1,
       "message": "For this function and the one above it I guess the assumption is that we\u0027ll only ever operate on \"converted\" values? Should we instead try to get the index() of job_id in the appropriate list and if not present then return job_id as is instead? This way you can provide either type and it should work?\n\nI\u0027m mostly thinking that it is hard to reason about whether we\u0027ll always provide the correct value type in generic terms since these functions could be called from values that don\u0027t originate in the jobgraph?",
+      "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ff253f7_1b4b8f35",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3751,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-10T23:52:00Z",
+      "side": 1,
+      "message": "These relate to the \"getJobIds\" method above, which is the only way to get a \"job id\" from the graph now, so it\u0027s a closed system (we know all values originate in the job graph).",
+      "parentUuid": "07105c63_50b56baf",
       "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
