@@ -434,15 +434,48 @@ class DatabaseSession(object):
         except sqlalchemy.orm.exc.MultipleResultsFound:
             raise Exception("Multiple buildset found with uuid %s", uuid)
 
+    def _getBuildsetsForDelete(self, updated_max, limit):
+        # This does a query for buildsets, then a "select in" query
+        # for each adjoining table.  This is used by the
+        # deleteBuildsets method.
+        buildset_table = self.connection.zuul_buildset_table
+        q = self.session().query(self.connection.buildSetModel).\
+            options(
+                orm.selectinload(
+                    self.connection.buildSetModel.builds,
+                ),
+                orm.selectinload(
+                    self.connection.buildSetModel.refs,
+                ),
+                orm.selectinload(
+                    self.connection.buildSetModel.builds,
+                    self.connection.buildModel.provides,
+                ),
+                orm.selectinload(
+                    self.connection.buildSetModel.builds,
+                    self.connection.buildModel.artifacts,
+                ),
+                orm.selectinload(
+                    self.connection.buildSetModel.builds,
+                    self.connection.buildModel.build_events,
+                ),
+            )
+
+        q = q.filter(buildset_table.c.updated < updated_max)
+        q = q.order_by(buildset_table.c.id.desc()).limit(limit)
+        try:
+            return q.all()
+        except sqlalchemy.orm.exc.NoResultFound:
+            return []
+
     def deleteBuildsets(self, cutoff, batch_size):
         """Delete buildsets before the cutoff"""
 
-        # delete buildsets updated before the cutoff
         deleted = True
         while deleted:
             deleted = False
             oldest = None
-            for buildset in self.getBuildsets(
+            for buildset in self._getBuildsetsForDelete(
                     updated_max=cutoff, limit=batch_size):
                 deleted = True
                 if oldest is None:
