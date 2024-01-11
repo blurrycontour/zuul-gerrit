@@ -1923,12 +1923,27 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         url = github.session.build_url('repos', project_name, 'branches',
                                        branch_name)
 
-        resp = github.session.get(url)
+        # Prevent the cachecontrol adapter from returning cached responses, as
+        # this doesn't work correctly with renamed branches for which Github
+        # returns HTTP 301 permanent redirects.
+        headers = {
+            "Cache-Control": "no-cache",
+        }
 
-        if resp.status_code == 404:
+        # When a branch is renamed Github will redirect to the endpoint for
+        # the new name. This is not what we want, so we disable redirects.
+        resp = github.session.get(url, headers=headers, allow_redirects=False)
+
+        # Ignore redirects and error responses
+        if 200 <= resp.status_code <= 299:
             return None
 
-        return resp.json().get('protected')
+        data = resp.json()
+        # Make sure the information we receive is for the requested branch.
+        if data["name"] != branch_name:
+            return None
+
+        return data.get('protected')
 
     def getPullUrl(self, project, number):
         return '%s/pull/%s' % (self.getGitwebUrl(project), number)
