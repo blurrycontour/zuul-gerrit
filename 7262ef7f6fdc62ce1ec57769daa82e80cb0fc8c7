@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ed569024_d10ac99c",
+        "filename": "tests/unit/test_nodepool.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T19:46:13Z",
+      "side": 1,
+      "message": "I see this pattern is duplicated elsewhere in existing tests. That said, this will patch a global entity should we be using a fixture that will properly clean up after itself and reset the COMPONENT_REGISTRY?\n\nIf we leak improperly we could potentially impact other tests that rely on these values being set appropriately like the model upgrade tests.",
+      "revId": "7262ef7f6fdc62ce1ec57769daa82e80cb0fc8c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ee5342e_5bfd69e3",
         "filename": "zuul/model.py",
         "patchSetId": 1
