@@ -1928,7 +1928,12 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if resp.status_code == 404:
             return None
 
-        return resp.json().get('protected')
+        data = resp.json()
+        if data["name"] != branch_name:
+            # Branch was renamed
+            return None
+
+        return data.get('protected')
 
     def getPullUrl(self, project, number):
         return '%s/pull/%s' % (self.getGitwebUrl(project), number)
