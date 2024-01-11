@@ -117,6 +117,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4dd8c8dd_de4b2dbf",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4518,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T16:01:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6941b7d2_cc17e8eb",
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9a2d91c6_6703643f",
@@ -165,6 +183,24 @@
       "writtenOn": "2024-01-11T00:25:11Z",
       "side": 1,
       "message": "This is going to return the entire job now rather than just the job name/uuid. The call points in scheduler.py have been updated to accommodate the change.",
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a179811_edcabfa0",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5048,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T16:01:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "696245f6_a114e878",
       "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
