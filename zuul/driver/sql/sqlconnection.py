@@ -154,12 +154,18 @@ class DatabaseSession(object):
         # joinedload).
         q = self.session().query(self.connection.buildModel).\
             join(self.connection.buildSetModel).\
-            join(self.connection.refModel).\
-            outerjoin(self.connection.providesModel).\
-            options(orm.contains_eager(self.connection.buildModel.buildset),
-                    orm.contains_eager(self.connection.buildModel.ref),
-                    orm.selectinload(self.connection.buildModel.provides),
-                    orm.selectinload(self.connection.buildModel.artifacts))
+            join(self.connection.refModel)
+        # Avoid joining the provides table unless necessary; postgres
+        # has created some poor query plans in that case.  Currently
+        # the only time this gets called with provides is from the
+        # scheduler which has several other criteria which narrow down
+        # the query.
+        if provides:
+            q = q.outerjoin(self.connection.providesModel)
+        q = q.options(orm.contains_eager(self.connection.buildModel.buildset),
+                      orm.contains_eager(self.connection.buildModel.ref),
+                      orm.selectinload(self.connection.buildModel.provides),
+                      orm.selectinload(self.connection.buildModel.artifacts))
         # If the query planner isn't able to reduce either the number
         # of rows returned by the buildset or build tables, then it
         # tends to produce a very slow query.  This hint produces
