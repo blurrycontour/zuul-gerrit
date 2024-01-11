@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "663931cba39bbe30fad76b640a1b0503f3ee0156",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02b226e2_056a261d",
+        "filename": "tests/unit/test_event_queues.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T20:01:31Z",
+      "side": 1,
+      "message": "Is this necessary now because we\u0027re checking the model api version in code paths that these tests traverse but weren\u0027t before?",
+      "revId": "663931cba39bbe30fad76b640a1b0503f3ee0156",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fdfd2f05_aadf0489",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2884,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T20:01:31Z",
+      "side": 1,
+      "message": "It appears that Job() objects don\u0027t actually have a uuid or _job_id property. We don\u0027t use a FrozenJob here which does beacuse FrozenJobs are backed to zookeeper. Should we add these properties to the in memory Job objects to reduce confusion.\n\nMaybe a better alternative is to use a Dummy object to make it clear we don\u0027t actually care about the rest of the object class here and just need a way to pass data around?\n\nAdditionally we seem to refer to job._job_id in a lot of places in the code (including in this change) but that must imply these are all FrozenJobs? Should we try and make that more clear somehow to avoid confusion between what is a Job() and a FrozenJob()?",
+      "revId": "663931cba39bbe30fad76b640a1b0503f3ee0156",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
