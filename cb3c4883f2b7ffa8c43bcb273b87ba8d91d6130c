@@ -71,6 +71,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5309e49f_627564ec",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3675,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T00:04:54Z",
+      "side": 1,
+      "message": "Ok that makes sense to me. I guess the only thing to cleanup here is the initial_model_api variable. That is probably fine in a followup if you like.",
+      "parentUuid": "692e6b9a_d1d9e156",
+      "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07105c63_50b56baf",
