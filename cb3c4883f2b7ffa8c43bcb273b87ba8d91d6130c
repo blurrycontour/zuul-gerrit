@@ -16,6 +16,24 @@
       "message": "Do we not need to cancel old builds when reenqueing anymore?",
       "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4e0ffd2_d428fc0f",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1702,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-11T01:16:18Z",
+      "side": 0,
+      "message": "Nope, turns out this has been dead code for a while; since some time around when we stored frozen jobs in zk.  Basically once the \"job\" became immutable for a buildset, this can\u0027t happen any more.",
+      "parentUuid": "492bce28_01d7b688",
+      "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

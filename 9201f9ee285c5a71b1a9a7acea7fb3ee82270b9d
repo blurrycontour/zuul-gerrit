@@ -41,6 +41,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aecc0b66_5a5d50a9",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5801,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-11T01:16:18Z",
+      "side": 1,
+      "message": "Me too.  I guess I was speaking lisp that day.  :)",
+      "parentUuid": "0ed88aec_07ba12fa",
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec3ab885_0e5efd94",
@@ -60,6 +78,24 @@
         "endLine": 2463,
         "endChar": 20
       },
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a9c71d0_88c34cdc",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2463,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-11T01:16:18Z",
+      "side": 1,
+      "message": "This one\u0027s correct since that\u0027s when we first added the uuid, and we\u0027re just adding a new method here, not changing data storage.  IOW, as soon as it\u0027s safe to remove the backwards compat code for model_api 19, this chunk can be removed too.",
+      "parentUuid": "ec3ab885_0e5efd94",
       "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -94,6 +130,24 @@
       "writtenOn": "2024-01-11T00:25:11Z",
       "side": 1,
       "message": "Should there be a break here to shorten the iteration?",
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d20cbecb_2a190b97",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4967,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-11T01:16:18Z",
+      "side": 1,
+      "message": "Yep, but I think we can ignore since this is temporary and the impact is minimal.",
+      "parentUuid": "9a2d91c6_6703643f",
       "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
