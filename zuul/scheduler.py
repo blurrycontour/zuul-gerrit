@@ -66,7 +66,6 @@ from zuul.model import (
     EnqueueEvent,
     FilesChangesCompletedEvent,
     HoldRequest,
-    Job,
     MergeCompletedEvent,
     NodesProvisionedEvent,
     PromoteEvent,
@@ -170,6 +169,12 @@ class SchedulerStatsElection(SessionAwareElection):
     def __init__(self, client):
         self.election_root = "/zuul/scheduler/stats-election"
         super().__init__(client.client, self.election_root)
+
+
+class DummyFrozenJob:
+    """Some internal methods expect a FrozenJob for cleanup;
+    use this when we don't actually have one"""
+    pass
 
 
 class Scheduler(threading.Thread):
@@ -2878,7 +2883,8 @@ class Scheduler(threading.Thread):
             # allows reporting the build via SQL and cleaning up build
             # resources.
             build = Build()
-            job = Job(event.job_name)
+            job = DummyFrozenJob()
+            job.name = event.job_name
             job.uuid = event.job_uuid
             # MODEL_API < 25
             job._job_id = job.uuid or job.name
