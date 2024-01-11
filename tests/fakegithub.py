@@ -623,7 +623,7 @@ class FakeGithubSession(object):
         fakepath = '/'.join(args)
         return FAKE_BASE_URL + fakepath
 
-    def get(self, url, headers=None, params=None):
+    def get(self, url, headers=None, params=None, allow_redirects=True):
         request = url
         if request.startswith(FAKE_BASE_URL):
             request = request[len(FAKE_BASE_URL):]
