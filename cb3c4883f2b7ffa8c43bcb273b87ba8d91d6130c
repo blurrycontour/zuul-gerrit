@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "492bce28_01d7b688",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1702,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T00:25:11Z",
+      "side": 0,
+      "message": "Do we not need to cancel old builds when reenqueing anymore?",
+      "revId": "cb3c4883f2b7ffa8c43bcb273b87ba8d91d6130c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

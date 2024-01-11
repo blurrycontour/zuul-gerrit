@@ -39,6 +39,80 @@
       "message": "nit: personal preference, but I think a list comp is a little more readable here\n\n        job \u003d [j for j in items[0].getJobs()\n               if j.name \u003d\u003d \u0027project-test1\u0027][0]",
       "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec3ab885_0e5efd94",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2463,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T00:25:11Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be 23?",
+      "range": {
+        "startLine": 2463,
+        "startChar": 18,
+        "endLine": 2463,
+        "endChar": 20
+      },
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6941b7d2_cc17e8eb",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4518,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T00:25:11Z",
+      "side": 1,
+      "message": "As noted in the parent change review comments this could be refactored to use the current model api but this whole part of the code will be cleaned up in the final circular dependencies refactor anyway. Not worth updating.",
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a2d91c6_6703643f",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4967,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T00:25:11Z",
+      "side": 1,
+      "message": "Should there be a break here to shorten the iteration?",
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "696245f6_a114e878",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5048,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-11T00:25:11Z",
+      "side": 1,
+      "message": "This is going to return the entire job now rather than just the job name/uuid. The call points in scheduler.py have been updated to accommodate the change.",
+      "revId": "9201f9ee285c5a71b1a9a7acea7fb3ee82270b9d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
