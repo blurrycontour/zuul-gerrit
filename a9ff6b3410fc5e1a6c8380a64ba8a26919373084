@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3c9d285_fe81499d",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 7131,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-12T11:51:15Z",
+      "side": 1,
+      "message": "Should we also change this in https://opendev.org/zuul/zuul/src/branch/master/zuul/cmd/client.py#L566-L569 and https://opendev.org/zuul/zuul-client/src/branch/master/zuulclient/cmd/__init__.py#L157-L160 ?\n\nWe just had a case where a user wanted to enqueue a branch head and Zuul checked out the default branch instead of the triggering branch due to https://opendev.org/zuul/zuul/src/branch/master/zuul/merger/merger.py#L1345-L1350 \nand https://opendev.org/zuul/zuul/src/branch/master/zuul/merger/merger.py#L1106-L1108",
+      "revId": "a9ff6b3410fc5e1a6c8380a64ba8a26919373084",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
