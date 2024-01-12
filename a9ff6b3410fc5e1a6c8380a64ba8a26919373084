@@ -34,6 +34,24 @@
       "parentUuid": "a3c9d285_fe81499d",
       "revId": "a9ff6b3410fc5e1a6c8380a64ba8a26919373084",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "361769b8_cc3d49e3",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 7131,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-12T14:54:28Z",
+      "side": 1,
+      "message": "https://review.opendev.org/905465 and https://review.opendev.org/905466",
+      "parentUuid": "a3c9d285_fe81499d",
+      "revId": "a9ff6b3410fc5e1a6c8380a64ba8a26919373084",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
