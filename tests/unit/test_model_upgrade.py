@@ -754,15 +754,29 @@ class TestDataReturn(AnsibleZuulTestCase):
         self.assertIn('- data-return-relative https://zuul.example.com',
                       A.messages[-1])
 
-    @model_version(20)
-    def test_model_20_21(self):
-        self._test_circ_dep_refactor()
-
+    # To 21
     @model_version(18)
     def test_model_18_21(self):
-        self._test_circ_dep_refactor()
+        self._test_circ_dep_refactor(21)
 
-    def _test_circ_dep_refactor(self):
+    @model_version(20)
+    def test_model_20_21(self):
+        self._test_circ_dep_refactor(21)
+
+    # To 22
+    @model_version(18)
+    def test_model_18_22(self):
+        self._test_circ_dep_refactor(22)
+
+    @model_version(20)
+    def test_model_20_22(self):
+        self._test_circ_dep_refactor(22)
+
+    @model_version(21)
+    def test_model_21_22(self):
+        self._test_circ_dep_refactor(22)
+
+    def _test_circ_dep_refactor(self, final_model_api):
         # Test backwards compat for job graph dependency freezing.
         # First test the entire lifecycle under the old api.
         A = self.fake_gerrit.addFakeChange('org/project6', 'master', 'A')
@@ -786,10 +800,10 @@ class TestDataReturn(AnsibleZuulTestCase):
         self.assertEqual(len(self.builds), 1)
 
         # Upgrade our component
-        self.model_test_component_info.model_api = 21
+        self.model_test_component_info.model_api = final_model_api
         component_registry = ComponentRegistry(self.zk_client)
         for _ in iterate_timeout(30, "model api to update"):
-            if component_registry.model_api == 21:
+            if component_registry.model_api == final_model_api:
                 break
 
         self.executor_server.hold_jobs_in_build = False

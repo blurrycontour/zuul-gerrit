@@ -354,6 +354,8 @@ Work Items
   later, but again, will work for the n=1 case now.  This can be
   done as an early standalone change.
 
+* Index the build dictionary on the BuildSet by job uuid.
+
 * Update items to support multiple changes.  This is likely to be a
   large change where we simultaneously update anything where we can't
   support both systems ahead of time.
