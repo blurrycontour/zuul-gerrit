@@ -3683,11 +3683,9 @@ class JobGraph(object):
         self.project_metadata = {}
         # A temporary model version to help with the circular dep refactor
         self.model_version = 0
-        # Not serialized
-        # Store the model api at the time this object was instantiated
+        # Store the model version at the time this object was instantiated
         # so we don't change behavior while freezing.
-        self.initial_model_api = COMPONENT_REGISTRY.model_api
-        if self.initial_model_api >= 22:
+        if COMPONENT_REGISTRY.model_api >= 22:
             self.model_version = 22
 
     def __repr__(self):
