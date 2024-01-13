@@ -3047,12 +3047,11 @@ class Scheduler(threading.Thread):
             return
 
         log = get_annotated_logger(self.log, request.event_id)
-        job = build_set.item.getJob(request.job_name)
+        job = build_set.item.getJob(request._job_id)
         if job is None:
             log.warning("Item %s does not contain job %s "
                         "for node request %s",
-                        build_set.item, request.job_name, request)
-            build_set.removeJobNodeRequestID(request.job_name)
+                        build_set.item, request._job_id, request)
             return
 
         # If the request failed, we must directly delete it as the nodes will
@@ -3063,7 +3062,7 @@ class Scheduler(threading.Thread):
 
         nodeset = self.nodepool.getNodeSet(request, job.nodeset)
 
-        job = build_set.item.getJob(request.job_name)
+        job = build_set.item.getJob(request._job_id)
         if build_set.getJobNodeSetInfo(job) is None:
             pipeline.manager.onNodesProvisioned(request, nodeset, build_set)
         else:

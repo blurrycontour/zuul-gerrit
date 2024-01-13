@@ -191,8 +191,8 @@ class Nodepool(object):
         else:
             event_id = None
         req = model.NodeRequest(self.system_id, build_set_uuid, tenant_name,
-                                pipeline_name, job.name, labels, provider,
-                                relative_priority, event_id)
+                                pipeline_name, job.name, job._job_id, labels,
+                                provider, relative_priority, event_id)
 
         if job.nodeset.nodes:
             self.zk_nodepool.submitNodeRequest(req, priority)

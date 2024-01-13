@@ -180,3 +180,9 @@ Version 23
 :Prior Zuul version: 9.3.0
 :Description: Add model_version field to bulid sets.
               Affects schedulers.
+
+Version 24
+----------
+:Prior Zuul version: 9.3.0
+:Description: Add job_uuid to NodeRequests.
+              Affects schedulers.
