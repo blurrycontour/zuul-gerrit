@@ -623,7 +623,8 @@ class TestScaleOutScheduler(ZuulTestCase):
         self.waitUntilSettled()
 
         timer1 = self.scheds.first.sched.connections.drivers['timer']
-        timer1_jobs = timer1.apsched.get_jobs()
+        timer1_jobs = sorted(timer1.apsched.get_jobs(),
+                             key=lambda x: x.trigger._zuul_jitter)
 
         sched2 = self.createScheduler()
         sched2.start()
@@ -635,7 +636,8 @@ class TestScaleOutScheduler(ZuulTestCase):
         timer2 = sched2.connections.drivers['timer']
 
         for _ in iterate_timeout(10, "until jobs registered"):
-            timer2_jobs = timer2.apsched.get_jobs()
+            timer2_jobs = sorted(timer2.apsched.get_jobs(),
+                                 key=lambda x: x.trigger._zuul_jitter)
             if timer2_jobs:
                 break
 
@@ -647,9 +649,7 @@ class TestScaleOutScheduler(ZuulTestCase):
                              timer2_jobs[x].trigger._zuul_jitter)
             if x:
                 # Assert that we're not applying the same jitter to
-                # every job.  Since we're dealing with a PRNG here,
-                # this could fail and be a false negative, but that's
-                # unlikely to happen often.
+                # every job.
                 self.assertNotEqual(timer1_jobs[x - 1].trigger._zuul_jitter,
                                     timer1_jobs[x].trigger._zuul_jitter)
 
