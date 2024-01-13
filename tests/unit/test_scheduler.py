@@ -5797,10 +5797,13 @@ For CI problems and help debugging, contact ci@example.org"""
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         items = tenant.layout.pipelines['check'].getAllItems()
         build_set = items[0].current_build_set
+        job = list(filter(lambda j: j.name == 'project-test1',
+                          items[0].getJobs()))[0]
+        build_set.job_graph.getJobFromName(job)
 
         for x in range(3):
             # We should have x+1 retried builds for project-test1
-            retry_builds = build_set.getRetryBuildsForJob('project-test1')
+            retry_builds = build_set.getRetryBuildsForJob(job)
             self.assertEqual(len(retry_builds), x + 1)
             for build in retry_builds:
                 self.assertEqual(build.retry, True)
@@ -6561,7 +6564,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertEqual('check-job', check_job.name)
         self.assertTrue(isinstance(check_job._variables,
                                    zuul.model.JobData))
-        check_build = item.current_build_set.getBuild('check-job')
+        check_build = item.current_build_set.getBuild(check_job)
         self.assertTrue(isinstance(check_build._result_data,
                                    zuul.model.JobData))
 

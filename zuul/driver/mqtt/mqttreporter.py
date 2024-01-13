@@ -65,7 +65,7 @@ class MQTTReporter(BaseReporter):
                 'job_name': job.name,
                 'voting': job.voting,
             }
-            build = item.current_build_set.getBuild(job.name)
+            build = item.current_build_set.getBuild(job)
             if build:
                 # Report build data if available
                 (result, web_url) = item.formatJobResult(job)
@@ -89,7 +89,7 @@ class MQTTReporter(BaseReporter):
 
                 # Report build data of retried builds if available
                 retry_builds = item.current_build_set.getRetryBuildsForJob(
-                    job.name)
+                    job)
                 for build in retry_builds:
                     (result, web_url) = item.formatJobResult(job, build)
                     retry_build_information = {

@@ -992,7 +992,7 @@ class PipelineState(zkobject.ZKObject):
             if not job_graph:
                 continue
             for job in job_graph.getJobs():
-                build = build_set.getBuild(job.name)
+                build = build_set.getBuild(job)
                 if build:
                     items_referenced_by_builds.add(build.build_set.item.uuid)
         stale_items = all_items - known_items - items_referenced_by_builds
@@ -2459,6 +2459,11 @@ class FrozenJob(zkobject.ZKObject):
         # MODEL_API < 19
         job_id = self.uuid or self.name
         return self.jobPath(job_id, self.buildset.getPath())
+
+    # MODEL_API < 19
+    @property
+    def _job_id(self):
+        return self.uuid or self.name
 
     def serialize(self, context):
         # Ensure that any special handling in this method is matched
@@ -4508,6 +4513,9 @@ class BuildSet(zkobject.ZKObject):
 
     def __init__(self):
         super().__init__()
+        model_version = 0
+        if COMPONENT_REGISTRY.model_api >= 23:
+            model_version = 23
         self._set(
             item=None,
             builds={},
@@ -4545,6 +4553,8 @@ class BuildSet(zkobject.ZKObject):
             # Cached job graph of previous layout; not serialized
             _old_job_graph=None,
             _old_jobs={},
+            # A temporary model version to help with the circular dep refactor
+            model_version=model_version,
         )
 
     def setFiles(self, items):
@@ -4663,6 +4673,7 @@ class BuildSet(zkobject.ZKObject):
             "repo_state_request_time": self.repo_state_request_time,
             "job_versions": self.job_versions,
             "build_versions": self.build_versions,
+            "model_version": self.model_version,
             # jobs (serialize as separate objects)
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
@@ -4740,11 +4751,11 @@ class BuildSet(zkobject.ZKObject):
         existing_retry_builds = {b.getPath(): b
                                  for bl in self.retry_builds.values()
                                  for b in bl}
-        # This is a tuple of (kind, job_name, Future), where kind is
-        # None if no action needs to be taken, or a string to indicate
-        # which kind of job it was.  This structure allows us to
-        # execute async ZK reads and perform local data updates in
-        # order.
+        # This is a tuple of (kind, job_id, job_build_key, Future),
+        # where kind is None if no action needs to be taken, or a
+        # string to indicate which kind of job it was.  This structure
+        # allows us to execute async ZK reads and perform local data
+        # updates in order.
         tpe_jobs = []
         tpe = context.executor[BuildSet]
         job_versions = data.get('job_versions', {})
@@ -4755,9 +4766,18 @@ class BuildSet(zkobject.ZKObject):
                 # If we have a current build before refreshing, we may
                 # be able to skip refreshing some items since they
                 # will not have changed.
+
+                # TODO: after circular dependency refactor, we can
+                # just use job_id (or job.uuid) for everything.  Until
+                # then, the index for the job graph and the index for
+                # the build dict may each either be name or id.
                 job_name = job_graph.getNameForJobId(job_id)
-                build_path = data["builds"].get(job_name)
-                old_build = self.builds.get(job_name)
+                if self.model_version < 23:
+                    job_build_key = job_graph.getNameForJobId(job_id)
+                else:
+                    job_build_key = job_graph.getUuidForJobId(job_id)
+                build_path = data["builds"].get(job_build_key)
+                old_build = self.builds.get(job_build_key)
                 old_build_exists = (old_build
                                     and old_build.getPath() == build_path)
 
@@ -4765,52 +4785,52 @@ class BuildSet(zkobject.ZKObject):
                     job = self.jobs[job_id]
                     if ((not old_build_exists) or
                         self.shouldRefreshJob(job, job_versions)):
-                        tpe_jobs.append((None, job_id, job_name,
+                        tpe_jobs.append((None, job_id, job_build_key,
                                          tpe.submit(job.refresh, context)))
                 else:
                     job_uuid = job_graph.getUuidForJobId(job_id)
                     # MODEL_API < 19; use job_name if job_uuid is None
                     job_path = FrozenJob.jobPath(
                         job_uuid or job_name, self.getPath())
-                    tpe_jobs.append(('job', job_id, job_name, tpe.submit(
+                    tpe_jobs.append(('job', job_id, job_build_key, tpe.submit(
                         FrozenJob.fromZK, context, job_path, buildset=self)))
 
                 if build_path:
-                    build = self.builds.get(job_name)
-                    builds[job_name] = build
+                    build = self.builds.get(job_build_key)
+                    builds[job_build_key] = build
                     if build and build.getPath() == build_path:
                         if self.shouldRefreshBuild(build, build_versions):
                             tpe_jobs.append((
-                                None, job_id, job_name, tpe.submit(
+                                None, job_id, job_build_key, tpe.submit(
                                     build.refresh, context)))
                     else:
                         if not self._isMyBuild(build_path):
                             build = BuildReference(build_path)
                             context.build_references = True
-                            builds[job_name] = build
+                            builds[job_build_key] = build
                         else:
                             tpe_jobs.append((
-                                'build', job_id, job_name, tpe.submit(
+                                'build', job_id, job_build_key, tpe.submit(
                                     Build.fromZK, context, build_path,
                                     build_set=self)))
 
-                for retry_path in data["retry_builds"].get(job_name, []):
+                for retry_path in data["retry_builds"].get(job_build_key, []):
                     retry_build = existing_retry_builds.get(retry_path)
                     if retry_build and retry_build.getPath() == retry_path:
                         # Retry builds never change.
-                        retry_builds[job_name].append(retry_build)
+                        retry_builds[job_build_key].append(retry_build)
                     else:
                         if not self._isMyBuild(retry_path):
                             retry_build = BuildReference(retry_path)
                             context.build_references = True
-                            retry_builds[job_name].append(retry_build)
+                            retry_builds[job_build_key].append(retry_build)
                         else:
                             tpe_jobs.append((
-                                'retry', job_id, job_name, tpe.submit(
+                                'retry', job_id, job_build_key, tpe.submit(
                                     Build.fromZK, context, retry_path,
                                     build_set=self)))
 
-        for (kind, job_id, job_name, future) in tpe_jobs:
+        for (kind, job_id, job_build_key, future) in tpe_jobs:
             result = future.result()
             if kind == 'job':
                 self.jobs[job_id] = result
@@ -4820,10 +4840,10 @@ class BuildSet(zkobject.ZKObject):
                 # the job future is guaranteed to have completed, so
                 # we can look it up now.
                 result._set(job=self.jobs[job_id])
-                builds[job_name] = result
+                builds[job_build_key] = result
             elif kind == 'retry':
                 result._set(job=self.jobs[job_id])
-                retry_builds[job_name].append(result)
+                retry_builds[job_build_key].append(result)
 
         data.update({
             "builds": builds,
@@ -4857,7 +4877,7 @@ class BuildSet(zkobject.ZKObject):
 
         version = job.getZKVersion()
         if version is not None:
-            self.job_versions[job.name] = version + 1
+            self.job_versions[self._getJobId(job)] = version + 1
             self.updateAttributes(context, job_versions=self.job_versions)
 
     def shouldRefreshBuild(self, build, build_versions):
@@ -4873,7 +4893,7 @@ class BuildSet(zkobject.ZKObject):
         if (COMPONENT_REGISTRY.model_api < 12):
             return True
         current = job.getZKVersion()
-        expected = job_versions.get(job.name, 0)
+        expected = job_versions.get(self._getJobId(job), 0)
         return expected != current
 
     @property
@@ -4922,100 +4942,137 @@ class BuildSet(zkobject.ZKObject):
         return self.states_map.get(
             state_num, 'UNKNOWN (%s)' % state_num)
 
-    def addBuild(self, build):
+    def addBuild(self, job, build):
+        # We require the job temporarily until the circular dependency
+        # refactor is complete at which point the build and its linked
+        # job should be 1:1.
         with self.activeContext(self.item.pipeline.manager.current_context):
-            self.builds[build.job.name] = build
-            if build.job.name not in self.tries:
-                self.tries[build.job.name] = 1
+            job_id = self._getJobId(job)
+            self.builds[job_id] = build
+            if job_id not in self.tries:
+                self.tries[job_id] = 1
 
     def addRetryBuild(self, build):
         with self.activeContext(self.item.pipeline.manager.current_context):
-            self.retry_builds.setdefault(build.job.name, []).append(build)
+            self.retry_builds.setdefault(
+                self._getJobId(build.job), []).append(build)
 
     def removeBuild(self, build):
-        if build.job.name not in self.builds:
+        # Temporarily for circular dependency refactoring, we remove
+        # all builds with the same job name as the supplied build (in
+        # case they have been deduplicated).
+        job_id = None
+        for my_job_id, my_build in self.builds.items():
+            if my_build.job.name == build.job.name:
+                job_id = my_job_id
+        if job_id is None:
             return
         with self.activeContext(self.item.pipeline.manager.current_context):
-            self.tries[build.job.name] += 1
-            del self.builds[build.job.name]
+            self.tries[job_id] += 1
+            del self.builds[job_id]
 
-    def getBuild(self, job_name):
-        return self.builds.get(job_name)
+    # MODEL_API < 23
+    def _getJobId(self, job):
+        if self.model_version < 23:
+            return job.name
+        return job.uuid
+
+    def _getJobById(self, job_id):
+        if self.model_version < 23:
+            for job in self.job_graph.getJobs():
+                if job.name == job_id:
+                    return job
+        for job in self.job_graph.getJobs():
+            if job.uuid == job_id:
+                return job
+        return None
+
+    def getBuild(self, job):
+        return self.builds.get(self._getJobId(job))
 
     def getBuilds(self):
-        keys = list(self.builds.keys())
-        keys.sort()
-        return [self.builds.get(x) for x in keys]
+        builds = list(self.builds.values())
+        builds.sort(key=lambda b: b.job.name)
+        return builds
 
-    def getRetryBuildsForJob(self, job_name):
-        return self.retry_builds.get(job_name, [])
+    def getRetryBuildsForJob(self, job):
+        job_id = self._getJobId(job)
+        return self.retry_builds.get(job_id, [])
 
-    def getJobNodeSetInfo(self, job_name):
+    def getJobNodeSetInfo(self, job):
         # Return None if not provisioned; dict of info about nodes otherwise
-        return self.nodeset_info.get(job_name)
+        job_id = self._getJobId(job)
+        return self.nodeset_info.get(job_id)
 
-    def getJobNodeProvider(self, job_name):
-        info = self.getJobNodeSetInfo(job_name)
+    def getJobNodeProvider(self, job):
+        info = self.getJobNodeSetInfo(job)
         if info:
             return info.get('provider')
 
-    def getJobNodeExecutorZone(self, job_name):
-        info = self.getJobNodeSetInfo(job_name)
+    def getJobNodeExecutorZone(self, job):
+        info = self.getJobNodeSetInfo(job)
         if info:
             return info.get('zone')
 
-    def getJobNodeList(self, job_name):
-        info = self.getJobNodeSetInfo(job_name)
+    def getJobNodeList(self, job):
+        info = self.getJobNodeSetInfo(job)
         if info:
             return info.get('nodes')
 
-    def removeJobNodeSetInfo(self, job_name):
-        if job_name not in self.nodeset_info:
-            raise Exception("No job nodeset for %s" % (job_name))
+    def removeJobNodeSetInfo(self, job):
+        job_id = self._getJobId(job)
+        if job_id not in self.nodeset_info:
+            raise Exception("No job nodeset for %s" % (job.name))
         with self.activeContext(self.item.pipeline.manager.current_context):
-            del self.nodeset_info[job_name]
+            del self.nodeset_info[job_id]
 
-    def setJobNodeRequestID(self, job_name, request_id):
-        if job_name in self.node_requests:
-            raise Exception("Prior node request for %s" % (job_name))
+    def setJobNodeRequestID(self, job, request_id):
+        job_id = self._getJobId(job)
+        if job_id in self.node_requests:
+            raise Exception("Prior node request for %s" % (job.name))
         with self.activeContext(self.item.pipeline.manager.current_context):
-            self.node_requests[job_name] = request_id
+            self.node_requests[job_id] = request_id
 
-    def getJobNodeRequestID(self, job_name, ignore_deduplicate=False):
-        r = self.node_requests.get(job_name)
+    def getJobNodeRequestID(self, job, ignore_deduplicate=False):
+        job_id = self._getJobId(job)
+        r = self.node_requests.get(job_id)
         if ignore_deduplicate and isinstance(r, dict):
             return None
         return r
 
     def getNodeRequests(self):
         # This ignores deduplicated node requests
-        for job_name, request in self.node_requests.items():
+        for job_id, request in self.node_requests.items():
             if isinstance(request, dict):
                 continue
-            yield job_name, request
+            yield self._getJobById(job_id), request
 
-    def removeJobNodeRequestID(self, job_name):
-        if job_name in self.node_requests:
+    def removeJobNodeRequestID(self, job):
+        job_id = self._getJobId(job)
+        if job_id in self.node_requests:
             with self.activeContext(
                     self.item.pipeline.manager.current_context):
-                del self.node_requests[job_name]
+                del self.node_requests[job_id]
 
-    def setJobNodeRequestDuplicate(self, job_name, other_item):
+    def setJobNodeRequestDuplicate(self, job, other_item):
+        job_id = self._getJobId(job)
         with self.activeContext(
                 self.item.pipeline.manager.current_context):
-            self.node_requests[job_name] = {
+            self.node_requests[job_id] = {
                 'deduplicated_item': other_item.uuid}
 
-    def setJobNodeSetInfoDuplicate(self, job_name, other_item):
+    def setJobNodeSetInfoDuplicate(self, job, other_item):
         # Nothing uses this value yet; we just need an entry in the
         # nodset_info dict.
+        job_id = self._getJobId(job)
         with self.activeContext(self.item.pipeline.manager.current_context):
-            self.nodeset_info[job_name] = {
+            self.nodeset_info[job_id] = {
                 'deduplicated_item': other_item.uuid}
 
-    def jobNodeRequestComplete(self, job_name, nodeset):
-        if job_name in self.nodeset_info:
-            raise Exception("Prior node request for %s" % (job_name))
+    def jobNodeRequestComplete(self, job, nodeset):
+        job_id = self._getJobId(job)
+        if job_id in self.nodeset_info:
+            raise Exception("Prior node request for %s" % (job.name))
         info = {}
         if nodeset.nodes:
             node = nodeset.getNodes()[0]
@@ -5026,10 +5083,11 @@ class BuildSet(zkobject.ZKObject):
             info['provider'] = node.provider
             info['nodes'] = [n.id for n in nodeset.getNodes()]
         with self.activeContext(self.item.pipeline.manager.current_context):
-            self.nodeset_info[job_name] = info
+            self.nodeset_info[job_id] = info
 
-    def getTries(self, job_name):
-        return self.tries.get(job_name, 0)
+    def getTries(self, job):
+        job_id = self._getJobId(job)
+        return self.tries.get(job_id, 0)
 
     def getMergeMode(self):
         # We may be called before this build set has a shadow layout
@@ -5337,8 +5395,8 @@ class QueueItem(zkobject.ZKObject):
                 layout_uuid=None)
         old_build_set.delete(context)
 
-    def addBuild(self, build):
-        self.current_build_set.addBuild(build)
+    def addBuild(self, job, build):
+        self.current_build_set.addBuild(job, build)
 
     def addRetryBuild(self, build):
         self.current_build_set.addRetryBuild(build)
@@ -5426,7 +5484,7 @@ class QueueItem(zkobject.ZKObject):
         if not self.hasJobGraph():
             return False
         for job in self.getJobs():
-            build = self.current_build_set.getBuild(job.name)
+            build = self.current_build_set.getBuild(job)
             if not build or not build.start_time:
                 return False
         return True
@@ -5438,7 +5496,7 @@ class QueueItem(zkobject.ZKObject):
         if not self.hasJobGraph():
             return False
         for job in self.getJobs():
-            build = self.current_build_set.getBuild(job.name)
+            build = self.current_build_set.getBuild(job)
             if not build or not build.result:
                 return False
         return True
@@ -5458,7 +5516,7 @@ class QueueItem(zkobject.ZKObject):
 
         all_jobs_skipped = True
         for job in self.getJobs():
-            build = self.current_build_set.getBuild(job.name)
+            build = self.current_build_set.getBuild(job)
             if build:
                 # If the build ran, record whether or not it was skipped
                 # and return False if the build was voting and has an
@@ -5492,7 +5550,7 @@ class QueueItem(zkobject.ZKObject):
         for job in self.getJobs():
             if not job.voting:
                 continue
-            build = self.current_build_set.getBuild(job.name)
+            build = self.current_build_set.getBuild(job)
             if (build and build.failed):
                 return True
         return False
@@ -5584,7 +5642,7 @@ class QueueItem(zkobject.ZKObject):
         for job in self.getJobs():
             if not job.hold_following_changes:
                 continue
-            build = self.current_build_set.getBuild(job.name)
+            build = self.current_build_set.getBuild(job)
             if not build:
                 return True
             if build.result != 'SUCCESS':
@@ -5679,7 +5737,7 @@ class QueueItem(zkobject.ZKObject):
         if self.hasJobGraph():
             for _job in self.getJobs():
                 if _job.provides.intersection(requirements):
-                    build = self.current_build_set.getBuild(_job.name)
+                    build = self.current_build_set.getBuild(_job)
                     if not build:
                         return False
                     if build.result and build.result != 'SUCCESS':
@@ -5721,7 +5779,7 @@ class QueueItem(zkobject.ZKObject):
             fakebuild = Build.new(self.pipeline.manager.current_context,
                                   job=job, build_set=self.current_build_set,
                                   error_detail=str(e), result='FAILURE')
-            self.addBuild(fakebuild)
+            self.addBuild(job, fakebuild)
             self.pipeline.manager.sched.reportBuildEnd(
                 fakebuild,
                 tenant=self.pipeline.tenant.name,
@@ -5811,22 +5869,22 @@ class QueueItem(zkobject.ZKObject):
 
     def updateJobParentData(self):
         job_graph = self.current_build_set.job_graph
-        failed_job_names = set()  # Jobs that run and failed
-        ignored_job_names = set()  # Jobs that were skipped or canceled
-        unexecuted_job_names = set()  # Jobs that were not started yet
+        failed_job_ids = set()  # Jobs that run and failed
+        ignored_job_ids = set()  # Jobs that were skipped or canceled
+        unexecuted_job_ids = set()  # Jobs that were not started yet
         jobs_not_started = set()
         for job in job_graph.getJobs():
             job._set(_ready_to_run=False)
-            build = self.current_build_set.getBuild(job.name)
+            build = self.current_build_set.getBuild(job)
             if build:
                 if build.result == 'SUCCESS' or build.paused:
                     pass
                 elif build.result == 'SKIPPED':
-                    ignored_job_names.add(job.name)
+                    ignored_job_ids.add(job._job_id)
                 else:  # elif build.result in ('FAILURE', 'CANCELED', ...):
-                    failed_job_names.add(job.name)
+                    failed_job_ids.add(job._job_id)
             else:
-                unexecuted_job_names.add(job.name)
+                unexecuted_job_ids.add(job._job_id)
                 jobs_not_started.add(job)
 
         for job in job_graph.getJobs():
@@ -5837,17 +5895,17 @@ class QueueItem(zkobject.ZKObject):
             all_parent_jobs_successful = True
             parent_builds_with_data = {}
             for parent_job in job_graph.getParentJobsRecursively(job):
-                if parent_job.name in unexecuted_job_names \
-                        or parent_job.name in failed_job_names:
+                if parent_job._job_id in unexecuted_job_ids \
+                        or parent_job._job_id in failed_job_ids:
                     all_parent_jobs_successful = False
                     break
-                parent_build = self.current_build_set.getBuild(parent_job.name)
+                parent_build = self.current_build_set.getBuild(parent_job)
                 if parent_build.result_data:
-                    parent_builds_with_data[parent_job.name] = parent_build
+                    parent_builds_with_data[parent_job._job_id] = parent_build
 
             for parent_job in job_graph.getParentJobsRecursively(
                     job, skip_soft=True):
-                if parent_job.name in ignored_job_names:
+                if parent_job._job_id in ignored_job_ids:
                     all_parent_jobs_successful = False
                     break
 
@@ -5867,7 +5925,7 @@ class QueueItem(zkobject.ZKObject):
                     new_artifact_data = job.artifact_data or []
                     for parent_job in job_graph.getJobs():
                         parent_build = parent_builds_with_data.get(
-                            parent_job.name)
+                            parent_job._job_id)
                         if parent_build:
                             (new_parent_data,
                              new_secret_parent_data,
@@ -5891,9 +5949,9 @@ class QueueItem(zkobject.ZKObject):
         job_graph = self.current_build_set.job_graph
         parent_builds_with_data = {}
         for parent_job in job_graph.getParentJobsRecursively(job):
-            parent_build = self.current_build_set.getBuild(parent_job.name)
+            parent_build = self.current_build_set.getBuild(parent_job)
             if parent_build and parent_build.result_data:
-                parent_builds_with_data[parent_job.name] = parent_build
+                parent_builds_with_data[parent_job._job_id] = parent_build
 
         parent_data = {}
         secret_parent_data = {}
@@ -5905,7 +5963,7 @@ class QueueItem(zkobject.ZKObject):
         # in sorted config order) and apply parent data of the jobs we
         # already found.
         for parent_job in job_graph.getJobs():
-            parent_build = parent_builds_with_data.get(parent_job.name)
+            parent_build = parent_builds_with_data.get(parent_job._job_id)
             if not parent_build:
                 continue
             (parent_data, secret_parent_data, artifact_data
@@ -5944,9 +6002,9 @@ class QueueItem(zkobject.ZKObject):
         job_graph = build_set.job_graph
         other_bundles = self.findDuplicateBundles()
         for job in job_graph.getJobs():
-            this_request = build_set.getJobNodeRequestID(job.name)
-            this_nodeset = build_set.getJobNodeSetInfo(job.name)
-            this_build = build_set.getBuild(job.name)
+            this_request = build_set.getJobNodeRequestID(job)
+            this_nodeset = build_set.getJobNodeSetInfo(job)
+            this_build = build_set.getBuild(job)
 
             if this_build:
                 # Nothing more possible for this job
@@ -5956,9 +6014,13 @@ class QueueItem(zkobject.ZKObject):
             if not other_item:
                 continue
             other_build_set = other_item.current_build_set
+            # TODO: this lookup of the other job by name will be
+            # refactored out as part of the circular dependency
+            # refactor.
+            other_job = other_build_set.job_graph.getJobFromName(job.name)
 
             # Handle node requests
-            other_request = other_build_set.getJobNodeRequestID(job.name)
+            other_request = other_build_set.getJobNodeRequestID(other_job)
             if (isinstance(other_request, dict) and
                 other_request.get('deduplicated_item') == self.uuid):
                 # We're the original, but we're probably in the middle
@@ -5967,11 +6029,11 @@ class QueueItem(zkobject.ZKObject):
             if other_request is not None and this_request is None:
                 log.info("Deduplicating request of bundle job %s for item %s "
                          "with item %s", job, self, other_item)
-                build_set.setJobNodeRequestDuplicate(job.name, other_item)
+                build_set.setJobNodeRequestDuplicate(job, other_item)
                 job._set(_ready_to_run=False)
 
             # Handle provisioned nodes
-            other_nodeset = other_build_set.getJobNodeSetInfo(job.name)
+            other_nodeset = other_build_set.getJobNodeSetInfo(other_job)
             if (isinstance(other_nodeset, dict) and
                 other_nodeset.get('deduplicated_item') == self.uuid):
                 # We're the original, but we're probably in the middle
@@ -5980,15 +6042,15 @@ class QueueItem(zkobject.ZKObject):
             if other_nodeset is not None and this_nodeset is None:
                 log.info("Deduplicating nodeset of bundle job %s for item %s "
                          "with item %s", job, self, other_item)
-                build_set.setJobNodeSetInfoDuplicate(job.name, other_item)
+                build_set.setJobNodeSetInfoDuplicate(job, other_item)
                 job._set(_ready_to_run=False)
 
             # Handle builds
-            other_build = other_build_set.getBuild(job.name)
+            other_build = other_build_set.getBuild(other_job)
             if other_build and not this_build:
                 log.info("Deduplicating build of bundle job %s for item %s "
                          "with item %s", job, self, other_item)
-                self.addBuild(other_build)
+                self.addBuild(job, other_build)
                 job._set(_ready_to_run=False)
                 deduplicated = True
         return deduplicated
@@ -6008,7 +6070,7 @@ class QueueItem(zkobject.ZKObject):
         job_graph = self.current_build_set.job_graph
         for job in job_graph.getJobs():
             if job._ready_to_run:
-                nodeset = self.current_build_set.getJobNodeSetInfo(job.name)
+                nodeset = self.current_build_set.getJobNodeSetInfo(job)
                 if nodeset is None:
                     # The nodes for this job are not ready, skip
                     # it for now.
@@ -6031,23 +6093,23 @@ class QueueItem(zkobject.ZKObject):
                 return []
 
         job_graph = self.current_build_set.job_graph
-        failed_job_names = set()       # Jobs that run and failed
-        ignored_job_names = set()      # Jobs that were skipped or canceled
-        unexecuted_job_names = set()   # Jobs that were not started yet
+        failed_job_ids = set()       # Jobs that run and failed
+        ignored_job_ids = set()      # Jobs that were skipped or canceled
+        unexecuted_job_ids = set()   # Jobs that were not started yet
         jobs_not_requested = set()
         for job in job_graph.getJobs():
-            build = build_set.getBuild(job.name)
+            build = build_set.getBuild(job)
             if build and (build.result == 'SUCCESS' or build.paused):
                 pass
             elif build and build.result == 'SKIPPED':
-                ignored_job_names.add(job.name)
+                ignored_job_ids.add(job._job_id)
             elif build and build.result in ('FAILURE', 'CANCELED'):
-                failed_job_names.add(job.name)
+                failed_job_ids.add(job._job_id)
             else:
-                unexecuted_job_names.add(job.name)
-                nodeset = build_set.getJobNodeSetInfo(job.name)
+                unexecuted_job_ids.add(job._job_id)
+                nodeset = build_set.getJobNodeSetInfo(job)
                 if nodeset is None:
-                    req_id = build_set.getJobNodeRequestID(job.name)
+                    req_id = build_set.getJobNodeRequestID(job)
                     if req_id is None:
                         jobs_not_requested.add(job)
                     else:
@@ -6072,30 +6134,32 @@ class QueueItem(zkobject.ZKObject):
             # Some set operations to figure out what jobs we really need:
             all_dep_jobs_successful = True
             # Every parent job (dependency), whether soft or hard:
-            all_dep_job_names = set(
-                [x.name for x in
+            all_dep_job_ids = set(
+                [x._job_id for x in
                  job_graph.getParentJobsRecursively(job)])
             # Only the hard deps:
-            hard_dep_job_names = set(
-                [x.name for x in job_graph.getParentJobsRecursively(
+            hard_dep_job_ids = set(
+                [x._job_id for x in job_graph.getParentJobsRecursively(
                     job, skip_soft=True)])
             # Any dep that hasn't finished (or started) running
-            unexecuted_dep_job_names = unexecuted_job_names & all_dep_job_names
+            unexecuted_dep_job_ids = unexecuted_job_ids & all_dep_job_ids
             # Any dep that has finished and failed
-            failed_dep_job_names = failed_job_names & all_dep_job_names
-            ignored_hard_dep_job_names = hard_dep_job_names & ignored_job_names
+            failed_dep_job_ids = failed_job_ids & all_dep_job_ids
+            ignored_hard_dep_job_ids = hard_dep_job_ids & ignored_job_ids
             # We can't proceed if there are any:
             # * Deps that haven't finished running
             #     (this includes soft deps that haven't skipped)
             # * Deps that have failed
             # * Hard deps that were skipped
-            required_dep_job_names = (
-                unexecuted_dep_job_names |
-                failed_dep_job_names |
-                ignored_hard_dep_job_names)
-            if required_dep_job_names:
+            required_dep_job_ids = (
+                unexecuted_dep_job_ids |
+                failed_dep_job_ids |
+                ignored_hard_dep_job_ids)
+            if required_dep_job_ids:
+                deps = [build_set._getJobById(i).name
+                        for i in required_dep_job_ids]
                 job.setWaitingStatus('dependencies: {}'.format(
-                    ', '.join(required_dep_job_names)))
+                    ', '.join(deps)))
                 all_dep_jobs_successful = False
 
             if all_dep_jobs_successful:
@@ -6158,14 +6222,14 @@ class QueueItem(zkobject.ZKObject):
             skipped += to_skip
 
         for job in skipped:
-            child_build = self.current_build_set.getBuild(job.name)
+            child_build = self.current_build_set.getBuild(job)
             if not child_build:
                 fakebuild = Build.new(self.pipeline.manager.current_context,
                                       job=job,
                                       build_set=self.current_build_set,
                                       error_detail=skipped_reason,
                                       result='SKIPPED')
-                self.addBuild(fakebuild)
+                self.addBuild(job, fakebuild)
                 self.pipeline.manager.sched.reportBuildEnd(
                     fakebuild,
                     tenant=self.pipeline.tenant.name,
@@ -6181,7 +6245,7 @@ class QueueItem(zkobject.ZKObject):
             error_detail=error,
             result='NODE_FAILURE',
         )
-        self.addBuild(fakebuild)
+        self.addBuild(job, fakebuild)
         self.pipeline.manager.sched.reportBuildEnd(
             fakebuild,
             tenant=self.pipeline.tenant.name,
@@ -6242,7 +6306,7 @@ class QueueItem(zkobject.ZKObject):
             fakebuild = Build.new(self.pipeline.manager.current_context,
                                   job=job, build_set=self.current_build_set,
                                   error_detail=msg, result='SKIPPED')
-            self.addBuild(fakebuild)
+            self.addBuild(job, fakebuild)
             self.pipeline.manager.sched.reportBuildEnd(
                 fakebuild,
                 tenant=self.pipeline.tenant.name,
@@ -6250,13 +6314,14 @@ class QueueItem(zkobject.ZKObject):
 
     def _setMissingJobsSkipped(self, msg):
         for job in self.getJobs():
-            if job.name in self.current_build_set.builds:
+            build = self.current_build_set.getBuild(job)
+            if build:
                 # We already have a build for this job
                 continue
             fakebuild = Build.new(self.pipeline.manager.current_context,
                                   job=job, build_set=self.current_build_set,
                                   error_detail=msg, result='SKIPPED')
-            self.addBuild(fakebuild)
+            self.addBuild(job, fakebuild)
             self.pipeline.manager.sched.reportBuildEnd(
                 fakebuild,
                 tenant=self.pipeline.tenant.name,
@@ -6300,7 +6365,7 @@ class QueueItem(zkobject.ZKObject):
 
     def formatJobResult(self, job, build=None):
         if build is None:
-            build = self.current_build_set.getBuild(job.name)
+            build = self.current_build_set.getBuild(job)
         pattern = urllib.parse.urljoin(self.pipeline.tenant.web_root,
                                        'build/{build.uuid}')
         url = self.formatUrlPattern(pattern, job, build)
@@ -6375,7 +6440,7 @@ class QueueItem(zkobject.ZKObject):
         max_remaining = 0
         for job in self.getJobs():
             now = time.time()
-            build = self.current_build_set.getBuild(job.name)
+            build = self.current_build_set.getBuild(job)
             elapsed = None
             remaining = None
             result = None
@@ -6431,7 +6496,7 @@ class QueueItem(zkobject.ZKObject):
                 'paused': build.paused if build else None,
                 'pre_fail': build.pre_fail if build else None,
                 'retry': build.retry if build else None,
-                'tries': self.current_build_set.getTries(job.name),
+                'tries': self.current_build_set.getTries(job),
                 'queued': job.queued,
                 'waiting_status': waiting_status,
             })
@@ -6458,7 +6523,7 @@ class QueueItem(zkobject.ZKObject):
                 self.change._id(),
                 self.item_ahead)
         for job in self.getJobs():
-            build = self.current_build_set.getBuild(job.name)
+            build = self.current_build_set.getBuild(job)
             if build:
                 result = build.result
             else:
