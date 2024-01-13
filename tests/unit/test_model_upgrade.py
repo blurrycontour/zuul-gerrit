@@ -814,6 +814,31 @@ class TestDataReturn(AnsibleZuulTestCase):
     def test_model_23_24(self):
         self._test_circ_dep_refactor(24)
 
+    # To 25
+    @model_version(18)
+    def test_model_18_25(self):
+        self._test_circ_dep_refactor(25)
+
+    @model_version(20)
+    def test_model_20_25(self):
+        self._test_circ_dep_refactor(25)
+
+    @model_version(21)
+    def test_model_21_25(self):
+        self._test_circ_dep_refactor(25)
+
+    @model_version(22)
+    def test_model_22_25(self):
+        self._test_circ_dep_refactor(25)
+
+    @model_version(23)
+    def test_model_23_25(self):
+        self._test_circ_dep_refactor(25)
+
+    @model_version(24)
+    def test_model_24_25(self):
+        self._test_circ_dep_refactor(25)
+
     def _test_circ_dep_refactor(self, final_model_api):
         # Test backwards compat for job graph dependency freezing.
         # First test the entire lifecycle under the old api.
