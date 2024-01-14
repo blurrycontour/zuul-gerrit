@@ -1493,6 +1493,7 @@ class ZuulWebAPI(object):
                 'change': build.ref.change,
                 'patchset': build.ref.patchset,
                 'ref': build.ref.ref,
+                'oldrev': build.ref.oldrev,
                 'newrev': build.ref.newrev,
                 'ref_url': build.ref.ref_url,
                 'event_id': buildset.event_id,

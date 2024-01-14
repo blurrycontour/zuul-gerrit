@@ -65,16 +65,7 @@ class Change extends React.Component {
     let changeRef = change.ref
     this.setState(() => ({ showDequeueModal: false }))
     // post-merge
-    if (/^[0-9a-f]{40}$/.test(changeId)) {
-      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, changeRef)
-        .then(() => {
-          this.props.dispatch(fetchStatusIfNeeded(tenant))
-        })
-        .catch(error => {
-          this.props.dispatch(addDequeueError(error))
-        })
-      // pre-merge, ie we have a change id
-    } else if (changeId !== 'N/A') {
+    if (changeId !== 'N/A') {
       dequeue(tenant.apiPrefix, projectName, pipeline.name, changeId)
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
@@ -83,12 +74,13 @@ class Change extends React.Component {
           this.props.dispatch(addDequeueError(error))
         })
     } else {
-      this.props.dispatch(addNotification({
-        url: null,
-        status: 'Invalid change ' + changeRef + ' on project ' + projectName,
-        text: '',
-        type: 'error',
-      }))
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, changeRef)
+        .then(() => {
+          this.props.dispatch(fetchStatusIfNeeded(tenant))
+        })
+        .catch(error => {
+          this.props.dispatch(addDequeueError(error))
+        })
     }
   }
 

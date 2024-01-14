@@ -7282,8 +7282,8 @@ class ChangeManagementEvent(ManagementEvent):
         else:
             self.change_number, self.patch_number = (None, None)
         self.ref = ref
-        self.oldrev = oldrev or '0000000000000000000000000000000000000000'
-        self.newrev = newrev or '0000000000000000000000000000000000000000'
+        self.oldrev = oldrev
+        self.newrev = newrev
         self.timestamp = time.time()
         span = trace.get_current_span()
         self.span_context = tracing.getSpanContext(span)
