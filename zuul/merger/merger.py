@@ -552,13 +552,21 @@ class Repo(object):
                     binsha = gitdb.util.to_bin_sha(hexsha)
                     repo.odb.info(binsha)
                     f.write(f'{hexsha} {path}\n'.encode(encoding))
+                    msg = f"Set reference {path} at {hexsha} in {repo.git_dir}"
                     if log:
-                        log.debug("Set reference %s at %s in %s",
-                                  path, hexsha, repo.git_dir)
+                        log.debug(msg)
+                    else:
+                        messages.append(msg)
                 except ValueError:
                     # If the object does not exist, skip setting it.
-                    log.warning("Unable to resolve reference %s at %s in %s",
-                                path, hexsha, repo.git_dir)
+                    msg = (
+                        f"Unable to resolve reference {path} at {hexsha}"
+                        f" in {repo.git_dir}",
+                    )
+                    if log:
+                        log.warning(msg)
+                    else:
+                        messages.append(msg)
 
         # Delete all the loose refs
         for dname in ('remotes', 'tags', 'heads'):
