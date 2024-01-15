@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1448bf95_bf7883e5",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1931,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-15T14:35:41Z",
+      "side": 1,
+      "message": "I wondered if there\u0027s something we should be doing with etags or similar to make caching work correctly... but wow the latest version of the github api docs doesn\u0027t seem to talk about that at all.  And the branches endpoint doesn\u0027t discuss this behavior either.",
+      "revId": "481cb953d898e8c1f01ab72af9838683ec6cdfc4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
