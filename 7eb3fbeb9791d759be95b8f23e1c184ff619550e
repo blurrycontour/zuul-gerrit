@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f837074c_4c280cf4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-15T06:40:18Z",
+      "side": 1,
+      "message": "PS4 fixes a small typo",
+      "revId": "7eb3fbeb9791d759be95b8f23e1c184ff619550e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
