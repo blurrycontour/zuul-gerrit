@@ -1797,6 +1797,8 @@ class AnsibleJob(object):
         # between here and the hosts in the inventory; return them and
         # reschedule the job.
 
+        should_retry = False  # We encountered a retryable failure
+
         self.writeSetupInventory()
         setup_status, setup_code = self.runAnsibleSetup(
             self.jobdir.setup_playbook, self.ansible_version)
@@ -1804,6 +1806,7 @@ class AnsibleJob(object):
             if setup_status == self.RESULT_TIMED_OUT:
                 error_detail = "Ansible setup timeout"
             elif setup_status == self.RESULT_UNREACHABLE:
+                should_retry = True
                 error_detail = "Host unreachable"
             return result, error_detail
 
@@ -1826,7 +1829,6 @@ class AnsibleJob(object):
 
         self.loadFrozenHostvars()
         pre_failed = False
-        should_retry = False  # We encountered a retryable failure
         will_retry = False  # The above and we have not hit retry_limit
         # Whether we will allow POST_FAILURE to override the result:
         allow_post_result = True
@@ -1934,7 +1936,8 @@ class AnsibleJob(object):
             # the first place.
             post_status, post_code = self.runAnsiblePlaybook(
                 playbook, post_timeout, self.ansible_version, success,
-                phase='post', index=index, will_retry=will_retry)
+                phase='post', index=index, will_retry=will_retry,
+                should_retry=should_retry)
             if post_status == self.RESULT_ABORTED:
                 return 'ABORTED', None
             if post_status == self.RESULT_UNREACHABLE:
@@ -1974,12 +1977,13 @@ class AnsibleJob(object):
 
         success = result == 'SUCCESS'
         will_retry = result is None and not self.retry_limit
+        should_retry = result is None and self.retry_limit
         self.cleanup_started = True
         for index, playbook in enumerate(self.jobdir.cleanup_playbooks):
             self.runAnsiblePlaybook(
                 playbook, CLEANUP_TIMEOUT, self.ansible_version,
                 success=success, phase='cleanup', index=index,
-                will_retry=will_retry)
+                will_retry=will_retry, should_retry=should_retry)
 
     def _logFinalPlaybookError(self):
         # Failures in the final post playbook can include failures
@@ -3231,7 +3235,7 @@ class AnsibleJob(object):
 
     def runAnsiblePlaybook(self, playbook, timeout, ansible_version,
                            success=None, phase=None, index=None,
-                           will_retry=None):
+                           will_retry=None, should_retry=None):
         if playbook.trusted or playbook.secrets_content:
             self.writeInventory(playbook, self.frozen_hostvars)
         else:
@@ -3250,6 +3254,9 @@ class AnsibleJob(object):
 
         if will_retry is not None:
             cmd.extend(['-e', f'zuul_will_retry={bool(will_retry)}'])
+
+        if should_retry is not None:
+            cmd.extend(['-e', f'zuul_unreachable={bool(should_retry)}'])
 
         if phase:
             cmd.extend(['-e', 'zuul_execution_phase=%s' % phase])
