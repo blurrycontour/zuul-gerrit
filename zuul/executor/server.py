@@ -1974,12 +1974,13 @@ class AnsibleJob(object):
 
         success = result == 'SUCCESS'
         will_retry = result is None and not self.retry_limit
+        should_retry = result is None and self.retry_limit
         self.cleanup_started = True
         for index, playbook in enumerate(self.jobdir.cleanup_playbooks):
             self.runAnsiblePlaybook(
                 playbook, CLEANUP_TIMEOUT, self.ansible_version,
                 success=success, phase='cleanup', index=index,
-                will_retry=will_retry)
+                will_retry=will_retry, should_retry=should_retry)
 
     def _logFinalPlaybookError(self):
         # Failures in the final post playbook can include failures
@@ -3231,7 +3232,7 @@ class AnsibleJob(object):
 
     def runAnsiblePlaybook(self, playbook, timeout, ansible_version,
                            success=None, phase=None, index=None,
-                           will_retry=None):
+                           will_retry=None, should_retry=None):
         if playbook.trusted or playbook.secrets_content:
             self.writeInventory(playbook, self.frozen_hostvars)
         else:
@@ -3250,6 +3251,9 @@ class AnsibleJob(object):
 
         if will_retry is not None:
             cmd.extend(['-e', f'zuul_will_retry={bool(will_retry)}'])
+
+        if should_retry is not None:
+            cmd.extend(['-e', f'zuul_unreachable={bool(should_retry)}'])
 
         if phase:
             cmd.extend(['-e', 'zuul_execution_phase=%s' % phase])

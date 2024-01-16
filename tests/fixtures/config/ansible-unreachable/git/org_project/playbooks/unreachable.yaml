@@ -5,6 +5,9 @@
       add_host:
         hostname: fake
         ansible_host: notexisting.example.notexisting
+    - copy:
+        content: "{{ zuul_unreachable }}"
+        dest: "{{ zuul._test.test_root }}/builds/{{ zuul.build }}.zuul-unreachable.flag"
 
 - hosts: fake
   gather_facts: no

@@ -8146,7 +8146,9 @@ class TestUnreachable(AnsibleZuulTestCase):
         conn = self.scheds.first.sched.sql.connection
         for build in conn.getBuilds():
             self.assertEqual(build.error_detail, 'Host unreachable')
-
+            zuul_unreachable_flag = os.path.join(
+                self.jobdir_root, f'{build.uuid}.zuul-unreachable.flag')
+            self.assertTrue(os.path.exists(zuul_unreachable_flag))
 
 class TestJobPause(AnsibleZuulTestCase):
     tenant_config_file = 'config/job-pause/main.yaml'
