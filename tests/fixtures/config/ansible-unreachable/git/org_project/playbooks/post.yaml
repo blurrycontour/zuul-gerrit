@@ -4,3 +4,6 @@
     - copy:
         content: "{{ zuul_will_retry }}"
         dest: "{{ zuul._test.test_root }}/builds/{{ zuul.build }}.will-retry.flag"
+    - copy:
+        content: "{{ zuul_unreachable }}"
+        dest: "{{ zuul._test.test_root }}/builds/{{ zuul.build }}.zuul-unreachable.flag"
