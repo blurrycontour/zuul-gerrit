@@ -687,6 +687,17 @@ of item.
        - shell: echo example
          when: zuul_will_retry | bool
 
+.. var:: zuul_unreachable
+
+   In post-run playbook(s) this variable can be used to skip tasks if a host node is unreachable. 
+   This variable is meant to be used with the `bool` filter.
+
+   .. code-block:: yaml
+
+     tasks:
+       - shell: echo example
+         when: zuul_unreachable | bool
+
 .. var:: nodepool
 
    Information about each host from Nodepool is supplied in the
