@@ -1797,6 +1797,8 @@ class AnsibleJob(object):
         # between here and the hosts in the inventory; return them and
         # reschedule the job.
 
+        unreachable = False
+
         self.writeSetupInventory()
         setup_status, setup_code = self.runAnsibleSetup(
             self.jobdir.setup_playbook, self.ansible_version)
@@ -1804,6 +1806,7 @@ class AnsibleJob(object):
             if setup_status == self.RESULT_TIMED_OUT:
                 error_detail = "Ansible setup timeout"
             elif setup_status == self.RESULT_UNREACHABLE:
+                unreachable = True
                 error_detail = "Host unreachable"
             return result, error_detail
 
@@ -1856,6 +1859,7 @@ class AnsibleJob(object):
                 should_retry = True
                 allow_post_result = False
                 if pre_status == self.RESULT_UNREACHABLE:
+                    unreachable = True
                     error_detail = "Host unreachable"
                 break
 
@@ -1887,6 +1891,7 @@ class AnsibleJob(object):
                     # run post playbooks to get a chance to upload logs.
                     allow_post_result = False
                     should_retry = True
+                    unreachable = True
                     error_detail = "Host unreachable"
                     break
                 elif job_status == self.RESULT_NORMAL:
@@ -1927,6 +1932,7 @@ class AnsibleJob(object):
         post_timeout = self.job.post_timeout
         for index, playbook in enumerate(self.jobdir.post_playbooks):
             will_retry = should_retry and not self.retry_limit
+            unreachable = should_retry and self.retry_limit
             # Post timeout operates a little differently to the main job
             # timeout. We give each post playbook the full post timeout to
             # do its job because post is where you'll often record job logs
@@ -1934,7 +1940,8 @@ class AnsibleJob(object):
             # the first place.
             post_status, post_code = self.runAnsiblePlaybook(
                 playbook, post_timeout, self.ansible_version, success,
-                phase='post', index=index, will_retry=will_retry)
+                phase='post', index=index, will_retry=will_retry,
+                unreachable=unreachable)
             if post_status == self.RESULT_ABORTED:
                 return 'ABORTED', None
             if post_status == self.RESULT_UNREACHABLE:
@@ -1943,6 +1950,7 @@ class AnsibleJob(object):
                 # playbooks we should still try to run all playbooks to get a
                 # chance to upload logs.
                 should_retry = True
+                unreachable = True
                 error_detail = "Host unreachable"
             if post_status != self.RESULT_NORMAL or post_code != 0:
                 success = False
@@ -1974,12 +1982,13 @@ class AnsibleJob(object):
 
         success = result == 'SUCCESS'
         will_retry = result is None and not self.retry_limit
+        unreachable = result is None and self.retry_limit
         self.cleanup_started = True
         for index, playbook in enumerate(self.jobdir.cleanup_playbooks):
             self.runAnsiblePlaybook(
                 playbook, CLEANUP_TIMEOUT, self.ansible_version,
                 success=success, phase='cleanup', index=index,
-                will_retry=will_retry)
+                will_retry=will_retry, unreachable=unreachable)
 
     def _logFinalPlaybookError(self):
         # Failures in the final post playbook can include failures
@@ -3231,7 +3240,7 @@ class AnsibleJob(object):
 
     def runAnsiblePlaybook(self, playbook, timeout, ansible_version,
                            success=None, phase=None, index=None,
-                           will_retry=None):
+                           will_retry=None, unreachable=None):
         if playbook.trusted or playbook.secrets_content:
             self.writeInventory(playbook, self.frozen_hostvars)
         else:
@@ -3250,6 +3259,9 @@ class AnsibleJob(object):
 
         if will_retry is not None:
             cmd.extend(['-e', f'zuul_will_retry={bool(will_retry)}'])
+
+        if unreachable is not None:
+            cmd.extend(['-e', f'zuul_unreachable={bool(unreachable)}'])
 
         if phase:
             cmd.extend(['-e', 'zuul_execution_phase=%s' % phase])

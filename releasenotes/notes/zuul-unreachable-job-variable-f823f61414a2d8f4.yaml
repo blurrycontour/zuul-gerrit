@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds a new Zuul job variable :var:`zuul_unreachable` which can
+    can be used in (post) playbooks to check if a host is reachable
