@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c179561b_d325c213",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1937,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-16T22:08:13Z",
+      "side": 1,
+      "message": "Do you need to add the flag here as well for the post playbook(s)? The documentation edit indicates the intention is to have this information in post playbooks. I would also include it in the cleanup playbook as you ahve done below so keep that. But edit this too.",
+      "revId": "f02aabb01364ee2061fbc7955d65ae8282fa0385",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
