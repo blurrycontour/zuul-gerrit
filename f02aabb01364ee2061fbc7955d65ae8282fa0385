@@ -16,6 +16,24 @@
       "message": "Do you need to add the flag here as well for the post playbook(s)? The documentation edit indicates the intention is to have this information in post playbooks. I would also include it in the cleanup playbook as you ahve done below so keep that. But edit this too.",
       "revId": "f02aabb01364ee2061fbc7955d65ae8282fa0385",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed076fd2_55d865d1",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1937,
+      "author": {
+        "id": 36143
+      },
+      "writtenOn": "2024-01-17T14:00:33Z",
+      "side": 1,
+      "message": "yes good point, the flag needs to be passed in the function call here as well to indicate the host status.\n\nDone",
+      "parentUuid": "c179561b_d325c213",
+      "revId": "f02aabb01364ee2061fbc7955d65ae8282fa0385",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
