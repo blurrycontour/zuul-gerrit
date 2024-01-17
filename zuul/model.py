@@ -3948,8 +3948,11 @@ class JobGraph(object):
                     {d: s for d, s in current_parent_jobs.items() if not s}
                 current_parent_jobs = hard_parent_jobs
             if current_parent_jobs is None:
-                raise Exception("Job %s depends on %s which was not run." %
-                                (dependent_job, current_job))
+                if current_soft:
+                    current_parent_jobs = {}
+                else:
+                    raise Exception("Job %s depends on %s which was not run." %
+                                    (dependent_job, current_job))
             elif dependent_job != current_job:
                 all_parent_jobs.add(current_job)
             new_parent_jobs = set(current_parent_jobs.keys()) - all_parent_jobs

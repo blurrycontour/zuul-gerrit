@@ -450,6 +450,16 @@ class TestModelUpgrade(ZuulTestCase):
                  result='SUCCESS', changes='2,1'),
         ], ordered=False)
 
+    @model_version(20)
+    @simple_layout('layouts/soft-dependencies.yaml')
+    def test_20_soft_dependencies(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='deploy', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
 
 class TestGithubModelUpgrade(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
