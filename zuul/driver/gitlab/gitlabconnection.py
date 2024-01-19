@@ -156,6 +156,10 @@ class GitlabEventConnector(threading.Thread):
         elif attrs['action'] == 'merge':
             event.action = 'merged'
         elif attrs['action'] == 'update' and "labels" not in body["changes"]:
+            # Any update that add or remove reviewers must not trigger the
+            # 'gl_merge_request' event.
+            if "reviewers" in body["changes"]:
+                return None
             event.action = 'changed'
         elif attrs['action'] == 'update' and "labels" in body["changes"]:
             event.action = 'labeled'
