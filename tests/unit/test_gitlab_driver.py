@@ -175,6 +175,11 @@ class TestGitlabDriver(ZuulTestCase):
             ], ordered=False
         )
 
+        # Adding or removing reviewer should not trigger a build
+        self.fake_gitlab.emitEvent(A.getMergeRequestReviewersUpdatedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(4, len(self.history))
+
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_approved(self):
 

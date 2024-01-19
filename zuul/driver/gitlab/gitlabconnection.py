@@ -155,9 +155,9 @@ class GitlabEventConnector(threading.Thread):
             event.action = 'opened'
         elif attrs['action'] == 'merge':
             event.action = 'merged'
-        elif attrs['action'] == 'update' and "labels" not in body["changes"]:
+        elif attrs['action'] == 'update' and not body.get("changes", {}):
             event.action = 'changed'
-        elif attrs['action'] == 'update' and "labels" in body["changes"]:
+        elif attrs['action'] == 'update' and body["changes"].get("labels", {}):
             event.action = 'labeled'
             previous_labels = [
                 label["title"] for
