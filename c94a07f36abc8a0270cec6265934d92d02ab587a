@@ -16,6 +16,24 @@
       "message": "What happens if a user edits the merge request description?  I suspect that we get:\n  action: update\n  changes: {...old and new description...}\n\nSince editing the MR description is used to add or remove Depends-On lines, users may be relying on that to trigger pipeline runs.\n\nThe way this is currently written, we would need to make a new fake action like labeled.  But we shouldn\u0027t have done that to start with; these triggers were intended to be very thin layers on top of the remote system (and this issue demonstrates why).  To match the original design and the Gerrit driver, we should have had the triggers specified as:\n\n  event: merge_request\n  action: update\n  changes: description\n\nSince we already have fake actions, I\u0027m not opposed to adding another one, so I think either approach would be okay for this (but at some point, we should consider migrating to the more explicit one).\n\nRegardless, assuming I\u0027m correct about the description edit (please check), I think we need to distinguish that case and still allow it.",
       "revId": "c94a07f36abc8a0270cec6265934d92d02ab587a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f284666_965d99f3",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-19T21:53:15Z",
+      "side": 1,
+      "message": "I think the minimal form of this change would execute this branch if changes is empty or if it has whatever happens with a MR description edit.  Or perhaps a switch like:\nif labels in changes: labeled action\nif reviews in changes: review action (this is new)\nelse: changed action\n\nI think either of those would work without breaking anyone.",
+      "parentUuid": "fcefd57a_fffb60f5",
+      "revId": "c94a07f36abc8a0270cec6265934d92d02ab587a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
