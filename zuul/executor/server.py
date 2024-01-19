@@ -3670,10 +3670,10 @@ class ExecutorServer(BaseMergeServer):
         self.governor_thread.join()
         for update_thread in self.update_threads:
             update_thread.join()
-        if self.process_merge_jobs:
-            super().join()
         self.build_loop_wake_event.set()
         self.build_worker.join()
+        if self.process_merge_jobs:
+            super().join()
         self.command_thread.join()
         self.monitoring_server.join()
         self.log.debug("Joined executor")
