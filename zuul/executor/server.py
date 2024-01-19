@@ -3670,10 +3670,13 @@ class ExecutorServer(BaseMergeServer):
         self.governor_thread.join()
         for update_thread in self.update_threads:
             update_thread.join()
-        if self.process_merge_jobs:
-            super().join()
         self.build_loop_wake_event.set()
         self.build_worker.join()
+        # The BaseMergeServer's join method also disconnects the
+        # Zookeeper client, so this must happend after we've stopped
+        # all other threads that interact with Zookeeper.
+        if self.process_merge_jobs:
+            super().join()
         self.command_thread.join()
         self.monitoring_server.join()
         self.log.debug("Joined executor")
