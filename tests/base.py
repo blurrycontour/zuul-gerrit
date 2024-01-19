@@ -2286,7 +2286,9 @@ class FakeGitlabMergeRequest(object):
     def _updateTimeStamp(self):
         self.updated_at = datetime.datetime.now(datetime.timezone.utc)
 
-    def getMergeRequestEvent(self, action, previous_labels=None):
+    def getMergeRequestEvent(self, action, code_change=False,
+                             previous_labels=None,
+                             reviewers_updated=False):
         name = 'gl_merge_request'
         data = {
             'object_kind': 'merge_request',
@@ -2306,6 +2308,10 @@ class FakeGitlabMergeRequest(object):
             },
         }
         data['labels'] = [{'title': label} for label in self.labels]
+
+        if action == "update" and code_change:
+            data["object_attributes"]["oldrev"] = random_sha1()
+
         data['changes'] = {}
 
         if previous_labels is not None:
@@ -2313,6 +2319,10 @@ class FakeGitlabMergeRequest(object):
                 'previous': [{'title': label} for label in previous_labels],
                 'current': data['labels']
             }
+
+        if reviewers_updated:
+            data["changes"]["reviewers"] = {'current': [], 'previous': []}
+
         return (name, data)
 
     def getMergeRequestOpenedEvent(self):
@@ -2320,7 +2330,12 @@ class FakeGitlabMergeRequest(object):
 
     def getMergeRequestUpdatedEvent(self):
         self.addCommit()
-        return self.getMergeRequestEvent(action='update')
+        return self.getMergeRequestEvent(action='update',
+                                         code_change=True)
+
+    def getMergeRequestReviewersUpdatedEvent(self):
+        return self.getMergeRequestEvent(action='update',
+                                         reviewers_updated=True)
 
     def getMergeRequestMergedEvent(self):
         self.mergeMergeRequest()

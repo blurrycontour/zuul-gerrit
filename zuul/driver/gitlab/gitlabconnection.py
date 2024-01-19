@@ -155,9 +155,11 @@ class GitlabEventConnector(threading.Thread):
             event.action = 'opened'
         elif attrs['action'] == 'merge':
             event.action = 'merged'
-        elif attrs['action'] == 'update' and "labels" not in body["changes"]:
+        # As stated in the merge-request-event doc 'oldrev' attribute
+        # is set when there is code change.
+        elif attrs['action'] == 'update' and attrs.get("oldrev"):
             event.action = 'changed'
-        elif attrs['action'] == 'update' and "labels" in body["changes"]:
+        elif attrs['action'] == 'update' and body["changes"].get("labels"):
             event.action = 'labeled'
             previous_labels = [
                 label["title"] for
