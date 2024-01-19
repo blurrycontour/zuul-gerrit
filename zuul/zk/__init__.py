@@ -164,6 +164,7 @@ class ZooKeeperClient(object):
             listener()
 
         if self.client is not None and self.client.connected:
+            self.client.remove_listener(self._connectionListener)
             self.client.stop()
             self.client.close()
             self.client = None
