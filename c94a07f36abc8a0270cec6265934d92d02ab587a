@@ -34,6 +34,24 @@
       "parentUuid": "fcefd57a_fffb60f5",
       "revId": "c94a07f36abc8a0270cec6265934d92d02ab587a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9292a62_b0cccf99",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2024-01-20T16:32:18Z",
+      "side": 1,
+      "message": "I\u0027ve updated with a new patchset because I\u0027ve figured out that an \u0027update\u0027 action get the \u0027oldrev\u0027 attribute (only in case of code change) and this simplify the checking. Yes the previous patchset will cause trouble as you said.\n\nNote that I have the setup to validate the proposed change.",
+      "parentUuid": "2f284666_965d99f3",
+      "revId": "c94a07f36abc8a0270cec6265934d92d02ab587a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
