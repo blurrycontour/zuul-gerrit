@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "610c36dd_2035bd58",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1859,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-22T17:08:25Z",
+      "side": 1,
+      "message": "Here it is possible to set should_retry to True when the host is reachable (because the check for unreachable happens after setting the flag). Do we need to set a different flag to track this to avoid setting unreachable when should_retry was set just above here?",
+      "revId": "1209464a27fbcdb9acc266f0a91e4597827cabbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
