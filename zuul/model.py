@@ -3940,7 +3940,7 @@ class JobGraph(object):
             (current_job, current_soft) = jobs_to_iterate.pop()
             if current_job in ancestor_jobs:
                 raise Exception("Dependency cycle detected in job %s" %
-                                current_job.name)
+                                current_job)
             ancestor_jobs.add(current_job)
             current_parent_jobs = self._dependencies.get(current_job)
             if skip_soft:
