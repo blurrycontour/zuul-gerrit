@@ -16,6 +16,40 @@
       "message": "Here is an update to fix the rebase conflict and address one remaining comment.\n\nAlso, I\u0027ve test the change and was able to validate the behavior.",
       "revId": "05a529f30044520c2a706b3779a9b2dd40bd6da9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90ff8c48_1fd14003",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 749,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-23T15:28:54Z",
+      "side": 1,
+      "message": "Nit: this might be better to just add the the info line below.",
+      "revId": "05a529f30044520c2a706b3779a9b2dd40bd6da9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63285de5_dd526408",
+        "filename": "zuul/driver/gitlab/gitlabmodel.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-23T15:28:54Z",
+      "side": 1,
+      "message": "Because of the way you check this and assume it\u0027s initialized to True if not present on the data we get from gitlab, this needs to default to True here as well.  Otherwise, any existing entries in the cache will have this set to \"None\" and unless/until they get an update from gitlab, all those changes will be marked as being unable to merge.  And on projects that don\u0027t have the setting enabled, that will never happen, so any change Zuul has ever seen up to that point will be marked that way.",
+      "revId": "05a529f30044520c2a706b3779a9b2dd40bd6da9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
