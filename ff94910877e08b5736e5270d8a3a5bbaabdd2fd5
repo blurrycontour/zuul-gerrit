@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c833422_318304ae",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-23T15:17:48Z",
+      "side": 1,
+      "message": "I\u0027m curious why the change from \"label in changes\" to \"changes.get(\u0027labels\u0027)\"?\n\nIt looks like changes.labels is always itself a dictionary, so if it exists, it should always evaluate to true, so we should end up with the same behavior.  But I did have to double check that since if there was a way for it to evaluate to false the behavior would change.",
+      "revId": "ff94910877e08b5736e5270d8a3a5bbaabdd2fd5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
