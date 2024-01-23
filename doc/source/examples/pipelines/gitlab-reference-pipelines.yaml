@@ -48,7 +48,6 @@
     success:
       gitlab.com:
         comment: true
-        approval: true
         merge: true
     failure:
       gitlab.com:
@@ -57,7 +56,6 @@
     start:
       gitlab.com:
         comment: true
-        approval: false
 
 - pipeline:
     name: promote
@@ -68,9 +66,9 @@
       gitlab.com:
         merged: true
     trigger:
-       gitlab.com:
-         - event: gl_merge_request
-           action: merged
+      gitlab.com:
+        - event: gl_merge_request
+          action: merged
     success:
       gitlab.com:
         comment: true
