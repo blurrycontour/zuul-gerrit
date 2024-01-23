@@ -1220,6 +1220,58 @@ For example the following would skip retrying the build:
           zuul:
             retry: false
 
+.. _updating_inventory:
+
+Updating Inventory
+------------------
+
+Zuul jobs run with an Ansible inventory file automatically created
+based on the requested :attr:`job.nodeset` nodes supplied by Nodepool.
+Some jobs may create or otherwise obtain access to resources that may
+then be added to the inventory via the ansible `add_host` module.
+Ansible does not persist dynamic inventory changes, so that normally
+when running multiple Ansible playbooks, the `add_host` tasks would
+need to be repeated in each playbook.  Since Zuul jobs are frequently
+constructed from multiple playbooks, Zuul includes a facility for
+persisting changes to the Ansible inventory across playbooks.
+
+To add a host only for the current playbook, use the `add_host`
+Ansible module as normal.
+
+To add a host to the inventory for the current and subsequent
+playbooks, use the `add_host` Ansible module and set the
+`zuul.persist_host` variable as in the following example:
+
+.. code-block:: yaml
+
+   - hosts: localhost
+     gather_facts: no
+     tasks:
+       - name: Add a dynamic host
+         add_host:
+           hostname: newhost
+           ansible_host: newhost.example.com
+           zuul:
+             persist_host: true
+
+Ansible does not currently have a facility to remove a host from
+dynamic inventory.  Zuul does include a module that will reset the
+inventory for subsequent playbooks only back to the job's original
+inventory.  To do so, use the `zuul_reset_inventory` module:
+
+.. code-block:: yaml
+
+   - hosts: localhost
+     gather_facts: no
+     tasks:
+       - name: Reset inventory for subsequent playbooks
+         zuul_reset_inventory:
+
+.. warning::
+
+   The `zuul_reset_inventory` module will not alter the inventory for
+   the current playbook.  It only affects subsequent playbooks.
+
 .. _build_status:
 
 Build Status

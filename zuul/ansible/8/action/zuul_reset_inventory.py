@@ -1,0 +1,1 @@
+../../base/action/zuul_reset_inventory.py

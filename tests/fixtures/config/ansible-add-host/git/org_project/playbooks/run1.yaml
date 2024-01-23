@@ -1,0 +1,17 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Add a fake host run1
+      add_host:
+        hostname: fake-run1
+        ansible_host: fake-run.example.com
+        groups:
+          - testgroup
+        zuul:
+          persist_host: true
+
+- hosts: all, localhost
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: Test run1 playbook {{inventory_hostname}}

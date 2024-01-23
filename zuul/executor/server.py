@@ -576,6 +576,7 @@ class JobDir(object):
         #       job-output.txt
         #     tmp
         #     results.json
+        #     inventory.json
         self.keep = keep
         if root:
             tmpdir = root
@@ -661,6 +662,8 @@ class JobDir(object):
         self.result_data_file = os.path.join(self.work_root, 'results.json')
         with open(self.result_data_file, 'w'):
             pass
+        self.result_inventory_file = os.path.join(
+            self.work_root, 'inventory.json')
         self.known_hosts = os.path.join(ssh_dir, 'known_hosts')
         self.inventory = os.path.join(self.ansible_root, 'inventory.yaml')
         self.logging_json = os.path.join(self.ansible_root, 'logging.json')
@@ -919,7 +922,8 @@ def is_group_var_set(name, host, nodeset, job):
     return False
 
 
-def make_inventory_dict(nodes, nodeset, hostvars, remove_keys=None):
+def make_inventory_dict(nodes, nodeset, hostvars, additional_hosts,
+                        remove_keys=None):
     hosts = {}
     for node in nodes:
         node_hostvars = hostvars[node['name']].copy()
@@ -927,6 +931,16 @@ def make_inventory_dict(nodes, nodeset, hostvars, remove_keys=None):
             for k in remove_keys:
                 node_hostvars.pop(k, None)
         hosts[node['name']] = node_hostvars
+
+    for add_host in additional_hosts:
+        # Don't override existing hosts
+        if add_host['host_name'] in hosts:
+            continue
+        add_host_hostvars = add_host['host_vars'].copy()
+        if remove_keys:
+            for k in remove_keys:
+                add_host_hostvars.pop(k, None)
+        hosts[add_host['host_name']] = add_host_hostvars
 
     # localhost has no hostvars, so we'll set what we froze for
     # localhost as the 'all' vars which will in turn be available to
@@ -944,17 +958,24 @@ def make_inventory_dict(nodes, nodeset, hostvars, remove_keys=None):
     }
 
     for group in nodeset.getGroups():
-        if 'children' not in inventory['all']:
-            inventory['all']['children'] = dict()
+        children = inventory['all'].setdefault('children', {})
 
         group_hosts = {}
         for node_name in group.nodes:
             group_hosts[node_name] = None
 
-        inventory['all']['children'].update({
+        children.update({
             group.name: {
                 'hosts': group_hosts,
-            }})
+            }
+        })
+
+    for add_host in additional_hosts:
+        for group in add_host['groups']:
+            children = inventory['all'].setdefault('children', {})
+            existing_group = children.setdefault(group, {})
+            existing_hosts = existing_group.setdefault('hosts', {})
+            existing_hosts[add_host['host_name']] = None
 
     return inventory
 
@@ -981,6 +1002,7 @@ class AnsibleJob(object):
         self.arguments = arguments
         with executor_server.zk_context as ctx:
             self.job = FrozenJob.fromZK(ctx, arguments["job_ref"])
+        self.additional_hosts = []
         job_zuul_params = zuul_params_from_job(self.job)
         # MODEL_API < 20
         job_zuul_params["artifacts"] = self.arguments["zuul"].get(
@@ -1621,6 +1643,21 @@ class AnsibleJob(object):
             self.log.exception("Unable to load result data:")
         return data, secret_data
 
+    def getResultInventory(self):
+        ret = []
+        if os.path.exists(self.jobdir.result_inventory_file):
+            try:
+                with open(self.jobdir.result_inventory_file) as f:
+                    file_data = f.read()
+                    if file_data:
+                        file_data = json.loads(file_data)
+                        ret = file_data['hosts']
+            except Exception:
+                self.log.exception("Unable to load inventory data:")
+        hostnames = [x['host_name'] for x in ret]
+        self.log.info("Additional hosts: %s", hostnames)
+        return ret
+
     def mapLines(self, args, data, commit, warnings):
         # The data and warnings arguments are mutated in this method.
 
@@ -1844,6 +1881,7 @@ class AnsibleJob(object):
         # to copy logs even when the job has timed out.
         job_timeout = self.job.timeout
         for index, playbook in enumerate(self.jobdir.pre_playbooks):
+            self.additional_hosts = self.getResultInventory()
             # TODOv3(pabelanger): Implement pre-run timeout setting.
             ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
             pre_status, pre_code = self.runAnsiblePlaybook(
@@ -1868,6 +1906,7 @@ class AnsibleJob(object):
 
         if not pre_failed:
             for index, playbook in enumerate(self.jobdir.playbooks):
+                self.additional_hosts = self.getResultInventory()
                 ansible_timeout = self.getAnsibleTimeout(
                     time_started, job_timeout)
                 job_status, job_code = self.runAnsiblePlaybook(
@@ -1926,6 +1965,7 @@ class AnsibleJob(object):
 
         post_timeout = self.job.post_timeout
         for index, playbook in enumerate(self.jobdir.post_playbooks):
+            self.additional_hosts = self.getResultInventory()
             will_retry = should_retry and not self.retry_limit
             # Post timeout operates a little differently to the main job
             # timeout. We give each post playbook the full post timeout to
@@ -1976,6 +2016,7 @@ class AnsibleJob(object):
         will_retry = result is None and not self.retry_limit
         self.cleanup_started = True
         for index, playbook in enumerate(self.jobdir.cleanup_playbooks):
+            self.additional_hosts = self.getResultInventory()
             self.runAnsiblePlaybook(
                 playbook, CLEANUP_TIMEOUT, self.ansible_version,
                 success=success, phase='cleanup', index=index,
@@ -2685,7 +2726,8 @@ class AnsibleJob(object):
         # This file is unused by Zuul, but the base jobs copy it to logs
         # for debugging, so let's continue to put something there.
         inventory = make_inventory_dict(
-            self.host_list, self.nodeset, self.original_hostvars)
+            self.host_list, self.nodeset, self.original_hostvars,
+            self.additional_hosts)
 
         inventory['all']['vars']['zuul'] = self.debug_zuul_vars
         with open(self.jobdir.inventory, 'w') as inventory_yaml:
@@ -2711,6 +2753,7 @@ class AnsibleJob(object):
     def writeInventory(self, jobdir_playbook, hostvars):
         inventory = make_inventory_dict(
             self.host_list, self.nodeset, hostvars,
+            self.additional_hosts,
             remove_keys=jobdir_playbook.secrets_keys)
 
         with open(jobdir_playbook.inventory, 'w') as inventory_yaml:
