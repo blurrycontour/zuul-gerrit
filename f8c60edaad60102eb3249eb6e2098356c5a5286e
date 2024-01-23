@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1255f02_92a93d5a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-23T15:40:05Z",
+      "side": 1,
+      "message": "Thanks for pointing this out.  It appears that the current configuration is (mostly) what we call a \"clean check\" system, where success in check is required in order to be enqueued into gate.  And your changes make that tie a little bit stronger by removing more opportunities for approval to be added.\n\nAs a project, we don\u0027t recommend that system, as it is not necessary in a well-behaved project gating configuration.  It is perfectly fine for a change to be enqueued into gate without ever being in check.\n\n(Of course, it\u0027s perfectly reasonable for some projects to decide that they need clean check.  For example, the openstack project decided to use it because too many developers were being irresponsible and approving changes without any idea of whether they would pass or not.  The Zuul project, on the other hand, does not use it because its circumstances are different.)\n\nI think what we should do here is provide the simplest example pipeline configuration possible, and one that matches the gerrit example configuration as well.  Let\u0027s drop the clean check config.  I think that would mean leaving the approval settings for both pipelines and then removing the require.gitlab.com.approved:true pipeline requirement.",
+      "revId": "f8c60edaad60102eb3249eb6e2098356c5a5286e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
