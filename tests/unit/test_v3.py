@@ -8567,6 +8567,60 @@ class TestJobPausePostFail(AnsibleZuulTestCase):
         ])
 
 
+class AddHostMixIn:
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+    def test_add_host(self):
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+        self.executor_server.keep_jobdir = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # The result must be retry limit because jobs with unreachable nodes
+        # will be retried.
+        self.assertHistory([
+            dict(name='testjob', result='SUCCESS'),
+        ], ordered=False)
+        testjob = self.getJobFromHistory('testjob')
+        job_output = self._get_file(testjob, 'work/logs/job-output.txt')
+        self.assertIn("Test pre playbook fake-pre", job_output)
+        self.assertNotIn("Test pre playbook fake-run1", job_output)
+        self.assertNotIn("Test pre playbook fake-run2", job_output)
+        self.assertIn("Test pre playbook localhost", job_output)
+
+        self.assertIn("Test run1 playbook fake-pre", job_output)
+        self.assertIn("Test run1 playbook fake-run1", job_output)
+        self.assertNotIn("Test run1 playbook fake-run2", job_output)
+        self.assertIn("Test run1 playbook localhost", job_output)
+
+        self.assertIn("Test run2 playbook fake-pre", job_output)
+        self.assertIn("Test run2 playbook fake-run1", job_output)
+        self.assertIn("Test run2 playbook fake-run2", job_output)
+        self.assertIn("Test run2 playbook localhost", job_output)
+
+        self.assertNotIn("End of job fake-pre", job_output)
+        self.assertNotIn("End of job fake-run1", job_output)
+        self.assertNotIn("End of job fake-run2", job_output)
+        self.assertIn("End of job localhost", job_output)
+
+
+class TestAddHostAnsible6(AnsibleZuulTestCase, AddHostMixIn):
+    tenant_config_file = 'config/ansible-add-host/main6.yaml'
+    ansible_major_minor = '2.13'
+
+
+class TestAddHostAnsible8(AnsibleZuulTestCase, AddHostMixIn):
+    tenant_config_file = 'config/ansible-add-host/main8.yaml'
+    ansible_major_minor = '2.15'
+
+
 class TestContainerJobs(AnsibleZuulTestCase):
     tenant_config_file = "config/container-build-resources/main.yaml"
 

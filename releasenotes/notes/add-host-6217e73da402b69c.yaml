@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    The `add_host` Ansible module may now be used to persist dynamic
+    inventory hosts to subsequent playbooks.  See
+    :ref:`updating_inventory` for more information.

@@ -1,0 +1,15 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Add a fake host pre
+      add_host:
+        hostname: fake-pre
+        ansible_host: fake-pre.example.com
+        zuul:
+          persist_host: true
+
+- hosts: all, localhost
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: Test pre playbook {{inventory_hostname}}

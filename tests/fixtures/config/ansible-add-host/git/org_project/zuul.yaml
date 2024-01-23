@@ -1,0 +1,33 @@
+- pipeline:
+    name: check
+    manager: independent
+    post-review: true
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+    failure:
+      gerrit:
+        Verified: -1
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: testjob
+    pre-run:
+      - playbooks/pre.yaml
+    run:
+      - playbooks/run1.yaml
+      - playbooks/run2.yaml
+    post-run:
+      - playbooks/post.yaml
+    attempts: 1
+
+- project:
+    check:
+      jobs:
+        - testjob

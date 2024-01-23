@@ -1,0 +1,21 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Add a fake host run2
+      add_host:
+        hostname: fake-run2
+        ansible_host: fake-run.example.com
+        zuul:
+          persist_host: true
+
+- hosts: all, localhost
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: Test run2 playbook {{inventory_hostname}}
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Reset inventory
+      zuul_reset_inventory:
