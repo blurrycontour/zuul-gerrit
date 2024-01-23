@@ -1,0 +1,22 @@
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Add a fake host
+      add_host:
+        hostname: fake-run
+        ansible_host: fake-run.example.com
+    - name: Save inventory
+      zuul_save_inventory:
+
+- hosts: fake-pre
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: Test fake-pre
+
+- hosts: fake-run
+  gather_facts: no
+  tasks:
+    - debug:
+        msg: Test fake-pre
+
