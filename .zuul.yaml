@@ -342,6 +342,11 @@
     pre-run: playbooks/release/pre.yaml
     nodeset: ubuntu-jammy
 
+- job:
+    name: verify-delay-bug
+    run: playbooks/bug.yaml
+    nodeset: ubuntu-jammy
+
 - project:
     queue: zuul
     vars:
@@ -350,6 +355,9 @@
       ensure_tox_version: "<4"
     check:
       jobs:
+<<<<<<< PATCH SET (c7fbb2 Test 10s delay bug after skipped task)
+        - verify-delay-bug
+=======
         - zuul-build-image
         - zuul-nox-docs:
             vars:
@@ -382,6 +390,7 @@
             dependencies: zuul-build-image
         - zuul-nox-zuul-client
         - zuul-build-python-release
+>>>>>>> BASE      (8dd401 Monitor and report executor inode usage)
     gate:
       jobs:
         - zuul-upload-image
