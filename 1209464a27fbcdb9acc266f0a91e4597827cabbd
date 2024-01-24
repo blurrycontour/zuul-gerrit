@@ -34,6 +34,24 @@
       "parentUuid": "610c36dd_2035bd58",
       "revId": "1209464a27fbcdb9acc266f0a91e4597827cabbd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe3276e0_e3a6eacc",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1859,
+      "author": {
+        "id": 36143
+      },
+      "writtenOn": "2024-01-24T09:26:59Z",
+      "side": 1,
+      "message": "However, I assume we would need to check the self.retry_limit first before setting the will_retry flag here.",
+      "parentUuid": "6d907668_5da31650",
+      "revId": "1209464a27fbcdb9acc266f0a91e4597827cabbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
