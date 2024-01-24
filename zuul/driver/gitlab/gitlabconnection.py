@@ -142,6 +142,7 @@ class GitlabEventConnector(threading.Thread):
     def _event_merge_request(self, body):
         event = self._event_base(body)
         attrs = body['object_attributes']
+        event.type = 'gl_merge_request'
         event.title = attrs['title']
         event.change_number = attrs['iid']
         event.ref = "refs/merge-requests/%s/head" % event.change_number
@@ -149,15 +150,18 @@ class GitlabEventConnector(threading.Thread):
         event.patch_number = attrs['last_commit']['id']
         event.change_url = self.connection.getMRUrl(event.project_name,
                                                     event.change_number)
-        if attrs['action'] == 'update' and "description" in body["changes"]:
-            event.merge_request_description_changed = True
         if attrs['action'] == 'open':
             event.action = 'opened'
         elif attrs['action'] == 'merge':
             event.action = 'merged'
-        elif attrs['action'] == 'update' and "labels" not in body["changes"]:
+        elif attrs['action'] == 'update' and attrs.get("oldrev"):
+            # As stated in the merge-request-event doc 'oldrev' attribute
+            # is set when there is code change.
             event.action = 'changed'
-        elif attrs['action'] == 'update' and "labels" in body["changes"]:
+        elif attrs['action'] == 'update' and "description" in body["changes"]:
+            event.merge_request_description_changed = True
+            event.action = 'changed'
+        elif attrs['action'] == 'update' and body["changes"].get("labels"):
             event.action = 'labeled'
             previous_labels = [
                 label["title"] for
@@ -174,7 +178,6 @@ class GitlabEventConnector(threading.Thread):
         else:
             # Do not handle other merge_request action for now.
             return None
-        event.type = 'gl_merge_request'
         return event
 
     # https://docs.gitlab.com/ee/user/project/integrations/webhooks.html#comment-on-merge-request
