@@ -16,6 +16,24 @@
       "message": "I\u0027m curious why the change from \"label in changes\" to \"changes.get(\u0027labels\u0027)\"?\n\nIt looks like changes.labels is always itself a dictionary, so if it exists, it should always evaluate to true, so we should end up with the same behavior.  But I did have to double check that since if there was a way for it to evaluate to false the behavior would change.",
       "revId": "ff94910877e08b5736e5270d8a3a5bbaabdd2fd5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae5611bd_2ee5061f",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2024-01-24T09:30:01Z",
+      "side": 1,
+      "message": "Yes, this change is not related to the purpose of this patch. I you prefer I can revert that part to avoid unintended behavior change.\n\nHowever, when there is a change to MR\u0027s label then changes.labels looks like:\n\n\u0027\u0027\u0027\n{\u0027changes\u0027: {\u0027labels\u0027: {\u0027current\u0027: [{\u0027color\u0027: \u0027#dc143c\u0027, \u0027created_at\u0027: \u00272024-01-19 11:36:30 UTC\u0027, \u0027description\u0027: None, \u0027group_id\u0027: None, \u0027id\u0027: 105672, \u0027lock_on_merge\u0027: False, \u0027project_id\u0027: 84160, \u0027template\u0027: False, \u0027title\u0027\n: \u0027test\u0027, \u0027type\u0027: \u0027ProjectLabel\u0027, \u0027updated_at\u0027: \u00272024-01-19 11:36:30 UTC\u0027}], \u0027previous\u0027: []}}}\n\u0027\u0027\u0027\n\nIt seems that `labels` will always have the \u0027current\u0027 and \u0027previous\u0027 keys however I was looking to add a bit more safety here by ensuring the \u0027labels\u0027 is not an empty dict to avoid exception later where we expect the \u0027previous\u0027 and \u0027current\u0027 keys.\n\nIf \u0027labels\u0027 is {} (perhaps it will never) it will evaluate to false line 164.\n\nLet me know if you prefer a revert of that part.",
+      "parentUuid": "8c833422_318304ae",
+      "revId": "ff94910877e08b5736e5270d8a3a5bbaabdd2fd5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
