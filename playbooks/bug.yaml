@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - ping:
+    - shell: echo "foobar"
+      when: False
+    - ping:
