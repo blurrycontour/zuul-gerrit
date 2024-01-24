@@ -16,6 +16,24 @@
       "message": "Here it is possible to set should_retry to True when the host is reachable (because the check for unreachable happens after setting the flag). Do we need to set a different flag to track this to avoid setting unreachable when should_retry was set just above here?",
       "revId": "1209464a27fbcdb9acc266f0a91e4597827cabbd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d907668_5da31650",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1859,
+      "author": {
+        "id": 36143
+      },
+      "writtenOn": "2024-01-24T09:17:38Z",
+      "side": 1,
+      "message": "Thanks for pointing out this behaviour. We could set the will_retry flag here, below pre_failed and move the initialization of the should_retry flag, in case the pre_status result is unreachable, within this execution flow.",
+      "parentUuid": "610c36dd_2035bd58",
+      "revId": "1209464a27fbcdb9acc266f0a91e4597827cabbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
