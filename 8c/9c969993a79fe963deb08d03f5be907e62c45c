@@ -1,0 +1,10 @@
+Code-Review+2: James E. Blair <jim@acmegating.com>
+Verified+2: Zuul
+Code-Review+2: Tristan Cacqueray <tdecacqu@redhat.com>
+Workflow+1: Tristan Cacqueray <tdecacqu@redhat.com>
+Submitted-by: Zuul
+Submitted-at: Wed, 24 Jan 2024 18:43:23 +0000
+Reviewed-on: https://review.opendev.org/c/zuul/zuul/+/906355
+Comments-Total: 2
+Project: zuul/zuul
+Branch: refs/heads/master
