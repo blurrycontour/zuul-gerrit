@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f0ab72e1_9c6b8f4e",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 8586,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-01-25T16:40:55Z",
+      "side": 1,
+      "message": "I guess this not the case when using debug tasks, is this comment still relevant?",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "af62a38d_716d55d8",
         "filename": "zuul/ansible/base/action/add_host.py",
         "patchSetId": 3
@@ -90,6 +107,52 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "85b1cf8a_a0cc73c5",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-01-25T16:40:55Z",
+      "side": 1,
+      "message": "nit: using `additional` instead of `result` looks better to me:\n\n - self.additional_inventory_file, and below\n - getAdditionalInventory",
+      "range": {
+        "startLine": 665,
+        "startChar": 13,
+        "endLine": 665,
+        "endChar": 34
+      },
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d45ffc5_4a411f46",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-01-25T16:40:55Z",
+      "side": 1,
+      "message": "I guess this should not happen because the additional inventory is only updated for new host, so is this only to prevent manual tempering with the inventory.json?\nIf so, perhaps we should check that the `host_name` key exists?",
+      "range": {
+        "startLine": 938,
+        "startChar": 12,
+        "endLine": 938,
+        "endChar": 20
+      },
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dca072bb_3aecff02",
         "filename": "zuul/executor/server.py",
         "patchSetId": 3
@@ -154,6 +217,23 @@
       "side": 1,
       "message": "I don\u0027t think that\u0027s correct.  This file carries additional hosts, and line 937 is protection against mischief in case someone adds an entry that collides with an existing nodeset host.",
       "parentUuid": "f9c48402_1f3ee9b9",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66835db6_20fecaa3",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1909,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-01-25T16:40:55Z",
+      "side": 1,
+      "message": "nit: since the method already has access to self, it could also overwrite the variable instead of returning it.",
       "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
