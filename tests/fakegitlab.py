@@ -167,6 +167,8 @@ class GitlabWebServer(object):
                     mr.updated_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ'),
                     'sha': mr.sha,
                     'labels': mr.labels,
+                    'blocking_discussions_resolved':
+                        mr.blocking_discussions_resolved,
                     'merged_at': mr.merged_at.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
                     if mr.merged_at else mr.merged_at,
                     'merge_status': mr.merge_status,
