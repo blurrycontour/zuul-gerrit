@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31664f3d_98da20f6",
+        "filename": "zuul/ansible/base/action/add_host.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-25T00:32:18Z",
+      "side": 1,
+      "message": "Well, this is what we do for the freeze job playbook.  But I think Ansible will actually template everything before we get to this point and raise an error before then.  So I don\u0027t think we need to worry about this, and we can just conisder it a backup.",
+      "parentUuid": "af62a38d_716d55d8",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06f48954_48cb6232",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-01-25T00:06:57Z",
       "side": 1,
       "message": "This would cause us to not update hostvars or group membership right? Is that worth a note in the docs or should we try and merge the two items?",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fbbaf37_08b3f6fe",
+        "filename": "zuul/ansible/base/action/add_host.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-25T00:32:18Z",
+      "side": 1,
+      "message": "That would be a change from the current add_host behavior, but I\u0027m concerned about making persistent changes to non-dynamic hosts.\n\nSo we should either update the docs, or see about ensuring that we don\u0027t update non-dynamic hosts in subsequent playbooks.\n\nBut I\u0027ve tried to keep behavior consistent within the current playbook and across playbooks.\n\nSo my inclination would be to keep it this way because that way it\u0027s consistent, and update the docs to indicate that you can\u0027t use add_host to update hostvars and group membership of existing hosts.",
+      "parentUuid": "06f48954_48cb6232",
       "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -69,6 +105,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2a1fc98_4866afad",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 978,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-25T00:32:18Z",
+      "side": 1,
+      "message": "I agree, we should enforce it here too.",
+      "parentUuid": "dca072bb_3aecff02",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f9c48402_1f3ee9b9",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-01-25T00:06:57Z",
       "side": 1,
       "message": "The new inventory file will actually carry all of the inventory info and not just additional hosts. We then skip over them on line 937. Might be mroe accurate to call this \"updated_inventory\" or similar.",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be2be149_9d3b5413",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1884,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-25T00:32:18Z",
+      "side": 1,
+      "message": "I don\u0027t think that\u0027s correct.  This file carries additional hosts, and line 937 is protection against mischief in case someone adds an entry that collides with an existing nodeset host.",
+      "parentUuid": "f9c48402_1f3ee9b9",
       "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
