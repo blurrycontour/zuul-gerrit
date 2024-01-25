@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af62a38d_716d55d8",
+        "filename": "zuul/ansible/base/action/add_host.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-25T00:06:57Z",
+      "side": 1,
+      "message": "Should this be an error rather than a silent removal? At the very least maybe emit a warning? I worry this might lead to unexpected job behavior if certain vars don\u0027t resolve properly.",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06f48954_48cb6232",
+        "filename": "zuul/ansible/base/action/add_host.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-25T00:06:57Z",
+      "side": 1,
+      "message": "This would cause us to not update hostvars or group membership right? Is that worth a note in the docs or should we try and merge the two items?",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aeadf20d_ebd65406",
+        "filename": "zuul/ansible/base/action/zuul_reset_inventory.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-25T00:06:57Z",
+      "side": 1,
+      "message": "Maybe a note here that this file carries additional info and removing it allows the normal inventory to be used instead?",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dca072bb_3aecff02",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 978,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-25T00:06:57Z",
+      "side": 1,
+      "message": "Unlike hostvar handling above we don\u0027t filter out group changes for hosts that were already in the inventory. I think we should be consistent about that. Either add_host persistence only allows adding completely new hosts or it should allow hostvars and groups to be modified for all hosts.\n\nSide note the check above on line 937 may not be necessary due to my comment on line 80 of https://review.opendev.org/c/zuul/zuul/+/906433/3/zuul/ansible/base/action/add_host.py. But I think belts and suspenders is nice. It also avoids inconsistent behavior if things write to the inventory file out of band.",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9c48402_1f3ee9b9",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1884,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-01-25T00:06:57Z",
+      "side": 1,
+      "message": "The new inventory file will actually carry all of the inventory info and not just additional hosts. We then skip over them on line 937. Might be mroe accurate to call this \"updated_inventory\" or similar.",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
