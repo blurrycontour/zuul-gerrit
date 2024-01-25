@@ -16,6 +16,23 @@
       "message": "recheck the test failure appears to be due to builds remaining in a queue and settle timeouts are hit. I don\u0027t think this will be related to this change.",
       "revId": "abc39fa056a8227f89c7726252acebe6237f98b9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7fc7585_ea6c9621",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-25T08:40:08Z",
+      "side": 1,
+      "message": "Not a -1, but I think the reason we are seeing those connection lost messages is fixed by https://review.opendev.org/c/zuul/zuul/+/906105 so I\u0027d vote for keeping the message.",
+      "revId": "abc39fa056a8227f89c7726252acebe6237f98b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
