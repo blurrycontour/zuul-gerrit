@@ -58,6 +58,17 @@
         - name: Always task
           command: echo "This is an always task"
 
+    - name: Skip command task
+      command: /bin/true
+      when: false
+
+    - name: Skip command task loop
+      command: /bin/true
+      when: false
+      with_items:
+        - failed_in_loop1
+        - failed_in_loop2
+
   handlers:
     - name: test handler
       command: echo "This is a handler"

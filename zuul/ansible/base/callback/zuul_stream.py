@@ -1,4 +1,5 @@
 # Copyright 2017 Red Hat, Inc.
+# Copyright 2024 Acme Gating, LLC
 #
 # Zuul is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -104,6 +105,140 @@ def is_rescuable(task):
     return is_rescuable(task._parent)
 
 
+class Streamer:
+    def __init__(self, callback, host, ip, port, log_id):
+        self.callback = callback
+        self.host = host
+        self.ip = ip
+        self.port = port
+        self.log_id = log_id
+        self._zuul_console_version = 0
+        self.stopped = False
+
+    def start(self):
+        self.thread = threading.Thread(target=self._read_log)
+        self.thread.daemon = True
+        self.thread.start()
+
+    def stop(self, grace):
+        self.stop_ts = time.monotonic()
+        self.stop_grace = grace
+        self.stopped = True
+
+    def join(self, timeout):
+        self.thread.join(timeout)
+
+    def is_alive(self):
+        return self.thread.is_alive()
+
+    def _read_log_connect(self):
+        logger_retries = 0
+        while True:
+            try:
+                s = socket.create_connection((self.ip, self.port), 5)
+                # Disable the socket timeout after we have successfully
+                # connected to accomodate the fact that jobs may not be writing
+                # logs continously. Without this we can easily trip the 5
+                # second timeout.
+                s.settimeout(None)
+                return s
+            except socket.timeout:
+                self.callback._log_streamline(
+                    "localhost",
+                    "Timeout exception waiting for the logger. "
+                    "Please check connectivity to [%s:%s]"
+                    % (self.ip, self.port))
+                return None
+            except Exception:
+                if logger_retries % 10 == 0:
+                    self.callback._log("[%s] Waiting on logger" % self.host)
+                logger_retries += 1
+                time.sleep(0.1)
+                continue
+
+    def _read_log(self):
+        s = self._read_log_connect()
+        if s is None:
+            # Can't connect; _read_log_connect() already logged an
+            # error for us, just bail
+            return
+
+        # Find out what version we are running against
+        s.send(f'v:{LOG_STREAM_VERSION}\n'.encode('utf-8'))
+        buff = s.recv(1024).decode('utf-8').strip()
+
+        # NOTE(ianw) 2022-07-21 : zuul_console from < 6.3.0 do not
+        # understand this protocol.  They will assume the send
+        # above is a log request and send back the not found
+        # message in a loop.  So to handle this we disconnect and
+        # reconnect.  When we decide to remove this, we can remove
+        # anything in the "version 0" path.
+        if buff == '[Zuul] Log not found':
+            s.close()
+            s = self._read_log_connect()
+            if s is None:
+                return
+        else:
+            self._zuul_console_version = int(buff)
+
+        if self._zuul_console_version >= 1:
+            msg = 's:%s\n' % self.log_id
+        else:
+            msg = '%s\n' % self.log_id
+
+        s.send(msg.encode("utf-8"))
+        buff = s.recv(4096)
+        buffering = True
+        while buffering:
+            if b'\n' in buff:
+                (line, buff) = buff.split(b'\n', 1)
+
+                stopped = False
+                if self.stopped:
+                    if time.monotonic() >= (self.stop_ts + self.stop_grace):
+                        # The task is finished, but we're still
+                        # reading the log.  We might just be reading
+                        # more data, or we might be reading "Log not
+                        # found" repeatedly.  That might be due to
+                        # contention on a busy node and the log will
+                        # show up soon, or it may be because we
+                        # skipped the task and nothing ran.  In the
+                        # latter case, the grace period will be 0, but
+                        # in the former, we will allow an extra 10
+                        # seconds for the log to show up.
+                        stopped = True
+
+                # We can potentially get binary data here. In order to
+                # being able to handle that use the backslashreplace
+                # error handling method. This decodes unknown utf-8
+                # code points to escape sequences which exactly represent
+                # the correct data without throwing a decoding exception.
+                done = self.callback._log_streamline(
+                    self.host, line.decode("utf-8", "backslashreplace"),
+                    stopped=stopped)
+                if done:
+                    if self._zuul_console_version > 0:
+                        try:
+                            # reestablish connection and tell console to
+                            # clean up
+                            s = self._read_log_connect()
+                            s.send(f'f:{self.log_id}\n'.encode('utf-8'))
+                            s.close()
+                        except Exception:
+                            # Don't worry if this fails
+                            pass
+                    return
+            else:
+                more = s.recv(4096)
+                if not more:
+                    buffering = False
+                else:
+                    buff += more
+        if buff:
+            self.callback._log_streamline(
+                self.host, buff.decode("utf-8", "backslashreplace"))
+
+
 class CallbackModule(default.CallbackModule):
 
     '''
@@ -121,15 +256,13 @@ class CallbackModule(default.CallbackModule):
         self._task = None
         self._daemon_running = False
         self._play = None
-        self._streamers = []
-        self._streamers_stop = False
+        self._streamers = {}  # task uuid -> streamer
         self.sent_failure_result = False
         self.configure_logger()
         self.configure_regexes()
         self._items_done = False
         self._deferred_result = None
         self._playbook_name = None
-        self._zuul_console_version = 0
 
     def configure_logger(self):
         # ansible appends timestamp, user and pid to the log lines emitted
@@ -183,112 +316,15 @@ class CallbackModule(default.CallbackModule):
             else:
                 self._display.display(msg)
 
-    def _read_log_connect(self, host, ip, port):
-        logger_retries = 0
-        while True:
-            try:
-                s = socket.create_connection((ip, port), 5)
-                # Disable the socket timeout after we have successfully
-                # connected to accomodate the fact that jobs may not be writing
-                # logs continously. Without this we can easily trip the 5
-                # second timeout.
-                s.settimeout(None)
-                return s
-            except socket.timeout:
-                self._log_streamline(
-                    "localhost",
-                    "Timeout exception waiting for the logger. "
-                    "Please check connectivity to [%s:%s]"
-                    % (ip, port))
-                return None
-            except Exception:
-                if logger_retries % 10 == 0:
-                    self._log("[%s] Waiting on logger" % host)
-                logger_retries += 1
-                time.sleep(0.1)
-                continue
-
-    def _read_log(self, host, ip, port, log_id, task_name, hosts):
-        s = self._read_log_connect(host, ip, port)
-        if s is None:
-            # Can't connect; _read_log_connect() already logged an
-            # error for us, just bail
-            return
-
-        # Find out what version we are running against
-        s.send(f'v:{LOG_STREAM_VERSION}\n'.encode('utf-8'))
-        buff = s.recv(1024).decode('utf-8').strip()
-
-        # NOTE(ianw) 2022-07-21 : zuul_console from < 6.3.0 do not
-        # understand this protocol.  They will assume the send
-        # above is a log request and send back the not found
-        # message in a loop.  So to handle this we disconnect and
-        # reconnect.  When we decide to remove this, we can remove
-        # anything in the "version 0" path.
-        if buff == '[Zuul] Log not found':
-            s.close()
-            s = self._read_log_connect(host, ip, port)
-            if s is None:
-                return
-        else:
-            self._zuul_console_version = int(buff)
-
-        if self._zuul_console_version >= 1:
-            msg = 's:%s\n' % log_id
-        else:
-            msg = '%s\n' % log_id
-
-        s.send(msg.encode("utf-8"))
-        buff = s.recv(4096)
-        buffering = True
-        while buffering:
-            if b'\n' in buff:
-                (line, buff) = buff.split(b'\n', 1)
-                # We can potentially get binary data here. In order to
-                # being able to handle that use the backslashreplace
-                # error handling method. This decodes unknown utf-8
-                # code points to escape sequences which exactly represent
-                # the correct data without throwing a decoding exception.
-                done = self._log_streamline(
-                    host, line.decode("utf-8", "backslashreplace"))
-                if done:
-                    if self._zuul_console_version > 0:
-                        try:
-                            # reestablish connection and tell console to
-                            # clean up
-                            s = self._read_log_connect(host, ip, port)
-                            s.send(f'f:{log_id}\n'.encode('utf-8'))
-                            s.close()
-                        except Exception:
-                            # Don't worry if this fails
-                            pass
-                    return
-            else:
-                more = s.recv(4096)
-                if not more:
-                    buffering = False
-                else:
-                    buff += more
-        if buff:
-            self._log_streamline(
-                host, buff.decode("utf-8", "backslashreplace"))
-
-    def _log_streamline(self, host, line):
+    def _log_streamline(self, host, line, stopped):
         if "[Zuul] Task exit code" in line:
-            return True
-        elif self._streamers_stop and "[Zuul] Log not found" in line:
-            # When we got here it indicates that the task is already finished
-            # but the logfile didn't appear yet on the remote node. This can
-            # happen rarely on a contended remote node. In this case give
-            # the streamer some additional time to pick up the log. Otherwise
-            # we would discard the log.
-            if time.monotonic() < (self._streamers_stop_ts + 10):
-                # don't output this line
-                return False
             return True
         elif "[Zuul] Log not found" in line:
             # don't output this line
-            return False
+            if stopped:
+                return True
+            else:
+                return False
         elif " | " in line:
             ts, ln = line.split(' | ', 1)
 
@@ -410,28 +446,43 @@ class CallbackModule(default.CallbackModule):
                 self._log("[%s] Starting to log %s for task %s"
                           % (host, log_id, task_name),
                           job=False, executor=True)
-                streamer = threading.Thread(
-                    target=self._read_log, args=(
-                        host, ip, port, log_id, task_name, hosts))
-                streamer.daemon = True
+                streamer = Streamer(self, host, ip, port, log_id)
                 streamer.start()
-                self._streamers.append(streamer)
+                self._streamers[self._task._uuid] = streamer
 
     def v2_playbook_on_handler_task_start(self, task):
         self.v2_playbook_on_task_start(task, False)
 
     def _stop_streamers(self):
-        self._streamers_stop_ts = time.monotonic()
-        self._streamers_stop = True
         while True:
-            if not self._streamers:
+            keys = list(self._streamers.keys())
+            if not keys:
+                # No streamers, so all are stopped
                 break
-            streamer = self._streamers.pop()
+            streamer = self._streamers.pop(keys[0], None)
+            if streamer is None:
+                # Perhaps we raced; restart the loop and try again
+                continue
+            # Give 10 seconds of grace for the log to appear
+            streamer.stop(10)
+            # And 30 seconds to finish streaming after that
             streamer.join(30)
             if streamer.is_alive():
                 msg = "[Zuul] Log Stream did not terminate"
                 self._log(msg)
-        self._streamers_stop = False
+
+    def _stop_skipped_task_streamer(self, task):
+        # Immediately stop a streamer for a skipped task.  We don't
+        # expect a logfile in that situation.
+        streamer = self._streamers.pop(task._uuid, None)
+        if streamer is None:
+            return
+        # Give no grace since we don't expect the log to exist
+        streamer.stop(0)
+        streamer.join(30)
+        if streamer.is_alive():
+            msg = "[Zuul] Log Stream did not terminate"
+            self._log(msg)
 
     def _process_result_for_localhost(self, result, is_task=True):
         result_dict = dict(result._result)
@@ -512,6 +563,7 @@ class CallbackModule(default.CallbackModule):
         return ret
 
     def v2_runner_on_skipped(self, result):
+        self._stop_skipped_task_streamer(result._task)
         if result._task.loop:
             self._items_done = False
             self._deferred_result = dict(result._result)

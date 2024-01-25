@@ -222,7 +222,7 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine('PLAY RECAP', text)
             self.assertLogLine(
                 r'controller \| ok: \d+ changed: \d+ unreachable: 0 failed: 0 '
-                'skipped: 0 rescued: 1 ignored: 0', text)
+                'skipped: 2 rescued: 1 ignored: 0', text)
             self.assertLogLine(
                 r'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
                 r'org/project/playbooks/command.yaml@master]', text)
@@ -329,7 +329,7 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine('PLAY RECAP', text)
             self.assertLogLine(
                 r'controller \| ok: \d+ changed: \d+ unreachable: 0 failed: 0 '
-                'skipped: 0 rescued: 1 ignored: 0', text)
+                'skipped: 2 rescued: 1 ignored: 0', text)
             self.assertLogLine(
                 r'RUN END RESULT_NORMAL: \[untrusted : review.example.com/'
                 r'org/project/playbooks/command.yaml@master]', text)
