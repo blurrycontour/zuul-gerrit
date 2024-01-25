@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "423299395dcaf9585e4328180df20133885cc0f5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b10b012_c4c95921",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3675,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-25T14:37:53Z",
+      "side": 1,
+      "message": "This is probably worth a comment since the ordering is critical.",
+      "revId": "423299395dcaf9585e4328180df20133885cc0f5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
