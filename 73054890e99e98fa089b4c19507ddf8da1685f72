@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ac5ff81_84fc0b4a",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 8586,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-25T18:39:56Z",
+      "side": 1,
+      "message": "Yep this is obsolete.",
+      "parentUuid": "f0ab72e1_9c6b8f4e",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af62a38d_716d55d8",
@@ -128,6 +146,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d37e4f6_91e6b16a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-25T18:39:56Z",
+      "side": 1,
+      "message": "To me, the word result means that it\u0027s a job result; additional inventory file to me would mean a second inventory file (which is valid in ansible, and something I considered for this change).  But I agree that some way of tying it to the \"additional hosts\" would be nice, so I\u0027ll try to come up with a better name.",
+      "parentUuid": "85b1cf8a_a0cc73c5",
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d45ffc5_4a411f46",
@@ -147,6 +183,24 @@
         "endLine": 938,
         "endChar": 20
       },
+      "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b67ea0fe_38f4164b",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 938,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-25T18:39:56Z",
+      "side": 1,
+      "message": "Agree, we should be more defensive.",
+      "parentUuid": "6d45ffc5_4a411f46",
       "revId": "73054890e99e98fa089b4c19507ddf8da1685f72",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
