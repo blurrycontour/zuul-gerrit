@@ -1,0 +1,300 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e126b56_affb4589",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "It looks like we should keep the truthiness check for the return value. The Elasticsearch, SMTP and MQTT reporters do seem to return `None` in some cases.",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a18e1997_f73b925a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "nit: `change` argument should be plural",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ab148c3_d7c5ee0b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "nit: temporary list could be removed here (avoid object churn)",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "caccd64e_0f7bb9cb",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "`Change.getNeedsChanges()` is already sorting the git dependencies first. What\u0027s the reason we are re-sorting the cycle by Git dependencies here? Is this for reporting Git parents first? \n\nMaybe it would be enough to just reverse the cycle as that looks much simpler then the sort and looks like it would achieve the same goal.\n\nOne thing I\u0027m wondering here: with changing the order of the changes we might also change the first/last change in the list which are still treated a bit special in some cases, e.g. in line #666 when reporting a non-enqueued item. Could that mean that we are reporting to a different change than the one we got the trigger for?",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bd952da_af8b4094",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1625,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "Do we still need this? I think the only thing we do now is to mark jobs ready to run. So maybe we can revert parts of the changes done in https://review.opendev.org/c/zuul/zuul/+/840244 and move the code back into `findJobsToRun()`.\n\nThis could also be done in a follow up change. It feels like it\u0027s more of a cleanup.",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e102a71b_9b5bee7f",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1675,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "Is the `quiet_dequeue` here no longer necessary?",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fc8dd96_31ea1bfa",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1683,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "This condition no longer checks if the item is live. Is that correct?",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "073e75df_24bdfd38",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1689,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "Why do we try a re-enqueue here now?",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4466f784_292971cf",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2291,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "nit: temporary list could be removed here (avoid object churn)",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be3a48ea_d1816743",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2314,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "nit: temporary list could be removed here (avoid object churn)",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb55d47f_5415d438",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2380,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "nit: to avoid creating temporary lists which introduces object churn this can also be written as `[self.ref, *self.other_refs]`",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0791b354_9ea5d155",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2515,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "Could this lead to a broken pipeline that can\u0027t be restored anymore? (Thinking about a case where this exception is raised while restoring the pipeline state)",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c26723a7_2bea2de2",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3761,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "I think this should say \"non-deduplicated parent\".\n\nWith the changes in https://review.opendev.org/c/zuul/zuul/+/897664 we no longer set parent data and with that it\u0027s not considered when deduplicating jobs.",
+      "range": {
+        "startLine": 3761,
+        "startChar": 26,
+        "endLine": 3761,
+        "endChar": 38
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e8d0117_e624f893",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4965,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "nit: temporary list could be removed here (avoid object churn)",
+      "range": {
+        "startLine": 4964,
+        "startChar": 27,
+        "endLine": 4965,
+        "endChar": 49
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "380bf6a8_5572bf68",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4969,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 4968,
+        "startChar": 27,
+        "endLine": 4969,
+        "endChar": 49
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d753ab9_1c2de310",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5106,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:25:01Z",
+      "side": 1,
+      "message": "nit: temporary list could be removed here (avoid object churn)",
+      "range": {
+        "startLine": 5106,
+        "startChar": 29,
+        "endLine": 5106,
+        "endChar": 72
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
