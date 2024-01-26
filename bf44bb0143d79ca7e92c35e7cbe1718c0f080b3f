@@ -230,6 +230,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9651f203_13063841",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3761,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:37:35Z",
+      "side": 1,
+      "message": "Since we deduplicate jobs now once when creating the job graph, I think parent data is anyways no longer considered.",
+      "parentUuid": "c26723a7_2bea2de2",
+      "range": {
+        "startLine": 3761,
+        "startChar": 26,
+        "endLine": 3761,
+        "endChar": 38
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1e8d0117_e624f893",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -292,6 +316,29 @@
         "startChar": 29,
         "endLine": 5106,
         "endChar": 72
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77ab1c42_819795b8",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5198,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-26T14:37:35Z",
+      "side": 1,
+      "message": "nit: `if not getattr(change, \u0027is_merged\u0027, True):`",
+      "range": {
+        "startLine": 5197,
+        "startChar": 19,
+        "endLine": 5198,
+        "endChar": 37
       },
       "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
