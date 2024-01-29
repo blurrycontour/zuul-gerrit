@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "62b4ed26_b222ad71",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-29T22:10:12Z",
+      "side": 1,
+      "message": "This is covered by test_cycle_git_dependency.\n\nA -\u003e B (via depends-on footer)\nB -\u003e A (via git)\n\nIf the enqueue order ends up as B, A (which getNeedsChanges won\u0027t help -- A needs only B and B needs only A) then the cycle will fail to merge.  The only valed enqueue order is A, B.\n\nIf we reverse the cycle, that test passes, but then if we switch the order in the test it fails again.  I\u0027m afraid we need the more complex version that orders the git deps for the entire cycle.\n\nI think we can change the cycle[-1] below to change now -- since we enqueue the entire cycle at once, we won\u0027t be recursing when adding the cycle.  I believe that should match the current behavior.  It\u0027s possible (I haven\u0027t examined this too closely) that if we do that we might still report on the wrong change if we enqueue A which is not a cycle and then recursively try to enqueue the cycle B\u003c-\u003eC ahead of it; however I\u0027m pretty sure the current code suffers from that problem too.  I\u0027d vote for not making this worse now (\u003d\u003d change line 666 to \u0027change\u0027) and then optionally fix that later if we think it\u0027s worthwhile (it\u0027s a very unlikely case).\n\nLeaving this open as this is my current TODO list assuming we agree:\n1) Duplicate test_cycle_git_dependency but enqueue B instead of A\n2) Change line 666 from \u0027cycle[-1]\u0027 to \u0027change\u0027",
+      "parentUuid": "caccd64e_0f7bb9cb",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8bd952da_af8b4094",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 1
@@ -82,6 +100,24 @@
       "writtenOn": "2024-01-26T14:25:01Z",
       "side": 1,
       "message": "Do we still need this? I think the only thing we do now is to mark jobs ready to run. So maybe we can revert parts of the changes done in https://review.opendev.org/c/zuul/zuul/+/840244 and move the code back into `findJobsToRun()`.\n\nThis could also be done in a follow up change. It feels like it\u0027s more of a cleanup.",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e620a06_6004de0a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1625,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-29T22:10:12Z",
+      "side": 1,
+      "message": "Yeah, let\u0027s do that as a followup.  I\u0027m going to add that to the TODO list in the commit message.",
+      "parentUuid": "8bd952da_af8b4094",
       "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -105,6 +141,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f64b4de9_3a50d61c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1675,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-29T22:10:12Z",
+      "side": 1,
+      "message": "I believe that not only is it not necessary here, it may not have been necessary or correct previously.  The fake github driver had a bug (fakegithub.py line 694) where it did not correctly increment the check run counter, so our tests that verified that we closed out obsolete check runs when re-enqueing were not valid.  The updates in this change around reporting and dequeing started to fail those tests, and in fixing that, I found the the underlying test bug, fixed it, and then found that at least this code was not reporting the dequeue event because of the quiet_dequeue flag.  I suspect that the old code probably had the same problem, but it was being masked by different reporting.\n\nIn other words, I agree it is counter intuitive to remove quiet_dequeue in this change, but with the understanding that the test fixture was incorrect and therefore the old code may have been incorrect (I have not verified, but it makes sense to me), it becomes more intuitive.\n\nI will update the commit message to mention the fakegithub.py fix; sorry I forgot that.",
+      "parentUuid": "e102a71b_9b5bee7f",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6fc8dd96_31ea1bfa",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 1
@@ -122,6 +176,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e83bf090_1236d1e1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1683,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-29T22:10:12Z",
+      "side": 1,
+      "message": "This change alters the behavior of the \"safety check\" (that can\u0027t be helped), so when I was trying to resolve the behavior change with minimum intervention, this seemed to produce what I thought were \"better\" results for test_dependency_removal_check but on second thought, I think I was probably looking ahead too much toward a future change where we re-asses this behavior (and clean up the safety check) and I think that leaving the item.live check in place is the minimal change.  It does cause more jobs to run in that test, and more changes to be enqueued, but under the circumstances, I don\u0027t think any answer is wrong.\n\nThe important thing is that we take an explicit look at this behavior with the safety check cleanup.\n\nI\u0027ll re-add the item.live check and update the test to match.",
+      "parentUuid": "6fc8dd96_31ea1bfa",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "073e75df_24bdfd38",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 1
@@ -133,6 +205,24 @@
       "writtenOn": "2024-01-26T14:25:01Z",
       "side": 1,
       "message": "Why do we try a re-enqueue here now?",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4a29c33_085d802c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1689,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-29T22:10:12Z",
+      "side": 1,
+      "message": "Previously in the cases where dependency graphs change while changes are in the pipeline, we would generally detect that above when an individual item\u0027s dependencies change.  This \"safety check\" was only to handle some cases where we didn\u0027t.  But now if a cycle changes without dependencies being added we\u0027re going to notice that here, so this is taking on some of the load of the re-enqueue above.\n\nI suspect that in general, too many things are going to be re-enqueued as a result of this change, but I think that\u0027s okay in the short term and we should address the behavior directly in a followup change (to clean up the \"safety check\").",
+      "parentUuid": "073e75df_24bdfd38",
       "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -207,6 +297,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "910c5f55_d2d88a09",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2515,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-29T22:10:12Z",
+      "side": 1,
+      "message": "I don\u0027t think it will cause that, but it might be a symptom of that.  There are a few cases where we resolveChangeReferences on pipeline restore, including today with QueueItem.change which has almost the same save/restore profile as here.  Except we don\u0027t check that the value is not None, so if it does happen, we\u0027re going to continue up until we actually try to do something with it.  This extra check seems preferable to me.  I\u0027m not sure what prompted it (probably some temporary error while I was developing).",
+      "parentUuid": "0791b354_9ea5d155",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c26723a7_2bea2de2",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -242,6 +350,30 @@
       "side": 1,
       "message": "Since we deduplicate jobs now once when creating the job graph, I think parent data is anyways no longer considered.",
       "parentUuid": "c26723a7_2bea2de2",
+      "range": {
+        "startLine": 3761,
+        "startChar": 26,
+        "endLine": 3761,
+        "endChar": 38
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "089fb4ac_12b438e2",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3761,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-29T22:10:12Z",
+      "side": 1,
+      "message": "This comment was copied verbatim.  I don\u0027t think it\u0027s wrong (including the use of \"deduplicated parent\" because if the parent wasn\u0027t deduplicated then neither should be the child) but I do agree that parts of this no longer need to be considered so I\u0027ll rework the comment to be more relevant.",
+      "parentUuid": "9651f203_13063841",
       "range": {
         "startLine": 3761,
         "startChar": 26,
