@@ -1882,6 +1882,38 @@ class TestBuildInfo(BaseTestWeb):
                                     "idx_min=%i" % idx_max).json()
         self.assertEqual(len(builds_query), 1, builds_query)
 
+    def test_web_substring_search_builds(self):
+        # Generate some build records in the db.
+        self.add_base_changes()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        builds = self.get_url("api/tenant/tenant-one/builds?"
+                              "project=org/project*&"
+                              "branch=*aster").json()
+        self.assertEqual(len(builds), 6)
+
+        builds = self.get_url("api/tenant/tenant-one/builds?"
+                              "job_name=*-merge").json()
+        self.assertEqual(len(builds), 2)
+
+        builds = self.get_url("api/tenant/tenant-one/builds?"
+                              "job_name=*-merge&"
+                              "project=org/project1").json()
+        self.assertEqual(len(builds), 1)
+
+        builds = self.get_url("api/tenant/tenant-one/builds?"
+                              "pipeline=gat*&"
+                              "project=org/project1&"
+                              "job_name=*-merge&"
+                              "job_name=*test*").json()
+        self.assertEqual(len(builds), 3)
+        self.assertTrue(
+            all(b["ref"]["project"] == "org/project1" for b in builds))
+        self.assertEqual("project-test2", builds[0]["job_name"])
+        self.assertEqual("project-test1", builds[1]["job_name"])
+        self.assertEqual("project-merge", builds[2]["job_name"])
+
     def test_web_list_skipped_builds(self):
         # Test the exclude_result filter
         # Generate some build records in the db.
@@ -2004,6 +2036,22 @@ class TestBuildInfo(BaseTestWeb):
         buildsets_query = self.get_url("api/tenant/tenant-one/buildsets?"
                                        "idx_min=%i" % idx_max).json()
         self.assertEqual(len(buildsets_query), 1, buildsets_query)
+
+    def test_web_substring_search_buildsets(self):
+        # Generate some build records in the db.
+        self.add_base_changes()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        buildsets = self.get_url("api/tenant/tenant-one/buildsets?"
+                                 "project=org/*&"
+                                 "branch=*ster*&"
+                                 "pipeline=check&"
+                                 "pipeline=*ate").json()
+        self.assertEqual(2, len(buildsets))
+        self.assertEqual("org/project1", buildsets[0]["refs"][0]["project"])
+        self.assertEqual("org/project", buildsets[1]["refs"][0]["project"])
 
     def test_web_list_build_times(self):
         # Generate some build records in the db.
