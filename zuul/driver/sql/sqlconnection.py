@@ -119,6 +119,29 @@ class DatabaseSession(object):
         self.session().close()
         self.session = None
 
+    def _sanitizeSubstringQuery(self, value, escape_char="\\"):
+        if isinstance(value, str):
+            for c in ("%", "_", "\\"):
+                value = value.replace(c, escape_char + c)
+            return value
+        return value
+
+    def _getFuzzyFilterOp(self, column, value, escape_char="\\"):
+        if isinstance(value, str) and "*" in value:
+            return column.like(value.replace("*", "%"), escape=escape_char)
+        else:
+            return column == value
+
+    def listFilterFuzzy(self, query, column, value):
+        value = self._sanitizeSubstringQuery(value)
+        if value is None:
+            return query
+        elif isinstance(value, list) or isinstance(value, tuple):
+            return query.filter(
+                sa.or_(*[self._getFuzzyFilterOp(column, v) for v in value])
+            )
+        return query.filter(self._getFuzzyFilterOp(column, value))
+
     def listFilter(self, query, column, value):
         if value is None:
             return query
@@ -191,10 +214,10 @@ class DatabaseSession(object):
                 dialect_name='postgresql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
-        q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
-        q = self.listFilter(q, ref_table.c.project, project)
+        q = self.listFilterFuzzy(q, buildset_table.c.pipeline, pipeline)
+        q = self.listFilterFuzzy(q, ref_table.c.project, project)
         q = self.listFilter(q, ref_table.c.change, change)
-        q = self.listFilter(q, ref_table.c.branch, branch)
+        q = self.listFilterFuzzy(q, ref_table.c.branch, branch)
         q = self.listFilter(q, ref_table.c.patchset, patchset)
         q = self.listFilter(q, ref_table.c.ref, ref)
         q = self.listFilter(q, ref_table.c.newrev, newrev)
@@ -206,7 +229,7 @@ class DatabaseSession(object):
         q = self.listFilter(
             q, buildset_table.c.last_build_end_time, last_build_end_time)
         q = self.listFilter(q, build_table.c.uuid, uuid)
-        q = self.listFilter(q, build_table.c.job_name, job_name)
+        q = self.listFilterFuzzy(q, build_table.c.job_name, job_name)
         q = self.listFilter(q, build_table.c.voting, voting)
         q = self.listFilter(q, build_table.c.nodeset, nodeset)
         q = self.listFilter(q, build_table.c.result, result)
@@ -387,10 +410,10 @@ class DatabaseSession(object):
                 dialect_name='postgresql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
-        q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
-        q = self.listFilter(q, ref_table.c.project, project)
+        q = self.listFilterFuzzy(q, buildset_table.c.pipeline, pipeline)
+        q = self.listFilterFuzzy(q, ref_table.c.project, project)
         q = self.listFilter(q, ref_table.c.change, change)
-        q = self.listFilter(q, ref_table.c.branch, branch)
+        q = self.listFilterFuzzy(q, ref_table.c.branch, branch)
         q = self.listFilter(q, ref_table.c.patchset, patchset)
         q = self.listFilter(q, ref_table.c.ref, ref)
         q = self.listFilter(q, ref_table.c.newrev, newrev)
