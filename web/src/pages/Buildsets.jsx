@@ -42,19 +42,19 @@ class BuildsetsPage extends React.Component {
         key: 'project',
         title: 'Project',
         placeholder: 'Filter by Project...',
-        type: 'search',
+        type: 'fuzzy-search',
       },
       {
         key: 'branch',
         title: 'Branch',
         placeholder: 'Filter by Branch...',
-        type: 'search',
+        type: 'fuzzy-search',
       },
       {
         key: 'pipeline',
         title: 'Pipeline',
         placeholder: 'Filter by Pipeline...',
-        type: 'search',
+        type: 'fuzzy-search',
       },
       {
         key: 'change',
@@ -78,7 +78,7 @@ class BuildsetsPage extends React.Component {
       },
       {
         key: 'uuid',
-        title: 'Buildset',
+        title: 'Buildset UUID',
         placeholder: 'Filter by Buildset UUID...',
         type: 'search',
       },
