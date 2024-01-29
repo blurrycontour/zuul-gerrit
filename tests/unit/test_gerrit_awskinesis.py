@@ -17,7 +17,7 @@ import os
 import time
 
 import boto3
-from moto import mock_kinesis
+from moto import mock_aws
 
 import tests.base
 from tests.base import (
@@ -36,10 +36,10 @@ def serialize(event):
 
 class TestGerritEventSourceAWSKinesis(ZuulTestCase):
     config_file = 'zuul-gerrit-awskinesis.conf'
-    mock_kinesis = mock_kinesis()
+    mock_aws = mock_aws()
 
     def setUp(self):
-        self.mock_kinesis.start()
+        self.mock_aws.start()
 
         self.kinesis_client = boto3.client('kinesis', region_name='us-west-2')
         self.kinesis_client.create_stream(
@@ -52,7 +52,7 @@ class TestGerritEventSourceAWSKinesis(ZuulTestCase):
         super().setUp()
 
     def tearDown(self):
-        self.mock_kinesis.stop()
+        self.mock_aws.stop()
         super().tearDown()
 
     @simple_layout('layouts/simple.yaml')
