@@ -396,6 +396,40 @@ class TestMysqlDatabase(DBBaseTestCase):
             tenant=tenant, uuid=buildset_uuid)
         self.assertEqual(db_buildset.result, 'SUCCESS')
 
+    def test_sanitize_subtring_query(self):
+        session = self.connection.getSession()
+        self.assertEqual(None, session._sanitizeSubstringQuery(None))
+        self.assertEqual("job-name",
+                         session._sanitizeSubstringQuery("job-name"))
+        self.assertEqual("$%job-$%name$%",
+                         session._sanitizeSubstringQuery("%job-%name%"))
+        self.assertEqual("job$_-$%name$%",
+                         session._sanitizeSubstringQuery("job_-%name%"))
+        self.assertEqual("job$_-$%name$%",
+                         session._sanitizeSubstringQuery("job_-%name%"))
+        self.assertEqual("$$$%job$_-$%name$%",
+                         session._sanitizeSubstringQuery("$%job_-%name%"))
+
+        self.assertEqual("***%job*_-*%name*%",
+                         session._sanitizeSubstringQuery("*%job_-%name%",
+                                                         escape_char="*"))
+
+    def test_fuzzy_filter_op(self):
+        col = sqlalchemy.Column("job_name")
+        session = self.connection.getSession()
+
+        filter = session._getFuzzyFilterOp(col, "job-name")
+        self.assertEqual(type(col == "foo"), type(filter))
+        self.assertEqual("job-name", filter.right.value)
+
+        filter = session._getFuzzyFilterOp(col, "*job*name*")
+        self.assertEqual(type(col.like("foo")), type(filter))
+        self.assertEqual("$", filter.modifiers["escape"])
+        self.assertEqual("%job%name%", filter.right.value)
+
+        filter = session._getFuzzyFilterOp(col, "job-name*", escape_char="#")
+        self.assertEqual("#", filter.modifiers["escape"])
+
 
 class TestPostgresqlDatabase(DBBaseTestCase):
     def setUp(self):
