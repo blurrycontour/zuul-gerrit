@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a082e15c_d4d16c51",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 36143
+      },
+      "writtenOn": "2024-01-29T12:57:14Z",
+      "side": 1,
+      "message": "Thank you for the review. \n\nConcerning point 1):\nMy initial thought process was also to either create a new \"unreachable\" bool variable or try to use an existing flag which might already signal if a host has become unreachable in order to avoid introducing a redundant variable.\n\nMy assumption was that should_retry was created to cover a special case in the server executor logic to account for a retryable failure and that the retry_limit is reached. In the current state of the server.py implementation to me it seems that should_retry is set to True when the job/post status is checked \u0026 equals result_unreachable.\n\nYou mentioned that it\u0027s not that simple to just use should_retry, can you elaborate in which cases this flag is insufficient to indicate an unreachable host ? \nI\u0027d like to better understand the circumstances in these cases.\n\nI agree with your argument that it is desired to avoid overloading the meaning of an existing variable and I\u0027ll refactor this change to use a new \"unreachable\" variable.\n\nConcerning point 2):\n\nFor jobs running on an AWS SPOT instance, it would be desired to check an exposed zuul unreachable variable in order to skip a play completely. If such a SPOT instance is used the host can be reclaimed/ICE\u0027d at any time and thus become unavailable.\n\nTasks which try to interact with this reclaimed host will eventually fail after a certain timeout. If a build is triggered on a host and later gets ICE\u0027d and there are many post-run tasks which attempt to reach out to the now unavailable host the timeouts can accumulate and add up to a significant delay until the job actually finishes.\n\nThe unreachable detection could be implemented in an ansible role using the\nmeta module https://docs.ansible.com/ansible/latest/collections/ansible/builtin/meta_module.html#parameter-free_form\nhowever, with the use of \"end_play\" (which ends execution for all host) or \"end_host\" \nthis would need to be called at the beginning of each play.\n\nUsing a zuul variable to check for the hosts property similarly to zuul_will_retry, \nwould make sense in my point of view, since zuul executor already defines an ansibleJob\nresult of being unreachable.\n\nIn summary this change attempts to improve AWS spot instance handling when a host reclaim occurs and I hope this comment could clarify the specific use case.",
+      "revId": "8e7e591b0503357c5e42a44cfc482c86d1024043",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
