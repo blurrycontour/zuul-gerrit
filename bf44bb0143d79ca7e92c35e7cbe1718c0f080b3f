@@ -387,6 +387,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c29fb657_0b7f5b21",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2515,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T17:35:23Z",
+      "side": 1,
+      "message": "This code isn\u0027t necessary now, but I do think we should add something like it in the future, as there are quite a few places where we work with awkward change ref cache keys instead of change objects, and this would make it better.\n\nGiven the catastrophic failure needed for this to happen (change not in cache and source unable to fetch the change), I\u0027m not sure that we should assume that the system would be functional enough to recover at all.  Indeed, it seems that a pre-requisite for this to happen would be a failure of the remote code review system, which means that Zuul is most likely to recover if we just keep trying to restore the pipeline until the remote system returns and we finally succeed.  Moreover, I\u0027m not sure it\u0027s better to roll the dice on hitting a random null-dereference later (your argument is that we\u0027ll probably hit that after restoration or not at all and can therefore dequeue it; my argument is that there\u0027s no guarantee that it still won\u0027t be in the critical path for a dequeue).  While it wouldn\u0027t be the case for this class, sometimes we use None to mean not yet assigned, and in that case it would be dangerous and wrong to store a value we know to be incorrect.\n\nIn short, I am not prepared to concede the point that we should never crash while restoring a pipeline.  I do agree that if we can find ways to make things recoverable, we should.  But we should not do so by mutating data to known incorrect values.  If this is important, then we should come up with some structural way to handle pipeline restoration failures more systemically.\n\nBut all of that is moot since we can\u0027t answer to exactly how this precise code would be used, so I will just remove this block for now.",
+      "parentUuid": "afb59a61_879a4037",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c26723a7_2bea2de2",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -470,6 +488,30 @@
       "side": 1,
       "message": "Sorry, missed that this was just copy \u0026 paste.\n\nI think currently we don\u0027t really consider if the parent was deduplicated or not when deciding if child jobs should be deduplicated. What you are describing sounds like the \"don\u0027t deduplicate\" of a parent job would also apply for all child jobs.\n\nHowever, atm. we don\u0027t consider that when deciding whether to deduplicate a job or not. In the past the parent data was an input to the child job, but with 897664 that\u0027s no longer the case.\n\nThis is also covered by `test_job_deduplication_check_child_of_diff_parent_diff_data`",
       "parentUuid": "089fb4ac_12b438e2",
+      "range": {
+        "startLine": 3761,
+        "startChar": 26,
+        "endLine": 3761,
+        "endChar": 38
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "939cdb3f_d7b31203",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3761,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T17:35:23Z",
+      "side": 1,
+      "message": "This conversation is difficult to follow because I\u0027m not sure whether we\u0027re talking about the old situation (which is the only thing that makes sense to discuss if we\u0027re trying to figure out if the phrase \"deduplicated parent\" was correct or not).  Let\u0027s just talk about the future now.  :)\n\nThe new behavior is described in the spec:\n\n   #. If a to-be-deduplicated job depends on a non-deduplicated job,\n      it will treat each (job, ref) instance as a parent.\n   #. Otherwise, each job will depend only on jobs for the same ref.\n\nAnd as you observe, we don\u0027t consider parent data at all.  That matches the typical behavior from before, so the diff_parent_diff_data tests don\u0027t need to change.  We can, however, remove one of those tests and update the comments there, so I will do so.",
+      "parentUuid": "5239196d_d6cec9c0",
       "range": {
         "startLine": 3761,
         "startChar": 26,
