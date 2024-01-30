@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "83e145f0_73a8dc29",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e126b56_affb4589",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a18e1997_f73b925a",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16ced4e1_1caff072",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a18e1997_f73b925a",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ab148c3_d7c5ee0b",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-01-26T14:25:01Z",
       "side": 1,
       "message": "nit: temporary list could be removed here (avoid object churn)",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b50e008e_4bd55398",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 489,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8ab148c3_d7c5ee0b",
       "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -105,6 +159,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd362035_6619f191",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "49098518_2b259f72",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8bd952da_af8b4094",
@@ -136,6 +208,24 @@
       "side": 1,
       "message": "Yeah, let\u0027s do that as a followup.  I\u0027m going to add that to the TODO list in the commit message.",
       "parentUuid": "8bd952da_af8b4094",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "954cd017_8b0d36c3",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1625,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Added to followup todo.",
+      "parentUuid": "8e620a06_6004de0a",
       "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -193,6 +283,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c46275c_e5e32331",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1675,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "14557850_79e606e4",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6fc8dd96_31ea1bfa",
@@ -224,6 +332,24 @@
       "side": 1,
       "message": "This change alters the behavior of the \"safety check\" (that can\u0027t be helped), so when I was trying to resolve the behavior change with minimum intervention, this seemed to produce what I thought were \"better\" results for test_dependency_removal_check but on second thought, I think I was probably looking ahead too much toward a future change where we re-asses this behavior (and clean up the safety check) and I think that leaving the item.live check in place is the minimal change.  It does cause more jobs to run in that test, and more changes to be enqueued, but under the circumstances, I don\u0027t think any answer is wrong.\n\nThe important thing is that we take an explicit look at this behavior with the safety check cleanup.\n\nI\u0027ll re-add the item.live check and update the test to match.",
       "parentUuid": "6fc8dd96_31ea1bfa",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e77cb54d_f251e8a9",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1683,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e83bf090_1236d1e1",
       "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -281,6 +407,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48922e56_bd8b00c0",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1689,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f461a06_def9ed10",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4466f784_292971cf",
@@ -294,6 +438,24 @@
       "writtenOn": "2024-01-26T14:25:01Z",
       "side": 1,
       "message": "nit: temporary list could be removed here (avoid object churn)",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36d60c6c_e9cd35f3",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2291,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4466f784_292971cf",
       "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -315,6 +477,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "903ac44d_e5a8d862",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2314,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be3a48ea_d1816743",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb55d47f_5415d438",
@@ -328,6 +508,24 @@
       "writtenOn": "2024-01-26T14:25:01Z",
       "side": 1,
       "message": "nit: to avoid creating temporary lists which introduces object churn this can also be written as `[self.ref, *self.other_refs]`",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c4b4649_b72ef4cc",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2380,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb55d47f_5415d438",
       "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -399,6 +597,24 @@
       "side": 1,
       "message": "This code isn\u0027t necessary now, but I do think we should add something like it in the future, as there are quite a few places where we work with awkward change ref cache keys instead of change objects, and this would make it better.\n\nGiven the catastrophic failure needed for this to happen (change not in cache and source unable to fetch the change), I\u0027m not sure that we should assume that the system would be functional enough to recover at all.  Indeed, it seems that a pre-requisite for this to happen would be a failure of the remote code review system, which means that Zuul is most likely to recover if we just keep trying to restore the pipeline until the remote system returns and we finally succeed.  Moreover, I\u0027m not sure it\u0027s better to roll the dice on hitting a random null-dereference later (your argument is that we\u0027ll probably hit that after restoration or not at all and can therefore dequeue it; my argument is that there\u0027s no guarantee that it still won\u0027t be in the critical path for a dequeue).  While it wouldn\u0027t be the case for this class, sometimes we use None to mean not yet assigned, and in that case it would be dangerous and wrong to store a value we know to be incorrect.\n\nIn short, I am not prepared to concede the point that we should never crash while restoring a pipeline.  I do agree that if we can find ways to make things recoverable, we should.  But we should not do so by mutating data to known incorrect values.  If this is important, then we should come up with some structural way to handle pipeline restoration failures more systemically.\n\nBut all of that is moot since we can\u0027t answer to exactly how this precise code would be used, so I will just remove this block for now.",
       "parentUuid": "afb59a61_879a4037",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "079a3d57_8a5252fa",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2515,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c29fb657_0b7f5b21",
       "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -546,6 +762,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c351893c_b6096987",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3761,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "939cdb3f_d7b31203",
+      "range": {
+        "startLine": 3761,
+        "startChar": 26,
+        "endLine": 3761,
+        "endChar": 38
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1e8d0117_e624f893",
@@ -559,6 +799,30 @@
       "writtenOn": "2024-01-26T14:25:01Z",
       "side": 1,
       "message": "nit: temporary list could be removed here (avoid object churn)",
+      "range": {
+        "startLine": 4964,
+        "startChar": 27,
+        "endLine": 4965,
+        "endChar": 49
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "005bb6d8_99d52ac3",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4965,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e8d0117_e624f893",
       "range": {
         "startLine": 4964,
         "startChar": 27,
@@ -592,6 +856,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0df6eb5c_cfab193e",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4969,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "380bf6a8_5572bf68",
+      "range": {
+        "startLine": 4968,
+        "startChar": 27,
+        "endLine": 4969,
+        "endChar": 49
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d753ab9_1c2de310",
@@ -615,6 +903,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a893e43_74a7f4ff",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5106,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d753ab9_1c2de310",
+      "range": {
+        "startLine": 5106,
+        "startChar": 29,
+        "endLine": 5106,
+        "endChar": 72
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77ab1c42_819795b8",
@@ -628,6 +940,30 @@
       "writtenOn": "2024-01-26T14:37:35Z",
       "side": 1,
       "message": "nit: `if not getattr(change, \u0027is_merged\u0027, True):`",
+      "range": {
+        "startLine": 5197,
+        "startChar": 19,
+        "endLine": 5198,
+        "endChar": 37
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5647367f_32155ca4",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5198,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-01-30T18:48:07Z",
+      "side": 1,
+      "message": "Definitely a nit; done.",
+      "parentUuid": "77ab1c42_819795b8",
       "range": {
         "startLine": 5197,
         "startChar": 19,
