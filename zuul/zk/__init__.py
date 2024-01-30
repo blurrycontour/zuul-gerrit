@@ -224,6 +224,25 @@ class ZooKeeperClient(object):
                 zstat = self.client.set("/zuul/ltime", b"")
         return zstat.last_modified_transaction_id
 
+    def _fastRecursiveDelete(self, path, results):
+        try:
+            children = self.client.get_children(path)
+        except NoNodeError:
+            return
+        if children:
+            for child in children:
+                self._fastRecursiveDelete(f'{path}/{child}', results)
+        results.append(self.client.delete_async(path, -1))
+
+    def fastRecursiveDelete(self, path):
+        results = []
+        self._fastRecursiveDelete(path, results)
+        for res in results:
+            try:
+                res.get()
+            except NoNodeError:
+                pass
+
 
 class ZooKeeperSimpleBase(metaclass=ABCMeta):
     """Base class for stateless Zookeeper interaction."""

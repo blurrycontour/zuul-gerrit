@@ -358,6 +358,46 @@ class TestOfflineZKOperations(ZuulTestCase):
 
         self.zk_client.disconnect()
 
+    def test_delete_state_keep_config_cache(self):
+        # Shut everything down (as much as possible) to reduce
+        # logspam and errors.
+        ZuulTestCase.shutdown(self)
+
+        # Re-start the client connection because we need one for the
+        # test.
+        self.zk_client = ZooKeeperClient.fromConfig(self.config)
+        self.zk_client.connect()
+
+        config_file = os.path.join(self.test_root, 'zuul.conf')
+        with open(config_file, 'w') as f:
+            self.config.write(f)
+
+        # Save a copy of the things we keep in ZK
+        old_keys = self.getZKTree('/keystorage')
+        old_config = self.getZKTree('/zuul/config')
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
+             '-c', config_file,
+             'delete-state', '--keep-config-cache',
+             ],
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate(b'yes\n')
+        self.log.debug(out.decode('utf8'))
+
+        # Make sure the keys are still around
+        new_keys = self.getZKTree('/keystorage')
+        self.assertEqual(new_keys, old_keys)
+        new_config = self.getZKTree('/zuul/config')
+        self.assertEqual(new_config, old_config)
+
+        # Make sure we really deleted everything
+        children = self.zk_client.client.get_children('/zuul')
+        self.assertEqual(['config'], children)
+
+        self.zk_client.disconnect()
+
 
 class TestOnlineZKOperations(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
