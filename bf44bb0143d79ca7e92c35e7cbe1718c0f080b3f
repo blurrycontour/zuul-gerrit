@@ -87,6 +87,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49098518_2b259f72",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-30T16:02:48Z",
+      "side": 1,
+      "message": "ack",
+      "parentUuid": "62b4ed26_b222ad71",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8bd952da_af8b4094",
@@ -157,6 +175,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14557850_79e606e4",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1675,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-30T16:02:48Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f64b4de9_3a50d61c",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6fc8dd96_31ea1bfa",
@@ -223,6 +259,24 @@
       "side": 1,
       "message": "Previously in the cases where dependency graphs change while changes are in the pipeline, we would generally detect that above when an individual item\u0027s dependencies change.  This \"safety check\" was only to handle some cases where we didn\u0027t.  But now if a cycle changes without dependencies being added we\u0027re going to notice that here, so this is taking on some of the load of the re-enqueue above.\n\nI suspect that in general, too many things are going to be re-enqueued as a result of this change, but I think that\u0027s okay in the short term and we should address the behavior directly in a followup change (to clean up the \"safety check\").",
       "parentUuid": "073e75df_24bdfd38",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f461a06_def9ed10",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1689,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-30T16:02:48Z",
+      "side": 1,
+      "message": "ack",
+      "parentUuid": "c4a29c33_085d802c",
       "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -315,6 +369,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "afb59a61_879a4037",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2515,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-30T16:02:48Z",
+      "side": 1,
+      "message": "The thing is that when that exception happens during restore the only option to recover from that is to delete the pipeline state. If there was a problem afterwards during pipeline processing we could still try to fix an issue by dequeueing the problematic item.",
+      "parentUuid": "910c5f55_d2d88a09",
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c26723a7_2bea2de2",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -374,6 +446,30 @@
       "side": 1,
       "message": "This comment was copied verbatim.  I don\u0027t think it\u0027s wrong (including the use of \"deduplicated parent\" because if the parent wasn\u0027t deduplicated then neither should be the child) but I do agree that parts of this no longer need to be considered so I\u0027ll rework the comment to be more relevant.",
       "parentUuid": "9651f203_13063841",
+      "range": {
+        "startLine": 3761,
+        "startChar": 26,
+        "endLine": 3761,
+        "endChar": 38
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5239196d_d6cec9c0",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3761,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-30T16:02:48Z",
+      "side": 1,
+      "message": "Sorry, missed that this was just copy \u0026 paste.\n\nI think currently we don\u0027t really consider if the parent was deduplicated or not when deciding if child jobs should be deduplicated. What you are describing sounds like the \"don\u0027t deduplicate\" of a parent job would also apply for all child jobs.\n\nHowever, atm. we don\u0027t consider that when deciding whether to deduplicate a job or not. In the past the parent data was an input to the child job, but with 897664 that\u0027s no longer the case.\n\nThis is also covered by `test_job_deduplication_check_child_of_diff_parent_diff_data`",
+      "parentUuid": "089fb4ac_12b438e2",
       "range": {
         "startLine": 3761,
         "startChar": 26,
