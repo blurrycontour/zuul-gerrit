@@ -524,6 +524,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "230c0a94_a404c128",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3761,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-30T18:02:06Z",
+      "side": 1,
+      "message": "Sorry for the confusion. I thought you were saying that with the new behavior child jobs where the parent wasn\u0027t deduplicated should also NOT be deduplicated.\n\nBut it looks like we agree on this point :)",
+      "parentUuid": "939cdb3f_d7b31203",
+      "range": {
+        "startLine": 3761,
+        "startChar": 26,
+        "endLine": 3761,
+        "endChar": 38
+      },
+      "revId": "bf44bb0143d79ca7e92c35e7cbe1718c0f080b3f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1e8d0117_e624f893",
         "filename": "zuul/model.py",
         "patchSetId": 1
