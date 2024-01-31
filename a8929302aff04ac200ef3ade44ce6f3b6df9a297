@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d66850cf_c58008d3",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2014,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-31T14:38:21Z",
+      "side": 0,
+      "message": "Is this check no longer required for refs?",
+      "revId": "a8929302aff04ac200ef3ade44ce6f3b6df9a297",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc01bb19_497b76d1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2062,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-01-31T14:38:21Z",
+      "side": 0,
+      "message": "Same question as above",
+      "revId": "a8929302aff04ac200ef3ade44ce6f3b6df9a297",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
