@@ -1010,8 +1010,9 @@ class Scheduler(threading.Thread):
             self.primeSystemConfig()
 
         loader = configloader.ConfigLoader(
-            self.connections, self.zk_client, self.globals, self.statsd, self,
-            self.merger, self.keystore)
+            self.connections, self.zk_client, self.globals,
+            self.unparsed_config_cache, self.statsd,
+            self, self.merger, self.keystore)
         new_tenants = (set(self.unparsed_abide.tenants)
                        - self.abide.tenants.keys())
 
@@ -1312,7 +1313,8 @@ class Scheduler(threading.Thread):
     def updateTenantLayout(self, log, tenant_name):
         log.debug("Updating layout of tenant %s", tenant_name)
         loader = configloader.ConfigLoader(
-            self.connections, self.zk_client, self.globals, self.statsd, self,
+            self.connections, self.zk_client, self.globals,
+            self.unparsed_config_cache, self.statsd, self,
             self.merger, self.keystore)
         # Since we are using the ZK 'locked' context manager (in order
         # to have a non-blocking lock) with a threading lock, we need
@@ -1396,8 +1398,14 @@ class Scheduler(threading.Thread):
         self.log.info("Config validation beginning")
         start = time.monotonic()
 
+        # Use a temporary config cache for the validation
+        validate_root = f"/zuul/validate/{uuid.uuid4().hex}"
+        self.unparsed_config_cache = UnparsedConfigCache(self.zk_client,
+                                                         validate_root)
+
         loader = configloader.ConfigLoader(
-            self.connections, self.zk_client, self.globals, self.statsd,
+            self.connections, self.zk_client, self.globals,
+            self.unparsed_config_cache, self.statsd,
             self, self.merger, self.keystore)
         tenant_config, script = self._checkTenantSourceConf(self.config)
         unparsed_abide = loader.readConfig(
@@ -1406,11 +1414,6 @@ class Scheduler(threading.Thread):
             tenants_to_validate=tenants_to_validate)
         available_tenants = list(unparsed_abide.tenants)
         tenants_to_load = tenants_to_validate or available_tenants
-
-        # Use a temporary config cache for the validation
-        validate_root = f"/zuul/validate/{uuid.uuid4().hex}"
-        self.unparsed_config_cache = UnparsedConfigCache(self.zk_client,
-                                                         validate_root)
 
         try:
             abide = Abide()
@@ -1457,7 +1460,8 @@ class Scheduler(threading.Thread):
 
         with self.unparsed_abide_lock:
             loader = configloader.ConfigLoader(
-                self.connections, self.zk_client, self.globals, self.statsd,
+                self.connections, self.zk_client, self.globals,
+                self.unparsed_config_cache, self.statsd,
                 self, self.merger, self.keystore)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             old_unparsed_abide = self.unparsed_abide
@@ -1585,7 +1589,8 @@ class Scheduler(threading.Thread):
             branch_cache_min_ltimes[connection_name] = ltime
 
         loader = configloader.ConfigLoader(
-            self.connections, self.zk_client, self.globals, self.statsd,
+            self.connections, self.zk_client, self.globals,
+            self.unparsed_config_cache, self.statsd,
             self, self.merger, self.keystore)
         loader.loadTPCs(self.abide, self.unparsed_abide,
                         [event.tenant_name])
@@ -2201,7 +2206,8 @@ class Scheduler(threading.Thread):
         # consistency and future-proofing.
         with self.unparsed_abide_lock:
             loader = configloader.ConfigLoader(
-                self.connections, self.zk_client, self.globals, self.statsd,
+                self.connections, self.zk_client, self.globals,
+                self.unparsed_config_cache, self.statsd,
                 self, self.merger, self.keystore)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             self.unparsed_abide = loader.readConfig(
@@ -2223,7 +2229,8 @@ class Scheduler(threading.Thread):
             self.ansible_manager = AnsibleManager(
                 default_version=self.globals.default_ansible_version)
             loader = configloader.ConfigLoader(
-                self.connections, self.zk_client, self.globals, self.statsd,
+                self.connections, self.zk_client, self.globals,
+                self.unparsed_config_cache, self.statsd,
                 self, self.merger, self.keystore)
 
             tenant_names = set(self.abide.tenants)

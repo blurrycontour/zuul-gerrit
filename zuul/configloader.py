@@ -1819,7 +1819,7 @@ class ParseContext(object):
 
 class TenantParser(object):
     def __init__(self, connections, zk_client, scheduler, merger, keystorage,
-                 zuul_globals, statsd):
+                 zuul_globals, statsd, unparsed_config_cache):
         self.log = logging.getLogger("zuul.TenantParser")
         self.connections = connections
         self.zk_client = zk_client
@@ -1828,7 +1828,7 @@ class TenantParser(object):
         self.keystorage = keystorage
         self.globals = zuul_globals
         self.statsd = statsd
-        self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
+        self.unparsed_config_cache = unparsed_config_cache
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret', 'queue')
@@ -2857,8 +2857,9 @@ class TenantParser(object):
 class ConfigLoader(object):
     log = logging.getLogger("zuul.ConfigLoader")
 
-    def __init__(self, connections, zk_client, zuul_globals, statsd=None,
-                 scheduler=None, merger=None, keystorage=None):
+    def __init__(self, connections, zk_client, zuul_globals,
+                 unparsed_config_cache, statsd=None, scheduler=None,
+                 merger=None, keystorage=None):
         self.connections = connections
         self.zk_client = zk_client
         self.globals = zuul_globals
@@ -2867,7 +2868,7 @@ class ConfigLoader(object):
         self.keystorage = keystorage
         self.tenant_parser = TenantParser(
             connections, zk_client, scheduler, merger, keystorage,
-            zuul_globals, statsd)
+            zuul_globals, statsd, unparsed_config_cache)
         self.authz_rule_parser = AuthorizationRuleParser()
         self.global_semaphore_parser = GlobalSemaphoreParser()
         self.api_root_parser = ApiRootParser()
