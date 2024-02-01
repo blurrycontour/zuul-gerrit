@@ -37,12 +37,17 @@ import { fetchStatusIfNeeded } from '../../actions/status'
 
 import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
-import ChangePanel from './ChangePanel'
+import ItemPanel from './ItemPanel'
 
+function getChange(item) {
+  // For backwards compat: get a representative change for this item
+  // if there is more than one.
+  return 'changes' in item ? item.changes[0] : item
+}
 
-class Change extends React.Component {
+class Item extends React.Component {
   static propTypes = {
-    change: PropTypes.object.isRequired,
+    item: PropTypes.object.isRequired,
     queue: PropTypes.object.isRequired,
     expanded: PropTypes.bool.isRequired,
     pipeline: PropTypes.object,
@@ -59,7 +64,10 @@ class Change extends React.Component {
   }
 
   dequeueConfirm = () => {
-    const { tenant, change, pipeline } = this.props
+    const { tenant, item, pipeline } = this.props
+    const change = getChange(item)
+    // Use the first change as a proxy for the item since queue
+    // commands operate on changes
     let projectName = change.project
     let changeId = change.id || 'N/A'
     let changeRef = change.ref
@@ -90,7 +98,8 @@ class Change extends React.Component {
 
   renderDequeueModal() {
     const { showDequeueModal } = this.state
-    const { change } = this.props
+    const { item } = this.props
+    const change = getChange(item)
     let projectName = change.project
     let changeId = change.id || change.ref
     const title = 'You are about to dequeue a change'
@@ -111,7 +120,8 @@ class Change extends React.Component {
   }
 
   promoteConfirm = () => {
-    const { tenant, change, pipeline } = this.props
+    const { tenant, item, pipeline } = this.props
+    const change = getChange(item)
     let changeId = change.id || 'NA'
     this.setState(() => ({ showPromoteModal: false }))
     if (changeId !== 'N/A') {
@@ -138,7 +148,8 @@ class Change extends React.Component {
 
   renderPromoteModal() {
     const { showPromoteModal } = this.state
-    const { change } = this.props
+    const { item } = this.props
+    const change = getChange(item)
     let changeId = change.id || 'N/A'
     const title = 'You are about to promote a change'
     return (
@@ -166,7 +177,7 @@ class Change extends React.Component {
         icon={<BanIcon style={{
           color: 'var(--pf-global--danger-color--100)',
         }} />}
-        description="Stop all jobs for this change"
+        description="Stop all jobs for this item"
         onClick={(event) => {
           event.preventDefault()
           this.setState(() => ({ showDequeueModal: true }))
@@ -177,7 +188,7 @@ class Change extends React.Component {
         icon={<AngleDoubleUpIcon style={{
           color: 'var(--pf-global--default-color--200)',
         }} />}
-        description="Promote this change to the top of the queue"
+        description="Promote this item to the top of the queue"
         onClick={(event) => {
           event.preventDefault()
           this.setState(() => ({ showPromoteModal: true }))
@@ -207,20 +218,19 @@ class Change extends React.Component {
 
   }
 
-
-  renderStatusIcon(change) {
+  renderStatusIcon(item) {
     let iconGlyph = 'pficon pficon-ok'
     let iconTitle = 'Succeeding'
-    if (change.active !== true) {
+    if (item.active !== true) {
       iconGlyph = 'pficon pficon-pending'
       iconTitle = 'Waiting until closer to head of queue to' +
         ' start jobs'
-    } else if (change.live !== true) {
+    } else if (item.live !== true) {
       iconGlyph = 'pficon pficon-info'
-      iconTitle = 'Dependent change required for testing'
-    } else if (change.failing_reasons &&
-      change.failing_reasons.length > 0) {
-      let reason = change.failing_reasons.join(', ')
+      iconTitle = 'Dependent item required for testing'
+    } else if (item.failing_reasons &&
+      item.failing_reasons.length > 0) {
+      let reason = item.failing_reasons.join(', ')
       iconTitle = 'Failing because ' + reason
       if (reason.match(/merge conflict/)) {
         iconGlyph = 'pficon pficon-error-circle-o zuul-build-merge-conflict'
@@ -233,9 +243,9 @@ class Change extends React.Component {
         className={'zuul-build-status ' + iconGlyph}
         title={iconTitle} />
     )
-    if (change.live) {
+    if (item.live) {
       return (
-        <Link to={this.props.tenant.linkPrefix + '/status/change/' + change.id}>
+        <Link to={this.props.tenant.linkPrefix + '/status/change/' + getChange(item).id}>
           {icon}
         </Link>
       )
@@ -244,9 +254,9 @@ class Change extends React.Component {
     }
   }
 
-  renderLineImg(change, i) {
+  renderLineImg(item, i) {
     let image = LineTImage
-    if (change._tree_branches.indexOf(i) === change._tree_branches.length - 1) {
+    if (item._tree_branches.indexOf(i) === item._tree_branches.length - 1) {
       // Angle line
       image = LineAngleImage
     }
@@ -254,13 +264,13 @@ class Change extends React.Component {
   }
 
   render() {
-    const { change, queue, expanded, pipeline, user, tenant } = this.props
+    const { item, queue, expanded, pipeline, user, tenant } = this.props
     let row = []
     let adminMenuWidth = 15
     let i
     for (i = 0; i < queue._tree_columns; i++) {
       let className = ''
-      if (i < change._tree.length && change._tree[i] !== null) {
+      if (i < item._tree.length && item._tree[i] !== null) {
         if (this.props.preferences.darkMode) {
           className = ' zuul-change-row-line-dark'
         } else {
@@ -269,19 +279,19 @@ class Change extends React.Component {
       }
       row.push(
         <td key={i} className={'zuul-change-row' + className}>
-          {i === change._tree_index ? this.renderStatusIcon(change) : ''}
-          {change._tree_branches.indexOf(i) !== -1 ? (
-            this.renderLineImg(change, i)) : ''}
+          {i === item._tree_index ? this.renderStatusIcon(item) : ''}
+          {item._tree_branches.indexOf(i) !== -1 ? (
+            this.renderLineImg(item, i)) : ''}
         </td>)
     }
-    let changeWidth = (user.isAdmin && user.scope.indexOf(tenant.name) !== -1)
+    let itemWidth = (user.isAdmin && user.scope.indexOf(tenant.name) !== -1)
       ? 360 - adminMenuWidth - 16 * queue._tree_columns
       : 360 - 16 * queue._tree_columns
     row.push(
       <td key={i + 1}
         className="zuul-change-cell"
-        style={{ width: changeWidth + 'px' }}>
-        <ChangePanel change={change} globalExpanded={expanded} pipeline={pipeline} />
+        style={{ width: itemWidth + 'px' }}>
+        <ItemPanel item={item} globalExpanded={expanded} pipeline={pipeline} />
       </td>
     )
     if (user.isAdmin && user.scope.indexOf(tenant.name) !== -1) {
@@ -311,4 +321,4 @@ export default connect(state => ({
   tenant: state.tenant,
   user: state.user,
   preferences: state.preferences,
-}))(Change)
+}))(Item)

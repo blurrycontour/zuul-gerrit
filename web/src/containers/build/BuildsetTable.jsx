@@ -55,6 +55,10 @@ import * as moment_tz from 'moment-timezone'
 import { BuildResult, BuildResultWithIcon } from './Misc'
 import { buildExternalTableLink, IconProperty } from '../../Misc'
 
+function getRef(buildset) {
+  return 'refs' in buildset ? buildset.refs[0] : buildset
+}
+
 function BuildsetTable({
   buildsets,
   fetching,
@@ -140,7 +144,8 @@ function BuildsetTable({
   ]
 
   function createBuildsetRow(buildset) {
-    const changeOrRefLink = buildExternalTableLink(buildset)
+    const ref = getRef(buildset)
+    const changeOrRefLink = buildExternalTableLink(ref)
 
     let duration
     if (currentDuration === 'Buildset Duration') {
@@ -163,12 +168,12 @@ function BuildsetTable({
             <BuildResultWithIcon
               result={buildset.result}
               link={`${tenant.linkPrefix}/buildset/${buildset.uuid}`}>
-              {buildset.project}
+              {ref.project}
             </BuildResultWithIcon>
           ),
         },
         {
-          title: buildset.branch ? buildset.branch : buildset.ref,
+          title: ref.branch ? ref.branch : ref.ref,
         },
         {
           title: buildset.pipeline,
