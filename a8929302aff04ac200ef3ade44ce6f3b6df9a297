@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d50dcaf_5ff911d3",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2014,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-01T16:07:36Z",
+      "side": 0,
+      "message": "Oops it is, I misread this and got overzealous in optimizing.  Reverted.",
+      "parentUuid": "d66850cf_c58008d3",
+      "revId": "a8929302aff04ac200ef3ade44ce6f3b6df9a297",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc01bb19_497b76d1",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-01-31T14:38:21Z",
       "side": 0,
       "message": "Same question as above",
+      "revId": "a8929302aff04ac200ef3ade44ce6f3b6df9a297",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7abbdb9a_6d78334a",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2062,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-01T16:07:36Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "cc01bb19_497b76d1",
       "revId": "a8929302aff04ac200ef3ade44ce6f3b6df9a297",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
