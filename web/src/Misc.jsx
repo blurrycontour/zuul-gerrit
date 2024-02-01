@@ -48,22 +48,22 @@ ExternalLink.propTypes = {
   children: PropTypes.node,
 }
 
-function buildExternalLink(buildish) {
+function buildExternalLink(ref) {
   /* TODO (felix): What should we show for periodic builds
       here? They don't provide a change, but the ref_url is
       also not usable */
-  if (buildish.ref_url && buildish.change) {
+  if (ref.ref_url && ref.change) {
     return (
-      <ExternalLink target={buildish.ref_url}>
+      <ExternalLink target={ref.ref_url}>
         <strong>Change </strong>
-        {buildish.change},{buildish.patchset}
+        {ref.change},{ref.patchset}
       </ExternalLink>
     )
-  } else if (buildish.ref_url && buildish.newrev) {
+  } else if (ref.ref_url && ref.newrev) {
     return (
-      <ExternalLink target={buildish.ref_url}>
+      <ExternalLink target={ref.ref_url}>
         <strong>Revision </strong>
-        {buildish.newrev.slice(0, 7)}
+        {ref.newrev.slice(0, 7)}
       </ExternalLink>
     )
   }
@@ -71,25 +71,51 @@ function buildExternalLink(buildish) {
   return null
 }
 
-function buildExternalTableLink(buildish) {
+function buildExternalTableLink(ref) {
   /* TODO (felix): What should we show for periodic builds
       here? They don't provide a change, but the ref_url is
       also not usable */
-  if (buildish.ref_url && buildish.change) {
+  if (ref.ref_url && ref.change) {
     return (
-      <ExternalLink target={buildish.ref_url}>
-        {buildish.change},{buildish.patchset}
+      <ExternalLink target={ref.ref_url}>
+        {ref.change},{ref.patchset}
       </ExternalLink>
     )
-  } else if (buildish.ref_url && buildish.newrev) {
+  } else if (ref.ref_url && ref.newrev) {
     return (
-      <ExternalLink target={buildish.ref_url}>
-        {buildish.newrev.slice(0, 7)}
+      <ExternalLink target={ref.ref_url}>
+        {ref.newrev.slice(0, 7)}
       </ExternalLink>
     )
   }
 
   return null
+}
+
+function renderRefInfo(ref) {
+  const refinfo = ref.branch ? (
+    <>
+      <strong>Branch </strong> {ref.branch}
+    </>
+  ) : (
+    <>
+      <strong>Ref </strong> {ref.ref}
+    </>
+  )
+  const oldrev = ref.oldrev ? (
+    <><br/><strong>Old</strong> {ref.oldrev}</>
+  ) : ( <></> )
+  const newrev = ref.newrev ? (
+    <><br/><strong>New</strong> {ref.newrev}</>
+  ) : ( <></> )
+
+  return (
+    <>
+      {refinfo}
+      {oldrev}
+      {newrev}
+    </>
+  )
 }
 
 function IconProperty(props) {
@@ -146,4 +172,4 @@ function setDarkMode(darkMode) {
   }
 }
 
-export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, ConditionalWrapper, resolveDarkMode, setDarkMode }
+export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, renderRefInfo, ConditionalWrapper, resolveDarkMode, setDarkMode }

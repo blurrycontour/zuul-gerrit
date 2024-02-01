@@ -22,8 +22,6 @@ import {
   BookIcon,
   BuildIcon,
   CodeBranchIcon,
-  CodeIcon,
-  CubeIcon,
   FileCodeIcon,
   FingerprintIcon,
   HistoryIcon,
@@ -35,20 +33,36 @@ import {
 } from '@patternfly/react-icons'
 import * as moment from 'moment'
 import * as moment_tz from 'moment-timezone'
+import _ from 'lodash'
 import 'moment-duration-format'
 
 import { BuildResultBadge, BuildResultWithIcon } from './Misc'
-import { buildExternalLink, ExternalLink, IconProperty } from '../../Misc'
+import { buildExternalLink, renderRefInfo, ExternalLink, IconProperty } from '../../Misc'
 
 import AutoholdModal from '../autohold/autoholdModal'
 
+function getRefs(build) {
+  // This method has a purpose beyond backwards compat: return the
+  // zuul ref for this build first, then the remaining refs.
+  if (!('refs' in build.buildset)) {
+    // Backwards compat
+    return [build]
+  }
+  return [build.ref, ...build.buildset.refs.filter((i) => !_.isEqual(i, build.ref))]
+}
+
+function getRef(build) {
+  return 'project' in build ? build : build.ref
+}
+
 function Build({ build, tenant, timezone, user }) {
   const [showAutoholdModal, setShowAutoholdModal] = useState(false)
-  const change = build.change ? build.change : ''
-  const ref = build.change ? '' : build.ref
-  const project = build.project
+  const buildRef = getRef(build)
+  // the change or ref to use for api actions like autohold
+  const actionRef = buildRef.change ? '' : buildRef.ref
+  const actionChange = buildRef.change ? String(buildRef.change) : ''
+  //const project = build.project
   const job_name = build.job_name
-  const build_link = buildExternalLink(build)
   const index_links = build.manifest && build.manifest.index_links
   const build_log_url = build.log_url ?
         (index_links ? build.log_url + 'index.html' : build.log_url)
@@ -77,7 +91,6 @@ function Build({ build, tenant, timezone, user }) {
       />
     )
   }
-
 
   return (
     <>
@@ -112,38 +125,20 @@ function Build({ build, tenant, timezone, user }) {
         <Flex flex={{ lg: 'flex_1' }}>
           <FlexItem>
             <List style={{ listStyle: 'none' }}>
-              {build_link && (
+              {getRefs(build).map((ref, idx) => (
                 <IconProperty
+                  key={idx}
                   WrapElement={ListItem}
-                  icon={<CodeIcon />}
-                  value={build_link}
+                  icon={<CodeBranchIcon />}
+                  value={
+                    <span>
+                      {buildExternalLink(ref)}<br/>
+                      <strong>Project </strong> {ref.project}<br/>
+                      {renderRefInfo(ref)}
+                    </span>
+                  }
                 />
-              )}
-              {/* TODO (felix): Link to project page in Zuul */}
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<CubeIcon />}
-                value={
-                  <>
-                    <strong>Project </strong> {build.project}
-                  </>
-                }
-              />
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<CodeBranchIcon />}
-                value={
-                  build.branch ? (
-                    <>
-                      <strong>Branch </strong> {build.branch}
-                    </>
-                  ) : (
-                    <>
-                      <strong>Ref </strong> {build.ref}
-                    </>
-                  )
-                }
-              />
+              ))}
               <IconProperty
                 WrapElement={ListItem}
                 icon={<StreamIcon />}
@@ -225,7 +220,7 @@ function Build({ build, tenant, timezone, user }) {
                       '/builds?job_name=' +
                       build.job_name +
                       '&project=' +
-                      build.project
+                      buildRef.project
                     }
                     title="See previous runs of this job inside current project."
                   >
@@ -277,9 +272,9 @@ function Build({ build, tenant, timezone, user }) {
       {<AutoholdModal
         showAutoholdModal={showAutoholdModal}
         setShowAutoholdModal={setShowAutoholdModal}
-        change={String(change)}
-        changeRef={ref}
-        project={project}
+        change={actionChange}
+        changeRef={actionRef}
+        project={buildRef.project}
         jobName={job_name}
       />}
     </>

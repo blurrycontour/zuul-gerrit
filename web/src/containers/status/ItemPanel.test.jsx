@@ -1,4 +1,5 @@
 // Copyright 2018 Red Hat, Inc
+// Copyright 2024 Acme Gating, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -20,11 +21,13 @@ import { Button } from '@patternfly/react-core'
 
 import { setTenantAction } from '../../actions/tenant'
 import configureStore from '../../store'
-import ChangePanel from './ChangePanel'
+import ItemPanel from './ItemPanel'
 
 
-const fakeChange = {
-  project: 'org-project',
+const fakeItem = {
+  changes: [{
+    project: 'org-project'
+  }],
   jobs: [{
     name: 'job-name',
     url: 'stream/42',
@@ -32,14 +35,13 @@ const fakeChange = {
   }]
 }
 
-
-it('change panel render multi tenant links', () => {
+it('item panel render multi tenant links', () => {
   const store = configureStore()
   store.dispatch(setTenantAction('tenant-one', false))
   const application = create(
       <Provider store={store}>
         <Router>
-          <ChangePanel change={fakeChange} globalExpanded={true} />
+          <ItemPanel item={fakeItem} globalExpanded={true} />
         </Router>
       </Provider>
     )
@@ -50,13 +52,13 @@ it('change panel render multi tenant links', () => {
   expect(skipButton === undefined)
 })
 
-it('change panel render white-label tenant links', () => {
+it('item panel render white-label tenant links', () => {
   const store = configureStore()
   store.dispatch(setTenantAction('tenant-one', true))
   const application = create(
     <Provider store={store}>
       <Router>
-        <ChangePanel change={fakeChange} globalExpanded={true} />
+        <ItemPanel item={fakeItem} globalExpanded={true} />
       </Router>
     </Provider>
   )
@@ -67,7 +69,77 @@ it('change panel render white-label tenant links', () => {
   expect(skipButton === undefined)
 })
 
-it('change panel skip jobs', () => {
+it('item panel skip jobs', () => {
+  const fakeItem = {
+    changes: [{
+      project: 'org-project'
+    }],
+    jobs: [{
+      name: 'job-name',
+      url: 'stream/42',
+      result: 'skipped'
+    }]
+  }
+
+  const store = configureStore()
+  store.dispatch(setTenantAction('tenant-one', true))
+  const application = create(
+    <Provider store={store}>
+      <Router>
+        <ItemPanel item={fakeItem} globalExpanded={true} />
+      </Router>
+    </Provider>
+  )
+  const skipButton = application.root.findByType(Button)
+  expect(skipButton.props.children.includes('skipped job'))
+})
+
+/* Backwards compat; remove after circular dependency refactor */
+
+const fakeChange = {
+  project: 'org-project',
+  jobs: [{
+    name: 'job-name',
+    url: 'stream/42',
+    result: null
+  }]
+}
+
+it('item panel backwards compat render multi tenant links', () => {
+  const store = configureStore()
+  store.dispatch(setTenantAction('tenant-one', false))
+  const application = create(
+      <Provider store={store}>
+        <Router>
+          <ItemPanel item={fakeChange} globalExpanded={true} />
+        </Router>
+      </Provider>
+    )
+  const jobLink = application.root.findByType(Link)
+  expect(jobLink.props.to).toEqual(
+    '/t/tenant-one/stream/42')
+  const skipButton = application.root.findAllByType(Button)
+  expect(skipButton === undefined)
+})
+
+it('item panel backwards compat render white-label tenant links', () => {
+  const store = configureStore()
+  store.dispatch(setTenantAction('tenant-one', true))
+  const application = create(
+    <Provider store={store}>
+      <Router>
+        <ItemPanel item={fakeChange} globalExpanded={true} />
+      </Router>
+    </Provider>
+  )
+  const jobLink = application.root.findByType(Link)
+  expect(jobLink.props.to).toEqual(
+    '/stream/42')
+  const skipButton = application.root.findAllByType(Button)
+  expect(skipButton === undefined)
+})
+
+it('item panel backwards compat skip jobs', () => {
   const fakeChange = {
     project: 'org-project',
     jobs: [{
@@ -82,7 +154,7 @@ it('change panel skip jobs', () => {
   const application = create(
     <Provider store={store}>
       <Router>
-        <ChangePanel change={fakeChange} globalExpanded={true} />
+        <ItemPanel item={fakeChange} globalExpanded={true} />
       </Router>
     </Provider>
   )

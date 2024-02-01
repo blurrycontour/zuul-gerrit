@@ -50,6 +50,10 @@ import * as moment_tz from 'moment-timezone'
 import { BuildResult, BuildResultWithIcon } from './Misc'
 import { buildExternalTableLink, IconProperty } from '../../Misc'
 
+function getRef(build) {
+  return 'project' in build ? build : build.ref
+}
+
 function BuildTable({
   builds,
   fetching,
@@ -101,7 +105,8 @@ function BuildTable({
   ]
 
   function createBuildRow(build) {
-    const changeOrRefLink = buildExternalTableLink(build)
+    const ref = getRef(build)
+    const changeOrRefLink = buildExternalTableLink(ref)
 
     return {
       // Pass the build's uuid as row id, so we can use it later on in the
@@ -125,10 +130,10 @@ function BuildTable({
           ),
         },
         {
-          title: build.project,
+          title: ref.project,
         },
         {
-          title: build.branch ? build.branch : build.ref,
+          title: ref.branch ? ref.branch : ref.ref,
         },
         {
           title: build.pipeline,
