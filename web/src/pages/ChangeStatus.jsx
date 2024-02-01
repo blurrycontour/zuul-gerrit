@@ -18,7 +18,7 @@ import { connect } from 'react-redux'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchChangeIfNeeded } from '../actions/change'
-import ChangePanel from '../containers/status/ChangePanel'
+import ItemPanel from '../containers/status/ItemPanel'
 import { Fetchable } from '../containers/Fetching'
 
 
@@ -63,7 +63,7 @@ class ChangeStatusPage extends React.Component {
 
   render () {
     const { remoteData } = this.props
-    const change = remoteData.change
+    const itemlist = remoteData.change
     return (
       <PageSection variant={PageSectionVariants.light}>
         <PageSection style={{paddingRight: '5px'}}>
@@ -72,11 +72,11 @@ class ChangeStatusPage extends React.Component {
             fetchCallback={this.updateData}
           />
         </PageSection>
-        {change && change.map((item, idx) => (
+        {itemlist && itemlist.map((item, idx) => (
           <div className='row zuul-change-content' key={idx}>
-            <ChangePanel
+            <ItemPanel
               globalExpanded={true}
-              change={item}
+              item={item}
             />
           </div>
         ))}
