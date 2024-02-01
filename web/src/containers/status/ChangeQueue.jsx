@@ -17,7 +17,7 @@ import PropTypes from 'prop-types'
 import { Badge } from 'patternfly-react'
 import { Tooltip } from '@patternfly/react-core'
 
-import Change from './Change'
+import Item from './Item'
 
 
 class ChangeQueue extends React.Component {
@@ -38,15 +38,15 @@ class ChangeQueue extends React.Component {
       shortName = shortName.substr(0, 32) + '...'
     }
     let changesList = []
-    queue.heads.forEach((changes, changeIdx) => {
-      changes.forEach((change, idx) => {
+    queue.heads.forEach((items, itemIdx) => {
+      items.forEach((item, idx) => {
         changesList.push(
-          <Change
-            change={change}
+          <Item
+            item={item}
             queue={queue}
             expanded={expanded}
             pipeline={pipeline}
-            key={changeIdx.toString() + idx}
+            key={itemIdx.toString() + idx}
           />)
       })
     })

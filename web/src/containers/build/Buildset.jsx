@@ -27,10 +27,8 @@ import {
   ModalVariant,
 } from '@patternfly/react-core'
 import {
-  CodeIcon,
   CodeBranchIcon,
   OutlinedCommentDotsIcon,
-  CubeIcon,
   FingerprintIcon,
   StreamIcon,
   OutlinedCalendarAltIcon,
@@ -41,15 +39,19 @@ import * as moment from 'moment'
 import * as moment_tz from 'moment-timezone'
 import 'moment-duration-format'
 
-import { buildExternalLink, IconProperty } from '../../Misc'
+import { buildExternalLink, renderRefInfo, IconProperty } from '../../Misc'
 import { BuildResultBadge, BuildResultWithIcon } from './Misc'
 import { enqueue, enqueue_ref } from '../../api'
 import { addNotification, addApiError } from '../../actions/notifications'
 import { ChartModal } from '../charts/ChartModal'
 import BuildsetGanttChart from '../charts/GanttChart'
 
+function getRefs(buildset) {
+  // For backwards compat: get a list of this items changes.
+  return 'refs' in buildset ? buildset.refs : [buildset]
+}
+
 function Buildset({ buildset, timezone, tenant, user, preferences }) {
-  const buildset_link = buildExternalLink(buildset)
   const [isGanttChartModalOpen, setIsGanttChartModalOpen] = useState(false)
 
   function renderBuildTimes() {
@@ -234,32 +236,6 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
     )
   }
 
-  function renderRefInfo(buildset) {
-    const refinfo = buildset.branch ? (
-      <>
-        <strong>Branch </strong> {buildset.branch}
-      </>
-    ) : (
-      <>
-        <strong>Ref </strong> {buildset.ref}
-      </>
-    )
-    const oldrev = buildset.oldrev ? (
-      <><br/><strong>Old</strong> {buildset.oldrev}</>
-    ) : ( <></> )
-    const newrev = buildset.newrev ? (
-      <><br/><strong>New</strong> {buildset.newrev}</>
-    ) : ( <></> )
-
-    return (
-      <>
-        {refinfo}
-        {oldrev}
-        {newrev}
-      </>
-    )
-  }
-
   return (
     <>
       <Title headingLevel="h2">
@@ -276,32 +252,20 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
         <Flex flex={{ default: 'flex_1' }}>
           <FlexItem>
             <List style={{ listStyle: 'none' }}>
-              {/* TODO (felix): It would be cool if we could differentiate
-                  between the SVC system (Github, Gitlab, Gerrit), so we could
-                  show the respective icon here (GithubIcon, GitlabIcon,
-                  GitIcon - AFAIK the Gerrit icon is not very popular among
-                  icon frameworks like fontawesome */}
-              {buildset_link && (
+              {getRefs(buildset).map((ref, idx) => (
                 <IconProperty
                   WrapElement={ListItem}
-                  icon={<CodeIcon />}
-                  value={buildset_link}
+                  icon={<CodeBranchIcon />}
+                  key={idx}
+                  value={
+                    <span>
+                      {buildExternalLink(ref)}<br/>
+                      <strong>Project </strong> {ref.project}<br/>
+                      {renderRefInfo(ref)}
+                    </span>
+                  }
                 />
-              )}
-              {/* TODO (felix): Link to project page in Zuul */}
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<CubeIcon />}
-                value={
-                  <>
-                    <strong>Project </strong> {buildset.project}
-                  </>
-                }
-              />
-              <IconProperty
-                WrapElement={ListItem}
-                icon={<CodeBranchIcon />}
-                value={renderRefInfo(buildset)}/>
+              ))}
               <IconProperty
                 WrapElement={ListItem}
                 icon={<StreamIcon />}
