@@ -4591,9 +4591,9 @@ class TestScheduler(ZuulTestCase):
 
         first = pipeline_status['change_queues'][0]['heads'][0][0]
         second = pipeline_status['change_queues'][1]['heads'][0][0]
-        self.assertIn(first['changes'][0]['ref'],
+        self.assertIn(first['refs'][0]['ref'],
                       ['refs/heads/master', 'refs/heads/stable'])
-        self.assertIn(second['changes'][0]['ref'],
+        self.assertIn(second['refs'][0]['ref'],
                       ['refs/heads/master', 'refs/heads/stable'])
 
         self.executor_server.hold_jobs_in_build = False
