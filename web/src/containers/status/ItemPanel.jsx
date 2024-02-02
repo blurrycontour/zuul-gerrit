@@ -21,9 +21,9 @@ import * as moment from 'moment'
 import 'moment-duration-format'
 import { Button } from '@patternfly/react-core'
 
-function getChanges(item) {
-  // For backwards compat: get a list of this items changes.
-  return 'changes' in item ? item.changes : [item]
+function getRefs(item) {
+  // For backwards compat: get a list of this items refs.
+  return 'refs' in item ? item.refs : [item]
 }
 
 class ItemPanel extends React.Component {
@@ -415,7 +415,7 @@ class ItemPanel extends React.Component {
                 </div>
               </div>
             ) : ''}
-            {getChanges(item).map((change, idx) => (
+            {getRefs(item).map((change, idx) => (
               <div key={idx} className='row'>
                 <div className='col-xs-8'>
                   <span className='change_project'>{change.project}</span>
