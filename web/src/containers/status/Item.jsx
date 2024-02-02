@@ -39,10 +39,10 @@ import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
 import ItemPanel from './ItemPanel'
 
-function getChange(item) {
-  // For backwards compat: get a representative change for this item
+function getRef(item) {
+  // For backwards compat: get a representative ref for this item
   // if there is more than one.
-  return 'changes' in item ? item.changes[0] : item
+  return 'refs' in item ? item.refs[0] : item
 }
 
 class Item extends React.Component {
@@ -65,16 +65,16 @@ class Item extends React.Component {
 
   dequeueConfirm = () => {
     const { tenant, item, pipeline } = this.props
-    const change = getChange(item)
-    // Use the first change as a proxy for the item since queue
+    const ref = getRef(item)
+    // Use the first ref as a proxy for the item since queue
     // commands operate on changes
-    let projectName = change.project
-    let changeId = change.id || 'N/A'
-    let changeRef = change.ref
+    let projectName = ref.project
+    let refId = ref.id || 'N/A'
+    let refRef = ref.ref
     this.setState(() => ({ showDequeueModal: false }))
     // post-merge
-    if (changeId !== 'N/A') {
-      dequeue(tenant.apiPrefix, projectName, pipeline.name, changeId)
+    if (refId !== 'N/A') {
+      dequeue(tenant.apiPrefix, projectName, pipeline.name, refId)
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
         })
@@ -82,7 +82,7 @@ class Item extends React.Component {
           this.props.dispatch(addDequeueError(error))
         })
     } else {
-      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, changeRef)
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, refRef)
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
         })
@@ -99,9 +99,9 @@ class Item extends React.Component {
   renderDequeueModal() {
     const { showDequeueModal } = this.state
     const { item } = this.props
-    const change = getChange(item)
-    let projectName = change.project
-    let changeId = change.id || change.ref
+    const ref = getRef(item)
+    let projectName = ref.project
+    let refId = ref.id || ref.ref
     const title = 'You are about to dequeue a change'
     return (
       <Modal
@@ -114,18 +114,18 @@ class Item extends React.Component {
           <Button key="deq_confirm" variant="primary" onClick={this.dequeueConfirm}>Confirm</Button>,
           <Button key="deq_cancel" variant="link" onClick={this.dequeueCancel}>Cancel</Button>,
         ]}>
-        <p>Please confirm that you want to cancel <strong>all ongoing builds</strong> on change <strong>{changeId}</strong> for project <strong>{projectName}</strong>.</p>
+        <p>Please confirm that you want to cancel <strong>all ongoing builds</strong> on change <strong>{refId}</strong> for project <strong>{projectName}</strong>.</p>
       </Modal>
     )
   }
 
   promoteConfirm = () => {
     const { tenant, item, pipeline } = this.props
-    const change = getChange(item)
-    let changeId = change.id || 'NA'
+    const ref = getRef(item)
+    let refId = ref.id || 'NA'
     this.setState(() => ({ showPromoteModal: false }))
-    if (changeId !== 'N/A') {
-      promote(tenant.apiPrefix, pipeline.name, [changeId,])
+    if (refId !== 'N/A') {
+      promote(tenant.apiPrefix, pipeline.name, [refId,])
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
         })
@@ -135,7 +135,7 @@ class Item extends React.Component {
     } else {
       this.props.dispatch(addNotification({
         url: null,
-        status: 'Invalid change ' + changeId + ' for promotion',
+        status: 'Invalid change ' + refId + ' for promotion',
         text: '',
         type: 'error'
       }))
@@ -149,8 +149,8 @@ class Item extends React.Component {
   renderPromoteModal() {
     const { showPromoteModal } = this.state
     const { item } = this.props
-    const change = getChange(item)
-    let changeId = change.id || 'N/A'
+    const ref = getRef(item)
+    let refId = ref.id || 'N/A'
     const title = 'You are about to promote a change'
     return (
       <Modal
@@ -163,7 +163,7 @@ class Item extends React.Component {
           <Button key="prom_confirm" variant="primary" onClick={this.promoteConfirm}>Confirm</Button>,
           <Button key="prom_cancel" variant="link" onClick={this.promoteCancel}>Cancel</Button>,
         ]}>
-        <p>Please confirm that you want to promote change <strong>{changeId}</strong>.</p>
+        <p>Please confirm that you want to promote change <strong>{refId}</strong>.</p>
       </Modal>
     )
   }
@@ -245,7 +245,7 @@ class Item extends React.Component {
     )
     if (item.live) {
       return (
-        <Link to={this.props.tenant.linkPrefix + '/status/change/' + getChange(item).id}>
+        <Link to={this.props.tenant.linkPrefix + '/status/change/' + getRef(item).id}>
           {icon}
         </Link>
       )
