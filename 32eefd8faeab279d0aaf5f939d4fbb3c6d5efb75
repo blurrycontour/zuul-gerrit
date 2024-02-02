@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f86e5b4_0cf212b6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-02T23:55:30Z",
+      "side": 1,
+      "message": "In addition to the two minor inline things I think it would also be good to have some minimum padding between the build status graph (the bar with green and blue and orange and red summary status on the card) and the elapsted time timestamp. When elapsed time and remaining time are large enough the graph and timestamp are immediately adjacent to one another.",
+      "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22dd9a26_ec35c6ae",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-02T23:55:30Z",
+      "side": 1,
+      "message": "Nit should this be itemIdx now that we are iterating over items not changes?",
+      "range": {
+        "startLine": 41,
+        "startChar": 31,
+        "endLine": 41,
+        "endChar": 38
+      },
+      "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa150fa1_08323e65",
+        "filename": "web/src/containers/status/Item.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-02T23:55:30Z",
+      "side": 1,
+      "message": "Thinking out loud here: \"item\" might be a bit of our internal terminology leaking to what users will see. For admin commands I don\u0027t think that is a big deal though. But I do wonder if keeping this as change or some other term might make sense in user facing contexts.",
+      "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
