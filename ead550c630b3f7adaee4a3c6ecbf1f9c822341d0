@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41aa6ba8_ad54015d",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 460,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-02T17:34:46Z",
+      "side": 1,
+      "message": "There are two possible places we can pop() the streamers dict. Here for the ok/failed/etc paths and in _stop_skipped_task_streamer() for the skipped path. Are we certain that the hook for a task must complete before the next task (and its resulting hook) can run? If not we probably need a default None return type here in case the skipped path has popped the first item off the dict in a race with us here.",
+      "revId": "ead550c630b3f7adaee4a3c6ecbf1f9c822341d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
