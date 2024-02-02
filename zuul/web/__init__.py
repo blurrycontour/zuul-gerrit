@@ -376,7 +376,7 @@ def json_handler(*args, **kwargs):
     return json_encoder.iterencode(value)
 
 
-class ChangeFilter(object):
+class RefFilter(object):
     def __init__(self, desired):
         self.desired = desired
 
@@ -387,16 +387,16 @@ class ChangeFilter(object):
                 for head in change_queue['heads']:
                     for item in head:
                         want_item = False
-                        for change in item['changes']:
-                            if self.wantChange(change):
+                        for ref in item['refs']:
+                            if self.wantRef(ref):
                                 want_item = True
                                 break
                         if want_item:
                             status.append(copy.deepcopy(item))
         return status
 
-    def wantChange(self, change):
-        return change['id'] == self.desired
+    def wantRef(self, ref):
+        return ref['id'] == self.desired
 
 
 class LogStreamHandler(WebSocket):
@@ -1213,7 +1213,7 @@ class ZuulWebAPI(object):
     @cherrypy.tools.check_tenant_auth()
     def status_change(self, tenant_name, tenant, auth, change):
         payload = self._getStatus(tenant)[0]
-        result_filter = ChangeFilter(change)
+        result_filter = RefFilter(change)
         return result_filter.filterPayload(payload)
 
     @cherrypy.expose
