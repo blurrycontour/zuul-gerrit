@@ -5909,34 +5909,34 @@ class QueueItem(zkobject.ZKObject):
         ret = {}
         ret['active'] = self.active
         ret['live'] = self.live
-        changes = []
+        refs = []
         for change in self.changes:
-            ret_change = {}
+            ret_ref = {}
             if hasattr(change, 'url') and change.url is not None:
-                ret_change['url'] = change.url
+                ret_ref['url'] = change.url
             else:
-                ret_change['url'] = None
+                ret_ref['url'] = None
             if hasattr(change, 'ref') and change.ref is not None:
-                ret_change['ref'] = change.ref
+                ret_ref['ref'] = change.ref
             else:
-                ret_change['ref'] = None
+                ret_ref['ref'] = None
             if change.project:
-                ret_change['project'] = change.project.name
-                ret_change['project_canonical'] = change.project.canonical_name
+                ret_ref['project'] = change.project.name
+                ret_ref['project_canonical'] = change.project.canonical_name
             else:
                 # For cross-project dependencies with the depends-on
                 # project not known to zuul, the project is None
                 # Set it to a static value
-                ret_change['project'] = "Unknown Project"
-                ret_change['project_canonical'] = "Unknown Project"
+                ret_ref['project'] = "Unknown Project"
+                ret_ref['project_canonical'] = "Unknown Project"
             if hasattr(change, 'owner'):
-                ret_change['owner'] = change.owner
+                ret_ref['owner'] = change.owner
             else:
-                ret_change['owner'] = None
-            ret_change['id'] = change._id()
-            changes.append(ret_change)
+                ret_ref['owner'] = None
+            ret_ref['id'] = change._id()
+            refs.append(ret_ref)
         ret['id'] = self.uuid
-        ret['changes'] = changes
+        ret['refs'] = refs
         if self.item_ahead:
             ret['item_ahead'] = self.item_ahead.uuid
         else:

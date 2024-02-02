@@ -25,7 +25,7 @@ import ItemPanel from './ItemPanel'
 
 
 const fakeItem = {
-  changes: [{
+  refs: [{
     project: 'org-project'
   }],
   jobs: [{
@@ -71,7 +71,7 @@ it('item panel render white-label tenant links', () => {
 
 it('item panel skip jobs', () => {
   const fakeItem = {
-    changes: [{
+    refs: [{
       project: 'org-project'
     }],
     jobs: [{
