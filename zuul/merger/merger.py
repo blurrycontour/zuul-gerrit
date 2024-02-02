@@ -683,7 +683,8 @@ class Repo(object):
         self.fetch(ref, zuul_event_id=zuul_event_id)
         log.debug("Squash-Merging %s with args %s", ref, args)
         repo.git.merge(*args)
-        repo.index.commit(
+        repo.git.commit(
+            '-m',
             'Merge change %s,%s' % (item['number'], item['patchset']))
         return repo.head.commit
 
