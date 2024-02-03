@@ -56,6 +56,23 @@
       "message": "Thinking out loud here: \"item\" might be a bit of our internal terminology leaking to what users will see. For admin commands I don\u0027t think that is a big deal though. But I do wonder if keeping this as change or some other term might make sense in user facing contexts.",
       "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83f368dc_02e6ff92",
+        "filename": "web/src/index.css",
+        "patchSetId": 3
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-03T00:00:27Z",
+      "side": 1,
+      "message": "On closer inspecting I think this width increase is why we lack space between the timestamp and progress bar is both timestamps are wide enough. Maybe decrease to 180 so that we get bigger bars but more room adjacent to the timestamp?",
+      "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
