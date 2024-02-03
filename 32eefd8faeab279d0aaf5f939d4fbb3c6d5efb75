@@ -43,6 +43,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fcc8ee91_718af431",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-03T01:04:06Z",
+      "side": 1,
+      "message": "yep, whoops.",
+      "parentUuid": "22dd9a26_ec35c6ae",
+      "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fa150fa1_08323e65",
         "filename": "web/src/containers/status/Item.jsx",
         "patchSetId": 3
@@ -60,6 +78,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "45086f21_e104a71d",
+        "filename": "web/src/containers/status/Item.jsx",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-03T01:04:06Z",
+      "side": 1,
+      "message": "I\u0027ve kept a lot of user facing terminology as \"change\" and we could probably leave this as change; but i think now that items can be more than one change we might need to start calling them \"items\" or \"queue items\" in the ui.",
+      "parentUuid": "fa150fa1_08323e65",
+      "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "83f368dc_02e6ff92",
         "filename": "web/src/index.css",
         "patchSetId": 3
@@ -71,6 +107,24 @@
       "writtenOn": "2024-02-03T00:00:27Z",
       "side": 1,
       "message": "On closer inspecting I think this width increase is why we lack space between the timestamp and progress bar is both timestamps are wide enough. Maybe decrease to 180 so that we get bigger bars but more room adjacent to the timestamp?",
+      "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73ee47ae_9680301d",
+        "filename": "web/src/index.css",
+        "patchSetId": 3
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-03T01:04:06Z",
+      "side": 1,
+      "message": "Yep; I thought I got some good examples from opendev (like multi-hour jobs, etc) and found the padding sufficient, but if not, shrinking 20px sounds good.  100 is definitely too small though.",
+      "parentUuid": "83f368dc_02e6ff92",
       "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
