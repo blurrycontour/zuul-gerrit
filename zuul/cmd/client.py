@@ -42,6 +42,8 @@ from zuul.zk.locks import tenant_read_lock, pipeline_lock
 from zuul.zk.zkobject import ZKContext
 from zuul.zk.components import COMPONENT_REGISTRY
 
+from kazoo.exceptions import NoNodeError
+
 
 def parse_cutoff(now, before, older_than):
     if before and not older_than:
@@ -496,6 +498,9 @@ class Client(zuul.cmd.ZuulApp):
             ZooKeeper; it will not remove private keys or Nodepool
             data.'''))
         cmd_delete_state.set_defaults(command='delete-state')
+        cmd_delete_state.add_argument(
+            '--keep-config-cache', action='store_true',
+            help='keep config cache')
         cmd_delete_state.set_defaults(func=self.delete_state)
 
         cmd_delete_pipeline_state = subparsers.add_parser(
@@ -1014,8 +1019,22 @@ class Client(zuul.cmd.ZuulApp):
         zk_client.connect()
         confirm = input("Are you sure you want to delete "
                         "all ephemeral data from ZooKeeper? (yes/no) ")
-        if confirm.strip().lower() == 'yes':
-            zk_client.client.delete('/zuul', recursive=True)
+        if confirm.strip().lower() != 'yes':
+            print("Aborting")
+            sys.exit(1)
+        if self.args.keep_config_cache:
+            try:
+                children = zk_client.client.get_children('/zuul')
+            except NoNodeError:
+                children = []
+            for child in children:
+                if child == 'config':
+                    continue
+                path = f'/zuul/{child}'
+                self.log.debug("Deleting %s", path)
+                zk_client.fastRecursiveDelete(path)
+        else:
+            zk_client.fastRecursiveDelete('/zuul')
         sys.exit(0)
 
     def delete_pipeline_state(self):
@@ -1028,16 +1047,13 @@ class Client(zuul.cmd.ZuulApp):
         safe_tenant = urllib.parse.quote_plus(args.tenant)
         safe_pipeline = urllib.parse.quote_plus(args.pipeline)
         COMPONENT_REGISTRY.create(zk_client)
-        self.log.info('get tenant')
         with tenant_read_lock(zk_client, args.tenant):
             path = f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}'
-            self.log.info('get pipe')
             pipeline = Pipeline(args.tenant, args.pipeline)
             with pipeline_lock(
                     zk_client, args.tenant, args.pipeline
             ) as plock:
-                self.log.info('got locks')
-                zk_client.client.delete(path, recursive=True)
+                zk_client.fastRecursiveDelete(path)
                 with ZKContext(zk_client, plock, None, self.log) as context:
                     pipeline.state = PipelineState.new(
                         context, _path=path, layout_uuid=None)
