@@ -16,7 +16,6 @@
 
 import re
 import textwrap
-from unittest import skip
 
 from zuul.model import PromoteEvent
 
@@ -4113,7 +4112,6 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.assertHistory([
             dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha}"),
-            # TODO: changed for safety check
             dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
             dict(name="project-job", result="SUCCESS",
@@ -4165,16 +4163,12 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.subject))
         self.waitUntilSettled()
 
-        # Validate that the Github check-run is still in progress
-        # and wasn't cancelled.
-
-        # TODO: we actually do cancel the check-run now due to the
-        # safety check in processOneItem.  In the future we should be
-        # able to avoid that.
+        # Validate that the Github check-run was cancelled and a new
+        # one restarted.
         check_runs = self.fake_github.getCommitChecks("gh/project", A.head_sha)
-        self.assertEqual(len(check_runs), 1)
-        check_run = check_runs[0]
-        # self.assertEqual(check_run["status"], "in_progress")
+        self.assertEqual(len(check_runs), 2)
+        self.assertEqual(check_runs[0]["status"], "in_progress")
+        self.assertEqual(check_runs[1]["status"], "completed")
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -4183,7 +4177,6 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.assertHistory([
             dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha}"),
-            # TODO: changed for safety check
             dict(name="project-job", result="ABORTED",
                  changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
             dict(name="project-job", result="SUCCESS",
@@ -4193,8 +4186,7 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
                  changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}",
                  ref="refs/pull/2/head"),
         ], ordered=False)
-        # TODO: We shouldn't need this in the future, but for now,
-        # verify that since we are issuing two check runs, they both
+        # Verify that since we are issuing two check runs, they both
         # complete.
         check_runs = self.fake_github.getCommitChecks("gh/project", A.head_sha)
         self.assertEqual(len(check_runs), 2)
@@ -4212,182 +4204,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.assertEqual(check_run["status"], "completed")
         self.assertNotEqual(check_runs[0]["id"], check_runs[1]["id"])
 
-    @skip("Disabled due to safety check")
-    @simple_layout('layouts/dependency_removal_gate.yaml', driver='github')
-    def test_dependency_removal_gate_orig(self):
-        # Dependency cycles can be updated without uploading new
-        # patchsets.  This test exercises such changes.
-
-        self.executor_server.hold_jobs_in_build = True
-        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
-        pipeline = tenant.layout.pipelines["gate"]
-
-        A = self.fake_github.openFakePullRequest("gh/project1", "master", "A")
-        B = self.fake_github.openFakePullRequest("gh/project2", "master", "B")
-        C = self.fake_github.openFakePullRequest("gh/project3", "master", "C")
-        D = self.fake_github.openFakePullRequest("gh/project", "master", "D")
-        E = self.fake_github.openFakePullRequest("gh/project", "master", "E")
-
-        # Because we call setConfiguration immediately upon removing a
-        # change, in order to fully exercise setConfiguration on a
-        # queue that has been reloaded from ZK with potentially stale
-        # bundle data, we need to remove a change from the bundle
-        # twice.  ABC is the main bundle we're interested in.  E is a
-        # sacrificial change to force a bundle update when it's
-        # removed.
-
-        # E->C, A->E, B->A, C->B
-        E.body = "{}\n\nDepends-On: {}\n".format(
-            E.subject, C.url
-        )
-        A.body = "{}\n\nDepends-On: {}\n".format(
-            A.subject, E.url
-        )
-        B.body = "{}\n\nDepends-On: {}\n".format(
-            B.subject, A.url
-        )
-        C.body = "{}\n\nDepends-On: {}\n".format(
-            C.subject, B.url
-        )
-
-        A.addLabel("approved")
-        B.addLabel("approved")
-        D.addLabel("approved")
-        E.addLabel("approved")
-
-        self.fake_github.emitEvent(C.addLabel("approved"))
-        self.waitUntilSettled()
-        expected_cycle = {A.number, B.number, C.number, E.number}
-        self.assertEqual(len(list(pipeline.getAllItems())), 4)
-        for item in pipeline.getAllItems():
-            cycle = {i.change.number for i in item.bundle.items}
-            self.assertEqual(expected_cycle, cycle)
-
-        # Now we remove the dependency on E.  The change E itself
-        # won't be removed yet.
-
-        # A->C, B->A, C->B
-        A.body = "{}\n\nDepends-On: {}\n".format(
-            A.subject, C.url
-        )
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
-        self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 4)
-        self.assertIsNone(pipeline.getAllItems()[0].bundle)
-        # E at the head is alone
-        # The next 3 are a cycle
-        expected_cycle = {A.number, B.number, C.number}
-        for item in pipeline.getAllItems()[1:]:
-            cycle = {i.change.number for i in item.bundle.items}
-            self.assertEqual(expected_cycle, cycle)
-
-        # Now remove E from the queue by forcing a dependency on D,
-        # which is not enqueued.
-        E.body = "{}\n\nDepends-On: {}\n".format(
-            E.subject, D.url
-        )
-        self.fake_github.emitEvent(E.getPullRequestEditedEvent(E.body))
-        self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 3)
-        expected_cycle = {A.number, B.number, C.number}
-        for item in pipeline.getAllItems():
-            cycle = {i.change.number for i in item.bundle.items}
-            self.assertEqual(expected_cycle, cycle)
-
-        # Now remove all dependencies for the three remaining changes.
-        A.body = A.subject
-        B.body = B.subject
-        C.body = C.subject
-
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
-        self.waitUntilSettled()
-        self.fake_github.emitEvent(B.getPullRequestEditedEvent(B.body))
-        self.waitUntilSettled()
-        self.fake_github.emitEvent(C.getPullRequestEditedEvent(C.body))
-        self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 3)
-        for item in pipeline.getAllItems():
-            self.assertIsNone(item.bundle)
-
-        # Remove the first change from the queue by forcing a
-        # dependency on D.
-        A.body = "{}\n\nDepends-On: {}\n".format(
-            A.subject, D.url
-        )
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
-        self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 2)
-        for item in pipeline.getAllItems():
-            self.assertIsNone(item.bundle)
-
-        # B and C are still in the queue.  Verify that we can put them
-        # back into a bundle.
-        C.body = "{}\n\nDepends-On: {}\n".format(
-            C.subject, B.url
-        )
-        self.fake_github.emitEvent(C.getPullRequestEditedEvent(C.body))
-        self.waitUntilSettled()
-        B.body = "{}\n\nDepends-On: {}\n".format(
-            B.subject, C.url
-        )
-        self.fake_github.emitEvent(B.getPullRequestEditedEvent(B.body))
-        self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 2)
-        expected_cycle = {B.number, C.number}
-        for item in pipeline.getAllItems():
-            cycle = {i.change.number for i in item.bundle.items}
-            self.assertEqual(expected_cycle, cycle)
-
-        # All done.
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        self.assertHistory([
-            dict(name="project-job", result="ABORTED",
-                 changes=f"{E.number},{E.head_sha} {A.number},{A.head_sha} "
-                 f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-            dict(name="common-job", result="ABORTED",
-                 changes=f"{E.number},{E.head_sha} {A.number},{A.head_sha} "
-                 f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-            dict(name="project1-job", result="ABORTED",
-                 changes=f"{E.number},{E.head_sha} {A.number},{A.head_sha} "
-                 f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-            dict(name="project2-job", result="ABORTED",
-                 changes=f"{E.number},{E.head_sha} {A.number},{A.head_sha} "
-                 f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-            dict(name="project3-job", result="ABORTED",
-                 changes=f"{E.number},{E.head_sha} {A.number},{A.head_sha} "
-                 f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-
-            dict(name="common-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha} "
-                 f"{C.number},{C.head_sha}"),
-            dict(name="project1-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha} "
-                 f"{C.number},{C.head_sha}"),
-            dict(name="project2-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha} "
-                 f"{C.number},{C.head_sha}"),
-            dict(name="project3-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha} "
-                 f"{C.number},{C.head_sha}"),
-
-            dict(name="common-job", result="SUCCESS",
-                 changes=f"{B.number},{B.head_sha}"),
-            dict(name="project2-job", result="SUCCESS",
-                 changes=f"{B.number},{B.head_sha}"),
-
-            dict(name="common-job", result="SUCCESS",
-                 changes=f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-            dict(name="project3-job", result="SUCCESS",
-                 changes=f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-        ], ordered=False)
-
     @simple_layout('layouts/dependency_removal_gate.yaml', driver='github')
     def test_dependency_removal_gate(self):
-        # TODO: After removal of the safety check, remove this test
-        # and use the _orig version.
         # Dependency cycles can be updated without uploading new
         # patchsets.  This test exercises such changes.
 
@@ -4504,73 +4322,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         for build in self.history[-3:]:
             self.assertEqual(build.result, 'SUCCESS')
 
-    @skip("Disabled due to safety check")
-    @simple_layout('layouts/dependency_removal_gate.yaml', driver='github')
-    def test_dependency_addition_gate_orig(self):
-        # Dependency cycles can be updated without uploading new
-        # patchsets.  This test exercises such changes.
-
-        self.executor_server.hold_jobs_in_build = True
-        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
-        pipeline = tenant.layout.pipelines["gate"]
-
-        A = self.fake_github.openFakePullRequest("gh/project1", "master", "A")
-        B = self.fake_github.openFakePullRequest("gh/project2", "master", "B")
-
-        B.addLabel("approved")
-
-        self.fake_github.emitEvent(A.addLabel("approved"))
-        self.waitUntilSettled()
-
-        expected_cycle = {A.number}
-        self.assertEqual(len(list(pipeline.getAllItems())), 1)
-        for item in pipeline.getAllItems():
-            self.assertIsNone(item.bundle)
-
-        B.body = "{}\n\nDepends-On: {}\n".format(
-            B.subject, A.url
-        )
-        self.fake_github.emitEvent(B.getPullRequestEditedEvent(B.body))
-        self.waitUntilSettled()
-
-        A.body = "{}\n\nDepends-On: {}\n".format(
-            A.subject, B.url
-        )
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
-        self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 2)
-        expected_cycle = {A.number, B.number}
-        for item in pipeline.getAllItems():
-            cycle = {i.change.number for i in item.bundle.items}
-            self.assertEqual(expected_cycle, cycle)
-
-        # All done.
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        self.assertHistory([
-            # Change 1 first enqueue
-            dict(name="project1-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha}"),
-            dict(name="common-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha}"),
-
-            # Change 1 bundle update
-            dict(name="project1-job", result="SUCCESS",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
-            dict(name="common-job", result="SUCCESS",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
-
-            # Change 2 bundle update
-            dict(name="project2-job", result="SUCCESS",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
-        ], ordered=False)
-
     @simple_layout('layouts/dependency_removal_gate.yaml', driver='github')
     def test_dependency_addition_gate(self):
-        # TODO: After removal of the safety check, remove this test
-        # and use the _orig version.
         # Dependency cycles can be updated without uploading new
         # patchsets.  This test exercises such changes.
 
@@ -4627,167 +4380,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
             expected_cycle = {c.number for c in bundles[x]}
             self.assertEqual(expected_cycle, cycle)
 
-    @skip("Disabled due to safety check")
-    @simple_layout('layouts/dependency_removal_check.yaml', driver='github')
-    def test_dependency_removal_check_orig(self):
-        # Dependency cycles can be updated without uploading new
-        # patchsets.  This test exercises such changes.
-
-        self.executor_server.hold_jobs_in_build = True
-        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
-        pipeline = tenant.layout.pipelines["check"]
-
-        A = self.fake_github.openFakePullRequest("gh/project1", "master", "A")
-        B = self.fake_github.openFakePullRequest("gh/project2", "master", "B")
-        C = self.fake_github.openFakePullRequest("gh/project3", "master", "C")
-        D = self.fake_github.openFakePullRequest("gh/project", "master", "D")
-        E = self.fake_github.openFakePullRequest("gh/project", "master", "E")
-
-        # Because we call setConfiguration immediately upon removing a
-        # change, in order to fully exercise setConfiguration on a
-        # queue that has been reloaded from ZK with potentially stale
-        # bundle data, we need to remove a change from the bundle
-        # twice.  ABC is the main bundle we're interested in.  E is a
-        # sacrificial change to force a bundle update when it's
-        # removed.
-
-        # E->C, A->E, B->A, C->B
-        E.body = "{}\n\nDepends-On: {}\n".format(
-            E.subject, C.url
-        )
-        A.body = "{}\n\nDepends-On: {}\n".format(
-            A.subject, E.url
-        )
-        B.body = "{}\n\nDepends-On: {}\n".format(
-            B.subject, A.url
-        )
-        C.body = "{}\n\nDepends-On: {}\n".format(
-            C.subject, B.url
-        )
-
-        self.fake_github.emitEvent(C.getPullRequestOpenedEvent())
-        self.waitUntilSettled()
-        abce = [A, B, C, E]
-        self.assertEqual(len(pipeline.queues), 1)
-        self.assertQueueCycles(pipeline, 0, [abce, abce, abce, abce])
-
-        # Now we remove the dependency on E.
-
-        # A->C, B->A, C->B
-        A.body = "{}\n\nDepends-On: {}\n".format(
-            A.subject, C.url
-        )
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
-        self.waitUntilSettled()
-
-        abc = [A, B, C]
-        # A,B,C<live>
-        self.assertQueueCycles(pipeline, 0, [abc, abc, abc])
-        # B,C,A<live>
-        self.assertQueueCycles(pipeline, 1, [abc, abc, abc])
-
-        # Now remove all dependencies for the three remaining changes.
-        A.body = A.subject
-        B.body = B.subject
-        C.body = C.subject
-
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
-        self.waitUntilSettled()
-        self.fake_github.emitEvent(B.getPullRequestEditedEvent(B.body))
-        self.waitUntilSettled()
-        self.fake_github.emitEvent(C.getPullRequestEditedEvent(C.body))
-        self.waitUntilSettled()
-
-        # A, B, C individually (not in that order)
-        self.assertEqual(len(pipeline.queues), 3)
-        self.assertQueueCycles(pipeline, 0, [None])
-        self.assertQueueCycles(pipeline, 1, [None])
-        self.assertQueueCycles(pipeline, 2, [None])
-
-        # Remove the first change from the queue by forcing a
-        # dependency on D.
-        A.body = "{}\n\nDepends-On: {}\n".format(
-            A.subject, D.url
-        )
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
-        self.waitUntilSettled()
-        self.assertEqual(len(pipeline.queues), 2)
-        self.assertQueueCycles(pipeline, 0, [None])
-        self.assertQueueCycles(pipeline, 1, [None])
-
-        # Verify that we can put B and C into a bundle.
-        C.body = "{}\n\nDepends-On: {}\n".format(
-            C.subject, B.url
-        )
-        self.fake_github.emitEvent(C.getPullRequestEditedEvent(C.body))
-        self.waitUntilSettled()
-        B.body = "{}\n\nDepends-On: {}\n".format(
-            B.subject, C.url
-        )
-        self.fake_github.emitEvent(B.getPullRequestEditedEvent(B.body))
-        self.waitUntilSettled()
-        self.assertEqual(len(pipeline.queues), 2)
-        bc = [B, C]
-        self.assertQueueCycles(pipeline, 0, [bc, bc])
-        self.assertQueueCycles(pipeline, 1, [bc, bc])
-
-        # All done.
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        self.assertHistory([
-            dict(name="common-job", result="ABORTED",
-                 changes=f"{E.number},{E.head_sha} {A.number},{A.head_sha} "
-                 f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-            dict(name="project3-job", result="ABORTED",
-                 changes=f"{E.number},{E.head_sha} {A.number},{A.head_sha} "
-                 f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-
-            # Relaunched
-            dict(name="common-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha} "
-                 f"{C.number},{C.head_sha}"),
-            dict(name="project3-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha} "
-                 f"{C.number},{C.head_sha}"),
-
-            dict(name="project1-job", result="ABORTED",
-                 changes=f"{B.number},{B.head_sha} {C.number},{C.head_sha} "
-                 f"{A.number},{A.head_sha}"),
-            # common-job deduplicated from stanza above
-
-            dict(name="common-job", result="ABORTED",
-                 changes=f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-            dict(name="project3-job", result="ABORTED",
-                 changes=f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-
-            dict(name="common-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha}"),
-            dict(name="project1-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha}"),
-            dict(name="common-job", result="ABORTED",
-                 changes=f"{B.number},{B.head_sha}"),
-            dict(name="project2-job", result="ABORTED",
-                 changes=f"{B.number},{B.head_sha}"),
-            dict(name="common-job", result="ABORTED",
-                 changes=f"{C.number},{C.head_sha}"),
-            dict(name="project3-job", result="ABORTED",
-                 changes=f"{C.number},{C.head_sha}"),
-
-            dict(name="common-job", result="SUCCESS",
-                 changes=f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-            dict(name="project3-job", result="SUCCESS",
-                 changes=f"{B.number},{B.head_sha} {C.number},{C.head_sha}"),
-            # common-job deduplicated
-            dict(name="project2-job", result="SUCCESS",
-                 changes=f"{C.number},{C.head_sha} {B.number},{B.head_sha}"),
-        ], ordered=False)
-
     @simple_layout('layouts/dependency_removal_check.yaml', driver='github')
     def test_dependency_removal_check(self):
-        # TODO: After removal of the safety check, remove this test
-        # and use the _orig version.
         # Dependency cycles can be updated without uploading new
         # patchsets.  This test exercises such changes.
 
@@ -4854,12 +4448,10 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.waitUntilSettled()
 
         # A, B, C individually
-        # ABC<nonlive> E<live>, A<live>, B<live>, C<live>
-        self.assertEqual(len(pipeline.queues), 4)
-        self.assertQueueCycles(pipeline, 0, [abc, [E]])
-        self.assertQueueCycles(pipeline, 1, [[A]])
-        self.assertQueueCycles(pipeline, 2, [[B]])
-        self.assertQueueCycles(pipeline, 3, [[C]])
+        self.assertEqual(len(pipeline.queues), 3)
+        self.assertQueueCycles(pipeline, 0, [[A], [B]])
+        self.assertQueueCycles(pipeline, 1, [[A], [B], [C]])
+        self.assertQueueCycles(pipeline, 2, [[A]])
 
         # Verify that we can put B and C into a bundle.
         C.body = "{}\n\nDepends-On: {}\n".format(
@@ -4872,93 +4464,24 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         )
         self.fake_github.emitEvent(B.getPullRequestEditedEvent(B.body))
         self.waitUntilSettled()
-        self.assertEqual(len(pipeline.queues), 3)
+        self.assertEqual(len(pipeline.queues), 2)
         bc = [B, C]
-        self.assertQueueCycles(pipeline, 0, [abc, [E]])
-        self.assertQueueCycles(pipeline, 1, [[A]])
-        self.assertQueueCycles(pipeline, 2, [bc])
+        self.assertQueueCycles(pipeline, 0, [[A]])
+        self.assertQueueCycles(pipeline, 1, [bc])
 
         # All done.
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
 
-        for build in self.history[:-7]:
+        for build in self.history[:-5]:
             self.assertEqual(build.result, 'ABORTED')
         # Changes A, B, C in the end
-        for build in self.history[-7:]:
+        for build in self.history[-5:]:
             self.assertEqual(build.result, 'SUCCESS')
-
-    @skip("Disabled due to safety check")
-    @simple_layout('layouts/dependency_removal_check.yaml', driver='github')
-    def test_dependency_addition_check_orig(self):
-        # Dependency cycles can be updated without uploading new
-        # patchsets.  This test exercises such changes.
-
-        self.executor_server.hold_jobs_in_build = True
-        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
-        pipeline = tenant.layout.pipelines["check"]
-
-        A = self.fake_github.openFakePullRequest("gh/project1", "master", "A")
-        B = self.fake_github.openFakePullRequest("gh/project2", "master", "B")
-
-        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
-        self.waitUntilSettled()
-
-        expected_cycle = {A.number}
-        self.assertEqual(len(list(pipeline.getAllItems())), 1)
-        for item in pipeline.getAllItems():
-            self.assertIsNone(item.bundle)
-
-        B.body = "{}\n\nDepends-On: {}\n".format(
-            B.subject, A.url
-        )
-        self.fake_github.emitEvent(B.getPullRequestEditedEvent(B.body))
-        self.waitUntilSettled()
-
-        A.body = "{}\n\nDepends-On: {}\n".format(
-            A.subject, B.url
-        )
-        self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
-        self.waitUntilSettled()
-        self.assertEqual(len(list(pipeline.getAllItems())), 4)
-        self.assertEqual(len(pipeline.queues), 2)
-        ab = [A, B]
-        self.assertQueueCycles(pipeline, 0, [ab, ab])
-        self.assertQueueCycles(pipeline, 1, [ab, ab])
-
-        expected_cycle = {A.number, B.number}
-        for item in pipeline.getAllItems():
-            cycle = {i.change.number for i in item.bundle.items}
-            self.assertEqual(expected_cycle, cycle)
-
-        # All done.
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        self.assertHistory([
-            # Change 1 first enqueue
-            dict(name="project1-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha}"),
-            dict(name="common-job", result="ABORTED",
-                 changes=f"{A.number},{A.head_sha}"),
-
-            # Change 1 bundle update
-            dict(name="project1-job", result="SUCCESS",
-                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
-            dict(name="common-job", result="SUCCESS",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
-
-            # Change 2 bundle update
-            dict(name="project2-job", result="SUCCESS",
-                 changes=f"{A.number},{A.head_sha} {B.number},{B.head_sha}"),
-        ], ordered=False)
 
     @simple_layout('layouts/dependency_removal_check.yaml', driver='github')
     def test_dependency_addition_check(self):
-        # TODO: After removal of the safety check, remove this test
-        # and use the _orig version.
         # Dependency cycles can be updated without uploading new
         # patchsets.  This test exercises such changes.
 
