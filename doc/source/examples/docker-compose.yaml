@@ -45,7 +45,7 @@ services:
       - "./zoo.cfg:/conf/zoo.cfg:z"
       - "zk-data:/data"
       - "zk-datalog:/datalog"
-    command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zkServer.sh start-foreground'"
+    command: "sh -c '/var/playbooks/wait-to-start-certs.sh && exec zkServer.sh start-foreground'"
     networks:
       - zuul
   mysql:
@@ -73,7 +73,7 @@ services:
     command: |
       sh -c '/var/playbooks/wait-to-start-certs.sh && \
              /var/playbooks/wait-to-start.sh && \
-             zuul-scheduler -f'
+             exec zuul-scheduler -f'
     # FIXME: The scheduler has no ansible anymore so use the executor image.
     #        This needs to be changes such that ansible is not required for startup.
     image: quay.io/zuul-ci/zuul-scheduler
@@ -88,7 +88,7 @@ services:
   web:
     command: |
       sh -c '/var/playbooks/wait-to-start-certs.sh && \
-             zuul-web -f'
+             exec zuul-web -f'
     depends_on:
       - scheduler
       - mysql
@@ -121,7 +121,7 @@ services:
       - "logs:/srv/static/logs:z"
       - "certs:/var/certs:z"
       - "lib-zuul-executor:/var/lib/zuul:z"
-    command: "sh -c '/var/playbooks/wait-to-start-certs.sh && zuul-executor -f'"
+    command: "sh -c '/var/playbooks/wait-to-start-certs.sh && exec zuul-executor -f'"
     networks:
       - zuul
   node:
@@ -146,7 +146,7 @@ services:
       - "certs:/var/certs:z"
     ports:
       - "8005:8005"
-    command: "sh -c '/var/playbooks/wait-to-start-certs.sh && nodepool-launcher -f'"
+    command: "sh -c '/var/playbooks/wait-to-start-certs.sh && exec nodepool-launcher -f'"
     networks:
       - zuul
   logs:
