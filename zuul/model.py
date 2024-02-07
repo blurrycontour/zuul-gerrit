@@ -52,7 +52,6 @@ from zuul.lib import tracing
 from zuul.zk import zkobject
 from zuul.zk.blob_store import BlobStore
 from zuul.zk.change_cache import ChangeKey
-from zuul.zk.components import COMPONENT_REGISTRY
 
 MERGER_MERGE = 1            # "git merge"
 MERGER_MERGE_RESOLVE = 2    # "git merge -s resolve"
@@ -308,9 +307,8 @@ class ConfigurationError(object):
     @classmethod
     def deserialize(cls, data):
         data["key"] = ConfigurationErrorKey.deserialize(data["key"])
-        # These attributes were added in MODEL_API 13
-        data['severity'] = data.get('severity', SEVERITY_ERROR)
-        data['name'] = data.get('name', 'Unknown')
+        data['severity'] = data['severity']
+        data['name'] = data['name']
         o = cls.__new__(cls)
         o.__dict__.update(data)
         return o
@@ -1192,9 +1190,6 @@ class ChangeQueue(zkobject.ZKObject):
             "queue": list(items_by_path.values()),
             "project_branches": [tuple(pb) for pb in data["project_branches"]],
         })
-        # MODEL_API < 17
-        if 'window_ceiling' not in data:
-            data['window_ceiling'] = math.inf
         return data
 
     def getPath(self):
@@ -2367,10 +2362,7 @@ class FrozenJob(zkobject.ZKObject):
 
     @classmethod
     def jobPath(cls, job_id, parent_path):
-        # MODEL_API < 19
-        # Job name is used as path component and needs to be quoted.
-        safe_id = urllib.parse.quote_plus(job_id)
-        return f"{parent_path}/job/{safe_id}"
+        return f"{parent_path}/job/{job_id}"
 
     def getPath(self):
         return self.jobPath(self.uuid, self.buildset.getPath())
@@ -2416,9 +2408,6 @@ class FrozenJob(zkobject.ZKObject):
                 v = {'storage': 'local', 'data': v}
             data[k] = v
 
-        if (COMPONENT_REGISTRY.model_api < 9):
-            data['nodeset'] = data['nodeset_alternatives'][0]
-
         data['ref'] = self.ref
         data['other_refs'] = self.other_refs
 
@@ -2430,27 +2419,6 @@ class FrozenJob(zkobject.ZKObject):
         # in Job.freezeJob so that FrozenJobs are identical regardless
         # of whether they have been deserialized.
         data = super().deserialize(raw, context)
-
-        # MODEL_API < 8
-        if 'deduplicate' not in data:
-            data['deduplicate'] = 'auto'
-
-        # MODEL_API < 9
-        if data.get('nodeset'):
-            data['nodeset_alternatives'] = [data['nodeset']]
-            data['nodeset_index'] = 0
-            del data['nodeset']
-
-        # MODEL_API < 15
-        if 'ansible_split_streams' not in data:
-            data['ansible_split_streams'] = None
-
-        # MODEL_API < 15
-        if 'failure_output' not in data:
-            data['failure_output'] = []
-
-        # MODEL_API < 19
-        data.setdefault("uuid", None)
 
         if hasattr(self, 'nodeset_alternatives'):
             alts = self.nodeset_alternatives
@@ -2899,8 +2867,7 @@ class Job(ConfigObject):
             for secret_key, secret_value in list(playbook['secrets'].items()):
                 secret_serialized = json_dumps(
                     secret_value, sort_keys=True).encode("utf8")
-                if (COMPONENT_REGISTRY.model_api >= 6 and
-                    len(secret_serialized) > self.SECRET_BLOB_SIZE):
+                if (len(secret_serialized) > self.SECRET_BLOB_SIZE):
                     # If the secret is large, store it in the blob store
                     # and store the key in the playbook secrets dict.
                     blob_key = blobstore.put(secret_serialized)
@@ -4068,21 +4035,14 @@ class Build(zkobject.ZKObject):
             "span_info": self.span_info,
             "events": [e.toDict() for e in self.events],
         }
-        if COMPONENT_REGISTRY.model_api < 5:
-            data["_result_data"] = (self._result_data.getPath()
-                                    if self._result_data else None)
-            data["_secret_result_data"] = (
-                self._secret_result_data.getPath()
-                if self._secret_result_data else None)
-        else:
-            for k in self.job_data_attributes:
-                v = getattr(self, '_' + k)
-                if isinstance(v, JobData):
-                    v = {'storage': 'offload', 'path': v.getPath(),
-                         'hash': v.hash}
-                else:
-                    v = {'storage': 'local', 'data': v}
-                data[k] = v
+        for k in self.job_data_attributes:
+            v = getattr(self, '_' + k)
+            if isinstance(v, JobData):
+                v = {'storage': 'offload', 'path': v.getPath(),
+                     'hash': v.hash}
+            else:
+                v = {'storage': 'local', 'data': v}
+            data[k] = v
 
         return json.dumps(data, sort_keys=True).encode("utf8")
 
@@ -4097,20 +4057,6 @@ class Build(zkobject.ZKObject):
         # Result data can change (between a pause and build
         # completion).
 
-        # MODEL_API < 5
-        for k in ('_result_data', '_secret_result_data'):
-            try:
-                if data.get(k):
-                    data[k] = JobData.fromZK(context, data[k])
-                    # This used to be a ResultData object, which is
-                    # the same as a JobData but without a hash, so
-                    # generate one.
-                    data[k]._set(hash=JobData.getHash(data[k].data))
-            except Exception:
-                self.log.exception("Failed to restore result data")
-                data[k] = None
-
-        # MODEL_API >= 5; override with this if present.
         for job_data_key in self.job_data_attributes:
             job_data = data.pop(job_data_key, None)
             if job_data:
@@ -4132,10 +4078,6 @@ class Build(zkobject.ZKObject):
                         # Load the object from ZK
                         data['_' + job_data_key] = JobData.fromZK(
                             context, job_data['path'])
-
-        # MODEL_API < 14
-        if 'pre_fail' not in data:
-            data['pre_fail'] = False
 
         return data
 
@@ -4631,12 +4573,6 @@ class BuildSet(zkobject.ZKObject):
         return data
 
     def updateBuildVersion(self, context, build):
-        # It's tempting to update versions regardless of the model
-        # API, but if we start writing versions before all components
-        # are upgraded we could get out of sync.
-        if (COMPONENT_REGISTRY.model_api < 12):
-            return True
-
         # It is common for a lot of builds/jobs to be added at once,
         # so to avoid writing this buildset object repeatedly during
         # that time, we only update the version after the initial
@@ -4648,26 +4584,17 @@ class BuildSet(zkobject.ZKObject):
             self.updateAttributes(context, build_versions=self.build_versions)
 
     def updateJobVersion(self, context, job):
-        if (COMPONENT_REGISTRY.model_api < 12):
-            return True
-
         version = job.getZKVersion()
         if version is not None:
             self.job_versions[job.uuid] = version + 1
             self.updateAttributes(context, job_versions=self.job_versions)
 
     def shouldRefreshBuild(self, build, build_versions):
-        # Unless all schedulers are updating versions, we can't trust
-        # the data.
-        if (COMPONENT_REGISTRY.model_api < 12):
-            return True
         current = build.getZKVersion()
         expected = build_versions.get(build.uuid, 0)
         return expected != current
 
     def shouldRefreshJob(self, job, job_versions):
-        if (COMPONENT_REGISTRY.model_api < 12):
-            return True
         current = job.getZKVersion()
         expected = job_versions.get(job.uuid, 0)
         return expected != current
@@ -4925,8 +4852,7 @@ class QueueItem(zkobject.ZKObject):
     def new(klass, context, **kw):
         obj = klass()
         obj._set(**kw)
-        if COMPONENT_REGISTRY.model_api >= 13:
-            obj._set(event=obj.event and EventInfo.fromEvent(obj.event))
+        obj._set(event=obj.event and EventInfo.fromEvent(obj.event))
 
         data = obj._trySerialize(context)
         obj._save(context, data, create=True)
@@ -4962,18 +4888,12 @@ class QueueItem(zkobject.ZKObject):
         return (tenant, pipeline, uuid)
 
     def serialize(self, context):
-        if COMPONENT_REGISTRY.model_api < 13:
-            if isinstance(self.event, TriggerEvent):
-                event_type = "TriggerEvent"
-            else:
-                event_type = self.event.__class__.__name__
-        else:
-            event_type = "EventInfo"
-            if not isinstance(self.event, EventInfo):
-                # Convert our local trigger event to a trigger info
-                # object. This will only happen on the transition to
-                # model API version 13.
-                self._set(event=EventInfo.fromEvent(self.event))
+        event_type = "EventInfo"
+        if not isinstance(self.event, EventInfo):
+            # Convert our local trigger event to a trigger info
+            # object. This will only happen on the transition to
+            # model API version 13.
+            self._set(event=EventInfo.fromEvent(self.event))
 
         data = {
             "uuid": self.uuid,
@@ -5013,24 +4933,7 @@ class QueueItem(zkobject.ZKObject):
         # child objects.
         self._set(uuid=data["uuid"])
 
-        if COMPONENT_REGISTRY.model_api < 13:
-            event_type = data["event"]["type"]
-            if event_type == "TriggerEvent":
-                event_class = (
-                    self.pipeline.manager.sched.connections
-                        .getTriggerEventClass(
-                            data["event"]["data"]["driver_name"])
-                )
-            else:
-                event_class = EventTypeIndex.event_type_mapping.get(event_type)
-        else:
-            event_class = EventInfo
-
-        if event_class is None:
-            raise NotImplementedError(
-                f"Event type {event_type} not deserializable")
-
-        event = event_class.fromDict(data["event"]["data"])
+        event = EventInfo.fromDict(data["event"]["data"])
         changes = self.pipeline.manager.resolveChangeReferences(
             data["changes"])
         build_set = self.current_build_set
@@ -5433,8 +5336,6 @@ class QueueItem(zkobject.ZKObject):
             return True
         try:
             data = None
-            if COMPONENT_REGISTRY.model_api < 20:
-                data = []
             ret = self.item_ahead.providesRequirements(job, data=data)
             if data:
                 data.reverse()
@@ -5496,33 +5397,6 @@ class QueueItem(zkobject.ZKObject):
                     break
 
             if all_parent_jobs_successful:
-                # Iterate over all jobs of the graph (which is
-                # in sorted config order) and apply parent data of the jobs we
-                # already found.
-                if (parent_builds_with_data
-                        and COMPONENT_REGISTRY.model_api < 20):
-                    # We have all of the parent data here, so we can
-                    # start from scratch each time.
-                    new_parent_data = {}
-                    new_secret_parent_data = {}
-                    # We may have artifact data from
-                    # jobRequirementsReady, so we preserve it.
-                    # updateParentData de-duplicates it.
-                    new_artifact_data = job.artifact_data or []
-                    for parent_job in job_graph.getJobs():
-                        parent_build = parent_builds_with_data.get(
-                            parent_job.uuid)
-                        if parent_build:
-                            (new_parent_data,
-                             new_secret_parent_data,
-                             new_artifact_data) = FrozenJob.updateParentData(
-                                 new_parent_data,
-                                 new_secret_parent_data,
-                                 new_artifact_data,
-                                 parent_build)
-                    job.setParentData(new_parent_data,
-                                      new_secret_parent_data,
-                                      new_artifact_data)
                 job._set(_ready_to_run=True)
 
     def getArtifactData(self, job):
@@ -7629,10 +7503,7 @@ class UnparsedAbideConfig(object):
             "semaphores": self.semaphores,
             "api_roots": self.api_roots,
         }
-        if (COMPONENT_REGISTRY.model_api < 10):
-            d["admin_rules"] = self.authz_rules
-        else:
-            d["authz_rules"] = self.authz_rules
+        d["authz_rules"] = self.authz_rules
         return d
 
     @classmethod
