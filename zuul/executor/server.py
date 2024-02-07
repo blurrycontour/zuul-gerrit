@@ -982,9 +982,7 @@ class AnsibleJob(object):
         with executor_server.zk_context as ctx:
             self.job = FrozenJob.fromZK(ctx, arguments["job_ref"])
         job_zuul_params = zuul_params_from_job(self.job)
-        # MODEL_API < 20
-        job_zuul_params["artifacts"] = self.arguments["zuul"].get(
-            "artifacts", job_zuul_params.get("artifacts"))
+        job_zuul_params["artifacts"] = self.arguments["zuul"].get("artifacts")
         if job_zuul_params["artifacts"] is None:
             del job_zuul_params["artifacts"]
         self.arguments["zuul"].update(job_zuul_params)
@@ -1079,18 +1077,10 @@ class AnsibleJob(object):
             max_attempts = self.arguments["max_attempts"]
         self.retry_limit = self.arguments["zuul"]["attempts"] >= max_attempts
 
-        try:
-            parent_data = self.arguments["parent_data"]
-        except KeyError:
-            # MODEL_API < 20
-            parent_data = self.job.parent_data or {}
+        parent_data = self.arguments["parent_data"]
         self.normal_vars = Job._deepUpdate(parent_data.copy(),
                                            self.job.variables)
-        try:
-            self.secret_vars = self.arguments["secret_parent_data"]
-        except KeyError:
-            # MODEL_API < 20
-            self.secret_vars = self.job.secret_parent_data or {}
+        self.secret_vars = self.arguments["secret_parent_data"]
 
     def run(self):
         self.running = True
