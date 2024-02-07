@@ -22,7 +22,8 @@ from tests.base import AnsibleZuulTestCase
 
 class FunctionalZuulJSONMixIn:
     tenant_config_file = 'config/remote-zuul-json/main.yaml'
-    ansible_version = '2.6'
+    # This should be overriden in child classes.
+    ansible_version = 'X'
 
     def _setUp(self):
         self.fake_nodepool.remote_ansible = True
@@ -144,16 +145,16 @@ class FunctionalZuulJSONMixIn:
             dateutil.parser.parse(play_end_time)
 
 
-class TestZuulJSON6(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
-    ansible_version = '6'
+class TestZuulJSON8(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
+    ansible_version = '8'
 
     def setUp(self):
         super().setUp()
         self._setUp()
 
 
-class TestZuulJSON8(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
-    ansible_version = '8'
+class TestZuulJSON9(AnsibleZuulTestCase, FunctionalZuulJSONMixIn):
+    ansible_version = '9'
 
     def setUp(self):
         super().setUp()
