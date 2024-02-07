@@ -2292,8 +2292,7 @@ class FrozenJob(zkobject.ZKObject):
 
     def __init__(self):
         super().__init__()
-        self._set(_ready_to_run=False,
-                  ref=None,
+        self._set(ref=None,
                   other_refs=[])
 
     def __repr__(self):
@@ -5354,51 +5353,6 @@ class QueueItem(zkobject.ZKObject):
             self.setResult(fakebuild)
         return False
 
-    def updateJobParentData(self):
-        job_graph = self.current_build_set.job_graph
-        failed_job_ids = set()  # Jobs that run and failed
-        ignored_job_ids = set()  # Jobs that were skipped or canceled
-        unexecuted_job_ids = set()  # Jobs that were not started yet
-        jobs_not_started = set()
-        for job in job_graph.getJobs():
-            job._set(_ready_to_run=False)
-            build = self.current_build_set.getBuild(job)
-            if build:
-                if build.result == 'SUCCESS' or build.paused:
-                    pass
-                elif build.result == 'SKIPPED':
-                    ignored_job_ids.add(job.uuid)
-                else:  # elif build.result in ('FAILURE', 'CANCELED', ...):
-                    failed_job_ids.add(job.uuid)
-            else:
-                unexecuted_job_ids.add(job.uuid)
-                jobs_not_started.add(job)
-
-        for job in job_graph.getJobs():
-            if job not in jobs_not_started:
-                continue
-            if not self.jobRequirementsReady(job):
-                continue
-            all_parent_jobs_successful = True
-            parent_builds_with_data = {}
-            for parent_job in job_graph.getParentJobsRecursively(job):
-                if parent_job.uuid in unexecuted_job_ids \
-                        or parent_job.uuid in failed_job_ids:
-                    all_parent_jobs_successful = False
-                    break
-                parent_build = self.current_build_set.getBuild(parent_job)
-                if parent_build.result_data:
-                    parent_builds_with_data[parent_job.uuid] = parent_build
-
-            for parent_job in job_graph.getParentJobsRecursively(
-                    job, skip_soft=True):
-                if parent_job.uuid in ignored_job_ids:
-                    all_parent_jobs_successful = False
-                    break
-
-            if all_parent_jobs_successful:
-                job._set(_ready_to_run=True)
-
     def getArtifactData(self, job):
         data = []
         self.providesRequirements(job, data)
@@ -5447,8 +5401,46 @@ class QueueItem(zkobject.ZKObject):
                 return []
 
         job_graph = self.current_build_set.job_graph
+        failed_job_ids = set()  # Jobs that run and failed
+        ignored_job_ids = set()  # Jobs that were skipped or canceled
+        unexecuted_job_ids = set()  # Jobs that were not started yet
+        jobs_not_started = set()
         for job in job_graph.getJobs():
-            if job._ready_to_run:
+            build = self.current_build_set.getBuild(job)
+            if build:
+                if build.result == 'SUCCESS' or build.paused:
+                    pass
+                elif build.result == 'SKIPPED':
+                    ignored_job_ids.add(job.uuid)
+                else:  # elif build.result in ('FAILURE', 'CANCELED', ...):
+                    failed_job_ids.add(job.uuid)
+            else:
+                unexecuted_job_ids.add(job.uuid)
+                jobs_not_started.add(job)
+
+        for job in job_graph.getJobs():
+            if job not in jobs_not_started:
+                continue
+            if not self.jobRequirementsReady(job):
+                continue
+            all_parent_jobs_successful = True
+            parent_builds_with_data = {}
+            for parent_job in job_graph.getParentJobsRecursively(job):
+                if parent_job.uuid in unexecuted_job_ids \
+                        or parent_job.uuid in failed_job_ids:
+                    all_parent_jobs_successful = False
+                    break
+                parent_build = self.current_build_set.getBuild(parent_job)
+                if parent_build.result_data:
+                    parent_builds_with_data[parent_job.uuid] = parent_build
+
+            for parent_job in job_graph.getParentJobsRecursively(
+                    job, skip_soft=True):
+                if parent_job.uuid in ignored_job_ids:
+                    all_parent_jobs_successful = False
+                    break
+
+            if all_parent_jobs_successful:
                 nodeset = self.current_build_set.getJobNodeSetInfo(job)
                 if nodeset is None:
                     # The nodes for this job are not ready, skip
