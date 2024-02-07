@@ -21,7 +21,7 @@ from tests.base import AnsibleZuulTestCase
 class FunctionalActionModulesMixIn:
     tenant_config_file = 'config/remote-action-modules/main.yaml'
     # This should be overriden in child classes.
-    ansible_version = '6'
+    ansible_version = 'X'
     wait_timeout = 120
 
     def _setUp(self):
@@ -87,16 +87,16 @@ class FunctionalActionModulesMixIn:
         self._run_job('shell-good', 'SUCCESS')
 
 
-class TestActionModules6(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
-    ansible_version = '6'
+class TestActionModules8(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
+    ansible_version = '8'
 
     def setUp(self):
         super().setUp()
         self._setUp()
 
 
-class TestActionModules8(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
-    ansible_version = '8'
+class TestActionModules9(AnsibleZuulTestCase, FunctionalActionModulesMixIn):
+    ansible_version = '9'
 
     def setUp(self):
         super().setUp()
