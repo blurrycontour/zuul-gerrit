@@ -127,6 +127,24 @@
       "parentUuid": "83f368dc_02e6ff92",
       "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d5ce60e_3a50e2eb",
+        "filename": "web/src/index.css",
+        "patchSetId": 3
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-07T16:38:35Z",
+      "side": 1,
+      "message": "This looks much better now with timestamp values like `1 hr 24 min | 1 hr 25 min`",
+      "parentUuid": "73ee47ae_9680301d",
+      "revId": "32eefd8faeab279d0aaf5f939d4fbb3c6d5efb75",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
