@@ -2855,9 +2855,8 @@ class Scheduler(threading.Thread):
         args = {}
         if 'url' in event.data:
             args['url'] = event.data['url']
-        if (COMPONENT_REGISTRY.model_api >= 14):
-            if 'pre_fail' in event.data:
-                args['pre_fail'] = event.data['pre_fail']
+        if 'pre_fail' in event.data:
+            args['pre_fail'] = event.data['pre_fail']
         build.updateAttributes(pipeline.manager.current_context,
                                **args)
 

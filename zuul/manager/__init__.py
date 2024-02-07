@@ -1905,8 +1905,7 @@ class PipelineManager(metaclass=ABCMeta):
         item.pipeline.tenant.semaphore_handler.release(
             event_queue, item, build.job)
 
-        # MODEL_API < 25
-        if item.getJob(build.job.uuid or build.job.name) is None:
+        if item.getJob(build.job.uuid) is None:
             log.info("Build %s no longer in job graph for item %s",
                      build, item)
             return
