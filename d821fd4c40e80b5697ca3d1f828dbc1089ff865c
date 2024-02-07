@@ -16,6 +16,24 @@
       "message": "I think we can add this directly to this pipeline\u0027s management event queue. I don\u0027t see a need to take a detour via the tenant event queue.",
       "revId": "d821fd4c40e80b5697ca3d1f828dbc1089ff865c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "311a6823_bf33c370",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 497,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-07T14:43:33Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "782c540f_158bf221",
+      "revId": "d821fd4c40e80b5697ca3d1f828dbc1089ff865c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
