@@ -21,7 +21,6 @@ configuration.
 import re
 
 from zuul.lib.re2util import ZuulRegex
-from zuul.zk.components import COMPONENT_REGISTRY
 
 
 class AbstractChangeMatcher(object):
@@ -94,24 +93,14 @@ class BranchMatcher(AbstractChangeMatcher):
         return False
 
     def serialize(self):
-        if (COMPONENT_REGISTRY.model_api < 17):
-            return {
-                "implied": self.exactmatch,
-                "regex": self.regex.pattern,
-            }
-        else:
-            return {
-                "implied": self.exactmatch,
-                "regex": self.regex.serialize(),
-            }
+        return {
+            "implied": self.exactmatch,
+            "regex": self.regex.serialize(),
+        }
 
     @classmethod
     def deserialize(cls, data):
-        if isinstance(data['regex'], dict):
-            regex = ZuulRegex.deserialize(data['regex'])
-        else:
-            # MODEL_API >= 17
-            regex = ZuulRegex(data['regex'])
+        regex = ZuulRegex.deserialize(data['regex'])
         o = cls(regex)
         return o
 
