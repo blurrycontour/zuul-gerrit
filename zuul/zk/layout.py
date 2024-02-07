@@ -22,7 +22,6 @@ import time
 
 from kazoo.exceptions import NoNodeError
 
-from zuul.zk.components import COMPONENT_REGISTRY
 from zuul.zk import sharding, ZooKeeperBase
 
 
@@ -169,8 +168,6 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
         return zstat.children_count
 
     def getMinLtimes(self, layout_state):
-        if COMPONENT_REGISTRY.model_api < 6:
-            return None
         try:
             path = f"{self.layout_data_root}/{layout_state.uuid}"
             with sharding.BufferedShardReader(
