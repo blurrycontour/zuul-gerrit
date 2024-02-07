@@ -71,7 +71,6 @@
         git push http://admin:secret@gerrit:8080/All-Projects +HEAD:refs/meta/config
       args:
         chdir: "{{ all_projects_repo }}"
-        warn: false
 
     - name: Create zuul-config project
       include_role:
