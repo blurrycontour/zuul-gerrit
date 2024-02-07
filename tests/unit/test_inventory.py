@@ -186,7 +186,7 @@ class TestInventoryShellType(TestInventoryBase):
 class InventoryAutoPythonMixin:
     ansible_version = 'X'
 
-    def test_auto_python_ansible6_inventory(self):
+    def test_auto_python_ansible_inventory(self):
         inventory = self._get_build_inventory(
             f'ansible-version{self.ansible_version}-inventory')
 
@@ -213,14 +213,14 @@ class InventoryAutoPythonMixin:
         self.waitUntilSettled()
 
 
-class TestInventoryAutoPythonAnsible6(TestInventoryBase,
-                                      InventoryAutoPythonMixin):
-    ansible_version = '6'
-
-
 class TestInventoryAutoPythonAnsible8(TestInventoryBase,
                                       InventoryAutoPythonMixin):
     ansible_version = '8'
+
+
+class TestInventoryAutoPythonAnsible9(TestInventoryBase,
+                                      InventoryAutoPythonMixin):
+    ansible_version = '9'
 
 
 class TestInventory(TestInventoryBase):
