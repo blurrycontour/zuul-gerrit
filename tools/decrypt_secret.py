@@ -16,22 +16,43 @@ import argparse
 from zuul.lib import encryption
 import zuul.configloader
 import zuul.model
-
+import json
+import sys
+import zuul.lib.keystorage
 
 DESCRIPTION = """Decrypt a Zuul secret.
 """
 
+def getProjectSecretsKeys(keyfile, path, password_bytes):
+    """Return the public and private keys"""
+    keys = keyfile.get("keys")
+    projectkeys = keys.get(path)
+    if projectkeys is None:
+        return None
+    pk = projectkeys["keys"][0]["private_key"]
+    pem_private_key = pk.encode("utf-8")
+    private_key, public_key = encryption.deserialize_rsa_keypair(
+        pem_private_key, password_bytes)
+
+    return private_key, public_key
 
 def main():
     parser = argparse.ArgumentParser(description=DESCRIPTION)
-    parser.add_argument('private_key',
-                        help="The path to the private key")
     parser.add_argument('file',
                         help="The YAML file with secrets")
+    parser.add_argument('dumppath',
+                        help="Path to the zuul-admin export-keys command output")
+    parser.add_argument('keystore',
+                        help="Zuul Keystore password")
+    parser.add_argument('zkpath',
+                        help="Path to the project key in Zookeeper")
     args = parser.parse_args()
 
-    (private_secrets_key, public_secrets_key) = \
-        encryption.deserialize_rsa_keypair(open(args.private_key, 'rb').read())
+    keysfile = json.load(open(args.dumppath))
+    password = args.keystore.encode("utf-8")
+
+    priv, pub = getProjectSecretsKeys(keysfile, args.zkpath, password)
+
     parser = zuul.configloader.SecretParser(None)
     sc = zuul.model.SourceContext(None, 'project', None, 'master',
                                   'path', False)
@@ -43,7 +64,7 @@ def main():
         s = element['secret']
         secret = parser.fromYaml(s)
         print(secret.name)
-        print(secret.decrypt(private_secrets_key).secret_data)
+        print(secret.decrypt(priv).secret_data)
 
 
 if __name__ == '__main__':
