@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f72139e_ab9395b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-02-08T13:26:59Z",
+      "side": 1,
+      "message": "There is also this set of changes\n- https://review.opendev.org/c/zuul/zuul/+/817949 \n- https://review.opendev.org/c/zuul/zuul/+/819483\nwhich accomplish a very similar thing.\nBut this change here is a more general approach, by letting the user decide where to put wildcards. Also, a different set of columns is enabled for substring search.",
+      "revId": "1a8db873575d4954b4ab7ae03f1e1ecc4347b4ab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
