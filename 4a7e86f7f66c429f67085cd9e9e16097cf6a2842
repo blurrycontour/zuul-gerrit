@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e20b590_101f55cf",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 0,
+      "message": "Is this test removed simply because the model api update is old enough we don\u0027t need to actively test it anymore?",
+      "revId": "4a7e86f7f66c429f67085cd9e9e16097cf6a2842",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de815c8c_0855f01e",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 0,
+      "message": "And this test is removed because deduplication has changed and the model api update is old enough that this is effectively dead code?",
+      "revId": "4a7e86f7f66c429f67085cd9e9e16097cf6a2842",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

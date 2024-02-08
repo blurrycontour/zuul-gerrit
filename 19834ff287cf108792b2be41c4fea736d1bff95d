@@ -1,0 +1,232 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42930898_cd173f4c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "Nit is this meant to be item?",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 8
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "69d8039e_3f428303",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "Posting an early draft review as this is large enough it is taking me some time to get through. I have reviewed everything but the circular deps test file, the pipeline manager class files, and model.py.\n\nI\u0027m also curious if we should bump the model api version to indicate that the old job name vs job uuid split has been resolved. I suspect this isn\u0027t technically necessary because we\u0027re restarting all services after an upgrade to 9.x (pretty sure we say this is required in our general upgrade docs). but having the model api and the version numebrs reflect the update might be nice?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "752f0d11_dd02afad",
+        "filename": "tests/unit/test_tracing.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "I guess this doesn\u0027t need to be a recursive call to handle lists of lists?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "039b1100_41f3182d",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1354,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "This option has been made redundant by the inclusion of ALL_REVISIONS below. Might be worth cleaning up to avoid confusion.\n\nThough looking at the diff in the next file we continue to refer to the current revision so maybe this isn\u0027t redundant and we need both to simplify our parsing of the data?",
+      "range": {
+        "startLine": 1354,
+        "startChar": 48,
+        "endLine": 1354,
+        "endChar": 67
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22599ee3_6ce738cb",
+        "filename": "zuul/driver/gerrit/gerritreporter.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "`item.changes` will include all changes including the current change right? Maybe we should rename this value from `other_change` to simply `a_change`? Or check if `other_change` is `change` and continue if so?\n\nThat a_change variable name is horrible but I don\u0027t want it colliding with `change`",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d2b80ce_03bcb405",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "One downside to changes like this is we won\u0027t be able to easily grep for change numbers in the logs anymore. I\u0027m not sure I have a better solution as listing all changes in an item seems just as bad for logging.\n\nI guess we just need to clearly log where a change is added to an item so that we can then grep on the item ids (or event id).",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76f01ecb_b4c0b8ba",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "What happens if branch is not set? If it is always set maybe we drop the None default here? Otherwise I\u0027m not sure what the expected before should be when merging tosha None.\n\nThough I notice the old code also defaulted tosha to None so it must be doing something?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce2148ab_f9063540",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "Maybe we should align the terminology between the server and client? We use raw here but on the server side call it old format.",
+      "range": {
+        "startLine": 168,
+        "startChar": 23,
+        "endLine": 168,
+        "endChar": 26
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07cc64c6_c7841ecf",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "Is corvus a model api version now :) Not sure if `JEB` is the intended long term version here or just a stand in for later replacement.",
+      "range": {
+        "startLine": 337,
+        "startChar": 22,
+        "endLine": 337,
+        "endChar": 25
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2def6058_75669d75",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1655,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "Should we be short circuiting here or should we return a list that can be appended to the list of new project below where `_reenqueueGetProject()` is called?\n\nI think this code is trying to ensure that all of the projects involved in a reenqueue are still valid and by short circuiting here we\u0027re potentially not checking for invalid projects that would require different processing below.",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f804f81_1ce47a16",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1699,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "Note this loop and array index may be affected by any changes made to address my comment above.",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3aea758b_5a9e765d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1990,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T18:58:15Z",
+      "side": 1,
+      "message": "This function call feels a bit odd to me. Pipelines operate on items. Items now have multiple changes. Instead of iterating and adding changes one by one for an item why not add them all at once to better reflect the relationship to a specific item?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
