@@ -50,6 +50,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "4692db0a_73b0cccd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:54:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2b2b5040_b6bc010c",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 8
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "69d8039e_3f428303",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 10
@@ -336,6 +360,30 @@
       "side": 1,
       "message": "Usually I grep for these but missed this.  This was a stand-in for the current model in this change.  Will fix.",
       "parentUuid": "07cc64c6_c7841ecf",
+      "range": {
+        "startLine": 337,
+        "startChar": 22,
+        "endLine": 337,
+        "endChar": 25
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea2fecdc_246d885e",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:54:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88f1a82a_e99b7cd3",
       "range": {
         "startLine": 337,
         "startChar": 22,
