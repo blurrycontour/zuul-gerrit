@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62eb678c_1608ee4e",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-02-08T16:18:00Z",
+      "side": 1,
+      "message": "It might be worth printing an error here, otherwise this can cause an obscure `TypeError: cannot unpack non-iterable NoneType object` error when the path is unknown.",
+      "revId": "8de1f98f021d55a36cc4461e7262395de5928cdc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4519ed14_643901ba",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-02-08T16:18:00Z",
+      "side": 1,
+      "message": "Perhaps this should provided by the environment to prevent leaking the password in the process list or the history. Better yet would be to read from the zuul.conf if possible.",
+      "revId": "8de1f98f021d55a36cc4461e7262395de5928cdc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95542d59_080f70eb",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-02-08T16:18:00Z",
+      "side": 1,
+      "message": "I think it would make sense to keep the same order as before, \u003chow to decrypt\u003e \u003cfile to decrypt\u003e",
+      "revId": "8de1f98f021d55a36cc4461e7262395de5928cdc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
