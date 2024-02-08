@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "312cbd69_b57a5b0e",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1192,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T22:49:55Z",
+      "side": 0,
+      "message": "Why do we stop verifying B\u0027s state? We test it with A when A gets a patchset but we don\u0027t report it until it it merges since only dependent queues use a singular item? I guess I\u0027m wondering why we don\u0027t want to check the independent behavior of having B enqueue a separate item (with A in it) and run those tests and report them alongside the actions for A.",
+      "revId": "4a7e86f7f66c429f67085cd9e9e16097cf6a2842",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0e20b590_101f55cf",
         "filename": "tests/unit/test_model_upgrade.py",
         "patchSetId": 10
