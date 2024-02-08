@@ -34,11 +34,13 @@ class TestComponentRegistry(ZuulTestCase):
             f"{component_name} in cache has {attr_name} set to {attr_value}",
         ):
             components = list(self.component_registry.all(component_name))
+            self.log.debug('JEB check match %s', components)
             if (
                 len(components) > 0 and
                 getattr(components[0], attr_name) == attr_value
             ):
                 break
+        self.log.debug('JEB matched')
 
     def assertComponentState(self, component_name, state, timeout=10):
         return self.assertComponentAttr(
@@ -50,8 +52,10 @@ class TestComponentRegistry(ZuulTestCase):
             timeout, f"{component_name} in cache is stopped"
         ):
             components = list(self.component_registry.all(component_name))
+            self.log.debug('JEB check stopped %s', components)
             if len(components) == 0:
                 break
+            self.log.debug('JEB stopped')
 
     def test_scheduler_component(self):
         self.assertComponentState("scheduler", BaseComponent.RUNNING)
