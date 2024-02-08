@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ca4b1ca_207ca7ab",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 468,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 0,
+      "message": "Yes and the behavior has likely changed.  We have tests of the desired behavior, and there is no upgrade path from where this test starts and this change, so this test is counter-productive now.\n\n(Keep in mind that essentially all model upgrades before this point are no longer necessary because we are clearing the state for this upgrade; a later change removes them all.)",
+      "parentUuid": "0e20b590_101f55cf",
+      "revId": "4a7e86f7f66c429f67085cd9e9e16097cf6a2842",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de815c8c_0855f01e",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-08T18:58:15Z",
       "side": 0,
       "message": "And this test is removed because deduplication has changed and the model api update is old enough that this is effectively dead code?",
+      "revId": "4a7e86f7f66c429f67085cd9e9e16097cf6a2842",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4db6b83_b85a6cc4",
+        "filename": "tests/unit/test_model_upgrade.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 735,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 0,
+      "message": "Yep.",
+      "parentUuid": "de815c8c_0855f01e",
       "revId": "4a7e86f7f66c429f67085cd9e9e16097cf6a2842",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }

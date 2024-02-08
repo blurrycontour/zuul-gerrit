@@ -24,6 +24,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b2b5040_b6bc010c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 1,
+      "message": "Yes",
+      "parentUuid": "42930898_cd173f4c",
+      "range": {
+        "startLine": 17,
+        "startChar": 0,
+        "endLine": 17,
+        "endChar": 8
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "69d8039e_3f428303",
@@ -58,6 +82,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48f4e591_61e681fa",
+        "filename": "tests/unit/test_tracing.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 1,
+      "message": "In theory it should, but this is sufficient to cover the data we currently send it.  If it were complete, it would be a rather more complex function I think.",
+      "parentUuid": "752f0d11_dd02afad",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "039b1100_41f3182d",
@@ -71,6 +113,30 @@
       "writtenOn": "2024-02-08T18:58:15Z",
       "side": 1,
       "message": "This option has been made redundant by the inclusion of ALL_REVISIONS below. Might be worth cleaning up to avoid confusion.\n\nThough looking at the diff in the next file we continue to refer to the current revision so maybe this isn\u0027t redundant and we need both to simplify our parsing of the data?",
+      "range": {
+        "startLine": 1354,
+        "startChar": 48,
+        "endLine": 1354,
+        "endChar": 67
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41e07e85_592760c4",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1354,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 1,
+      "message": "I believe they cause different attributes to be returned and current is not inclusive in all.",
+      "parentUuid": "039b1100_41f3182d",
       "range": {
         "startLine": 1354,
         "startChar": 48,
@@ -100,6 +166,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ae2ab6e7_4cca0e7f",
+        "filename": "zuul/driver/gerrit/gerritreporter.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 1,
+      "message": "I have used the \"other_X\" pattern somewhat consistently to mean \"there is a variable named X in this method but we\u0027re looping over another set of X\u0027s so the other X is other_X\".  I\u0027m open to other suggestions but I agree that a_change is not less confusing so I don\u0027t think we should use that; and I don\u0027t think we should make that change in this change since it would then be inconsistent with a lot of other instances.",
+      "parentUuid": "22599ee3_6ce738cb",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1d2b80ce_03bcb405",
         "filename": "zuul/executor/client.py",
         "patchSetId": 10
@@ -111,6 +195,24 @@
       "writtenOn": "2024-02-08T18:58:15Z",
       "side": 1,
       "message": "One downside to changes like this is we won\u0027t be able to easily grep for change numbers in the logs anymore. I\u0027m not sure I have a better solution as listing all changes in an item seems just as bad for logging.\n\nI guess we just need to clearly log where a change is added to an item so that we can then grep on the item ids (or event id).",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abb746fd_d7aa6d96",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 1,
+      "message": "The item repr/str includes the list of changes.  There should be no loss of grep functionality.",
+      "parentUuid": "1d2b80ce_03bcb405",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -134,6 +236,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e9ee6133_fbc741b8",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 1,
+      "message": "I expect it crashes, but in a different place.  :)\n\nAs you note, this is not a change from this change so I\u0027d rather keep it simple and just copy it over as-is.",
+      "parentUuid": "76f01ecb_b4c0b8ba",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ce2148ab_f9063540",
         "filename": "zuul/merger/client.py",
         "patchSetId": 10
@@ -145,6 +265,30 @@
       "writtenOn": "2024-02-08T18:58:15Z",
       "side": 1,
       "message": "Maybe we should align the terminology between the server and client? We use raw here but on the server side call it old format.",
+      "range": {
+        "startLine": 168,
+        "startChar": 23,
+        "endLine": 168,
+        "endChar": 26
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a730c9ea_49c2dc4b",
+        "filename": "zuul/merger/client.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 1,
+      "message": "Most of the time the only user of the merger is the pipeline processor.  But the drivers can call getFilesChanges and they supply data in a format that is even less like what the pipeline processor uses at this point.  So this method is designed to serve only them.\n\n(And really, I think it\u0027s just the git driver that does it.)",
+      "parentUuid": "ce2148ab_f9063540",
       "range": {
         "startLine": 168,
         "startChar": 23,
@@ -180,6 +324,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "88f1a82a_e99b7cd3",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 1,
+      "message": "Usually I grep for these but missed this.  This was a stand-in for the current model in this change.  Will fix.",
+      "parentUuid": "07cc64c6_c7841ecf",
+      "range": {
+        "startLine": 337,
+        "startChar": 22,
+        "endLine": 337,
+        "endChar": 25
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2def6058_75669d75",
         "filename": "zuul/scheduler.py",
         "patchSetId": 10
@@ -191,6 +359,24 @@
       "writtenOn": "2024-02-08T18:58:15Z",
       "side": 1,
       "message": "Should we be short circuiting here or should we return a list that can be appended to the list of new project below where `_reenqueueGetProject()` is called?\n\nI think this code is trying to ensure that all of the projects involved in a reenqueue are still valid and by short circuiting here we\u0027re potentially not checking for invalid projects that would require different processing below.",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d56aae5_66c5ce51",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1655,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 1,
+      "message": "All this method needs to do is find one project object associated with the change (keep in mind that an item\u0027s specific change is passed to this method, so we\u0027re not trying to work on all the changes in the item here).  Any single project object for that change will do.  The caller handles iterating over the changes within the items it\u0027s trying to re-enqueue.  This iteration is over items ahead in the case of a foreign project.  Anyway, long story short, I think the thing you\u0027re concerned about happens in the calling method.\n\nAlso, I\u0027m about 80% sure this code is impossible to reach at this point.",
+      "parentUuid": "2def6058_75669d75",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -225,6 +411,24 @@
       "writtenOn": "2024-02-08T18:58:15Z",
       "side": 1,
       "message": "This function call feels a bit odd to me. Pipelines operate on items. Items now have multiple changes. Instead of iterating and adding changes one by one for an item why not add them all at once to better reflect the relationship to a specific item?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56edb7ca_df5236f2",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1990,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-08T19:46:30Z",
+      "side": 1,
+      "message": "The addChange method still works one at a time, and it\u0027s probably not useful to change it since almost all of our events are for a single change.  What happens both in the case of a user uploading some changes to gerrit, as well as this case, which is a user promoting a change in a queue, is that we process the first one, it pulls in all the others as necessary, and then any subsequent changes in the cycle are just no-ops.\n\nThat is absolutely unavoidable in the typical gerrit case, so I don\u0027t think it would be that useful to do something different here in the promote case.\n\n(Now, on the other hand, we might want to start changing our tooling to operate on promoting/dequeing/etc items instead of changes, but it\u0027s not necessary now, so this change doesn\u0027t do it.)",
+      "parentUuid": "3aea758b_5a9e765d",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
