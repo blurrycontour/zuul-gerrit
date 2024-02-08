@@ -16,6 +16,23 @@
       "message": "Can\u0027t argue with that 😂",
       "revId": "eb42ce0677af422c3751cac63f0ad2633ed9b3db",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d67a7de7_0fc84890",
+        "filename": "tests/remote/test_remote_action_modules.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-08T16:24:57Z",
+      "side": 1,
+      "message": "In some number systems this could be interpreted at ansible version decimal 10. :)",
+      "revId": "eb42ce0677af422c3751cac63f0ad2633ed9b3db",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
