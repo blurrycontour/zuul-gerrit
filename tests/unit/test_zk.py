@@ -17,6 +17,7 @@ from collections import defaultdict
 import json
 import queue
 import threading
+import time
 import uuid
 from unittest import mock
 
@@ -316,11 +317,13 @@ class TestComponentRegistry(ZooKeeperBaseTestCase):
         ):
             components = list(self.second_component_registry.all(
                 component_name))
+            self.log.debug('JEB check match %s', components)
             if (
                 len(components) > 0 and
                 getattr(components[0], attr_name) == attr_value
             ):
                 break
+        self.log.debug('JEB matched')
 
     def assertComponentState(self, component_name, state, timeout=10):
         return self.assertComponentAttr(
@@ -333,10 +336,12 @@ class TestComponentRegistry(ZooKeeperBaseTestCase):
         ):
             components = list(self.second_component_registry.all(
                 component_name))
+            self.log.debug('JEB check stopped %s', components)
             if len(components) == 0:
                 break
+        self.log.debug('JEB stopped')
 
-    def test_component_registry(self):
+    def _test_component_registry(self):
         self.component_info = ExecutorComponent(self.zk_client, 'test')
         self.component_info.register()
         self.assertComponentState("executor", BaseComponent.STOPPED)
@@ -364,6 +369,18 @@ class TestComponentRegistry(ZooKeeperBaseTestCase):
 
         self.component_info.state = self.component_info.RUNNING
         self.assertComponentState("executor", BaseComponent.RUNNING)
+
+    def test_component_registry(self):
+        try:
+            self._test_component_registry()
+        except Exception:
+            start = time.time()
+            while time.time() - start < 10:
+                components = list(self.second_component_registry.all(
+                    'executor'))
+                self.log.debug('after failure %s', components)
+                time.sleep(1)
+            raise
 
 
 class TestExecutorApi(ZooKeeperBaseTestCase):
