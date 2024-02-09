@@ -16,6 +16,24 @@
       "message": "With this change, the retry_builds for a job are looked up by UUID (which makes sense since there can be multiple jobs with the same name in the same buildset now): https://review.opendev.org/c/zuul/zuul/+/906320/10/zuul/model.py#4750.\n\nI think we should also reflect this change in the MQTT payload. In the current state, the retry_builds are only a simple list, so we have no information to which job a retry_build belongs to. So far this wasn\u0027t a problem as we could assume that relation by the job_name, but this is no longer possible. Maybe we can change the retry_builds mapping to something like\n\n    message[\u0027buildset\u0027][\u0027retry_builds\u0027][\u003cbuild_uuid\u003e].append(...)\n\nOr provide the uuid of the related job within the `retry_build_information`.",
       "revId": "06a76c4971f3874a6d0d1cd4346e2fd243944bc7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3bb2eb3_aef84867",
+        "filename": "zuul/driver/mqtt/mqttreporter.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T15:40:19Z",
+      "side": 1,
+      "message": "Let\u0027s add the job.uuid to the retry_build_information.  That\u0027s most like the job.name that\u0027s there now and used for that purpose.",
+      "parentUuid": "37800802_01c56ecc",
+      "revId": "06a76c4971f3874a6d0d1cd4346e2fd243944bc7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
