@@ -91,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c0ad68fb_8a641680",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4454,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T18:30:19Z",
+      "side": 1,
+      "message": "Two different things going on here:\n\nAt the start of all this, BCA is a cycle enqueued as one item in the pipeline.  The order of a dependency cycle is undefined (unless there are git deps involved), and we arbitrarily end up with the BCA order of changes within that one item.\n\nLater, we sever the cycle, and the strict ordering between the same changes which are now no longer in a cycle is observed when we enqueue them into the pipeline.  So we end up with a bunch of changes correctly ordered, but invididually enqueued in the arbitrary order of however they ended up in the dependency cycle change list earlier.",
+      "parentUuid": "4c412eab_96e9d979",
+      "revId": "ca83980bb7c03e58f35763742bfcafd29b09f4cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "59141da8_a3583f7e",
         "filename": "tests/unit/test_circular_dependencies.py",
         "patchSetId": 6
