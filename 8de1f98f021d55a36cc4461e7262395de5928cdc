@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b6ec0b0_a25a4558",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 34620
+      },
+      "writtenOn": "2024-02-09T13:51:33Z",
+      "side": 1,
+      "message": "added",
+      "parentUuid": "62eb678c_1608ee4e",
+      "revId": "8de1f98f021d55a36cc4461e7262395de5928cdc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4519ed14_643901ba",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2744057_eb3f538b",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 34620
+      },
+      "writtenOn": "2024-02-09T13:51:33Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "4519ed14_643901ba",
+      "revId": "8de1f98f021d55a36cc4461e7262395de5928cdc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95542d59_080f70eb",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-02-08T16:18:00Z",
       "side": 1,
       "message": "I think it would make sense to keep the same order as before, \u003chow to decrypt\u003e \u003cfile to decrypt\u003e",
+      "revId": "8de1f98f021d55a36cc4461e7262395de5928cdc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e212bd8_d6b93b41",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 34620
+      },
+      "writtenOn": "2024-02-09T13:51:33Z",
+      "side": 1,
+      "message": "Check the new version of patch https://review.opendev.org/c/zuul/zuul/+/908507/3",
+      "parentUuid": "95542d59_080f70eb",
       "revId": "8de1f98f021d55a36cc4461e7262395de5928cdc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
