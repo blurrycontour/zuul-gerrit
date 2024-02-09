@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a20061ce_5fd75d15",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4171,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T17:37:21Z",
+      "side": 1,
+      "message": "I guess we insert new check runs at the front of the queue? I would\u0027ve expected [0] to be completed and [1] to be in progress if using an append.",
+      "revId": "ca83980bb7c03e58f35763742bfcafd29b09f4cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91f5d44e_319b1ac1",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4454,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T17:37:21Z",
+      "side": 1,
+      "message": "This might be related to my previous comment, but how do we end up with an order of `A,B ; A,B,C ; A` and not either `A ; A,B ; A,B,C` or `A,B,C ; A,B ; A` ? I know there is not git relationship between A B and C, but we emit the events in order A then B then C so I would expect A then AB then ABC (or reversed depending on queue representation order).",
+      "revId": "ca83980bb7c03e58f35763742bfcafd29b09f4cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59141da8_a3583f7e",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4470,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T17:37:21Z",
+      "side": 1,
+      "message": "This order makes sense as we\u0027ll enqueue BC after removing every other entry with B or C in it. Leaving A then BC.",
+      "revId": "ca83980bb7c03e58f35763742bfcafd29b09f4cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
