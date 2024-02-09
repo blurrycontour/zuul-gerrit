@@ -142,6 +142,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20b0525d_e5377c0d",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 872,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T01:15:06Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "949ababe_038e143e",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d86e400_33f0ab83",
@@ -191,6 +209,24 @@
       "side": 1,
       "message": "In the test above we previously checked B\u0027s approvals but now we do not. In this change we continue to check B\u0027s approvals. Otherwise they have a very similar structure. I guess I\u0027m just confused as to why we would remove\n\n```\nself.assertEqual(len(B.patchsets[-1][\"approvals\"]), 1)\nself.assertEqual(B.patchsets[-1][\"approvals\"][0][\"type\"], \"Verified\")\nself.assertEqual(B.patchsets[-1][\"approvals\"][0][\"value\"], \"1\")\n```\n\nfrom one test but keep it in the other.",
       "parentUuid": "e0875509_2b650905",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc7798a9_ddce02ce",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1281,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T01:15:06Z",
+      "side": 1,
+      "message": "Yep they can stay. I put them back.",
+      "parentUuid": "67208811_af775d31",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -309,6 +345,30 @@
       "side": 1,
       "message": "Ah yup confusion from the {} overloading. That said {} and None are still different. I\u0027m confused as to how the codepath where expected_cycle is None doesn\u0027t create a failure here.",
       "parentUuid": "35417352_7699294f",
+      "range": {
+        "startLine": 4628,
+        "startChar": 45,
+        "endLine": 4628,
+        "endChar": 50
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b5190a7_6337be0d",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 4628,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T01:15:06Z",
+      "side": 1,
+      "message": "Hah, you\u0027re right it\u0027s dead; the only use is in a skipped test that\u0027s removed in a followup.  I\u0027ve removed the None case since it doesn\u0027t make sense any more (a single change is a cycle of 1).",
+      "parentUuid": "be1418e1_833c7b2a",
       "range": {
         "startLine": 4628,
         "startChar": 45,
