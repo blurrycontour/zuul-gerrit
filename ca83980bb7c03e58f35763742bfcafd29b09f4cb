@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4c412eab_96e9d979",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4454,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T18:16:14Z",
+      "side": 1,
+      "message": "\u003e Then we do what this change does and add enqueue events for each of the component changes of the BCA item.  Since we do it in that order, we end up enqueing B first (which depends on A), so we get:\n\nBut we emit the event for A\u0027s update first, then B then C. I don\u0027t see where we have an order BCA after severing the cycle relationships.",
+      "parentUuid": "aa6ece07_c7a09250",
+      "revId": "ca83980bb7c03e58f35763742bfcafd29b09f4cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "59141da8_a3583f7e",
         "filename": "tests/unit/test_circular_dependencies.py",
         "patchSetId": 6
