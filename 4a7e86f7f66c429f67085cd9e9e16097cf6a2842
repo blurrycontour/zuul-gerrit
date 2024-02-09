@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ee02abe4_12ed59e9",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1192,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 0,
+      "message": "Independent pipelines with circular dependencies also get a single item with multiple changes.  That\u0027s reasonable because they aren\u0027t truly independent -- they do act as a unit, so testing and reporting them together makes sense.\n\nSo that\u0027s why we don\u0027t trigger again, but we do check the results on B, because it\u0027s being tested in the same item as A.",
+      "parentUuid": "312cbd69_b57a5b0e",
+      "revId": "4a7e86f7f66c429f67085cd9e9e16097cf6a2842",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0e20b590_101f55cf",
         "filename": "tests/unit/test_model_upgrade.py",
         "patchSetId": 10

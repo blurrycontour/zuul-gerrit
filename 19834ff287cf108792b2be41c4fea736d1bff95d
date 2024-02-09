@@ -108,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "724280e4_122a70ca",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 872,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Because the new reporting order doesn\u0027t match the old enqueue order.  It\u0027s not a substantial behavior change.\n\nOld:\n* change B is enqueued (because we trigger on A, and B is a dependency, so it ends up in the queue first)\n* change A is enqueued\n* change B reports but fails to merge\n* change A reports as merge failure\n\nYou can see that the particular result there is a happenstance of the enqueue order.  If we had put the trigger event on B, then the old behavior would have been:\n\n* change A is enqueued\n* change B is enqueued\n* change A reports and merges\n* change B reports and fails to merge\n\nAnd that is the behavior we get with the new system because we happen to add the changes to the item in A, B order.\n\nThe important part of this test is that the buildset reports merge_failure and we stop merging changes.  This exhibits the known behavior of not having two-phase commit.",
+      "parentUuid": "a2b48933_9b1676af",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7d86e400_33f0ab83",
         "filename": "tests/unit/test_circular_dependencies.py",
         "patchSetId": 10
@@ -119,6 +137,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "The behavior in this test seems to be at odds with what I thought was happening in the previous test above. Maybe the test above should keep the B result checks but remove the patchset created event?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0875509_2b650905",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1281,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "I think it does do that.  In this test and the one above, we enqueue a cycle and check the results of every change in that cycle.",
+      "parentUuid": "7d86e400_33f0ab83",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -142,6 +178,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e77ab466_8d64bd00",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2633,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "The tests with \"_check_\" are in the check pipeline, the ones without are gate.  We should have called those \"_gate_\" but they came first when there was no check deduplication...",
+      "parentUuid": "4e52e3a6_e7c19dfc",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b25ff661_b901fe20",
         "filename": "tests/unit/test_circular_dependencies.py",
         "patchSetId": 10
@@ -153,6 +207,30 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "Cycle is always going to have a type of dict due to line 4623. But expected_cycle may be None or a dict. I think the only way this passes is if the block on lines 4624-4625 is dead?",
+      "range": {
+        "startLine": 4628,
+        "startChar": 45,
+        "endLine": 4628,
+        "endChar": 50
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35417352_7699294f",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 4628,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "4623 creates a set.  I hate python went with that syntax because it looks like a dict.  Definitely not dead; there are uses.",
+      "parentUuid": "b25ff661_b901fe20",
       "range": {
         "startLine": 4628,
         "startChar": 45,
@@ -376,6 +454,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f5baece2_750b7c04",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Yeah, it seems to me it\u0027s either that or otherwise we introduce a loophole that escapes relative priority.  I think this is the best compromise and will behave in the as-fair-as-possible way we intend that to work.",
+      "parentUuid": "1c0d5302_da195f0e",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3bccf523_5e2e46bc",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 10
@@ -387,6 +483,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "Why would we get a merge failure here? Is it possible when we report and some changes in the cycle are mergeable but not all of them (including the abandoned change?).",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c726368_ce69fbdd",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "I think it would be a pathological case.  Like someone configured a dequeue reporter to submit in gerrit.  It shouldn\u0027t really happen, but it\u0027s better to keep the pattern we use elsewhere and handle the exception since it could be configured to do so.  In other words, it\u0027s insane, but not an error.",
+      "parentUuid": "3bccf523_5e2e46bc",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -410,6 +524,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8e6240dc_d15b3335",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "I think that case would be if we have a cycle B\u003c-\u003eC but B has a git dependency on A.  In that case, B.git_needs_changes\u003d[A], but A is not in the cycle.  We don\u0027t want to include it because it will be ahead in the queue.\n\nBut if A\u003c-\u003eB\u003c-\u003eC\u003c-\u003eA were a cycle, and A was still a git dependency of B, then B.git_needs_changes\u003d[A] but A is in the cycle.  In that case we want to make sure that A comes first since it won\u0027t be ahead in the queue.",
+      "parentUuid": "e0984e3f_ec910953",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8e7369eb_3a0312f3",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 10
@@ -421,6 +553,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "We\u0027ll send a supercede event for each change in the item\u0027s change list. I guess we can\u0027t safely avoid sending a bunch of redundant supercede lists without a lot of extra work? In particular superceding often operates on changes to a specific project branch. I\u0027m wondering what happens if we have a circular dep between a bunch of changes for a single project branch. Will they all do a bunch of work to supercede each other which results in reenqueing themselves due to the loop?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00d0ded5_4bfd0785",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 944,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "This is for pipeline supercedes.  So imagine you have A,B,C in a cycle in check.  Then you enqueue A into gate (which also enqueues B,C, so you now have item A,B,C in gate).  That sends 3 supercedes events as you note.  The first one will dequeue the item, the next two will noop.\n\nWith supercedes it\u0027s hard to imagine that the cycle would be different in a different pipeline, but I still think this is the most provably correct behavior and I don\u0027t think the extra work is going to kill us.  I don\u0027t think we end up in a loop because we\u0027re superceding a different pipeline.  If you supercede the same pipeline, you could probably cause a loop today.",
+      "parentUuid": "8e7369eb_3a0312f3",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -444,6 +594,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b10fad7f_b3840ad6",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1538,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "It\u0027s not going to hurt to issue a cat job on projects that aren\u0027t in the tenant; they should get ignored by the configloader.",
+      "parentUuid": "ece898bf_cf0581b2",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4b8fc454_56ce432a",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 10
@@ -455,6 +623,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "Should we preserve quiet_dequeue here? Otherwise we\u0027ll be noisy about dequeuing something that is reenqueued?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12df54ce_5326f213",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1676,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "This is the correct behavior now: we do report the dequeue event for this item even in the case where we re-enqueue.  We need to do that in order for things like the github checks api (and gerrit too, RIP) to close out their internal state for the old queue item.  This was an error before, but masked by a bug in testing.  The bug is fixed and so is this now.\n\n(We probably could have fixed that in a separate change, but the issue didn\u0027t appear to me until well into development of this change, and was difficult to untangle.)",
+      "parentUuid": "4b8fc454_56ce432a",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -478,6 +664,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bcdfc86b_76b238d0",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1938,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Yes.  And logically we should do that in this change.  But I already have the removal of this staged in a followup, so maybe we could wave this one through?",
+      "parentUuid": "b7ede655_26782232",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1e789252_0175f05e",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 10
@@ -489,6 +693,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "This block may be dead code now. We start off with phase2 being True then when we flip it to false we immediately flip it back to true again before reaching this point.",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ab02dcd_289a1bb1",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2132,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "If changes_merge \u003d is_cycle \u003d succeeded \u003d already_reported \u003d True\n\nThen we hit this code.  I\u0027m not sure if it\u0027s realistically possible, but it\u0027s theoretically possible.",
+      "parentUuid": "1e789252_0175f05e",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -512,6 +734,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9f8c33a6_b9874e27",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2213,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "It\u0027s enough that any project is in the pipeline.  This is mostly to avoid doing things like reporting merge failures on changes in projects that don\u0027t use Zuul (are just in the config for required-projects).  It\u0027s hard to imagine how changes in those projects could unintentionally end up in a circular dependency.",
+      "parentUuid": "a2b6801a_b11ca76a",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "15f44e4a_0295f913",
         "filename": "zuul/manager/dependent.py",
         "patchSetId": 10
@@ -523,6 +763,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "Elsewhere I mentioned concern around projects not sharing queues and how that might affect priority. Looking at this block for dependent pipelines at least this is an error? That addresses my concern I think other than maybe we should enforce that error on independent pipelines in order to catch it early? Though queues matter less there.",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6fd8602_6a14dfd1",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "That might be a good change.  I think we could make it standalone; it\u0027s at least not a regression.",
+      "parentUuid": "15f44e4a_0295f913",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -544,6 +802,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "45ab3234_acecb182",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Yep.  The needed changes are strictly that; a flat set of changes that are required before we know whether it\u0027s a cycle (or what other changes those changes may need).",
+      "parentUuid": "bca1ec21_b3c2acfa",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8cb4ee3_f9967de0",
@@ -557,6 +833,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "Should we store the return value of \n\n```\nchange.getNeedsChanges(self.useDependenciesByTopic(change.project))\n```\n\nSo that we don\u0027t have to immediately recall the function and pass it to resolveChangeReferences below?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4af00f4b_a139290f",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8cb4ee3_f9967de0",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -773,6 +1067,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1db72893_d15eb4f0",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2333,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Yeah, I think we\u0027re doing this with two classes now.  But let\u0027s not in this change.",
+      "parentUuid": "8ffa61e7_df8a3bb1",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dceb4552_f43b1667",
@@ -786,6 +1098,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "We don\u0027t need to explicitly deserialize this data because the super().deserialize below will json.loads() them properly?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac2b9f83_1cdef882",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2423,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Correct.",
+      "parentUuid": "dceb4552_f43b1667",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -809,6 +1139,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a799e38e_97dfd89b",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2603,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "If they\u0027re using cycles with deduplication, they are already probably dealing with the fact that the artifact is associated with one arbitrary change of the cycle.\n\nHowever, I think there is an error here.  Instead of using the first change of the item, we should use the actual triggering change for that particular build.\n\nI\u0027ll make that change, and then I think the resulting behavior will be sufficiently similar to the current state (whether using dedup or not) not to warrant a release note.",
+      "parentUuid": "7a7b1a56_1f613340",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "44dff39a_facc1249",
         "filename": "zuul/model.py",
         "patchSetId": 10
@@ -820,6 +1168,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "Removed only seems to be used here. Can we drop it?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05de4254_4743f9f7",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 3769,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44dff39a_facc1249",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -837,6 +1203,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "Elsewhere I commented about the confusion/blurring between cycle dependencies and pipeline queue dependencies. I think data structures like this may be contributing to that since we seem to flatten the lot here.\n\nI\u0027m not sure I have any good ideas on how to make that better but want to call it out in case others have better ideas than I do.",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b9bf372_7ffa641f",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 4703,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e7f97255_dcb841d8",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -860,6 +1244,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bd5de823_6b552a6d",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 5284,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "I think it\u0027s mostly about the different output format.  I\u0027m definitely not attached to the names.",
+      "parentUuid": "4ae633cb_3c5279df",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e71990d4_db46b8f4",
         "filename": "zuul/model.py",
         "patchSetId": 10
@@ -871,6 +1273,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "Previously there was an equality check between item.change and self.change. Is any overlap acceptable (in that case the intersection is fine). If not do we need to check that one side is a subset of the other? I guess the idea is if a change is in a cycle in an item it can only be in that one item so any overlap is sufficient?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9934faa2_39dd494f",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 5391,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "I think overlap is fine but we could switch to equality here to be more conservative.",
+      "parentUuid": "e71990d4_db46b8f4",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -888,6 +1308,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "This was renamed because the job doesn\u0027t become frozen until the very end of this function?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ecaf467e_47cb94c4",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 8223,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Yep.  It got a lot more confusing to me for some reason.  :)",
+      "parentUuid": "2f020c03_da023950",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -915,6 +1353,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65ee171b_64a24248",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 8347,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e16df44_e5340f41",
+      "range": {
+        "startLine": 8347,
+        "startChar": 63,
+        "endLine": 8347,
+        "endChar": 69
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "baa42c05_9202bcd9",
@@ -932,6 +1394,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b2be2a0_677ca109",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 8372,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "baa42c05_9202bcd9",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb730d31_c48672a7",
@@ -945,6 +1425,24 @@
       "writtenOn": "2024-02-08T22:49:55Z",
       "side": 1,
       "message": "We aren\u0027t doing a true copy and instead simply refering to it by reference. I don\u0027t think this will create issues with memory leaks, but since the comment above says copy it makes me wonder if we need a true copy to avoid modification races or conflicts?",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5074977_c1ee42f6",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 8387,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T00:11:08Z",
+      "side": 1,
+      "message": "Storing the reference is sufficient.  The layout may get __del__\u0027d but we\u0027ll keep this dict around.  It\u0027s a dict of scalars so shouldn\u0027t cause leaks.\n\n(Also, this isn\u0027t a change, just a code move).",
+      "parentUuid": "bb730d31_c48672a7",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
