@@ -16,6 +16,24 @@
       "message": "Why not keep the function and call it here? We would need to return a true false boolean to know if jobs are ready to run but that would be a simpler change to review and keeps functions generally smaller.",
       "revId": "1053323edf7f811657fca7c1ca146a0521fb74ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7963175_5312eb5c",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5404,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T18:24:57Z",
+      "side": 1,
+      "message": "I don\u0027t object to that, or perhaps a different refactor, but I\u0027m trying to put things back the way they were before I890407df822035d52ead3516942fd95e3633094b.  This is how this method has looked for most of the past several years.",
+      "parentUuid": "8ee86b9f_12dc0947",
+      "revId": "1053323edf7f811657fca7c1ca146a0521fb74ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "It isn\u0027t clear to me why this code and the block below are removed in this change. This change deals with determining if builds are ready to run not with how we process them onBuildCompleted().\n\nIt seems like this code might still be useful because we can have an item with a new buildset (due to cycle changes or a gate reset) and old jobs may continue to complete (due to cancellation) after the new buildset has started up?",
       "revId": "fa274fcf25c46ffd0acd006ca25d74a4ee77750b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5510264d_d2879f7b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1921,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T18:24:57Z",
+      "side": 0,
+      "message": "I should have explained that better in the commit message.  This code was introduced in change I890407df822035d52ead3516942fd95e3633094b which added job deduplication by linking builds across items.  So this particular check was to make sure that we didn\u0027t do something to a different item.  You are correct about us still being able to receive events from trailing jobs, but we handle the new buildset on the same item case already elsewhere.\n\nHowever, in order to completely revert this, we do need to keep using the current build\u0027s (potentially old) buildset in line 1927 below.  I\u0027ve made that change in a new PS.",
+      "parentUuid": "c8c068f9_b898720b",
+      "revId": "fa274fcf25c46ffd0acd006ca25d74a4ee77750b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
