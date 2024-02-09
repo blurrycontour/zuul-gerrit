@@ -107,6 +107,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "afdb279e_d93db817",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4454,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T18:38:46Z",
+      "side": 1,
+      "message": "Got it. The order is a side effect of iterating over the changes in cycle order in order to reenqueue them after the severing. This is subtle and really probably only makes a difference in testing, but I wanted to make sure I understood the behavior as it was unexpected to me.",
+      "parentUuid": "c0ad68fb_8a641680",
+      "revId": "ca83980bb7c03e58f35763742bfcafd29b09f4cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59141da8_a3583f7e",
