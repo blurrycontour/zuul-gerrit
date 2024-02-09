@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "880125e6_79f30e2c",
+        "filename": "web/src/containers/status/ItemPanel.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T16:18:23Z",
+      "side": 1,
+      "message": "Nit this should now be ref since we\u0027re getting refs not changes.",
+      "range": {
+        "startLine": 418,
+        "startChar": 32,
+        "endLine": 418,
+        "endChar": 38
+      },
+      "revId": "1cc276687a86bb9ea759b3a20d5c3762f065a990",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
