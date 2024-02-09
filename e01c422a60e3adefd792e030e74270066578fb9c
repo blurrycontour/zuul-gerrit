@@ -16,6 +16,24 @@
       "message": "This is inspired by the `escape_like` function found in sqlalchemy_utils [1].\nBut I think it might need some more attention, as e.g. characters that are already escaped will get escaped again, which might unescape them.\n\n[1] https://github.com/kvesteri/sqlalchemy-utils/blob/master/sqlalchemy_utils/functions/database.py#L14",
       "revId": "e01c422a60e3adefd792e030e74270066578fb9c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2d0135b_a8552d95",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-02-09T07:47:20Z",
+      "side": 1,
+      "message": "Patchset 4 addresses this issue",
+      "parentUuid": "87cdbc7a_5edcdffc",
+      "revId": "e01c422a60e3adefd792e030e74270066578fb9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
