@@ -34,6 +34,24 @@
       "parentUuid": "c8c068f9_b898720b",
       "revId": "fa274fcf25c46ffd0acd006ca25d74a4ee77750b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35d37a58_654bca3c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1921,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T18:46:36Z",
+      "side": 0,
+      "message": "Ok that makes sense. The change to selection of the buildset for the cleanup actions below also makes more sense. The only question is whether or not the subsequent actions are all safe against old buildsets. I think they are as we\u0027ll effectively cause additional builds in the old buildset to cleanup in response to this one being cleaned up. And we want the old buildset to be cleaned up.\n\nThe old code before the refactor work started can be found on the old side of this diff: https://review.opendev.org/c/zuul/zuul/+/840244/2/zuul/manager/__init__.py and it didn\u0027t do special case processing there.",
+      "parentUuid": "5510264d_d2879f7b",
+      "revId": "fa274fcf25c46ffd0acd006ca25d74a4ee77750b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
