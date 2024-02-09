@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2238a384_165ccced",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-02-09T07:48:42Z",
+      "side": 1,
+      "message": "Trying out this stack I found the following problem:\n```\n2024-02-09 07:42:43,023 ERROR zuul.Pipeline.tenant.check: [e: ...] Exception while reporting\nTraceback (most recent call last):\n  File \"/opt/zuul/lib/python3.11/site-packages/zuul/manager/__init__.py\", line 398, in sendReport\n    for r in ret:\nTypeError: \u0027NoneType\u0027 object is not iterable\n```",
+      "revId": "00c5c766a4c423474691a5d4ee295e544260bd7e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
