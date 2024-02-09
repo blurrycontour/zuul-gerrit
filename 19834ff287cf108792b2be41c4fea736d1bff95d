@@ -126,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "949ababe_038e143e",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 872,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "I see so this is a side effect of the merges not actually being atomic?",
+      "parentUuid": "724280e4_122a70ca",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7d86e400_33f0ab83",
         "filename": "tests/unit/test_circular_dependencies.py",
         "patchSetId": 10
@@ -161,6 +179,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "67208811_af775d31",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1281,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "In the test above we previously checked B\u0027s approvals but now we do not. In this change we continue to check B\u0027s approvals. Otherwise they have a very similar structure. I guess I\u0027m just confused as to why we would remove\n\n```\nself.assertEqual(len(B.patchsets[-1][\"approvals\"]), 1)\nself.assertEqual(B.patchsets[-1][\"approvals\"][0][\"type\"], \"Verified\")\nself.assertEqual(B.patchsets[-1][\"approvals\"][0][\"value\"], \"1\")\n```\n\nfrom one test but keep it in the other.",
+      "parentUuid": "e0875509_2b650905",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4e52e3a6_e7c19dfc",
         "filename": "tests/unit/test_circular_dependencies.py",
         "patchSetId": 10
@@ -190,6 +226,24 @@
       "side": 1,
       "message": "The tests with \"_check_\" are in the check pipeline, the ones without are gate.  We should have called those \"_gate_\" but they came first when there was no check deduplication...",
       "parentUuid": "4e52e3a6_e7c19dfc",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a5b2634_c2bd4a18",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2633,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e77ab466_8d64bd00",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -231,6 +285,30 @@
       "side": 1,
       "message": "4623 creates a set.  I hate python went with that syntax because it looks like a dict.  Definitely not dead; there are uses.",
       "parentUuid": "b25ff661_b901fe20",
+      "range": {
+        "startLine": 4628,
+        "startChar": 45,
+        "endLine": 4628,
+        "endChar": 50
+      },
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be1418e1_833c7b2a",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 4628,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Ah yup confusion from the {} overloading. That said {} and None are still different. I\u0027m confused as to how the codepath where expected_cycle is None doesn\u0027t create a failure here.",
+      "parentUuid": "35417352_7699294f",
       "range": {
         "startLine": 4628,
         "startChar": 45,
@@ -470,6 +548,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbd28ac2_64dcda77",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f5baece2_750b7c04",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bccf523_5e2e46bc",
@@ -501,6 +597,24 @@
       "side": 1,
       "message": "I think it would be a pathological case.  Like someone configured a dequeue reporter to submit in gerrit.  It shouldn\u0027t really happen, but it\u0027s better to keep the pattern we use elsewhere and handle the exception since it could be configured to do so.  In other words, it\u0027s insane, but not an error.",
       "parentUuid": "3bccf523_5e2e46bc",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8edba922_54982be6",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7c726368_ce69fbdd",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -540,6 +654,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a598b9c_3f683223",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8e6240dc_d15b3335",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e7369eb_3a0312f3",
@@ -571,6 +703,24 @@
       "side": 1,
       "message": "This is for pipeline supercedes.  So imagine you have A,B,C in a cycle in check.  Then you enqueue A into gate (which also enqueues B,C, so you now have item A,B,C in gate).  That sends 3 supercedes events as you note.  The first one will dequeue the item, the next two will noop.\n\nWith supercedes it\u0027s hard to imagine that the cycle would be different in a different pipeline, but I still think this is the most provably correct behavior and I don\u0027t think the extra work is going to kill us.  I don\u0027t think we end up in a loop because we\u0027re superceding a different pipeline.  If you supercede the same pipeline, you could probably cause a loop today.",
       "parentUuid": "8e7369eb_3a0312f3",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "acbbe902_8493f961",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 944,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "00d0ded5_4bfd0785",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -610,6 +760,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bf26f55_7f91aa79",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1538,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b10fad7f_b3840ad6",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b8fc454_56ce432a",
@@ -641,6 +809,24 @@
       "side": 1,
       "message": "This is the correct behavior now: we do report the dequeue event for this item even in the case where we re-enqueue.  We need to do that in order for things like the github checks api (and gerrit too, RIP) to close out their internal state for the old queue item.  This was an error before, but masked by a bug in testing.  The bug is fixed and so is this now.\n\n(We probably could have fixed that in a separate change, but the issue didn\u0027t appear to me until well into development of this change, and was difficult to untangle.)",
       "parentUuid": "4b8fc454_56ce432a",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bcd596c_e8da3ecf",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1676,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "12df54ce_5326f213",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -680,6 +866,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25446b21_29038a98",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 1938,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "bcdfc86b_76b238d0",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1e789252_0175f05e",
@@ -711,6 +915,24 @@
       "side": 1,
       "message": "If changes_merge \u003d is_cycle \u003d succeeded \u003d already_reported \u003d True\n\nThen we hit this code.  I\u0027m not sure if it\u0027s realistically possible, but it\u0027s theoretically possible.",
       "parentUuid": "1e789252_0175f05e",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11b427d4_97cbde7e",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2132,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0ab02dcd_289a1bb1",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -750,6 +972,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e1a9103_a6c2dc84",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 2213,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9f8c33a6_b9874e27",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "15f44e4a_0295f913",
@@ -781,6 +1021,24 @@
       "side": 1,
       "message": "That might be a good change.  I think we could make it standalone; it\u0027s at least not a regression.",
       "parentUuid": "15f44e4a_0295f913",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09020b5f_da2c53be",
+        "filename": "zuul/manager/dependent.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a6fd8602_6a14dfd1",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -1260,6 +1518,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e35ddef6_c0bad374",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 5284,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "bd5de823_6b552a6d",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e71990d4_db46b8f4",
@@ -1326,6 +1602,24 @@
       "side": 1,
       "message": "Yep.  It got a lot more confusing to me for some reason.  :)",
       "parentUuid": "2f020c03_da023950",
+      "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb3b7f9d_ba862f17",
+        "filename": "zuul/model.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 8223,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T00:34:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ecaf467e_47cb94c4",
       "revId": "19834ff287cf108792b2be41c4fea736d1bff95d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
