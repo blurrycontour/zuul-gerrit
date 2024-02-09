@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ee86b9f_12dc0947",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 5404,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T18:10:21Z",
+      "side": 1,
+      "message": "Why not keep the function and call it here? We would need to return a true false boolean to know if jobs are ready to run but that would be a simpler change to review and keeps functions generally smaller.",
+      "revId": "1053323edf7f811657fca7c1ca146a0521fb74ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8c068f9_b898720b",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1921,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-09T18:10:21Z",
+      "side": 0,
+      "message": "It isn\u0027t clear to me why this code and the block below are removed in this change. This change deals with determining if builds are ready to run not with how we process them onBuildCompleted().\n\nIt seems like this code might still be useful because we can have an item with a new buildset (due to cycle changes or a gate reset) and old jobs may continue to complete (due to cancellation) after the new buildset has started up?",
+      "revId": "fa274fcf25c46ffd0acd006ca25d74a4ee77750b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
