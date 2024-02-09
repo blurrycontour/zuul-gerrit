@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6cdbc87_5351d133",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4171,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T18:09:59Z",
+      "side": 1,
+      "message": "Yep. https://opendev.org/zuul/zuul/src/branch/master/tests/fakegithub.py#L187-L189",
+      "parentUuid": "a20061ce_5fd75d15",
+      "revId": "ca83980bb7c03e58f35763742bfcafd29b09f4cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91f5d44e_319b1ac1",
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aa6ece07_c7a09250",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4454,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T18:09:59Z",
+      "side": 1,
+      "message": "If you go up a few lines to where we have a queue state of: ABC,E (where ABC is a cycle).  We write the cycle as ABC in the test, but due to the quirks of how the cycle is enqueued, the change list for the queue item is actually BCA.\n\nSo after we sever the cycle, we dequeue BCA, then also dequeue E because E still depends on C.  This leaves us with an empty pipeline.\n\nThen we do what this change does and add enqueue events for each of the component changes of the BCA item.  Since we do it in that order, we end up enqueing B first (which depends on A), so we get:\n\nA,B\n\nThen we enqueue C, which depends on B, so we get:\n\nA,B ; A,B,C\n\nThen we enqueue A which has no deps leaving us with:\n\nA,B ; A,B,C ; A\n\ntl;dr we don\u0027t care about the cycle item change order in the test assertions and it doesn\u0027t match the actual order.  But the result is the same.",
+      "parentUuid": "91f5d44e_319b1ac1",
+      "revId": "ca83980bb7c03e58f35763742bfcafd29b09f4cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "59141da8_a3583f7e",
         "filename": "tests/unit/test_circular_dependencies.py",
         "patchSetId": 6
@@ -48,6 +84,24 @@
       "writtenOn": "2024-02-09T17:37:21Z",
       "side": 1,
       "message": "This order makes sense as we\u0027ll enqueue BC after removing every other entry with B or C in it. Leaving A then BC.",
+      "revId": "ca83980bb7c03e58f35763742bfcafd29b09f4cb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "537c13b4_32c717c8",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 4470,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-09T18:09:59Z",
+      "side": 1,
+      "message": "And there\u0027s no cycles at play in the previous dequeue so there\u0027s no unexpected ordering.",
+      "parentUuid": "59141da8_a3583f7e",
       "revId": "ca83980bb7c03e58f35763742bfcafd29b09f4cb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
