@@ -176,9 +176,9 @@ class TestWeb(BaseTestWeb):
                     for item in head:
                         self.assertIn(
                             'review.example.com/org/project',
-                            item['changes'][0]['project_canonical'])
+                            item['refs'][0]['project_canonical'])
                         self.assertTrue(item['active'])
-                        change = item['changes'][0]
+                        change = item['refs'][0]
                         self.assertIn(change['id'], ('1,1', '2,1', '3,1'))
                         for job in item['jobs']:
                             status_jobs.append(job)
@@ -335,12 +335,12 @@ class TestWeb(BaseTestWeb):
         data = self.get_url("api/tenant/tenant-one/status/change/1,1").json()
 
         self.assertEqual(1, len(data), data)
-        self.assertEqual("org/project", data[0]['changes'][0]['project'])
+        self.assertEqual("org/project", data[0]['refs'][0]['project'])
 
         data = self.get_url("api/tenant/tenant-one/status/change/2,1").json()
 
         self.assertEqual(1, len(data), data)
-        self.assertEqual("org/project1", data[0]['changes'][0]['project'],
+        self.assertEqual("org/project1", data[0]['refs'][0]['project'],
                          data)
 
     @simple_layout('layouts/nodeset-alternatives.yaml')
