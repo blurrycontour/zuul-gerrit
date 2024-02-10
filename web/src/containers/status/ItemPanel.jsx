@@ -1,4 +1,5 @@
 // Copyright 2018 Red Hat, Inc
+// Copyright 2024 Acme Gating, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -20,11 +21,15 @@ import * as moment from 'moment'
 import 'moment-duration-format'
 import { Button } from '@patternfly/react-core'
 
+function getChanges(item) {
+  // For backwards compat: get a list of this items changes.
+  return 'changes' in item ? item.changes : [item]
+}
 
-class ChangePanel extends React.Component {
+class ItemPanel extends React.Component {
   static propTypes = {
     globalExpanded: PropTypes.bool.isRequired,
-    change: PropTypes.object.isRequired,
+    item: PropTypes.object.isRequired,
     tenant: PropTypes.object,
     preferences: PropTypes.object
   }
@@ -175,12 +180,12 @@ class ChangePanel extends React.Component {
     }
     return (
       <React.Fragment>
-        <small title='Remaining Time' className='time' style={{display: 'inline'}}>
-          {remainingTime}
-        </small>
-        <br />
         <small title='Elapsed Time' className='time' style={{display: 'inline'}}>
           {this.enqueueTime(change.enqueue_time)}
+        </small>
+        <small> | </small>
+        <small title='Remaining Time' className='time' style={{display: 'inline'}}>
+          {remainingTime}
         </small>
       </React.Fragment>
     )
@@ -347,12 +352,12 @@ class ChangePanel extends React.Component {
     )
   }
 
-  calculateTimes (change) {
+  calculateTimes (item) {
     let maxRemaining = 0
     let jobs = {}
     const now = Date.now()
 
-    for (const job of change.jobs) {
+    for (const job of item.jobs) {
       let jobElapsed = null
       let jobRemaining = null
       if (job.start_time) {
@@ -378,7 +383,7 @@ class ChangePanel extends React.Component {
     }
     // If not all the jobs have started, this will be null, so only
     // use our value if it's oky to calculate it.
-    if (change.remaininging_time === null) {
+    if (item.remaininging_time === null) {
       maxRemaining = null
     }
     return {
@@ -389,36 +394,40 @@ class ChangePanel extends React.Component {
 
   render () {
     const { expanded } = this.state
-    const { change, globalExpanded } = this.props
+    const { item, globalExpanded } = this.props
     let expand = globalExpanded
     if (this.clicked) {
       expand = expanded
     }
-    const times = this.calculateTimes(change)
+    const times = this.calculateTimes(item)
     const header = (
       <div className={`panel panel-default ${this.props.preferences.darkMode ? 'zuul-change-dark' : 'zuul-change'}`}>
         <div className={`panel-heading ${this.props.preferences.darkMode ? 'zuul-patchset-header-dark' : 'zuul-patchset-header'}`}
           onClick={this.onClick}>
-          <div className='row'>
-            <div className='col-xs-8'>
-              <span className='change_project'>{change.project}</span>
+          <div>
+            {item.live === true ? (
               <div className='row'>
-                <div className='col-xs-4'>
-                  {this.renderChangeLink(change)}
+                <div className='col-xs-6'>
+                  {this.renderProgressBar(item)}
                 </div>
-                <div className='col-xs-8'>
-                  {this.renderProgressBar(change)}
+                <div className='col-xs-6 text-right'>
+                  {this.renderTimer(item, times)}
                 </div>
-              </div>
-            </div>
-            {change.live === true ? (
-              <div className='col-xs-4 text-right'>
-                {this.renderTimer(change, times)}
               </div>
             ) : ''}
+            {getChanges(item).map((change, idx) => (
+              <div key={idx} className='row'>
+                <div className='col-xs-8'>
+                  <span className='change_project'>{change.project}</span>
+                </div>
+                <div className='col-xs-4 text-right'>
+                  {this.renderChangeLink(change)}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-        {expand ? this.renderJobList(change.jobs, times) : ''}
+        {expand ? this.renderJobList(item.jobs, times) : ''}
       </div >
     )
     return (
@@ -432,4 +441,4 @@ class ChangePanel extends React.Component {
 export default connect(state => ({
   tenant: state.tenant,
   preferences: state.preferences,
-}))(ChangePanel)
+}))(ItemPanel)
