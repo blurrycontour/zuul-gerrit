@@ -173,13 +173,14 @@ class TestWeb(BaseTestWeb):
                 # information is missing.
                 self.assertIsNone(q['branch'])
                 for head in q['heads']:
-                    for change in head:
+                    for item in head:
                         self.assertIn(
                             'review.example.com/org/project',
-                            change['project_canonical'])
-                        self.assertTrue(change['active'])
+                            item['changes'][0]['project_canonical'])
+                        self.assertTrue(item['active'])
+                        change = item['changes'][0]
                         self.assertIn(change['id'], ('1,1', '2,1', '3,1'))
-                        for job in change['jobs']:
+                        for job in item['jobs']:
                             status_jobs.append(job)
         self.assertEqual('project-merge', status_jobs[0]['name'])
         # TODO(mordred) pull uuids from self.builds
@@ -334,12 +335,13 @@ class TestWeb(BaseTestWeb):
         data = self.get_url("api/tenant/tenant-one/status/change/1,1").json()
 
         self.assertEqual(1, len(data), data)
-        self.assertEqual("org/project", data[0]['project'])
+        self.assertEqual("org/project", data[0]['changes'][0]['project'])
 
         data = self.get_url("api/tenant/tenant-one/status/change/2,1").json()
 
         self.assertEqual(1, len(data), data)
-        self.assertEqual("org/project1", data[0]['project'], data)
+        self.assertEqual("org/project1", data[0]['changes'][0]['project'],
+                         data)
 
     @simple_layout('layouts/nodeset-alternatives.yaml')
     def test_web_find_job_nodeset_alternatives(self):
@@ -1966,7 +1968,10 @@ class TestBuildInfo(BaseTestWeb):
 
         buildsets = self.get_url("api/tenant/tenant-one/buildsets").json()
         self.assertEqual(2, len(buildsets))
-        project_bs = [x for x in buildsets if x["project"] == "org/project"][0]
+        project_bs = [
+            x for x in buildsets
+            if x["refs"][0]["project"] == "org/project"
+        ][0]
 
         buildset = self.get_url(
             "api/tenant/tenant-one/buildset/%s" % project_bs['uuid']).json()
@@ -2070,7 +2075,10 @@ class TestArtifacts(BaseTestWeb, AnsibleZuulTestCase):
         self.waitUntilSettled()
 
         buildsets = self.get_url("api/tenant/tenant-one/buildsets").json()
-        project_bs = [x for x in buildsets if x["project"] == "org/project"][0]
+        project_bs = [
+            x for x in buildsets
+            if x["refs"][0]["project"] == "org/project"
+        ][0]
         buildset = self.get_url(
             "api/tenant/tenant-one/buildset/%s" % project_bs['uuid']).json()
         self.assertEqual(3, len(buildset["builds"]))
@@ -2672,7 +2680,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         items = tenant.layout.pipelines['gate'].getAllItems()
         enqueue_times = {}
         for item in items:
-            enqueue_times[str(item.change)] = item.enqueue_time
+            enqueue_times[str(item.changes[0])] = item.enqueue_time
 
         # REST API
         args = {'pipeline': 'gate',
@@ -2699,7 +2707,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         items = tenant.layout.pipelines['gate'].getAllItems()
         for item in items:
             self.assertEqual(
-                enqueue_times[str(item.change)], item.enqueue_time)
+                enqueue_times[str(item.changes[0])], item.enqueue_time)
 
         self.waitUntilSettled()
         self.executor_server.release('.*-merge')
@@ -2761,7 +2769,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         items = tenant.layout.pipelines['gate'].getAllItems()
         enqueue_times = {}
         for item in items:
-            enqueue_times[str(item.change)] = item.enqueue_time
+            enqueue_times[str(item.changes[0])] = item.enqueue_time
 
         # REST API
         args = {'pipeline': 'gate',
@@ -2788,7 +2796,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         items = tenant.layout.pipelines['gate'].getAllItems()
         for item in items:
             self.assertEqual(
-                enqueue_times[str(item.change)], item.enqueue_time)
+                enqueue_times[str(item.changes[0])], item.enqueue_time)
 
         self.waitUntilSettled()
         self.executor_server.release('.*-merge')
@@ -2853,7 +2861,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  if i.live]
         enqueue_times = {}
         for item in items:
-            enqueue_times[str(item.change)] = item.enqueue_time
+            enqueue_times[str(item.changes[0])] = item.enqueue_time
 
         # REST API
         args = {'pipeline': 'check',
@@ -2882,12 +2890,12 @@ class TestTenantScopedWebApi(BaseTestWeb):
                  if i.live]
         for item in items:
             self.assertEqual(
-                enqueue_times[str(item.change)], item.enqueue_time)
+                enqueue_times[str(item.changes[0])], item.enqueue_time)
 
         # We can't reliably test for side effects in the check
         # pipeline since the change queues are independent, so we
         # directly examine the queues.
-        queue_items = [(item.change.number, item.live) for item in
+        queue_items = [(item.changes[0].number, item.live) for item in
                        tenant.layout.pipelines['check'].getAllItems()]
         expected = [('1', False),
                     ('2', True),
@@ -3555,7 +3563,7 @@ class TestCLIViaWebApi(BaseTestWeb):
         items = tenant.layout.pipelines['gate'].getAllItems()
         enqueue_times = {}
         for item in items:
-            enqueue_times[str(item.change)] = item.enqueue_time
+            enqueue_times[str(item.changes[0])] = item.enqueue_time
 
         # Promote B and C using the cli
         authz = {'iss': 'zuul_operator',
@@ -3581,7 +3589,7 @@ class TestCLIViaWebApi(BaseTestWeb):
         items = tenant.layout.pipelines['gate'].getAllItems()
         for item in items:
             self.assertEqual(
-                enqueue_times[str(item.change)], item.enqueue_time)
+                enqueue_times[str(item.changes[0])], item.enqueue_time)
 
         self.waitUntilSettled()
         self.executor_server.release('.*-merge')

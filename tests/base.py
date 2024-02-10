@@ -881,32 +881,32 @@ class FakeGerritChange(object):
                 if 'approved' not in label:
                     label['approved'] = app['by']
         revisions = {}
-        rev = self.patchsets[-1]
-        num = len(self.patchsets)
-        files = {}
-        for f in rev['files']:
-            if f['file'] == '/COMMIT_MSG':
-                continue
-            files[f['file']] = {"status": f['type'][0]}  # ADDED -> A
-        parent = '0000000000000000000000000000000000000000'
-        if self.depends_on_change:
-            parent = self.depends_on_change.patchsets[
-                self.depends_on_patchset - 1]['revision']
-        revisions[rev['revision']] = {
-            "kind": "REWORK",
-            "_number": num,
-            "created": rev['createdOn'],
-            "uploader": rev['uploader'],
-            "ref": rev['ref'],
-            "commit": {
-                "subject": self.subject,
-                "message": self.data['commitMessage'],
-                "parents": [{
-                    "commit": parent,
-                }]
-            },
-            "files": files
-        }
+        for i, rev in enumerate(self.patchsets):
+            num = i + 1
+            files = {}
+            for f in rev['files']:
+                if f['file'] == '/COMMIT_MSG':
+                    continue
+                files[f['file']] = {"status": f['type'][0]}  # ADDED -> A
+            parent = '0000000000000000000000000000000000000000'
+            if self.depends_on_change:
+                parent = self.depends_on_change.patchsets[
+                    self.depends_on_patchset - 1]['revision']
+            revisions[rev['revision']] = {
+                "kind": "REWORK",
+                "_number": num,
+                "created": rev['createdOn'],
+                "uploader": rev['uploader'],
+                "ref": rev['ref'],
+                "commit": {
+                    "subject": self.subject,
+                    "message": self.data['commitMessage'],
+                    "parents": [{
+                        "commit": parent,
+                    }]
+                },
+                "files": files
+            }
         data = {
             "id": self.project + '~' + self.branch + '~' + self.data['id'],
             "project": self.project,
@@ -1462,13 +1462,14 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         }
         return event
 
-    def review(self, item, message, submit, labels, checks_api, file_comments,
-               phase1, phase2, zuul_event_id=None):
+    def review(self, item, change, message, submit, labels,
+               checks_api, file_comments, phase1, phase2,
+               zuul_event_id=None):
         if self.web_server:
             return super(FakeGerritConnection, self).review(
-                item, message, submit, labels, checks_api, file_comments,
-                phase1, phase2, zuul_event_id)
-        self._test_handle_review(int(item.change.number), message, submit,
+                item, change, message, submit, labels, checks_api,
+                file_comments, phase1, phase2, zuul_event_id)
+        self._test_handle_review(int(change.number), message, submit,
                                  labels, phase1, phase2)
 
     def _test_get_submitted_together(self, change):
@@ -3577,9 +3578,11 @@ class TestingExecutorApi(HoldableExecutorApi):
             self._test_build_request_job_map = {}
         if build_request.uuid in self._test_build_request_job_map:
             return self._test_build_request_job_map[build_request.uuid]
-        job_name = build_request.job_name
+
+        params = self.getParams(build_request)
+        job_name = params['zuul']['job']
         self._test_build_request_job_map[build_request.uuid] = job_name
-        return build_request.job_name
+        return job_name
 
     def release(self, what=None):
         """

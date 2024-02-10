@@ -1107,7 +1107,7 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(queue), 1)
         self.assertEqual(queue[0].zone, None)
         params = self.executor_server.executor_api.getParams(queue[0])
-        self.assertEqual(queue[0].job_name, 'project-merge')
+        self.assertEqual(params['zuul']['job'], 'project-merge')
         self.assertEqual(params['items'][0]['number'], '%d' % A.number)
 
         self.executor_api.release('.*-merge')
@@ -1121,12 +1121,14 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(len(self.builds), 0)
         self.assertEqual(len(queue), 6)
 
-        self.assertEqual(queue[0].job_name, 'project-test1')
-        self.assertEqual(queue[1].job_name, 'project-test2')
-        self.assertEqual(queue[2].job_name, 'project-test1')
-        self.assertEqual(queue[3].job_name, 'project-test2')
-        self.assertEqual(queue[4].job_name, 'project-test1')
-        self.assertEqual(queue[5].job_name, 'project-test2')
+        params = [self.executor_server.executor_api.getParams(x)
+                  for x in queue]
+        self.assertEqual(params[0]['zuul']['job'], 'project-test1')
+        self.assertEqual(params[1]['zuul']['job'], 'project-test2')
+        self.assertEqual(params[2]['zuul']['job'], 'project-test1')
+        self.assertEqual(params[3]['zuul']['job'], 'project-test2')
+        self.assertEqual(params[4]['zuul']['job'], 'project-test1')
+        self.assertEqual(params[5]['zuul']['job'], 'project-test2')
 
         self.executor_api.release(queue[0])
         self.waitUntilSettled()
@@ -2935,16 +2937,16 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 3)
 
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '1')
+        self.assertEqual(items[0].changes[0].number, '1')
+        self.assertEqual(items[0].changes[0].patchset, '1')
         self.assertFalse(items[0].live)
 
-        self.assertEqual(items[1].change.number, '2')
-        self.assertEqual(items[1].change.patchset, '1')
+        self.assertEqual(items[1].changes[0].number, '2')
+        self.assertEqual(items[1].changes[0].patchset, '1')
         self.assertTrue(items[1].live)
 
-        self.assertEqual(items[2].change.number, '1')
-        self.assertEqual(items[2].change.patchset, '1')
+        self.assertEqual(items[2].changes[0].number, '1')
+        self.assertEqual(items[2].changes[0].patchset, '1')
         self.assertTrue(items[2].live)
 
         # Add a new patchset to A
@@ -2957,16 +2959,16 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 3)
 
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '1')
+        self.assertEqual(items[0].changes[0].number, '1')
+        self.assertEqual(items[0].changes[0].patchset, '1')
         self.assertFalse(items[0].live)
 
-        self.assertEqual(items[1].change.number, '2')
-        self.assertEqual(items[1].change.patchset, '1')
+        self.assertEqual(items[1].changes[0].number, '2')
+        self.assertEqual(items[1].changes[0].patchset, '1')
         self.assertTrue(items[1].live)
 
-        self.assertEqual(items[2].change.number, '1')
-        self.assertEqual(items[2].change.patchset, '2')
+        self.assertEqual(items[2].changes[0].number, '1')
+        self.assertEqual(items[2].changes[0].patchset, '2')
         self.assertTrue(items[2].live)
 
         # Add a new patchset to B
@@ -2979,16 +2981,16 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 3)
 
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '2')
+        self.assertEqual(items[0].changes[0].number, '1')
+        self.assertEqual(items[0].changes[0].patchset, '2')
         self.assertTrue(items[0].live)
 
-        self.assertEqual(items[1].change.number, '1')
-        self.assertEqual(items[1].change.patchset, '1')
+        self.assertEqual(items[1].changes[0].number, '1')
+        self.assertEqual(items[1].changes[0].patchset, '1')
         self.assertFalse(items[1].live)
 
-        self.assertEqual(items[2].change.number, '2')
-        self.assertEqual(items[2].change.patchset, '2')
+        self.assertEqual(items[2].changes[0].number, '2')
+        self.assertEqual(items[2].changes[0].patchset, '2')
         self.assertTrue(items[2].live)
 
         self.builds[0].release()
@@ -3055,13 +3057,13 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 3)
 
-        self.assertEqual(items[0].change.number, '1')
+        self.assertEqual(items[0].changes[0].number, '1')
         self.assertFalse(items[0].live)
 
-        self.assertEqual(items[1].change.number, '2')
+        self.assertEqual(items[1].changes[0].number, '2')
         self.assertTrue(items[1].live)
 
-        self.assertEqual(items[2].change.number, '1')
+        self.assertEqual(items[2].changes[0].number, '1')
         self.assertTrue(items[2].live)
 
         # Abandon A
@@ -3073,10 +3075,10 @@ class TestScheduler(ZuulTestCase):
         items = check_pipeline.getAllItems()
         self.assertEqual(len(items), 2)
 
-        self.assertEqual(items[0].change.number, '1')
+        self.assertEqual(items[0].changes[0].number, '1')
         self.assertFalse(items[0].live)
 
-        self.assertEqual(items[1].change.number, '2')
+        self.assertEqual(items[1].changes[0].number, '2')
         self.assertTrue(items[1].live)
 
         self.executor_server.hold_jobs_in_build = False
@@ -4589,8 +4591,9 @@ class TestScheduler(ZuulTestCase):
 
         first = pipeline_status['change_queues'][0]['heads'][0][0]
         second = pipeline_status['change_queues'][1]['heads'][0][0]
-        self.assertIn(first['ref'], ['refs/heads/master', 'refs/heads/stable'])
-        self.assertIn(second['ref'],
+        self.assertIn(first['changes'][0]['ref'],
+                      ['refs/heads/master', 'refs/heads/stable'])
+        self.assertIn(second['changes'][0]['ref'],
                       ['refs/heads/master', 'refs/heads/stable'])
 
         self.executor_server.hold_jobs_in_build = False
@@ -5799,7 +5802,6 @@ For CI problems and help debugging, contact ci@example.org"""
         build_set = items[0].current_build_set
         job = list(filter(lambda j: j.name == 'project-test1',
                           items[0].getJobs()))[0]
-        build_set.job_graph.getJobFromName(job)
 
         for x in range(3):
             # We should have x+1 retried builds for project-test1
@@ -8311,8 +8313,8 @@ class TestSemaphore(ZuulTestCase):
             1)
 
         items = check_pipeline.getAllItems()
-        self.assertEqual(items[0].change.number, '1')
-        self.assertEqual(items[0].change.patchset, '2')
+        self.assertEqual(items[0].changes[0].number, '1')
+        self.assertEqual(items[0].changes[0].patchset, '2')
         self.assertTrue(items[0].live)
 
         self.executor_server.hold_jobs_in_build = False
@@ -8389,7 +8391,8 @@ class TestSemaphore(ZuulTestCase):
         # Save some variables for later use while the job is running
         check_pipeline = tenant.layout.pipelines['check']
         item = check_pipeline.getAllItems()[0]
-        job = item.getJob('semaphore-one-test1')
+        job = list(filter(lambda j: j.name == 'semaphore-one-test1',
+                          item.getJobs()))[0]
 
         tenant.semaphore_handler.cleanupLeaks()
 
