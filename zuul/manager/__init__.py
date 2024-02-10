@@ -28,7 +28,7 @@ from zuul.lib.tarjan import strongly_connected_components
 import zuul.lib.tracing as tracing
 from zuul.model import (
     Change, PipelineState, PipelineChangeList, QueueItem,
-    filter_severity
+    filter_severity, EnqueueEvent
 )
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.exceptions import LockException
@@ -445,23 +445,29 @@ class PipelineManager(metaclass=ABCMeta):
         return None
 
     def findOldVersionOfChangeAlreadyInQueue(self, change):
+        # Return the item and the old version of the change
         for item in self.pipeline.getAllItems():
             if not item.live:
                 continue
             for item_change in item.changes:
                 if change.isUpdateOf(item_change):
-                    return item
-        return None
+                    return item, item_change
+        return None, None
 
     def removeOldVersionsOfChange(self, change, event):
         if not self.pipeline.dequeue_on_new_patchset:
             return
-        old_item = self.findOldVersionOfChangeAlreadyInQueue(change)
+        old_item, old_change = self.findOldVersionOfChangeAlreadyInQueue(
+            change)
         if old_item:
             log = get_annotated_logger(self.log, event)
             log.debug("Change %s is a new version, removing %s",
                       change, old_item)
             self.removeItem(old_item)
+            if old_item.live:
+                changes = old_item.changes[:]
+                changes.remove(old_change)
+                self.reEnqueueChanges(old_item, changes)
 
     def removeAbandonedChange(self, change, event):
         log = get_annotated_logger(self.log, event)
@@ -481,44 +487,16 @@ class PipelineManager(metaclass=ABCMeta):
                             pass
                     self.removeItem(item)
 
-    def reEnqueueIfDepsPresent(self, item, needs_changes, log,
-                               skip_presence_check=True):
-        # This item is about to be dequeued because it's missing
-        # changes.  Try to re-enqueue it before dequeing.
-        # Return whether the dequeue should be quiet.
-        if not item.live:
-            return False
-        if not all(self.isChangeAlreadyInPipeline(c) for c in needs_changes):
-            return False
-        # We enqueue only the first change in the item, presuming
-        # that the remaining changes will be pulled in as
-        # appropriate.  Because we skip the presence check, we
-        # can't enqueue all of the items changes directly since we
-        # would end up with new items for every change.  We only
-        # want one new item.
-        change = item.changes[0]
-        # Check if there is another live item with the change already.
-        for other_item in self.pipeline.getAllItems():
-            if other_item is item:
-                continue
-            if not other_item.live:
-                continue
-            for item_change in other_item.changes:
-                if item_change.equals(change):
-                    return True
-        # Try enqueue, if that succeeds, keep this dequeue quiet
-        try:
-            log.info("Attempting re-enqueue of %s", item)
-            return self.addChange(
-                change, item.event,
-                enqueue_time=item.enqueue_time,
-                quiet=True,
-                skip_presence_check=skip_presence_check)
-        except Exception:
-            log.exception("Unable to re-enqueue %s "
-                          "which is missing dependencies",
-                          item)
-            return False
+    def reEnqueueChanges(self, item, changes):
+        for change in changes:
+            event = EnqueueEvent(self.pipeline.tenant.name,
+                                 self.pipeline.name,
+                                 change.project.canonical_hostname,
+                                 change.project.name,
+                                 change=change._id())
+            event.zuul_event_id = item.event.zuul_event_id
+            self.sched.pipeline_management_events[
+                self.pipeline.tenant.name][self.pipeline.name].put(event)
 
     @abstractmethod
     def getChangeQueue(self, change, event, existing=None):
@@ -1644,6 +1622,20 @@ class PipelineManager(metaclass=ABCMeta):
         dependency_graph = collections.OrderedDict()
         self.getDependencyGraph(item.changes[0], dependency_graph, item.event,
                                 quiet=True)
+
+        # Verify that the cycle dependency graph is correct
+        cycle = self.cycleForChange(
+            item.changes[0], dependency_graph, item.event, debug=False)
+        cycle = cycle or [item.changes[0]]
+        item_cycle = set(item.changes)
+        if set(cycle) != item_cycle:
+            log.info("Item cycle has changed: %s, now: %s, was: %s", item,
+                     set(cycle), item_cycle)
+            self.removeItem(item)
+            if item.live:
+                self.reEnqueueChanges(item, item.changes)
+            return (True, nnfi)
+
         abort, needs_changes = self.getMissingNeededChanges(
             item.changes, change_queue, item.event,
             dependency_graph=dependency_graph)
@@ -1652,7 +1644,6 @@ class PipelineManager(metaclass=ABCMeta):
             log.info("Dequeuing %s because "
                      "it can no longer merge" % item)
             self.cancelJobs(item)
-            quiet_dequeue = False
             if not meets_reqs:
                 item.setDequeuedMissingRequirements()
             else:
@@ -1662,33 +1653,12 @@ class PipelineManager(metaclass=ABCMeta):
                 else:
                     msg = f'Change {clist} is needed.'
                 item.setDequeuedNeedingChange(msg)
-                # If all the dependencies are already in the pipeline
-                # (but not ahead of this change), then we probably
-                # just added updated versions of them, possibly
-                # updating a cycle.  In that case, attempt to
-                # re-enqueue this change with the updated deps.
-                quiet_dequeue = self.reEnqueueIfDepsPresent(
-                    item, needs_changes, log)
-            if item.live and not quiet_dequeue:
+            if item.live:
                 try:
                     self.reportItem(item)
                 except exceptions.MergeFailure:
                     pass
             self.dequeueItem(item)
-            return (True, nnfi)
-
-        # Safety check: verify that the cycle dependency graph is correct
-        cycle = self.cycleForChange(
-            item.changes[0], dependency_graph, item.event, debug=False)
-        cycle = cycle or [item.changes[0]]
-        item_cycle = set(item.changes)
-        if (item.live and set(cycle) != item_cycle):
-            log.info("Item cycle has changed: %s, now: %s, was: %s", item,
-                     set(cycle), item_cycle)
-            self.removeItem(item)
-            if item.live:
-                self.reEnqueueIfDepsPresent(item, needs_changes, log,
-                                            skip_presence_check=False)
             return (True, nnfi)
 
         actionable = change_queue.isActionable(item)
