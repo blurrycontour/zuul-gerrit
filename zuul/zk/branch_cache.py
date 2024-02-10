@@ -20,7 +20,6 @@ import json
 
 from zuul.zk.zkobject import ZKContext, ShardedZKObject
 from zuul.zk.locks import SessionAwareReadLock, SessionAwareWriteLock, locked
-from zuul.zk.components import COMPONENT_REGISTRY
 from zuul import model
 
 from kazoo.exceptions import NoNodeError
@@ -75,15 +74,9 @@ class BranchCacheZKObject(ShardedZKObject):
         data = {
             "protected": self.protected,
             "remainder": self.remainder,
+            "merge_modes": self.merge_modes,
+            "default_branch": self.default_branch,
         }
-        # This is mostly here to enable unit tests of upgrades, it's
-        # safe to move into the dict above at any time.
-        if (COMPONENT_REGISTRY.model_api >= 11):
-            data["merge_modes"] = self.merge_modes
-        # This is mostly here to enable unit tests of upgrades, it's
-        # safe to move into the dict above at any time.
-        if (COMPONENT_REGISTRY.model_api >= 16):
-            data["default_branch"] = self.default_branch
         return json.dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context):
