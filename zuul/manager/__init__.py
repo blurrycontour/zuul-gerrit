@@ -1602,7 +1602,6 @@ class PipelineManager(metaclass=ABCMeta):
             self.scheduleGlobalRepoState(item)
         if build_set.repo_state_state == build_set.PENDING:
             return False
-        item.updateJobParentData()
 
         return True
 
@@ -1911,20 +1910,9 @@ class PipelineManager(metaclass=ABCMeta):
                      build, item)
             return
 
-        item = build.build_set.item
-        # We don't care about some actions below if this build
-        # isn't in the current buildset, so determine that before
-        # it is potentially removed with setResult.
-        if build not in item.current_build_set.getBuilds():
-            current = False
-        else:
-            current = True
         item.setResult(build)
         log.debug("Item %s status is now:\n %s", item, item.formatStatus())
-
-        if not current:
-            return
-        build_set = item.current_build_set
+        build_set = build.build_set
 
         if build.retry:
             if build_set.getJobNodeSetInfo(build.job):
