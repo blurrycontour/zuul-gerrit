@@ -27,7 +27,7 @@ pyjwt>=2.0.0
 iso8601
 psutil
 google-re2>=1.1
-paho-mqtt
+paho-mqtt<2.0.0
 cherrypy
 ws4py
 routes
