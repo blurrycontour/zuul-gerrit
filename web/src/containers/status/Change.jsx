@@ -269,8 +269,14 @@ class Change extends React.Component {
           className = ' zuul-change-row-line'
         }
       }
+      let lineStyle = {}
+      if (i === change._tree_index ||
+          change._tree_branches.indexOf(i) !== -1) {
+        // Icon or line image: leave a gap
+        lineStyle = {backgroundPositionY: '15px'}
+      }
       row.push(
-        <td key={i} className={'zuul-change-row' + className}>
+        <td key={i} className={'zuul-change-row' + className} style={lineStyle}>
           {i === change._tree_index ? this.renderStatusIcon(change) : ''}
           {change._tree_branches.indexOf(i) !== -1 ? (
             this.renderLineImg(change, i)) : ''}
