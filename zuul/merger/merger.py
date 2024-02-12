@@ -74,7 +74,8 @@ class Repo(object):
 
     def __init__(self, remote, local, email, username, speed_limit, speed_time,
                  sshkey=None, cache_path=None, logger=None, git_timeout=300,
-                 zuul_event_id=None, retry_timeout=None, skip_refs=False):
+                 zuul_event_id=None, retry_timeout=None, skip_refs=False,
+                 clone_filter=None):
         if logger is None:
             self.log = logging.getLogger("zuul.Repo")
         else:
@@ -99,6 +100,7 @@ class Repo(object):
         self.username = username
         self.cache_path = cache_path
         self._initialized = False
+        self.clone_filter = clone_filter
         try:
             self._setup_known_hosts()
         except Exception:
@@ -244,11 +246,19 @@ class Repo(object):
             kwargs.update(dict(
                 no_checkout=True,
             ))
+        if self.clone_filter:
+            kwargs.update(dict(
+                filter=self.clone_filter,
+            ))
         for attempt in range(1, self.retry_attempts + 1):
             try:
                 with timeout_handler(self.local_path):
+                    start = time.time()
                     mygit.clone(git.cmd.Git.polish_url(url), self.local_path,
                                 **kwargs)
+                    finish = time.time()
+                    log.debug("Cloned %s in %.3f seconds",
+                              self.local_path, (finish - start))
                 break
             except Exception:
                 if attempt < self.retry_attempts:
@@ -923,7 +933,7 @@ class Merger(object):
     def __init__(self, working_root, connections, zk_client, email,
                  username, speed_limit, speed_time, cache_root=None,
                  logger=None, execution_context=False, git_timeout=300,
-                 scheme=None, cache_scheme=None):
+                 scheme=None, cache_scheme=None, clone_filter=None):
         self.logger = logger
         if logger is None:
             self.log = logging.getLogger("zuul.Merger")
@@ -942,6 +952,7 @@ class Merger(object):
         self.cache_root = cache_root
         self.scheme = scheme or zuul.model.SCHEME_UNIQUE
         self.cache_scheme = cache_scheme or zuul.model.SCHEME_UNIQUE
+        self.clone_filter = clone_filter
         # Flag to determine if the merger is used for preparing repositories
         # for job execution. This flag can be used to enable executor specific
         # behavior e.g. to keep the 'origin' remote intact.
@@ -996,7 +1007,8 @@ class Merger(object):
                 self.speed_time, sshkey=sshkey, cache_path=cache_path,
                 logger=self.logger, git_timeout=self.git_timeout,
                 zuul_event_id=zuul_event_id, retry_timeout=retry_timeout,
-                skip_refs=self.execution_context)
+                skip_refs=self.execution_context,
+                clone_filter=self.clone_filter)
 
             self.repos[key] = repo
         except Exception:

@@ -377,6 +377,16 @@ The following section of ``zuul.conf`` is used by the merger:
 
 .. attr:: merger
 
+   .. attr:: clone_filter
+      :default: None
+
+      Filtering options to use when cloning repositories. See git's `filter spec documentation
+      <https://git-scm.com/docs/git-rev-list#Documentation/git-rev-list.txt---filterltfilter-specgt>`_
+      for details on what options are available.
+
+      Using options `blob:none` (*blobless clones*) or `tree:0` (*treeless clones*) may improve Zuul's
+      cloning speed, especially if dealing with large and/or old repositories - for example monorepos.
+
    .. attr:: command_socket
       :default: /var/lib/zuul/merger.socket
 
