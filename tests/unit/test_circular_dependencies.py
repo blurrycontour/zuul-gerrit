@@ -3514,6 +3514,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/deps-by-topic.yaml')
     def test_deps_by_topic_git_needs(self):
+        self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
                                            topic='test-topic')
         B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
@@ -3530,6 +3531,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
         self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
         self.waitUntilSettled()
 
         self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
@@ -3578,6 +3581,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/deps-by-topic.yaml')
     def test_deps_by_topic_git_needs_outdated_patchset(self):
+        self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
                                            topic='test-topic')
         B = self.fake_gerrit.addFakeChange('org/project1', "master", "B",
@@ -3598,6 +3602,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(2))
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
         self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(2))
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
         self.waitUntilSettled()
 
         # This used to run jobs with some very unlikely changes
