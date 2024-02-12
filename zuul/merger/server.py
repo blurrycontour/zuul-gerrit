@@ -91,7 +91,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         self.merge_root = get_default(config, component, 'git_dir',
                                       '/var/lib/zuul/{}-git'.format(component))
-
+        self.clone_filter = get_default(config, merger, 'clone_filter')
         self.config = config
 
         self.tracing = tracing.Tracing(self.config)
@@ -141,6 +141,7 @@ class BaseMergeServer(metaclass=ABCMeta):
             git_timeout=self.git_timeout,
             scheme=scheme,
             cache_scheme=cache_scheme,
+            clone_filter=self.clone_filter,
         )
 
     def _repoLock(self, connection_name, project_name):
