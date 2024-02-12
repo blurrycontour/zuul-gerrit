@@ -16,6 +16,23 @@
       "message": "LGTM did a manual test too with a job built preview site.",
       "revId": "a4b539408573b3ce964c68b98cf209848692478e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36829bcc_2c98958b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-12T19:21:44Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "a4b539408573b3ce964c68b98cf209848692478e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
