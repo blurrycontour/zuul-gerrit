@@ -1,5 +1,13 @@
 - queue:
     name: zuul
+    # We don't really want to use circular dependencies in the Zuul
+    # project (for our interactions with other projects, we prefer to
+    # be able to do stepwise upgrades to support continuous
+    # deployment).  However, this is enable to allow Zuul developers
+    # to observe circular dependencies in a live environment via test
+    # changes that are not intended to be merged (or otherwise have no
+    # impact on our upgrade and continuous deployment processes).
+    allow-circular-dependencies: true
 
 - nodeset:
     name: zuul-functional-temp-master
