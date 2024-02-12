@@ -51,8 +51,13 @@ function getRefs(buildset) {
   return 'refs' in buildset ? buildset.refs : [buildset]
 }
 
+function getRef(buildset) {
+  return 'refs' in buildset ? buildset.refs[0] : buildset
+}
+
 function Buildset({ buildset, timezone, tenant, user, preferences }) {
   const [isGanttChartModalOpen, setIsGanttChartModalOpen] = useState(false)
+  const ref = getRef(buildset)
 
   function renderBuildTimes() {
     const firstStartBuild = buildset.builds.reduce((prev, cur) =>
@@ -181,9 +186,9 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
 
   function enqueueConfirm() {
     setShowEnqueueModal(false)
-    if (buildset.change === null) {
-      enqueue_ref(tenant.apiPrefix, buildset.project, buildset.pipeline,
-                  buildset.ref, buildset.oldrev, buildset.newrev)
+    if (ref.change === null) {
+      enqueue_ref(tenant.apiPrefix, ref.project, buildset.pipeline,
+                  ref.ref, ref.oldrev, ref.newrev)
         .then(() => {
           dispatch(addNotification(
             {
@@ -197,12 +202,12 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
           dispatch(addApiError(error))
         })
     } else {
-      const changeId = buildset.change + ',' + buildset.patchset
-      enqueue(tenant.apiPrefix, buildset.project, buildset.pipeline, changeId)
+      const changeId = ref.change + ',' + ref.patchset
+      enqueue(tenant.apiPrefix, ref.project, ref.pipeline, changeId)
         .then(() => {
           dispatch(addNotification(
             {
-              text: 'Change queued successfully.',
+              text: 'Change enqueued successfully.',
               type: 'success',
               status: '',
               url: '',
@@ -215,10 +220,10 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
   }
 
   function renderEnqueueModal() {
-    let changeId = buildset.change ? buildset.change + ',' + buildset.patchset : buildset.newrev
+    let changeId = ref.change ? ref.change + ',' + ref.patchset : ref.newrev
     let changeInfo = changeId
       ? <>for change <strong>{changeId}</strong></>
-      : <>for ref <strong>{buildset.ref}</strong></>
+      : <>for ref <strong>{ref.ref}</strong></>
     const title = 'You are about to re-enqueue a change'
     return (
       <Modal
@@ -231,7 +236,7 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
           <Button key="deq_confirm" variant="primary" onClick={enqueueConfirm}>Confirm</Button>,
           <Button key="deq_cancel" variant="link" onClick={() => { setShowEnqueueModal(false) }}>Cancel</Button>,
         ]}>
-        <p>Please confirm that you want to re-enqueue <strong>all jobs</strong> {changeInfo} on project <strong>{buildset.project}</strong> on pipeline <strong>{buildset.pipeline}</strong>.</p>
+        <p>Please confirm that you want to re-enqueue <strong>all jobs</strong> {changeInfo} on project <strong>{ref.project}</strong> on pipeline <strong>{buildset.pipeline}</strong>.</p>
       </Modal>
     )
   }
