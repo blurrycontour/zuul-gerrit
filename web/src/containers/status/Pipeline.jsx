@@ -66,6 +66,11 @@ const PIPELINE_ICONS = {
 
 const DEFAULT_PIPELINE_ICON = PIPELINE_ICONS['unknown']
 
+function getRefs(item) {
+  // Backwards compat
+  return 'refs' in item ? item.refs : [item]
+}
+
 class Pipeline extends React.Component {
   static propTypes = {
     expanded: PropTypes.bool.isRequired,
@@ -138,15 +143,17 @@ class Pipeline extends React.Component {
   filterQueue(queue, filter) {
     let found = false
     let filters = filter.replace(/ +/g, ',').split(',')
-    queue.heads.forEach(changes => {
-      changes.forEach(change => {
-        filters.forEach(changeFilter => {
-          if (changeFilter && (
-            (change.project && change.project.indexOf(changeFilter) !== -1) ||
-            (change.id && change.id.indexOf(changeFilter) !== -1))) {
-            found = true
-            return
-          }
+    queue.heads.forEach(itemList => {
+      itemList.forEach(item => {
+        getRefs(item).forEach(ref => {
+          filters.forEach(changeFilter => {
+            if (changeFilter && (
+              (ref.project && ref.project.indexOf(changeFilter) !== -1) ||
+                (ref.id && ref.id.indexOf(changeFilter) !== -1))) {
+              found = true
+              return
+            }
+          })
         })
         if (found) {
           return
