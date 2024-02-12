@@ -1,8 +1,10 @@
 Configuring Keycloak Authentication
 ===================================
 
-This document explains how to configure Zuul and Keycloak in order to enable
-authentication in Zuul with Keycloak.
+This document explains how to configure Zuul and Keycloak in order to
+enable authentication in Zuul with Keycloak. It's written with Keycloak 23
+in mind, but should probably work for other versions with only minor
+adjustments.
 
 Prerequisites
 -------------
@@ -28,14 +30,28 @@ Create a client
 Choose the realm ``my_realm``, then click ``clients`` in the Configure panel.
 Click ``Create``.
 
-Name your client as you please. We will pick ``zuul`` for this example. Make sure
-to fill the following fields:
+Give your client whatever ID you please; we will pick ``zuul`` for this
+example. Also this example assumes your Zuul WebUI is served from a host
+referred to as zuul.example.org in DNS. Make sure to fill the following fields:
 
-* Client Protocol: ``openid-connect``
-* Access Type: ``public``
-* Implicit Flow Enabled: ``ON``
-* Valid Redirect URIs: ``https://zuul/*``
-* Web Origins: ``https://zuul/``
+* General settings (page 1):
+
+  * Client type: ``OpenID Connect`` (default)
+  * Client ID: ``zuul`` (or whatever else you want)
+
+* Capability config (page 2):
+
+  * Client authentication: ``Off`` (default)
+  * Authentication flow:
+
+    * Standard flow: ``On`` (default)
+    * Direct access grants: ``On`` (default)
+    * Implicit flow: ``On``
+
+* Login settings (page 3):
+
+  * Valid redirect URIs: ``https://zuul.example.org/*``
+  * Web origins: ``https://zuul.example.org`` (no trailing ``/`` here)
 
 Click "Save" when done.
 
@@ -52,39 +68,31 @@ Click ``Create``.
 Name your scope as you please. We will name it ``zuul_aud`` for this example.
 Make sure you fill the following fields:
 
-* Protocol: ``openid-connect``
-* Include in Token Scope: ``ON``
+* Name: ``zuul_aud``
+* Protocol: ``OpenID Connect`` (default)
+* Include in Token Scope: ``On`` (default)
 
 Click "Save" when done.
 
 On the Client Scopes page, click on ``zuul_aud`` to configure it; click on
-``Mappers`` then ``create``.
+``Mappers`` then ``Configure a new mapper`` and select ``Audience`` from the
+list it presents.
 
-Make sure to fill the following:
+On the resulting form, name the mapper whatever you want (our example will use
+``zuul_map``), and make sure to fill the following:
 
-* Mapper Type: ``Audience``
-* Included Client Audience: ``zuul``
-* Add to ID token: ``ON``
-* Add to access token: ``ON``
+* Name: ``zuul_map``
+* Included client audience: ``zuul``
+* Add to ID token: ``On``
+* Add to access token: ``On`` (default)
 
 Then save.
 
-Finally, go back to the clients list and pick the ``zuul`` client again. Click
-on ``Client Scopes``, and add the ``zuul_aud`` scope to the ``Assigned Default
-Client Scopes``.
-
-Configuring JWT signing algorithms
-..................................
-
-.. note::
-
-  Skip this step if you are using a keycloak version prior to 18.0.
-
-Due to current limitations with the pyJWT library, Zuul does not support every default
-signing algorithm used by Keycloak.
-
-Go to `my_realm->Settings->Keys`, then choose `rsa-enc-generated` (this should be mapped
-to "RSA-OAEP") if available. Then set `enabled` to false and save your changes.
+Finally, go back to the clients list and pick the ``zuul`` client again.
+Click on ``Client scopes`` and click the ``Add client scope`` button. Pick
+the checkbox next to the ``zuul_aud`` scope you created and click the
+``Add`` button choosing the ``Default`` option from the list that
+subsequently pops up.
 
 (Optional) Set up a social identity provider
 ............................................
