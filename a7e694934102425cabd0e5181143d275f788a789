@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0815971e_f6919778",
+        "filename": "doc/source/howtos/openid-with-keycloak.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-02-13T23:38:13Z",
+      "side": 1,
+      "message": "I think I misinterpreted the original process at this stage, the type for zuul_aud should be set to default in the zuul client, not globally in the zuul realm.",
+      "revId": "a7e694934102425cabd0e5181143d275f788a789",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
