@@ -16,6 +16,24 @@
       "message": "It would be good if this change could also describe the limitations these options impose upon actions within the repository. One reason zuul has avoided shallow clones for example is that it breaks git based versioning. Understanding if there are similar impacts here is important.\n\nIf we simply end up deferring the cost of git repo operations to jobs rather than centralizing that cost into merger caches that may be a detriment rather than a benefit. Additionally job repos don\u0027t have remotes to their merger repos so any blobs/trees that need to be fetched on a deferred basis might not be retrievable.",
       "revId": "7af3b15e55b82704b0813e9c6e3410fbf602f2e9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1fc4c7d_fdfcf4ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2024-02-13T09:40:07Z",
+      "side": 1,
+      "message": "This is still at the experimentation stage. Benchmarking would be necessary to evaluate the speed boost, if any. I hope to get numbers on this.\n\nIt might turn out that tweaking this is only beneficial in very specific scenarios: repos with large blobs and/or a lot of history, and running jobs that don\u0027t require fetching trees/blobs other than the tip of a branch + patch being applied.",
+      "parentUuid": "a49b34e6_6c9ca715",
+      "revId": "7af3b15e55b82704b0813e9c6e3410fbf602f2e9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
