@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d76f40ae_e6f5ae3b",
+        "filename": "doc/source/howtos/openid-with-keycloak.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2024-02-13T09:02:44Z",
+      "side": 1,
+      "message": "Screenshots might be good here",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 47,
+        "endChar": 27
+      },
+      "revId": "6b4dac92a1ed96658d47ed16b97cf976a674c192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
