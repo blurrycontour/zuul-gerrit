@@ -1,6 +1,46 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a11ffd7a_c9df783c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2024-02-13T09:10:20Z",
+      "side": 1,
+      "message": "And here is a companion patch to update the demo compose with keycloak 23. Given that the import data is modified in your patch, this should ensure the demo still works. https://review.opendev.org/c/zuul/zuul/+/872552",
+      "revId": "6b4dac92a1ed96658d47ed16b97cf976a674c192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc04b932_d72cc1d0",
+        "filename": "doc/source/howtos/openid-with-keycloak.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2024-02-13T09:10:20Z",
+      "side": 1,
+      "message": "Specify that this version of the doc targets Keycloak 23 (but should work for older versions with minor tweaks)",
+      "range": {
+        "startLine": 5,
+        "startChar": 28,
+        "endLine": 5,
+        "endChar": 37
+      },
+      "revId": "6b4dac92a1ed96658d47ed16b97cf976a674c192",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d76f40ae_e6f5ae3b",
