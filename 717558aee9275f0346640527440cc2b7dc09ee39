@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "672a67a4_78188bc2",
+        "filename": "doc/source/tutorials/keycloak.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-02-13T15:42:07Z",
+      "side": 1,
+      "message": "This seems to imply a follow-on with the previous steps as a prerequisite, but doesn\u0027t explain why/how they\u0027re related. You might better tie them together by saying \"...using your username and password from your Keycloak account to authenticate the zuul-client utility with direct grant access enabled on the server, or obtaining an access token from the Zuul WebUI...\"",
+      "revId": "717558aee9275f0346640527440cc2b7dc09ee39",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
