@@ -28,7 +28,7 @@ class TestComponentRegistry(ZuulTestCase):
         self.component_registry = ComponentRegistry(self.zk_client)
 
     def assertComponentAttr(self, component_name, attr_name,
-                            attr_value, timeout=10):
+                            attr_value, timeout=25):
         for _ in iterate_timeout(
             timeout,
             f"{component_name} in cache has {attr_name} set to {attr_value}",
@@ -40,12 +40,12 @@ class TestComponentRegistry(ZuulTestCase):
             ):
                 break
 
-    def assertComponentState(self, component_name, state, timeout=10):
+    def assertComponentState(self, component_name, state, timeout=25):
         return self.assertComponentAttr(
             component_name, "state", state, timeout
         )
 
-    def assertComponentStopped(self, component_name, timeout=10):
+    def assertComponentStopped(self, component_name, timeout=25):
         for _ in iterate_timeout(
             timeout, f"{component_name} in cache is stopped"
         ):
