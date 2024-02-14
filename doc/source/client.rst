@@ -148,7 +148,7 @@ Autohold Delete
 
 Example::
 
-  zuul-admin autohold-delete --id 0000000123
+  zuul-admin autohold-delete 0000000123
 
 Autohold Info
 ^^^^^^^^^^^^^
@@ -156,7 +156,7 @@ Autohold Info
 
 Example::
 
-  zuul-admin autohold-info --id 0000000123
+  zuul-admin autohold-info 0000000123
 
 Autohold List
 ^^^^^^^^^^^^^
