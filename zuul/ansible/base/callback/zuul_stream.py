@@ -141,6 +141,18 @@ class Streamer:
                 # logs continously. Without this we can easily trip the 5
                 # second timeout.
                 s.settimeout(None)
+                # Some remote commands can run for some time without
+                # producing output.  In case there are network
+                # components that might drop an idle TCP connection,
+                # enable keepalives so that we can hopefully maintain
+                # the connection, or at the least, be notified if it
+                # is terminated.  Ping every 30 seconds after 30
+                # seconds of idle activity.  Allow 3 minutes of lost
+                # pings before we fail.
+                s.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 30)
+                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)
+                s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 9)
                 return s
             except socket.timeout:
                 self.callback._log_streamline(
@@ -229,7 +241,14 @@ class Streamer:
                             pass
                     return
             else:
-                more = s.recv(4096)
+                try:
+                    more = s.recv(4096)
+                except TimeoutError:
+                    self.callback._log_streamline(
+                        self.host,
+                        "[Zuul] Lost log stream connection to [%s:%s]"
+                        % (self.ip, self.port))
+                    raise
                 if not more:
                     buffering = False
                 else:
