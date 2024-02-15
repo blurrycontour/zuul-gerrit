@@ -343,12 +343,10 @@ a.refresh {
 
 .zuul-change-row-line {
     background: linear-gradient(#000, #000) no-repeat center/2px 100%;
-    background-position-y: 15px;
 }
 
 .zuul-change-row-line-dark {
     background: linear-gradient(#fff, #fff) no-repeat center/2px 100%;
-    background-position-y: 15px;
 }
 
 .progress-bar-animated {
