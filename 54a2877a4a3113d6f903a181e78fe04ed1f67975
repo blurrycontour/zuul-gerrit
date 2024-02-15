@@ -50,6 +50,24 @@
       "message": "Not originally related to this change, but are we missing a return here?  And in this change it should be updated to \"return False\".  Given what this change is trying to do, and how potentially important it is, maybe we should add that here?",
       "revId": "54a2877a4a3113d6f903a181e78fe04ed1f67975",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c51d8ff6_fb9e5b08",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3928,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-02-15T16:49:52Z",
+      "side": 1,
+      "message": "Yes I think we should return here. Added the return for this case.",
+      "parentUuid": "cc1e95a8_5bf2e7ee",
+      "revId": "54a2877a4a3113d6f903a181e78fe04ed1f67975",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
