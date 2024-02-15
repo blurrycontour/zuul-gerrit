@@ -21,6 +21,7 @@ import threading
 import time
 from abc import ABCMeta
 from configparser import ConfigParser
+from contextlib import nullcontext
 
 from kazoo.exceptions import NoNodeError
 
@@ -29,7 +30,6 @@ from zuul.lib.config import get_default
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib import tracing
 from zuul.merger import merger
-from zuul.merger.merger import nullcontext
 from zuul.model import (
     FilesChangesCompletedEvent, MergeCompletedEvent, MergeRequest
 )

@@ -14,7 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from contextlib import contextmanager
+from contextlib import nullcontext
 from urllib.parse import urlsplit, urlunsplit, urlparse
 import hashlib
 import logging
@@ -59,11 +59,6 @@ def timeout_handler(path):
             if os.path.exists(path):
                 shutil.rmtree(path)
         raise
-
-
-@contextmanager
-def nullcontext():
-    yield
 
 
 class Repo(object):
