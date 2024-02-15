@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1811fce8_52f4b8a5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-15T20:34:00Z",
+      "side": 1,
+      "message": "There is no str.__init__.  It inherits from object.__init__ which takes any args and eats them.  There should be no reason to do this.",
+      "revId": "781e3d055e9b1ae42d01d2eba0023bb887a4a96e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
