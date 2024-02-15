@@ -43,10 +43,6 @@ class EventQueueBaseTestCase(BaseTestCase):
         )
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
-        self.component_registry = ComponentRegistry(self.zk_client)
-        # We don't have any other component to initialize the global
-        # registry in these tests, so we do it ourselves.
-        COMPONENT_REGISTRY.create(self.zk_client)
 
         self.connections = ConnectionRegistry()
         self.addCleanup(self.connections.stop)
