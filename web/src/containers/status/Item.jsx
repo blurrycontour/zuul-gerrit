@@ -37,6 +37,8 @@ import { fetchStatusIfNeeded } from '../../actions/status'
 
 import LineAngleImage from '../../images/line-angle.png'
 import LineTImage from '../../images/line-t.png'
+import LineAngleDarkImage from '../../images/line-angle-dark.png'
+import LineTDarkImage from '../../images/line-t-dark.png'
 import ItemPanel from './ItemPanel'
 
 function getRef(item) {
@@ -255,10 +257,10 @@ class Item extends React.Component {
   }
 
   renderLineImg(item, i) {
-    let image = LineTImage
+    let image = this.props.preferences.darkMode ? LineTDarkImage : LineTImage
     if (item._tree_branches.indexOf(i) === item._tree_branches.length - 1) {
       // Angle line
-      image = LineAngleImage
+      image = this.props.preferences.darkMode ? LineAngleDarkImage : LineAngleImage
     }
     return <img alt="Line" src={image} style={{ verticalAlign: 'baseline' }} />
   }
