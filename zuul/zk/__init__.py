@@ -70,7 +70,7 @@ class ZooKeeperClient(object):
                 with open(fn):
                     pass
 
-        self._last_retry_log: int = 0
+        self._last_retry_log = 0.0
         self.on_connect_listeners: List[Callable[[], None]] = []
         self.on_disconnect_listeners: List[Callable[[], None]] = []
         self.on_connection_lost_listeners: List[Callable[[], None]] = []

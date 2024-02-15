@@ -58,7 +58,7 @@ class JWTAuthenticator(AuthenticatorInterface):
     def __init__(self, **conf):
         # Common configuration for all authenticators
         self.uid_claim = conf.get('uid_claim', 'sub')
-        self.issuer_id = conf.get('issuer_id')
+        self.issuer_id = conf.get('issuer_id', '')
         self.authority = conf.get('authority', self.issuer_id)
         self.client_id = conf.get('client_id')
         self.audience = conf.get('audience', self.client_id)

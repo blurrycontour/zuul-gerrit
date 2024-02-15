@@ -228,7 +228,7 @@ class SQLReporter(BaseReporter):
         """Return a list of Build objects"""
         return self.connection.getBuilds(*args, **kw)
 
-    def report(self, item):
+    def report(self, item, phase1=True, phase2=True):
         # We're not a real reporter, but we use _formatItemReport, so
         # we inherit from the reporters.
         raise NotImplementedError()

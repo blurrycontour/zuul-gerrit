@@ -290,7 +290,7 @@ class AuthenticatorInterface(object, metaclass=abc.ABCMeta):
     """The Authenticator interface to be implemented by a driver."""
 
     @abc.abstractmethod
-    def authenticate(self, **kwargs):
+    def authenticate(self, *args, **kwargs):
         """verify an Authentication Token and if correct, return the user id
         and the authorization claim if present (or an empty dictionary).
 
