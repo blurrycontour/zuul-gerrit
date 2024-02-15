@@ -83,6 +83,10 @@ class ZuulConfigKey(str):
         self.line = line
         return self
 
+    def __init__(self, s, line):
+        # __new__ handles everything
+        pass
+
     def __copy__(self):
         return ZuulConfigKey(self, self.line)
 
