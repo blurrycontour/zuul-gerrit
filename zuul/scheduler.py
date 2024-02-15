@@ -24,8 +24,7 @@ import time
 import traceback
 import urllib.parse
 import uuid
-from contextlib import suppress
-from zuul.vendor.contextlib import nullcontext
+from contextlib import nullcontext, suppress
 from collections import defaultdict, OrderedDict
 
 from apscheduler.schedulers.background import BackgroundScheduler
