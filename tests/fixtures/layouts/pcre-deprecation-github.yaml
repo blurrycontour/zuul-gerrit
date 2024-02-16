@@ -3,9 +3,7 @@
     manager: independent
     trigger:
       github:
-        - event: pull_request_review
-          action: submitted
-          state: approve
+        - event: push
           ref: '(?!invalid)'
     start:
       github: {}

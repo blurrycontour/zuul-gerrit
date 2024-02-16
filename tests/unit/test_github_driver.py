@@ -2790,3 +2790,23 @@ class TestGithubDefaultBranch(ZuulTestCase):
         self.assertEqual('foobar', md.default_branch)
         new_layout = layout.uuid
         self.assertNotEqual(new_layout, prev_layout)
+
+
+class TestGithubSchemaWarnings(ZuulTestCase):
+    config_file = 'zuul-github-driver.conf'
+
+    @simple_layout('layouts/github-schema.yaml', driver='github')
+    def test_broken_config_on_startup_warnings(self):
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 3,
+            "An error should have been stored")
+        self.assertIn(
+            "extra keys not allowed @ data['check']",
+            str(tenant.layout.loading_errors[0].error))
+        self.assertIn(
+            "extra keys not allowed @ data['branch']",
+            str(tenant.layout.loading_errors[1].error))
+        self.assertIn(
+            "as a list is deprecated",
+            str(tenant.layout.loading_errors[2].error))
