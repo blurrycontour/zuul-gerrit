@@ -16,6 +16,24 @@
       "message": "Is it expected that the file mode changed to non executable? It does not seems to cause an issue in testing though.",
       "revId": "5a8e373c3bb53b6ca8932dd751586033b431f536",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e94e3238_15415d04",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-16T16:35:39Z",
+      "side": 1,
+      "message": "That wasn\u0027t intentional, but it doesn\u0027t look like ansible modules need to be executable, so maybe we should just leave it as-is and call this an unplanned transition to roll-forward into not having the executable bit set.  Once we remove version 8, we\u0027ll be left with this non-executable file.",
+      "parentUuid": "36712ad2_815f3a06",
+      "revId": "5a8e373c3bb53b6ca8932dd751586033b431f536",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
