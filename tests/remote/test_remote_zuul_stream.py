@@ -26,7 +26,8 @@ from tests.base import AnsibleZuulTestCase
 class FunctionalZuulStreamMixIn:
     tenant_config_file = 'config/remote-zuul-stream/main.yaml'
     # This should be overriden in child classes.
-    ansible_version = '6'
+    ansible_version = 'X'
+    ansible_core_version = 'X.Y'
 
     def _setUp(self):
         self.log_console_port = 19000 + int(
@@ -379,18 +380,18 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine(regex, text)
 
 
-class TestZuulStream6(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
-    ansible_version = '6'
-    ansible_core_version = '2.13'
+class TestZuulStream8(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
+    ansible_version = '8'
+    ansible_core_version = '2.15'
 
     def setUp(self):
         super().setUp()
         self._setUp()
 
 
-class TestZuulStream8(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
-    ansible_version = '8'
-    ansible_core_version = '2.15'
+class TestZuulStream9(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
+    ansible_version = '9'
+    ansible_core_version = '2.16'
 
     def setUp(self):
         super().setUp()

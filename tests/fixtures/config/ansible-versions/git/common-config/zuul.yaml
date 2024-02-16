@@ -37,15 +37,7 @@
     parent: ansible-version
     vars:
       test_ansible_version_major: 2
-      test_ansible_version_minor: 13
-
-- job:
-    name: ansible-6
-    parent: ansible-version
-    ansible-version: 6
-    vars:
-      test_ansible_version_major: 2
-      test_ansible_version_minor: 13
+      test_ansible_version_minor: 16
 
 - job:
     name: ansible-8
@@ -55,18 +47,26 @@
       test_ansible_version_major: 2
       test_ansible_version_minor: 15
 
+- job:
+    name: ansible-9
+    parent: ansible-version
+    ansible-version: 9
+    vars:
+      test_ansible_version_major: 2
+      test_ansible_version_minor: 16
+
 - project:
     name: common-config
     check:
       jobs:
         - ansible-default
-        - ansible-6
         - ansible-8
+        - ansible-9
 
 - project:
     name: org/project
     check:
       jobs:
         - ansible-default-zuul-conf
-        - ansible-6
         - ansible-8
+        - ansible-9

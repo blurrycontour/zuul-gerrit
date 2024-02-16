@@ -43,16 +43,16 @@
       - setup.cfg
 
 - job:
-    name: zuul-stream-functional-6
-    parent: zuul-stream-functional
-    vars:
-      zuul_ansible_version: 6
-
-- job:
     name: zuul-stream-functional-8
     parent: zuul-stream-functional
     vars:
       zuul_ansible_version: 8
+
+- job:
+    name: zuul-stream-functional-9
+    parent: zuul-stream-functional
+    vars:
+      zuul_ansible_version: 9
 
 - job:
     name: zuul-nox
@@ -374,8 +374,8 @@
             files:
               - web/.*
             nodeset: ubuntu-jammy
-        - zuul-stream-functional-6
         - zuul-stream-functional-8
+        - zuul-stream-functional-9
         - zuul-nox-remote
         - zuul-quick-start:
             requires: nodepool-container-image
@@ -405,8 +405,8 @@
             files:
               - web/.*
             nodeset: ubuntu-jammy
-        - zuul-stream-functional-6
         - zuul-stream-functional-8
+        - zuul-stream-functional-9
         - zuul-nox-remote
         - zuul-quick-start:
             requires: nodepool-container-image
