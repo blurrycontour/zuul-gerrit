@@ -3885,6 +3885,9 @@ class ExecutorServer(BaseMergeServer):
                     if not self._running:
                         break
 
+                    if not self._runBuildWorker(build_request):
+                        continue
+
                     # Delay our response to running a new job based on
                     # the number of jobs we're currently running, in
                     # an attempt to spread load evenly among
@@ -3892,8 +3895,6 @@ class ExecutorServer(BaseMergeServer):
                     workers = len(self.job_workers)
                     delay = (workers ** 2) / 1000.0
                     time.sleep(delay)
-
-                    self._runBuildWorker(build_request)
             except Exception:
                 self.log.exception("Error in build loop:")
                 time.sleep(5)
@@ -3904,7 +3905,7 @@ class ExecutorServer(BaseMergeServer):
         )
         # Lock and update the build request
         if not self.executor_api.lock(build_request, blocking=False):
-            return
+            return False
 
         # Ensure that the request is still in state requested. This method is
         # called based on cached data and there might be a mismatch between the
@@ -3914,6 +3915,7 @@ class ExecutorServer(BaseMergeServer):
         if build_request.state != BuildRequest.REQUESTED:
             self._retry(build_request.lock, log, self.executor_api.unlock,
                         build_request)
+            return False
 
         try:
             params = self.executor_api.getParams(build_request)
@@ -3938,7 +3940,7 @@ class ExecutorServer(BaseMergeServer):
             # able to grab the build.
             self._retry(build_request.lock, log, self.executor_api.unlock,
                         build_request)
-            return
+            return False
 
         try:
             self.executor_api.clearParams(build_request)
@@ -3955,6 +3957,8 @@ class ExecutorServer(BaseMergeServer):
                 "exception": traceback.format_exc(),
             }
             self.completeBuild(build_request, result)
+            return False
+        return True
 
     def run_governor(self):
         while not self.governor_stop_event.wait(10):
