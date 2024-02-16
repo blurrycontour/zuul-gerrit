@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36712ad2_815f3a06",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-02-16T15:51:09Z",
+      "side": 1,
+      "message": "Is it expected that the file mode changed to non executable? It does not seems to cause an issue in testing though.",
+      "revId": "5a8e373c3bb53b6ca8932dd751586033b431f536",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
