@@ -5,7 +5,7 @@
       github:
         - event: pull_request_review
           action: submitted
-          state: approve
+          state: approved
     start:
       github: {}
     success:

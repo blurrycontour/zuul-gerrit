@@ -292,6 +292,13 @@ the following options.
    .. attr:: event
       :required:
 
+      .. warning:: While it is currently possible to list more than
+                   one event in a single trigger, that is deprecated
+                   and support will be removed in a future version.
+                   Instead, specify a single event type per trigger,
+                   and list multiple triggers as necessary to cover
+                   all intended events.
+
       The event from github. Supported events are:
 
       .. value:: pull_request
@@ -359,7 +366,17 @@ the following options.
 
       .. value:: requested
 
-         A check run is requested.
+         .. warning:: This is deprecated and will be removed in a
+                      future version.  Use
+                      :value:`pipeline.trigger.<github
+                      source>.action.rerequested` instead.
+
+         Deprecated alias for :value:`pipeline.trigger.<github
+         source>.action.rerequested`.
+
+      .. value:: rerequested
+
+         A check run is rerequested.
 
       .. value:: completed
 
@@ -400,7 +417,7 @@ the following options.
 
    .. attr:: status
 
-      This is used for ``pull-request`` and ``status`` actions. It
+      This is used for ``pull_request`` and ``status`` actions. It
       accepts a list of strings each of which matches the user setting
       the status, the status context, and the status itself in the
       format of ``user:context:status``.  For example,
