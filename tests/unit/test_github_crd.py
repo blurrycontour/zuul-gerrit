@@ -195,7 +195,7 @@ class TestGithubCrossRepoDeps(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = True
 
         # Enqueue A,B,C
-        self.fake_github.emitEvent(C.getReviewAddedEvent('approve'))
+        self.fake_github.emitEvent(C.getReviewAddedEvent('approved'))
         self.waitUntilSettled()
 
         self.assertEqual(len(self.builds), 1)

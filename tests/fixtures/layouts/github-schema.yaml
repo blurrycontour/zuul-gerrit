@@ -1,0 +1,31 @@
+- pipeline:
+    name: check
+    manager: independent
+    trigger:
+      github:
+        # Valid
+        - event: pull_request
+          action: comment
+          comment: test me
+        # Valid
+        - event: pull_request
+          action:
+            - opened
+            - closed
+        # "extra keys not allowed @ data['check']"
+        - event: pull_request
+          action:
+            - opened
+            - closed
+          branch: ^master$
+          check: foo
+        # "extra keys not allowed @ data['branch']"
+        - event: check_run
+          branch: ^master$
+        - event:
+            - pull_request
+            - check_run
+    success:
+      github: {}
+    failure:
+      github: {}
