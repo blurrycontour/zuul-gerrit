@@ -375,7 +375,7 @@ class TestGithubDriver(ZuulTestCase):
     @simple_layout('layouts/reviews-github.yaml', driver='github')
     def test_reviews(self):
         A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
-        self.fake_github.emitEvent(A.getReviewAddedEvent('approve'))
+        self.fake_github.emitEvent(A.getReviewAddedEvent('approved'))
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
         self.assertEqual('project-reviews', self.history[0].name)
@@ -383,7 +383,7 @@ class TestGithubDriver(ZuulTestCase):
 
         # test_review_unmatched_event
         B = self.fake_github.openFakePullRequest('org/project', 'master', 'B')
-        self.fake_github.emitEvent(B.getReviewAddedEvent('comment'))
+        self.fake_github.emitEvent(B.getReviewAddedEvent('commented'))
         self.waitUntilSettled()
         self.assertEqual(1, len(self.history))
 
@@ -2790,3 +2790,38 @@ class TestGithubDefaultBranch(ZuulTestCase):
         self.assertEqual('foobar', md.default_branch)
         new_layout = layout.uuid
         self.assertNotEqual(new_layout, prev_layout)
+
+
+class TestGithubSchemaWarnings(ZuulTestCase):
+    config_file = 'zuul-github-driver.conf'
+
+    @simple_layout('layouts/github-schema.yaml', driver='github')
+    def test_broken_config_on_startup_warnings(self):
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 8,
+            "An error should have been stored")
+        self.assertIn(
+            "extra keys not allowed @ data['check']",
+            str(tenant.layout.loading_errors[0].error))
+        self.assertIn(
+            "extra keys not allowed @ data['branch']",
+            str(tenant.layout.loading_errors[1].error))
+        self.assertIn(
+            "as a list is deprecated",
+            str(tenant.layout.loading_errors[2].error))
+        self.assertIn(
+            "'require-status' trigger attribute",
+            str(tenant.layout.loading_errors[3].error))
+        self.assertIn(
+            "extra keys not allowed @ data['require-status']",
+            str(tenant.layout.loading_errors[4].error))
+        self.assertIn(
+            "'unlabel' trigger attribute",
+            str(tenant.layout.loading_errors[5].error))
+        self.assertIn(
+            "extra keys not allowed @ data['unlabel']",
+            str(tenant.layout.loading_errors[6].error))
+        self.assertIn(
+            "Use 'rerequested' instead",
+            str(tenant.layout.loading_errors[7].error))
