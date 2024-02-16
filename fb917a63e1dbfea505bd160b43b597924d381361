@@ -16,6 +16,23 @@
       "message": "Is it possible to move the initialization so that it\u0027s initialized in all cases?\n(Because if we want it initialized for normal usage, and also validate-tenants, it sort of sounds we mostly want it initialized, except maybe for zuul-web?)",
       "revId": "fb917a63e1dbfea505bd160b43b597924d381361",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75d0248d_c403dc2f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-02-16T08:51:42Z",
+      "side": 1,
+      "message": "Missed https://review.opendev.org/c/zuul/zuul/+/861211",
+      "revId": "fb917a63e1dbfea505bd160b43b597924d381361",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
