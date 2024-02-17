@@ -22,7 +22,8 @@ from zuul.lib.config import get_default
 class StartingBuildsSensor(SensorInterface):
     log = logging.getLogger("zuul.executor.sensor.startingbuilds")
 
-    def __init__(self, executor, max_load_avg, config=None):
+    def __init__(self, statsd, base_key, executor, max_load_avg, config=None):
+        super().__init__(statsd, base_key)
         self.executor = executor
 
         coefficient = 2 if multiprocessing.cpu_count() <= 4 else 1
@@ -55,17 +56,21 @@ class StartingBuildsSensor(SensorInterface):
 
     def isOk(self):
         starting_builds = self._getStartingBuilds()
+        running_builds = self._getRunningBuilds()
+        paused_builds = self._getPausedBuilds()
         max_starting_builds = max(
-            self.max_starting_builds - self._getRunningBuilds(),
+            self.max_starting_builds - running_builds,
             self.min_starting_builds)
+        if self.statsd:
+            self.statsd.gauge(self.base_key + '.paused_builds',
+                              paused_builds)
+            self.statsd.gauge(self.base_key + '.running_builds',
+                              running_builds)
+            self.statsd.gauge(self.base_key + '.starting_builds',
+                              starting_builds)
 
         if starting_builds >= max_starting_builds:
             return False, "too many starting builds {} >= {}".format(
                 starting_builds, max_starting_builds)
 
         return True, "{} <= {}".format(starting_builds, max_starting_builds)
-
-    def reportStats(self, statsd, base_key):
-        statsd.gauge(base_key + '.paused_builds', self._getPausedBuilds())
-        statsd.gauge(base_key + '.running_builds', self._getRunningBuilds())
-        statsd.gauge(base_key + '.starting_builds', self._getStartingBuilds())

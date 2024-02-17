@@ -3449,17 +3449,24 @@ class ExecutorServer(BaseMergeServer):
                                               self.stopJobDiskFull,
                                               self.merge_root)
 
-        self.pause_sensor = PauseSensor(get_default(self.config, 'executor',
+        if self.statsd:
+            base_key = 'zuul.executor.{hostname}'
+        else:
+            base_key = None
+        self.pause_sensor = PauseSensor(self.statsd, base_key,
+                                        get_default(self.config, 'executor',
                                                     'paused_on_start', False))
         self.log.info("Starting executor (hostname: %s) in %spaused mode" % (
             self.hostname, "" if self.pause_sensor.pause else "un"))
-        cpu_sensor = CPUSensor(config)
+
+        cpu_sensor = CPUSensor(self.statsd, base_key, config)
         self.sensors = [
             cpu_sensor,
-            HDDSensor(config),
+            HDDSensor(self.statsd, base_key, config),
             self.pause_sensor,
-            RAMSensor(config),
-            StartingBuildsSensor(self, cpu_sensor.max_load_avg, config)
+            RAMSensor(self.statsd, base_key, config),
+            StartingBuildsSensor(self.statsd, base_key,
+                                 self, cpu_sensor.max_load_avg, config),
         ]
 
         manage_ansible = get_default(
@@ -3971,16 +3978,17 @@ class ExecutorServer(BaseMergeServer):
             return self._manageLoad()
 
     def _manageLoad(self):
-
         if self.accepting_work:
-            # Don't unregister if we don't have any active jobs.
+            unregister = False
             for sensor in self.sensors:
                 ok, message = sensor.isOk()
                 if not ok:
-                    self.log.info(
-                        "Unregistering due to {}".format(message))
-                    self.unregister_work()
-                    break
+                    # Continue to check all sensors to emit stats
+                    unregister = True
+            if unregister:
+                self.log.info(
+                    "Unregistering due to {}".format(message))
+                self.unregister_work()
         else:
             reregister = True
             limits = []
@@ -3988,16 +3996,12 @@ class ExecutorServer(BaseMergeServer):
                 ok, message = sensor.isOk()
                 limits.append(message)
                 if not ok:
+                    # Continue to check all sensors to emit stats
                     reregister = False
-                    break
             if reregister:
                 self.log.info("Re-registering as job is within its limits "
                               "{}".format(", ".join(limits)))
                 self.register_work()
-        if self.statsd:
-            base_key = 'zuul.executor.{hostname}'
-            for sensor in self.sensors:
-                sensor.reportStats(self.statsd, base_key)
 
     def finishJob(self, unique):
         del self.job_workers[unique]
