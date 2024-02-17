@@ -714,8 +714,10 @@ class TestGovernor(ZuulTestCase):
         hdd = Dummy()
         hdd.f_frsize = 4096
         hdd.f_blocks = 120920708
-        hdd.f_bfree = 95716701
-        statvfs_mock.return_value = hdd  # 20.84% used
+        hdd.f_bfree = 95716701  # 20.84% used
+        hdd.f_files = 61022208
+        hdd.f_ffree = 32147841  # 47.31% used
+        statvfs_mock.return_value = hdd
         loadavg_mock.return_value = (0.0, 0.0, 0.0)
 
         self.executor_server.manageLoad()
@@ -724,9 +726,12 @@ class TestGovernor(ZuulTestCase):
         self.assertReportedStat(
             'zuul.executor.test-executor-hostname_example_com.pct_used_hdd',
             value='2084', kind='g')
+        self.assertReportedStat(
+            'zuul.executor.test-executor-hostname_example_com.pct_used_inodes',
+            value='4731', kind='g')
 
-        hdd.f_bfree = 5716701
-        statvfs_mock.return_value = hdd  # 95.27% used
+        hdd.f_bfree = 5716701  # 95.27% used
+        statvfs_mock.return_value = hdd
 
         self.executor_server.manageLoad()
         self.assertFalse(self.executor_server.accepting_work)
@@ -734,6 +739,23 @@ class TestGovernor(ZuulTestCase):
         self.assertReportedStat(
             'zuul.executor.test-executor-hostname_example_com.pct_used_hdd',
             value='9527', kind='g')
+        self.assertReportedStat(
+            'zuul.executor.test-executor-hostname_example_com.pct_used_inodes',
+            value='4731', kind='g')
+
+        hdd.f_bfree = 95716701  # 20.84% used
+        hdd.f_ffree = 1336387  # 97.80% used
+        statvfs_mock.return_value = hdd
+
+        self.executor_server.manageLoad()
+        self.assertFalse(self.executor_server.accepting_work)
+
+        self.assertReportedStat(
+            'zuul.executor.test-executor-hostname_example_com.pct_used_hdd',
+            value='2084', kind='g')
+        self.assertReportedStat(
+            'zuul.executor.test-executor-hostname_example_com.pct_used_inodes',
+            value='9780', kind='g')
 
     @mock.patch('os.getloadavg')
     def test_pause_governor(self, loadavg_mock):

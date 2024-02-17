@@ -740,6 +740,16 @@ The following sections of ``zuul.conf`` are used by the executor:
       disk space divided by the total real storage capacity multiplied by
       100.
 
+   .. attr:: min_avail_inodes
+      :default: 5.0
+
+      This is the minimum percentage of HDD inodes available for the
+      :attr:`executor.state_dir` directory. The executor will stop accepting
+      more than 1 job at a time until more inodes are available. The
+      available inode percentage is calculated from the total available
+      inodes divided by the total real inode capacity multiplied by
+      100.
+
    .. attr:: min_avail_mem
       :default: 5.0
 
