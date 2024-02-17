@@ -490,6 +490,11 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
 
       The used disk on this executor, as a percentage multiplied by 100.
 
+   .. stat:: pct_used_hdd_inodes
+      :type: gauge
+
+      The used inodes on this executor, as a percentage multiplied by 100.
+
    .. stat:: pct_used_ram
       :type: gauge
 
