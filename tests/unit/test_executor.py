@@ -589,7 +589,7 @@ class TestStartingBuildsSensor(ZuulTestCase):
         cores = multiprocessing.cpu_count()
 
         # When
-        sensor = StartingBuildsSensor(None, cores * 2.5, None)
+        sensor = StartingBuildsSensor(None, '', None, cores * 2.5, None)
 
         # Then
         coefficient = 2 if multiprocessing.cpu_count() <= 4 else 1
@@ -602,7 +602,7 @@ class TestStartingBuildsSensor(ZuulTestCase):
         cores = multiprocessing.cpu_count()
 
         # When
-        sensor = StartingBuildsSensor(None, cores * 2.5, self.config)
+        sensor = StartingBuildsSensor(None, '', None, cores * 2.5, self.config)
 
         # Then
         coefficient = 2 if multiprocessing.cpu_count() <= 4 else 1
@@ -616,7 +616,7 @@ class TestStartingBuildsSensor(ZuulTestCase):
         self.config.set('executor', 'max_starting_builds', '5')
 
         # When
-        sensor = StartingBuildsSensor(None, cores * 2.5, self.config)
+        sensor = StartingBuildsSensor(None, '', None, cores * 2.5, self.config)
 
         # Then
         self.assertEqual(sensor.max_starting_builds, 5)
@@ -629,7 +629,7 @@ class TestStartingBuildsSensor(ZuulTestCase):
         self.config.set('executor', 'max_starting_builds', '1')
 
         # When
-        sensor = StartingBuildsSensor(None, cores * 2.5, self.config)
+        sensor = StartingBuildsSensor(None, '', None, cores * 2.5, self.config)
 
         # Then
         self.assertEqual(sensor.max_starting_builds, 1)

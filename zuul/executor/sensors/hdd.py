@@ -1,4 +1,5 @@
 # Copyright 2018 Red Hat, Inc.
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -30,7 +31,8 @@ def get_avail_hdd_pct(path):
 class HDDSensor(SensorInterface):
     log = logging.getLogger("zuul.executor.sensor.hdd")
 
-    def __init__(self, config=None):
+    def __init__(self, statsd, base_key, config=None):
+        super().__init__(statsd, base_key)
         self.min_avail_hdd = float(
             get_default(config, 'executor', 'min_avail_hdd', '5.0'))
         self.state_dir = get_default(
@@ -39,16 +41,14 @@ class HDDSensor(SensorInterface):
     def isOk(self):
         avail_hdd_pct = get_avail_hdd_pct(self.state_dir)
 
+        if self.statsd:
+            # We multiply the percentage by 100 so we can report it to
+            # 2 decimal points.
+            self.statsd.gauge(self.base_key + '.pct_used_hdd',
+                              int((100.0 - avail_hdd_pct) * 100))
+
         if avail_hdd_pct < self.min_avail_hdd:
             return False, "low disk space {:3.1f}% < {}".format(
                 avail_hdd_pct, self.min_avail_hdd)
 
         return True, "{:3.1f}% <= {}".format(avail_hdd_pct, self.min_avail_hdd)
-
-    def reportStats(self, statsd, base_key):
-        avail_hdd_pct = get_avail_hdd_pct(self.state_dir)
-
-        # We multiply the percentage by 100 so we can report it to 2 decimal
-        # points.
-        statsd.gauge(base_key + '.pct_used_hdd',
-                     int((100.0 - avail_hdd_pct) * 100))

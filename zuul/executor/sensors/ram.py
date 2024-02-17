@@ -30,7 +30,8 @@ def get_avail_mem_pct():
 class RAMSensor(SensorInterface):
     log = logging.getLogger("zuul.executor.sensor.ram")
 
-    def __init__(self, config=None):
+    def __init__(self, statsd, base_key, config=None):
+        super().__init__(statsd, base_key)
         self.min_avail_mem = float(get_default(config, 'executor',
                                                'min_avail_mem', '5.0'))
         self.cgroup_stats_file = CGROUP_STATS_FILE
@@ -68,6 +69,14 @@ class RAMSensor(SensorInterface):
 
     def isOk(self):
         avail_mem_pct = get_avail_mem_pct()
+        avail_mem_pct_cgroup = self._get_avail_mem_pct_cgroup()
+
+        if self.statsd:
+            self.statsd.gauge(self.base_key + '.pct_used_ram',
+                              int((100.0 - avail_mem_pct) * 100))
+            if math.isfinite(self._get_cgroup_limit()):
+                self.statsd.gauge(self.base_key + '.pct_used_ram_cgroup',
+                                  int((100.0 - avail_mem_pct_cgroup) * 100))
 
         if avail_mem_pct < self.min_avail_mem:
             return False, "low memory {:3.1f}% < {}".format(
@@ -78,7 +87,6 @@ class RAMSensor(SensorInterface):
             return True, "{:3.1f}% <= {}".format(
                 avail_mem_pct, self.min_avail_mem)
 
-        avail_mem_pct_cgroup = self._get_avail_mem_pct_cgroup()
         if avail_mem_pct_cgroup < self.min_avail_mem:
             return False, "low memory cgroup {:3.1f}% < {}".format(
                 avail_mem_pct_cgroup, self.min_avail_mem)
@@ -86,14 +94,3 @@ class RAMSensor(SensorInterface):
         return True, "{:3.1f}% <= {}, {:3.1f}% <= {}".format(
             avail_mem_pct, self.min_avail_mem,
             avail_mem_pct_cgroup, self.min_avail_mem)
-
-    def reportStats(self, statsd, base_key):
-        avail_mem_pct = get_avail_mem_pct()
-
-        statsd.gauge(base_key + '.pct_used_ram',
-                     int((100.0 - avail_mem_pct) * 100))
-
-        if math.isfinite(self._get_cgroup_limit()):
-            avail_mem_pct_cgroup = self._get_avail_mem_pct_cgroup()
-            statsd.gauge(base_key + '.pct_used_ram_cgroup',
-                         int((100.0 - avail_mem_pct_cgroup) * 100))
