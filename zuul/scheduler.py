@@ -153,15 +153,27 @@ class ZKProfileCommand(commandsocket.Command):
     args = [TenantArgument, PipelineArgument]
 
 
+class StatusCommand(commandsocket.Command):
+    name = 'status'
+    help = 'Print status debug info'
+    output = True
+
+
 COMMANDS = [
     FullReconfigureCommand,
     SmartReconfigureCommand,
     TenantReconfigureCommand,
     ZKProfileCommand,
+    StatusCommand,
     commandsocket.StopCommand,
     commandsocket.ReplCommand,
     commandsocket.NoReplCommand,
 ]
+
+
+STATUS_RECONFIG = 'Reconfiguration'
+STATUS_RUN_HANDLER = 'Run handler'
+STATUS_LAYOUT_UPDATER = 'Layout updater'
 
 
 class SchedulerStatsElection(SessionAwareElection):
@@ -232,6 +244,7 @@ class Scheduler(threading.Thread):
         self.layout_lock = defaultdict(threading.Lock)
         # Only used by tests in order to quiesce the main run loop
         self.run_handler_lock = threading.Lock()
+        self.status_info = {}
         self._stopped = False
 
         self._zuul_app = app
@@ -325,6 +338,7 @@ class Scheduler(threading.Thread):
             TenantReconfigureCommand:
                 self.tenantReconfigureCommandHandler,
             ZKProfileCommand: self.zkProfileCommandHandler,
+            StatusCommand: self.statusCommandHandler,
             commandsocket.StopCommand: self.stop,
             commandsocket.ReplCommand: self.startRepl,
             commandsocket.NoReplCommand: self.stopRepl,
@@ -957,6 +971,10 @@ class Scheduler(threading.Thread):
         self._profile_pipelines = self._profile_pipelines ^ key
         self.log.debug("Now profiling %s", self._profile_pipelines)
 
+    def statusCommandHandler(self):
+        self.log.debug("sending %s", repr(self.status_info))
+        return json.dumps(self.status_info)
+
     def startRepl(self):
         if self.repl:
             return
@@ -1240,12 +1258,16 @@ class Scheduler(threading.Thread):
     def runTenantLayoutUpdates(self):
         log = logging.getLogger("zuul.Scheduler.LayoutUpdate")
         # Only run this after config priming is complete
+        self.setStatus(STATUS_LAYOUT_UPDATER,
+                       "waiting for initialization", log=False)
         self.primed_event.wait()
         while not self._stopped:
+            self.setStatus(STATUS_LAYOUT_UPDATER, "idle", log=False)
             self.layout_update_event.wait()
             self.layout_update_event.clear()
             if self._stopped:
                 break
+            self.setStatus(STATUS_LAYOUT_UPDATER, "locking", log=False)
             with self.layout_update_lock:
                 # We need to handle new and deleted tenants, so we need to
                 # process all tenants currently known and the new ones.
@@ -1258,8 +1280,13 @@ class Scheduler(threading.Thread):
                     try:
                         if (self.unparsed_abide.ltime
                                 < self.system_config_cache.ltime):
+                            self.setStatus(STATUS_LAYOUT_UPDATER,
+                                           "updating system config", log=False)
                             self.updateSystemConfig()
 
+                        self.setStatus(STATUS_LAYOUT_UPDATER,
+                                       f'locking tenant {tenant_name}',
+                                       log=False)
                         with tenant_read_lock(self.zk_client, tenant_name,
                                               blocking=False):
                             remote_state = self.tenant_layout_state.get(
@@ -1279,6 +1306,10 @@ class Scheduler(threading.Thread):
                                 log.debug(
                                     "Local layout of tenant %s not up to date",
                                     tenant_name)
+                                self.setStatus(
+                                    STATUS_LAYOUT_UPDATER,
+                                    f'update tenant {tenant_name} layout',
+                                    log=False)
                                 self.updateTenantLayout(log, tenant_name)
                                 # Wake up the main thread to process any
                                 # events for this tenant.
@@ -1434,6 +1465,7 @@ class Scheduler(threading.Thread):
         self.log.info("Reconfiguration beginning (smart=%s, tenants=%s)",
                       event.smart, event.tenants)
         start = time.monotonic()
+        self.setStatus(STATUS_RECONFIG, "starting", log=False)
 
         # Update runtime related system attributes from config
         self.config = self._zuul_app.config
@@ -1442,6 +1474,8 @@ class Scheduler(threading.Thread):
             default_version=self.globals.default_ansible_version)
 
         with self.unparsed_abide_lock:
+            self.setStatus(STATUS_RECONFIG, "loading system config",
+                           log=False)
             loader = configloader.ConfigLoader(
                 self.connections, self.zk_client, self.globals, self.statsd,
                 self, self.merger, self.keystore)
@@ -1502,6 +1536,8 @@ class Scheduler(threading.Thread):
             branch_cache_min_ltimes = defaultdict(lambda: ltime)
 
         for tenant_name in tenant_names:
+            self.setStatus(STATUS_RECONFIG, f'locking tenant {tenant_name}',
+                           log=False)
             with self.layout_lock[tenant_name]:
                 if event.smart:
                     old_tenant = old_unparsed_abide.tenants.get(tenant_name)
@@ -1518,12 +1554,18 @@ class Scheduler(threading.Thread):
                         self.zk_client, tenant_name,
                         identifier=RECONFIG_LOCK_ID) as lock,
                       self.statsd_timer(f'{stats_key}.reconfiguration_time')):
+                    self.setStatus(STATUS_RECONFIG,
+                                   f'loading tenant {tenant_name}',
+                                   log=False)
                     tenant = loader.loadTenant(
                         self.abide, tenant_name, self.ansible_manager,
                         self.unparsed_abide, min_ltimes=min_ltimes,
                         branch_cache_min_ltimes=branch_cache_min_ltimes)
                     reconfigured_tenants.append(tenant_name)
                     with self.createZKContext(lock, self.log) as ctx:
+                        self.setStatus(STATUS_RECONFIG,
+                                       f'reconfiguring tenant {tenant_name}',
+                                       log=False)
                         if tenant is not None:
                             self._reconfigureTenant(ctx, min_ltimes,
                                                     event.zuul_event_ltime,
@@ -1536,6 +1578,7 @@ class Scheduler(threading.Thread):
                                 del self.local_layout_state[tenant_name]
 
         duration = round(time.monotonic() - start, 3)
+        self.setStatus(STATUS_RECONFIG, 'complete', log=False)
         self.log.info("Reconfiguration complete (smart: %s, tenants: %s, "
                       "duration: %s seconds)", event.smart, event.tenants,
                       duration)
@@ -1577,23 +1620,33 @@ class Scheduler(threading.Thread):
                         [event.tenant_name])
         stats_key = f'zuul.tenant.{event.tenant_name}'
 
+        self.setStatus(STATUS_RECONFIG,
+                       f'locking tenant {event.tenant_name}',
+                       log=False)
         with self.layout_lock[event.tenant_name]:
             old_tenant = self.abide.tenants.get(event.tenant_name)
             with (tenant_write_lock(
                     self.zk_client, event.tenant_name,
                     identifier=RECONFIG_LOCK_ID) as lock,
                   self.statsd_timer(f'{stats_key}.reconfiguration_time')):
+                self.setStatus(STATUS_RECONFIG,
+                               f'loading tenant {event.tenant_name}',
+                               log=False)
                 log.debug("Loading tenant %s", event.tenant_name)
                 loader.loadTenant(
                     self.abide, event.tenant_name, self.ansible_manager,
                     self.unparsed_abide, min_ltimes=min_ltimes,
                     branch_cache_min_ltimes=branch_cache_min_ltimes)
                 tenant = self.abide.tenants[event.tenant_name]
+                self.setStatus(STATUS_RECONFIG,
+                               f'reconfiguring tenant {event.tenant_name}',
+                               log=False)
                 with self.createZKContext(lock, self.log) as ctx:
                     self._reconfigureTenant(ctx, min_ltimes,
                                             event.trigger_event_ltime,
                                             tenant, old_tenant)
         duration = round(time.monotonic() - start, 3)
+        self.setStatus(STATUS_RECONFIG, 'complete', log=False)
         log.info("Tenant reconfiguration complete for %s (duration: %s "
                  "seconds)", event.tenant_name, duration)
 
@@ -2101,22 +2154,28 @@ class Scheduler(threading.Thread):
             return True
         return False
 
+    def setStatus(self, key, value, log=True):
+        self.status_info[key] = value
+        if log:
+            self.log.debug("%s status: %s", key, value)
+
     def run(self):
         if self.statsd:
             self.log.debug("Statsd enabled")
         else:
             self.log.debug("Statsd not configured")
         if self.wait_for_init:
-            self.log.debug("Waiting for tenant initialization")
+            self.setStatus(STATUS_RUN_HANDLER,
+                           "waiting for tenant initialization")
             self.primed_event.wait()
         while True:
-            self.log.debug("Run handler sleeping")
+            self.setStatus(STATUS_RUN_HANDLER, "sleeping")
             self.wake_event.wait()
             self.wake_event.clear()
             if self._stopped:
-                self.log.debug("Run handler stopping")
+                self.setStatus(STATUS_RUN_HANDLER, "stopping")
                 return
-            self.log.debug("Run handler awake")
+            self.setStatus(STATUS_RUN_HANDLER, "awake")
             self.run_handler_lock.acquire()
             with self.statsd_timer("zuul.scheduler.run_handler"):
                 try:
@@ -2130,9 +2189,13 @@ class Scheduler(threading.Thread):
 
     def _run(self):
         if not self._stopped:
+            self.setStatus(STATUS_RUN_HANDLER,
+                           "processing reconfiguration queue", log=False)
             self.process_reconfigure_queue()
 
         if self.unparsed_abide.ltime < self.system_config_cache.ltime:
+            self.setStatus(STATUS_RUN_HANDLER,
+                           "updating system config", log=False)
             self.updateSystemConfig()
 
         for tenant_name in self.unparsed_abide.tenants:
@@ -2146,12 +2209,18 @@ class Scheduler(threading.Thread):
             # This will also forward events for the pipelines
             # (e.g. enqueue or dequeue events) to the matching
             # pipeline event queues that are processed afterwards.
+            self.setStatus(STATUS_RUN_HANDLER,
+                           f'processing tenant {tenant_name} management queue',
+                           log=False)
             self.process_tenant_management_queue(tenant)
 
             if self._stopped:
                 break
 
             try:
+                self.setStatus(STATUS_RUN_HANDLER,
+                               f'read locking {tenant_name}',
+                               log=False)
                 with tenant_read_lock(
                     self.zk_client, tenant_name, blocking=False
                 ) as tlock:
@@ -2165,6 +2234,10 @@ class Scheduler(threading.Thread):
                     if not self._stopped:
                         # This will forward trigger events to pipeline
                         # event queues that are processed below.
+                        self.setStatus(
+                            STATUS_RUN_HANDLER,
+                            f'processing {tenant_name} trigger queue',
+                            log=False)
                         self.process_tenant_trigger_queue(tenant)
 
                     self.process_pipelines(tenant, tlock)
@@ -2241,12 +2314,17 @@ class Scheduler(threading.Thread):
                 return
             stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
             try:
+                self.setStatus(
+                    STATUS_RUN_HANDLER,
+                    f'locking tenant {tenant.name} pipeline {pipeline.name}',
+                    log=False)
                 with (pipeline_lock(
                         self.zk_client, tenant.name, pipeline.name,
                         blocking=False) as lock,
                       self.createZKContext(lock, self.log) as ctx):
-                    self.log.debug("Processing pipeline %s in tenant %s",
-                                   pipeline.name, tenant.name)
+                    self.setStatus(STATUS_RUN_HANDLER,
+                                   f'processing pipeline {pipeline.name} '
+                                   f'in tenant {tenant.name}')
                     with pipeline.manager.currentContext(ctx):
                         if ((tenant.name, pipeline.name) in
                             self._profile_pipelines):
