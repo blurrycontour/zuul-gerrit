@@ -34,7 +34,7 @@ class Command:
 class Argument:
     name = None
     help = None
-    required = None
+    nargs = None
     default = None
 
 

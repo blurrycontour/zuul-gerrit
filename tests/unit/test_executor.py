@@ -20,6 +20,7 @@ import configparser
 import multiprocessing
 import os
 import re
+import socket
 import time
 from unittest import mock
 
@@ -1194,3 +1195,27 @@ class TestExecutorFailure(ZuulTestCase):
         self.assertTrue(
             build_retries[0].error_detail.startswith(
                 "Failed to update project"))
+
+
+class TestExecutorCommands(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_verbose(self):
+        command_socket = self.executor_server.config.get(
+            'executor', 'command_socket')
+        self.assertEqual('-v', self.executor_server.verbose)
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.connect(command_socket)
+            s.sendall('verbose [3]\n'.encode('utf8'))
+            s.recv(4096)
+        self.assertEqual('-vvv', self.executor_server.verbose)
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.connect(command_socket)
+            s.sendall('verbose ["4"]\n'.encode('utf8'))
+            s.recv(4096)
+        self.assertEqual('-vvvv', self.executor_server.verbose)
+        with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
+            s.connect(command_socket)
+            s.sendall('unverbose\n'.encode('utf8'))
+            s.recv(4096)
+        self.assertEqual('-v', self.executor_server.verbose)

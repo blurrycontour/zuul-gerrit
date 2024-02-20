@@ -133,6 +133,7 @@ class ZuulApp(object):
             cmd.set_defaults(command=command.name)
             for arg in command.args:
                 cmd.add_argument(arg.name,
+                                 nargs=arg.nargs,
                                  help=arg.help,
                                  default=arg.default)
 

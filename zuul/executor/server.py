@@ -106,9 +106,17 @@ BLACKLISTED_VARS = dict(
 CLEANUP_TIMEOUT = 300
 
 
+class VerboseArgument(commandsocket.Argument):
+    name = 'verbosity'
+    help = 'Ansible verbosity level'
+    nargs = '?'
+    default = 3
+
+
 class VerboseCommand(commandsocket.Command):
     name = 'verbose'
     help = 'Enable Ansible verbose mode'
+    args = [VerboseArgument]
 
 
 class UnVerboseCommand(commandsocket.Command):
@@ -3085,11 +3093,7 @@ class AnsibleJob(object):
         return (self.RESULT_NORMAL, ret)
 
     def runAnsibleSetup(self, playbook, ansible_version):
-        if self.executor_server.verbose:
-            verbose = '-vvv'
-        else:
-            verbose = '-v'
-
+        verbose = self.executor_server.verbose
         # TODO: select correct ansible version from job
         ansible = self.executor_server.ansible_manager.getAnsibleCommand(
             ansible_version,
@@ -3113,11 +3117,7 @@ class AnsibleJob(object):
         return result, code
 
     def runAnsibleFreeze(self, playbook, ansible_version):
-        if self.executor_server.verbose:
-            verbose = '-vvv'
-        else:
-            verbose = '-v'
-
+        verbose = self.executor_server.verbose
         # Create a play for each host with set_fact, and every
         # top-level variable.
         plays = []
@@ -3166,11 +3166,7 @@ class AnsibleJob(object):
         # Once this is used, increase the controlpersist timeout.
         return (self.RESULT_NORMAL, 0)
 
-        if self.executor_server.verbose:
-            verbose = '-vvv'
-        else:
-            verbose = '-v'
-
+        verbose = self.executor_server.verbose
         cmd = ['ansible', '*', verbose, '-m', 'meta',
                '-a', 'reset_connection']
 
@@ -3224,11 +3220,7 @@ class AnsibleJob(object):
         else:
             self.writeInventory(playbook, self.original_hostvars)
 
-        if self.executor_server.verbose:
-            verbose = '-vvv'
-        else:
-            verbose = '-v'
-
+        verbose = self.executor_server.verbose
         cmd = [self.executor_server.ansible_manager.getAnsibleCommand(
             ansible_version), verbose, playbook.path]
 
@@ -3353,7 +3345,7 @@ class ExecutorServer(BaseMergeServer):
         self.log_streaming_port = log_streaming_port
         self.governor_lock = threading.Lock()
         self.run_lock = threading.Lock()
-        self.verbose = False
+        self.verbose = '-v'
         self.log_console_port = log_console_port
         self.repl = None
 
@@ -3697,11 +3689,14 @@ class ExecutorServer(BaseMergeServer):
         except Exception:
             self.log.exception('Error while stopping')
 
-    def verboseOn(self):
-        self.verbose = True
+    def verboseOn(self, level):
+        level = max(int(level), 1)
+        self.verbose = '-' + ('v' * level)
+        self.log.info('Set Ansible verbosity to %s', self.verbose)
 
     def verboseOff(self):
-        self.verbose = False
+        self.verbose = '-v'
+        self.log.info('Set Ansible verbosity to %s', self.verbose)
 
     def keep(self):
         self.keep_jobdir = True
