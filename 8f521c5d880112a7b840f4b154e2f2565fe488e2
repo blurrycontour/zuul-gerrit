@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95a7c020_cad64be9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 35200
+      },
+      "writtenOn": "2024-02-21T12:40:36Z",
+      "side": 1,
+      "message": "typo? Or is it 2 threads?",
+      "range": {
+        "startLine": 15,
+        "startChar": 29,
+        "endLine": 15,
+        "endChar": 32
+      },
+      "revId": "8f521c5d880112a7b840f4b154e2f2565fe488e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
