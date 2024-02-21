@@ -41,12 +41,14 @@ class GerritChange(Change):
         self.hashtags = []
         self.zuul_query_ltime = None
 
-    def update(self, data, connection):
+    def update(self, data, extra, connection):
         self.zuul_query_ltime = data.zuul_query_ltime
         if data.format == data.SSH:
             self.updateFromSSH(data.data, connection)
         else:
             self.updateFromHTTP(data.data, data.files, connection)
+        for k, v in extra.items():
+            setattr(self, k, v)
         key = ChangeKey(connection.connection_name, None,
                         'GerritChange', str(self.number), str(self.patchset))
         return key

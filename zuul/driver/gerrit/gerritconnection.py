@@ -138,6 +138,7 @@ class GerritChangeData(object):
         self.message = data['commitMessage']
         self.current_patchset = str(data['currentPatchSet']['number'])
         self.number = str(data['number'])
+        self.id = data['id']
 
         if 'dependsOn' in data:
             parts = data['dependsOn'][0]['ref'].split('/')
@@ -152,6 +153,7 @@ class GerritChangeData(object):
         self.message = rev['commit']['message']
         self.current_patchset = str(rev['_number'])
         self.number = str(data['_number'])
+        self.id = data['change_id']
 
     def parseRelatedHTTP(self, data, related):
         self.needed_by = []
@@ -827,10 +829,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         # None.  All paths hit the change cache first.  To be able to
         # drop history, we need to resolve the patchset on events with
         # no patchsets before adding the entry to the change cache.
-        if (history and change.number and change.patchset and
-            (change.number, change.patchset) in history):
-            log.debug("Change %s is in history", change)
-            return change
+        if history and change.number and change.patchset:
+            for history_change in history:
+                if (history_change.number == change.number and
+                    history_change.patchset == change.patchset):
+                    log.debug("Change %s is in history", change)
+                    return history_change
 
         if (self.max_dependencies is not None and
             history and
@@ -841,21 +845,30 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         log.info("Updating %s", change)
         data = self.queryChange(change.number, event=event)
 
+        # Do a local update without updating the cache so that we can
+        # reference this change when we recurse for dependencies.
+        change.update(data, {}, self)
+
+        # Get the dependencies for this change, and recursively update
+        # dependent changes (recursively calling this method).
+        if not change.is_merged:
+            extra = self._updateChangeDependencies(log, change, data, event, history)
+        else:
+            extra = {}
+
+        # Actually update this change in the change cache.
         def _update_change(c):
-            return c.update(data, self)
+            return c.update(data, extra, self)
 
         change = self._change_cache.updateChangeWithRetry(
             key, change, _update_change, allow_key_update=allow_key_update)
-
-        if not change.is_merged:
-            self._updateChangeDependencies(log, change, data, event, history)
 
         return change
 
     def _updateChangeDependencies(self, log, change, data, event, history):
         if history is None:
             history = []
-        history.append((change.number, change.patchset))
+        history.append(change)
 
         needs_changes = set()
         git_needs_changes = []
@@ -871,12 +884,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             # already merged. So even if it is "ABANDONED", we should not
             # ignore it.
             if (not dep.is_merged) and dep not in needs_changes:
-                git_needs_changes.append(dep.cache_key)
-                needs_changes.add(dep.cache_key)
+                git_needs_changes.append(dep_key.reference)
+                needs_changes.add(dep_key.reference)
 
         compat_needs_changes = []
         for (dep_num, dep_ps) in self._getDependsOnFromCommit(
-                change.message, change, event):
+                data.message, change, event):
             log.debug("Updating %s: Getting commit-dependent "
                       "change %s,%s", change, dep_num, dep_ps)
             dep_key = ChangeKey(self.connection_name, None,
@@ -884,8 +897,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             dep = self._getChange(dep_key, history=history,
                                   event=event)
             if dep.open and dep not in needs_changes:
-                compat_needs_changes.append(dep.cache_key)
-                needs_changes.add(dep.cache_key)
+                compat_needs_changes.append(dep_key.reference)
+                needs_changes.add(dep_key.reference)
 
         needed_by_changes = set()
         git_needed_by_changes = []
@@ -899,8 +912,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                       event=event)
                 if (dep.open and dep.is_current_patchset and
                     dep not in needed_by_changes):
-                    git_needed_by_changes.append(dep.cache_key)
-                    needed_by_changes.add(dep.cache_key)
+                    git_needed_by_changes.append(dep_key.reference)
+                    needed_by_changes.add(dep_key.reference)
             except GerritEventProcessingException:
                 raise
             except Exception:
@@ -909,7 +922,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
         compat_needed_by_changes = []
         for (dep_num, dep_ps) in self._getNeededByFromCommit(
-                change.id, change, event):
+                data.id, change, event):
             try:
                 log.debug("Updating %s: Getting commit-needed change %s,%s",
                           change, dep_num, dep_ps)
@@ -926,8 +939,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     event=event)
                 if (dep.open and dep.is_current_patchset
                     and dep not in needed_by_changes):
-                    compat_needed_by_changes.append(dep.cache_key)
-                    needed_by_changes.add(dep.cache_key)
+                    compat_needed_by_changes.append(dep_key.reference)
+                    needed_by_changes.add(dep_key.reference)
             except GerritEventProcessingException:
                 raise
             except Exception:
@@ -959,24 +972,24 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 # a cycle. This ensures Zuul's cycle handling manages
                 # the submitted together changes properly.
                 if dep.open and dep not in needs_changes:
-                    compat_needs_changes.append(dep.cache_key)
-                    needs_changes.add(dep.cache_key)
+                    compat_needs_changes.append(dep_key.reference)
+                    needs_changes.add(dep_key.reference)
                 if (dep.open and dep.is_current_patchset
                     and dep not in needed_by_changes):
-                    compat_needed_by_changes.append(dep.cache_key)
-                    needed_by_changes.add(dep.cache_key)
+                    compat_needed_by_changes.append(dep_key.reference)
+                    needed_by_changes.add(dep_key.reference)
             except GerritEventProcessingException:
                 raise
             except Exception:
                 log.exception("Failed to get commit-needed change %s,%s",
                               dep_num, dep_ps)
 
-        self.updateChangeAttributes(
-            change,
+        return dict(
             git_needs_changes=git_needs_changes,
             compat_needs_changes=compat_needs_changes,
             git_needed_by_changes=git_needed_by_changes,
-            compat_needed_by_changes=compat_needed_by_changes)
+            compat_needed_by_changes=compat_needed_by_changes,
+        )
 
     def isMerged(self, change, head=None):
         self.log.debug("Checking if change %s is merged" % change)
@@ -992,7 +1005,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                         str(change.patchset))
 
         def _update_change(c):
-            c.update(data, self)
+            c.update(data, {}, self)
 
         self._change_cache.updateChangeWithRetry(key, change, _update_change)
 

@@ -115,7 +115,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                 # cycle changes will otherwise be partially enqueued without
                 # any error handling
                 self.log.debug(
-                    "    Skipping change %s due to dependency cycle"
+                    "    Skipping change %s due to dependency cycle",
+                    other_change
                 )
                 continue
 
