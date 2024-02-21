@@ -22,6 +22,24 @@
       },
       "revId": "8f521c5d880112a7b840f4b154e2f2565fe488e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16fa28de_ffb5838d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-21T18:08:58Z",
+      "side": 1,
+      "message": "Two: the run handler thread and the layout update thread.",
+      "parentUuid": "95a7c020_cad64be9",
+      "revId": "8f521c5d880112a7b840f4b154e2f2565fe488e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
