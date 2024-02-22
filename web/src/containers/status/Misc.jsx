@@ -286,11 +286,18 @@ QueueItemProgressbar.propTypes = {
   darkMode: PropTypes.bool,
 }
 
+// TODO (felix): Taken from containers.status.ItemPanel.getRefs
+function getRefs(item) {
+  // For backwards compat: get a list of this items refs.
+  return 'refs' in item ? item.refs : [item]
+}
+
 export {
   calculateQueueItemTimes,
   ChangeLink,
   getJobStrResult,
   getQueueItemIconConfig,
+  getRefs,
   QueueItemProgressbar,
   PipelineIcon,
 }

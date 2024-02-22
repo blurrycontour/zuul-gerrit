@@ -25,10 +25,23 @@ import {
   FlexItem,
   Tooltip,
 } from '@patternfly/react-core'
-
 import { SquareIcon } from '@patternfly/react-icons'
 
+import QueueItemPopover from './QueueItemPopover'
 import { PipelineIcon, getQueueItemIconConfig } from './Misc'
+
+function QueueItemSquareWithPopover({ item }) {
+  return (
+    <QueueItemPopover
+      item={item}
+      triggerElement={<QueueItemSquare item={item} />}
+    />
+  )
+}
+
+QueueItemSquareWithPopover.propTypes = {
+  item: PropTypes.object,
+}
 
 function QueueItemSquare({ item }) {
   const iconConfig = getQueueItemIconConfig(item)
@@ -65,7 +78,7 @@ function QueueSummary({ pipeline, pipelineType }) {
               </CardTitle>
               <CardBody style={{ paddingBottom: '0' }}>
                 {queue.heads.map((head) => (
-                  head.map((item) => <QueueItemSquare item={item} key={item.id} />)
+                  head.map((item) => <QueueItemSquareWithPopover item={item} key={item.id} />)
                 ))}
               </CardBody>
             </Card>
@@ -83,7 +96,7 @@ function QueueSummary({ pipeline, pipelineType }) {
           queue.heads.map((head) => (
             head.map((item) => (
               <FlexItem key={item.id}>
-                <QueueItemSquare item={item} />
+                <QueueItemSquareWithPopover item={item} />
               </FlexItem>
             ))
           ))
