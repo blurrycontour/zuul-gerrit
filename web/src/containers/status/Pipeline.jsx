@@ -18,53 +18,7 @@ import { Badge } from 'patternfly-react'
 import { Title, Tooltip } from '@patternfly/react-core'
 
 import ChangeQueue from './ChangeQueue'
-
-import {
-  CodeBranchIcon,
-  FlaskIcon,
-  SortAmountDownIcon,
-  BundleIcon,
-  StreamIcon,
-} from '@patternfly/react-icons'
-
-/*
-  Note: the documentation links are unused at the moment, but kept for convenience. We might figure a way to
-  use these at some point.
-*/
-const PIPELINE_ICONS = {
-  dependent: {
-    icon: CodeBranchIcon,
-    help_title: 'Dependent Pipeline',
-    help: 'A dependent pipeline ensures that every change is tested exactly in the order it is going to be merged into the repository.',
-    doc_url: 'https://zuul-ci.org/docs/zuul/reference/pipeline_def.html#value-pipeline.manager.dependent',
-  },
-  independent: {
-    icon: FlaskIcon,
-    help_title: 'Independent Pipeline',
-    help: 'An independent pipeline treats every change as independent of other changes in it.',
-    doc_url: 'https://zuul-ci.org/docs/zuul/reference/pipeline_def.html#value-pipeline.manager.independent',
-  },
-  serial: {
-    icon: SortAmountDownIcon,
-    help_title: 'Serial Pipeline',
-    help: 'A serial pipeline supports shared queues, but only one item in each shared queue is processed at a time.',
-    doc_url: 'https://zuul-ci.org/docs/zuul/reference/pipeline_def.html#value-pipeline.manager.serial',
-  },
-  supercedent: {
-    icon: BundleIcon,
-    help_title: 'Supercedent Pipeline',
-    help: 'A supercedent pipeline groups items by project and ref, and processes only one item per grouping at a time. Only two items (currently processing and latest) can be queued per grouping.',
-    doc_url: 'https://zuul-ci.org/docs/zuul/reference/pipeline_def.html#value-pipeline.manager.supercedent',
-  },
-  unknown: {
-    icon: StreamIcon,
-    help_title: '?',
-    help: 'Unknown pipeline type',
-    doc_url: 'https://zuul-ci.org/docs/zuul/reference/pipeline_def.html'
-  },
-}
-
-const DEFAULT_PIPELINE_ICON = PIPELINE_ICONS['unknown']
+import { PipelineIcon } from './Misc'
 
 function getRefs(item) {
   // Backwards compat
@@ -170,18 +124,9 @@ class Pipeline extends React.Component {
     const { pipeline } = this.props
     let pipeline_type = pipeline.manager || 'unknown'
 
-    const pl_config = PIPELINE_ICONS[pipeline_type] || DEFAULT_PIPELINE_ICON
-    const Icon = pl_config.icon
     return (
       <>
-        <Tooltip
-          position="bottom"
-          content={<div><strong>{pl_config.help_title}</strong><p>{pl_config.help}</p></div>}
-        >
-          <Icon />
-        </Tooltip>
-        &nbsp;
-        {pipeline.name}
+        <PipelineIcon pipelineType={pipeline_type} /> {pipeline.name}
       </>
     )
   }
