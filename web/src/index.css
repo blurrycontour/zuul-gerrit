@@ -182,6 +182,58 @@ a.refresh {
 }
 
 /* Status page */
+
+/* Use the same hover effect like for selectable cards, but without
+   actually selecting them */
+.zuul-pipeline-summary:hover {
+    box-shadow: var(--pf-c-card--m-selectable--active--BoxShadow);
+    cursor: default;
+}
+
+/* Override PF4 padding values on compact cards to make them even more
+   compact. */
+.pf-c-card.zuul-compact-card .pf-c-card__header {
+    padding: 8px 16px 0 16px;
+}
+
+.pf-c-card.zuul-compact-card .pf-c-card__title {
+    padding: 16px 16px 0 16px;
+}
+
+.pf-c-card.zuul-compact-card .pf-c-card__body {
+    padding: 0 16px 16px 16px;
+}
+
+/* TODO (felix): Could we put every title within a compact header and
+   remove this css rule? */
+.pf-c-card.zuul-compact-card .pf-c-card__header .pf-c-card__title {
+    padding: 0;
+    padding-bottom: 8px;
+}
+
+.zuul-item-square {
+    /* We make this clickable in a follow-up change */
+    cursor: default;
+    opacity: 0.7;
+    padding: 0 !important;
+}
+
+.zuul-item-square-success {
+    color: var(--pf-global--success-color--100) !important;
+}
+.zuul-item-square-danger {
+    color: var(--pf-global--danger-color--100) !important;
+}
+.zuul-item-square-info {
+    color: var(--pf-global--info-color--100) !important;
+}
+.zuul-item-square-warning {
+    color: var(--pf-global--warning-color--100) !important;
+}
+.zuul-item-square-pending {
+    color: var(--pf-global--palette--black-500) !important;
+}
+
 .zuul-pipeline-header h3 {
     font-weight: var(--pf-global--FontWeight--bold);
 }
@@ -524,6 +576,9 @@ details.foldable[open] summary::before {
     background: var(--pf-global--palette--red-50);
 }
 
+/*
+ * Dark Mode overrides
+ */
 .pf-theme-dark .pf-c-nav__link {
   color: #fff !important;
 }
@@ -561,4 +616,24 @@ details.foldable[open] summary::before {
 
 .pf-theme-dark .pf-c-empty-state {
     color: #fff !important;
+}
+
+.pf-theme-dark .zuul-item-square-success {
+    color: var(--pf-global--palette--green-300) !important;
+}
+
+.pf-theme-dark .zuul-item-square-success svg:hover {
+    color: var(--pf-global--palette--green-500) !important;
+}
+
+.pf-theme-dark .zuul-item-square-danger svg:hover {
+    color: var(--pf-global--palette--red-200) !important;
+}
+
+.pf-theme-dark .zuul-item-square-pending {
+    color: var(--pf-global--palette--black-400) !important
+}
+
+.pf-theme-dark .zuul-item-square-pending svg:hover {
+    color: var(--pf-global--palette--black-500) !important;
 }
