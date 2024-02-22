@@ -14,7 +14,6 @@
 
 import ComponentsPage from './pages/Components'
 import FreezeJobPage from './pages/FreezeJob'
-import StatusPage from './pages/Status'
 import ChangeStatusPage from './pages/ChangeStatus'
 import ProjectPage from './pages/Project'
 import ProjectsPage from './pages/Projects'
@@ -34,6 +33,7 @@ import ConfigErrorsPage from './pages/ConfigErrors'
 import TenantsPage from './pages/Tenants'
 import StreamPage from './pages/Stream'
 import OpenApiPage from './pages/OpenApi'
+import PipelineOverviewPage from './pages/PipelineOverview'
 
 // The Route object are created in the App component.
 // Object with a title are created in the menu.
@@ -43,7 +43,7 @@ const routes = () => [
   {
     title: 'Status',
     to: '/status',
-    component: StatusPage
+    component: PipelineOverviewPage,
   },
   {
     title: 'Projects',
