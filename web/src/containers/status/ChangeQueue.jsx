@@ -12,63 +12,67 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import * as React from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { Badge } from 'patternfly-react'
-import { Tooltip } from '@patternfly/react-core'
 
-import Item from './Item'
+import {
+  Card,
+  CardTitle,
+  CardBody,
+  Panel,
+  ProgressStep,
+  ProgressStepper,
+  Title,
+} from '@patternfly/react-core'
+
+import QueueItem from './QueueItem'
+import { getQueueItemIconConfig } from './Misc'
 
 
-class ChangeQueue extends React.Component {
-  static propTypes = {
-    pipeline: PropTypes.object.isRequired,
-    queue: PropTypes.object.isRequired,
-    expanded: PropTypes.bool.isRequired
-  }
+function ChangeQueue({ queue }) {
+  return (
+    <>
+      <Card isPlain className="zuul-change-queue">
+        {queue.name ?
+          <CardTitle>
+            <Title headingLevel="h3" style={{ padding: 0, margin: 0 }}>
+              {queue.name}
+              {queue.branch ? ` (${queue.branch})` : ''}
+            </Title>
+          </CardTitle>
+          : ''}
+        <CardBody>
+          <Panel>
+            <ProgressStepper isVertical>
+              {queue.heads.map(head => (
+                head.map(item => {
+                  const iconConfig = getQueueItemIconConfig(item)
+                  const Icon = iconConfig.icon
+                  return (
+                    <ProgressStep
+                      variant={iconConfig.variant}
+                      id={item.id}
+                      titleId={item.id}
+                      icon={<Icon />}
+                      style={{ marginBottom: '16px' }}
+                      key={item.id}
+                    >
+                      <QueueItem item={item} />
+                    </ProgressStep>
+                  )
+                })
+              ))}
+            </ProgressStepper>
+          </Panel>
+        </CardBody>
+      </Card >
+    </>
+  )
+}
 
-  render() {
-    const { queue, pipeline, expanded } = this.props
-    let fullName = queue.name
-    if (queue.branch) {
-      fullName = `${fullName} (${queue.branch})`
-    }
-    let shortName = fullName
-    if (shortName.length > 32) {
-      shortName = shortName.substr(0, 32) + '...'
-    }
-    let changesList = []
-    queue.heads.forEach((items, itemIdx) => {
-      items.forEach((item, idx) => {
-        changesList.push(
-          <Item
-            item={item}
-            queue={queue}
-            expanded={expanded}
-            pipeline={pipeline}
-            key={itemIdx.toString() + idx}
-          />)
-      })
-    })
-    const window = queue.window || '\u221e'  // infinity
-    const is_dependent = pipeline.manager === 'dependent'
-    return (
-      <div className="change-queue" data-zuul-pipeline={pipeline.name}>
-        <p>
-          Queue: <abbr title={fullName}>{shortName}</abbr>
-          <Tooltip position="bottom"
-                   content={
-                     <div>
-                       <p>Queue length: {changesList.length}</p>
-                       {is_dependent && <p>Window size: {window}</p>}
-                     </div>
-                   }>
-            <Badge>{changesList.length} {is_dependent && `/ ${window}`}</Badge>
-          </Tooltip>
-        </p>
-        {changesList}
-      </div>)
-  }
+ChangeQueue.propTypes = {
+  queue: PropTypes.object,
+  tenant: PropTypes.object,
 }
 
 export default ChangeQueue
