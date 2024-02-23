@@ -183,11 +183,30 @@ a.refresh {
 
 /* Status page */
 
+.zuul-remaining-time {
+    text-align: right;
+}
+
+.zuul-unknown-remaining-time {
+    text-align: right;
+    padding-right: 4px;
+}
+
 /* Use the same hover effect like for selectable cards, but without
    actually selecting them */
-.zuul-pipeline-summary:hover {
+.zuul-pipeline-summary:hover,
+.zuul-queue-item:hover {
     box-shadow: var(--pf-c-card--m-selectable--active--BoxShadow);
     cursor: default;
+}
+
+.pf-c-popover.zuul-queue-item-popover .pf-c-popover__content h6 {
+    margin-bottom: 0;
+    margin-top: 5px;
+}
+
+.pf-c-popover.zuul-queue-item-popover .pf-c-popover__footer {
+    margin-top: 8px;
 }
 
 /* Override PF4 padding values on compact cards to make them even more
@@ -209,6 +228,22 @@ a.refresh {
 .pf-c-card.zuul-compact-card .pf-c-card__header .pf-c-card__title {
     padding: 0;
     padding-bottom: 8px;
+}
+
+.pf-c-card.zuul-compact-card .pf-c-expandable-section__content {
+    margin-top: 8px;
+}
+
+.zuul-compact-grid {
+    grid-gap: 4px;
+}
+
+.zuul-compact-expendable-section .pf-c-expandable-section__toggle-text {
+    margin-left: 4px;
+}
+
+.zuul-pipeline-link {
+    color: #363636;
 }
 
 .zuul-item-square {
@@ -251,6 +286,91 @@ a.refresh {
 .zuul-item-square-pending svg:hover {
     opacity: 1;
     color: var(--pf-global--palette--black-700) !important;
+}
+
+.zuul-change-queue .pf-c-progress-stepper__step-main {
+    margin-bottom: 20px;
+}
+
+.zuul-job-list.pf-c-data-list .pf-c-data-list__item-content {
+    padding-bottom: 4px;
+}
+
+.zuul-job-list .pf-c-data-list__item-row {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.zuul-job-list .pf-c-data-list__item:last-child {
+    border-bottom: none;
+}
+
+.zuul-job-list .pf-c-data-list__item:last-child .pf-c-data-list__item-content {
+    padding-bottom: 0;
+}
+
+@media screen and (max-width: 768px) {
+    .pf-c-data-list.pf-m-compact.pf-m-grid-md.zuul-job-list {
+        border-top-width: 4px;
+    }
+    .zuul-job-list .pf-c-data-list__item {
+        border-bottom-width: 4px;
+    }
+}
+
+/* Use a fixed width for job result labels. Otherwise the width will
+   be different based on the length of the result string (e.g. SUCCESS,
+   POST_FAILURE, RETRY_LIMIT) */
+.zuul-job-result-label.pf-c-label {
+    border-radius: 3px;
+    width: 100px;
+}
+
+.zuul-job-result-label.pf-c-label .pf-c-label__content::before {
+    border-radius: 3px;
+}
+
+.zuul-job-result-label.pf-c-label .pf-c-label__content {
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+
+/* Remove grid gap for job progress bars to align them with the
+   width of the result labels. */
+.pf-c-progress.zuul-progress,
+.pf-c-progress.zuul-progress-animated {
+    --pf-c-progress--GridGap: 0;
+}
+
+/* Make job progress bars the same width as the job result labels */
+.zuul-progress div.pf-c-progress__bar {
+    width: 100px;
+    height: 24px;
+}
+
+.zuul-progress .pf-c-progress__indicator,
+.zuul-progress-animated .pf-c-progress__indicator {
+    border-radius: 3px;
+    height: 24px;
+}
+
+.zuul-progress-animated div.pf-c-progress__bar::before {
+    border-radius: 3px;
+}
+
+.zuul-progress-animated div.pf-c-progress__bar {
+    width: 100px;
+    height: 24px;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(3,3,3,.15) 25%, rgba(3,3,3,.15) 26%, transparent 27%, transparent 49%,
+        rgba(3,3,3,.15) 50%, rgba(3,3,3,.15) 51%,transparent 52%,transparent 74%,
+        rgba(3,3,3,.15) 75%,rgba(3,3,3,.15) 76%,transparent 77%
+    );
+    background-size: 40px 40px;
+    -webkit-animation: progress-bar-stripes 1s linear infinite;
+    animation: progress-bar-stripes 1s linear infinite;
 }
 
 .zuul-pipeline-header h3 {
@@ -664,4 +784,21 @@ details.foldable[open] summary::before {
 
 .pf-theme-dark .zuul-queue-item-popover {
     color: var(--pf-global--Color--100);
+}
+
+.pf-theme-dark .zuul-pipeline-link {
+    color: var(--pf-global--Color--100);
+}
+
+.pf-theme-dark .progress {
+    background-color: var(--pf-global--palette--black-500);
+}
+
+.pf-theme-dark .zuul-progress-animated div.pf-c-progress__bar {
+    background-image: linear-gradient(
+        -45deg,
+        rgba(254,254,254,.30) 25%, rgba(254,254,254,.30) 26%, transparent 27%, transparent 49%,
+        rgba(254,254,254,.30) 50%, rgba(254,254,254,.30) 51%,transparent 52%,transparent 74%,
+        rgba(254,254,254,.30) 75%,rgba(254,254,254,.30) 76%,transparent 77%
+    );
 }
