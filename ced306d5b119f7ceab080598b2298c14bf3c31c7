@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e1875e8_20171519",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 893,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-23T23:28:42Z",
+      "side": 1,
+      "message": "Discussed with Clark out of band and he\u0027s okay with it as written, so proxying a +3 from him.",
+      "parentUuid": "c8a33c1c_bdd95d79",
+      "revId": "ced306d5b119f7ceab080598b2298c14bf3c31c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbcc24d3_dcd3d735",
@@ -49,6 +67,24 @@
       "writtenOn": "2024-02-23T17:05:42Z",
       "side": 1,
       "message": "See above. It is actually this modification that makes me think this might be a meaningful update since we also set id on the change data objects as part of this zuul change.",
+      "revId": "ced306d5b119f7ceab080598b2298c14bf3c31c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d3dd8c2_4c5b8f01",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-23T23:28:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbcc24d3_dcd3d735",
       "revId": "ced306d5b119f7ceab080598b2298c14bf3c31c7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
