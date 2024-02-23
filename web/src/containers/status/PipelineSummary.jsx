@@ -14,6 +14,7 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 
 import {
   Badge,
@@ -97,7 +98,7 @@ function QueueSummary({ pipeline, pipelineType }) {
   }
 }
 
-function PipelineSummary({ pipeline }) {
+function PipelineSummary({ pipeline, tenant }) {
 
   const countItems = (pipeline) => {
     let count = 0
@@ -120,7 +121,12 @@ function PipelineSummary({ pipeline }) {
         style={pipelineType !== "dependent" ? { paddingBottom: '8px' } : {}}
       >
         <PipelineIcon pipelineType={pipelineType} />
-        {pipeline.name}
+        <Link
+          to={`${tenant.linkPrefix}/status/pipeline/${pipeline.name}`}
+          style={{color: '#363636'}}
+        >
+          {pipeline.name}
+        </Link>
         <Tooltip
           content={
             itemCount === 1
@@ -146,6 +152,7 @@ function PipelineSummary({ pipeline }) {
 
 PipelineSummary.propTypes = {
   pipeline: PropTypes.object,
+  tenant: PropTypes.object,
 }
 
 export default PipelineSummary
