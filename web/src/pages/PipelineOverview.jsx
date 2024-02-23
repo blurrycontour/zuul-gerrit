@@ -48,7 +48,7 @@ function PipelineOverviewPage({ pipelines, tenant, darkMode, fetchStatusIfNeeded
         >
           {pipelines.map(pipeline => (
             <GalleryItem key={pipeline.name}>
-              <PipelineSummary pipeline={pipeline} />
+              <PipelineSummary pipeline={pipeline} tenant={tenant} />
             </GalleryItem>
           ))}
 
