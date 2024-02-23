@@ -16,21 +16,31 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 
-import { Tooltip } from '@patternfly/react-core'
 import {
+  Label,
+  Progress,
+  ProgressMeasureLocation,
+  ProgressVariant,
+  Tooltip,
+} from '@patternfly/react-core'
+import {
+  AngleDoubleRightIcon,
   BundleIcon,
   CheckIcon,
   CodeBranchIcon,
   ExclamationIcon,
   FlaskIcon,
+  InProgressIcon,
+  PauseIcon,
   OutlinedClockIcon,
   SortAmountDownIcon,
   StreamIcon,
   TimesIcon,
 } from '@patternfly/react-icons'
 
-import { ExternalLink } from '../../Misc'
+import { ExternalLink, formatTime } from '../../Misc'
 
 const QUEUE_ITEM_ICON_CONFIGS = {
   SUCCESS: {
@@ -98,6 +108,66 @@ const PIPELINE_ICON_CONFIGS = {
 }
 
 const DEFAULT_PIPELINE_ICON_CONFIG = PIPELINE_ICON_CONFIGS['unknown']
+
+const JOB_STATE_ICON_CONFIGS = {
+  // TODO (felix): Add missing stats/result values like
+  // unstable, retry_limit, post_failure, node_failure
+  SUCCESS: {
+    icon: CheckIcon,
+    color: 'var(--pf-global--success-color--100)',
+    variant: 'success',
+    labelColor: 'green',
+  },
+  FAILURE: {
+    icon: TimesIcon,
+    color: 'var(--pf-global--danger-color--100)',
+    variant: 'danger',
+    labelColor: 'red',
+  },
+  PAUSED: {
+    icon: PauseIcon,
+    color: 'var(--pf-global--info-color--100)',
+    variant: 'info',
+    labelColor: 'blue',
+  },
+  QUEUED: {
+    icon: OutlinedClockIcon,
+    color: 'var(--pf-global--info-color--100)',
+    variant: 'pending',
+    labelColor: 'grey',
+  },
+  WAITING: {
+    icon: OutlinedClockIcon,
+    color: 'var(--pf-global--disabled-color--100)',
+    variant: 'pending',
+    labelColor: 'grey',
+  },
+  SKIPPED: {
+    icon: AngleDoubleRightIcon,
+    color: 'var(--pf-global--info-color--100)',
+    variant: 'info',
+    labelColor: 'blue',
+  },
+  CANCELED: {
+    icon: TimesIcon,
+    color: 'var(--pf-global--danger-color--100)',
+    variant: 'danger',
+    labelColor: 'orange',
+  },
+  POST_FAILURE: {
+    icon: TimesIcon,
+    color: 'var(--pf-global--danger-color--100)',
+    variant: 'danger',
+    labelColor: 'red',
+  },
+}
+
+const DEFAULT_JOB_STATE_ICON_CONFIG = {
+  icon: InProgressIcon,
+  color: 'var(--pf-global--disabled-color--100)',
+  variant: 'info',
+  labelColor: 'grey',
+}
 
 const getQueueItemIconConfig = (item) => {
   if (item.failing_reasons && item.failing_reasons.length > 0) {
@@ -288,6 +358,125 @@ QueueItemProgressbar.propTypes = {
   darkMode: PropTypes.bool,
 }
 
+function JobProgressBar({ job, elapsedTime, remainingTime }) {
+  let progressPercent = 100 * (elapsedTime / (elapsedTime + remainingTime))
+  const remainingTimeStr = formatTime(remainingTime)
+
+  if (Number.isNaN(progressPercent)) {
+    progressPercent = 0
+  }
+
+  const progressBar = (
+      <Progress
+        aria-label={`${job.name}-progress`}
+        className={progressPercent === 0 ? 'zuul-progress-animated' : 'zuul-progress'}
+        variant={job.pre_fail ? ProgressVariant.danger : ''}
+        value={progressPercent}
+        measureLocation={ProgressMeasureLocation.none}
+      />
+  )
+
+  if (progressPercent === 0) {
+    return progressBar
+  }
+  return (
+    <Tooltip content={`Estimated remaining time: ${remainingTimeStr}`} position="right">
+      {progressBar}
+    </Tooltip>
+  )
+}
+
+JobProgressBar.propTypes = {
+  job: PropTypes.object,
+  elapsedTime: PropTypes.number,
+  remainingTime: PropTypes.number,
+}
+
+function JobStatusLabel({ job, result }) {
+  const iconConfig = JOB_STATE_ICON_CONFIGS[result.toUpperCase()] || DEFAULT_JOB_STATE_ICON_CONFIG
+  let title = ''
+
+  if (['waiting', 'queued'].includes(result) && job.waiting_status !== null) {
+    title = 'Waiting on ' + job.waiting_status
+  }
+
+  return (
+    <Label
+      className="zuul-job-result-label"
+      color={iconConfig.labelColor}
+      title={title}
+    >
+      {result}
+    </Label>
+  )
+}
+
+JobStatusLabel.propTypes = {
+  job: PropTypes.object,
+  result: PropTypes.string,
+}
+
+function JobLink({ job, tenant }) {
+  // Format job name with retries
+  let job_name = job.name
+  let ordinal_rules = new Intl.PluralRules('en', { type: 'ordinal' })
+  const suffixes = {
+    one: 'st',
+    two: 'nd',
+    few: 'rd',
+    other: 'th',
+  }
+  if (job.retries > 1) {
+    job_name = job_name + '(' + job.tries + suffixes[ordinal_rules.select(job.tries)] + ' attempt)'
+  }
+
+  let name = ''
+  if (job.result !== null) {
+    name = <a className='zuul-job-name' href={job.report_url}>{job_name}</a>
+  } else if (job.url !== null) {
+    let url = job.url
+    if (job.url.match('stream/')) {
+      const to = (
+        tenant.linkPrefix + '/' + job.url
+      )
+      name = <Link className='zuul-job-name' to={to}>{job_name}</Link>
+    } else {
+      name = <a className='zuul-job-name' href={url}>{job_name}</a>
+    }
+  } else {
+    name = <span className='zuul-job-name'>{job_name}</span>
+  }
+
+  return (
+    <span>
+      {name}
+      {job.voting === false
+        ? <small className='zuul-non-voting-desc'> (non-voting)</small>
+        : ''
+      }
+    </span>
+  )
+}
+
+JobLink.propTypes = {
+  job: PropTypes.object,
+  tenant: PropTypes.object,
+}
+
+function JobResultOrStatus({ job, job_times }) {
+  let result = getJobStrResult(job)
+  if (result === 'in progress') {
+    return <JobProgressBar job={job} elapsedTime={job_times.elapsed} remainingTime={job_times.remaining} />
+  }
+
+  return <JobStatusLabel job={job} result={result} />
+}
+
+JobResultOrStatus.propTypes = {
+  job: PropTypes.object,
+  job_times: PropTypes.object,
+}
+
 function getRefs(item) {
   // For backwards compat: get a list of this items refs.
   return 'refs' in item ? item.refs : [item]
@@ -299,6 +488,8 @@ export {
   getJobStrResult,
   getQueueItemIconConfig,
   getRefs,
+  JobLink,
+  JobResultOrStatus,
   QueueItemProgressbar,
   PipelineIcon,
 }
