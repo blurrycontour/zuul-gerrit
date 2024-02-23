@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c8a33c1c_bdd95d79",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 893,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-23T23:26:11Z",
+      "side": 1,
+      "message": "Good catch; I started by taking an approach where I thought I could rely entirely on data in this method and disregard change; however that didn\u0027t work because of the recursion -- we needed the change objects that we\u0027re putting into the history list to have correct information.  So it\u0027s true that line 850 means that data.message\u003d\u003dchange.message (and same for \u0027id\u0027), and we don\u0027t have to change this line, the id line, or add the lines that set data.id.\n\nHaving said that, it does seem tidy that we now reference only attributes on data in this method, so leaving this change as written doesn\u0027t seem like a bad idea.\n\nI\u0027m ambivalent about it.  We could do either.",
+      "parentUuid": "cbe6c56c_9a696df0",
+      "revId": "ced306d5b119f7ceab080598b2298c14bf3c31c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cbcc24d3_dcd3d735",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 2
