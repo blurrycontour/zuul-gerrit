@@ -185,7 +185,8 @@ a.refresh {
 
 /* Use the same hover effect like for selectable cards, but without
    actually selecting them */
-.zuul-pipeline-summary:hover {
+.zuul-pipeline-summary:hover,
+.zuul-queue-item:hover {
     box-shadow: var(--pf-c-card--m-selectable--active--BoxShadow);
     cursor: default;
 }
@@ -209,6 +210,18 @@ a.refresh {
 .pf-c-card.zuul-compact-card .pf-c-card__header .pf-c-card__title {
     padding: 0;
     padding-bottom: 8px;
+}
+
+.pf-c-card.zuul-compact-card .pf-c-expandable-section__content {
+    margin-top: 8px;
+}
+
+.zuul-compact-grid {
+    grid-gap: 4px;
+}
+
+.zuul-compact-expendable-section .pf-c-expandable-section__toggle-text {
+    margin-left: 4px;
 }
 
 .zuul-item-square {
@@ -251,6 +264,62 @@ a.refresh {
 .zuul-item-square-pending svg:hover {
     opacity: 1;
     color: var(--pf-global--palette--black-700) !important;
+}
+
+.zuul-change-queue .pf-c-progress-stepper__step-main {
+    margin-bottom: 20px;
+}
+
+.zuul-change-link {
+    float: right;
+    padding-bottom: 6px;
+    padding-top: 6px;
+}
+
+.zuul-job-list.pf-c-data-list .pf-c-data-list__item-content {
+    padding-bottom: 4px;
+}
+
+.zuul-job-list .pf-c-data-list__item-row {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.zuul-job-list .pf-c-data-list__item:last-child {
+    border-bottom: none;
+}
+
+.zuul-job-list .pf-c-data-list__item:last-child .pf-c-data-list__item-content {
+    padding-bottom: 0;
+}
+
+/* Use a fixed width for job result labels. Otherwise the width will
+   be different based on the length of the result string (e.g. SUCCESS,
+   POST_FAILURE, RETRY_LIMIT) */
+.zuul-job-result-label.pf-c-label {
+    border-radius: 3px;
+    width: 100px;
+}
+
+.zuul-job-result-label.pf-c-label .pf-c-label__content::before {
+    border-radius: 3px;
+}
+
+.zuul-progress div.pf-c-progress__bar {
+    width: 100px;
+}
+
+.zuul-animated-progress div.pf-c-progress__bar {
+    width: 100px;
+    background-image: linear-gradient(
+        -45deg,
+        rgba(3,3,3,.15) 25%, rgba(3,3,3,.15) 26%, transparent 27%, transparent 49%,
+        rgba(3,3,3,.15) 50%, rgba(3,3,3,.15) 51%,transparent 52%,transparent 74%,
+        rgba(3,3,3,.15) 75%,rgba(3,3,3,.15) 76%,transparent 77%
+    );
+    background-size: 40px 40px;
+    -webkit-animation: progress-bar-stripes 1s linear infinite;
+    animation: progress-bar-stripes 1s linear infinite;
 }
 
 .zuul-pipeline-header h3 {
