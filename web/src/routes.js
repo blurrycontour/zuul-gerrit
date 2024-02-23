@@ -33,6 +33,7 @@ import ConfigErrorsPage from './pages/ConfigErrors'
 import TenantsPage from './pages/Tenants'
 import StreamPage from './pages/Stream'
 import OpenApiPage from './pages/OpenApi'
+import PipelineDetailsPage from './pages/PipelineDetails'
 import PipelineOverviewPage from './pages/PipelineOverview'
 
 // The Route object are created in the App component.
@@ -92,6 +93,10 @@ const routes = () => [
   {
     to: '/status/change/:changeId',
     component: ChangeStatusPage
+  },
+  {
+    to: '/status/pipeline/:pipelineName',
+    component: PipelineDetailsPage,
   },
   {
     to: '/stream/:buildId',
