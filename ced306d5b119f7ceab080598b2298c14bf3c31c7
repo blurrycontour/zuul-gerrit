@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbe6c56c_9a696df0",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 893,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-23T17:05:42Z",
+      "side": 1,
+      "message": "Why did we go from `change` to `data` here? It appears that change.message should be set from the `change.update()` call on line 850 above?",
+      "revId": "ced306d5b119f7ceab080598b2298c14bf3c31c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbcc24d3_dcd3d735",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-23T17:05:42Z",
+      "side": 1,
+      "message": "See above. It is actually this modification that makes me think this might be a meaningful update since we also set id on the change data objects as part of this zuul change.",
+      "revId": "ced306d5b119f7ceab080598b2298c14bf3c31c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
