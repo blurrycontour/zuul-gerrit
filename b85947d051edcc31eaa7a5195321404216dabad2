@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffbe26d1_1ca12914",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 631,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-26T23:41:11Z",
+      "side": 1,
+      "message": "The git commit manpage says these options can take the git internal timestamp format which is seconds from epoch and a timezone offset, rfc2822, or iso8601 timestamps. The timestamp used here will be a number of seconds since the epoch represented as a float (not int) and no timezone info. Should we ensure that we\u0027re using whole integer values and add a +0000 suffix?\n\nTesting with my local git installation does seem to show that if you leave off the timezone info git will use the local timezone. It also seems to handle the floating point epoch seconds just fine. The main reasons to change this are likely for future proofing against git becoming more picky.",
+      "revId": "b85947d051edcc31eaa7a5195321404216dabad2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53fd22ff_915bc395",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-26T23:41:11Z",
+      "side": 1,
+      "message": "Is setting the message necessary for strict hashes? I would\u0027ve expected the defaults (which we relied on previously) to be consistent. Might be worth a note here if there is some sublte behavior we need to deal with.\n\nAlso how does this impact the fast forward case? I see below in the rebase we don\u0027t set a message which makes sense as we are simply changing the commit tree. That would be similar to a fast forward. Does a fast forward set the timestamps and leave the message alone?",
+      "range": {
+        "startLine": 645,
+        "startChar": 27,
+        "endLine": 645,
+        "endChar": 51
+      },
+      "revId": "b85947d051edcc31eaa7a5195321404216dabad2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbabc777_343397f0",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-26T23:41:11Z",
+      "side": 1,
+      "message": "We aren\u0027t setting the message for the merge here. Should we if we keep that behavior in the regular merge case above?",
+      "revId": "b85947d051edcc31eaa7a5195321404216dabad2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
