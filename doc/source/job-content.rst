@@ -1222,6 +1222,30 @@ For example the following would skip retrying the build:
 
 .. _build_status:
 
+Ansible Groups
+--------------
+
+Ansible host groups may be configured via the job's :attr:`nodeset`.
+In addition to these, Zuul automatically creates a group named
+`zuul_unreachable`.  It is always present, and is empty when the job
+starts.  If any playbook encounters an unreachable host, that host is
+added to the group for all subsequent playbooks.  This can be used to
+avoid executing certain post-run playbook steps on hosts that are
+already known to be unreachable.  For example, to avoid copying logs
+from a remote host, a play might look something like:
+
+.. code-block:: yaml
+
+   - hosts: all:!zuul_unreachable
+     gather_facts: no
+     tasks:
+       - name: Copy logs
+         ...
+
+The group name `zuul_unreachable` is reserved by zuul and will
+automatically override any similarly named group defined by the
+nodeset.
+
 Build Status
 ------------
 

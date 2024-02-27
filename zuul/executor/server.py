@@ -919,7 +919,8 @@ def is_group_var_set(name, host, nodeset, job):
     return False
 
 
-def make_inventory_dict(nodes, nodeset, hostvars, remove_keys=None):
+def make_inventory_dict(nodes, nodeset, hostvars, unreachable_nodes,
+                        remove_keys=None):
     hosts = {}
     for node in nodes:
         node_hostvars = hostvars[node['name']].copy()
@@ -940,13 +941,11 @@ def make_inventory_dict(nodes, nodeset, hostvars, remove_keys=None):
         'all': {
             'hosts': hosts,
             'vars': all_hostvars,
+            'children': {},
         }
     }
 
     for group in nodeset.getGroups():
-        if 'children' not in inventory['all']:
-            inventory['all']['children'] = dict()
-
         group_hosts = {}
         for node_name in group.nodes:
             group_hosts[node_name] = None
@@ -955,6 +954,11 @@ def make_inventory_dict(nodes, nodeset, hostvars, remove_keys=None):
             group.name: {
                 'hosts': group_hosts,
             }})
+
+    inventory['all']['children'].update({
+        'zuul_unreachable': {
+            'hosts': {n: None for n in unreachable_nodes}
+        }})
 
     return inventory
 
@@ -1068,6 +1072,7 @@ class AnsibleJob(object):
         self.frozen_hostvars = {}
         # The zuul.* vars
         self.debug_zuul_vars = {}
+        self.unreachable_nodes = set()
         self.waiting_for_semaphores = False
         try:
             max_attempts = self.arguments["zuul"]["max_attempts"]
@@ -2671,11 +2676,23 @@ class AnsibleJob(object):
                 self.original_hostvars[host['name']])
             self.original_hostvars[host['name']]['unsafe_vars'] = unsafe
 
+    def updateUnreachableHosts(self):
+        # Load the unreachable file and update our running scoreboard
+        # of unreachable hosts.
+        try:
+            for line in open(self.jobdir.job_unreachable_file):
+                node = line.strip()
+                self.log.debug("Noting %s as unreachable", node)
+                self.unreachable_nodes.add(node)
+        except Exception:
+            self.log.error("Error updating unreachable hosts:")
+
     def writeDebugInventory(self):
         # This file is unused by Zuul, but the base jobs copy it to logs
         # for debugging, so let's continue to put something there.
         inventory = make_inventory_dict(
-            self.host_list, self.nodeset, self.original_hostvars)
+            self.host_list, self.nodeset, self.original_hostvars,
+            self.unreachable_nodes)
 
         inventory['all']['vars']['zuul'] = self.debug_zuul_vars
         with open(self.jobdir.inventory, 'w') as inventory_yaml:
@@ -2701,6 +2718,7 @@ class AnsibleJob(object):
     def writeInventory(self, jobdir_playbook, hostvars):
         inventory = make_inventory_dict(
             self.host_list, self.nodeset, hostvars,
+            self.unreachable_nodes,
             remove_keys=jobdir_playbook.secrets_keys)
 
         with open(jobdir_playbook.inventory, 'w') as inventory_yaml:
@@ -3003,7 +3021,7 @@ class AnsibleJob(object):
             return (self.RESULT_TIMED_OUT, None)
         # Note: Unlike documented ansible currently wrongly returns 4 on
         # unreachable so we have the zuul_unreachable callback module that
-        # creates the file job-output.unreachable in case there were
+        # creates the file nodes.unreachable in case there were
         # unreachable nodes. This can be removed once ansible returns a
         # distinct value for unreachable.
         # TODO: Investigate whether the unreachable callback can be
@@ -3012,6 +3030,7 @@ class AnsibleJob(object):
         if ret == 3 or os.path.exists(self.jobdir.job_unreachable_file):
             # AnsibleHostUnreachable: We had a network issue connecting to
             # our zuul-worker.
+            self.updateUnreachableHosts()
             return (self.RESULT_UNREACHABLE, None)
         elif ret == -9:
             # Received abort request.

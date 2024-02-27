@@ -8141,6 +8141,14 @@ class TestUnreachable(AnsibleZuulTestCase):
                 will_retry = f.readline()
                 expect_retry = build.name not in retried_builds
                 self.assertEqual(str(expect_retry), will_retry)
+            output_path = os.path.join(build.jobdir.root,
+                                       'work/logs/job-output.txt')
+            with open(output_path) as f:
+                job_output = f.read()
+            self.log.debug(job_output)
+            self.assertNotIn("This host is not unreachable", job_output)
+            self.assertIn("This host is unreachable: fake", job_output)
+
             retried_builds.add(build.name)
 
         conn = self.scheds.first.sched.sql.connection
