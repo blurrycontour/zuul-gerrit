@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab65ce74_66d7662f",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 631,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-27T16:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ce695ea_9e65cbc9",
+      "revId": "b85947d051edcc31eaa7a5195321404216dabad2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "53fd22ff_915bc395",
@@ -77,6 +95,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d778859_a6d2ba46",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 645,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-27T16:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5339fd4b_10c07f11",
+      "revId": "b85947d051edcc31eaa7a5195321404216dabad2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dbabc777_343397f0",
@@ -108,6 +144,24 @@
       "side": 1,
       "message": "Yes, I think so.",
       "parentUuid": "dbabc777_343397f0",
+      "revId": "b85947d051edcc31eaa7a5195321404216dabad2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "731322f3_26ce1566",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 689,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-27T16:14:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a7e4794_823da7f8",
       "revId": "b85947d051edcc31eaa7a5195321404216dabad2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
