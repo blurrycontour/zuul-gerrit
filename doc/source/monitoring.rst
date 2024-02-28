@@ -237,12 +237,16 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
          This hierarchy holds more specific metrics for each
          :term:`project queue` in the pipeline.
 
-         .. stat:: <queue name>
+         .. stat:: <queue>
 
             The name of the queue.  If the queue is automatically
             generated for a single project, the name of the project is
             used by default.  Embedded ``.`` characters will be
             translated to ``_``, and ``/`` to ``.``.
+
+            If the queue is configured as per-branch, the metrics
+            below are omitted and instead found under
+            :stat:`zuul.tenant.<tenant>.pipeline.<pipeline>.queue.<queue>.branch.<branch>`.
 
             .. stat:: current_changes
                :type: gauge
@@ -265,6 +269,20 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
                :type: counter
 
                The number of changes processed by the queue.
+
+            .. stat:: branch
+
+               If the queue is configured as per-branch, this
+               hierarchy will be present and will hold stats for each
+               branch seen.
+
+               .. stat:: <branch>
+
+                  The name of the branch.  Embedded ``.`` characters
+                  will be translated to ``_``, and ``/`` to ``.``.
+
+                  Underneath this key are per-branch values of the
+                  metrics above.
 
       .. stat:: project
 
