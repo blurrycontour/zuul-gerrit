@@ -410,6 +410,7 @@ class PlayBook extends React.Component {
 
     // This is the header for each playbook
     let dataListCells = []
+    console.log(playbook)
     dataListCells.push(
       <DataListCell key='name' width={1}>
         <strong>
