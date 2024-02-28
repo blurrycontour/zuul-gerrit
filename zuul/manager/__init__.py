@@ -2269,7 +2269,23 @@ class PipelineManager(metaclass=ABCMeta):
                 # stats.gauges.zuul.tenant.<tenant>.pipeline.<pipeline>.queue.<queue>.total_changes
                 # stats.gauges.zuul.tenant.<tenant>.pipeline.<pipeline>.queue.<queue>.current_changes
                 # stats.gauges.zuul.tenant.<tenant>.pipeline.<pipeline>.queue.<queue>.window
-                queuekey = '%s.queue.%s' % (key, queuename)
+                queuekey = f'{key}.queue.{queuename}'
+
+                # Handle per-branch queues
+                layout = self.pipeline.tenant.layout
+                queue_config = layout.queues.get(item.queue.name)
+                per_branch = queue_config and queue_config.per_branch
+                if per_branch and item.queue.project_branches:
+                    # Get the first project-branch of this queue,
+                    # which is a tuple of project, branch, and get
+                    # second item of that tuple, the branch name.  In
+                    # a per-branch queue, we expect the branch name to
+                    # be the same for every project.
+                    branch = item.queue.project_branches[0][1]
+                    if branch:
+                        branch = branch.replace('.', '_').replace('/', '.')
+                        queuekey = f'{queuekey}.branch.{branch}'
+
                 queue_changes = sum(len(i.changes) for i in item.queue.queue)
                 self.sched.statsd.gauge(queuekey + '.current_changes',
                                         queue_changes)
