@@ -42,7 +42,8 @@ class TestConfigLoader(ZuulTestCase):
         ansible_manager = AnsibleManager(
             default_version=zuul_globals.default_ansible_version)
         loader = ConfigLoader(
-            sched.connections, self.zk_client, zuul_globals, sched.statsd,
+            sched.connections, self.zk_client, zuul_globals,
+            sched.unparsed_config_cache, sched.statsd,
             keystorage=sched.keystore)
         abide = Abide()
         loader.loadTPCs(abide, unparsed_abide)

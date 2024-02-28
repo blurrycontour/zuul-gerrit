@@ -64,7 +64,7 @@ from zuul.model import (
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import COMPONENT_REGISTRY, WebComponent
-from zuul.zk.config_cache import SystemConfigCache
+from zuul.zk.config_cache import SystemConfigCache, UnparsedConfigCache
 from zuul.zk.event_queues import (
     TenantManagementEventQueue,
     TenantTriggerEventQueue,
@@ -2070,6 +2070,7 @@ class ZuulWeb(object):
             self.zk_client,
             self.system_config_cache_wake_event.set)
 
+        self.unparsed_config_cache = UnparsedConfigCache(self.zk_client)
         self.keystore = KeyStorage(
             self.zk_client, password=self._get_key_store_password())
         self.globals = SystemAttributes.fromConfig(self.config)
@@ -2423,7 +2424,7 @@ class ZuulWeb(object):
 
         loader = ConfigLoader(
             self.connections, self.zk_client, self.globals,
-            keystorage=self.keystore)
+            self.unparsed_config_cache, keystorage=self.keystore)
 
         tenant_names = set(self.abide.tenants)
         deleted_tenants = tenant_names.difference(
@@ -2441,7 +2442,7 @@ class ZuulWeb(object):
         self.log.debug("Updating layout state")
         loader = ConfigLoader(
             self.connections, self.zk_client, self.globals,
-            keystorage=self.keystore)
+            self.unparsed_config_cache, keystorage=self.keystore)
 
         # We need to handle new and deleted tenants, so we need to process all
         # tenants currently known and the new ones.

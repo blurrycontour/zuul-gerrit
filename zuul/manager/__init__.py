@@ -1152,7 +1152,7 @@ class PipelineManager(metaclass=ABCMeta):
         import zuul.configloader
         loader = zuul.configloader.ConfigLoader(
             self.sched.connections, self.sched.zk_client, self.sched.globals,
-            self.sched.statsd, self.sched)
+            self.sched.unparsed_config_cache, self.sched.statsd, self.sched)
 
         log.debug("Loading dynamic layout")
 

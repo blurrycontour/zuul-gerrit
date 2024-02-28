@@ -919,9 +919,9 @@ class Client(zuul.cmd.ZuulApp):
                 self.unparsed_config_cache = None
 
         zuul_globals = SystemAttributes.fromConfig(self.config)
-        loader = configloader.ConfigLoader(
-            self.connections, None, zuul_globals)
         sched = SchedulerConfig(self.config, self.connections)
+        loader = configloader.ConfigLoader(
+            self.connections, None, zuul_globals, None)
         tenant_config, script = sched._checkTenantSourceConf(self.config)
         try:
             unparsed_abide = loader.readConfig(
