@@ -2829,3 +2829,30 @@ class TestGithubSchemaWarnings(ZuulTestCase):
         self.assertIn(
             "Use 'rerequested' instead",
             str(tenant.layout.loading_errors[8].error))
+
+
+class TestGithubGraphQL(ZuulTestCase):
+    config_file = 'zuul-github-driver.conf'
+    scheduler_count = 1
+
+    @simple_layout('layouts/basic-github.yaml', driver='github')
+    def test_graphql_query_branch_protection(self):
+        project = self.fake_github.getProject('org/project')
+        github = self.fake_github.getGithubClient(project.name)
+        repo = github.repo_from_project('org/project')
+
+        # Ensure that both parts of the query hit pagination by having
+        # more than 100 results for each.
+        num_rules = 110
+        num_extra_branches = 104
+        for branch_no in range(num_rules):
+            rule = repo._set_branch_protection(f'branch{branch_no}',
+                                               protected=True,
+                                               locked=True)
+            # Add more fake matching refs to the rule here
+            for suffix in range(num_extra_branches):
+                rule.matching_refs.append(f'branch{branch_no}_{suffix}')
+        branches = list(
+            self.fake_github.graphql_client.fetch_branch_protection(
+                github, project))
+        self.assertEqual(num_rules * (1 + num_extra_branches), len(branches))
