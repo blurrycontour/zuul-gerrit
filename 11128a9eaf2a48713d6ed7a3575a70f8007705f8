@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "698fa946_9337c99d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-29T23:35:14Z",
+      "side": 1,
+      "message": "I think there is a bug in at least one of my comments.",
+      "revId": "11128a9eaf2a48713d6ed7a3575a70f8007705f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7404be17_e3122957",
+        "filename": "tests/fixtures/layouts/github-schema.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-29T23:35:14Z",
+      "side": 1,
+      "message": "No comment for this being deprecated now? It should produce a warning right?\n\nAdditionally should we have tests for unlabel, require-status, and requested?",
+      "revId": "11128a9eaf2a48713d6ed7a3575a70f8007705f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6be2664_eee6da72",
+        "filename": "zuul/driver/github/githubtrigger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-29T23:35:14Z",
+      "side": 1,
+      "message": "This block checks if require-status is in trigger, but then enters the unlabel context. I think this is bad copy paste and this block needs to be fully updated for require-status.\n\nAlso a good reason to add the suggested tests in the config file comment I left.",
+      "revId": "11128a9eaf2a48713d6ed7a3575a70f8007705f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1edc6eca_a2e42e61",
+        "filename": "zuul/driver/github/githubtrigger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-29T23:35:14Z",
+      "side": 1,
+      "message": "I\u0027m not sure where I see this being enforced. The schema at the end of this file allows a str or list for action.",
+      "revId": "11128a9eaf2a48713d6ed7a3575a70f8007705f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "362408ac_845a5e1d",
+        "filename": "zuul/driver/github/githubtrigger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-29T23:35:14Z",
+      "side": 1,
+      "message": "Nit we also need to modify this new schema to disallow lists in some places when we stop allowing those fields to be a list (for example event).",
+      "revId": "11128a9eaf2a48713d6ed7a3575a70f8007705f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c579520_012d4068",
+        "filename": "zuul/driver/github/githubtrigger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-29T23:35:14Z",
+      "side": 1,
+      "message": "When we extend schemas and redefine entries like we do here for `vs.Required(\u0027event\u0027)` we\u0027re replacing the schema rules for that entry. Then we choose which rules we want to apply in validate right? we aren\u0027t creating some merge of the two rules?\n\nIf that is the case should we drop the `vs.Required(\u0027event\u0027)` entry above on line 144 to avoid confusion (we appear to override it in each of these special cases here and below)?",
+      "revId": "11128a9eaf2a48713d6ed7a3575a70f8007705f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05112834_e909cbeb",
+        "filename": "zuul/driver/github/githubtrigger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-29T23:35:14Z",
+      "side": 1,
+      "message": "Nit if we\u0027re making a fixup patchset can we update this comment to read a bit more clearly? I think we want `# This method could be a simple...`",
+      "revId": "11128a9eaf2a48713d6ed7a3575a70f8007705f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29eda4b5_574fb284",
+        "filename": "zuul/driver/github/githubtrigger.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-02-29T23:35:14Z",
+      "side": 1,
+      "message": "This appears to be a redundant `event \u003d data.get(\u0027event\u0027)` line. \n\nAdditionally, event may still be a list right? Don\u0027t we need to loop over event if it is a list and do the checks below? Similar thing with action. Or are we hoping that people will get iterative errors and first fix the list problem then fix any deprecated event and action types?",
+      "revId": "11128a9eaf2a48713d6ed7a3575a70f8007705f8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
