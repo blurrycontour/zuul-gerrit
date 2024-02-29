@@ -198,3 +198,9 @@ Version 26
 :Prior Zuul version: 9.5.0
 :Description: Refactor circular dependencies.
               Affects schedulers and executors.
+
+Version 27
+----------
+:Prior Zuul version: 10.0.0
+:Description: Refactor branch cache.
+              Affects schedulers and web.

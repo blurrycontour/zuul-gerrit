@@ -24,7 +24,6 @@ from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 from zuul.model import FalseWithReason
 from zuul.driver.util import time_to_seconds, to_list
 
-
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
 
 
