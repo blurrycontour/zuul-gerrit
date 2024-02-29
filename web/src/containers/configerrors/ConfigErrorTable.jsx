@@ -24,7 +24,7 @@ import {
   EmptyStateSecondaryActions,
   Spinner,
   Title,
-  Tooltip,
+  DropdownToggle,
 } from '@patternfly/react-core'
 import {
   InfoCircleIcon,
@@ -47,31 +47,6 @@ import {
 } from '@patternfly/react-table'
 
 import { IconProperty } from '../../Misc'
-
-function FilterableText(props) {
-  const { addFilter, category, value } = props
-
-  return (
-    <>
-      {value &&
-       <Tooltip content={<div>Add filter</div>}>
-         <SearchPlusIcon color='var(--pf-global--Color--200)'
-                         onClick={() => addFilter(category, value)}
-         />
-       </Tooltip>
-      }
-      &#32;
-      <span>{value}</span>
-    </>
-  )
-}
-
-FilterableText.propTypes = {
-  category: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired,
-  addFilter: PropTypes.func.isRequired,
-}
-
 
 function ConfigErrorTable({
   errors,
@@ -129,20 +104,20 @@ function ConfigErrorTable({
       isOpen: isRowExpanded(rows.length),
       cells: [
         {
-          title: <FilterableText addFilter={addFilter} category='project'
-                                 value={error.source_context.project}/>
+          title: error.source_context.project,
+          filterCategory: 'project'
         },
         {
-          title: <FilterableText addFilter={addFilter} category='branch'
-                                 value={error.source_context.branch}/>
+          title: error.source_context.branch,
+          filterCategory: 'branch'
         },
         {
-          title: <FilterableText addFilter={addFilter} category='severity'
-                                 value={error.severity}/>
+          title: error.severity,
+          filterCategory: 'severity'
         },
         {
-          title: <FilterableText addFilter={addFilter} category='name'
-                                 value={error.name}/>
+          title: error.name,
+          filterCategory: 'name'
         },
         {
           title: error.short_error,
@@ -199,6 +174,27 @@ function ConfigErrorTable({
     })
   }
 
+  const actionResolver = (rowData) => {
+    if (rowData.parent !== undefined) {
+      return []
+    }
+    const cells = rowData.cells.filter(cell =>
+      cell.filterCategory
+    )
+    return cells.map(cell => {
+      return {
+        title: `Filter by ${cell.filterCategory}: ${cell.title} `,
+        onClick: () => {addFilter(cell.filterCategory, cell.title)}
+      }
+    })
+  }
+
+  const filterToggle = (filterProps) => (
+    <DropdownToggle toggleIndicator={null} onToggle={filterProps.onToggle}>
+      <SearchPlusIcon color='var(--pf-global--Color--200)'/>
+    </DropdownToggle>
+  )
+
   return (
     <>
       <Table
@@ -206,11 +202,11 @@ function ConfigErrorTable({
         variant={TableVariant.compact}
         cells={columns}
         rows={rows}
-        className="zuul-table"
+        actionResolver={actionResolver}
         onCollapse={(_event, rowIndex, isOpen) => {
           setRowExpanded(rowIndex, isOpen)
         }}
-        expandId="expandable-table-toggle" contentId="expandable-table-content"
+        actionsToggle={filterToggle}
       >
         <TableHeader />
         <TableBody />
