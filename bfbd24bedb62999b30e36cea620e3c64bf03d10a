@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "073a5590_a577745c",
+        "filename": "doc/source/monitoring.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-02-29T17:03:16Z",
+      "side": 1,
+      "message": "Sphinx doesn\u0027t like these to end with \u003e so I\u0027m going to drop the last segment.",
+      "parentUuid": "a36d111d_68d17179",
+      "revId": "bfbd24bedb62999b30e36cea620e3c64bf03d10a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
