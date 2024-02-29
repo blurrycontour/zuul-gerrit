@@ -24,7 +24,7 @@ import {
   EmptyStateSecondaryActions,
   Spinner,
   Title,
-  Tooltip,
+  DropdownToggle,
 } from '@patternfly/react-core'
 import {
   InfoCircleIcon,
@@ -49,21 +49,9 @@ import {
 import { IconProperty } from '../../Misc'
 
 function FilterableText(props) {
-  const { addFilter, category, value } = props
+  const { value } = props
 
-  return (
-    <>
-      {value &&
-       <Tooltip content={<div>Add filter</div>}>
-         <SearchPlusIcon color='var(--pf-global--Color--200)'
-                         onClick={() => addFilter(category, value)}
-         />
-       </Tooltip>
-      }
-      &#32;
-      <span>{value}</span>
-    </>
-  )
+  return value
 }
 
 FilterableText.propTypes = {
@@ -199,6 +187,28 @@ function ConfigErrorTable({
     })
   }
 
+  const actionResolver = (rowData, {rowIndex}) => {
+    if (rowData.parent !== undefined) {
+      return []
+    }
+    const cells = rowData.cells.filter(cell =>
+      cell.title.type && cell.title.type.name === 'FilterableText'
+    )
+    return cells.map(cell => {
+      const props = cell.title.props
+      return {
+        title: `Filter by ${props.category}: ${props.value} `,
+        onClick: () => {props.addFilter(props.category, props.value)}
+      }
+    })
+  }
+
+  const filterToggle = (props) => (
+    <DropdownToggle toggleIndicator={null} onToggle={props.onToggle}>
+      <SearchPlusIcon color='var(--pf-global--Color--200)'/>
+    </DropdownToggle>
+  )
+
   return (
     <>
       <Table
@@ -206,11 +216,11 @@ function ConfigErrorTable({
         variant={TableVariant.compact}
         cells={columns}
         rows={rows}
-        className="zuul-table"
+        actionResolver={actionResolver}
         onCollapse={(_event, rowIndex, isOpen) => {
           setRowExpanded(rowIndex, isOpen)
         }}
-        expandId="expandable-table-toggle" contentId="expandable-table-content"
+        actionsToggle={filterToggle}
       >
         <TableHeader />
         <TableBody />
