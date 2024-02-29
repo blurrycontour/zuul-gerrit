@@ -27,7 +27,7 @@ from collections import OrderedDict, defaultdict
 from collections.abc import Mapping
 from itertools import chain
 from json.decoder import JSONDecodeError
-from typing import List, Optional
+from typing import Optional
 
 import cherrypy
 import cachecontrol
@@ -55,7 +55,7 @@ from zuul.model import Ref, Branch, Tag, Project
 from zuul.exceptions import MergeFailure
 from zuul.driver.github.githubmodel import PullRequest, GithubTriggerEvent
 from zuul.model import DequeueEvent
-from zuul.zk.branch_cache import BranchCache
+from zuul.zk.branch_cache import (BranchCache, BranchFlag, BranchInfo)
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ChangeKey,
@@ -666,10 +666,13 @@ class GithubEventProcessor(object):
 
         # Save all protected branches
         cached_branches = self.connection._branch_cache.getProjectBranches(
-            project_name, True, default=None)
+            project_name, {BranchFlag.PROTECTED}, default=None)
 
         if cached_branches is None:
             raise RuntimeError(f"No branches for project {project_name}")
+        else:
+            cached_branches = [b.name for b in cached_branches
+                               if b.protected is True]
         old_protected_branches = set(cached_branches)
 
         # Update the project banches
@@ -681,9 +684,11 @@ class GithubEventProcessor(object):
         self.connection.updateProjectBranches(project)
 
         # Get all protected branches
-        new_protected_branches = set(
+        new_protected_branches =\
             self.connection._branch_cache.getProjectBranches(
-                project_name, True))
+                project_name, {BranchFlag.PROTECTED})
+        new_protected_branches = set(
+            [b.name for b in new_protected_branches if b.protected is True])
 
         newly_protected = new_protected_branches - old_protected_branches
         newly_unprotected = old_protected_branches - new_protected_branches
@@ -1825,15 +1830,57 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def addProject(self, project):
         self.projects[project.name] = project
 
-    def _fetchProjectBranches(self, project: Project,
-                              exclude_unprotected: bool) -> List[str]:
+    def _fetchProjectBranchesRequiredFlags(
+            self, exclude_unprotected, exclude_locked):
+        required_flags = set()
+        if exclude_unprotected:
+            required_flags.add(BranchFlag.PROTECTED)
+        if exclude_locked:
+            required_flags.add(BranchFlag.LOCKED)
+            if not exclude_unprotected:
+                # We also need all the branches:
+                required_flags.add(BranchFlag.PRESENT)
+        if not required_flags:
+            required_flags = {BranchFlag.PRESENT}
+        return required_flags
+
+    def _filterProjectBranches(
+            self, branch_infos, exclude_unprotected, exclude_locked):
+        if exclude_unprotected:
+            branch_infos = [b for b in branch_infos if b.protected is True]
+        if exclude_locked:
+            branch_infos = [b for b in branch_infos if b.locked is not True]
+        return branch_infos
+
+    def _fetchProjectBranches(self, project, required_flags):
         github = self.getGithubClient(project.name)
+
+        valid_flags = set()
+        branch_infos = {}
+        if BranchFlag.PROTECTED in required_flags:
+            valid_flags.add(BranchFlag.PROTECTED)
+            for branch_name in self._fetchProjectBranchesREST(
+                    github, project, protected=True):
+                bi = branch_infos.setdefault(
+                    branch_name, BranchInfo(branch_name))
+                bi.protected = True
+        if BranchFlag.PRESENT in required_flags:
+            valid_flags.add(BranchFlag.PRESENT)
+            for branch_name in self._fetchProjectBranchesREST(
+                    github, project, protected=False):
+                bi = branch_infos.setdefault(
+                    branch_name, BranchInfo(branch_name))
+                bi.present = True
+        return valid_flags, list(branch_infos.values())
+
+    def _fetchProjectBranchesREST(self, github, project, protected):
+        # Fetch the project branches from the rest api
         url = github.session.build_url('repos', project.name,
                                        'branches')
 
         headers = {'Accept': 'application/vnd.github.loki-preview+json'}
         params = {'per_page': 100}
-        if exclude_unprotected:
+        if protected:
             params['protected'] = 1
 
         branches = []
