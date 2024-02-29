@@ -1859,8 +1859,9 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         branch_infos = {}
         if BranchFlag.PROTECTED in required_flags:
             valid_flags |= BranchFlag.PROTECTED
-            for branch_name in self._fetchProjectBranchesREST(
-                    github, project, protected_only=True):
+            for branch_name, locked in \
+                self.graphql_client.fetch_branch_protection(
+                    github, project).items():
                 bi = branch_infos.setdefault(
                     branch_name, BranchInfo(branch_name))
                 bi.protected = True
@@ -1883,7 +1884,7 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if protected_only:
             params['protected'] = 1
 
-        branches = []
+        branches = set()
         while url:
             resp = github.session.get(
                 url, headers=headers, params=params)
@@ -1902,8 +1903,8 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 raise Exception("Got status code 404 when listing branches "
                                 "of project %s" % project.name)
 
-            branches.extend([x['name'] for x in resp.json()])
-
+            for x in resp.json():
+                branches.add(x['name'])
         return branches
 
     def _fetchProjectMergeModes(self, project):
