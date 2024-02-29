@@ -1,4 +1,4 @@
-# Copyright 2022 Acme Gating, LLC
+# Copyright 2022, 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -67,3 +67,84 @@ class TestModelUpgrade(ZuulTestCase):
         for _ in iterate_timeout(30, "model api to update"):
             if component_registry.model_api == 1:
                 break
+
+
+class TestGithubModelUpgrade(ZuulTestCase):
+    config_file = "zuul-gerrit-github.conf"
+    scheduler_count = 1
+
+    @model_version(26)
+    @simple_layout('layouts/gate-github.yaml', driver='github')
+    def test_model_26(self):
+        # This excercises the backwards-compat branch cache
+        # serialization code; no uprade happens in this test.
+        first = self.scheds.first
+        second = self.createScheduler()
+        second.start()
+        self.assertEqual(len(self.scheds), 2)
+        for _ in iterate_timeout(10, "until priming is complete"):
+            state_one = first.sched.local_layout_state.get("tenant-one")
+            if state_one:
+                break
+
+        for _ in iterate_timeout(
+                10, "all schedulers to have the same layout state"):
+            if (second.sched.local_layout_state.get(
+                    "tenant-one") == state_one):
+                break
+
+        conn = first.connections.connections['github']
+        with self.createZKContext() as ctx:
+            # There's a lot of exception catching in the branch cache,
+            # so exercise a serialize/deserialize cycle.
+            old = conn._branch_cache.cache.serialize(ctx)
+            data = json.loads(old)
+            self.assertEqual(['master'],
+                             data['remainder']['org/common-config'])
+            new = conn._branch_cache.cache.deserialize(old, ctx)
+            self.assertTrue(new['projects'][
+                'org/common-config'].branches['master'].present)
+
+        with first.sched.layout_update_lock, first.sched.run_handler_lock:
+            A = self.fake_github.openFakePullRequest(
+                'org/project', 'master', 'A')
+            self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+            self.waitUntilSettled(matcher=[second])
+
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS'),
+            dict(name='project-test2', result='SUCCESS'),
+        ], ordered=False)
+
+    @model_version(26)
+    @simple_layout('layouts/gate-github.yaml', driver='github')
+    def test_model_26_27(self):
+        # This excercises the branch cache upgrade.
+        first = self.scheds.first
+        self.model_test_component_info.model_api = 27
+        second = self.createScheduler()
+        second.start()
+        self.assertEqual(len(self.scheds), 2)
+        for _ in iterate_timeout(10, "until priming is complete"):
+            state_one = first.sched.local_layout_state.get("tenant-one")
+            if state_one:
+                break
+
+        for _ in iterate_timeout(
+                10, "all schedulers to have the same layout state"):
+            if (second.sched.local_layout_state.get(
+                    "tenant-one") == state_one):
+                break
+
+        with first.sched.layout_update_lock, first.sched.run_handler_lock:
+            A = self.fake_github.openFakePullRequest(
+                'org/project', 'master', 'A')
+            self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+            self.waitUntilSettled(matcher=[second])
+
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS'),
+            dict(name='project-test2', result='SUCCESS'),
+        ], ordered=False)
