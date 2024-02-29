@@ -12,42 +12,58 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from graphene import Boolean, Field, Int, List, ObjectType, String
+from graphene import Boolean, Field, Int, List, ObjectType, String, Schema
 
 
-class FakePageInfo(ObjectType):
+class ID(String):
+    """Github global object ids are strings"""
+    pass
+
+
+class PageInfo(ObjectType):
     end_cursor = String()
+    has_previous_page = Boolean()
     has_next_page = Boolean()
 
     def resolve_end_cursor(parent, info):
-        return 'testcursor'
+        return str(parent['after'] + parent['first'])
+
+    def resolve_has_previous_page(parent, info):
+        return parent['after'] > 0
 
     def resolve_has_next_page(parent, info):
-        return False
+        return parent['after'] + parent['first'] < parent['length']
 
 
-class FakeMatchingRef(ObjectType):
+class MatchingRef(ObjectType):
     name = String()
 
     def resolve_name(parent, info):
         return parent
 
 
-class FakeMatchingRefs(ObjectType):
-    nodes = List(FakeMatchingRef)
+class MatchingRefs(ObjectType):
+    pageInfo = Field(PageInfo)
+    nodes = List(MatchingRef)
 
     def resolve_nodes(parent, info):
-        # To simplify tests just return the pattern and a bogus ref that should
-        # not disturb zuul.
-        return [parent.pattern, 'bogus-ref']
+        return parent['nodes']
+
+    def resolve_pageInfo(parent, info):
+        return parent
 
 
-class FakeBranchProtectionRule(ObjectType):
+class BranchProtectionRule(ObjectType):
+    id = ID()
     pattern = String()
     requiredStatusCheckContexts = List(String)
     requiresApprovingReviews = Boolean()
     requiresCodeOwnerReviews = Boolean()
-    matchingRefs = Field(FakeMatchingRefs, first=Int())
+    matchingRefs = Field(MatchingRefs, first=Int(), after=String())
+    lockBranch = Boolean()
+
+    def resolve_id(parent, info):
+        return parent.id
 
     def resolve_pattern(parent, info):
         return parent.pattern
@@ -61,25 +77,41 @@ class FakeBranchProtectionRule(ObjectType):
     def resolve_requiresCodeOwnerReviews(parent, info):
         return parent.require_codeowners_review
 
-    def resolve_matchingRefs(parent, info, first=None):
+    def resolve_lockBranch(parent, info):
+        return parent.lock_branch
+
+    def resolve_matchingRefs(parent, info, first, after=None):
+        if after is None:
+            after = '0'
+        after = int(after)
+        values = parent.matching_refs
+        return dict(
+            length=len(values),
+            nodes=values[after:after + first],
+            first=first,
+            after=after,
+        )
+
+
+class BranchProtectionRules(ObjectType):
+    pageInfo = Field(PageInfo)
+    nodes = List(BranchProtectionRule)
+
+    def resolve_nodes(parent, info):
+        return parent['nodes']
+
+    def resolve_pageInfo(parent, info):
         return parent
 
 
-class FakeBranchProtectionRules(ObjectType):
-    nodes = List(FakeBranchProtectionRule)
-
-    def resolve_nodes(parent, info):
-        return parent.values()
-
-
-class FakeActor(ObjectType):
+class Actor(ObjectType):
     login = String()
 
 
-class FakeStatusContext(ObjectType):
+class StatusContext(ObjectType):
     state = String()
     context = String()
-    creator = Field(FakeActor)
+    creator = Field(Actor)
 
     def resolve_state(parent, info):
         state = parent.state.upper()
@@ -92,14 +124,14 @@ class FakeStatusContext(ObjectType):
         return parent.creator
 
 
-class FakeStatus(ObjectType):
-    contexts = List(FakeStatusContext)
+class Status(ObjectType):
+    contexts = List(StatusContext)
 
     def resolve_contexts(parent, info):
         return parent
 
 
-class FakeCheckRun(ObjectType):
+class CheckRun(ObjectType):
     name = String()
     conclusion = String()
 
@@ -112,21 +144,21 @@ class FakeCheckRun(ObjectType):
         return None
 
 
-class FakeCheckRuns(ObjectType):
-    nodes = List(FakeCheckRun)
+class CheckRuns(ObjectType):
+    nodes = List(CheckRun)
 
     def resolve_nodes(parent, info):
         return parent
 
 
-class FakeApp(ObjectType):
+class App(ObjectType):
     slug = String()
     name = String()
 
 
-class FakeCheckSuite(ObjectType):
-    app = Field(FakeApp)
-    checkRuns = Field(FakeCheckRuns, first=Int())
+class CheckSuite(ObjectType):
+    app = Field(App)
+    checkRuns = Field(CheckRuns, first=Int())
 
     def resolve_app(parent, info):
         if not parent:
@@ -143,9 +175,9 @@ class FakeCheckSuite(ObjectType):
         return check_runs_by_name.values()
 
 
-class FakeCheckSuites(ObjectType):
+class CheckSuites(ObjectType):
 
-    nodes = List(FakeCheckSuite)
+    nodes = List(CheckSuite)
 
     def resolve_nodes(parent, info):
         # Note: we only use a single check suite in the tests so return a
@@ -153,15 +185,15 @@ class FakeCheckSuites(ObjectType):
         return [parent]
 
 
-class FakeCommit(ObjectType):
+class Commit(ObjectType):
 
     class Meta:
         # Graphql object type that defaults to the class name, but we require
         # 'Commit'.
         name = 'Commit'
 
-    status = Field(FakeStatus)
-    checkSuites = Field(FakeCheckSuites, first=Int())
+    status = Field(Status)
+    checkSuites = Field(CheckSuites, first=Int())
 
     def resolve_status(parent, info):
         seen = set()
@@ -178,7 +210,7 @@ class FakeCommit(ObjectType):
         return parent._check_runs
 
 
-class FakePullRequest(ObjectType):
+class PullRequest(ObjectType):
     isDraft = Boolean()
     reviewDecision = String()
     mergeable = String()
@@ -210,18 +242,28 @@ class FakePullRequest(ObjectType):
         return 'REVIEW_REQUIRED'
 
 
-class FakeRepository(ObjectType):
+class Repository(ObjectType):
     name = String()
-    branchProtectionRules = Field(FakeBranchProtectionRules, first=Int())
-    pullRequest = Field(FakePullRequest, number=Int(required=True))
-    object = Field(FakeCommit, expression=String(required=True))
+    branchProtectionRules = Field(BranchProtectionRules,
+                                  first=Int(), after=String())
+    pullRequest = Field(PullRequest, number=Int(required=True))
+    object = Field(Commit, expression=String(required=True))
 
     def resolve_name(parent, info):
         org, name = parent.name.split('/')
         return name
 
-    def resolve_branchProtectionRules(parent, info, first):
-        return parent._branch_protection_rules
+    def resolve_branchProtectionRules(parent, info, first, after=None):
+        if after is None:
+            after = '0'
+        after = int(after)
+        values = list(parent._branch_protection_rules.values())
+        return dict(
+            length=len(values),
+            nodes=values[after:after + first],
+            first=first,
+            after=after,
+        )
 
     def resolve_pullRequest(parent, info, number):
         return parent.data.pull_requests.get(number)
@@ -231,8 +273,19 @@ class FakeRepository(ObjectType):
 
 
 class FakeGithubQuery(ObjectType):
-    repository = Field(FakeRepository, owner=String(required=True),
+    repository = Field(Repository, owner=String(required=True),
                        name=String(required=True))
+    node = Field(BranchProtectionRule, id=ID(required=True))
 
     def resolve_repository(root, info, owner, name):
         return info.context._data.repos.get((owner, name))
+
+    def resolve_node(root, info, id):
+        for repo in info.context._data.repos.values():
+            for rule in repo._branch_protection_rules.values():
+                if rule.id == id:
+                    return rule
+
+
+def getGrapheneSchema():
+    return Schema(query=FakeGithubQuery, types=[ID])
