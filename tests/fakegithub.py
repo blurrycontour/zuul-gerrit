@@ -27,14 +27,13 @@ import uuid
 import string
 import random
 
-from tests.fake_graphql import FakeGithubQuery
+from tests.fake_graphql import getGrapheneSchema
 import zuul.driver.github.githubconnection as githubconnection
 from zuul.driver.github.githubconnection import utc, GithubClientManager
 from tests.util import random_sha1
 
 import git
 import github3.exceptions
-import graphene
 import requests
 from requests.structures import CaseInsensitiveDict
 import requests_mock
@@ -684,16 +683,21 @@ class FakeRepository(object):
         return self._branches
 
     def _set_branch_protection(self, branch_name, protected=True,
-                               contexts=None, require_review=False):
+                               contexts=None, require_review=False,
+                               locked=False):
         if not protected:
             if branch_name in self._branch_protection_rules:
                 del self._branch_protection_rules[branch_name]
             return
 
         rule = self._branch_protection_rules[branch_name]
+        rule.id = str(uuid.uuid4())
         rule.pattern = branch_name
         rule.required_contexts = contexts or []
         rule.require_reviews = require_review
+        rule.matching_refs = [branch_name]
+        rule.lock_branch = locked
+        return rule
 
     def _set_permission(self, key, value):
         # NOTE (felix): Currently, this is only used to mock a repo with
@@ -1029,7 +1033,7 @@ class FakeGithubSession(object):
         self.client = client
         self.headers = CaseInsensitiveDict()
         self._base_url = None
-        self.schema = graphene.Schema(query=FakeGithubQuery)
+        self.schema = getGrapheneSchema()
 
         # Imitate hooks dict. This will be unused and ignored in the tests.
         self.hooks = {
