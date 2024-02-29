@@ -155,18 +155,17 @@ class ZKBranchCacheMixin:
         pass
 
     @abc.abstractmethod
-    def _fetchProjectBranches(self, project, exclude_unprotected):
+    def _fetchProjectBranches(self, project, required_flags):
         """Perform a remote query to determine the project's branches.
 
         Connection subclasses should implement this method.
 
         :param model.Project project:
             The project.
-        :param bool exclude_unprotected:
-            Whether the query should exclude unprotected branches from
-            the response.
+        :param set(BranchFlag) required_flags:
+            Which flags need to be valid in the result set.
 
-        :returns: A list of branch names.
+        :returns: A list of BranchInfo objects
         """
 
     def _fetchProjectMergeModes(self, project):
@@ -247,21 +246,15 @@ class ZKBranchCacheMixin:
             The project for which the branches are returned.
         """
         # Figure out which queries we have a cache for
-        protected_branches = self._branch_cache.getProjectBranches(
-            project.name, True, default=None)
-        all_branches = self._branch_cache.getProjectBranches(
-            project.name, False, default=None)
 
-        # Update them if we have them
-        if protected_branches is not None:
-            protected_branches = self._fetchProjectBranches(project, True)
+        required_flags = self._branch_cache._getProjectCompletedFlags(
+            project.name)
+        if required_flags:
+            # Update them if we have them
+            valid_flags, branch_infos = self._fetchProjectBranches(
+                project, required_flags)
             self._branch_cache.setProjectBranches(
-                project.name, True, protected_branches)
-
-        if all_branches is not None:
-            all_branches = self._fetchProjectBranches(project, False)
-            self._branch_cache.setProjectBranches(
-                project.name, False, all_branches)
+                project.name, valid_flags, branch_infos)
 
         merge_modes = self._fetchProjectMergeModes(project)
         self._branch_cache.setProjectMergeModes(
@@ -285,12 +278,18 @@ class ZKBranchCacheMixin:
         :returns: The list of branch names.
         """
         exclude_unprotected = tenant.getExcludeUnprotectedBranches(project)
+        exclude_locked = False
         branches = None
 
+        required_flags = self._fetchProjectBranchesRequiredFlags(
+            exclude_unprotected, exclude_locked)
         if self._branch_cache:
             try:
                 branches = self._branch_cache.getProjectBranches(
-                    project.name, exclude_unprotected, min_ltime)
+                    project.name, required_flags, min_ltime)
+                if branches is not None:
+                    branches = [b.name for b in self._filterProjectBranches(
+                        branches, exclude_unprotected, exclude_locked)]
             except LookupError:
                 if self.read_only:
                     # A scheduler hasn't attempted to fetch them yet
@@ -308,9 +307,17 @@ class ZKBranchCacheMixin:
             raise RuntimeError(
                 "Will not fetch project branches as read-only is set")
 
-        # We need to perform a query
+        # Above we calculated a set of flags needed to answer the
+        # query.  If the fetch below fails, we will mark that set of
+        # flags as failed in the ProjectInfo structure.  However, if
+        # the fetch below succeeds, it can supply its own set of valid
+        # flags that we will record as successful.  This lets the
+        # driver indicate that the returned results include more data
+        # than strictly necessary (ie, protected+locked and not just
+        # protected).
         try:
-            branches = self._fetchProjectBranches(project, exclude_unprotected)
+            valid_flags, branch_infos = self._fetchProjectBranches(
+                project, required_flags)
         except Exception:
             # We weren't able to get the branches.  We need to tell
             # future schedulers to try again but tell zuul-web that we
@@ -319,15 +326,15 @@ class ZKBranchCacheMixin:
             # time we encounter None in the cache, we will try again.
             if self._branch_cache:
                 self._branch_cache.setProjectBranches(
-                    project.name, exclude_unprotected, None)
+                    project.name, required_flags, None)
             raise
         self.log.info("Got branches for %s" % project.name)
 
         if self._branch_cache:
             self._branch_cache.setProjectBranches(
-                project.name, exclude_unprotected, branches)
+                project.name, valid_flags, branch_infos)
 
-        return sorted(branches)
+        return sorted([bi.name for bi in branch_infos])
 
     def getProjectMergeModes(self, project, tenant, min_ltime=-1):
         """Get the merge modes for the given project.
@@ -442,9 +449,8 @@ class ZKBranchCacheMixin:
 
         return default_branch
 
-    def checkBranchCache(self, project_name: str, event,
-                         protected: bool = None) -> None:
-        """Clear the cache for a project when a branch event is processed
+    def checkBranchCache(self, project_name, event, protected=None):
+        """Update the cache for a project when a branch event is processed
 
         This method must be called when a branch event is processed: if the
         event references a branch and the unprotected branches are excluded,
@@ -462,21 +468,16 @@ class ZKBranchCacheMixin:
             protected = self.isBranchProtected(project_name, event.branch,
                                                zuul_event_id=event)
         if protected is not None:
-
-            # If the branch appears in the exclude_unprotected cache but
-            # is unprotected, clear the exclude cache.
-
-            # If the branch does not appear in the exclude_unprotected
-            # cache but is protected, clear the exclude cache.
-
-            # All branches should always appear in the include_unprotected
-            # cache, so we never clear it.
+            required_flags = self._fetchProjectBranchesRequiredFlags(
+                exclude_unprotected=True, exclude_locked=False)
 
             branches = self._branch_cache.getProjectBranches(
-                project_name, True, default=None)
+                project_name, required_flags, default=None)
 
             if not branches:
                 branches = []
+
+            branches = [b.name for b in branches]
 
             update = False
             if (event.branch in branches) and (not protected):
