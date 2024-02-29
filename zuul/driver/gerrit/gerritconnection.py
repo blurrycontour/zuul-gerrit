@@ -55,7 +55,7 @@ from zuul.driver.git.gitwatcher import GitWatcher
 from zuul.lib import tracing
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Ref, Tag, Branch, Project
-from zuul.zk.branch_cache import BranchCache
+from zuul.zk.branch_cache import BranchCache, BranchFlag, BranchInfo
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ChangeKey,
@@ -1128,12 +1128,21 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
              not any(part.startswith('.') or part.endswith('.lock')
                      for part in parts))
 
-    def _fetchProjectBranches(self, project, exclude_unprotected):
+    def _getProjectBranchesRequiredFlags(
+            self, exclude_unprotected, exclude_locked):
+        return BranchFlag.PRESENT
+
+    def _filterProjectBranches(
+            self, branch_infos, exclude_unprotected, exclude_locked):
+        return branch_infos
+
+    def _fetchProjectBranches(self, project, required_flags):
         refs = self.getInfoRefs(project)
         heads = [str(k[len('refs/heads/'):]) for k in refs
                  if k.startswith('refs/heads/') and
                  GerritConnection._checkRefFormat(k)]
-        return heads
+        branch_infos = [BranchInfo(h, present=True) for h in heads]
+        return BranchFlag.PRESENT, branch_infos
 
     def _fetchProjectDefaultBranch(self, project):
         if not self.session:
