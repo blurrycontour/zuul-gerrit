@@ -27,7 +27,6 @@ import urllib3
 import dateutil.parser
 
 from urllib.parse import quote_plus
-from typing import List, Optional
 
 from opentelemetry import trace
 
@@ -40,9 +39,9 @@ from zuul.lib.http import ZuulHTTPAdapter
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.config import any_to_bool
 from zuul.exceptions import MergeFailure
-from zuul.model import Branch, Project, Ref, Tag
+from zuul.model import Branch, Ref, Tag
 from zuul.driver.gitlab.gitlabmodel import GitlabTriggerEvent, MergeRequest
-from zuul.zk.branch_cache import BranchCache
+from zuul.zk.branch_cache import BranchCache, BranchFlag, BranchInfo
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ConcurrentUpdateError,
@@ -597,14 +596,42 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def addProject(self, project):
         self.projects[project.name] = project
 
-    def _fetchProjectBranches(self, project: Project,
-                              exclude_unprotected: bool) -> List[str]:
-        branches = self.gl_client.get_project_branches(project.name,
-                                                       exclude_unprotected)
-        return branches
+    def _getProjectBranchesRequiredFlags(
+            self, exclude_unprotected, exclude_locked):
+        required_flags = BranchFlag.CLEAR
+        if exclude_unprotected:
+            required_flags |= BranchFlag.PROTECTED
+        if not required_flags:
+            required_flags = BranchFlag.PRESENT
+        return required_flags
 
-    def isBranchProtected(self, project_name: str, branch_name: str,
-                          zuul_event_id=None) -> Optional[bool]:
+    def _filterProjectBranches(
+            self, branch_infos, exclude_unprotected, exclude_locked):
+        if exclude_unprotected:
+            branch_infos = [b for b in branch_infos if b.protected is True]
+        return branch_infos
+
+    def _fetchProjectBranches(self, project, required_flags):
+        valid_flags = BranchFlag.CLEAR
+        branch_infos = {}
+        if BranchFlag.PROTECTED in required_flags:
+            valid_flags |= BranchFlag.PROTECTED
+            for branch_name in self.gl_client.get_project_branches(
+                    project.name, True):
+                bi = branch_infos.setdefault(
+                    branch_name, BranchInfo(branch_name))
+                bi.protected = True
+        if BranchFlag.PRESENT in required_flags:
+            valid_flags |= BranchFlag.PRESENT
+            for branch_name in self.gl_client.get_project_branches(
+                    project.name, False):
+                bi = branch_infos.setdefault(
+                    branch_name, BranchInfo(branch_name))
+                bi.present = True
+        return valid_flags, list(branch_infos.values())
+
+    def isBranchProtected(self, project_name, branch_name,
+                          zuul_event_id=None):
         branch = self.gl_client.get_project_branch(project_name, branch_name,
                                                    zuul_event_id)
         return branch.get('protected')

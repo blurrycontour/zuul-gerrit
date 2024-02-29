@@ -33,7 +33,7 @@ from zuul.web.handler import BaseWebController
 from zuul.model import Ref, Branch, Tag
 from zuul.lib import tracing
 from zuul.lib import dependson
-from zuul.zk.branch_cache import BranchCache
+from zuul.zk.branch_cache import BranchCache, BranchFlag, BranchInfo
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ConcurrentUpdateError,
@@ -592,12 +592,22 @@ class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             url += '/c/%s' % sha
         return url
 
-    def _fetchProjectBranches(self, project, exclude_unprotected):
+    def _getProjectBranchesRequiredFlags(
+            self, exclude_unprotected, exclude_locked):
+        return BranchFlag.PRESENT
+
+    def _filterProjectBranches(
+            self, branch_infos, exclude_unprotected, exclude_locked):
+        return branch_infos
+
+    def _fetchProjectBranches(self, project, required_flags):
         pagure = self.get_project_api_client(project.name)
         branches = pagure.get_project_branches()
 
         self.log.info("Got branches for %s" % project.name)
-        return branches
+        branch_infos = [BranchInfo(name, present=True)
+                        for name in branches]
+        return BranchFlag.PRESENT, branch_infos
 
     def isBranchProtected(self, project_name, branch_name,
                           zuul_event_id=None):
