@@ -1,5 +1,5 @@
 # Copyright 2019 Red Hat, Inc.
-# Copyright 2022 Acme Gating, LLC
+# Copyright 2022, 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -27,7 +27,7 @@ from zuul.lib import yamlutil as yaml
 from zuul.model import BuildRequest, HoldRequest, MergeRequest
 from zuul.zk import ZooKeeperClient
 from zuul.zk.blob_store import BlobStore
-from zuul.zk.branch_cache import BranchCache
+from zuul.zk.branch_cache import BranchCache, BranchFlag, BranchInfo
 from zuul.zk.change_cache import (
     AbstractChangeCache,
     ChangeKey,
@@ -1830,132 +1830,193 @@ class TestBranchCache(ZooKeeperBaseTestCase):
         conn = DummyConnection()
         cache = BranchCache(self.zk_client, conn, self.component_registry)
 
+        protected_flags = {BranchFlag.PROTECTED}
+        all_flags = {BranchFlag.PRESENT}
         test_data = {
             'project1': {
-                'all': ['protected1', 'protected2',
-                        'unprotected1', 'unprotected2'],
-                'protected': ['protected1', 'protected2'],
+                'all': [
+                    BranchInfo('protected1', present=True),
+                    BranchInfo('protected2', present=True),
+                    BranchInfo('unprotected1', present=True),
+                    BranchInfo('unprotected2', present=True),
+                ],
+                'protected': [
+                    BranchInfo('protected1', protected=True),
+                    BranchInfo('protected2', protected=True),
+                ],
             },
         }
 
         # Test a protected-only query followed by all
-        cache.setProjectBranches('project1', True,
+        cache.setProjectBranches('project1', protected_flags,
                                  test_data['project1']['protected'])
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', True)),
-            test_data['project1']['protected']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', protected_flags)
+                    if bi.protected is True]),
+            [bi.name for bi in test_data['project1']['protected']]
         )
         self.assertRaises(
             LookupError,
-            lambda: cache.getProjectBranches('project1', False)
+            lambda: cache.getProjectBranches('project1', all_flags),
         )
 
-        cache.setProjectBranches('project1', False,
+        cache.setProjectBranches('project1', all_flags,
                                  test_data['project1']['all'])
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', True)),
-            test_data['project1']['protected']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', protected_flags)
+                    if bi.protected is True]),
+            [bi.name for bi in test_data['project1']['protected']]
         )
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', False)),
-            test_data['project1']['all']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', all_flags)]),
+            [bi.name for bi in test_data['project1']['all']]
         )
+
+        # There's a lot of exception catching in the branch cache,
+        # so exercise a serialize/deserialize cycle.
+        ctx = ZKContext(self.zk_client, None, None, self.log)
+        data = cache.cache.serialize(ctx)
+        cache.cache.deserialize(data, ctx)
 
     def test_branch_cache_all_then_protected(self):
         conn = DummyConnection()
         cache = BranchCache(self.zk_client, conn, self.component_registry)
 
+        protected_flags = {BranchFlag.PROTECTED}
+        all_flags = {BranchFlag.PRESENT}
         test_data = {
             'project1': {
-                'all': ['protected1', 'protected2',
-                        'unprotected1', 'unprotected2'],
-                'protected': ['protected1', 'protected2'],
+                'all': [
+                    BranchInfo('protected1', present=True),
+                    BranchInfo('protected2', present=True),
+                    BranchInfo('unprotected1', present=True),
+                    BranchInfo('unprotected2', present=True),
+                ],
+                'protected': [
+                    BranchInfo('protected1', protected=True),
+                    BranchInfo('protected2', protected=True),
+                ],
             },
         }
 
         self.assertRaises(
             LookupError,
-            lambda: cache.getProjectBranches('project1', True)
+            lambda: cache.getProjectBranches('project1', protected_flags)
         )
         self.assertRaises(
             LookupError,
-            lambda: cache.getProjectBranches('project1', False)
+            lambda: cache.getProjectBranches('project1', all_flags)
         )
 
         # Test the other order; all followed by protected-only
-        cache.setProjectBranches('project1', False,
+        cache.setProjectBranches('project1', all_flags,
                                  test_data['project1']['all'])
         self.assertRaises(
             LookupError,
-            lambda: cache.getProjectBranches('project1', True)
+            lambda: cache.getProjectBranches('project1', protected_flags)
         )
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', False)),
-            test_data['project1']['all']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', all_flags)]),
+            [bi.name for bi in test_data['project1']['all']]
         )
 
-        cache.setProjectBranches('project1', True,
+        cache.setProjectBranches('project1', protected_flags,
                                  test_data['project1']['protected'])
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', True)),
-            test_data['project1']['protected']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', protected_flags)
+                    if bi.protected is True]),
+            [bi.name for bi in test_data['project1']['protected']]
         )
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', False)),
-            test_data['project1']['all']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', all_flags)]),
+            [bi.name for bi in test_data['project1']['all']]
         )
+
+        # There's a lot of exception catching in the branch cache,
+        # so exercise a serialize/deserialize cycle.
+        ctx = ZKContext(self.zk_client, None, None, self.log)
+        data = cache.cache.serialize(ctx)
+        cache.cache.deserialize(data, ctx)
 
     def test_branch_cache_change_protected(self):
         conn = DummyConnection()
         cache = BranchCache(self.zk_client, conn, self.component_registry)
+        protected_flags = {BranchFlag.PROTECTED}
+        all_flags = {BranchFlag.PRESENT}
 
         data1 = {
             'project1': {
-                'all': ['newbranch', 'protected'],
-                'protected': ['protected'],
+                'all': [
+                    BranchInfo('newbranch', present=True),
+                    BranchInfo('protected', present=True),
+                ],
+                'protected': [
+                    BranchInfo('protected', protected=True),
+                ],
             },
         }
         data2 = {
             'project1': {
-                'all': ['newbranch', 'protected'],
-                'protected': ['newbranch', 'protected'],
+                'all': [
+                    BranchInfo('newbranch', present=True),
+                    BranchInfo('protected', present=True),
+                ],
+                'protected': [
+                    BranchInfo('newbranch', present=True, protected=True),
+                    BranchInfo('protected', protected=True),
+                ],
             },
         }
 
         # Create a new unprotected branch
-        cache.setProjectBranches('project1', False,
+        cache.setProjectBranches('project1', all_flags,
                                  data1['project1']['all'])
-        cache.setProjectBranches('project1', True,
+        cache.setProjectBranches('project1', protected_flags,
                                  data1['project1']['protected'])
         self.assertEqual(
-            cache.getProjectBranches('project1', True),
-            data1['project1']['protected']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', protected_flags)
+                    if bi.protected is True]),
+            [bi.name for bi in data1['project1']['protected']]
         )
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', False)),
-            data1['project1']['all']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', all_flags)]),
+            [bi.name for bi in data1['project1']['all']]
         )
 
         # Change it to protected
         cache.setProtected('project1', 'newbranch', True)
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', True)),
-            data2['project1']['protected']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', protected_flags)
+                    if bi.protected is True]),
+            [bi.name for bi in data2['project1']['protected']]
         )
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', False)),
-            data2['project1']['all']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', all_flags)]),
+            [bi.name for bi in data2['project1']['all']]
         )
 
         # Change it back
         cache.setProtected('project1', 'newbranch', False)
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', True)),
-            data1['project1']['protected']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', protected_flags)
+                    if bi.protected is True]),
+            [bi.name for bi in data1['project1']['protected']]
         )
         self.assertEqual(
-            sorted(cache.getProjectBranches('project1', False)),
-            data1['project1']['all']
+            sorted([bi.name for bi in
+                    cache.getProjectBranches('project1', all_flags)]),
+            [bi.name for bi in data1['project1']['all']]
         )
 
     def test_branch_cache_lookup_error(self):
