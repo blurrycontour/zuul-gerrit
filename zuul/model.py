@@ -4315,8 +4315,9 @@ class BuildSet(zkobject.ZKObject):
         for item in items:
             connection = connections.setdefault(item['connection'], {})
             project = connection.setdefault(item['project'], {})
-            branch = project.setdefault(item['branch'], {})
-            branch.update(item['files'])
+            # We are only interested in the most recent set of
+            # config files for a project-branch combination.
+            project[item['branch']] = item['files']
         repo_files = RepoFiles.new(self._active_context,
                                    connections=connections,
                                    _buildset_path=self.getPath())

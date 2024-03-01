@@ -3322,6 +3322,34 @@ class TestInRepoConfigDir(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='3,1'),
         ], ordered=True)
 
+    def test_file_move_dependency(self):
+        # Tests that a zuul config file can be modified and renamed
+        # while also depending on another unrelated change.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project-test2
+
+            - project:
+                name: org/project
+                check:
+                  jobs:
+                    - project-test2
+            """)
+        file_dict = {'zuul.d/project.yaml': None,
+                     'zuul.d/newfile.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data['url'])
+
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
+        ])
+
     def test_extra_config_move(self):
         # Tests that a extra config file can be renamed
         in_repo_conf = textwrap.dedent(
