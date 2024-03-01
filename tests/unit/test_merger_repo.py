@@ -921,30 +921,24 @@ class TestMerger(ZuulTestCase):
         result = merger.mergeChanges([item_a, item_b], files=files, dirs=dirs)
         self.assertIsNotNone(result)
         hexsha, read_files, repo_state, ret_recent, orig_commit = result
-        self.assertEqual(len(read_files), 2)
+        self.assertEqual(len(read_files), 1)
         self.assertEqual(read_files[0]['project'], 'org/project')
         self.assertEqual(read_files[0]['branch'], 'master')
         self.assertEqual(read_files[0]['files']['zuul.d/a.yaml'], 'a')
-        self.assertEqual(read_files[1]['project'], 'org/project')
-        self.assertEqual(read_files[1]['branch'], 'master')
-        self.assertEqual(read_files[1]['files']['zuul.d/b.yaml'], 'b')
+        self.assertEqual(read_files[0]['files']['zuul.d/b.yaml'], 'b')
 
         # Merge A -> B -> C
         result = merger.mergeChanges([item_a, item_b, item_c], files=files,
                                      dirs=dirs)
         self.assertIsNotNone(result)
         hexsha, read_files, repo_state, ret_recent, orig_commit = result
-        self.assertEqual(len(read_files), 3)
+        self.assertEqual(len(read_files), 1)
         self.assertEqual(read_files[0]['project'], 'org/project')
         self.assertEqual(read_files[0]['branch'], 'master')
-        self.assertEqual(read_files[0]['files']['zuul.d/a.yaml'], 'a')
-        self.assertEqual(read_files[1]['project'], 'org/project')
-        self.assertEqual(read_files[1]['branch'], 'master')
-        self.assertEqual(read_files[1]['files']['zuul.d/b.yaml'], 'b')
-        self.assertEqual(read_files[2]['project'], 'org/project')
-        self.assertEqual(read_files[2]['branch'], 'master')
-        self.assertEqual(read_files[2]['files']['zuul.d/a.yaml'],
+        self.assertEqual(read_files[0]['files']['zuul.d/a.yaml'],
                          'a-with-c')
+        self.assertEqual(read_files[0]['files']['zuul.d/b.yaml'], 'b')
+        self.assertEqual(read_files[0]['files']['zuul.d/b.yaml'], 'b')
 
         # Merge A -> B -> C -> D
         result = merger.mergeChanges([item_a, item_b, item_c, item_d],
@@ -952,20 +946,15 @@ class TestMerger(ZuulTestCase):
         self.assertIsNotNone(result)
         hexsha, read_files, repo_state, ret_recent, orig_commit = result
 
-        self.assertEqual(len(read_files), 4)
+        self.assertEqual(len(read_files), 2)
         self.assertEqual(read_files[0]['project'], 'org/project')
         self.assertEqual(read_files[0]['branch'], 'master')
-        self.assertEqual(read_files[0]['files']['zuul.d/a.yaml'], 'a')
-        self.assertEqual(read_files[1]['project'], 'org/project')
-        self.assertEqual(read_files[1]['branch'], 'master')
-        self.assertEqual(read_files[1]['files']['zuul.d/b.yaml'], 'b')
-        self.assertEqual(read_files[2]['project'], 'org/project')
-        self.assertEqual(read_files[2]['branch'], 'master')
-        self.assertEqual(read_files[2]['files']['zuul.d/a.yaml'],
+        self.assertEqual(read_files[0]['files']['zuul.d/a.yaml'],
                          'a-with-c')
-        self.assertEqual(read_files[3]['project'], 'org/project1')
-        self.assertEqual(read_files[3]['branch'], 'master')
-        self.assertEqual(read_files[3]['files']['zuul.d/a.yaml'],
+        self.assertEqual(read_files[0]['files']['zuul.d/b.yaml'], 'b')
+        self.assertEqual(read_files[1]['project'], 'org/project1')
+        self.assertEqual(read_files[1]['branch'], 'master')
+        self.assertEqual(read_files[1]['files']['zuul.d/a.yaml'],
                          'a-in-project1')
 
     def test_merge_temp_refs(self):
