@@ -608,7 +608,11 @@ class PipelineManager(metaclass=ABCMeta):
 
             cycle = []
             if isinstance(change, model.Change):
-                cycle = self.cycleForChange(change, dependency_graph, event)
+                try:
+                    cycle = self.cycleForChange(change, dependency_graph, event)
+                except Exception:
+                    log.exception("Failed to get cycle for change:")
+                    return False
                 cycle = self.sortCycleByGitDepends(cycle)
             if not cycle:
                 cycle = [change]
