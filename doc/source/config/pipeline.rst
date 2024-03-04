@@ -151,12 +151,18 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
          these cases, build resources can be conserved by avoiding
          building intermediate versions.
 
-         .. note:: Since this pipeline filters intermediate buildsets
-                   using it in combination with file filters on jobs
-                   is dangerous.  In this case jobs of in between
-                   buildsets can be unexpectedly skipped entirely. If
-                   file filters are needed the ``independent`` or
-                   ``serial`` pipeline managers should be used.
+         .. note:: Since this pipeline manager filters intermediate
+                   buildsets using it in combination with file filters
+                   on jobs is dangerous.  In this case jobs of in
+                   between buildsets can be unexpectedly skipped
+                   entirely. If file filters are needed the
+                   ``independent`` or ``serial`` pipeline managers
+                   should be used.
+
+         .. note:: Since this pipeline manager creates a virtual queue
+                   for each project-ref, it ignores manually
+                   configured shared queues as well as circular
+                   dependencies.
 
    .. attr:: post-review
       :default: false

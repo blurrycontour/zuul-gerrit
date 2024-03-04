@@ -69,11 +69,11 @@ class SupercedentPipelineManager(PipelineManager):
                 self.removeItem(item)
 
     def cycleForChange(self, *args, **kw):
-        ret = super().cycleForChange(*args, **kw)
-        if len(ret) > 1:
-            raise Exception("Dependency cycles not supported "
-                            "in supercedent pipelines")
-        return ret
+        # Supercedent pipelines ignore circular dependencies and
+        # individually enqueue each change that matches the trigger.
+        # This is because they ignore shared queues and instead create
+        # a virtual queue for each project-ref.
+        return []
 
     def addChange(self, *args, **kw):
         ret = super(SupercedentPipelineManager, self).addChange(
