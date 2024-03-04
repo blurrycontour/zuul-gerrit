@@ -154,7 +154,7 @@ class GitlabSource(BaseSource):
         raise NotImplementedError()
 
     def getRefForChange(self, change):
-        raise NotImplementedError()
+        return "refs/merge-requests/%s/head" % change
 
     def setChangeAttributes(self, change, **attrs):
         return self.connection.updateChangeAttributes(change, **attrs)
