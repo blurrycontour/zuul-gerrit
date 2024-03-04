@@ -16,6 +16,24 @@
       "message": "I think this default value needs to be set before line 3879 outside of the loop. The reason for this is on line 3903 we set delay_response to the return value of _runBuildWorker() but then we\u0027ll reenter the loop just aboev and then force the value back to True. This means we\u0027ll always delay every iteration through the loop rather than only on the first pass.\n\nInstead we can just set the initial value outside the loop then let _runBuildWorker() maintain the on going value.",
       "revId": "ae258ac2e02ea0a6e9ab04eae28793e8f1712cc8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c93d0bea_005914a8",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3884,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-04T20:16:27Z",
+      "side": 1,
+      "message": "That would effectively give us the behavior we have today under a low-to-medium load system (any system where, at the end of processing a chunk of new jobs, there is a delay before a new chunk appears).\n\nThe fundamental idea is that we should delay before every time we accept a job.  That is what we used to do, and what we accidentally broke in the previous change.  This change corrects that and returns the old behavior -- we can\u0027t accept a job without having delayed.\n\nWhat the previous change *attempted* to do, and that is a behavior that this change attempts to keep, is that we don\u0027t need to delay after we don\u0027t accept a job.\n\nTo rephrase:\n\nWe want to delay before accepting each job.  But if we fail to accept the job (because someone else won the race, or it was canceled, etc), we don\u0027t need to delay again.\n\nI think the confusion is that once we exhaust the list of pending jobs, we reset our state so that we delay again.  One way to think about that is that once we exhaust the list, we are likely to sit and wait for more jobs to show up.  The race with other executors is over at that point, and we are starting a new race, so we should delay again.",
+      "parentUuid": "42efe6aa_a782314f",
+      "revId": "ae258ac2e02ea0a6e9ab04eae28793e8f1712cc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
