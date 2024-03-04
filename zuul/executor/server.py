@@ -3880,6 +3880,8 @@ class ExecutorServer(BaseMergeServer):
             self.build_loop_wake_event.wait()
             self.build_loop_wake_event.clear()
             try:
+                # Always delay the response to the first build request
+                delay_response = True
                 for build_request in self.executor_api.next():
                     # Check the sensors again as they might have changed in the
                     # meantime. E.g. the last build started within the next()
@@ -3889,16 +3891,16 @@ class ExecutorServer(BaseMergeServer):
                     if not self._running:
                         break
 
-                    if not self._runBuildWorker(build_request):
-                        continue
-
                     # Delay our response to running a new job based on
                     # the number of jobs we're currently running, in
                     # an attempt to spread load evenly among
                     # executors.
-                    workers = len(self.job_workers)
-                    delay = (workers ** 2) / 1000.0
-                    time.sleep(delay)
+                    if delay_response:
+                        workers = len(self.job_workers)
+                        delay = (workers ** 2) / 1000.0
+                        time.sleep(delay)
+
+                    delay_response = self._runBuildWorker(build_request)
             except Exception:
                 self.log.exception("Error in build loop:")
                 time.sleep(5)
