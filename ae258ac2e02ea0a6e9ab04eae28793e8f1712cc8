@@ -34,6 +34,24 @@
       "parentUuid": "42efe6aa_a782314f",
       "revId": "ae258ac2e02ea0a6e9ab04eae28793e8f1712cc8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eff521f0_3e33f119",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3884,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-04T21:04:18Z",
+      "side": 1,
+      "message": "Yes I had in my head that this was an initial startup delay and not a delay after each buildset makes requests. Makes sense that we want to delay between buildset handling to end up with a normalish distribution of build assignments across executors.",
+      "parentUuid": "c93d0bea_005914a8",
+      "revId": "ae258ac2e02ea0a6e9ab04eae28793e8f1712cc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
