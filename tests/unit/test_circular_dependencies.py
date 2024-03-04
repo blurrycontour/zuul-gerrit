@@ -2200,7 +2200,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-noop.yaml')
     def test_job_deduplication_noop(self):
-        # Test that we don't deduplicate noop (there's no good reason
+        # Test that we deduplicate noop (there's no good reason not
         # to do so)
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
         B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
@@ -2229,11 +2229,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
         ], ordered=False)
         # It's tricky to get info about a noop build, but the jobs in
         # the report have the build UUID, so we make sure it's
-        # different.
+        # the same and we only have one noop job.
         a_noop = [l for l in A.messages[-1].split('\n') if 'noop' in l]
         b_noop = [l for l in B.messages[-1].split('\n') if 'noop' in l]
         self.assertEqual(a_noop, b_noop)
-        self.assertNotEqual(a_noop[0], a_noop[1])
+        self.assertEqual(len(a_noop), 1)
 
     @simple_layout('layouts/job-dedup-retry.yaml')
     def test_job_deduplication_retry(self):
@@ -2991,7 +2991,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/job-dedup-noop.yaml')
     def test_job_deduplication_check_noop(self):
-        # Test that we don't deduplicate noop (there's no good reason
+        # Test that we deduplicate noop (there's no good reason not
         # to do so)
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
@@ -3019,11 +3019,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
         ], ordered=False)
         # It's tricky to get info about a noop build, but the jobs in
         # the report have the build UUID, so we make sure it's
-        # different.
+        # the same and we only have one noop job.
         a_noop = [l for l in A.messages[-1].split('\n') if 'noop' in l]
         b_noop = [l for l in B.messages[-1].split('\n') if 'noop' in l]
         self.assertEqual(a_noop, b_noop)
-        self.assertNotEqual(a_noop[0], a_noop[1])
+        self.assertEqual(len(a_noop), 1)
 
     @simple_layout('layouts/job-dedup-retry.yaml')
     def test_job_deduplication_check_retry(self):
