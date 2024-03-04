@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42efe6aa_a782314f",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3884,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-04T19:45:36Z",
+      "side": 1,
+      "message": "I think this default value needs to be set before line 3879 outside of the loop. The reason for this is on line 3903 we set delay_response to the return value of _runBuildWorker() but then we\u0027ll reenter the loop just aboev and then force the value back to True. This means we\u0027ll always delay every iteration through the loop rather than only on the first pass.\n\nInstead we can just set the initial value outside the loop then let _runBuildWorker() maintain the on going value.",
+      "revId": "ae258ac2e02ea0a6e9ab04eae28793e8f1712cc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
