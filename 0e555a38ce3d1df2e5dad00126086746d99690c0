@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd793738_08fb3011",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-03-06T09:20:13Z",
+      "side": 1,
+      "message": "Debug leftover?",
+      "revId": "0e555a38ce3d1df2e5dad00126086746d99690c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f19dea64_95745c58",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2286,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-03-06T09:20:13Z",
+      "side": 1,
+      "message": "Having a branch name with a \"/\" would change the hierarchy of the metric. I\u0027d rather replace this also with an underscore to have the branch name as a single namespace.\n\nThis is especially problematic e.g. when using something like the prometheus-statsd-exporter where glob matching would no longer work in those cases and we\u0027d need to resort to the much more expensive regex matching for metrics.",
+      "revId": "0e555a38ce3d1df2e5dad00126086746d99690c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
