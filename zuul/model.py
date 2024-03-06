@@ -1650,13 +1650,17 @@ class NodeRequest(object):
     """A request for a set of nodes."""
 
     def __init__(self, requestor, build_set_uuid, tenant_name, pipeline_name,
-                 job_uuid, labels, provider, relative_priority,
+                 job_uuid, job_name, labels, provider, relative_priority,
                  event_id=None, span_info=None):
         self.requestor = requestor
         self.build_set_uuid = build_set_uuid
         self.tenant_name = tenant_name
         self.pipeline_name = pipeline_name
         self.job_uuid = job_uuid
+        # The requestor doesn't need the job name anymore after moving
+        # to job UUIDs, but we should keep it in the requestor data,
+        # since it can be used in Nodepool for dynamic label tags.
+        self.job_name = job_name
         self.labels = labels
         self.nodes = []
         self._state = STATE_REQUESTED
@@ -1720,6 +1724,7 @@ class NodeRequest(object):
             "tenant_name": self.tenant_name,
             "pipeline_name": self.pipeline_name,
             "job_uuid": self.job_uuid,
+            "job_name": self.job_name,
             "span_info": self.span_info,
         }
         d.setdefault('node_types', self.labels)
@@ -1766,6 +1771,7 @@ class NodeRequest(object):
             tenant_name=requestor_data.get("tenant_name"),
             pipeline_name=requestor_data.get("pipeline_name"),
             job_uuid=requestor_data.get("job_uuid"),
+            job_name=requestor_data.get("job_name"),
             labels=data["node_types"],
             provider=data["provider"],
             relative_priority=data.get("relative_priority", 0),

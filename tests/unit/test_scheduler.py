@@ -5946,12 +5946,12 @@ For CI problems and help debugging, contact ci@example.org"""
         system_id = self.scheds.first.sched.system.system_id
         zk_nodepool = self.scheds.first.sched.nodepool.zk_nodepool
         req1 = zuul.model.NodeRequest(system_id, "uuid1", "tenant",
-                                      "pipeline", "job", ['label'], None,
-                                      0, None)
+                                      "pipeline", "job_uuid", "job",
+                                      ['label'], None, 0, None)
         zk_nodepool.submitNodeRequest(req1, 100)
         req2 = zuul.model.NodeRequest("someone else", "uuid1", "tenant",
-                                      "pipeline", "job", ['label'], None,
-                                      0, None)
+                                      "pipeline", "job_uuid", "job",
+                                      ['label'], None, 0, None)
         zk_nodepool.submitNodeRequest(req2, 100)
         self.assertEqual(zk_nodepool.getNodeRequests(),
                          ['100-0000000000', '100-0000000001'])
