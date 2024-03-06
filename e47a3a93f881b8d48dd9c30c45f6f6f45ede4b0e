@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce723b2a_d02859c7",
+        "filename": "releasenotes/notes/substring-web-search-362ede4088338005.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-06T19:10:42Z",
+      "side": 1,
+      "message": "nit: \"its\"",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "131aa175_cd14d120",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-06T19:10:42Z",
+      "side": 1,
+      "message": "Given the notes below, it would probably be good to test this with lists and tuples of strings.\n\nOptional: you could move these checks into the test below so that the internal api is not as constrained (some things get a lot simpler if you fold the implementation of _sanitizeSubstringQuery into the implementation of _getFuzzyFilterOp).",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ce6697e_0a7e3875",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-06T19:10:42Z",
+      "side": 1,
+      "message": "Ditto about testing lists/tuples of strings.",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2a79446_f47aaff9",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-06T19:10:42Z",
+      "side": 1,
+      "message": "A few distinct points:\n\n1) Nit: this probably could be a regex instead of looping over the chars; it might be more efficient (I don\u0027t know, I haven\u0027t tested), but it would be harder to read.  :)  I\u0027m fine either way; even if this is less efficient, it\u0027s not running all the time.\n2) I believe the input to this method might be a list of strings, in which case I don\u0027t think we would end up sanitizing them; we should probably loop over all of them and do so in that case, right? (Actually, see comment on line 130).\n3) Question: why use a custom escape character instead of the default \"\\\" ?\n\nNote to myself and other revewiers: the \"sanitization\" performed here is distinct from sql quoting/escaping and is just making sure that if someone searches for \"foo%*\", not knowing the underlying mechanism for the glob is the sql like operator, that % gets escaped within the string so that is treated as a literal as the user expects.  Whatever we do here still goes through the normal sqlalchemy quoting and escaping to keep it as a string.  (And that is why I\u0027m curious about the custom escape char.)",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "232bae6f_d0057e2f",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-06T19:10:42Z",
+      "side": 1,
+      "message": "The escape_char is set here and in the other method, and they need to match.  That\u0027s probably why you made them arguments to both methods.  But instead, why don\u0027t we perform the sanitization here?  We would have both cases where we care about the escape char in the same spot, so we could either be sure that we\u0027re using the default, or set it to the same value here.  It also solves the loop issue in port #2 on line 127.",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
