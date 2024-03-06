@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30bfb0f7_1ae1c336",
+        "filename": "web/src/containers/build/Console.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-06T14:32:28Z",
+      "side": 1,
+      "message": "Oops fixed.",
+      "parentUuid": "dd793738_08fb3011",
+      "revId": "0e555a38ce3d1df2e5dad00126086746d99690c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f19dea64_95745c58",
@@ -31,6 +49,41 @@
       "writtenOn": "2024-03-06T09:20:13Z",
       "side": 1,
       "message": "Having a branch name with a \"/\" would change the hierarchy of the metric. I\u0027d rather replace this also with an underscore to have the branch name as a single namespace.\n\nThis is especially problematic e.g. when using something like the prometheus-statsd-exporter where glob matching would no longer work in those cases and we\u0027d need to resort to the much more expensive regex matching for metrics.",
+      "revId": "0e555a38ce3d1df2e5dad00126086746d99690c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edc068d6_440fa599",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2286,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-06T14:32:28Z",
+      "side": 1,
+      "message": "On the other hand, it\u0027s more useful in statsd because you can combine, say, all stable branches with \".stable.*\".  That is why we chose this format originally, and we use it everywhere we emit branch names.  I highlighted one example below.\n\nPerhaps another format would be a better choice now or in the future, but for the moment it\u0027s more important to be consistent.",
+      "parentUuid": "f19dea64_95745c58",
+      "revId": "0e555a38ce3d1df2e5dad00126086746d99690c0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac0e3c67_39e1595f",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2307,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-06T14:32:28Z",
+      "side": 1,
+      "message": "See here.",
       "revId": "0e555a38ce3d1df2e5dad00126086746d99690c0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
