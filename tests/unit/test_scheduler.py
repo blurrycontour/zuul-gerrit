@@ -7552,14 +7552,12 @@ class TestSchedulerMerges(ZuulTestCase):
         return repo_messages
 
     def _test_merge(self, mode):
-        us_path = 'file://' + os.path.join(
-            self.upstream_root, 'org/project-%s' % mode)
         expected_messages = [
             'initial commit',
             'add content from fixture',
             # the intermediate commits order is nondeterministic
-            "Merge commit 'refs/changes/02/2/1' of %s into HEAD" % us_path,
-            "Merge commit 'refs/changes/03/3/1' of %s into HEAD" % us_path,
+            "Merge 'refs/changes/02/2/1'",
+            "Merge 'refs/changes/03/3/1'",
         ]
         result = self._test_project_merge_mode(mode)
         self.assertEqual(result[:2], expected_messages[:2])

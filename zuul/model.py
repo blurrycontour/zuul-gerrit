@@ -4616,8 +4616,10 @@ class BuildSet(zkobject.ZKObject):
             # The change isn't enqueued until after it's created
             # so we don't know what the other changes ahead will be
             # until jobs start.
-            if self.dependent_changes is None:
+            if not self.configured:
                 items = [self.item]
+                # The time is used by makeMergerItem
+                self.configured_time = time.time()
                 items.extend(i for i in self.item.items_ahead
                              if i not in items)
                 items.reverse()
@@ -4628,8 +4630,7 @@ class BuildSet(zkobject.ZKObject):
                 self.merger_items = [
                     i.makeMergerItem(c) for i in items for c in i.changes
                 ]
-            self.configured = True
-            self.configured_time = time.time()
+                self.configured = True
 
     def _toChangeDict(self, item, change):
         # Inject bundle_id to dict if available, this can be used to decide
@@ -5931,6 +5932,7 @@ class QueueItem(zkobject.ZKObject):
                     patchset=patchset,
                     oldrev=oldrev,
                     newrev=newrev,
+                    configured_time=self.current_build_set.configured_time,
                     )
 
     def updatesJobConfig(self, job, change, layout):

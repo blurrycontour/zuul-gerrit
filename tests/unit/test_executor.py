@@ -431,6 +431,65 @@ class TestExecutorRepos(ZuulTestCase, ExecutorReposMixin):
 
         self.assertBuildStates(states, projects)
 
+    @simple_layout('layouts/reproducible-repo.yaml')
+    def test_reproducible_repo(self):
+        # Verify that we get exactly the same commit shas when merging
+        # items.
+        self.executor_server.hold_jobs_in_build = True
+        self.hold_jobs_in_queue = True
+
+        project = 'review.example.com/org/project'
+        projects = [project]
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        time.sleep(1)
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        time.sleep(1)
+        self.waitUntilSettled()
+
+        # Four builds running:
+        #   job1, job2 for change A
+        #   job1, job2 for change A+B
+        queue = list(self.executor_api.queued())
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(len(queue), 4)
+
+        for x in range(4):
+            self.executor_api.release(queue[x])
+            time.sleep(1)
+            self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 4)
+        work = [build.getWorkspaceRepos(projects) for build in self.builds]
+        shas = [
+            [c.hexsha for c in repos[project].iter_commits(
+                repos[project].commit('HEAD'))]
+            for repos in work
+        ]
+        self.log.debug("Shas: %s", shas)
+
+        # Verify that the commit shas are the same for each pair of builds
+        self.assertEqual(shas[0], shas[1])
+        self.assertEqual(shas[2], shas[3])
+        # Verify that every sha in the first 2 builds are in the last
+        # two as well
+        for sha in shas[0]:
+            self.assertTrue(sha in shas[2])
+
+        states = [
+            {project: dict(present=[A], absent=[B], branch='master')},
+            {project: dict(present=[A], absent=[B], branch='master')},
+            {project: dict(present=[A, B], absent=[], branch='master')},
+            {project: dict(present=[A, B], absent=[], branch='master')},
+        ]
+        self.assertBuildStates(states, projects)
+
 
 class TestExecutorRepoRoles(ZuulTestCase, ExecutorReposMixin):
     tenant_config_file = 'config/executor-repos/main.yaml'
