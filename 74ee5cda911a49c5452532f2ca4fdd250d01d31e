@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2f4b0f1_bcabfb69",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1659,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-06T19:36:12Z",
+      "side": 1,
+      "message": "This would be a good place for a comment explaining why we\u0027re including the job_name in requestor_data even though the requestor doesn\u0027t need it.  I think we should add it, otherwise I think the chances of us removing it again are relatively high.  :)",
+      "revId": "74ee5cda911a49c5452532f2ca4fdd250d01d31e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
