@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27f0af3f_0e0978eb",
+        "filename": "tests/unit/test_supercedent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-06T00:00:11Z",
+      "side": 1,
+      "message": "Nit only C is superceded.",
+      "revId": "79a9f86c8dc4ef97aa736f44e7d067b714b03275",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4841826_04ec1acb",
+        "filename": "tests/unit/test_supercedent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-06T00:00:11Z",
+      "side": 1,
+      "message": "Is this hold necessary? We\u0027ve already held above.",
+      "revId": "79a9f86c8dc4ef97aa736f44e7d067b714b03275",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcc229a8_14116f0e",
+        "filename": "tests/unit/test_supercedent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-06T00:00:11Z",
+      "side": 1,
+      "message": "Nit only C is superceded.",
+      "revId": "79a9f86c8dc4ef97aa736f44e7d067b714b03275",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27fc6594_c3c6e945",
+        "filename": "tests/unit/test_supercedent.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-06T00:00:11Z",
+      "side": 1,
+      "message": "Is this hold necessary? We\u0027ve already held above.",
+      "revId": "79a9f86c8dc4ef97aa736f44e7d067b714b03275",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
