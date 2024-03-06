@@ -7686,7 +7686,7 @@ class Layout(object):
         noop = Job('noop')
         noop.description = 'A job that will always succeed, no operation.'
         noop.parent = noop.BASE_JOB_MARKER
-        noop.deduplicate = False
+        noop.deduplicate = True
         noop.run = (PlaybookContext(None, 'noop.yaml', [], [], []),)
         self.jobs = {'noop': [noop]}
         self.nodesets = {}
