@@ -1,18 +1,96 @@
 info:
+  description: Incomplete (work in progress) list of the endpoints.
   title: Zuul REST API
   version: v1
-  description: Incomplete (work in progress) list of the endpoints.
 openapi: 3.0.0
-tags:
-- name: tenant
 paths:
-  /api/tenant/{tenant}/badge:
+  /api:
     get:
-      operationId: get-badge
+      operationId: index
+      parameters: []
+      summary: ''
+      tags:
+      - tenant
+  /api/authorizations:
+    get:
+      operationId: root_authorizations
+      parameters: []
+      summary: ''
+      tags:
+      - tenant
+  /api/components:
+    get:
+      operationId: components
+      parameters: []
+      summary: ''
+      tags:
+      - tenant
+  /api/connections:
+    get:
+      operationId: connections
+      parameters: []
+      summary: ''
+      tags:
+      - tenant
+  /api/info:
+    get:
+      operationId: info
+      parameters: []
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/authorizations:
+    get:
+      operationId: tenant_authorizations
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/autohold:
+    get:
+      operationId: autohold_list
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/autohold/{request_id}:
+    delete:
+      operationId: autohold_delete
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: request_id
+        required: true
+      summary: ''
+      tags:
+      - tenant
+    get:
+      operationId: autohold_get
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: request_id
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/badge:
+    get:
+      operationId: badge
       parameters:
       - description: The tenant name
         in: path
-        name: tenant
+        name: tenant_name
         required: true
         schema:
           type: string
@@ -44,169 +122,171 @@ paths:
       summary: Get a badge describing the result of the latest buildset found.
       tags:
       - tenant
-  /api/tenant/{tenant}/builds:
+  /api/tenant/{tenant_name}/build-times:
     get:
-      operationId: list-builds
+      operationId: build_times
       parameters:
-      - description: The tenant name
-        in: path
-        name: tenant
+      - in: path
+        name: tenant_name
         required: true
-        schema:
-          type: string
-      - description: A project name
-        in: query
+      - in: query
         name: project
-        schema:
-          type: string
-      - description: A pipeline name
-        in: query
+      - in: query
         name: pipeline
-        schema:
-          type: string
-      - description: A job name
-        in: query
+      - in: query
+        name: branch
+      - in: query
+        name: ref
+      - in: query
         name: job_name
-        schema:
-          type: string
-      - description: A branch name
-        in: query
-        name: branch
-        schema:
-          type: string
-      - description: A change number
-        in: query
-        name: change
-        schema:
-          type: string
-      - description: A patchset number
-        in: query
-        name: patchset
-        schema:
-          type: string
-      - description: A ref
-        in: query
-        name: ref
-        schema:
-          type: string
-      - description: A new revision hash
-        in: query
-        name: newrev
-        schema:
-          type: string
-      - description: A build uuid
-        in: query
-        name: uuid
-        schema:
-          type: string
-      - description: A build voting status
-        in: query
-        name: voting
-        schema:
-          type: string
-      - description: A build result
-        in: query
-        name: result
-        schema:
-          type: string
-      - description: The limit count (default 50)
-        in: query
+      - in: query
+        name: final
+      - in: query
+        name: start_time
+      - in: query
+        name: end_time
+      - in: query
         name: limit
-        schema:
-          type: string
-      - description: Skip number of results
-        in: query
+      - in: query
         name: skip
-        schema:
-          type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                description: The list of builds
-                items:
-                  $ref: '#/components/schemas/build'
-                type: array
-          description: Returns the list of builds
-        '404':
-          description: Tenant not found
-      summary: List the executed builds
+      - in: query
+        name: exclude_result
+      summary: ''
       tags:
       - tenant
-  /api/tenant/{tenant}/buildsets:
+  /api/tenant/{tenant_name}/build/{uuid}:
     get:
-      operationId: list-buildsets
+      operationId: build
       parameters:
-      - description: The tenant name
-        in: path
-        name: tenant
+      - in: path
+        name: tenant_name
         required: true
-        schema:
-          type: string
-      - description: A project name
-        in: query
+      - in: path
+        name: uuid
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/builds:
+    get:
+      operationId: builds
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: query
         name: project
-        schema:
-          type: string
-      - description: A pipeline name
-        in: query
+      - in: query
         name: pipeline
-        schema:
-          type: string
-      - description: A branch name
-        in: query
-        name: branch
-        schema:
-          type: string
-      - description: A change number
-        in: query
+      - in: query
         name: change
-        schema:
-          type: string
-      - description: A patchset number
-        in: query
+      - in: query
+        name: branch
+      - in: query
         name: patchset
-        schema:
-          type: string
-      - description: A ref
-        in: query
+      - in: query
         name: ref
-        schema:
-          type: string
-      - description: A new revision hash
-        in: query
+      - in: query
         name: newrev
-        schema:
-          type: string
-      - description: A buildset uuid
-        in: query
+      - in: query
         name: uuid
-        schema:
-          type: string
-      - description: A buildset result
-        in: query
+      - in: query
+        name: job_name
+      - in: query
+        name: voting
+      - in: query
+        name: nodeset
+      - in: query
         name: result
-        schema:
-          type: string
-      - description: The limit count (default 50)
-        in: query
+      - in: query
+        name: final
+      - in: query
+        name: held
+      - in: query
+        name: complete
+      - in: query
         name: limit
-        schema:
-          type: string
-      - description: Skip number of results
-        in: query
+      - in: query
         name: skip
-        schema:
-          type: string
+      - in: query
+        name: idx_min
+      - in: query
+        name: idx_max
+      - in: query
+        name: exclude_result
       responses:
         '200':
           content:
             application/json:
               schema:
-                description: The list of buildsets
                 items:
-                  $ref: '#/components/schemas/buildset'
+                  description: The build
+                  properties:
+                    _id:
+                      type: string
+                    artifacts:
+                      items:
+                        properties:
+                          metadata:
+                            type: object
+                          name:
+                            type: string
+                          url:
+                            type: string
+                        type: object
+                      type: array
+                    duration:
+                      type: string
+                    end_time:
+                      type: string
+                    error_detail:
+                      type: string
+                    final:
+                      type: string
+                    held:
+                      type: string
+                    job_name:
+                      type: string
+                    log_url:
+                      type: string
+                    nodeset:
+                      type: string
+                    provides:
+                      items:
+                        properties:
+                          name:
+                            type: string
+                        type: object
+                      type: array
+                    ref:
+                      description: The ref
+                      properties:
+                        branch:
+                          type: string
+                        change:
+                          type: string
+                        newrev:
+                          type: string
+                        oldrev:
+                          type: string
+                        patchset:
+                          type: string
+                        project:
+                          type: string
+                        ref:
+                          type: string
+                        ref_url:
+                          type: string
+                      type: object
+                    result:
+                      type: string
+                    start_time:
+                      type: string
+                    uuid:
+                      type: string
+                    voting:
+                      type: string
+                  type: object
                 type: array
           description: Returns the list of builds
         '404':
@@ -214,55 +294,216 @@ paths:
       summary: List the executed builds
       tags:
       - tenant
-  /api/tenant/{tenant}/jobs:
+  /api/tenant/{tenant_name}/buildset/{uuid}:
     get:
-      operationId: list-jobs
+      operationId: buildset
       parameters:
-      - description: The tenant name
-        in: path
-        name: tenant
+      - in: path
+        name: tenant_name
         required: true
-        schema:
-          type: string
+      - in: path
+        name: uuid
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/buildsets:
+    get:
+      operationId: buildsets
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: query
+        name: project
+      - in: query
+        name: pipeline
+      - in: query
+        name: change
+      - in: query
+        name: branch
+      - in: query
+        name: patchset
+      - in: query
+        name: ref
+      - in: query
+        name: newrev
+      - in: query
+        name: uuid
+      - in: query
+        name: result
+      - in: query
+        name: complete
+      - in: query
+        name: limit
+      - in: query
+        name: skip
+      - in: query
+        name: idx_min
+      - in: query
+        name: idx_max
       responses:
         '200':
           content:
             application/json:
               schema:
-                description: The list of jobs
                 items:
-                  description: A job
+                  description: The buildset
+                  properties:
+                    _id:
+                      type: string
+                    event_id:
+                      type: string
+                    event_timestamp:
+                      type: string
+                    first_build_start_time:
+                      type: string
+                    last_build_end_time:
+                      type: string
+                    message:
+                      type: string
+                    pipeline:
+                      type: string
+                    refs:
+                      items:
+                        description: The ref
+                        properties:
+                          branch:
+                            type: string
+                          change:
+                            type: string
+                          newrev:
+                            type: string
+                          oldrev:
+                            type: string
+                          patchset:
+                            type: string
+                          project:
+                            type: string
+                          ref:
+                            type: string
+                          ref_url:
+                            type: string
+                        type: object
+                      type: array
+                    result:
+                      type: string
+                    uuid:
+                      type: string
+                  type: object
+                type: array
+          description: Returns the list of buildsets
+        '404':
+          description: Tenant not found
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/config-errors:
+    get:
+      operationId: config_errors
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: query
+        name: project
+      - in: query
+        name: branch
+      - in: query
+        name: severity
+      - in: query
+        name: name
+      - in: query
+        name: limit
+      - in: query
+        name: skip
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/console-stream:
+    get:
+      operationId: console_stream_get
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/info:
+    get:
+      operationId: tenant_info
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/job/{job_name}:
+    get:
+      operationId: job
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: job_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/jobs:
+    get:
+      operationId: jobs
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
                   properties:
                     description:
-                      description: The job short description
                       type: string
                     name:
-                      description: The job name
                       type: string
+                    tags:
+                      items:
+                        type: string
+                      type: array
+                    variants:
+                      items:
+                        properties:
+                          branches:
+                            items:
+                              type: string
+                            type: array
+                          parent:
+                            type: string
+                        type: object
+                      type: array
                   type: object
                 type: array
           description: Returns the list of jobs
         '404':
           description: Tenant not found
-      summary: List available jobs
+      summary: ''
       tags:
       - tenant
-  /api/tenant/{tenant}/key/{project}.pub:
+  /api/tenant/{tenant_name}/key/{project_name}.pub:
     get:
-      operationId: get-project-secrets-key
+      operationId: key
       parameters:
-      - description: The tenant name
-        in: path
-        name: tenant
+      - in: path
+        name: tenant_name
         required: true
-        schema:
-          type: string
-      - description: The project name
-        in: path
-        name: project
+      - in: path
+        name: project_name
         required: true
-        schema:
-          type: string
       responses:
         '200':
           content:
@@ -280,107 +521,271 @@ paths:
           description: Returns the project public key that is used to encrypt secrets
         '404':
           description: Tenant or Project not found
-      summary: Get a project public key that is used to encrypt secrets
+      summary: ''
       tags:
       - tenant
-  /api/tenant/{tenant}/project-ssh-key/{project}.pub:
+  /api/tenant/{tenant_name}/labels:
     get:
-      operationId: get-project-ssh-key
+      operationId: labels
       parameters:
-      - description: The tenant name
-        in: path
-        name: tenant
+      - in: path
+        name: tenant_name
         required: true
-        schema:
-          type: string
-      - description: The project name
-        in: path
-        name: project
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/nodes:
+    get:
+      operationId: nodes
+      parameters:
+      - in: path
+        name: tenant_name
         required: true
-        schema:
-          type: string
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/pipeline/{pipeline_name}/project/{project_name}/branch/{branch_name}/freeze-job/{job_name}:
+    get:
+      operationId: project_freeze_job
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: pipeline_name
+        required: true
+      - in: path
+        name: project_name
+        required: true
+      - in: path
+        name: branch_name
+        required: true
+      - in: path
+        name: job_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/pipeline/{pipeline_name}/project/{project_name}/branch/{branch_name}/freeze-jobs:
+    get:
+      operationId: project_freeze_jobs
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: pipeline_name
+        required: true
+      - in: path
+        name: project_name
+        required: true
+      - in: path
+        name: branch_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/pipelines:
+    get:
+      operationId: pipelines
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/project-ssh-key/{project_name}.pub:
+    get:
+      operationId: project_ssh_key
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: project_name
+        required: true
       responses:
         '200':
           content:
             text/plain:
-              example: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACA
-
-                '
+              example: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACA
               schema:
-                description: The project ssh public key in SSH2 format
+                description: The project secrets public key in SSH2 format
                 type: string
           description: Returns the project public key that executor adds to SSH agent
         '404':
           description: Tenant or Project not found
-      summary: Get a project public key that is used for SSH in post-merge pipelines
+      summary: ''
       tags:
       - tenant
-  /api/tenant/{tenant}/semaphores:
+  /api/tenant/{tenant_name}/project/{project_name}:
     get:
-      operationId: list-semaphores
+      operationId: project
       parameters:
-      - description: The tenant name
-        in: path
-        name: tenant
+      - in: path
+        name: tenant_name
         required: true
-        schema:
-          type: string
+      - in: path
+        name: project_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/project/{project_name}/autohold:
+    get:
+      operationId: autohold_project_get
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: project_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+    post:
+      operationId: autohold_project_post
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: project_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/project/{project_name}/dequeue:
+    get:
+      operationId: dequeue
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: project_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/project/{project_name}/enqueue:
+    get:
+      operationId: enqueue
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: project_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/projects:
+    get:
+      operationId: projects
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/promote:
+    get:
+      operationId: promote
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      summary: ''
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/semaphores:
+    get:
+      operationId: semaphores
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
       responses:
         '200':
           content:
             application/json:
               schema:
-                description: The list of semaphores
                 items:
-                  $ref: '#/components/schemas/semaphore'
+                  properties:
+                    global:
+                      type: boolean
+                    holders:
+                      properties:
+                        count:
+                          type: integer
+                        other_tenants:
+                          type: integer
+                        this_tenant:
+                          items:
+                            properties:
+                              buildset_uuid:
+                                type: string
+                              job_name:
+                                type: string
+                            type: object
+                          type: array
+                      type: object
+                    max:
+                      type: integer
+                    name:
+                      type: string
+                  type: object
                 type: array
           description: Returns the list of semaphores
         '404':
           description: Tenant not found
-      summary: List available semaphores
+      summary: ''
       tags:
       - tenant
-  /api/tenant/{tenant}/status:
+  /api/tenant/{tenant_name}/status:
     get:
-      operationId: get-status
+      operationId: status
       parameters:
-      - description: The tenant name
-        in: path
-        name: tenant
+      - in: path
+        name: tenant_name
         required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                description: The tenant status
-                properties:
-                  last_reconfigured:
-                    description: The Epoch timestamp of the last reconfiguration
-                    type: integer
-                  pipelines:
-                    description: The list of pipelines
-                    items:
-                      $ref: '#/components/schemas/pipelineStatus'
-                    type: array
-                  trigger_event_queue:
-                    description: The number of running events
-                    type: integer
-                  zuul_version:
-                    description: The Zuul version
-                    type: string
-                type: object
-          description: Returns the list of tenants
-        '404':
-          description: Tenant not found
-      summary: Get tenant status
+      summary: 'Return the tenant status. Note: the output format is not currently
+        documented and subject to change without notice.'
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/status/change/{change}:
+    get:
+      operationId: status_change
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      - in: path
+        name: change
+        required: true
+      summary: 'Return the status for a single change. Note: the output format is
+        not currently documented and subject to change without notice.'
+      tags:
+      - tenant
+  /api/tenant/{tenant_name}/tenant-status:
+    get:
+      operationId: tenant_status
+      parameters:
+      - in: path
+        name: tenant_name
+        required: true
+      summary: ''
       tags:
       - tenant
   /api/tenants:
     get:
-      operationId: list-tenants
+      operationId: tenants
+      parameters: []
       responses:
         '200':
           content:
@@ -400,289 +805,10 @@ paths:
                   type: object
                 type: array
           description: Returns the list of tenants
-      summary: List the tenants
+        '404':
+          description: Tenant not found
+      summary: ''
       tags:
       - tenant
-components:
-  schemas:
-    build:
-      description: A build
-      properties:
-        branch:
-          description: The build change branch
-          type: string
-        change:
-          description: The build change number
-          type: integer
-        duration:
-          description: The build duration in second
-          type: integer
-        end_time:
-          description: The build end time ISO 8601 format
-          type: string
-        job_name:
-          description: The build job name
-          type: string
-        log_url:
-          description: The build logs url
-          type: string
-        newrev:
-          description: The build newrev
-          type: string
-        patchset:
-          description: The build patchset number
-          type: integer
-        pipeline:
-          description: The build pipeline
-          type: string
-        project:
-          description: The build project name
-          type: string
-        ref:
-          description: The build change reference
-          type: string
-        ref_url:
-          description: The build change reference url
-          type: string
-        result:
-          description: The build result
-          type: string
-        start_time:
-          description: The build start time ISO 8601 format
-          type: string
-        uuid:
-          description: The build uuid
-          type: string
-        voting:
-          description: The build voting status
-          type: boolean
-      type: object
-    buildset:
-      description: A buildset
-      properties:
-        project:
-          description: The buildset project name
-          type: string
-        event_id:
-          description: The event id that triggered the buildset
-          type: string
-        uuid:
-          description: The buildset uuid
-          type: string
-        branch:
-          description: The buildset change branch
-          type: string
-        ref_url:
-          description: The buildset change reference url
-          type: string
-        newrev:
-          description: The buildset newrev
-          type: string
-        result:
-          description: The buildset result
-          type: string
-        change:
-          description: The buildset change number
-          type: integer
-        patchset:
-          description: The buildset patchset number
-          type: integer
-        ref:
-          description: The buildset change reference
-          type: string
-        pipeline:
-          description: The buildset pipeline
-          type: string
-        message:
-          description: The message that got reported by the buildset
-      type: object
-    changeQueue:
-      description: A change queue
-      properties:
-        heads:
-          description: The list of queue events
-          items:
-            items:
-              $ref: '#/components/schemas/eventQueue'
-            type: array
-          type: array
-        name:
-          description: The queue name
-          type: string
-        window:
-          description: The queue window
-          type: integer
-      type: object
-    eventQueue:
-      description: A queue event
-      properties:
-        active:
-          description: Is the event active
-          type: boolean
-        enqueue_time:
-          description: The epoch creation time
-          type: integer
-        failing_reasons:
-          description: The list of failing reasons
-          items:
-            type: string
-          type: array
-        id:
-          description: The event id
-          type: string
-        item_ahead:
-          description: The event ahead
-          type: string
-        items_behind:
-          description: The list of events behind
-          items:
-            type: string
-          type: array
-        jobs:
-          description: The event list of jobs
-          items:
-            $ref: '#/components/schemas/statusJob'
-          type: array
-        live:
-          description: Is the event live
-          type: boolean
-        owner:
-          description: The event owner
-          type: string
-        project:
-          description: The event project
-          type: string
-        remaining_time:
-          description: The estimated remaining time
-          type: integer
-        url:
-          description: The event url
-          type: string
-        zuul_ref:
-          description: The zuul ref
-          type: string
-      type: object
-    pipelineStatus:
-      description: A pipeline
-      properties:
-        change_queues:
-          description: The pipeline list of change queues
-          items:
-            $ref: '#/components/schemas/changeQueue'
-          type: array
-        description:
-          description: The pipeline description
-          type: string
-        name:
-          description: The pipeline name
-          type: string
-      type: object
-    semaphore:
-      description: A semaphore
-      properties:
-        name:
-          description: The semaphore name
-          type: string
-        global:
-          description: Whether the semaphore is global
-          type: boolean
-        max:
-          description: The maximum number of holders
-          type: integer
-        holders:
-          $ref: '#/components/schemas/semaphoreHolders'
-      type: object
-    semaphoreHolders:
-      description: Information about the holders of a semaphore
-      properties:
-        count:
-          description: The number of jobs currently holding this semaphore
-          type: integer
-        this_tenant:
-          description: Holders within this tenant
-          items:
-            $ref: '#/components/schemas/semaphoreHolder'
-          type: array
-        other_tenants:
-          description: The number of jobs in other tenants currently holding this semaphore
-          type: integer
-      type: object
-    semaphoreHolder:
-      description: Information about a holder of a semaphore
-      properties:
-        buildset_uuid:
-          description: The UUID of the job's buildset
-          type: string
-        job_name:
-          description: The name of the job
-          type: string
-      type: object
-    statusJob:
-      description: A job status
-      properties:
-        canceled:
-          description: Is the job canceled
-          type: boolean
-        elapsed_time:
-          description: The elapsed time
-          type: integer
-        launch_time:
-          description: The epoch launch time
-          type: integer
-        name:
-          description: The job name
-          type: string
-        number:
-          description: The job number
-          type: integer
-        pipeline:
-          description: The job pipeline
-          type: string
-        remaining_time:
-          description: The estimated remaining time
-          type: integer
-        result:
-          description: The job result
-          type: string
-        retry:
-          description: The retry count
-          type: integer
-        start_time:
-          description: The epoch start time
-          type: integer
-        url:
-          description: The job stream url
-          type: string
-        uuid:
-          description: The job uuid
-          type: string
-        voting:
-          description: Is the job voting
-          type: boolean
-        worker:
-          $ref: '#/components/schemas/statusWorker'
-      type: object
-    statusWorker:
-      description: A job worker node
-      properties:
-        fqdn:
-          description: The worker fully qualified domain name
-          type: string
-        hostname:
-          description: The worker hostname
-          type: string
-        ips:
-          description: The list of worker ip addresses
-          items:
-            type: string
-          type: array
-        name:
-          description: The worker name
-          type: string
-        program:
-          description: The worker program
-          type: string
-        version:
-          description: The worker version
-          type: string
-      type: object
+tags:
+- name: tenant
