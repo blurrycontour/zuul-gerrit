@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb10395d_3cb33430",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-03-07T12:16:27Z",
+      "side": 1,
+      "message": "I split this up into this change here, and the UI part in https://review.opendev.org/c/zuul/zuul/+/911700",
+      "revId": "f6fb8dcf94c0fbdd0037839768b553a8ed7e1900",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

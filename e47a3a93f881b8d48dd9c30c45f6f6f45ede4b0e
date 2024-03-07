@@ -71,6 +71,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "3e8eec36_4170dac0",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-03-07T12:16:27Z",
+      "side": 1,
+      "message": "1) the reason to do this in a loop is that we need to replace the escape_char first. If we replace the escape_char after inserting it in front of the wildcard chars, they (% and _) are not escaped anymore.\n2) I\u0027ve put the sanitation into the getFuzzFilterOp method, so we are sure to pass a string, and not a sequence of strings (good find, thanks!)\n3) The original reason to use another char as the escape_char was that backslashes must be escaped again in Python, which is a bit odd to debug because of Pythons string representation of repeated backslashes. But since it doesn\u0027t make a difference, I changed the default escape_char to backslash.",
+      "parentUuid": "b2a79446_f47aaff9",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "232bae6f_d0057e2f",
         "filename": "zuul/driver/sql/sqlconnection.py",
         "patchSetId": 5
