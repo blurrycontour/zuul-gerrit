@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53e828f1_43769632",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-03-07T06:07:56Z",
+      "side": 1,
+      "message": "\u003e This is what you mentioned in Iebf49a9efe193788199197bf7846e336d96edf19 -- it\u0027s more efficient in that we are returning less data, but it may constrain us in the future so that we don\u0027t know which change in a cycle that a file came from, right?\n\nYes, correct.",
+      "revId": "76882e1b3a3b718d497a1d8b8177c64c6f74c54d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
