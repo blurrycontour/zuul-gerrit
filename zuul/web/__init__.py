@@ -34,6 +34,7 @@ import threading
 import uuid
 import prometheus_client
 import urllib.parse
+import types
 
 import zuul.executor.common
 from zuul import exceptions
@@ -108,6 +109,239 @@ def get_request_logger(logger=None):
     return get_annotated_logger(logger, None, request=zuul_request_id)
 
 
+def _datetimeToString(my_datetime):
+    if my_datetime:
+        return my_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+    return None
+
+
+class Prop:
+    def __init__(self, description, value):
+        """A property of an OpenAPI schema.
+
+        :param str description: The description of this property
+        :param type value: The type of the property; either a native
+            Python scalar type, Prop instance, or list or dictionary of
+            the preceding.
+        """
+        self.description = description
+        self.value = value
+
+    @staticmethod
+    def _toOpenAPI(value):
+        ret = {}
+        if isinstance(value, Prop):
+            ret['description'] = value.description
+            value = value.value
+        if isinstance(value, (list, tuple)):
+            ret['type'] = 'array'
+            ret['items'] = Prop._toOpenAPI(value[0])
+        elif isinstance(value, (types.MappingProxyType, dict)):
+            ret['type'] = 'object'
+            ret['properties'] = {
+                k: Prop._toOpenAPI(v) for (k, v) in value.items()
+            }
+        elif value is str:
+            ret['type'] = 'string'
+        elif value is int:
+            ret['type'] = 'integer'
+        elif value is float:
+            ret['type'] = 'number'
+        elif value is bool:
+            ret['type'] = 'boolean'
+        elif value is dict:
+            ret['type'] = 'object'
+        return ret
+
+    def toOpenAPI(self):
+        "Convert this Prop to an OpenAPI schema."
+        return Prop._toOpenAPI(self.value)
+
+
+class RefConverter:
+    # A class to encapsulate the conversion of database Ref objects to
+    # API output.
+    @staticmethod
+    def toDict(ref):
+        return {
+            'project': ref.project,
+            'branch': ref.branch,
+            'change': ref.change,
+            'patchset': ref.patchset,
+            'ref': ref.ref,
+            'oldrev': ref.oldrev,
+            'newrev': ref.newrev,
+            'ref_url': ref.ref_url,
+        }
+
+    @staticmethod
+    def schema():
+        return Prop('The ref', {
+            'project': str,
+            'branch': str,
+            'change': str,
+            'patchset': str,
+            'ref': str,
+            'oldrev': str,
+            'newrev': str,
+            'ref_url': str,
+        })
+
+
+class BuildConverter:
+    # A class to encapsulate the conversion of database Build objects to
+    # API output.
+    def toDict(build, buildset=None, skip_refs=False):
+        start_time = _datetimeToString(build.start_time)
+        end_time = _datetimeToString(build.end_time)
+        if build.start_time and build.end_time:
+            duration = (build.end_time -
+                        build.start_time).total_seconds()
+        else:
+            duration = None
+
+        ret = {
+            '_id': build.id,
+            'uuid': build.uuid,
+            'job_name': build.job_name,
+            'result': build.result,
+            'held': build.held,
+            'start_time': start_time,
+            'end_time': end_time,
+            'duration': duration,
+            'voting': build.voting,
+            'log_url': build.log_url,
+            'nodeset': build.nodeset,
+            'error_detail': build.error_detail,
+            'final': build.final,
+            'artifacts': [],
+            'provides': [],
+            'ref': RefConverter.toDict(build.ref),
+        }
+        if buildset:
+            # We enter this branch if we're returning top-level build
+            # objects (ie, not builds under a buildset).
+            event_timestamp = _datetimeToString(buildset.event_timestamp)
+            ret.update({
+                'pipeline': buildset.pipeline,
+                'event_id': buildset.event_id,
+                'event_timestamp': event_timestamp,
+                'buildset': {
+                    'uuid': buildset.uuid,
+                },
+            })
+            if not skip_refs:
+                ret['buildset']['refs'] = [
+                    RefConverter.toDict(ref)
+                    for ref in buildset.refs
+                ]
+
+        for artifact in build.artifacts:
+            art = {
+                'name': artifact.name,
+                'url': artifact.url,
+            }
+            if artifact.meta:
+                art['metadata'] = json.loads(artifact.meta)
+            ret['artifacts'].append(art)
+        for provides in build.provides:
+            ret['provides'].append({
+                'name': provides.name,
+            })
+        return ret
+
+    @staticmethod
+    def schema(buildset=False, skip_refs=False):
+        ret = {
+            '_id': str,
+            'uuid': str,
+            'job_name': str,
+            'result': str,
+            'held': str,
+            'start_time': str,
+            'end_time': str,
+            'duration': str,
+            'voting': str,
+            'log_url': str,
+            'nodeset': str,
+            'error_detail': str,
+            'final': str,
+            'artifacts': [{
+                'name': str,
+                'url': str,
+                'metadata': dict,
+            }],
+            'provides': [{
+                'name': str,
+            }],
+            'ref': RefConverter.schema(),
+        }
+        if buildset:
+            # We enter this branch if we're returning top-level build
+            # objects (ie, not builds under a buildset).
+            ret.update({
+                'pipeline': str,
+                'event_id': str,
+                'event_timestamp': str,
+                'buildset': {
+                    'uuid': str,
+                },
+            })
+            if not skip_refs:
+                ret['buildset']['refs'] = [RefConverter.schema()]
+
+        ret = Prop('The build', ret)
+        return ret
+
+
+class BuildsetConverter:
+    # A class to encapsulate the conversion of database Buildset
+    # objects to API output.
+    def toDict(buildset, builds=[]):
+        event_timestamp = _datetimeToString(buildset.event_timestamp)
+        start = _datetimeToString(buildset.first_build_start_time)
+        end = _datetimeToString(buildset.last_build_end_time)
+        ret = {
+            '_id': buildset.id,
+            'uuid': buildset.uuid,
+            'result': buildset.result,
+            'message': buildset.message,
+            'pipeline': buildset.pipeline,
+            'event_id': buildset.event_id,
+            'event_timestamp': event_timestamp,
+            'first_build_start_time': start,
+            'last_build_end_time': end,
+            'refs': [
+                RefConverter.toDict(ref)
+                for ref in buildset.refs
+            ],
+        }
+        if builds:
+            ret['builds'] = []
+        for build in builds:
+            ret['builds'].append(BuildConverter.toDict(build))
+        return ret
+
+    def schema(builds=False):
+        ret = {
+            '_id': str,
+            'uuid': str,
+            'result': str,
+            'message': str,
+            'pipeline': str,
+            'event_id': str,
+            'event_timestamp': str,
+            'first_build_start_time': str,
+            'last_build_end_time': str,
+            'refs': [
+                RefConverter.schema()
+            ],
+        }
+        if builds:
+            ret['builds'] = [BuildConverter.schema()]
+        return Prop('The buildset', ret)
+
+
 class APIError(cherrypy.HTTPError):
     def __init__(self, code, json_doc=None, headers=None):
         self._headers = headers or {}
@@ -177,6 +411,52 @@ def handle_options(allowed_methods=None):
 cherrypy.tools.handle_options = cherrypy.Tool('on_start_resource',
                                               handle_options,
                                               priority=50)
+
+
+def openapi(spec):
+    """Describe a free form OpenAPI response
+
+    :param dict spec: The raw OpenAPI specification dictionary for the
+        operation
+
+    """
+    def decorator(func):
+        func.__openapi__ = spec
+        return func
+    return decorator
+
+
+def openapi_json_response(
+        description=None,
+        schema=None,
+        error=None,
+):
+    """Describe a JSON OpenAPI response
+
+    :param str description: A description for the successful response
+    :param Prop schema: A Prop describing the returned schema
+    :param str error: A description of the 404 response
+    """
+    spec = {
+        'responses': {
+            '200': {
+                'description': description,
+                'content': {
+                    'application/json': {
+                        'schema': schema.toOpenAPI(),
+                    },
+                },
+            },
+            '404': {
+                'description': error,
+            }
+        }
+    }
+
+    def decorator(func):
+        func.__openapi__ = spec
+        return func
+    return decorator
 
 
 class AuthInfo:
@@ -1069,6 +1349,15 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_root_auth()
+    @openapi_json_response(
+        description='Returns the list of tenants',
+        schema=Prop('The list of tenants', [{
+            'name': Prop('Tenant name', str),
+            'projects': Prop('Tenant project count', int),
+            'queue': Prop('Active changes count', int),
+        }]),
+        error='Tenant not found',
+    )
     def tenants(self, auth):
         cache_time = self.tenants_cache_time
         if time.time() - cache_time > self.cache_expiry:
@@ -1204,6 +1493,12 @@ class ZuulWebAPI(object):
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
     def status(self, tenant_name, tenant, auth):
+        """Return the tenant status.
+
+        Note: the output format is not currently documented and
+        subject to change without notice.
+
+        """
         return self._getStatus(tenant)[1]
 
     @cherrypy.expose
@@ -1212,6 +1507,12 @@ class ZuulWebAPI(object):
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
     def status_change(self, tenant_name, tenant, auth, change):
+        """Return the status for a single change.
+
+        Note: the output format is not currently documented and
+        subject to change without notice.
+
+        """
         payload = self._getStatus(tenant)[0]
         result_filter = RefFilter(change)
         return result_filter.filterPayload(payload)
@@ -1223,6 +1524,19 @@ class ZuulWebAPI(object):
     )
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi_json_response(
+        description='Returns the list of jobs',
+        schema=Prop('The list of jobs', [{
+            'name': str,
+            'description': str,
+            'tags': [str],
+            'variants': [{
+                'parent': str,
+                'branches': [str],
+            }],
+        }]),
+        error='Tenant not found',
+    )
     def jobs(self, tenant_name, tenant, auth):
         result = []
         for job_name in sorted(tenant.layout.jobs):
@@ -1435,6 +1749,29 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi({
+        'responses': {
+            '200': {
+                'content': {
+                    'text/plain': {
+                        'example': ('-----BEGIN PUBLIC KEY-----\n'
+                                    'MIICI...\n'
+                                    '-----END PUBLIC KEY-----\n'),
+                        'schema': {
+                            'description': ('The project secrets public key '
+                                            'in PKCS8 format'),
+                            'type': 'string',
+                        },
+                    },
+                },
+                'description': ('Returns the project public key that is used '
+                                'to encrypt secrets'),
+            },
+            '404': {
+                'description': 'Tenant or Project not found',
+            }
+        }
+    })
     def key(self, tenant_name, tenant, auth, project_name):
         project = self._getProjectOrRaise(tenant, project_name)
 
@@ -1447,6 +1784,27 @@ class ZuulWebAPI(object):
     @cherrypy.tools.save_params()
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi({
+        'responses': {
+            '200': {
+                'content': {
+                    'text/plain': {
+                        'example': 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACA',
+                        'schema': {
+                            'description': ('The project secrets public key '
+                                            'in SSH2 format'),
+                            'type': 'string',
+                        },
+                    },
+                },
+                'description': ('Returns the project public key that '
+                                'executor adds to SSH agent'),
+            },
+            '404': {
+                'description': 'Tenant or Project not found',
+            }
+        }
+    })
     def project_ssh_key(self, tenant_name, tenant, auth, project_name):
         project = self._getProjectOrRaise(tenant, project_name)
 
@@ -1454,82 +1812,6 @@ class ZuulWebAPI(object):
         resp = cherrypy.response
         resp.headers['Content-Type'] = 'text/plain'
         return key
-
-    def _datetimeToString(self, my_datetime):
-        if my_datetime:
-            return my_datetime.strftime('%Y-%m-%dT%H:%M:%S')
-        return None
-
-    def refToDict(self, ref):
-        return {
-            'project': ref.project,
-            'branch': ref.branch,
-            'change': ref.change,
-            'patchset': ref.patchset,
-            'ref': ref.ref,
-            'oldrev': ref.oldrev,
-            'newrev': ref.newrev,
-            'ref_url': ref.ref_url,
-        }
-
-    def buildToDict(self, build, buildset=None, skip_refs=False):
-        start_time = self._datetimeToString(build.start_time)
-        end_time = self._datetimeToString(build.end_time)
-        if build.start_time and build.end_time:
-            duration = (build.end_time -
-                        build.start_time).total_seconds()
-        else:
-            duration = None
-
-        ret = {
-            '_id': build.id,
-            'uuid': build.uuid,
-            'job_name': build.job_name,
-            'result': build.result,
-            'held': build.held,
-            'start_time': start_time,
-            'end_time': end_time,
-            'duration': duration,
-            'voting': build.voting,
-            'log_url': build.log_url,
-            'nodeset': build.nodeset,
-            'error_detail': build.error_detail,
-            'final': build.final,
-            'artifacts': [],
-            'provides': [],
-            'ref': self.refToDict(build.ref),
-        }
-        if buildset:
-            # We enter this branch if we're returning top-level build
-            # objects (ie, not builds under a buildset).
-            event_timestamp = self._datetimeToString(buildset.event_timestamp)
-            ret.update({
-                'pipeline': buildset.pipeline,
-                'event_id': buildset.event_id,
-                'event_timestamp': event_timestamp,
-                'buildset': {
-                    'uuid': buildset.uuid,
-                },
-            })
-            if not skip_refs:
-                ret['buildset']['refs'] = [
-                    self.refToDict(ref)
-                    for ref in buildset.refs
-                ]
-
-        for artifact in build.artifacts:
-            art = {
-                'name': artifact.name,
-                'url': artifact.url,
-            }
-            if artifact.meta:
-                art['metadata'] = json.loads(artifact.meta)
-            ret['artifacts'].append(art)
-        for provides in build.provides:
-            ret['provides'].append({
-                'name': provides.name,
-            })
-        return ret
 
     def _get_connection(self):
         return self.zuulweb.connections.connections['database']
@@ -1539,12 +1821,21 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi_json_response(
+        description='Returns the list of builds',
+        schema=Prop('The list of builds', [BuildConverter.schema()]),
+        error='Tenant not found',
+    )
     def builds(self, tenant_name, tenant, auth, project=None,
                pipeline=None, change=None, branch=None, patchset=None,
                ref=None, newrev=None, uuid=None, job_name=None,
                voting=None, nodeset=None, result=None, final=None,
                held=None, complete=None, limit=50, skip=0,
                idx_min=None, idx_max=None, exclude_result=None):
+        """
+        List the executed builds
+        """
+
         connection = self._get_connection()
 
         if tenant_name not in self.zuulweb.abide.tenants.keys():
@@ -1574,7 +1865,7 @@ class ZuulWebAPI(object):
             idx_max=_idx_max, exclude_result=exclude_result,
             query_timeout=self.query_timeout)
 
-        return [self.buildToDict(b, b.buildset, skip_refs=True)
+        return [BuildConverter.toDict(b, b.buildset, skip_refs=True)
                 for b in builds]
 
     @cherrypy.expose
@@ -1588,12 +1879,12 @@ class ZuulWebAPI(object):
         data = connection.getBuild(tenant_name, uuid)
         if not data:
             raise cherrypy.HTTPError(404, "Build not found")
-        data = self.buildToDict(data, data.buildset)
+        data = BuildConverter.toDict(data, data.buildset)
         return data
 
     def buildTimeToDict(self, build):
-        start_time = self._datetimeToString(build.start_time)
-        end_time = self._datetimeToString(build.end_time)
+        start_time = _datetimeToString(build.start_time)
+        end_time = _datetimeToString(build.end_time)
         if build.start_time and build.end_time:
             duration = (build.end_time -
                         build.start_time).total_seconds()
@@ -1652,37 +1943,42 @@ class ZuulWebAPI(object):
 
         return [self.buildTimeToDict(b) for b in build_times]
 
-    def buildsetToDict(self, buildset, builds=[]):
-        event_timestamp = self._datetimeToString(buildset.event_timestamp)
-        start = self._datetimeToString(buildset.first_build_start_time)
-        end = self._datetimeToString(buildset.last_build_end_time)
-        ret = {
-            '_id': buildset.id,
-            'uuid': buildset.uuid,
-            'result': buildset.result,
-            'message': buildset.message,
-            'pipeline': buildset.pipeline,
-            'event_id': buildset.event_id,
-            'event_timestamp': event_timestamp,
-            'first_build_start_time': start,
-            'last_build_end_time': end,
-            'refs': [
-                self.refToDict(ref)
-                for ref in buildset.refs
-            ],
-        }
-        if builds:
-            ret['builds'] = []
-        for build in builds:
-            ret['builds'].append(self.buildToDict(build))
-        return ret
-
     @cherrypy.expose
     @cherrypy.tools.save_params()
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi({
+        'responses': {
+            '200': {
+                'description': ('Badge describing the result of '
+                                'the latest buildset found.'),
+                'content': {
+                    'image/svg+xml': {
+                        'schema': {
+                            'description': 'SVG image',
+                            'type': 'object',
+                        },
+                    },
+                },
+            },
+            '404': {
+                'description': 'No buildset found',
+            }
+        }
+    })
     def badge(self, tenant_name, tenant, auth, project=None,
               pipeline=None, branch=None):
+        """
+        Get a badge describing the result of the latest buildset found.
+
+        :param str tenant_name: The tenant name
+        :param Tenant tenant: The tenant object
+        :param AuthInfo auth: The auth object
+        :param str project: A project name
+        :param str pipeline: A pipeline name
+        :param str branch: A branch name
+        """
+
         connection = self._get_connection()
 
         buildsets = connection.getBuildsets(
@@ -1709,6 +2005,11 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi_json_response(
+        description='Returns the list of buildsets',
+        schema=Prop('The list of buildsets', [BuildsetConverter.schema()]),
+        error='Tenant not found',
+    )
     def buildsets(self, tenant_name, tenant, auth, project=None,
                   pipeline=None, change=None, branch=None,
                   patchset=None, ref=None, newrev=None, uuid=None,
@@ -1732,7 +2033,7 @@ class ZuulWebAPI(object):
             limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max,
             query_timeout=self.query_timeout)
 
-        return [self.buildsetToDict(b) for b in buildsets]
+        return [BuildsetConverter.toDict(b) for b in buildsets]
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1745,7 +2046,7 @@ class ZuulWebAPI(object):
         data = connection.getBuildset(tenant_name, uuid)
         if not data:
             raise cherrypy.HTTPError(404, "Buildset not found")
-        data = self.buildsetToDict(data, data.builds)
+        data = BuildsetConverter.toDict(data, data.builds)
         return data
 
     @cherrypy.expose
@@ -1755,6 +2056,23 @@ class ZuulWebAPI(object):
     )
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi_json_response(
+        description='Returns the list of semaphores',
+        schema=Prop('The list of semaphores', [{
+            'name': str,
+            'global': bool,
+            'max': int,
+            'holders': {
+                'count': int,
+                'other_tenants': int,
+                'this_tenant': [{
+                    'buildset_uuid': str,
+                    'job_name': str,
+                }],
+            },
+        }]),
+        error='Tenant not found',
+    )
     def semaphores(self, tenant_name, tenant, auth):
         result = []
         names = set(tenant.layout.semaphores.keys())
@@ -2022,6 +2340,132 @@ class ZuulWeb(object):
     log = logging.getLogger("zuul.web")
     tracer = trace.get_tracer("zuul")
 
+    @staticmethod
+    def generateRouteMap(api, include_auth):
+        route_map = cherrypy.dispatch.RoutesDispatcher()
+        route_map.connect('api', '/api',
+                          controller=api, action='index')
+        route_map.connect('api', '/api/info',
+                          controller=api, action='info')
+        route_map.connect('api', '/api/connections',
+                          controller=api, action='connections')
+        route_map.connect('api', '/api/components',
+                          controller=api, action='components')
+        route_map.connect('api', '/api/tenants',
+                          controller=api, action='tenants')
+        route_map.connect('api', '/api/tenant/{tenant_name}/info',
+                          controller=api, action='tenant_info')
+        route_map.connect('api', '/api/tenant/{tenant_name}/status',
+                          controller=api, action='status')
+        route_map.connect('api', '/api/tenant/{tenant_name}/status/change'
+                          '/{change}',
+                          controller=api, action='status_change')
+        route_map.connect('api', '/api/tenant/{tenant_name}/semaphores',
+                          controller=api, action='semaphores')
+        route_map.connect('api', '/api/tenant/{tenant_name}/jobs',
+                          controller=api, action='jobs')
+        route_map.connect('api', '/api/tenant/{tenant_name}/job/{job_name}',
+                          controller=api, action='job')
+        # if no auth configured, deactivate admin routes
+        if include_auth:
+            # route order is important, put project actions before the more
+            # generic tenant/{tenant_name}/project/{project} route
+            route_map.connect('api',
+                              '/api/tenant/{tenant_name}/authorizations',
+                              controller=api,
+                              action='tenant_authorizations')
+            route_map.connect('api',
+                              '/api/authorizations',
+                              controller=api,
+                              action='root_authorizations')
+            route_map.connect('api', '/api/tenant/{tenant_name}/promote',
+                              controller=api, action='promote')
+            route_map.connect(
+                'api',
+                '/api/tenant/{tenant_name}/project/{project_name:.*}/autohold',
+                controller=api,
+                conditions=dict(method=['GET', 'OPTIONS']),
+                action='autohold_project_get')
+            route_map.connect(
+                'api',
+                '/api/tenant/{tenant_name}/project/{project_name:.*}/autohold',
+                controller=api,
+                conditions=dict(method=['POST']),
+                action='autohold_project_post')
+            route_map.connect(
+                'api',
+                '/api/tenant/{tenant_name}/project/{project_name:.*}/enqueue',
+                controller=api, action='enqueue')
+            route_map.connect(
+                'api',
+                '/api/tenant/{tenant_name}/project/{project_name:.*}/dequeue',
+                controller=api, action='dequeue')
+        route_map.connect('api',
+                          '/api/tenant/{tenant_name}/autohold/{request_id}',
+                          controller=api,
+                          conditions=dict(method=['GET', 'OPTIONS']),
+                          action='autohold_get')
+        route_map.connect('api',
+                          '/api/tenant/{tenant_name}/autohold/{request_id}',
+                          controller=api,
+                          conditions=dict(method=['DELETE']),
+                          action='autohold_delete')
+        route_map.connect('api', '/api/tenant/{tenant_name}/autohold',
+                          controller=api, action='autohold_list')
+        route_map.connect('api', '/api/tenant/{tenant_name}/projects',
+                          controller=api, action='projects')
+        route_map.connect('api', '/api/tenant/{tenant_name}/project/'
+                          '{project_name:.*}',
+                          controller=api, action='project')
+        route_map.connect(
+            'api',
+            '/api/tenant/{tenant_name}/pipeline/{pipeline_name}'
+            '/project/{project_name:.*}/branch/{branch_name:.*}/freeze-jobs',
+            controller=api, action='project_freeze_jobs'
+        )
+        route_map.connect(
+            'api',
+            '/api/tenant/{tenant_name}/pipeline/{pipeline_name}'
+            '/project/{project_name:.*}/branch/{branch_name:.*}'
+            '/freeze-job/{job_name}',
+            controller=api, action='project_freeze_job'
+        )
+        route_map.connect('api', '/api/tenant/{tenant_name}/pipelines',
+                          controller=api, action='pipelines')
+        route_map.connect('api', '/api/tenant/{tenant_name}/labels',
+                          controller=api, action='labels')
+        route_map.connect('api', '/api/tenant/{tenant_name}/nodes',
+                          controller=api, action='nodes')
+        route_map.connect('api', '/api/tenant/{tenant_name}/key/'
+                          '{project_name:.*}.pub',
+                          controller=api, action='key')
+        route_map.connect('api', '/api/tenant/{tenant_name}/'
+                          'project-ssh-key/{project_name:.*}.pub',
+                          controller=api, action='project_ssh_key')
+        route_map.connect('api', '/api/tenant/{tenant_name}/console-stream',
+                          controller=api, action='console_stream_get',
+                          conditions=dict(method=['GET']))
+        route_map.connect('api', '/api/tenant/{tenant_name}/console-stream',
+                          controller=api, action='console_stream_options',
+                          conditions=dict(method=['OPTIONS']))
+        route_map.connect('api', '/api/tenant/{tenant_name}/builds',
+                          controller=api, action='builds')
+        route_map.connect('api', '/api/tenant/{tenant_name}/badge',
+                          controller=api, action='badge')
+        route_map.connect('api', '/api/tenant/{tenant_name}/build/{uuid}',
+                          controller=api, action='build')
+        route_map.connect('api', '/api/tenant/{tenant_name}/buildsets',
+                          controller=api, action='buildsets')
+        route_map.connect('api', '/api/tenant/{tenant_name}/buildset/{uuid}',
+                          controller=api, action='buildset')
+        route_map.connect('api', '/api/tenant/{tenant_name}/build-times',
+                          controller=api, action='build_times')
+        route_map.connect('api', '/api/tenant/{tenant_name}/config-errors',
+                          controller=api, action='config_errors')
+        route_map.connect('api', '/api/tenant/{tenant_name}/tenant-status',
+                          controller=api, action='tenant_status')
+        return route_map
+
     def __init__(self,
                  config,
                  connections,
@@ -2130,130 +2574,15 @@ class ZuulWeb(object):
         self.finger_tls_verify_hostnames = get_default(
             self.config, 'fingergw', 'tls_verify_hostnames', default=True)
 
-        route_map = cherrypy.dispatch.RoutesDispatcher()
         api = ZuulWebAPI(self)
         self.api = api
-        route_map.connect('api', '/api',
-                          controller=api, action='index')
-        route_map.connect('api', '/api/info',
-                          controller=api, action='info')
-        route_map.connect('api', '/api/connections',
-                          controller=api, action='connections')
-        route_map.connect('api', '/api/components',
-                          controller=api, action='components')
-        route_map.connect('api', '/api/tenants',
-                          controller=api, action='tenants')
-        route_map.connect('api', '/api/tenant/{tenant_name}/info',
-                          controller=api, action='tenant_info')
-        route_map.connect('api', '/api/tenant/{tenant_name}/status',
-                          controller=api, action='status')
-        route_map.connect('api', '/api/tenant/{tenant_name}/status/change'
-                          '/{change}',
-                          controller=api, action='status_change')
-        route_map.connect('api', '/api/tenant/{tenant_name}/semaphores',
-                          controller=api, action='semaphores')
-        route_map.connect('api', '/api/tenant/{tenant_name}/jobs',
-                          controller=api, action='jobs')
-        route_map.connect('api', '/api/tenant/{tenant_name}/job/{job_name}',
-                          controller=api, action='job')
-        # if no auth configured, deactivate admin routes
-        if self.authenticators.authenticators:
-            # route order is important, put project actions before the more
-            # generic tenant/{tenant_name}/project/{project} route
-            route_map.connect('api',
-                              '/api/tenant/{tenant_name}/authorizations',
-                              controller=api,
-                              action='tenant_authorizations')
-            route_map.connect('api',
-                              '/api/authorizations',
-                              controller=api,
-                              action='root_authorizations')
-            route_map.connect('api', '/api/tenant/{tenant_name}/promote',
-                              controller=api, action='promote')
-            route_map.connect(
-                'api',
-                '/api/tenant/{tenant_name}/project/{project_name:.*}/autohold',
-                controller=api,
-                conditions=dict(method=['GET', 'OPTIONS']),
-                action='autohold_project_get')
-            route_map.connect(
-                'api',
-                '/api/tenant/{tenant_name}/project/{project_name:.*}/autohold',
-                controller=api,
-                conditions=dict(method=['POST']),
-                action='autohold_project_post')
-            route_map.connect(
-                'api',
-                '/api/tenant/{tenant_name}/project/{project_name:.*}/enqueue',
-                controller=api, action='enqueue')
-            route_map.connect(
-                'api',
-                '/api/tenant/{tenant_name}/project/{project_name:.*}/dequeue',
-                controller=api, action='dequeue')
-        route_map.connect('api',
-                          '/api/tenant/{tenant_name}/autohold/{request_id}',
-                          controller=api,
-                          conditions=dict(method=['GET', 'OPTIONS']),
-                          action='autohold_get')
-        route_map.connect('api',
-                          '/api/tenant/{tenant_name}/autohold/{request_id}',
-                          controller=api,
-                          conditions=dict(method=['DELETE']),
-                          action='autohold_delete')
-        route_map.connect('api', '/api/tenant/{tenant_name}/autohold',
-                          controller=api, action='autohold_list')
-        route_map.connect('api', '/api/tenant/{tenant_name}/projects',
-                          controller=api, action='projects')
-        route_map.connect('api', '/api/tenant/{tenant_name}/project/'
-                          '{project_name:.*}',
-                          controller=api, action='project')
+        route_map = self.generateRouteMap(
+            api, bool(self.authenticators.authenticators))
+        # Add fallthrough routes at the end for the static html/js files
         route_map.connect(
-            'api',
-            '/api/tenant/{tenant_name}/pipeline/{pipeline_name}'
-            '/project/{project_name:.*}/branch/{branch_name:.*}/freeze-jobs',
-            controller=api, action='project_freeze_jobs'
-        )
-        route_map.connect(
-            'api',
-            '/api/tenant/{tenant_name}/pipeline/{pipeline_name}'
-            '/project/{project_name:.*}/branch/{branch_name:.*}'
-            '/freeze-job/{job_name}',
-            controller=api, action='project_freeze_job'
-        )
-        route_map.connect('api', '/api/tenant/{tenant_name}/pipelines',
-                          controller=api, action='pipelines')
-        route_map.connect('api', '/api/tenant/{tenant_name}/labels',
-                          controller=api, action='labels')
-        route_map.connect('api', '/api/tenant/{tenant_name}/nodes',
-                          controller=api, action='nodes')
-        route_map.connect('api', '/api/tenant/{tenant_name}/key/'
-                          '{project_name:.*}.pub',
-                          controller=api, action='key')
-        route_map.connect('api', '/api/tenant/{tenant_name}/'
-                          'project-ssh-key/{project_name:.*}.pub',
-                          controller=api, action='project_ssh_key')
-        route_map.connect('api', '/api/tenant/{tenant_name}/console-stream',
-                          controller=api, action='console_stream_get',
-                          conditions=dict(method=['GET']))
-        route_map.connect('api', '/api/tenant/{tenant_name}/console-stream',
-                          controller=api, action='console_stream_options',
-                          conditions=dict(method=['OPTIONS']))
-        route_map.connect('api', '/api/tenant/{tenant_name}/builds',
-                          controller=api, action='builds')
-        route_map.connect('api', '/api/tenant/{tenant_name}/badge',
-                          controller=api, action='badge')
-        route_map.connect('api', '/api/tenant/{tenant_name}/build/{uuid}',
-                          controller=api, action='build')
-        route_map.connect('api', '/api/tenant/{tenant_name}/buildsets',
-                          controller=api, action='buildsets')
-        route_map.connect('api', '/api/tenant/{tenant_name}/buildset/{uuid}',
-                          controller=api, action='buildset')
-        route_map.connect('api', '/api/tenant/{tenant_name}/build-times',
-                          controller=api, action='build_times')
-        route_map.connect('api', '/api/tenant/{tenant_name}/config-errors',
-                          controller=api, action='config_errors')
-        route_map.connect('api', '/api/tenant/{tenant_name}/tenant-status',
-                          controller=api, action='tenant_status')
+            'root_static', '/{path:.*}',
+            controller=StaticHandler(self.static_path),
+            action='default')
 
         for connection in connections.connections.values():
             controller = connection.getWebController(self)
@@ -2261,12 +2590,6 @@ class ZuulWeb(object):
                 cherrypy.tree.mount(
                     controller,
                     '/api/connection/%s' % connection.connection_name)
-
-        # Add fallthrough routes at the end for the static html/js files
-        route_map.connect(
-            'root_static', '/{path:.*}',
-            controller=StaticHandler(self.static_path),
-            action='default')
 
         cherrypy.tools.stats = StatsTool(self.statsd, self.metrics)
 
