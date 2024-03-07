@@ -62,6 +62,58 @@
       },
       "revId": "b2c07d43d6faedfc883dfbdb0aed0968a84222ef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5451c0f0_70bf8a31",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-07T23:07:08Z",
+      "side": 1,
+      "message": "It\u0027s for future support of key rotation.  I would expect this script to iterate through all of them despite there only being one now.",
+      "parentUuid": "e9960b64_b9bece39",
+      "revId": "b2c07d43d6faedfc883dfbdb0aed0968a84222ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd524461_82fad313",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-07T23:07:08Z",
+      "side": 1,
+      "message": "Maybe call this \"export-path\" to suggest a connection with export-keys.",
+      "revId": "b2c07d43d6faedfc883dfbdb0aed0968a84222ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f765841_2eb1135b",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-07T23:07:08Z",
+      "side": 1,
+      "message": "It\u0027s not clear what this is supposed to be or how a user should identify it.",
+      "revId": "b2c07d43d6faedfc883dfbdb0aed0968a84222ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
