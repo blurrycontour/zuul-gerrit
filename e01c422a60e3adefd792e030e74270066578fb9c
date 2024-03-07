@@ -34,6 +34,24 @@
       "parentUuid": "87cdbc7a_5edcdffc",
       "revId": "e01c422a60e3adefd792e030e74270066578fb9c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a390e425_0bcc12a0",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-07T15:33:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2d0135b_a8552d95",
+      "revId": "e01c422a60e3adefd792e030e74270066578fb9c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

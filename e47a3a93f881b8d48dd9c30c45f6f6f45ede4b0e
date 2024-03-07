@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b38fecf_2320806d",
+        "filename": "releasenotes/notes/substring-web-search-362ede4088338005.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-07T15:33:57Z",
+      "side": 1,
+      "message": "As long as you\u0027re making a new patchset, you might as well fix this.",
+      "parentUuid": "ce723b2a_d02859c7",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "131aa175_cd14d120",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-03-06T19:10:42Z",
       "side": 1,
       "message": "Ditto about testing lists/tuples of strings.",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2624b7a9_78d9e3f6",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-07T15:33:57Z",
+      "side": 1,
+      "message": "-1: I think it\u0027s important we test lists and tuples here as well as bare strings and None.",
+      "parentUuid": "5ce6697e_0a7e3875",
       "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -83,6 +119,24 @@
       "side": 1,
       "message": "1) the reason to do this in a loop is that we need to replace the escape_char first. If we replace the escape_char after inserting it in front of the wildcard chars, they (% and _) are not escaped anymore.\n2) I\u0027ve put the sanitation into the getFuzzFilterOp method, so we are sure to pass a string, and not a sequence of strings (good find, thanks!)\n3) The original reason to use another char as the escape_char was that backslashes must be escaped again in Python, which is a bit odd to debug because of Pythons string representation of repeated backslashes. But since it doesn\u0027t make a difference, I changed the default escape_char to backslash.",
       "parentUuid": "b2a79446_f47aaff9",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "549dc164_af488bb8",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-07T15:33:57Z",
+      "side": 1,
+      "message": "1) You don\u0027t need a loop to do this, you could use str.translate -- however, I just benchmarked that, and it actually takes 2x as long as your loop, so let\u0027s keep your loop.  :)\n3) -1: I agree with your reasoning about using $ and I would rather have the unit tests actually test what we\u0027re doing, not a different character, and I also would like the unit tests to be readable.  So I think you should switch back to using $ as the escape char.  But I also think you should remove it as method arguments and just hardcode it.  There is no current reason for us to call any of these methods with a different character.",
+      "parentUuid": "3e8eec36_4170dac0",
       "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
