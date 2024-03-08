@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "c074c5e5_a890eb6a",
+        "filename": "releasenotes/notes/substring-web-search-362ede4088338005.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-03-08T09:56:16Z",
+      "side": 1,
+      "message": "This is now part of https://review.opendev.org/c/zuul/zuul/+/911700 and fixed over there",
+      "parentUuid": "4b38fecf_2320806d",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "131aa175_cd14d120",
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "-1: I think it\u0027s important we test lists and tuples here as well as bare strings and None.",
       "parentUuid": "5ce6697e_0a7e3875",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5275f0b1_3a9fdc09",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-03-08T09:56:16Z",
+      "side": 1,
+      "message": "Sure we can test that with lists/tuples, but we never call _getFuzzyFilterOp with lists or tuples (cf. sqlconnection.py:142).\nTesting substring queries with lists is done in TestBuildInfo (test_web.py).",
+      "parentUuid": "2624b7a9_78d9e3f6",
       "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -137,6 +173,24 @@
       "side": 1,
       "message": "1) You don\u0027t need a loop to do this, you could use str.translate -- however, I just benchmarked that, and it actually takes 2x as long as your loop, so let\u0027s keep your loop.  :)\n3) -1: I agree with your reasoning about using $ and I would rather have the unit tests actually test what we\u0027re doing, not a different character, and I also would like the unit tests to be readable.  So I think you should switch back to using $ as the escape char.  But I also think you should remove it as method arguments and just hardcode it.  There is no current reason for us to call any of these methods with a different character.",
       "parentUuid": "3e8eec36_4170dac0",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "deb5397e_b115d8cf",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-03-08T09:56:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "549dc164_af488bb8",
       "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
