@@ -124,6 +124,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "a26930b5_756fa537",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-08T15:46:11Z",
+      "side": 1,
+      "message": "Okay, sorry this still isn\u0027t clear.  I think the problem is that this comment is getting textually separated from the original concern I raised.\n\nWhat I want to see is that there is a test that would have caught the original error in the patchset where multiple fuzzy options for the same attribute would have failed.\n\nIt looks like the way to do that now would be either to test listFilterFuzzy, or to extend the test in test_web to have some weird branch names that need escaping.\n\nOr, if that ends up being too complicated, we could say that we\u0027ve all looked at this enough to know that it\u0027s good now.  :)\n\nI\u0027m not interested in testing things that we don\u0027t care about.  So I would remove the tests of sanitize and fuzzy filter op that pass in values that should never happen like lists or None.\n\nlistFilterFuzzy should take a value that is one of:\n\n* None (in which case it returns immediately)\n* str (in which case it calls getfuzzyfilterop with a str)\n* [str] (in which case it calls getfuzzyfilterop with a str)\n\nAnything else shouldn\u0027t be possible, and if it were to happen, there is no correct behavior (perhaps crashing is the best behavior).  Regardless, we don\u0027t need to assert that it actually works.\n\nThe main thing I\u0027m trying to get across here is that it\u0027s more important to have full coverage of the actual usage than to ensure that these methods are completely generically useful.  They only have one call site.",
+      "parentUuid": "5275f0b1_3a9fdc09",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b2a79446_f47aaff9",
