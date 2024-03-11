@@ -20,8 +20,8 @@ import shutil
 import subprocess
 import sys
 import zuul.ansible
+import importlib.resources
 
-from pkg_resources import resource_string
 from zuul.lib.config import get_default
 
 
@@ -160,7 +160,9 @@ class AnsibleManager:
             self.default_version = default_version
 
     def load_ansible_config(self):
-        c = resource_string(__name__, 'ansible-config.conf').decode()
+        ref = importlib.resources.files('zuul').joinpath(
+            'lib/ansible-config.conf')
+        c = ref.read_bytes().decode()
         config = configparser.ConfigParser()
         config.read_string(c)
 
