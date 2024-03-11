@@ -24,6 +24,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df50549f_5f682cd0",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 34620
+      },
+      "writtenOn": "2024-03-11T10:36:58Z",
+      "side": 1,
+      "message": "The idea was to convert ZuulKeyConfig which returned from the line https://review.opendev.org/c/zuul/zuul/+/908507/7/tools/decrypt_secret.py#89, but now that you have mentioned it, I checked it and this is not needed anymore.",
+      "parentUuid": "c9b91705_e1537cc5",
+      "range": {
+        "startLine": 31,
+        "startChar": 15,
+        "endLine": 31,
+        "endChar": 21
+      },
+      "revId": "b2c07d43d6faedfc883dfbdb0aed0968a84222ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "efe65c89_3d853711",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-03-07T21:50:49Z",
       "side": 1,
       "message": "Is it `path + \"/secrets\"` that doesn\u0027t exist or just `path`? I think we don\u0027t have sufficient info here. Maybe better to say that `path + \"/secrets\"` could not be found / does not exist.\n\nLooking at the code I think it is theoretically possible for a project to have an ssh key but not a secrets key. However, that would only be possible in the case of a manually curated zk database? Otherwise zuul should ensure both get created in zk.",
+      "revId": "b2c07d43d6faedfc883dfbdb0aed0968a84222ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "342e8fa5_1f01e0c9",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 34620
+      },
+      "writtenOn": "2024-03-11T10:36:58Z",
+      "side": 1,
+      "message": "Thank you for the suggestion, I changed it to a more clear output.\n\nRegarding the second part of your comment, I do not know if it is possible or not, to have several combinations of ssh and secret keys. I can only tell that, in our use case we just use ZK database created by Zuul.",
+      "parentUuid": "efe65c89_3d853711",
       "revId": "b2c07d43d6faedfc883dfbdb0aed0968a84222ef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
