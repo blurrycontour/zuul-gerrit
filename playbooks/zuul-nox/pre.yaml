@@ -4,3 +4,22 @@
     - run-dstat
     - role: ensure-zookeeper
       zookeeper_use_tls: true
+  tasks:
+    - name: Install bcc tooling
+      package:
+        name:
+          - "bpfcc-tools"
+          - "linux-headers-{{ ansible_kernel }}"
+        state: present
+      become: yes
+    - name: Run the bcc tools in the background
+      shell: |
+        # Try to get the tools to write out without buffering
+        export PYTHONUNBUFFERED=1
+        /usr/sbin/fileslower-bpfcc > /tmp/bcc_fileslower.log 2>&1 &
+        # Disabled as this doesnt appear to work with jammy
+        #/usr/sbin/runqslower-bpfcc > /tmp/bcc_runqslower.log 2>&1 &
+        # 10 second summaries
+        /usr/sbin/ustat -l python -C 10 > /tmp/bcc_ustat_python.log 2>&1 &
+        /usr/sbin/ustat -l java -C 10 > /tmp/bcc_ustat_java.log 2>&1 &
+      become: yes
