@@ -191,7 +191,7 @@ class Nodepool(object):
         else:
             event_id = None
         req = model.NodeRequest(self.system_id, build_set_uuid, tenant_name,
-                                pipeline_name, job.uuid, labels,
+                                pipeline_name, job.uuid, job.name, labels,
                                 provider, relative_priority, event_id)
 
         if job.nodeset.nodes:
