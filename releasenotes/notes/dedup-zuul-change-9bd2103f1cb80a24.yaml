@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    When circular dependencies and job deduplication are used, Zuul
+    will attempt to select the triggering change as the "Zuul change"
+    when setting zuul job variables whenever possible.  See
+    :ref:`user_jobs_zuul_variables`.

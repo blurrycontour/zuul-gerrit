@@ -209,6 +209,8 @@ Parent Job Results
 A job may return data to Zuul for later use by jobs which depend on
 it.  For details, see :ref:`return_values`.
 
+.. _user_jobs_zuul_variables:
+
 Zuul Variables
 --------------
 
@@ -224,6 +226,15 @@ Information about these items is available to jobs.  All of the items
 enqueued in a pipeline are git references, and therefore share some
 attributes in common.  But other attributes may vary based on the type
 of item.
+
+In the case of circular dependencies, a queue item may have multiple
+changes associated with it, and if jobs are deduplicated, then a
+single build may be run for multiple changes.  In these cases, Zuul
+will attempt to use the change that triggered the queue item to supply
+variables related to the queue item whenever applicable.  If that is
+not possible (for example, the triggering change's does not run the
+job, but other dependent changes do), then one of the item's changes
+that do run the job is selected arbitrarily.
 
 .. var:: zuul
 
