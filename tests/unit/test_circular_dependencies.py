@@ -1839,8 +1839,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/01/1/1'),
             dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/02/2/1'),
+                 ref='refs/changes/01/1/1'),
         ], ordered=False)
+        # child-job for 2 is deduplicated into 1 (the triggering change).
         job = self.getJobFromHistory('child-job')
         self.assertEqual({'foo': 'a', 'bar': 'b'},
                          job.parameters['parent_data'])
@@ -2286,8 +2287,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
             B.subject, A.data["url"]
         )
 
+        # A is the triggering change for the deduplicated parent-job
         self.executor_server.returnData(
-            'parent-job', B,
+            'parent-job', A,
             {'zuul': {'pause': True}}
         )
 
@@ -2651,8 +2653,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/02/2/1'),
             dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/02/2/1'),
+                 ref='refs/changes/01/1/1'),
         ], ordered=False)
+        # child-job for 2 is deduplicated into 1 (the triggering change).
         self._assert_job_deduplication_check()
         job = self.getJobFromHistory('child-job')
         self.assertEqual({'foo': 'a', 'bar': 'b'},
@@ -3231,12 +3234,13 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.assertHistory([
             dict(name="common-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/02/2/1'),
+                 ref='refs/changes/01/1/1'),
             dict(name="child-job", result="SUCCESS", changes="2,1 1,1",
-                 ref='refs/changes/02/2/1'),
+                 ref='refs/changes/01/1/1'),
             dict(name="project1-job", result="SUCCESS", changes="2,1 1,1",
                  ref='refs/changes/01/1/1'),
         ], ordered=False)
+        # All jobs for 2 are deduplicated into 1 (the triggering change).
         self._assert_job_deduplication_check()
 
     def _test_job_deduplication_check_semaphore(self):
@@ -3828,9 +3832,9 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="check-job", result="SUCCESS", changes="2,1 1,1 3,1",
                  ref="refs/changes/02/2/1"),
             dict(name="check-job", result="SUCCESS", changes="2,1 1,1 3,1",
-                 ref="refs/changes/01/1/1"),
-            # check-job for change 3 is deduplicated into change 1
-            # because they are the same repo.
+                 ref="refs/changes/03/3/1"),
+            # check-job for change 1 is deduplicated into change 3
+            # because they are the same repo; 3 is the triggering change.
         ], ordered=False)
 
     def test_dependency_refresh_config_error(self):
