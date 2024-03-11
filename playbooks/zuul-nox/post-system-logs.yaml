@@ -4,3 +4,10 @@
   tasks:
     - name: Collect zookeeper logs
       shell: "cp /opt/zookeeper/logs/* {{ zuul_output_dir }}/logs/"
+    - name: Collect bcc fileslower logs
+      shell: "cp /tmp/bcc_fileslower.log {{ zuul_output_dir }}/logs/"
+    # Disabled as this doesn't appear to work with Jammy.
+    #- name: Collect bcc runqslower logs
+    #  shell: "cp /tmp/bcc_runqslower.log {{ zuul_output_dir }}/logs/"
+    - name: Collect bcc ustat logs
+      shell: "cp /tmp/bcc_ustat.log {{ zuul_output_dir }}/logs/"
