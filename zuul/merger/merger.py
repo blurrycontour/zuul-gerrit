@@ -24,6 +24,7 @@ import os
 import re
 import shutil
 import time
+from collections import OrderedDict
 from concurrent.futures.process import BrokenProcessPool
 
 import git
@@ -1291,7 +1292,8 @@ class Merger(object):
         # connection+project+branch -> commit
         recent = {}
         commit = None
-        read_files = []
+        # tuple(connection, project, branch) -> dict(config state)
+        read_files = OrderedDict()
         # connection -> project -> ref -> commit
         if repo_state is None:
             repo_state = {}
@@ -1328,12 +1330,16 @@ class Merger(object):
                 if files or dirs:
                     repo = self.getRepo(item['connection'], item['project'])
                     repo_files = repo.getFiles(files, dirs, commit=commit)
-                    read_files.append(dict(
+                    key = item['connection'], item['project'], item['branch']
+                    read_files[key] = dict(
                         connection=item['connection'],
                         project=item['project'],
                         branch=item['branch'],
-                        files=repo_files))
-        return commit.hexsha, read_files, repo_state, recent, orig_commit
+                        files=repo_files)
+        return (
+            commit.hexsha, list(read_files.values()), repo_state, recent,
+            orig_commit
+        )
 
     def setRepoState(self, connection_name, project_name, repo_state,
                      zuul_event_id=None, process_worker=None):
