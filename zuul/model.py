@@ -1230,10 +1230,32 @@ class ChangeQueue(zkobject.ZKObject):
                        enqueue_time=None):
         if enqueue_time is None:
             enqueue_time = time.time()
+
+        if event:
+            event_ref_cache_key = None
+            if isinstance(event, EventInfo):
+                event_ref_cache_key = event.ref
+            elif hasattr(event, 'canonical_project_name'):
+                trusted, project = self.pipeline.tenant.getProject(
+                    event.canonical_project_name)
+                if project:
+                    change_key = project.source.getChangeKey(event)
+                    event_ref_cache_key = change_key.reference
+            else:
+                # We handle promote, enqueue, and trigger events
+                # above; it's unclear what other unhandled event would
+                # cause an enqueue, but if it happens, log and
+                # continue.
+                self.pipeline.manager.log.warning(
+                    "Unable to identify triggering ref from event %s",
+                    event)
+            event_info = EventInfo.fromEvent(event, event_ref_cache_key)
+        else:
+            event_info = None
         item = QueueItem.new(self.zk_context,
                              queue=self,
                              changes=changes,
-                             event=event,
+                             event=event_info,
                              span_info=span_info,
                              enqueue_time=enqueue_time)
         self.enqueueItem(item)
@@ -3703,7 +3725,7 @@ class JobGraph(object):
             return self.project_metadata[name]
         return None
 
-    def deduplicateJobs(self, log):
+    def deduplicateJobs(self, log, item):
         # Jobs are deduplicated before they start, so returned data
         # are not considered at all.
         #
@@ -3712,11 +3734,17 @@ class JobGraph(object):
         #
         # Otherwise, each job will depend only on jobs for the same
         # ref.
+
+        event_ref = item.event.ref if item.event else None
+        # A list of lists where the inner list is a set of identical
+        # jobs to merge:
+        all_combine = []
         job_list = list(self._job_map.values())
         while job_list:
             job = job_list.pop(0)
             if job.deduplicate is False:
                 continue
+            job_combine = [job]
             for other_job in job_list[:]:
                 if other_job.deduplicate is False:
                     continue
@@ -3733,11 +3761,30 @@ class JobGraph(object):
                         other_job_change.project):
                         continue
                 # Deduplicate!
-                log.info("Deduplicating %s for %s into %s for %s",
-                         other_job, other_job_change, job, job_change)
-                job.other_refs.append(other_job.ref)
-                self._removeJob(other_job)
+                job_combine.append(other_job)
                 job_list.remove(other_job)
+            if len(job_combine) > 1:
+                all_combine.append(job_combine)
+        for to_combine in all_combine:
+            # to_combine is a list of jobs that should be
+            # deduplicated; pick the zuul change and deduplicate the
+            # rest into its job.
+            primary_job = to_combine[0]
+            for job in to_combine:
+                job_change = job.buildset.item.getChangeForJob(job)
+                if job_change.cache_key == event_ref:
+                    primary_job = job
+                    break
+            to_combine.remove(primary_job)
+            primary_job_change = job.buildset.item.getChangeForJob(primary_job)
+            for other_job in to_combine:
+                other_job_change = other_job.buildset.item.getChangeForJob(
+                    other_job)
+                log.info("Deduplicating %s for %s into %s for %s",
+                         other_job, other_job_change,
+                         primary_job, primary_job_change)
+                primary_job.other_refs.append(other_job.ref)
+                self._removeJob(other_job)
 
 
 @total_ordering
@@ -4783,13 +4830,18 @@ class EventInfo:
         self.zuul_event_id = None
         self.timestamp = time.time()
         self.span_context = None
+        self.ref = None
 
     @classmethod
-    def fromEvent(cls, event):
+    def fromEvent(cls, event, event_ref_key):
         tinfo = cls()
         tinfo.zuul_event_id = event.zuul_event_id
         tinfo.timestamp = event.timestamp
         tinfo.span_context = event.span_context
+        if event_ref_key:
+            tinfo.ref = event_ref_key
+        else:
+            tinfo.ref = None
         return tinfo
 
     @classmethod
@@ -4798,6 +4850,8 @@ class EventInfo:
         tinfo.zuul_event_id = d["zuul_event_id"]
         tinfo.timestamp = d["timestamp"]
         tinfo.span_context = d["span_context"]
+        # MODEL_API <= 26
+        tinfo.ref = d.get("ref")
         return tinfo
 
     def toDict(self):
@@ -4805,6 +4859,7 @@ class EventInfo:
             "zuul_event_id": self.zuul_event_id,
             "timestamp": self.timestamp,
             "span_context": self.span_context,
+            "ref": self.ref,
         }
 
 
@@ -4859,7 +4914,6 @@ class QueueItem(zkobject.ZKObject):
     def new(klass, context, **kw):
         obj = klass()
         obj._set(**kw)
-        obj._set(event=obj.event and EventInfo.fromEvent(obj.event))
 
         data = obj._trySerialize(context)
         obj._save(context, data, create=True)
@@ -4896,12 +4950,6 @@ class QueueItem(zkobject.ZKObject):
 
     def serialize(self, context):
         event_type = "EventInfo"
-        if not isinstance(self.event, EventInfo):
-            # Convert our local trigger event to a trigger info
-            # object. This will only happen on the transition to
-            # model API version 13.
-            self._set(event=EventInfo.fromEvent(self.event))
-
         data = {
             "uuid": self.uuid,
             # TODO: we need to also store some info about the change in
@@ -6582,6 +6630,10 @@ class ChangeManagementEvent(ManagementEvent):
         span = trace.get_current_span()
         self.span_context = tracing.getSpanContext(span)
 
+    @property
+    def canonical_project_name(self):
+        return self.project_hostname + '/' + self.project_name
+
     def toDict(self):
         d = super().toDict()
         d["type"] = self.type
@@ -8243,7 +8295,7 @@ class Layout(object):
                 # last one wins.
                 fail_fast = ppc.fail_fast
 
-        job_graph.deduplicateJobs(self.log)
+        job_graph.deduplicateJobs(self.log, item)
         job_graph.freezeDependencies(self)
 
         # Copy project metadata to job_graph since this must be independent
