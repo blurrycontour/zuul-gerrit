@@ -767,6 +767,37 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertGreater(
             resume_event["event_time"], pause_event["event_time"])
 
+    def test_mqtt_retried_builds(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 1)
+        build = self.builds[0]
+        build.requeue = True
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        success_event = self.mqtt_messages.pop()
+        mqtt_payload = success_event["msg"]
+        retry_builds = mqtt_payload["buildset"]["retry_builds"]
+        self.assertEqual(len(retry_builds), 1)
+        retry_build = retry_builds[0]
+
+        self.assertEqual(build.job.name, retry_build["job_name"])
+        self.assertEqual(build.job.uuid, retry_build["job_uuid"])
+        self.assertEqual(build.job.voting, retry_build["voting"])
+        self.assertEqual(build.uuid, retry_build["uuid"])
+        self.assertIn(build.uuid, retry_build["web_url"])
+        self.assertEqual("RETRY", retry_build["result"])
+
+        self.assertIn("start_time", retry_build)
+        self.assertIn("end_time", retry_build)
+        self.assertIn("execute_time", retry_build)
+        self.assertIn("log_url", retry_build)
+
     def test_mqtt_invalid_topic(self):
         in_repo_conf = textwrap.dedent(
             """

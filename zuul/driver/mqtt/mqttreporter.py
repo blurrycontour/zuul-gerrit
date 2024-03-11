@@ -119,7 +119,7 @@ class MQTTReporter(BaseReporter):
                 retry_builds = item.current_build_set.getRetryBuildsForJob(
                     job)
                 for retry_build in retry_builds:
-                    (result, web_url) = item.formatJobResult(job, build)
+                    (result, web_url) = item.formatJobResult(job, retry_build)
                     retry_build_information = {
                         'job_name': job.name,
                         'job_uuid': job.uuid,
