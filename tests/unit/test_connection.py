@@ -718,6 +718,7 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertEquals(test_job['job_name'], 'test')
         self.assertEquals(test_job['result'], 'SUCCESS')
         self.assertEquals(test_job['dependencies'], [])
+        self.assertEquals(test_job['job_dependencies'], {})
         self.assertEquals(test_job['artifacts'], [artifact])
         self.assertEquals(test_job['log_url'], 'some-log-url/')
         self.assertEquals(test_job['returned_data'], {'foo': 'bar'})
@@ -735,6 +736,7 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertIn('zuul_event_id', mqtt_payload)
         self.assertIn('uuid', mqtt_payload)
         self.assertEquals(dependent_test_job['dependencies'], ['test'])
+        self.assertIn('test', dependent_test_job['job_dependencies'])
 
     def test_mqtt_paused_job(self):
 
