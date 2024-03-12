@@ -142,6 +142,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "098315c8_1f027309",
+        "filename": "tests/unit/test_database.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-03-12T11:58:21Z",
+      "side": 1,
+      "message": "I\u0027ve added a test case for escaped wildcard chars in TestWeb. Let me know if you want to see more tests for that or if thats enough.\nI also removed the cases from TestDatabase with values that aren\u0027t going to get passed in reality.",
+      "parentUuid": "a26930b5_756fa537",
+      "revId": "e47a3a93f881b8d48dd9c30c45f6f6f45ede4b0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "b2a79446_f47aaff9",
