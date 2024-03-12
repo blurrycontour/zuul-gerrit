@@ -423,26 +423,32 @@ class CallbackModule(default.CallbackModule):
 
             hosts = self._get_task_hosts(task)
             for host, inventory_hostname in hosts:
-                port = LOG_STREAM_PORT
+                host_vars = play_vars[host]
+                port = int(host_vars.get(
+                            'zuul_console_streamer_port',
+                            LOG_STREAM_PORT
+                        ))
                 if (host in ('localhost', '127.0.0.1')):
                     # Don't try to stream from localhost
                     continue
-                ip = play_vars[host].get(
-                    'ansible_host', play_vars[host].get(
-                        'ansible_inventory_host'))
+                ip = host_vars.get('zuul_console_streamer_ip', None)
+                if not ip:
+                    ip = host_vars.get(
+                        'ansible_host', host_vars.get(
+                            'ansible_inventory_host'))
                 if (ip in ('localhost', '127.0.0.1')):
                     # Don't try to stream from localhost
                     continue
-                if boolean(play_vars[host].get(
+                if boolean(host_vars.get(
                         'zuul_console_disabled', False)):
                     # The user has told us not to even try
                     continue
-                if play_vars[host].get('ansible_connection') in ('winrm',):
+                if host_vars.get('ansible_connection') in ('winrm',):
                     # The winrm connections don't support streaming for now
                     continue
-                if play_vars[host].get('ansible_connection') in ('kubectl', ):
+                if host_vars.get('ansible_connection') in ('kubectl', ):
                     # Stream from the forwarded port on kubectl conns
-                    port = play_vars[host]['zuul']['resources'][
+                    port = host_vars['zuul']['resources'][
                         inventory_hostname].get('stream_port')
                     if port is None:
                         self._log("[Zuul] Kubectl and socat must be installed "
