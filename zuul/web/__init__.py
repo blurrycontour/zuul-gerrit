@@ -1461,6 +1461,8 @@ class ZuulWebAPI(object):
         return None
 
     def refToDict(self, ref):
+        if ref is None:
+            return None
         return {
             'project': ref.project,
             'branch': ref.branch,
@@ -1664,6 +1666,7 @@ class ZuulWebAPI(object):
             'pipeline': buildset.pipeline,
             'event_id': buildset.event_id,
             'event_timestamp': event_timestamp,
+            'event_ref': self.refToDict(buildset.event_ref),
             'first_build_start_time': start,
             'last_build_end_time': end,
             'refs': [
