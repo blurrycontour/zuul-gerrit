@@ -1183,7 +1183,8 @@ class TestGerritDriver(ZuulTestCase):
 
     @simple_layout('layouts/simple.yaml')
     def test_change_event(self):
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           topic='test-topic')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
@@ -1203,6 +1204,7 @@ class TestGerritDriver(ZuulTestCase):
         self.assertEqual(zuulvars["message"], strings.b64encode('A'))
         self.assertEqual(1, len(self.history))
         self.assertEqual(1, len(A.messages))
+        self.assertEqual('test-topic', zuulvars['topic'])
 
     @simple_layout('layouts/simple.yaml')
     def test_tag_event(self):

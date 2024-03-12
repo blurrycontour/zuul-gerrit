@@ -808,6 +808,10 @@ are available:
       jobs.  It is included here to support interfacing with systems
       that identify a change by the commit.
 
+   .. var:: topic
+
+      The topic of the change (if any)
+
 Branch Items
 ~~~~~~~~~~~~
 

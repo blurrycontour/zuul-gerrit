@@ -67,6 +67,8 @@ def construct_build_params(uuid, connections, job, item, pipeline,
     if hasattr(change, 'message'):
         zuul_params['message'] = strings.b64encode(change.message)
         zuul_params['change_message'] = change.message
+    if hasattr(change, 'topic'):
+        zuul_params['topic'] = change.topic
     commit_id = None
     if (hasattr(change, 'oldrev') and change.oldrev
         and change.oldrev != '0' * 40):
