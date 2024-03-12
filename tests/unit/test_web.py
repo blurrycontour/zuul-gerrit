@@ -1976,6 +1976,7 @@ class TestBuildInfo(BaseTestWeb):
         buildset = self.get_url(
             "api/tenant/tenant-one/buildset/%s" % project_bs['uuid']).json()
         self.assertEqual(3, len(buildset["builds"]))
+        self.assertEqual(1, buildset["event_ref"]["change"])
 
         project_test1_build = [x for x in buildset["builds"]
                                if x["job_name"] == "project-test1"][0]

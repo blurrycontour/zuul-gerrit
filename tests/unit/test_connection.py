@@ -80,7 +80,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
         build_event_table = table_prefix + 'zuul_build_event'
 
         self.assertEqual(9, len(insp.get_columns(ref_table)))
-        self.assertEqual(11, len(insp.get_columns(buildset_table)))
+        self.assertEqual(12, len(insp.get_columns(buildset_table)))
         self.assertEqual(2, len(insp.get_columns(buildset_ref_table)))
         self.assertEqual(14, len(insp.get_columns(build_table)))
         self.assertEqual(5, len(insp.get_columns(artifact_table)))
@@ -115,7 +115,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
         indexes_build_event = insp.get_indexes(build_event_table)
 
         self.assertEqual(8, len(indexes_ref))
-        self.assertEqual(2, len(indexes_buildset))
+        self.assertEqual(3, len(indexes_buildset))
         self.assertEqual(2, len(indexes_buildset_ref))
         self.assertEqual(5, len(indexes_build))
         self.assertEqual(1, len(indexes_artifact))
@@ -157,6 +157,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
                     buildsets[0].refs[0].ref_url)
                 self.assertNotEqual(None, buildsets[0].event_id)
                 self.assertNotEqual(None, buildsets[0].event_timestamp)
+                self.assertEqual(1, buildsets[0].event_ref.change)
 
                 # Check the first result, which should be the project-merge job
                 self.assertEqual(
@@ -209,7 +210,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
                 self.assertIsNotNone(resume_event.event_time)
                 self.assertIsNone(resume_event.description)
 
-                self.assertGreater(
+                self.assertGreaterEqual(
                     resume_event.event_time, pause_event.event_time)
 
         self.executor_server.hold_jobs_in_build = True

@@ -356,6 +356,30 @@ class TestMysqlDatabase(DBBaseTestCase):
                 (481941, 'refs/heads/stable/zed', 'stable/zed'),
             ])
 
+    def test_migration_4c050a0c0139(self):
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql("set foreign_key_checks=0")
+            for table in connection.exec_driver_sql("show tables"):
+                table = table[0]
+                connection.exec_driver_sql(f"drop table {table}")
+            connection.exec_driver_sql("set foreign_key_checks=1")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('c57e9e76b812')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql(
+                "insert into zuul_buildset (project, result) "
+                "values ('org/project', 'SUCCESS')")
+            results = [r for r in connection.exec_driver_sql(
+                "select result from zuul_buildset")]
+            self.assertEqual(results, [('SUCCESS',)])
+
+        self.connection._migrate()
+        with self.connection.engine.begin() as connection:
+            results = [r for r in connection.exec_driver_sql(
+                "select result, event_ref_id from zuul_buildset")]
+            self.assertEqual(results, [('SUCCESS', None)])
+
     def test_buildsets(self):
         tenant = 'tenant1',
         buildset_uuid = 'deadbeef'
@@ -637,3 +661,30 @@ class TestPostgresqlDatabase(DBBaseTestCase):
                 (473958, 'refs/heads/master', 'master'),
                 (481941, 'refs/heads/stable/zed', 'stable/zed'),
             ])
+
+    def test_migration_4c050a0c0139(self):
+        with self.connection.engine.begin() as connection:
+            tables = [x[0] for x in connection.exec_driver_sql(
+                "select tablename from pg_catalog.pg_tables "
+                "where schemaname='public'"
+            ).all()]
+
+            self.assertTrue(len(tables) > 0)
+            for table in tables:
+                connection.exec_driver_sql(f"drop table {table} cascade")
+
+        self.connection.force_migrations = True
+        self.connection._migrate('c57e9e76b812')
+        with self.connection.engine.begin() as connection:
+            connection.exec_driver_sql(
+                "insert into zuul_buildset (project, result) "
+                "values ('org/project', 'SUCCESS')")
+            results = [r for r in connection.exec_driver_sql(
+                "select result from zuul_buildset")]
+            self.assertEqual(results, [('SUCCESS',)])
+
+        self.connection._migrate()
+        with self.connection.engine.begin() as connection:
+            results = [r for r in connection.exec_driver_sql(
+                "select result, event_ref_id from zuul_buildset")]
+            self.assertEqual(results, [('SUCCESS', None)])
