@@ -1235,6 +1235,8 @@ class ChangeQueue(zkobject.ZKObject):
             event_ref_cache_key = None
             if isinstance(event, EventInfo):
                 event_ref_cache_key = event.ref
+            if getattr(event, 'orig_ref', None):
+                event_ref_cache_key = event.orig_ref
             elif hasattr(event, 'canonical_project_name'):
                 trusted, project = self.pipeline.tenant.getProject(
                     event.canonical_project_name)
@@ -6606,11 +6608,13 @@ class ChangeManagementEvent(ManagementEvent):
     :arg str ref: optional, the ref
     :arg str oldrev: optional, the old revision
     :arg str newrev: optional, the new revision
+    :arg dict orig_ref: optional, the cache key reference of the
+        ref of the original triggering event
     """
 
     def __init__(self, tenant_name, pipeline_name, project_hostname,
                  project_name, change=None, ref=None, oldrev=None,
-                 newrev=None):
+                 newrev=None, orig_ref=None):
         super().__init__()
         self.type = None
         self.tenant_name = tenant_name
@@ -6625,6 +6629,7 @@ class ChangeManagementEvent(ManagementEvent):
         self.ref = ref
         self.oldrev = oldrev
         self.newrev = newrev
+        self.orig_ref = orig_ref
         self.timestamp = time.time()
         span = trace.get_current_span()
         self.span_context = tracing.getSpanContext(span)
@@ -6646,6 +6651,7 @@ class ChangeManagementEvent(ManagementEvent):
         d["newrev"] = self.newrev
         d["timestamp"] = self.timestamp
         d["span_context"] = self.span_context
+        d["orig_ref"] = self.orig_ref
         return d
 
     def updateFromDict(self, d):
@@ -6665,6 +6671,7 @@ class ChangeManagementEvent(ManagementEvent):
             data.get("ref"),
             data.get("oldrev"),
             data.get("newrev"),
+            data.get("orig_ref"),
         )
         event.updateFromDict(data)
         return event
