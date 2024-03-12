@@ -822,6 +822,22 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertIn("topic component 'bad' is invalid", A.messages[0],
                       "A should report a syntax error")
 
+    def test_topic_replace_invalid_chars(self):
+        # Test that special characters in the topic are replaced
+        self.create_branch('org/project', 'weird#+')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'weird#+'))
+        self.waitUntilSettled()
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'weird#+', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        success_event = self.mqtt_messages.pop()
+        self.assertEqual(success_event['topic'],
+                         'tenant-one/zuul_buildset/check/org/project/weird__')
+
 
 class TestElasticsearchConnection(AnsibleZuulTestCase):
     config_file = 'zuul-elastic-driver.conf'

@@ -27,6 +27,10 @@ class MQTTReporter(BaseReporter):
 
     name = 'mqtt'
     log = logging.getLogger("zuul.MQTTReporter")
+    invalid_topic_chars = str.maketrans({
+        '+': '_',
+        '#': '_',
+    })
 
     def report(self, item, phase1=True, phase2=True):
         if not phase1:
@@ -158,6 +162,7 @@ class MQTTReporter(BaseReporter):
                 change=getattr(item.changes[0], 'number', None),
                 patchset=getattr(item.changes[0], 'patchset', None),
                 ref=getattr(item.changes[0], 'ref', None))
+            topic = topic.translate(self.invalid_topic_chars)
         except Exception:
             log.exception("Error while formatting MQTT topic %s:",
                           self.config['topic'])
