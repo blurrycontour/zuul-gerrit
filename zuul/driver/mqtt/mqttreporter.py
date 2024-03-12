@@ -34,6 +34,7 @@ class MQTTReporter(BaseReporter):
         include_returned_data = self.config.get('include-returned-data')
         log = get_annotated_logger(self.log, item.event)
         log.debug("Report %s, params %s", item, self.config)
+        buildset = item.current_build_set
         changes = [
             {
                 'project': change.project.name,
@@ -51,7 +52,7 @@ class MQTTReporter(BaseReporter):
             'timestamp': time.time(),
             'action': self._action,
             'tenant': item.pipeline.tenant.name,
-            'zuul_ref': item.current_build_set.ref,
+            'zuul_ref': buildset.ref,
             'pipeline': item.pipeline.name,
             'changes': changes,
             'project': item.changes[0].project.name,
@@ -68,8 +69,8 @@ class MQTTReporter(BaseReporter):
             'enqueue_time': item.enqueue_time,
             'uuid': item.uuid,
             'buildset': {
-                'uuid': item.current_build_set.uuid,
-                'result': item.current_build_set.result,
+                'uuid': buildset.uuid,
+                'result': buildset.result,
                 'builds': [],
                 'retry_builds': [],
             },
@@ -81,7 +82,7 @@ class MQTTReporter(BaseReporter):
                 'job_uuid': job.uuid,
                 'voting': job.voting,
             }
-            build = item.current_build_set.getBuild(job)
+            build = buildset.getBuild(job)
             if build:
                 # Report build data if available
                 (result, web_url) = item.formatJobResult(job)
@@ -96,6 +97,15 @@ class MQTTReporter(BaseReporter):
                     'owner': getattr(change, 'owner', ''),
                     'ref': getattr(change, 'ref', ''),
                 }
+                # Build a list of job dependencies as `job.dependencies`
+                # only gives us `JobDependency` instances that don't
+                # have any information about the UUID of the exact job
+                # dependency (there can be multiple jobs with the same
+                # name in one job graph).
+                dependencies = [
+                    item.getJob(jid)for jid in
+                    buildset.job_graph.job_dependencies[job.uuid]
+                ]
                 job_informations.update({
                     'change': change_info,
                     'uuid': build.uuid,
@@ -105,7 +115,8 @@ class MQTTReporter(BaseReporter):
                     'log_url': build.log_url,
                     'web_url': web_url,
                     'result': result,
-                    'dependencies': [j.name for j in job.dependencies],
+                    'dependencies': [j.name for j in dependencies],
+                    'job_dependencies': {j.name: j.uuid for j in dependencies},
                     'artifacts': get_artifacts_from_result_data(
                         build.result_data, logger=log),
                     'events': [e.toDict() for e in build.events],
@@ -116,7 +127,7 @@ class MQTTReporter(BaseReporter):
                     job_informations['returned_data'] = rdata
 
                 # Report build data of retried builds if available
-                retry_builds = item.current_build_set.getRetryBuildsForJob(
+                retry_builds = buildset.getRetryBuildsForJob(
                     job)
                 for retry_build in retry_builds:
                     (result, web_url) = item.formatJobResult(job, retry_build)
