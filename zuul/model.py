@@ -6045,6 +6045,16 @@ class QueueItem(zkobject.ZKObject):
                         keys.add(secret['blob'])
         return keys
 
+    def getEventChange(self):
+        if not self.event:
+            return None
+        if not self.event.ref:
+            return None
+        sched = self.pipeline.manager.sched
+        key = ChangeKey.fromReference(self.event.ref)
+        source = sched.connections.getSource(key.connection_name)
+        return source.getChange(key)
+
 
 # Cache info of a ref
 CacheStat = namedtuple("CacheStat",

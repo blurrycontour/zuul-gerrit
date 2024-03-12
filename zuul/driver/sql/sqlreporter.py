@@ -75,6 +75,25 @@ class SQLReporter(BaseReporter):
                 branch=getattr(change, 'branch', ''),
             )
             db_buildset.refs.append(ref)
+        event_change = None
+        try:
+            event_change = item.getEventChange()
+        except Exception:
+            self.log.exception("Unable to get event change:")
+            raise
+        if event_change:
+            ref = db.getOrCreateRef(
+                project=event_change.project.name,
+                change=getattr(event_change, 'number', None),
+                patchset=getattr(event_change, 'patchset', None),
+                ref_url=event_change.url,
+                ref=getattr(event_change, 'ref', ''),
+                oldrev=getattr(event_change, 'oldrev', ''),
+                newrev=getattr(event_change, 'newrev', ''),
+                branch=getattr(event_change, 'branch', ''),
+            )
+            db_buildset.event_ref = ref
+
         return db_buildset
 
     def reportBuildsetStart(self, buildset):

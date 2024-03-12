@@ -153,8 +153,11 @@ class DatabaseSession(object):
         # buildset *and* use that table in filters (unlike
         # joinedload).
         q = self.session().query(self.connection.buildModel).\
-            join(self.connection.buildSetModel).\
-            join(self.connection.refModel)
+            join(self.connection.buildSetModel,
+                 buildset_table.c.id == build_table.c.buildset_id).\
+            join(self.connection.refModel,
+                 ref_table.c.id == build_table.c.ref_id)
+
         # Avoid joining the provides table unless necessary; postgres
         # has created some poor query plans in that case.  Currently
         # the only time this gets called with provides is from the
@@ -240,13 +243,16 @@ class DatabaseSession(object):
     def getBuild(self, tenant, uuid):
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
+        ref_table = self.connection.zuul_ref_table
 
         # contains_eager allows us to perform eager loading on the
         # buildset *and* use that table in filters (unlike
         # joinedload).
         q = self.session().query(self.connection.buildModel).\
-            join(self.connection.buildSetModel).\
-            join(self.connection.refModel).\
+            join(self.connection.refModel,
+                 ref_table.c.id == build_table.c.ref_id).\
+            join(self.connection.buildSetModel,
+                 buildset_table.c.id == build_table.c.buildset_id).\
             outerjoin(self.connection.providesModel).\
             options(orm.contains_eager(self.connection.buildModel.buildset).
                     subqueryload(self.connection.buildSetModel.refs),
@@ -286,8 +292,10 @@ class DatabaseSession(object):
         # buildset *and* use that table in filters (unlike
         # joinedload).
         q = self.session().query(self.connection.buildModel).\
-            join(self.connection.buildSetModel).\
-            join(self.connection.refModel).\
+            join(self.connection.buildSetModel,
+                 buildset_table.c.id == build_table.c.buildset_id).\
+            join(self.connection.refModel,
+                 ref_table.c.id == build_table.c.ref_id).\
             options(orm.contains_eager(self.connection.buildModel.buildset),
                     orm.contains_eager(self.connection.buildModel.ref))
 
@@ -368,13 +376,19 @@ class DatabaseSession(object):
                      query_timeout=None):
 
         buildset_table = self.connection.zuul_buildset_table
+        buildset_ref_table = self.connection.zuul_buildset_ref_table
         ref_table = self.connection.zuul_ref_table
 
         # See note above about the hint.
         q = self.session().query(self.connection.buildSetModel).\
-            join(self.connection.buildSetRefModel).\
-            join(self.connection.refModel).\
-            options(orm.contains_eager(self.connection.buildSetModel.refs))
+            join(self.connection.buildSetRefModel,
+                 buildset_table.c.id == buildset_ref_table.c.buildset_id).\
+            join(self.connection.refModel,
+                 ref_table.c.id == buildset_ref_table.c.ref_id).\
+            options(orm.contains_eager(
+                self.connection.buildSetModel.event_ref)).\
+            options(orm.contains_eager(
+                self.connection.buildSetModel.refs))
         if not (project or change or uuid):
             q = q.with_hint(buildset_table, 'USE INDEX (PRIMARY)', 'mysql')
 
@@ -427,6 +441,7 @@ class DatabaseSession(object):
         buildset_table = self.connection.zuul_buildset_table
 
         q = self.session().query(self.connection.buildSetModel).\
+            options(orm.joinedload(self.connection.buildSetModel.event_ref)).\
             options(orm.joinedload(self.connection.buildSetModel.refs)).\
             options(orm.joinedload(self.connection.buildSetModel.builds).
                     subqueryload(self.connection.buildModel.artifacts)).\
@@ -637,12 +652,26 @@ class SQLConnection(BaseConnection):
             first_build_start_time = sa.Column(sa.DateTime, nullable=True)
             last_build_end_time = sa.Column(sa.DateTime, nullable=True)
             updated = sa.Column(sa.DateTime, nullable=True)
+            event_ref_id = sa.Column(sa.Integer, sa.ForeignKey(
+                self.table_prefix + REF_TABLE + ".id",
+                name=self.table_prefix + 'zuul_buildset_event_ref_id_fkey',
+            ))
 
             refs = orm.relationship(
                 RefModel,
-                secondary=self.table_prefix + BUILDSET_REF_TABLE)
+                primaryjoin=(
+                    f"{self.table_prefix}{BUILDSET_TABLE}.c.id == "
+                    f"{self.table_prefix}{BUILDSET_REF_TABLE}.c.buildset_id"),
+                secondaryjoin=(
+                    f"{self.table_prefix}{REF_TABLE}.c.id == "
+                    f"{self.table_prefix}{BUILDSET_REF_TABLE}.c.ref_id"),
+                secondary=self.table_prefix + BUILDSET_REF_TABLE,
+            )
+            event_ref = orm.relationship(RefModel, foreign_keys=[event_ref_id])
             sa.Index(self.table_prefix + 'zuul_buildset_uuid_idx', uuid)
             sa.Index(self.table_prefix + 'zuul_buildset_tenant_idx', tenant)
+            sa.Index(self.table_prefix + 'zuul_buildset_event_ref_id_idx',
+                     event_ref_id)
 
             def createBuild(self, ref, *args, **kw):
                 session = orm.session.Session.object_session(self)
@@ -700,7 +729,7 @@ class SQLConnection(BaseConnection):
                                             "builds",
                                             order_by=id,
                                             cascade="all, delete-orphan"))
-            ref = orm.relationship(RefModel)
+            ref = orm.relationship(RefModel, foreign_keys=[ref_id])
 
             sa.Index(self.table_prefix + 'zuul_build_job_name_buildset_id_idx',
                      job_name, buildset_id)
