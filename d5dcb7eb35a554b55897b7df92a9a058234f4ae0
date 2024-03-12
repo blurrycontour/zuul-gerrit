@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "d5dcb7eb35a554b55897b7df92a9a058234f4ae0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6272c077_31824ec9",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 813,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-12T21:22:56Z",
+      "side": 1,
+      "message": "Do we need a note that only the Gerrit driver currently supports topics? Maybe this is understood since github et al don\u0027t have the concept of a PR topic",
+      "revId": "d5dcb7eb35a554b55897b7df92a9a058234f4ae0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "477e7bca_69f1b137",
+        "filename": "zuul/executor/common.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-12T21:22:56Z",
+      "side": 1,
+      "message": "Not something to update in this change but I wonder if we need a note here that we can have plaintext attributes here and they don\u0027t need to be base64 encoded like message is. I had to dig around in git history but it seems we decided this was not necessary but kept the old base64encoded value for backward compatibility.\n\nAs an alternative maybe we go ahead and finally remove the old base64 encoded values.",
+      "revId": "d5dcb7eb35a554b55897b7df92a9a058234f4ae0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
