@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "999b0557_d373600c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-13T16:08:33Z",
+      "side": 1,
+      "message": "Just a +1 for now as my availability to test properly and/or monitor as this deploys to opendev is low. That said reading the zuul-jobs swift upload code and the linked openstacksdk I think this particular issue should be addressed. However, there may be other newer incompatibilities we do not yet know about.",
+      "revId": "a78c8eb1f9f45338be4da056c3ea5ce7de2a149c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
