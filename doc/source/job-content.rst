@@ -222,24 +222,594 @@ vary based on the pipeline's configuration.  For example, when a new
 change is created, that change may be enqueued into the pipeline,
 while a tag may be enqueued into the pipeline when it is pushed.
 
-Information about these items is available to jobs.  All of the items
-enqueued in a pipeline are git references, and therefore share some
-attributes in common.  But other attributes may vary based on the type
-of item.
+An item typically refers to a single git reference, but in the case of
+a dependency cycle among changes, the item may be composed of multiple
+changes.
 
-In the case of circular dependencies, a queue item may have multiple
-changes associated with it, and if jobs are deduplicated, then a
-single build may be run for multiple changes.  In these cases, Zuul
-will select one of the queue item's changes to supply values for
-variables related to the queue item's change.  The selected change may
-be the change that triggered the item to be enqueued, or it may not.
-Beyond the fact that the change will be one of the item's changes,
-this behavior should not be relied upon.
+Information about these items is available to jobs.  Since all of the
+items enqueued in a pipeline represent one or more git references, the
+different types of item share some attributes in common.  But other
+attributes may vary based on the type of ref.  The different types of
+ref are:
+
+Change
+   A change to the repository.  Most often, this will be a git
+   reference which has not yet been merged into the repository (e.g.,
+   a Gerrit change or a GitHub pull request).
+
+Branch
+   This represents a branch tip.  This item may have been enqueued
+   because the branch was updated (via a change having merged, or a
+   direct push).  Or it may have been enqueued by a timer for the
+   purpose of verifying the current condition of the branch.
+
+Tag
+   This represents a git tag.  The item may have been enqueued because
+   a tag was created or deleted.
+
+Ref
+   This represents a git reference that is neither a change, branch, or
+   tag.
+
+If a build is running for a queue item with a single ref, the values
+below are straightforward.  Things are a little more complex if the
+queue item represents multiple changes in a dependency cycle.  In that
+case, the same job may be run multiple times, each for a different
+change in the cycle.  If that happens, then many of the attributes
+below (such as :var:`zuul.change` and :var:`zuul.project`, etc) will
+refer to the particular change that is assigned to that build.
+However, if a job is deduplicated, then one build is run for several
+changes simultaneously.  In that case, one of the changes which
+triggered the job will arbitrarily be selected for those values.  If
+possible, Zuul will use the change that originally caused the item to
+be enqueued, but that is not always possible, and that behavior should
+not be relied upon.
+
+Job Ref
+~~~~~~~
+
+The following variables related to the job's selected ref (as
+described above) are available:
 
 .. var:: zuul
 
-   All items provide the following information as Ansible variables
-   under the ``zuul`` key:
+   .. var:: project
+
+      The job's project.  If the job is running for a single change,
+      then this will be the project of that change.  In the case of a
+      circular dependency queue item where this job is run more than
+      once for different changes in the item, this will be set to the
+      project of the particular change assigned to this build of the
+      job.  If the job is deduplicated, then this is arbitrarily set
+      to one of the changes in the queue item that triggered the job.
+
+      This is a data structure with the following fields:
+
+      .. var:: name
+
+         The name of the project, excluding hostname.  E.g., `org/project`.
+
+      .. var:: short_name
+
+         The name of the project, excluding directories or
+         organizations.  E.g., `project`.
+
+      .. var:: canonical_hostname
+
+         The canonical hostname where the project lives.  E.g.,
+         `git.example.com`.
+
+      .. var:: canonical_name
+
+         The full canonical name of the project including hostname.
+         E.g., `git.example.com/org/project`.
+
+      .. var:: src_dir
+
+         The path to the source code relative to the work dir.  E.g.,
+         `src/git.example.com/org/project`.
+
+   .. var:: branch
+
+      This field is present for the following item types:
+
+      Branch
+         The item's branch (without the `refs/heads/` prefix).
+
+      Change
+         The target branch of the change (without the `refs/heads/`
+         prefix).
+
+   .. var:: change
+
+      This field is present for the following item type:
+
+      Change
+         The identifier for the change.
+
+   .. var:: message
+
+      The commit or pull request message of the change base64 encoded. Use the
+      `b64decode` filter in ansible when working with it.
+
+      .. warning:: This variable is deprecated and will be removed in
+                   a future version.  Use :var:`zuul.change_message`
+                   instead.
+
+   .. var:: change_message
+
+      This field is present for the following item type:
+
+      Change
+         The commit or pull request message of the change.  When
+         Zuul runs Ansible, this variable is tagged with the
+         ``!unsafe`` YAML tag so that Ansible will not interpolate
+         values into it.  Note, however, that the `inventory.yaml`
+         file placed in the build's workspace for debugging and
+         inspection purposes does not inclued the ``!unsafe`` tag.
+
+   .. var:: change_url
+
+      This field is present for the following item type:
+
+      Change
+         The URL to the source location of the given change.
+         E.g., `https://review.example.org/#/c/123456/` or
+         `https://github.com/example/example/pull/1234`.
+
+   .. var:: patchset
+
+      This field is present for the following item types:
+
+      Change
+         The patchset identifier for the change.  If a change is
+         revised, this will have a different value.
+
+   .. var:: project
+
+      The item's project.  This is a data structure with the
+      following fields:
+
+      .. var:: name
+
+         The name of the project, excluding hostname.  E.g.,
+         `org/project`.
+
+      .. var:: short_name
+
+         The name of the project, excluding directories or
+         organizations.  E.g., `project`.
+
+      .. var:: canonical_hostname
+
+         The canonical hostname where the project lives.  E.g.,
+         `git.example.com`.
+
+      .. var:: canonical_name
+
+         The full canonical name of the project including hostname.
+         E.g., `git.example.com/org/project`.
+
+      .. var:: src_dir
+
+         The path to the source code on the remote host, relative
+         to the home dir of the remote user.
+         E.g., `src/git.example.com/org/project`.
+
+   .. var:: oldrev
+
+      This field is present for the following item types:
+
+      Branch
+         If the item was enqueued as the result of a change merging
+         or being pushed to the branch, the git sha of the old
+         revision will be included here.
+
+      Tag
+         If the item was enqueued as the result of a tag being
+         deleted, the previous git sha of the tag will be included
+         here.  If the tag was created, this variable will be
+         undefined.
+
+      Ref
+         If the item was enqueued as the result of a ref being
+         deleted, the previous git sha of the ref will be included
+         here.  If the ref was created, this variable will be
+         undefined.
+
+   .. var:: newrev
+
+      This field is present for the following item types:
+
+      Branch
+         If the item was enqueued as the result of a change merging
+         or being pushed to the branch, the git sha of the new
+         revision will be included here.
+
+      Tag
+         If the item was enqueued as the result of a tag being
+         created, the new git sha of the tag will be included here.
+         If the tag was deleted, this variable will be undefined.
+
+      Ref
+         If the item was enqueued as the result of a ref being
+         created, the new git sha of the ref will be included here.
+         If the ref was deleted, this variable will be undefined.
+
+   .. var:: commit_id
+
+      This field is present for the following item types:
+
+      Branch
+         The git sha of the branch.  Identical to ``newrev`` or
+         ``oldrev`` if defined.
+      Tag
+         The git sha of the tag.  Identical to ``newrev`` or
+         ``oldrev`` if defined.
+      Ref
+         The git sha of the ref.  Identical to ``newrev`` or
+         ``oldrev`` if defined.
+
+   .. var:: tag
+
+      This field is present for the following item types:
+
+      Tag
+         The name of the item's tag (without the `refs/tags/` prefix).
+
+   .. var:: topic
+
+      This field is present for the following item types:
+
+      Change
+         The topic of the change (if any).
+
+   .. var:: ref
+
+      The git ref of the item.  This will be the full path (e.g.,
+      `refs/heads/master` or `refs/changes/...`).
+
+
+Item
+~~~~
+
+The following variables related to the queue item are available:
+
+.. var:: zuul
+
+   .. var:: items
+      :type: list
+
+      .. note::
+
+         ``zuul.items`` conflicts with the ``items()`` builtin so the
+         variable can only be accessed with python dictionary like syntax,
+         e.g: ``zuul['items']``
+
+      A list of dictionaries, each representing a ref being tested
+      with this change.
+
+      .. var:: branch
+
+         This field is present for the following item types:
+
+         Branch
+            The item's branch (without the `refs/heads/` prefix).
+
+         Change
+            The target branch of the change (without the `refs/heads/`
+            prefix).
+
+      .. var:: bundle_id
+
+         This field is present for the following item type:
+
+         Change
+            The id of the bundle if the change is in a circular
+            dependency cycle.
+
+            Only available for items with more than one change.
+
+         .. warning:: This variable is deprecated and will be removed in
+                      a future version.  Use :var:`zuul.refs` to
+                      identify if the item is for a dependency cycle and
+                      the associated changes instead.
+
+      .. var:: change
+
+         This field is present for the following item type:
+
+         Change
+            The identifier for the change.
+
+      .. var:: change_message
+
+         This field is present for the following item type:
+
+         Change
+            The commit or pull request message of the change.  When
+            Zuul runs Ansible, this variable is tagged with the
+            ``!unsafe`` YAML tag so that Ansible will not interpolate
+            values into it.  Note, however, that the `inventory.yaml`
+            file placed in the build's workspace for debugging and
+            inspection purposes does not inclued the ``!unsafe`` tag.
+
+      .. var:: change_url
+
+         This field is present for the following item type:
+
+         Change
+            The URL to the source location of the given change.
+            E.g., `https://review.example.org/#/c/123456/` or
+            `https://github.com/example/example/pull/1234`.
+
+      .. var:: patchset
+
+         This field is present for the following item types:
+
+         Change
+            The patchset identifier for the change.  If a change is
+            revised, this will have a different value.
+
+      .. var:: project
+
+         The item's project.  This is a data structure with the
+         following fields:
+
+         .. var:: name
+
+            The name of the project, excluding hostname.  E.g.,
+            `org/project`.
+
+         .. var:: short_name
+
+            The name of the project, excluding directories or
+            organizations.  E.g., `project`.
+
+         .. var:: canonical_hostname
+
+            The canonical hostname where the project lives.  E.g.,
+            `git.example.com`.
+
+         .. var:: canonical_name
+
+            The full canonical name of the project including hostname.
+            E.g., `git.example.com/org/project`.
+
+         .. var:: src_dir
+
+            The path to the source code on the remote host, relative
+            to the home dir of the remote user.
+            E.g., `src/git.example.com/org/project`.
+
+      .. var:: oldrev
+
+         This field is present for the following item types:
+
+         Branch
+            If the item was enqueued as the result of a change merging
+            or being pushed to the branch, the git sha of the old
+            revision will be included here.
+
+         Tag
+            If the item was enqueued as the result of a tag being
+            deleted, the previous git sha of the tag will be included
+            here.  If the tag was created, this variable will be
+            undefined.
+
+         Ref
+            If the item was enqueued as the result of a ref being
+            deleted, the previous git sha of the ref will be included
+            here.  If the ref was created, this variable will be
+            undefined.
+
+      .. var:: newrev
+
+         This field is present for the following item types:
+
+         Branch
+            If the item was enqueued as the result of a change merging
+            or being pushed to the branch, the git sha of the new
+            revision will be included here.
+
+         Tag
+            If the item was enqueued as the result of a tag being
+            created, the new git sha of the tag will be included here.
+            If the tag was deleted, this variable will be undefined.
+
+         Ref
+            If the item was enqueued as the result of a ref being
+            created, the new git sha of the ref will be included here.
+            If the ref was deleted, this variable will be undefined.
+
+      .. var:: commit_id
+
+         This field is present for the following item types:
+
+         Branch
+            The git sha of the branch.  Identical to ``newrev`` or
+            ``oldrev`` if defined.
+         Tag
+            The git sha of the tag.  Identical to ``newrev`` or
+            ``oldrev`` if defined.
+         Ref
+            The git sha of the ref.  Identical to ``newrev`` or
+            ``oldrev`` if defined.
+
+      .. var:: tag
+
+         This field is present for the following item types:
+
+         Tag
+            The name of the item's tag (without the `refs/tags/` prefix).
+
+      .. var:: topic
+
+         This field is present for the following item types:
+
+         Change
+            The topic of the change (if any).
+
+   .. var:: refs
+      :type: list
+
+      A list of dictionaries, each representing a ref associated with
+      this queue item.  Normally there is only one item in this list,
+      but if the queue item is a dependency cycle, each change in the
+      cycle will be present.
+
+      .. var:: branch
+
+         This field is present for the following item types:
+
+         Branch
+            The item's branch (without the `refs/heads/` prefix).
+
+         Change
+            The target branch of the change (without the `refs/heads/`
+            prefix).
+
+      .. var:: change
+
+         This field is present for the following item type:
+
+         Change
+            The identifier for the change.
+
+      .. var:: change_message
+
+         This field is present for the following item type:
+
+         Change
+            The commit or pull request message of the change.  When
+            Zuul runs Ansible, this variable is tagged with the
+            ``!unsafe`` YAML tag so that Ansible will not interpolate
+            values into it.  Note, however, that the `inventory.yaml`
+            file placed in the build's workspace for debugging and
+            inspection purposes does not inclued the ``!unsafe`` tag.
+
+      .. var:: change_url
+
+         This field is present for the following item type:
+
+         Change
+            The URL to the source location of the given change.
+            E.g., `https://review.example.org/#/c/123456/` or
+            `https://github.com/example/example/pull/1234`.
+
+      .. var:: patchset
+
+         This field is present for the following item types:
+
+         Change
+            The patchset identifier for the change.  If a change is
+            revised, this will have a different value.
+
+      .. var:: project
+
+         The item's project.  This is a data structure with the
+         following fields:
+
+         .. var:: name
+
+            The name of the project, excluding hostname.  E.g.,
+            `org/project`.
+
+         .. var:: short_name
+
+            The name of the project, excluding directories or
+            organizations.  E.g., `project`.
+
+         .. var:: canonical_hostname
+
+            The canonical hostname where the project lives.  E.g.,
+            `git.example.com`.
+
+         .. var:: canonical_name
+
+            The full canonical name of the project including hostname.
+            E.g., `git.example.com/org/project`.
+
+         .. var:: src_dir
+
+            The path to the source code on the remote host, relative
+            to the home dir of the remote user.
+            E.g., `src/git.example.com/org/project`.
+
+      .. var:: oldrev
+
+         This field is present for the following item types:
+
+         Branch
+            If the item was enqueued as the result of a change merging
+            or being pushed to the branch, the git sha of the old
+            revision will be included here.
+
+         Tag
+            If the item was enqueued as the result of a tag being
+            deleted, the previous git sha of the tag will be included
+            here.  If the tag was created, this variable will be
+            undefined.
+
+         Ref
+            If the item was enqueued as the result of a ref being
+            deleted, the previous git sha of the ref will be included
+            here.  If the ref was created, this variable will be
+            undefined.
+
+      .. var:: newrev
+
+         This field is present for the following item types:
+
+         Branch
+            If the item was enqueued as the result of a change merging
+            or being pushed to the branch, the git sha of the new
+            revision will be included here.
+
+         Tag
+            If the item was enqueued as the result of a tag being
+            created, the new git sha of the tag will be included here.
+            If the tag was deleted, this variable will be undefined.
+
+         Ref
+            If the item was enqueued as the result of a ref being
+            created, the new git sha of the ref will be included here.
+            If the ref was deleted, this variable will be undefined.
+
+      .. var:: commit_id
+
+         This field is present for the following item types:
+
+         Branch
+            The git sha of the branch.  Identical to ``newrev`` or
+            ``oldrev`` if defined.
+         Tag
+            The git sha of the tag.  Identical to ``newrev`` or
+            ``oldrev`` if defined.
+         Ref
+            The git sha of the ref.  Identical to ``newrev`` or
+            ``oldrev`` if defined.
+
+      .. var:: tag
+
+         This field is present for the following item types:
+
+         Tag
+            The name of the item's tag (without the `refs/tags/` prefix).
+
+      .. var:: topic
+
+         This field is present for the following item types:
+
+         Change
+            The topic of the change (if any).
+
+Job
+~~~
+
+The following variables related to the job are available:
+
+.. var:: zuul
 
    .. var:: artifacts
       :type: list
@@ -284,16 +854,16 @@ this behavior should not be relied upon.
 
       The UUID of the build.  A build is a single execution of a job.
       When an item is enqueued into a pipeline, this usually results
-      in one build of each job configured for that item's project.
-      However, items may be re-enqueued in which case another build
-      may run.  In dependent pipelines, the same job may run multiple
-      times for the same item as circumstances change ahead in the
-      queue.  Each time a job is run, for whatever reason, it is
-      acompanied with a new unique id.
+      in one build of each job triggered by that item.  However, items
+      may be re-enqueued in which case another build may run.  In
+      dependent pipelines, the same job may run multiple times for the
+      same item as circumstances change ahead in the queue.  Each time
+      a job is run, for whatever reason, it is acompanied with a new
+      unique id.
 
    .. var:: buildset
 
-      The build set UUID.  When Zuul runs jobs for an item, the
+      The buildset UUID.  When Zuul runs jobs for an item, the
       collection of those jobs is known as a buildset.  If the
       configuration of items ahead in a dependent pipeline changes,
       Zuul creates a new buildset and restarts all of the jobs.
@@ -302,11 +872,6 @@ this behavior should not be relied upon.
 
       A list of the first level dependent jobs to be run after this job
       has finished successfully.
-
-   .. var:: ref
-
-      The git ref of the item.  This will be the full path (e.g.,
-      `refs/heads/master` or `refs/changes/...`).
 
    .. var:: override_checkout
 
@@ -354,40 +919,11 @@ this behavior should not be relied upon.
       The version of the Ansible community package release used for executing
       the job.
 
-   .. var:: project
-
-      The item's project.  This is a data structure with the following
-      fields:
-
-      .. var:: name
-
-         The name of the project, excluding hostname.  E.g., `org/project`.
-
-      .. var:: short_name
-
-         The name of the project, excluding directories or
-         organizations.  E.g., `project`.
-
-      .. var:: canonical_hostname
-
-         The canonical hostname where the project lives.  E.g.,
-         `git.example.com`.
-
-      .. var:: canonical_name
-
-         The full canonical name of the project including hostname.
-         E.g., `git.example.com/org/project`.
-
-      .. var:: src_dir
-
-         The path to the source code relative to the work dir.  E.g.,
-         `src/git.example.com/org/project`.
-
    .. var:: projects
       :type: dict
 
       A dictionary of all projects prepared by Zuul for the item.  It
-      includes, at least, the item's own project.  It also includes
+      includes, at least, the item's own projects.  It also includes
       the projects of any items this item depends on, as well as the
       projects that appear in :attr:`job.required-projects`.
 
@@ -457,7 +993,6 @@ this behavior should not be relied upon.
           with_items: {{ zuul.projects.values() | list }}
 
    .. var:: playbook_context
-      :type: dict
 
       This dictionary contains information about the execution of each
       playbook in the job.  This may be useful for understanding
@@ -563,116 +1098,87 @@ this behavior should not be relied upon.
       git tags, these are simply free-form text fields that can be
       used by the job for reporting or classification purposes.
 
-   .. var:: items
-      :type: list
+   .. var:: resources
 
-      .. note::
+      A job using a container build resources has access to a
+      resources variable that describes the resource. Resources is
+      a dictionary of group keys, each value consists of:
 
-         ``zuul.items`` conflicts with the ``items()`` builtin so the
-         variable can only be accessed with python dictionary like syntax,
-         e.g: ``zuul['items']``
+     .. var:: namespace
 
-      A list of dictionaries, each representing an item being tested
-      with this change with the format:
+         The resource's namespace name.
 
-      .. var:: project
+     .. var:: context
 
-         The item's project.  This is a data structure with the
-         following fields:
+         The kube config context name.
 
-         .. var:: name
+     .. var:: pod
 
-            The name of the project, excluding hostname.  E.g.,
-            `org/project`.
+         The name of the pod when the label defines a kubectl connection.
 
-         .. var:: short_name
+     Project or namespace resources might be used in a template as:
 
-            The name of the project, excluding directories or
-            organizations.  E.g., `project`.
+     .. code-block:: yaml
 
-         .. var:: canonical_hostname
+         - hosts: localhost
+             tasks:
+             - name: Create a k8s resource
+               k8s_raw:
+                 state: present
+                 context: "{{ zuul.resources['node-name'].context }}"
+                 namespace: "{{ zuul.resources['node-name'].namespace }}"
 
-            The canonical hostname where the project lives.  E.g.,
-            `git.example.com`.
+     Kubectl resources might be used in a template as:
 
-         .. var:: canonical_name
+     .. code-block:: yaml
 
-            The full canonical name of the project including hostname.
-            E.g., `git.example.com/org/project`.
+         - hosts: localhost
+             tasks:
+             - name: Copy src repos to the pod
+               command: >
+                 oc rsync -q --progress=false
+                     {{ zuul.executor.src_root }}/
+                     {{ zuul.resources['node-name'].pod }}:src/
+                 no_log: true
 
-         .. var:: src_dir
+Working Directory
+~~~~~~~~~~~~~~~~~
 
-            The path to the source code on the remote host, relative
-            to the home dir of the remote user.
-            E.g., `src/git.example.com/org/project`.
+Additionally, some information about the working directory and the
+executor running the job is available:
 
-      .. var:: branch
+.. var:: zuul
 
-         The target branch of the change (without the `refs/heads/` prefix).
+   .. var:: executor
 
-      .. var:: bundle_id
+      A number of values related to the executor running the job are
+      available:
 
-         The id of the bundle if the change is in a circular dependency cycle.
+      .. var:: hostname
 
-      .. var:: change
+         The hostname of the executor.
 
-         The identifier for the change.
+      .. var:: src_root
 
-      .. var:: change_url
+         The path to the source directory.
 
-         The URL to the source location of the given change.
-         E.g., `https://review.example.org/#/c/123456/` or
-         `https://github.com/example/example/pull/1234`.
+      .. var:: log_root
 
-      .. var:: patchset
+         The path to the logs directory.
 
-         The patchset identifier for the change.  If a change is
-         revised, this will have a different value.
+      .. var:: work_root
 
-      .. var:: resources
-         :type: dict
+         The path to the working directory.
 
-         A job using a container build resources has access to a resources variable
-         that describes the resource. Resources is a dictionary of group keys,
-         each value consists of:
+      .. var:: inventory_file
 
-        .. var:: namespace
+         The path to the inventory. This variable is needed for jobs running
+         without a nodeset since Ansible doesn't set it for localhost; see
+         this `porting guide
+         <https://docs.ansible.com/ansible/latest/porting_guides/porting_guide_2.4.html#inventory>`_.
 
-            The resource's namespace name.
-
-        .. var:: context
-
-            The kube config context name.
-
-        .. var:: pod
-
-            The name of the pod when the label defines a kubectl connection.
-
-        Project or namespace resources might be used in a template as:
-
-        .. code-block:: yaml
-
-            - hosts: localhost
-                tasks:
-                - name: Create a k8s resource
-                  k8s_raw:
-                    state: present
-                    context: "{{ zuul.resources['node-name'].context }}"
-                    namespace: "{{ zuul.resources['node-name'].namespace }}"
-
-        Kubectl resources might be used in a template as:
-
-        .. code-block:: yaml
-
-            - hosts: localhost
-                tasks:
-                - name: Copy src repos to the pod
-                  command: >
-                    oc rsync -q --progress=false
-                        {{ zuul.executor.src_root }}/
-                        {{ zuul.resources['node-name'].pod }}:src/
-                    no_log: true
-
+         The inventory file is only readable by jobs running in a
+         :term:`trusted execution context`.
 
 .. var:: zuul_success
 
@@ -760,201 +1266,6 @@ this behavior should not be relied upon.
 
       A private IPv6 address of the node.
 
-
-Change Items
-~~~~~~~~~~~~
-
-A change to the repository.  Most often, this will be a git reference
-which has not yet been merged into the repository (e.g., a gerrit
-change or a GitHub pull request).  The following additional variables
-are available:
-
-.. var:: zuul
-   :hidden:
-
-   .. var:: branch
-
-      The target branch of the change (without the `refs/heads/` prefix).
-
-   .. var:: change
-
-      The identifier for the change.
-
-   .. var:: patchset
-
-      The patchset identifier for the change.  If a change is revised,
-      this will have a different value.
-
-   .. var:: change_url
-
-      The URL to the source location of the given change.
-      E.g., `https://review.example.org/#/c/123456/` or
-      `https://github.com/example/example/pull/1234`.
-
-   .. var:: message
-
-      The commit or pull request message of the change base64 encoded. Use the
-      `b64decode` filter in ansible when working with it.
-
-      .. warning:: This variable is deprecated and will be removed in
-                   a future version.  Use :var:`zuul.change_message`
-                   instead.
-
-   .. var:: change_message
-
-      The commit or pull request message of the change.  When Zuul
-      runs Ansible, this variable is tagged with the ``!unsafe`` YAML
-      tag so that Ansible will not interpolate values into it.  Note,
-      however, that the `inventory.yaml` file placed in the build's
-      workspace for debugging and inspection purposes does not inclued
-      the ``!unsafe`` tag.
-
-   .. var:: commit_id
-
-      The git sha of the change.  This may be the commit sha of the
-      current patchset revision or the tip of a pull request branch
-      depending on the source.  Because of Zuul's speculative merge
-      process, this commit may not even appear in the prepared git
-      repos, so it should not be relied upon for git operations in
-      jobs.  It is included here to support interfacing with systems
-      that identify a change by the commit.
-
-   .. var:: topic
-
-      The topic of the change (if any)
-
-Branch Items
-~~~~~~~~~~~~
-
-This represents a branch tip.  This item may have been enqueued
-because the branch was updated (via a change having merged, or a
-direct push).  Or it may have been enqueued by a timer for the purpose
-of verifying the current condition of the branch.  The following
-additional variables are available:
-
-.. var:: zuul
-   :hidden:
-
-   .. var:: branch
-
-      The name of the item's branch (without the `refs/heads/`
-      prefix).
-
-   .. var:: oldrev
-
-      If the item was enqueued as the result of a change merging or
-      being pushed to the branch, the git sha of the old revision will
-      be included here.  Otherwise, this variable will be undefined.
-
-   .. var:: newrev
-
-      If the item was enqueued as the result of a change merging or
-      being pushed to the branch, the git sha of the new revision will
-      be included here.  Otherwise, this variable will be undefined.
-
-   .. var:: commit_id
-
-      The git sha of the branch.  Identical to ``newrev`` or
-      ``oldrev`` if defined.
-
-Tag Items
-~~~~~~~~~
-
-This represents a git tag.  The item may have been enqueued because a
-tag was created or deleted.  The following additional variables are
-available:
-
-.. var:: zuul
-   :hidden:
-
-   .. var:: tag
-
-      The name of the item's tag (without the `refs/tags/` prefix).
-
-   .. var:: oldrev
-
-      If the item was enqueued as the result of a tag being deleted,
-      the previous git sha of the tag will be included here.  If the
-      tag was created, this variable will be undefined.
-
-   .. var:: newrev
-
-      If the item was enqueued as the result of a tag being created,
-      the new git sha of the tag will be included here.  If the tag
-      was deleted, this variable will be undefined.
-
-   .. var:: commit_id
-
-      The git sha of the branch.  Identical to ``newrev`` or
-      ``oldrev`` if defined.
-
-Ref Items
-~~~~~~~~~
-
-This represents a git reference that is neither a change, branch, or
-tag.  Note that all items include a `ref` attribute which may be used
-to identify the ref.  The following additional variables are
-available:
-
-.. var:: zuul
-   :hidden:
-
-   .. var:: oldrev
-
-      If the item was enqueued as the result of a ref being deleted,
-      the previous git sha of the ref will be included here.  If the
-      ref was created, this variable will be undefined.
-
-   .. var:: newrev
-
-      If the item was enqueued as the result of a ref being created,
-      the new git sha of the ref will be included here.  If the ref
-      was deleted, this variable will be undefined.
-
-   .. var:: commit_id
-
-      The git sha of the branch.  Identical to ``newrev`` or
-      ``oldrev`` if defined.
-
-Working Directory
-~~~~~~~~~~~~~~~~~
-
-Additionally, some information about the working directory and the
-executor running the job is available:
-
-.. var:: zuul
-   :hidden:
-
-   .. var:: executor
-
-      A number of values related to the executor running the job are
-      available:
-
-      .. var:: hostname
-
-         The hostname of the executor.
-
-      .. var:: src_root
-
-         The path to the source directory.
-
-      .. var:: log_root
-
-         The path to the logs directory.
-
-      .. var:: work_root
-
-         The path to the working directory.
-
-      .. var:: inventory_file
-
-         The path to the inventory. This variable is needed for jobs running
-         without a nodeset since Ansible doesn't set it for localhost; see
-         this `porting guide
-         <https://docs.ansible.com/ansible/latest/porting_guides/porting_guide_2.4.html#inventory>`_.
-
-         The inventory file is only readable by jobs running in a
-         :term:`trusted execution context`.
 
 SSH Keys
 --------
