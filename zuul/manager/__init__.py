@@ -1733,6 +1733,11 @@ class PipelineManager(metaclass=ABCMeta):
                     self.reportItem(item)
                 except exceptions.MergeFailure:
                     pass
+                for item_behind in item.items_behind:
+                    log.info("Resetting builds for %s because the "
+                             "item ahead, %s, can not be merged" %
+                             (item_behind, item))
+                    self.cancelJobs(item_behind)
                 self.dequeueItem(item)
                 return (True, nnfi)
 
