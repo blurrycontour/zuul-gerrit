@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62127037_f9810f0a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 36884
+      },
+      "writtenOn": "2024-03-13T11:32:12Z",
+      "side": 1,
+      "message": "@James Hi, thanks for pointing out the finger gateway, cause I wasn\u0027t aware of it. One doubt that I have, after reviewing the docs, is that if we need to create an executor in the unreachable network to be able to run the finger gw in the environment, cause I saw in the docs that to configure the finger gw we need to pass the executor socket as part of its configuration.\nIf the answer to that is yes, I\u0027m not sure it will fit our use case. One thing that is missing in the commit message is the context of our specific use case.\nWe are creating jobs whose main purpose is to deploy and test a product on top of physical node (managed and provisioned automatically by external tools, it\u0027s not part of the nodepool) that is already running. Our jobs, requests a small nodepool instance, and from there, it runs nested ansible-playbook calls (we need a custom python environment, install collections, etc.) that turns that preprovisioned physical box into a libvirt based hypervisor, where we spawn an ephemeral environment. We use some SSH proxyjumps to be able to make hosts inside that libvirt box reachable from the zuul executor. With those proxyjumps, we call ansible.builtin.add_host to add the instances nested in that libvirt environment and start delegating tasks to them. When the job ends the entire libvirt environment is trashed, including the hardware box, that is re-provisioned.\n\nNot sure if that extra context may help to understand the needs.\n\nThanks!",
+      "revId": "429b35cb887ba081c2a9002b8164d57d9e50a7e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
