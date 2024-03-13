@@ -6045,6 +6045,16 @@ class QueueItem(zkobject.ZKObject):
                         keys.add(secret['blob'])
         return keys
 
+    def getEventChange(self):
+        if not self.event:
+            return None
+        if not self.event.ref:
+            return None
+        sched = self.pipeline.manager.sched
+        key = ChangeKey.fromReference(self.event.ref)
+        source = sched.connections.getSource(key.connection_name)
+        return source.getChange(key)
+
 
 # Cache info of a ref
 CacheStat = namedtuple("CacheStat",
@@ -6112,6 +6122,28 @@ class Ref(object):
             # Catch all
             rep = '<%s 0x%x %s %s updated %s..%s>' % (
                 type(self).__name__, id(self), pname,
+                self.ref, self.oldrev, self.newrev)
+        return rep
+
+    def toString(self):
+        # Not using __str__ because of prevalence in log lines and we
+        # prefer the repr syntax.
+        rep = None
+        pname = None
+        if self.project and self.project.name:
+            pname = self.project.name
+        if self.newrev == '0000000000000000000000000000000000000000':
+            rep = '%s %s deletes %s from %s' % (
+                type(self).__name__, pname,
+                self.ref, self.oldrev)
+        elif self.oldrev == '0000000000000000000000000000000000000000':
+            rep = '%s %s creates %s on %s' % (
+                type(self).__name__, pname,
+                self.ref, self.newrev)
+        else:
+            # Catch all
+            rep = '%s %s %s updated %s..%s' % (
+                type(self).__name__, pname,
                 self.ref, self.oldrev, self.newrev)
         return rep
 
@@ -6330,6 +6362,12 @@ class Change(Branch):
         if self.project and self.project.name:
             pname = self.project.name
         return '<Change 0x%x %s %s>' % (id(self), pname, self._id())
+
+    def toString(self):
+        pname = None
+        if self.project and self.project.name:
+            pname = self.project.name
+        return '%s %s %s' % (type(self).__name__, pname, self.number)
 
     def equals(self, other):
         if (super().equals(other) and

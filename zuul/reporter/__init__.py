@@ -154,6 +154,20 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         action = action or self._action
         ret = self._getFormatter(action)(item, with_jobs)
 
+        show_event_ref = False
+        if len(item.changes) > 1:
+            show_event_ref = True
+        elif (item.event and item.event.ref and
+              item.event.ref != item.changes[0].cache_key):
+            show_event_ref = True
+        if show_event_ref:
+            try:
+                change = item.getEventChange()
+                if change and change.url:
+                    ret += f'\nOriginally enqueued due to {change.toString()}.\n'
+            except Exception:
+                self.log.exception("Unable to get event change:")
+
         config_warnings = item.getConfigErrors(errors=False, warnings=True)
         if config_warnings:
             ret += '\nWarning:\n  ' + config_warnings[0].error + '\n'
