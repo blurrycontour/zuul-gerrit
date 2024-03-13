@@ -18,6 +18,7 @@ import logging
 import os
 import shutil
 from unittest import mock
+from zuul.lib import yamlutil as yaml
 
 import git
 import testtools
@@ -1338,6 +1339,20 @@ class TestOverlappingRepos(ZuulTestCase):
         jobdir_git_dir = os.path.join(build.jobdir.src_root,
                                       'subcomponent', '.git')
         self.assertTrue(os.path.exists(jobdir_git_dir))
+
+        inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
+        import pprint
+        pprint.pprint(inventory)
+        zuul = inventory['all']['vars']['zuul']
+        self.assertEqual('src/component',
+                         zuul['items'][0]['project']['src_dir'])
+        self.assertEqual('src/component',
+                         zuul['projects']['review.example.com/component']
+                         ['src_dir'])
+        self.assertEqual('src/component',
+                         zuul['refs'][0]['src_dir'])
 
 
 class TestMergerUpgrade(ZuulTestCase):

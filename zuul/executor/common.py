@@ -12,9 +12,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import copy
 import os
 
 from zuul.lib import strings
+
+def make_src_dir(canonical_hostname, name, scheme):
+    return os.path.join('src',
+                        strings.workspace_project_path(
+                            canonical_hostname,
+                            name,
+                            scheme))
 
 
 def construct_build_params(uuid, connections, job, item, pipeline,
@@ -35,17 +43,16 @@ def construct_build_params(uuid, connections, job, item, pipeline,
         short_name=change.project.name.split('/')[-1],
         canonical_hostname=change.project.canonical_hostname,
         canonical_name=change.project.canonical_name,
-        src_dir=os.path.join('src',
-                             strings.workspace_project_path(
-                                 change.project.canonical_hostname,
-                                 change.project.name,
-                                 job.workspace_scheme)),
+        src_dir=make_src_dir(change.project.canonical_hostname,
+                             change.project.name,
+                             job.workspace_scheme),
     )
 
     zuul_params = dict(
         build=uuid,
         buildset=item.current_build_set.uuid,
         ref=change.ref,
+        refs=[c.toDict() for c in item.changes],
         pipeline=pipeline.name,
         post_review=pipeline.post_review,
         job=job.name,
@@ -54,36 +61,25 @@ def construct_build_params(uuid, connections, job, item, pipeline,
         event_id=item.event.zuul_event_id if item.event else None,
         jobtags=sorted(job.tags),
     )
-    if hasattr(change, 'branch'):
-        zuul_params['branch'] = change.branch
-    if hasattr(change, 'tag'):
-        zuul_params['tag'] = change.tag
-    if hasattr(change, 'number'):
-        zuul_params['change'] = str(change.number)
-    if hasattr(change, 'url'):
-        zuul_params['change_url'] = change.url
-    if hasattr(change, 'patchset'):
-        zuul_params['patchset'] = str(change.patchset)
     if hasattr(change, 'message'):
         zuul_params['message'] = strings.b64encode(change.message)
-        zuul_params['change_message'] = change.message
-    if hasattr(change, 'topic'):
-        zuul_params['topic'] = change.topic
-    commit_id = None
-    if (hasattr(change, 'oldrev') and change.oldrev
-        and change.oldrev != '0' * 40):
-        zuul_params['oldrev'] = change.oldrev
-        commit_id = change.oldrev
-    if (hasattr(change, 'newrev') and change.newrev
-        and change.newrev != '0' * 40):
-        zuul_params['newrev'] = change.newrev
-        commit_id = change.newrev
-    if hasattr(change, 'commit_id'):
-        commit_id = change.commit_id
-    if commit_id:
-        zuul_params['commit_id'] = commit_id
-
+    zuul_params.update(change.toDict())
     zuul_params['projects'] = {}  # Set below
+
+    # Fixup the src_dir for the items based on this job
+    dependent_changes = copy.deepcopy(dependent_changes)
+    for dep_change in dependent_changes:
+        dep_change['project']['src_dir'] = make_src_dir(
+            dep_change['project']['canonical_hostname'],
+            dep_change['project']['name'],
+            job.workspace_scheme)
+    # Fixup the src_dir for the refs based on this job
+    for r in zuul_params['refs']:
+        r['src_dir'] = make_src_dir(
+            r['project']['canonical_hostname'],
+            r['project']['name'],
+            job.workspace_scheme)
+
     zuul_params['items'] = dependent_changes
     zuul_params['child_jobs'] = [
         x.name for x in item.current_build_set.job_graph.
