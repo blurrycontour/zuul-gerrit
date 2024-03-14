@@ -222,7 +222,7 @@ def getNewSchema():
         if event == 'pull_request':
             if action == 'comment':
                 pull_request_comment_schema(data)
-            elif action == 'labeled':
+            elif action in ('labeled', 'unlabeled',):
                 pull_request_labeled_schema(data)
             elif action == 'status':
                 pull_request_status_schema(data)

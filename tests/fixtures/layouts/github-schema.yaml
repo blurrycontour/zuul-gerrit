@@ -12,6 +12,14 @@
           action:
             - opened
             - closed
+        # Valid
+        - event: pull_request
+          action: labeled
+          label: foobar
+        # Valid
+        - event: pull_request
+          action: unlabeled
+          label: barfoo
         # "extra keys not allowed @ data['check']"
         - event: pull_request
           action:
