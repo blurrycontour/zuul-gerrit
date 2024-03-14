@@ -2799,7 +2799,7 @@ class TestGithubSchemaWarnings(ZuulTestCase):
     def test_broken_config_on_startup_warnings(self):
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         self.assertEquals(
-            len(tenant.layout.loading_errors), 8,
+            len(tenant.layout.loading_errors), 9,
             "An error should have been stored")
         self.assertIn(
             "extra keys not allowed @ data['check']",
@@ -2823,5 +2823,8 @@ class TestGithubSchemaWarnings(ZuulTestCase):
             "extra keys not allowed @ data['unlabel']",
             str(tenant.layout.loading_errors[6].error))
         self.assertIn(
-            "Use 'rerequested' instead",
+            "expected a list for dictionary value @ data['action']",
             str(tenant.layout.loading_errors[7].error))
+        self.assertIn(
+            "Use 'rerequested' instead",
+            str(tenant.layout.loading_errors[8].error))

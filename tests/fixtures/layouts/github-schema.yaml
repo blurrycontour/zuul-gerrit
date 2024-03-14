@@ -20,6 +20,9 @@
         - event: pull_request
           action: unlabeled
           label: barfoo
+        # Valid
+        - event: check_run
+          action: rerequested
         # "extra keys not allowed @ data['check']"
         - event: pull_request
           action:
