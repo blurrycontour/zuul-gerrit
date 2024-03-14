@@ -181,6 +181,17 @@ def getNewSchema():
         'branch': scalar_or_list(vs.Any(ZUUL_REGEX, str)),
     })
 
+    # The docs for this are at:
+    # https://docs.github.com/en/webhooks/webhook-events-and-payloads?actionType=dismissed#pull_request_review
+    # They specify "dismissed, approved, changes_requested"
+    # But we have also experimentally seen "commented"
+    # The graphql docs are at:
+    # https://docs.github.com/en/enterprise-server@3.12/graphql/reference/enums#pullrequestreviewstate
+    # And they additionally specify "commented" and "pending".
+    # It's unclear whether "pending" can show up in the webhook (it
+    # may only appear in a graphql query of a user's own unsaved
+    # reviews) but since we've seen the extra "commented" value, let's
+    # be generous and accept "pending" as well.
     pull_request_review_schema = pull_request_review_base_schema.extend({
         'action': scalar_or_list(vs.Any('submitted', 'dismissed')),
         'state': scalar_or_list(vs.Any(
