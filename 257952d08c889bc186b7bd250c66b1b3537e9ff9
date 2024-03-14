@@ -33,6 +33,24 @@
       "message": "I would have fixed this by just changing the value here.  Other deprecations are duplicated here as well (even at the risk that users end up with multiple warnings) because the intent was for this to be the final form of the new schema.  See the comment on line 142.",
       "revId": "257952d08c889bc186b7bd250c66b1b3537e9ff9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99bde979_1b572c0c",
+        "filename": "zuul/driver/github/githubtrigger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-03-14T13:48:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d768c011_1558c976",
+      "revId": "257952d08c889bc186b7bd250c66b1b3537e9ff9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
