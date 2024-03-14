@@ -197,7 +197,10 @@ def getNewSchema():
     # Check run
     check_run_schema = base_schema.extend({
         vs.Required('event'): 'check_run',
-        'action': scalar_or_list(vs.Any('requested', 'completed')),
+        # The 'requested' action is deprecated, but we have a separate,
+        # more specific deprecation for this.
+        'action': scalar_or_list(vs.Any(
+            'requested', 'rerequested', 'completed')),
         'check': scalar_or_list(str),
     })
 
