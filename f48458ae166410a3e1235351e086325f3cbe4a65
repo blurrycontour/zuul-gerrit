@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "366013cf_af6152ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 36884
+      },
+      "writtenOn": "2024-03-14T08:42:57Z",
+      "side": 1,
+      "message": "@James thanks for taking a look at the big picture explanation.\nThe behaviour, for jobs that don\u0027t consume the variables should be equivalent to the one without this change.\nFor the IP, as `zuul_console_streamer_ip` is not used anywhere, the get to the host_vars variable will return None, and the code that is already there that pickups it from `ansible_host` or `ansible_inventory_host` will fill it as usual.\nSame goes for the port, we default to the same value we were already using, that is the LOG_STREAM_PORT variable.",
+      "revId": "f48458ae166410a3e1235351e086325f3cbe4a65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
