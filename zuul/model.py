@@ -52,6 +52,11 @@ from zuul.lib import tracing
 from zuul.zk import zkobject
 from zuul.zk.blob_store import BlobStore
 from zuul.zk.change_cache import ChangeKey
+from zuul.exceptions import (
+    SEVERITY_ERROR,
+    SEVERITY_WARNING,
+    NodesetNotFoundError,
+)
 
 MERGER_MERGE = 1            # "git merge"
 MERGER_MERGE_RESOLVE = 2    # "git merge -s resolve"
@@ -117,10 +122,6 @@ NODE_STATES = set([STATE_BUILDING,
 SCHEME_GOLANG = 'golang'
 SCHEME_FLAT = 'flat'
 SCHEME_UNIQUE = 'unique'
-
-# Error severity
-SEVERITY_ERROR = 'error'
-SEVERITY_WARNING = 'warning'
 
 
 def add_debug_line(debug_messages, msg, indent=0):
@@ -1620,7 +1621,7 @@ class NodeSet(ConfigObject):
             # This references an existing named nodeset in the layout.
             ns = layout.nodesets.get(nodeset)
             if ns is None:
-                raise Exception(f'The nodeset "{nodeset}" was not found.')
+                raise NodesetNotFoundError(nodeset)
         else:
             ns = nodeset
         if ns in history:
@@ -2902,7 +2903,7 @@ class Job(ConfigObject):
             # This references an existing named nodeset in the layout.
             ns = layout.nodesets.get(nodeset)
             if ns is None:
-                raise Exception(f'The nodeset "{nodeset}" was not found.')
+                raise NodesetNotFoundError(nodeset)
         else:
             ns = nodeset
         return ns.flattenAlternatives(layout)
@@ -3044,9 +3045,7 @@ class Job(ConfigObject):
             # This references an existing named nodeset in the layout.
             ns = layout.nodesets.get(self.nodeset)
             if ns is None:
-                raise Exception(
-                    'The nodeset "{nodeset}" was not found.'.format(
-                        nodeset=self.nodeset))
+                raise NodesetNotFoundError(self.nodeset)
             return ns
         return self.nodeset
 
