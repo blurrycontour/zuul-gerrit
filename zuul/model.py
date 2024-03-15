@@ -5752,7 +5752,7 @@ class QueueItem(zkobject.ZKObject):
                 result = job.failure_message
         return (result, url)
 
-    def formatStatusUrl(self):
+    def formatItemUrl(self):
         # If we don't have a web root set, we can't format any url
         if not self.pipeline.tenant.web_root:
             # Apparently we have no website

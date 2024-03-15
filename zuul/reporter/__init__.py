@@ -176,10 +176,12 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         if status_url:
             status_url = item.formatUrlPattern(status_url)
 
+        # change, changes, and status_url are deprecated
         return item.pipeline.enqueue_message.format(
             pipeline=item.pipeline.getSafeAttributes(),
             change=item.changes[0].getSafeAttributes(),
             changes=[c.getSafeAttributes() for c in item.changes],
+            item_url=item.formatItemUrl(),
             status_url=status_url)
 
     def _formatItemReportStart(self, item, with_jobs=True):
@@ -187,18 +189,20 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         if status_url:
             status_url = item.formatUrlPattern(status_url)
 
+        # change, changes, and status_url are deprecated
         return item.pipeline.start_message.format(
             pipeline=item.pipeline.getSafeAttributes(),
             change=item.changes[0].getSafeAttributes(),
             changes=[c.getSafeAttributes() for c in item.changes],
+            item_url=item.formatItemUrl(),
             status_url=status_url)
 
     def _formatItemReportSuccess(self, item, with_jobs=True):
         msg = item.pipeline.success_message
         if with_jobs:
-            status_url = item.formatStatusUrl()
-            if status_url is not None:
-                msg += '\n' + status_url
+            item_url = item.formatItemUrl()
+            if item_url is not None:
+                msg += '\n' + item_url
             msg += '\n\n' + self._formatItemReportJobs(item)
         return msg
 
@@ -228,9 +232,9 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         else:
             msg = item.pipeline.failure_message
             if with_jobs:
-                status_url = item.formatStatusUrl()
-                if status_url is not None:
-                    msg += '\n' + status_url
+                item_url = item.formatItemUrl()
+                if item_url is not None:
+                    msg += '\n' + item_url
                 msg += '\n\n' + self._formatItemReportJobs(item)
         return msg
 
@@ -253,10 +257,12 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         if status_url:
             status_url = item.formatUrlPattern(status_url)
 
+        # change, changes, and status_url are deprecated
         return item.pipeline.no_jobs_message.format(
             pipeline=item.pipeline.getSafeAttributes(),
             change=item.changes[0].getSafeAttributes(),
             changes=[c.getSafeAttributes() for c in item.changes],
+            item_url=item.formatItemUrl(),
             status_url=status_url)
 
     def _formatItemReportDisabled(self, item, with_jobs=True):

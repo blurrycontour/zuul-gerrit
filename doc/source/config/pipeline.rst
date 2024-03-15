@@ -205,13 +205,45 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
       :default: Starting {pipeline.name} jobs.
 
       The introductory text in reports when jobs are started.
-      Three replacement fields are available ``status_url``, ``pipeline`` and
-      ``change``.
+      The following replacement fields are available:
+
+      pipeline
+        The name of the pipeline
+      item_url
+        The full URL to information about the item in the web UI
+      change
+        Deprecated: information about the change
+      changes
+        Deprecated: information about the change
+      status_url
+        Deprecated: the configured web ui status page root
+
+      .. warning:: The replacement fields ``change``, ``changes``, and
+                   ``status_url`` are deprecated.  Use ``item_url``,
+                   which is automatically the best URL for information
+                   about the item instead.
 
    .. attr:: enqueue-message
 
       The introductory text in reports when an item is enqueued.
       Empty by default.
+      The following replacement fields are available:
+
+      pipeline
+        The name of the pipeline
+      item_url
+        The full URL to information about the item in the web UI
+      change
+        Deprecated: information about the change
+      changes
+        Deprecated: information about the change
+      status_url
+        Deprecated: the configured web ui status page root
+
+      .. warning:: The replacement fields ``change``, ``changes``, and
+                   ``status_url`` are deprecated.  Use ``item_url``,
+                   which is automatically the best URL for information
+                   about the item instead.
 
    .. attr:: merge-conflict-message
       :default: Merge failed.
@@ -224,6 +256,23 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
 
       The introductory text in reports when an item is dequeued
       without running any jobs.  Empty by default.
+      The following replacement fields are available:
+
+      pipeline
+        The name of the pipeline
+      item_url
+        The full URL to information about the item in the web UI
+      change
+        Deprecated: information about the change
+      changes
+        Deprecated: information about the change
+      status_url
+        Deprecated: the configured web ui status page root
+
+      .. warning:: The replacement fields ``change``, ``changes``, and
+                   ``status_url`` are deprecated.  Use ``item_url``,
+                   which is automatically the best URL for information
+                   about the item instead.
 
    .. attr:: dequeue-message
       :default: Build canceled.
