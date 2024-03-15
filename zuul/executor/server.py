@@ -33,6 +33,7 @@ import threading
 import time
 import traceback
 from concurrent.futures.process import ProcessPoolExecutor, BrokenProcessPool
+from functools import partial
 
 from kazoo.exceptions import NoNodeError
 from kazoo.retry import KazooRetry
@@ -2925,7 +2926,13 @@ class AnsibleJob(object):
             # don't count towards BUFFER_LINES_FOR_SYNTAX
             idx = 0
             first = True
-            for line in iter(self.proc.stdout.readline, b''):
+            MAX_LINE_BYTES = 51200  # 50 MiB
+            for line in iter(
+                    partial(self.proc.stdout.readline, MAX_LINE_BYTES), b''):
+                if line and line[-1:] != b'\n':
+                    self.log.warning(
+                        "Ansible output exceeds max. line size of %s MiB",
+                        MAX_LINE_BYTES / 1024)
                 if first:
                     # When we receive our first log line, bwrap should
                     # have started Ansible and it should still be
