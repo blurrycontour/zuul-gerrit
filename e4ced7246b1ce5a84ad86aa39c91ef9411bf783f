@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5af24dd1_09c0e8b9",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 6404,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-03-15T10:00:10Z",
+      "side": 1,
+      "message": "Are those changes in the `toDict()` methods interfering in any way with the other use-case in `_toChangeDict()` which is used for constructing `Buildset.dependent_changes`?",
+      "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
