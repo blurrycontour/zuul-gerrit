@@ -2536,7 +2536,8 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(A.reported, 1,
                          "A should report failure")
-        self.assertIn('Unknown projects: does-not-exist', A.messages[0],
+        self.assertIn('The project "does-not-exist" was not found',
+                      A.messages[0],
                       "A should have a syntax error reported")
 
     def test_required_project_not_found_multiple_error(self):
@@ -2561,8 +2562,10 @@ class TestInRepoConfig(ZuulTestCase):
         self.assertEqual(A.data['status'], 'NEW')
         self.assertEqual(A.reported, 1,
                          "A should report failure")
-        self.assertIn('Unknown projects: does-not-exist, also-does-not-exist',
-                      A.messages[0], "A should have a syntax error reported")
+        self.assertIn('The projects "does-not-exist", '
+                      '"also-does-not-exist" were not found.',
+                      A.messages[0],
+                      "A should have a syntax error reported")
 
     def test_template_not_found_error(self):
         in_repo_conf = textwrap.dedent(
