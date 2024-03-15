@@ -8052,6 +8052,23 @@ class TestJobOutput(AnsibleZuulTestCase):
         self.assertReportedStat(post_failure_stat, value='1', kind='c')
         self.assertReportedStat(post_failure_stat, kind='ms')
 
+    @mock.patch("zuul.executor.server.OUTPUT_MAX_LINE_BYTES", 50)
+    def test_job_output_max_line_bytes(self):
+        logger = logging.getLogger('zuul.AnsibleJob')
+        output = io.StringIO()
+        logger.addHandler(logging.StreamHandler(output))
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='job-output', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        log_output = output.getvalue()
+        self.assertIn('Ansible output exceeds max. line size of', log_output)
+
 
 class TestNoLog(AnsibleZuulTestCase):
     tenant_config_file = 'config/ansible-no-log/main.yaml'
