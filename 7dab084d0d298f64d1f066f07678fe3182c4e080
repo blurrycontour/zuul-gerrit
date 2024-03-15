@@ -16,6 +16,23 @@
       "message": "\u003e What kind of mischief could one enact by setting this for a regular zuul job?\n\nSince a job can already adds new host, it looks like this change enables the following actions within the ansible-playbook process executed by the executor:\n\n- Connects to an arbitrary port other (instead of the hardcoded 19885).\n- Perform this connection when the host is not reachable otherwise (by setting an arbitrary streamer_ip).\n\nIt does not looks like this would be any different than a task running the finger command directly on the localhost, since the zuul_stream callback only read/write the stream without performing further actions on it.",
       "revId": "7dab084d0d298f64d1f066f07678fe3182c4e080",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dc6335e_6b141452",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-03-15T14:01:01Z",
+      "side": 1,
+      "message": "I just had a chat with Pablo about this change. So, presently, when adding a host using a ssh ProxyJump configuration, the `ansible_host` variable is not reachable by the executor, resulting in a stream of `Waiting on logger` error. The proposed change here is not enough as it needs more work by the job to setup a similar tunnel on the jump host (and it is missing tests and documentation).\n\n@Jim, if we can reliably detect such jump host configuration (e.g. to parse the ip of the reachable host), do you think we could improve the executor to automatically setup a tunnel, similar to what is being done with the KubeFwd for kubernetes pods? That way we could make such setup works transparently without any changes on the user side.\n\nOtherwise I am inclined to enable such Zuul stream configuration, assuming it can\u0027t be abused maliciously, so that the job can setup the necessary work around to make it works.",
+      "revId": "7dab084d0d298f64d1f066f07678fe3182c4e080",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
