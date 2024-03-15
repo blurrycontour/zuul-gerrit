@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74a89515_56bc8962",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-03-15T13:21:28Z",
+      "side": 1,
+      "message": "\u003e What kind of mischief could one enact by setting this for a regular zuul job?\n\nSince a job can already adds new host, it looks like this change enables the following actions within the ansible-playbook process executed by the executor:\n\n- Connects to an arbitrary port other (instead of the hardcoded 19885).\n- Perform this connection when the host is not reachable otherwise (by setting an arbitrary streamer_ip).\n\nIt does not looks like this would be any different than a task running the finger command directly on the localhost, since the zuul_stream callback only read/write the stream without performing further actions on it.",
+      "revId": "7dab084d0d298f64d1f066f07678fe3182c4e080",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
