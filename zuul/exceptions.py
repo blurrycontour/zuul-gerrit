@@ -216,12 +216,20 @@ class ProjectNotFoundError(ConfigurationSyntaxError):
     zuul_error_name = 'Project Not Found'
 
     def __init__(self, project):
-        message = textwrap.dedent("""\
-        The project "{project}" was not found.  All projects
-        referenced within a Zuul configuration must first be
-        added to the main configuration file by the Zuul
-        administrator.""")
-        message = textwrap.fill(message.format(project=project))
+        if isinstance(project, (list, tuple)):
+            projects = ', '.join(f'"{p}"' for p in project)
+            message = textwrap.dedent(f"""\
+            The projects "{projects}" were not found.  All projects
+            referenced within a Zuul configuration must first be
+            added to the main configuration file by the Zuul
+            administrator.""")
+        else:
+            message = textwrap.dedent(f"""\
+            The project "{project}" was not found.  All projects
+            referenced within a Zuul configuration must first be
+            added to the main configuration file by the Zuul
+            administrator.""")
+        message = textwrap.fill(message)
         super(ProjectNotFoundError, self).__init__(message)
 
 
