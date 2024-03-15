@@ -851,8 +851,7 @@ class JobParser(object):
             #               exception only once to capture all of them in the
             #               error message.
             if unknown_projects:
-                names = ", ".join(unknown_projects)
-                raise Exception("Unknown projects: %s" % (names,))
+                raise ProjectNotFoundError(unknown_projects)
 
             job.required_projects = new_projects
 
@@ -925,7 +924,7 @@ class JobParser(object):
             for p in as_list(allowed_projects):
                 (trusted, project) = self.pcontext.tenant.getProject(p)
                 if project is None:
-                    raise Exception("Unknown project %s" % (p,))
+                    raise ProjectNotFoundError(p)
                 allowed.append(project.name)
             job.allowed_projects = frozenset(allowed)
 
