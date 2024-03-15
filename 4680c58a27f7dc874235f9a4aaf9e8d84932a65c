@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63b8c0d5_ff3d84c6",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-15T21:46:25Z",
+      "side": 0,
+      "message": "This exception was not used in this file and is now no longer imported above in the new side of the diff.",
+      "revId": "4680c58a27f7dc874235f9a4aaf9e8d84932a65c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "461952d8_5a62097a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-15T21:46:25Z",
+      "side": 0,
+      "message": "This exception was not used in this file and is now no longer imported above in the new side of the diff. It is used in model.py and is imported from its new home in exceptions.py.",
+      "revId": "4680c58a27f7dc874235f9a4aaf9e8d84932a65c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cee210b_86f06c2a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-15T21:46:25Z",
+      "side": 0,
+      "message": "This warning was not used in this file and is now no longer imported above in the new side of the diff.",
+      "revId": "4680c58a27f7dc874235f9a4aaf9e8d84932a65c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "719dac1d_c8b0306a",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-15T21:46:25Z",
+      "side": 0,
+      "message": "This warning was not used in this file and is now no longer imported above in the new side of the diff. It is used in the gerrit and github drivers which now import this class from the exceptions file.",
+      "revId": "4680c58a27f7dc874235f9a4aaf9e8d84932a65c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

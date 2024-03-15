@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0049d67f_7ae93edf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-15T21:46:25Z",
+      "side": 1,
+      "message": "recheck I also left some notes on where things moved and what changed (the actual change is minimal but seeing that in Gerrit difficult. Hopefully this helps other reviewers.",
+      "revId": "7c0cc136fb4091984c6586ea18d53e258c33c2b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1af0441f_16d405aa",
+        "filename": "zuul/exceptions.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-15T21:46:25Z",
+      "side": 1,
+      "message": "This line is the only one that differs from the definitions that were in configloader.py. That is beacuse SEVERITY_WARNING is also moved into this file and no longer needs to be referred to as model.SEVERITY_WARNING.",
+      "revId": "7c0cc136fb4091984c6586ea18d53e258c33c2b4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
