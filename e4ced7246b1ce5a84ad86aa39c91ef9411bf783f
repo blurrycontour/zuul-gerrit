@@ -16,6 +16,24 @@
       "message": "Are those changes in the `toDict()` methods interfering in any way with the other use-case in `_toChangeDict()` which is used for constructing `Buildset.dependent_changes`?",
       "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b7e9c24_c1b8bf9d",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 6404,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-15T13:10:58Z",
+      "side": 1,
+      "message": "The only use I have found of dependent_changes is to pass to the executor client where it\u0027s used to construct the zuul.items list (which is what these changes are for) and also zuul.projects (but the values are not used directly for that).",
+      "parentUuid": "5af24dd1_09c0e8b9",
+      "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
