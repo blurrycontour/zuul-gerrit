@@ -24,7 +24,7 @@ from zuul.driver.util import (
     make_regex,
     ZUUL_REGEX,
 )
-from zuul.configloader import DeprecationWarning
+from zuul.exceptions import DeprecationWarning
 
 
 class GerritRequireApprovalDeprecation(DeprecationWarning):
