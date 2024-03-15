@@ -1438,7 +1438,7 @@ class Scheduler(threading.Thread):
                     loading_errors.append(repr(error))
         if loading_errors:
             summary = '\n\n\n'.join(loading_errors)
-            raise configloader.ConfigurationSyntaxError(
+            raise exceptions.ConfigurationSyntaxError(
                 f"Configuration errors: {summary}")
 
         duration = round(time.monotonic() - start, 3)
