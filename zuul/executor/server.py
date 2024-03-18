@@ -3286,9 +3286,18 @@ class AnsibleJob(object):
             timeout = self.getAnsibleTimeout(semaphore_wait_start, timeout)
 
         if acquired_semaphores:
+            if will_retry:
+                # Don't trigger early failure detection on post
+                # if we are going to retry, otherwise a pre failure
+                # that causes a post failure will trigger early
+                # failure detection. This will cause dependent jobs in
+                # the pipeline to restart when they might not need to.
+                allow_pre_fail_phases = ('run')
+            else:
+                allow_pre_fail_phases = ('run', 'post')
             result, code = self.runAnsible(
                 cmd, timeout, playbook, ansible_version,
-                allow_pre_fail=phase in ('run', 'post'),
+                allow_pre_fail=phase in allow_pre_fail_phases,
                 cleanup=phase == 'cleanup')
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
