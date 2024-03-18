@@ -1,0 +1,5 @@
+- project:
+    name: org/project
+    gate:
+      jobs:
+        - test-job-pre-post-fail

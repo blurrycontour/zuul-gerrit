@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - pause:
+        seconds: 5
+    - fail:
+        msg: Post Fail!
