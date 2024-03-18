@@ -4744,6 +4744,55 @@ class TestPlaybookSemaphore(AnsibleZuulTestCase):
         ])
 
 
+class TestPrePostFail(AnsibleZuulTestCase):
+    tenant_config_file = 'config/pre-post-fail/main.yaml'
+
+    def test_pre_and_post_failure(self):
+        # Test that when pre and post run steps fail, we don't
+        # rebuild dependent jobs
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+
+        self.log.debug("Wait for the first change to start its job")
+        for _ in iterate_timeout(30, 'job A started'):
+            if len(self.builds) == 1:
+                break
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        # Only one job should abort, the rest should retry
+        # because only when the retry limit occurs should the
+        # dependent job be aborted
+        self.assertHistory([
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='1,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='1,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='1,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='1,1 2,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='1,1 2,1'),
+            dict(name='test-job-pre-post-fail', result='ABORTED',
+                 changes='1,1 2,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='2,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='2,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='2,1'),
+        ], ordered=False)
+
+
 class TestBrokenTrustedConfig(ZuulTestCase):
     # Test we can deal with a broken config only with trusted projects. This
     # is different then TestBrokenConfig, as it does not have a missing
