@@ -70,6 +70,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05e8ff5c_0b666656",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2024-03-18T17:18:17Z",
+      "side": 1,
+      "message": "Sounds good to me.",
+      "parentUuid": "4acb44b2_530ebefb",
+      "revId": "a78c8eb1f9f45338be4da056c3ea5ce7de2a149c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "802f2a78_3d8a34ad",
@@ -83,6 +101,30 @@
       "writtenOn": "2024-03-18T17:07:01Z",
       "side": 1,
       "message": "It occurred to me we may wish to state we need `openstacksdk\u003e\u003d1.0.0` for maximum compatibility with ansible but this should work due to default pip behavior.",
+      "range": {
+        "startLine": 4,
+        "startChar": 15,
+        "endLine": 4,
+        "endChar": 27
+      },
+      "revId": "a78c8eb1f9f45338be4da056c3ea5ce7de2a149c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f24fa137_5baa7d75",
+        "filename": "zuul/lib/ansible-config.conf",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2024-03-18T17:18:17Z",
+      "side": 1,
+      "message": "I just assumed default pip behavior just like the other packages.",
+      "parentUuid": "802f2a78_3d8a34ad",
       "range": {
         "startLine": 4,
         "startChar": 15,
