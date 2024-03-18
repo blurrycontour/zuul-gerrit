@@ -4744,6 +4744,186 @@ class TestPlaybookSemaphore(AnsibleZuulTestCase):
         ])
 
 
+class TestPrePostFail(AnsibleZuulTestCase):
+    tenant_config_file = 'config/pre-post-fail/main.yaml'
+
+    def test_pre_and_post_failure(self):
+        # Test that when pre and post run steps fail, we don't
+        # rebuild dependent jobs
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+
+        self.log.debug("Wait for the first change to start its job")
+        for _ in iterate_timeout(30, 'job A started'):
+            if len(self.builds) == 1:
+                break
+        A1_build = self.builds[0]
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.log.debug("Wait for the second change to start its job")
+        for _ in iterate_timeout(30, 'job B started'):
+            if len(self.builds) == 2:
+                break
+        B1_build = self.builds[1]
+
+        self.log.debug("Wait for the first job to be in post-run")
+        start = os.path.join(self.jobdir_root, A1_build.uuid +
+                             '.wait_start.flag')
+        for _ in iterate_timeout(30, 'job A post running'):
+            if os.path.exists(start):
+                break
+
+        self.log.debug("Wait for the second job to be in post-run")
+        start = os.path.join(self.jobdir_root, B1_build.uuid +
+                             '.wait_start.flag')
+        for _ in iterate_timeout(30, 'job B post running'):
+            if os.path.exists(start):
+                break
+
+        self.log.debug("Allow the first job to finish")
+        flag_path = os.path.join(self.jobdir_root, A1_build.uuid,
+                                 'wait_continue_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.log.debug("Wait for the first job to finish")
+        for _ in iterate_timeout(30, 'job A complete'):
+            if A1_build not in self.builds:
+                break
+
+        self.log.debug("Allow the second job to finish")
+        flag_path = os.path.join(self.jobdir_root, B1_build.uuid,
+                                 'wait_continue_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.log.debug("Wait for the second job to finish")
+        for _ in iterate_timeout(30, 'job B complete'):
+            if B1_build not in self.builds:
+                break
+        A2_build = self.builds[0]
+
+        self.log.debug("Wait for the first retry to be in post-run")
+        start = os.path.join(self.jobdir_root, A2_build.uuid +
+                             '.wait_start.flag')
+        for _ in iterate_timeout(30, 'job A post running'):
+            if os.path.exists(start):
+                break
+
+        self.log.debug("Allow the first retry job to finish")
+        flag_path = os.path.join(self.jobdir_root, A2_build.uuid,
+                                 'wait_continue_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.log.debug("Wait for the first retry job to finish")
+        for _ in iterate_timeout(30, 'job A complete'):
+            if A2_build not in self.builds:
+                break
+
+        self.log.debug("Wait for the second retry to start its job")
+        for _ in iterate_timeout(30, 'job B started'):
+            if len(self.builds) == 1:
+                break
+        B2_build = self.builds[0]
+
+        self.log.debug("Wait for the second retry to be in post-run")
+        start = os.path.join(self.jobdir_root, B2_build.uuid +
+                             '.wait_start.flag')
+
+        self.log.debug("Allow the second retry job to finish")
+        flag_path = os.path.join(self.jobdir_root, B2_build.uuid,
+                                 'wait_continue_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.log.debug("Wait for the second retry job to finish")
+        for _ in iterate_timeout(30, 'job B complete'):
+            if B2_build not in self.builds:
+                break
+
+        self.log.debug("Wait for the standalone B job to start")
+        for _ in iterate_timeout(30, 'job B3 started'):
+            if len(self.builds) == 1:
+                break
+        B3_build = self.builds[0]
+
+        self.log.debug("Wait for B3 to be in post-run")
+        start = os.path.join(self.jobdir_root, B3_build.uuid +
+                             '.wait_start.flag')
+        for _ in iterate_timeout(30, 'job B3 post running'):
+            if os.path.exists(start):
+                break
+
+        self.log.debug("Allow the B3 job to finish")
+        flag_path = os.path.join(self.jobdir_root, B3_build.uuid,
+                                 'wait_continue_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.log.debug("Wait for the B3 job to finish")
+        for _ in iterate_timeout(30, 'job B complete'):
+            if B3_build not in self.builds:
+                break
+
+        self.log.debug("Wait for the standalone B retry job to start")
+        for _ in iterate_timeout(30, 'job B started'):
+            if len(self.builds) == 1:
+                break
+        B4_build = self.builds[0]
+
+        self.log.debug("Wait for the retry to be in post-run")
+        start = os.path.join(self.jobdir_root, B4_build.uuid +
+                             '.wait_start.flag')
+        for _ in iterate_timeout(30, 'job B4 post running'):
+            if os.path.exists(start):
+                break
+
+        self.log.debug("Allow the B retry job to finish")
+        flag_path = os.path.join(self.jobdir_root, B4_build.uuid,
+                                 'wait_continue_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.log.debug("Wait for the B retry job to finish")
+        for _ in iterate_timeout(30, 'job B complete'):
+            if B4_build not in self.builds:
+                break
+
+        self.waitUntilSettled()
+
+        # Only one job should abort, the rest should retry
+        # because only when the retry limit occurs should the
+        # dependent job be aborted
+        self.assertHistory([
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='1,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='1,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='1,1 2,1'),
+            dict(name='test-job-pre-post-fail', result='ABORTED',
+                 changes='1,1 2,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='2,1'),
+            dict(name='test-job-pre-post-fail', result=None,
+                 changes='2,1'),
+        ], ordered=False)
+
+
 class TestBrokenTrustedConfig(ZuulTestCase):
     # Test we can deal with a broken config only with trusted projects. This
     # is different then TestBrokenConfig, as it does not have a missing

@@ -1,0 +1,30 @@
+- pipeline:
+    name: gate
+    manager: dependent
+    trigger:
+      gerrit:
+        - event: comment-added
+          approval:
+            - Approved: 1
+    success:
+      gerrit:
+        Verified: 2
+        submit: true
+    failure:
+      gerrit:
+        Verified: -2
+    start:
+      gerrit:
+        Verified: 0
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: test-job-pre-post-fail
+    pre-run: playbooks/pre-fail.yaml
+    post-run: playbooks/post-fail.yaml
+    # Won't run (noop)
+    run: playbooks/run.yaml
+    attempts: 2
