@@ -596,8 +596,11 @@ class PipelineManager(metaclass=ABCMeta):
                       change, self.pipeline)
             return False
 
-        self.getDependencyGraph(change, dependency_graph, event,
-                                update_deps=True)
+        try:
+            self.getDependencyGraph(change, dependency_graph, event,
+                                    update_deps=True)
+        except exceptions.DependencyLimitExceededError:
+            return False
 
         with self.getChangeQueue(change, event, change_queue) as change_queue:
             if not change_queue:
@@ -810,7 +813,8 @@ class PipelineManager(metaclass=ABCMeta):
                  self.pipeline.tenant.max_dependencies)):
                 log.debug("%sDependency graph for change %s is too large",
                           indent, change)
-                raise Exception("Dependency graph is too large")
+                raise exceptions.DependencyLimitExceededError(
+                    "Dependency graph is too large")
 
             node = dependency_graph.setdefault(change, [])
             if needed_change not in node:
@@ -1619,8 +1623,12 @@ class PipelineManager(metaclass=ABCMeta):
 
         meets_reqs = self.areChangesReadyToBeEnqueued(item.changes, item.event)
         dependency_graph = collections.OrderedDict()
-        self.getDependencyGraph(item.changes[0], dependency_graph, item.event,
-                                quiet=True)
+        try:
+            self.getDependencyGraph(item.changes[0], dependency_graph,
+                                    item.event, quiet=True)
+        except exceptions.DependencyLimitExceededError:
+            self.removeItem(item)
+            return True, nnfi
 
         # Verify that the cycle dependency graph is correct
         cycle = self.cycleForChange(
