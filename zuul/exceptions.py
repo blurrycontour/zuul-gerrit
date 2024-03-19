@@ -50,6 +50,10 @@ class StreamingError(Exception):
     pass
 
 
+class DependencyLimitExceededError(Exception):
+    pass
+
+
 # Authentication Exceptions
 
 class AuthTokenException(Exception):
