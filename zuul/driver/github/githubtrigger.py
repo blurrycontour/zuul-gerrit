@@ -19,7 +19,7 @@ from zuul.trigger import BaseTrigger
 from zuul.driver.github.githubmodel import GithubEventFilter
 from zuul.driver.github import githubsource
 from zuul.driver.util import scalar_or_list, to_list, make_regex, ZUUL_REGEX
-from zuul.configloader import DeprecationWarning
+from zuul.exceptions import DeprecationWarning
 
 
 class GithubUnlabelDeprecation(DeprecationWarning):

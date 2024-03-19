@@ -5199,7 +5199,7 @@ class TestValidateAllBroken(ZuulTestCase):
     scheduler_count = 1
 
     def setUp(self):
-        self.assertRaises(zuul.configloader.ConfigurationSyntaxError,
+        self.assertRaises(zuul.exceptions.ConfigurationSyntaxError,
                           super().setUp)
 
     def test_validate_all_tenants_broken(self):
@@ -5223,7 +5223,7 @@ class TestValidateBroken(ZuulTestCase):
     scheduler_count = 1
 
     def setUp(self):
-        self.assertRaises(zuul.configloader.ConfigurationSyntaxError,
+        self.assertRaises(zuul.exceptions.ConfigurationSyntaxError,
                           super().setUp)
 
     def test_validate_tenant_broken(self):
