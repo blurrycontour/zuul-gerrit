@@ -11,9 +11,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import logging
 
-from pkg_resources import resource_string
+import importlib.resources
+import logging
 
 from zuul.lib.logutil import get_annotated_logger
 
@@ -40,8 +40,9 @@ class GraphQLClient:
             'canmerge-legacy',
         ]
         for query_name in query_names:
-            self.queries[query_name] = resource_string(
-                __name__, '%s.graphql' % query_name).decode('utf-8')
+            f = importlib.resources.files('zuul').joinpath(
+                'driver/github/graphql/%s.graphql' % query_name)
+            self.queries[query_name] = f.read_bytes().decode()
 
     @staticmethod
     def _prepare_query(query, variables):
