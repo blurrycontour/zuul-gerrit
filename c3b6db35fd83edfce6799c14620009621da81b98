@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56f4a84f_23c9eaa6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-19T23:33:41Z",
+      "side": 1,
+      "message": "\u003e We sure we want to switch the container builds immediately?\n\nNot necessarily. Especially since the unittests seem slower than I would have expected. But it is a good way to get extra coverage in this initial testing period since we have functional testing using those images.\n\nI\u0027m happy to drop the container update once we\u0027re ready to add regular unittest jobs if people prefer.",
+      "revId": "c3b6db35fd83edfce6799c14620009621da81b98",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
