@@ -9869,3 +9869,29 @@ class TestMaxDeps(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS', changes='1,1 2,1'),
             dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
+
+    def test_max_deps_extended(self):
+        self.executor_server.hold_jobs_in_build = True
+        # max_dependencies for the connection is 1, so this is okay
+        A = self.fake_gerrit.addFakeChange('org/project4', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project4', 'master', 'B',
+                                           topic='test-topic')
+        B.setDependsOn(A, 1)
+
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Increase the number of dependencies for B by adding a
+        # change with the same topic (dependencies-by-topic is enabled).
+        # With this C should not be enqueued and A is removed.
+        C = self.fake_gerrit.addFakeChange('org/project4', 'master', 'C',
+                                           topic='test-topic')
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+
+        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
+        ], ordered=False)
