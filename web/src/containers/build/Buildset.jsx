@@ -203,7 +203,7 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
         })
     } else {
       const changeId = ref.change + ',' + ref.patchset
-      enqueue(tenant.apiPrefix, ref.project, ref.pipeline, changeId)
+      enqueue(tenant.apiPrefix, ref.project, buildset.pipeline, changeId)
         .then(() => {
           dispatch(addNotification(
             {
