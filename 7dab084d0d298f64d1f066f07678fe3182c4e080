@@ -33,6 +33,42 @@
       "message": "I just had a chat with Pablo about this change. So, presently, when adding a host using a ssh ProxyJump configuration, the `ansible_host` variable is not reachable by the executor, resulting in a stream of `Waiting on logger` error. The proposed change here is not enough as it needs more work by the job to setup a similar tunnel on the jump host (and it is missing tests and documentation).\n\n@Jim, if we can reliably detect such jump host configuration (e.g. to parse the ip of the reachable host), do you think we could improve the executor to automatically setup a tunnel, similar to what is being done with the KubeFwd for kubernetes pods? That way we could make such setup works transparently without any changes on the user side.\n\nOtherwise I am inclined to enable such Zuul stream configuration, assuming it can\u0027t be abused maliciously, so that the job can setup the necessary work around to make it works.",
       "revId": "7dab084d0d298f64d1f066f07678fe3182c4e080",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbaaa642_e256b2f0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-19T22:11:41Z",
+      "side": 1,
+      "message": "It seems like someone could falsify the output of a task by streaming from a different source, but as long as we aren\u0027t persisting add_host across playbooks, it would be limited to a single playbook, and under that circumstance, they could probably do the same thing today using some other method.\n\nHowever, if a user is able to set this in a job or project variable, that would become more of a concern, since it would apply to a trusted pre-run playbook.",
+      "parentUuid": "74a89515_56bc8962",
+      "revId": "7dab084d0d298f64d1f066f07678fe3182c4e080",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68bff5ed_382802ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-19T22:11:41Z",
+      "side": 1,
+      "message": "We don\u0027t currently load any information back into zuul from add_host; and doing that securely is problematic, which is one of the reasons I stopped development on 906433.  I\u0027d be very skeptical of feeding that information back to the executor.  Basically, any time a job can make the executor do something like set up a tunnel to a host that wasn\u0027t originally involved in the job is cause for concern or at least caution.  Even if we said that for security purposes we won\u0027t load any other information except what\u0027s needed to establish the tunnel, I think it\u0027s a little too weird or esoteric to have the executor doing that for hosts it doesn\u0027t know about.",
+      "parentUuid": "3dc6335e_6b141452",
+      "revId": "7dab084d0d298f64d1f066f07678fe3182c4e080",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
