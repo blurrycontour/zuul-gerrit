@@ -75,7 +75,8 @@ class Repo(object):
 
     def __init__(self, remote, local, email, username, speed_limit, speed_time,
                  sshkey=None, cache_path=None, logger=None, git_timeout=300,
-                 zuul_event_id=None, retry_timeout=None, skip_refs=False):
+                 zuul_event_id=None, retry_timeout=None, skip_refs=False,
+                 workspace_project_path=None):
         if logger is None:
             self.log = logging.getLogger("zuul.Repo")
         else:
@@ -96,6 +97,7 @@ class Repo(object):
 
         self.remote_url = remote
         self.local_path = local
+        self.workspace_project_path = workspace_project_path
         self.email = email
         self.username = username
         self.cache_path = cache_path
@@ -641,54 +643,88 @@ class Repo(object):
             }
         return {}
 
-    def merge(self, ref, strategy=None, zuul_event_id=None, timestamp=None):
+    def merge(self, ref, strategy=None, zuul_event_id=None, timestamp=None,
+              ops=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
         args = []
         if strategy:
             args += ['-s', strategy]
         args.append('FETCH_HEAD')
+        msg = f"Merge '{ref}'"
         self.fetch(ref, zuul_event_id=zuul_event_id)
+        if ops is not None:
+            ops.append(zuul.model.MergeOp(cmd=['git', 'fetch', 'origin', ref],
+                                          path=self.workspace_project_path))
         log.debug("Merging %s with args %s", ref, args)
         with repo.git.custom_environment(**self._getTimestampEnv(timestamp)):
             # Use a custom message to avoid introducing
             # merger/executor path details
-            repo.git.merge(message=f"Merge '{ref}'", *args)
+            repo.git.merge(message=msg, *args)
+        if ops is not None:
+            ops.append(zuul.model.MergeOp(
+                cmd=['git', 'merge', '-m', msg, *args],
+                path=self.workspace_project_path,
+                timestamp=timestamp))
         return repo.head.commit
 
-    def squashMerge(self, item, zuul_event_id=None, timestamp=None):
+    def squashMerge(self, item, zuul_event_id=None, timestamp=None, ops=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
         args = ['--squash', 'FETCH_HEAD']
         ref = item['ref']
+        msg = f"Merge '{ref}'"
         self.fetch(ref, zuul_event_id=zuul_event_id)
+        if ops is not None:
+            ops.append(zuul.model.MergeOp(cmd=['git', 'fetch', 'origin', ref],
+                                          path=self.workspace_project_path))
         log.debug("Squash-Merging %s with args %s", ref, args)
         with repo.git.custom_environment(**self._getTimestampEnv(timestamp)):
             repo.git.merge(*args)
             # Use a custom message to avoid introducing
             # merger/executor path details
-            repo.git.commit(
-                message='Merge change %s,%s' % (
-                    item['number'], item['patchset']))
+            repo.git.commit(message=msg)
+        if ops is not None:
+            ops.append(zuul.model.MergeOp(
+                cmd=['git', 'merge', *args],
+                path=self.workspace_project_path,
+                timestamp=timestamp))
+            ops.append(zuul.model.MergeOp(
+                cmd=['git', 'commit', '-m', msg],
+                path=self.workspace_project_path,
+                timestamp=timestamp))
         return repo.head.commit
 
-    def rebaseMerge(self, item, base, zuul_event_id=None, timestamp=None):
+    def rebaseMerge(self, item, base, zuul_event_id=None, timestamp=None,
+                    ops=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
         args = [base]
         ref = item['ref']
         self.fetch(ref, zuul_event_id=zuul_event_id)
+        if ops is not None:
+            ops.append(zuul.model.MergeOp(cmd=['git', 'fetch', 'origin', ref],
+                                          path=self.workspace_project_path))
         log.debug("Rebasing %s with args %s", ref, args)
         repo.git.checkout('FETCH_HEAD')
+        if ops is not None:
+            ops.append(zuul.model.MergeOp(
+                cmd=['git', 'checkout', 'FETCH_HEAD'],
+                path=self.workspace_project_path))
         with repo.git.custom_environment(**self._getTimestampEnv(timestamp)):
             try:
                 repo.git.rebase(*args)
             except Exception:
                 repo.git.rebase(abort=True)
                 raise
+        if ops is not None:
+            ops.append(zuul.model.MergeOp(
+                cmd=['git', 'rebase', *args],
+                path=self.workspace_project_path,
+                timestamp=timestamp))
         return repo.head.commit
 
-    def cherryPick(self, ref, zuul_event_id=None, timestamp=None):
+    def cherryPick(self, ref, zuul_event_id=None, timestamp=None, ops=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.createRepoObject(zuul_event_id)
         self.fetch(ref, zuul_event_id=zuul_event_id)
@@ -697,11 +733,16 @@ class Repo(object):
             args = ["-s", "resolve", "FETCH_HEAD"]
             log.debug("Merging %s with args %s instead of cherry-picking",
                       ref, args)
+            msg = f"Merge '{ref}'"
             with repo.git.custom_environment(
                     **self._getTimestampEnv(timestamp)):
                 # Use a custom message to avoid introducing
                 # merger/executor path details
-                repo.git.merge(message=f"Merge '{ref}'", *args)
+                repo.git.merge(message=msg, *args)
+            op = zuul.model.MergeOp(
+                cmd=['git', 'merge', '-m', msg, *args],
+                path=self.workspace_project_path,
+                timestamp=timestamp)
         else:
             log.debug("Cherry-picking %s", ref)
             # Git doesn't have an option to ignore commits that are already
@@ -711,6 +752,11 @@ class Repo(object):
             with repo.git.custom_environment(
                     **self._getTimestampEnv(timestamp)):
                 repo.git.cherry_pick("FETCH_HEAD", keep_redundant_commits=True)
+            op = zuul.model.MergeOp(
+                cmd=['git', 'cherry-pick', 'FETCH_HEAD',
+                     '--keep-redundant-commits'],
+                path=self.workspace_project_path,
+                timestamp=timestamp)
 
             # If the newly applied commit is empty, it means either:
             #  1) The commit being cherry-picked was empty, in which the empty
@@ -723,7 +769,13 @@ class Repo(object):
                     any(fetch_head.diff(fetch_head.parents[0])):
                 log.debug("%s was already applied. Removing it", ref)
                 self._checkout(repo, parent)
-
+                op = zuul.model.MergeOp(comment=f"Already applied {ref}")
+        if ops is not None:
+            if op.cmd:
+                ops.append(zuul.model.MergeOp(
+                    cmd=['git', 'fetch', 'origin', ref],
+                    path=self.workspace_project_path))
+            ops.append(op)
         return repo.head.commit
 
     def fetch(self, ref, zuul_event_id=None):
@@ -1004,9 +1056,9 @@ class Merger(object):
         repo = None
         key = '/'.join([hostname, project_name])
         try:
-            path = os.path.join(self.working_root,
-                                strings.workspace_project_path(
-                                    hostname, project_name, self.scheme))
+            workspace_project_path = strings.workspace_project_path(
+                hostname, project_name, self.scheme)
+            path = os.path.join(self.working_root, workspace_project_path)
             self.repo_roots.add(path)
             if self.cache_root:
                 cache_path = os.path.join(
@@ -1020,7 +1072,8 @@ class Merger(object):
                 self.speed_time, sshkey=sshkey, cache_path=cache_path,
                 logger=self.logger, git_timeout=self.git_timeout,
                 zuul_event_id=zuul_event_id, retry_timeout=retry_timeout,
-                skip_refs=self.execution_context)
+                skip_refs=self.execution_context,
+                workspace_project_path=workspace_project_path)
 
             self.repos[key] = repo
         except Exception:
@@ -1163,7 +1216,7 @@ class Merger(object):
             for message in messages:
                 ref_log.debug(message)
 
-    def _mergeChange(self, item, base, zuul_event_id):
+    def _mergeChange(self, item, base, zuul_event_id, ops):
         log = get_annotated_logger(self.log, zuul_event_id)
         repo = self.getRepo(item['connection'], item['project'],
                             zuul_event_id=zuul_event_id)
@@ -1178,31 +1231,31 @@ class Merger(object):
             mode = item['merge_mode']
             if mode == zuul.model.MERGER_MERGE:
                 commit = repo.merge(item['ref'], zuul_event_id=zuul_event_id,
-                                    timestamp=timestamp)
+                                    timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_MERGE_RESOLVE:
                 commit = repo.merge(item['ref'], 'resolve',
                                     zuul_event_id=zuul_event_id,
-                                    timestamp=timestamp)
+                                    timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_MERGE_RECURSIVE:
                 commit = repo.merge(item['ref'], 'recursive',
                                     zuul_event_id=zuul_event_id,
-                                    timestamp=timestamp)
+                                    timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_MERGE_ORT:
                 commit = repo.merge(item['ref'], 'ort',
                                     zuul_event_id=zuul_event_id,
-                                    timestamp=timestamp)
+                                    timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_CHERRY_PICK:
                 commit = repo.cherryPick(item['ref'],
                                          zuul_event_id=zuul_event_id,
-                                         timestamp=timestamp)
+                                         timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_SQUASH_MERGE:
                 commit = repo.squashMerge(
                     item, zuul_event_id=zuul_event_id,
-                    timestamp=timestamp)
+                    timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_REBASE:
                 commit = repo.rebaseMerge(
                     item, base, zuul_event_id=zuul_event_id,
-                    timestamp=timestamp)
+                    timestamp=timestamp, ops=ops)
             else:
                 raise Exception("Unsupported merge mode: %s" % mode)
         except git.GitCommandError:
@@ -1218,7 +1271,7 @@ class Merger(object):
         return orig_commit, commit
 
     def _mergeItem(self, item, recent, repo_state, zuul_event_id,
-                   branches=None, process_worker=None):
+                   ops, branches=None, process_worker=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         log.debug("Processing ref %s for project %s/%s / %s uuid %s" %
                   (item['ref'], item['connection'],
@@ -1262,7 +1315,7 @@ class Merger(object):
                               zuul_event_id=zuul_event_id)
 
         # Merge the change
-        orig_commit, commit = self._mergeChange(item, base, zuul_event_id)
+        orig_commit, commit = self._mergeChange(item, base, zuul_event_id, ops)
         if not commit:
             return None, None
         # Store this commit as the most recent for this project-branch
@@ -1297,6 +1350,8 @@ class Merger(object):
         # connection -> project -> ref -> commit
         if repo_state is None:
             repo_state = {}
+        # A log of git operations
+        ops = []
         for item in items:
             # If we're in the executor context we have the repo_locks object
             # and perform per repo locking.
@@ -1314,7 +1369,7 @@ class Merger(object):
                           (item["number"], item["patchset"]))
                 try:
                     orig_commit, commit = self._mergeItem(
-                        item, recent, repo_state, zuul_event_id,
+                        item, recent, repo_state, zuul_event_id, ops,
                         branches=branches,
                         process_worker=process_worker)
                 except BrokenProcessPool:
@@ -1338,7 +1393,7 @@ class Merger(object):
                         files=repo_files)
         return (
             commit.hexsha, list(read_files.values()), repo_state, recent,
-            orig_commit
+            orig_commit, ops
         )
 
     def setRepoState(self, connection_name, project_name, repo_state,

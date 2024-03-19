@@ -911,7 +911,7 @@ class TestMerger(ZuulTestCase):
         # Merge A
         result = merger.mergeChanges([item_a], files=files, dirs=dirs)
         self.assertIsNotNone(result)
-        hexsha, read_files, repo_state, ret_recent, orig_commit = result
+        hexsha, read_files, repo_state, ret_recent, orig_commit, ops = result
         self.assertEqual(len(read_files), 1)
         self.assertEqual(read_files[0]['project'], 'org/project')
         self.assertEqual(read_files[0]['branch'], 'master')
@@ -920,7 +920,7 @@ class TestMerger(ZuulTestCase):
         # Merge A -> B
         result = merger.mergeChanges([item_a, item_b], files=files, dirs=dirs)
         self.assertIsNotNone(result)
-        hexsha, read_files, repo_state, ret_recent, orig_commit = result
+        hexsha, read_files, repo_state, ret_recent, orig_commit, ops = result
         self.assertEqual(len(read_files), 1)
         self.assertEqual(read_files[0]['project'], 'org/project')
         self.assertEqual(read_files[0]['branch'], 'master')
@@ -931,7 +931,7 @@ class TestMerger(ZuulTestCase):
         result = merger.mergeChanges([item_a, item_b, item_c], files=files,
                                      dirs=dirs)
         self.assertIsNotNone(result)
-        hexsha, read_files, repo_state, ret_recent, orig_commit = result
+        hexsha, read_files, repo_state, ret_recent, orig_commit, ops = result
         self.assertEqual(len(read_files), 1)
         self.assertEqual(read_files[0]['project'], 'org/project')
         self.assertEqual(read_files[0]['branch'], 'master')
@@ -943,7 +943,7 @@ class TestMerger(ZuulTestCase):
         result = merger.mergeChanges([item_a, item_b, item_c, item_d],
                                      files=files, dirs=dirs)
         self.assertIsNotNone(result)
-        hexsha, read_files, repo_state, ret_recent, orig_commit = result
+        hexsha, read_files, repo_state, ret_recent, orig_commit, ops = result
 
         self.assertEqual(len(read_files), 2)
         self.assertEqual(read_files[0]['project'], 'org/project')
