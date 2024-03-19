@@ -14,6 +14,7 @@
 
 import concurrent.futures
 import configparser
+import json
 import logging
 import os
 import shutil
@@ -235,23 +236,31 @@ class AnsibleManager:
         result = False
         try:
             extra_packages = self._getAnsible(version).extra_packages
-            python_package_check = \
-                "import pkg_resources; pkg_resources.require({})".format(
-                    repr(extra_packages))
 
-            command = [self.getAnsibleCommand(version, 'python'),
-                       '-c', python_package_check]
+            # Formerly this used pkg_resources which has been deprecated. If
+            # there is a better way to accomplish this task please change
+            # this approach.
+            # Ask pip to resolve a dry run installation to determine if any new
+            # packages need to be installed. A json doc is emitted to stdout
+            # including a list of things to install if necessary.
+            command = [self.getAnsibleCommand(version, 'pip'), 'install',
+                       '--dry-run', '--quiet', '--report', '-']
+            command += extra_packages
             ret = subprocess.run(command,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.STDOUT)
-            # We check manually so that we can log the stdout and stderr
-            # properly which aren't going to be available if we have
-            # subprocess.run() check and raise.
-            if ret.returncode != 0:
+            to_be_installed = json.loads(ret)["install"]
+            # We check manually so that we can log the missing packages
+            # properly. We also need to check the the JSON output to determine
+            # if any changes were necessary.
+            if to_be_installed:
                 self.log.error(
                     'Ansible version %s installation is missing packages' %
                     version)
-                self.log.debug("Ansible package check output: %s", ret.stdout)
+                missing = ["%s %s" %
+                           (x["metadata"]["name"], x["metadata"]["version"])
+                           for x in to_be_installed]
+                self.log.debug("These packages are missing: %s", missing)
             else:
                 result = True
         except Exception:
