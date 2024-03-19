@@ -24,6 +24,7 @@ import 'moment-duration-format'
 import { Chart, ChartBar, ChartAxis, ChartLegend, ChartTooltip } from '@patternfly/react-charts'
 
 import { buildResultLegendData, buildsBarStyle } from './Misc'
+import { describeRef } from '../../Misc'
 
 
 function BuildsetGanttChart(props) {
@@ -40,15 +41,17 @@ function BuildsetGanttChart(props) {
     const origin = moment_tz.utc(sortedByStartTime[builds.length - 1].start_time).tz(timezone)
 
     const longestJobName = builds.reduce((a, build) => (a.length < build.job_name.length ? build.job_name : a), '')
+    const jobNames = builds.map((d) => d.job_name)
 
     const data = sortedByStartTime.map((build) => {
         return {
-            x: build.job_name,
+            x: build.uuid,
             y0: build.start_time ? (moment_tz.utc(build.start_time).tz(timezone) - origin) / 1000 : 0,
             y: build.end_time ? (moment_tz.utc(build.end_time).tz(timezone) - origin) / 1000 : 0,
             result: build.result,
             started: moment_tz.utc(build.start_time).tz(timezone).format('YYYY-MM-DD HH:mm:ss'),
             ended: moment_tz.utc(build.end_time).tz(timezone).format('YYYY-MM-DD HH:mm:ss'),
+            ref: build.ref,
         }
     })
 
@@ -88,7 +91,10 @@ function BuildsetGanttChart(props) {
                 legendData={legendData}
                 legendComponent={<ChartLegend data={chartLegend} itemsPerRow={4} style={{labels: {fill: horizontalLegendTextColor}}} />}
             >
-                <ChartAxis style={{tickLabels: {fill:horizontalLegendTextColor}}} />
+              <ChartAxis
+                style={{tickLabels: {fill:horizontalLegendTextColor}}}
+                tickFormat={((tick, index) => jobNames[index])}
+              />
                 <ChartAxis
                     dependentAxis
                     showGrid
@@ -114,7 +120,7 @@ function BuildsetGanttChart(props) {
                     style={ buildsBarStyle }
                     labelComponent={
                         <ChartTooltip constrainToVisibleArea/>}
-                    labels={({ datum }) => `${datum.result}\nStarted ${datum.started}\nEnded ${datum.ended}`}
+                    labels={({ datum }) => `${datum.result}\nStarted ${datum.started}\nEnded ${datum.ended}\n${describeRef(datum.ref)}`}
                 />
             </Chart>
         </div>
