@@ -16,6 +16,24 @@
       "message": "We should probably log this at info level here (like line 1639)",
       "revId": "1cc1f8dee63a3f3a69a5c90311b8e842b5b0d289",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1656c39_3baea08c",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1629,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-03-19T13:56:59Z",
+      "side": 1,
+      "message": "Changed the log level in `getDependencyGraph(...)` to info.",
+      "parentUuid": "859d2b9d_73fe279b",
+      "revId": "1cc1f8dee63a3f3a69a5c90311b8e842b5b0d289",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
