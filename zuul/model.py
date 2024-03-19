@@ -149,6 +149,24 @@ def filter_severity(error_list, errors=True, warnings=True):
             )]
 
 
+class MergeOp:
+    def __init__(self, cmd=None, timestamp=None, comment=None, path=None):
+        """A class representing a merge operation, returned by the merger to
+        tell the user what was done."""
+        self.cmd = cmd
+        self.timestamp = timestamp
+        self.comment = comment
+        self.path = path
+
+    def toDict(self):
+        ret = {}
+        for k in ['cmd', 'timestamp', 'comment', 'path']:
+            v = getattr(self, k)
+            if v is not None:
+                ret[k] = v
+        return ret
+
+
 class ZuulMark:
     # The yaml mark class differs between the C and python versions.
     # The C version does not provide a snippet, and also appears to
@@ -6760,7 +6778,8 @@ class MergeCompletedEvent(ResultEvent):
 
     def __init__(self, request_uuid, build_set_uuid, merged, updated,
                  commit, files, repo_state, item_in_branches,
-                 errors, elapsed_time, span_info=None, zuul_event_id=None):
+                 errors, elapsed_time, span_info=None, zuul_event_id=None,
+                 ops=None):
         self.request_uuid = request_uuid
         self.build_set_uuid = build_set_uuid
         self.merged = merged
