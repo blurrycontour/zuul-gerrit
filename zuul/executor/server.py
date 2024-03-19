@@ -1022,6 +1022,7 @@ class AnsibleJob(object):
         self._resume_event = threading.Event()
         self.thread = None
         self.project_info = {}
+        self.merge_ops = []
         self.private_key_file = get_default(self.executor_server.config,
                                             'executor', 'private_key_file',
                                             '~/.ssh/id_rsa')
@@ -1518,6 +1519,9 @@ class AnsibleJob(object):
             p['checkout'] = selected_ref
             p['checkout_description'] = selected_desc
             p['commit'] = commit.hexsha
+            self.merge_ops.append(zuul.model.MergeOp(
+                cmd=['git', 'checkout', selected_ref],
+                path=repo.workspace_project_path))
 
         # Set the URL of the origin remote for each repo to a bogus
         # value. Keeping the remote allows tools to use it to determine
@@ -1711,6 +1715,7 @@ class AnsibleJob(object):
             self.executor_server.statsd.incr(base_key + ".SUCCESS")
         recent = ret[3]
         orig_commit = ret[4]
+        self.merge_ops = ret[5] or []
         for key, commit in recent.items():
             (connection, project, branch) = key
             restored_repos.add((connection, project))
