@@ -9895,3 +9895,20 @@ class TestMaxDeps(ZuulTestCase):
         self.assertHistory([
             dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
+
+    def test_max_deps_topic_self_dependency(self):
+        # Regression test asserting that we are not considering change
+        # A as a dependency of itself via the topic.
+        A = self.fake_gerrit.addFakeChange('org/project4', 'master', 'A',
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project4', 'master', 'B')
+        B.setDependsOn(A, 1)
+
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1 2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
+        ], ordered=False)

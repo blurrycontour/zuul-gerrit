@@ -979,6 +979,9 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug("  Updating topic dependencies for %s", change)
             new_topic_needs_changes = []
             for dep in source.getChangesByTopic(change.topic):
+                if dep is change:
+                    # Don't add ourself as a dependency
+                    continue
                 if dep and (not dep.is_merged):
                     log.debug("  Adding dependency: %s", dep)
                     new_topic_needs_changes.append(dep.cache_key)
