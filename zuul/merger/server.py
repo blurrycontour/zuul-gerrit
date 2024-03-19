@@ -315,7 +315,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         if ret is not None:
             result['merged'] = True
             (result['commit'], result['files'], result['repo_state'],
-             recent, orig_commit) = ret
+             recent, orig_commit, ops) = ret
         return result
 
     def refstate(self, merge_request, args):
