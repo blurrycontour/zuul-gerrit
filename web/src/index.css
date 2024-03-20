@@ -183,6 +183,10 @@ a.refresh {
 
 /* Status page */
 
+.zuul-show-pipeline-switch {
+    padding-left: var(--pf-global--spacer--sm);
+}
+
 /* Use the same hover effect like for selectable cards, but without
    actually selecting them */
 .zuul-pipeline-summary:hover,
