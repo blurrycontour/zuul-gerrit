@@ -62,6 +62,24 @@ QueueItemSquare.propTypes = {
 
 
 function QueueSummary({ pipeline, pipelineType }) {
+
+  const sortQueues = (a, b) => {
+    const totalQueueItems_a = a.heads.reduce(
+      (totalItems, head) => totalItems + head.length, 0
+    )
+    const totalQueueItems_b = b.heads.reduce(
+      (totalItems, head) => totalItems + head.length, 0
+    )
+
+    if (totalQueueItems_a > totalQueueItems_b) {
+      return -1
+    }
+    if (totalQueueItems_b < totalQueueItems_a) {
+      return 1
+    }
+    return 0
+  }
+
   // Dependent pipelines usually come with named queues, so we will
   // visualize each queue individually. For other pipeline types, we
   // will consolidate all heads as a single queue to simplify the
@@ -69,7 +87,12 @@ function QueueSummary({ pipeline, pipelineType }) {
   // change/item is enqueued in it's own queue by design).
   if (['dependent'].indexOf(pipelineType) > -1) {
     return (
-      pipeline.change_queues.map((queue) => (
+      // TODO (felix): Make filtering optional via a switch (default: on)
+      pipeline.change_queues.filter(
+        queue => queue.heads.length > 0
+      ).sort(
+        (a, b) => sortQueues(a, b)
+      ).map((queue) => (
         <Flex key={`${queue.name}${queue.branch}`}>
           <FlexItem>
             <Card isPlain className="zuul-compact-card">
@@ -114,20 +137,8 @@ QueueSummary.propTypes = {
 
 function PipelineSummary({ pipeline, tenant }) {
 
-  const countItems = (pipeline) => {
-    let count = 0
-    pipeline.change_queues.map(queue => (
-      queue.heads.map(head => (
-        head.map(() => (
-          count++
-        ))
-      ))
-    ))
-    return count
-  }
-
   const pipelineType = pipeline.manager || 'unknown'
-  const itemCount = countItems(pipeline)
+  const itemCount = pipeline._count
 
   return (
     <Card className="zuul-pipeline-summary zuul-compact-card">
