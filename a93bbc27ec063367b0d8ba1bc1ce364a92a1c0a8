@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9b03784_e0d07c68",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-03-20T00:19:14Z",
+      "side": 1,
+      "message": "Technically speaking, SetupTools was never included as part of CPython, it just happened to get installed by default by the venv module prior to 3.12. We could still explicitly install it if we want.",
+      "revId": "a93bbc27ec063367b0d8ba1bc1ce364a92a1c0a8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
