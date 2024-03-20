@@ -61,15 +61,19 @@ QueueItemSquare.propTypes = {
 }
 
 
-function QueueSummary({ pipeline, pipelineType }) {
+function QueueSummary({ pipeline, pipelineType, showAllQueues }) {
   // Dependent pipelines usually come with named queues, so we will
   // visualize each queue individually. For other pipeline types, we
   // will consolidate all heads as a single queue to simplify the
   // visualization (e.g. independent pipelines like check where each
   // change/item is enqueued in it's own queue by design).
   if (['dependent'].indexOf(pipelineType) > -1) {
+    let changeQueues = pipeline.change_queues
+    if (!showAllQueues) {
+      changeQueues = changeQueues.filter(queue => queue.heads.length > 0)
+    }
     return (
-      pipeline.change_queues.map((queue) => (
+      changeQueues.map((queue) => (
         <Flex key={`${queue.name}${queue.branch}`}>
           <FlexItem>
             <Card isPlain className="zuul-compact-card">
@@ -110,24 +114,13 @@ function QueueSummary({ pipeline, pipelineType }) {
 QueueSummary.propTypes = {
   pipeline: PropTypes.object,
   pipelineType: PropTypes.string,
+  showAllQueues: PropTypes.bool,
 }
 
-function PipelineSummary({ pipeline, tenant }) {
-
-  const countItems = (pipeline) => {
-    let count = 0
-    pipeline.change_queues.map(queue => (
-      queue.heads.map(head => (
-        head.map(() => (
-          count++
-        ))
-      ))
-    ))
-    return count
-  }
+function PipelineSummary({ pipeline, tenant, showAllQueues }) {
 
   const pipelineType = pipeline.manager || 'unknown'
-  const itemCount = countItems(pipeline)
+  const itemCount = pipeline._count
 
   return (
     <Card className="zuul-pipeline-summary zuul-compact-card">
@@ -157,7 +150,7 @@ function PipelineSummary({ pipeline, tenant }) {
         </Tooltip>
       </CardTitle>
       <CardBody>
-        <QueueSummary pipeline={pipeline} pipelineType={pipelineType} />
+        <QueueSummary pipeline={pipeline} pipelineType={pipelineType} showAllQueues={showAllQueues} />
       </CardBody>
 
     </Card>
@@ -167,6 +160,7 @@ function PipelineSummary({ pipeline, tenant }) {
 PipelineSummary.propTypes = {
   pipeline: PropTypes.object,
   tenant: PropTypes.object,
+  showAllQueues: PropTypes.bool,
 }
 
 export default PipelineSummary
