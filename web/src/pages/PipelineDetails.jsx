@@ -34,6 +34,23 @@ import { Fetching } from '../containers/Fetching'
 
 function PipelineDetailsPage({ pipeline, tenant, darkMode, fetchStatusIfNeeded }) {
 
+  const sortQueues = (a, b) => {
+    const totalQueueItems_a = a.heads.reduce(
+      (totalItems, head) => totalItems + head.length, 0
+    )
+    const totalQueueItems_b = b.heads.reduce(
+      (totalItems, head) => totalItems + head.length, 0
+    )
+
+    if (totalQueueItems_a > totalQueueItems_b) {
+      return -1
+    }
+    if (totalQueueItems_b < totalQueueItems_a) {
+      return 1
+    }
+    return 0
+  }
+
   useEffect(() => {
     document.title = 'Zuul Pipeline Details'
     if (tenant.name) {
@@ -80,11 +97,17 @@ function PipelineDetailsPage({ pipeline, tenant, darkMode, fetchStatusIfNeeded }
           }}
         >
 
-          {pipeline.change_queues.map((queue, idx) => (
-            <GalleryItem key={idx}>
-              <ChangeQueue queue={queue} />
-            </GalleryItem>
-          ))}
+          {
+            pipeline.change_queues.filter(
+              queue => queue.heads.length > 0
+            ).sort(
+              (a, b) => sortQueues(a, b)
+            ).map((queue, idx) => (
+              <GalleryItem key={idx}>
+                <ChangeQueue queue={queue} />
+              </GalleryItem>
+            ))
+          }
         </Gallery>
       </PageSection>
     </>
