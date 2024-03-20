@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b24af3eb_1a05e1cc",
+        "filename": "playbooks/zuul-nox/post-system-logs.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-03-20T00:14:47Z",
+      "side": 1,
+      "message": "We\u0027re doing py312 tests on Debian Bookworm though, right? It gets you bpfcc-tools 0.26 instead of Ubuntu Jammy\u0027s 0.18, if that changes this situation.",
+      "revId": "e4245dda789930c297ec510a0554809df8d1759b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
