@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b426a290_dbfce697",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-03-20T00:25:13Z",
+      "side": 1,
+      "message": "Bear in mind that the time will come when venv no longer preinstalls pip either. You can already use an external pip executable and point it to the location of the venv you want to manage with it, and the Python packaging ecosystem seems to be slowly shifting toward ever slimmer venvs, so the writing is on the wall. On the other hand, you can download a \"zipapp\" of pip and run it directly as if it were an installed Python module, so still more convenient than fiddling with SetupTools.",
+      "revId": "36a464f0af41df8323002f6c3e7181bafab1b2b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce7a68fd_2120de9b",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-03-20T00:25:13Z",
+      "side": 1,
+      "message": "If the goal is, as it seems to be, to find out what else pip\u0027s resolver things needs installing into the environment, this is probably your best option for the time being. Down the road maybe the dep solver in pip will get forklifted into its own separate library, but until that happens you\u0027re pretty much stuck treating pip\u0027s CLI as an API.",
+      "revId": "36a464f0af41df8323002f6c3e7181bafab1b2b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
