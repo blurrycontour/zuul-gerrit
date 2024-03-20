@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd82ccda_361ec0a8",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3767,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-20T18:27:58Z",
+      "side": 1,
+      "message": "Is it possible we could have two different job_combine lists for a job that should be deduplicated down to a single job. For example `[[Aa, Ab], [Ac, Ad]]` should be deduped to just `Aa` but instead we may get `[Aa, Ac]`?\n\nI think this is not the case as long as the for loop on 3748 iterates through all (remaining) jobs each time we loop through on the while loop. But wanted to make sure that is the case.",
+      "revId": "802c5a8ca6f01b1676959313cbb8563cfa09ca21",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
