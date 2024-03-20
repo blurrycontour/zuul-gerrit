@@ -16,6 +16,24 @@
       "message": "We\u0027re doing py312 tests on Debian Bookworm though, right? It gets you bpfcc-tools 0.26 instead of Ubuntu Jammy\u0027s 0.18, if that changes this situation.",
       "revId": "e4245dda789930c297ec510a0554809df8d1759b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "643bb106_767bd7cb",
+        "filename": "playbooks/zuul-nox/post-system-logs.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-03-20T00:29:16Z",
+      "side": 1,
+      "message": "Scratch that, I read to the end of the series and I see we\u0027re not. It was OpenStack\u0027s recent py312 job that\u0027s running the pyenv method on Bookworm. That said, we still could I suppose?",
+      "parentUuid": "b24af3eb_1a05e1cc",
+      "revId": "e4245dda789930c297ec510a0554809df8d1759b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
