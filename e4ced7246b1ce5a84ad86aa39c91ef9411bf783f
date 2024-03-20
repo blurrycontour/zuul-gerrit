@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "39b369d9_c42ccf4a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2580,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-20T20:32:56Z",
+      "side": 1,
+      "message": "Ack.",
+      "parentUuid": "175913da_223e93dd",
+      "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de974a33_3d7373ac",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-03-20T19:29:15Z",
       "side": 1,
       "message": "If we are running a mixed version zuul system it is possible for refs to not be in zuul_vars? In that case we either need a model api bump or we can simply ignore setting the attribute as unsafe here?",
+      "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c1573e1_1211e919",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2626,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-20T20:32:56Z",
+      "side": 1,
+      "message": "Yeah, let\u0027s be defensive here.",
+      "parentUuid": "de974a33_3d7373ac",
       "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -54,6 +90,24 @@
         "endLine": 6186,
         "endChar": 50
       },
+      "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2e68e81_09ff9f60",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 6186,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-20T20:32:56Z",
+      "side": 1,
+      "message": "I think we should keep this behavior; as you say it is the current behavior, and it is documented as such.  The fact that we get 40 zeroes from gerrit is one way to represent a tag deletion, but it\u0027s not the only way -- omitting a field is another.  Zuul does that, so someone wanting to test for tag creation or deletion can test for undefined for the old and new revs.",
+      "parentUuid": "a089aa34_62314f6b",
       "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
