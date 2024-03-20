@@ -3,6 +3,63 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "175913da_223e93dd",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2580,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-20T19:29:15Z",
+      "side": 1,
+      "message": "This is where I think we might get the info without refs (see comment below).",
+      "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de974a33_3d7373ac",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2626,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-20T19:29:15Z",
+      "side": 1,
+      "message": "If we are running a mixed version zuul system it is possible for refs to not be in zuul_vars? In that case we either need a model api bump or we can simply ignore setting the attribute as unsafe here?",
+      "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a089aa34_62314f6b",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 6186,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-20T19:29:15Z",
+      "side": 1,
+      "message": "I think newrev can be all zeros when you delete a branch or tag. That information is probably relevant to those events and we should set newrev to all the zeros in that case? I\u0027m not sure if it is relevant for oldrev though.\n\nThis does seem to match the old behavior in common.py though so feel free to ignore.",
+      "range": {
+        "startLine": 6186,
+        "startChar": 27,
+        "endLine": 6186,
+        "endChar": 50
+      },
+      "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5af24dd1_09c0e8b9",
         "filename": "zuul/model.py",
         "patchSetId": 4
