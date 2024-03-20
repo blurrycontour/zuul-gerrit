@@ -69,7 +69,10 @@ function QueueSummary({ pipeline, pipelineType }) {
   // change/item is enqueued in it's own queue by design).
   if (['dependent'].indexOf(pipelineType) > -1) {
     return (
-      pipeline.change_queues.map((queue) => (
+      // TODO (felix): Make filtering optional via a switch (default: on)
+      pipeline.change_queues.filter(
+        queue => queue.heads.length > 0
+      ).map((queue) => (
         <Flex key={`${queue.name}${queue.branch}`}>
           <FlexItem>
             <Card isPlain className="zuul-compact-card">
@@ -114,20 +117,8 @@ QueueSummary.propTypes = {
 
 function PipelineSummary({ pipeline, tenant }) {
 
-  const countItems = (pipeline) => {
-    let count = 0
-    pipeline.change_queues.map(queue => (
-      queue.heads.map(head => (
-        head.map(() => (
-          count++
-        ))
-      ))
-    ))
-    return count
-  }
-
   const pipelineType = pipeline.manager || 'unknown'
-  const itemCount = countItems(pipeline)
+  const itemCount = pipeline._count
 
   return (
     <Card className="zuul-pipeline-summary zuul-compact-card">
