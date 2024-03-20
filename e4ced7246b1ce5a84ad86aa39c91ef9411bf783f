@@ -71,6 +71,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7cbef1b_e995ed0c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2626,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-20T21:18:19Z",
+      "side": 1,
+      "message": "I think `get()` may return None here which is not iterable. And if it was iterable we would still fail on the `in ref` check below. Do we need to instead get then check if refs is valid then iterate over them?",
+      "parentUuid": "2c1573e1_1211e919",
+      "revId": "e4ced7246b1ce5a84ad86aa39c91ef9411bf783f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a089aa34_62314f6b",
