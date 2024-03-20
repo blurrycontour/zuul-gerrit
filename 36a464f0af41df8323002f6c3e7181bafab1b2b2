@@ -33,6 +33,24 @@
       "message": "If the goal is, as it seems to be, to find out what else pip\u0027s resolver things needs installing into the environment, this is probably your best option for the time being. Down the road maybe the dep solver in pip will get forklifted into its own separate library, but until that happens you\u0027re pretty much stuck treating pip\u0027s CLI as an API.",
       "revId": "36a464f0af41df8323002f6c3e7181bafab1b2b2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b86629aa_2ab1df25",
+        "filename": "zuul/lib/ansible.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-20T15:16:57Z",
+      "side": 1,
+      "message": "Yes, we\u0027re using pip to install Ansible and all of the extra deps. Then later (here) we\u0027re checking that we actually have all those requirements installed properly. I think using pip makes sense since it is being asked to do the installation so we know it is present without any extra dependencies, and as you point out, we want to know if pip\u0027s dep solver considers the requirements met.",
+      "parentUuid": "ce7a68fd_2120de9b",
+      "revId": "36a464f0af41df8323002f6c3e7181bafab1b2b2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
