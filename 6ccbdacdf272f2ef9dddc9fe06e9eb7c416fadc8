@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43284801_ea633972",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 6601,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-20T18:37:19Z",
+      "side": 1,
+      "message": "EnqueueEvent is a child of ChangeManagementEvent. That is why we update this class instead of the one we pass the new data into elsewhere.",
+      "revId": "6ccbdacdf272f2ef9dddc9fe06e9eb7c416fadc8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
