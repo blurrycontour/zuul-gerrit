@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -22,6 +22,10 @@ import {
   GalleryItem,
   PageSection,
   PageSectionVariants,
+  Switch,
+  Toolbar,
+  ToolbarContent,
+  ToolbarItem,
 } from '@patternfly/react-core'
 
 import PipelineSummary from '../containers/status/PipelineSummary'
@@ -50,7 +54,40 @@ TenantStats.propTypes = {
   stats: PropTypes.object,
 }
 
+function PipelineGallery({ pipelines, tenant, showAllPipelines }) {
+  // Filter out empty pipelines if necessary
+  if (!showAllPipelines) {
+    pipelines = pipelines.filter(ppl => ppl._count > 0)
+  }
+
+  return (
+    <Gallery
+      hasGutter
+      minWidths={{
+        default: '450px',
+      }}
+    >
+      {pipelines.map(pipeline => (
+        <GalleryItem key={pipeline.name}>
+          <PipelineSummary pipeline={pipeline} tenant={tenant} showAllQueues={showAllPipelines} />
+        </GalleryItem>
+      ))}
+    </Gallery>
+  )
+}
+
+PipelineGallery.propTypes = {
+  pipelines: PropTypes.array,
+  tenant: PropTypes.object,
+  showAllPipelines: PropTypes.bool,
+}
+
 function PipelineOverviewPage({ pipelines, stats, isFetching, tenant, darkMode, fetchStatusIfNeeded }) {
+  const [showAllPipelines, setShowAllPipelines] = useState(false)
+
+  const onShowAllPipelinesToggle = (isChecked) => {
+    setShowAllPipelines(isChecked)
+  }
 
   useEffect(() => {
     document.title = 'Zuul Status'
@@ -67,20 +104,26 @@ function PipelineOverviewPage({ pipelines, stats, isFetching, tenant, darkMode, 
     <>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <TenantStats stats={stats} />
+        <Toolbar>
+          <ToolbarContent>
+            <ToolbarItem>
+              <span>Show all pipelines</span>{' '}
+              <Switch
+                id="all-pipeline-switch"
+                aria-label="Show all pipelines"
+                isChecked={showAllPipelines}
+                onChange={onShowAllPipelinesToggle}
+              />
+            </ToolbarItem>
+          </ToolbarContent>
+        </Toolbar>
       </PageSection>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
-        <Gallery
-          hasGutter
-          minWidths={{
-            default: '450px',
-          }}
-        >
-          {pipelines.map(pipeline => (
-            <GalleryItem key={pipeline.name}>
-              <PipelineSummary pipeline={pipeline} tenant={tenant} />
-            </GalleryItem>
-          ))}
-        </Gallery>
+        <PipelineGallery
+          pipelines={pipelines}
+          tenant={tenant}
+          showAllPipelines={showAllPipelines}
+        />
       </PageSection>
     </>
   )
@@ -97,20 +140,32 @@ PipelineOverviewPage.propTypes = {
   fetchStatusIfNeeded: PropTypes.func,
 }
 
+const countItems = (pipeline) => {
+  let count = 0
+  pipeline.change_queues.map(queue => (
+    queue.heads.map(head => (
+      head.map(() => (
+        count++
+      ))
+    ))
+  ))
+  return count
+}
+
 function mapStateToProps(state) {
   let pipelines = []
   let stats = {}
   if (state.status.status) {
-    // TODO (felix): Here we could filter out the pipeline data from
-    // the status.json and if necessary "reformat" it to only contain
-    // the relevant information for this component (e.g. drop all
-    // job related information which isn't shown).
-    pipelines = state.status.status.pipelines
+    // TODO (felix): Make filtering optional via a switch (default: on)
+    pipelines = state.status.status.pipelines.map(ppl => (
+      { ...ppl, _count: countItems(ppl) }
+    ))
     stats = {
       trigger_event_queue: state.status.status.trigger_event_queue,
       management_event_queue: state.status.status.management_event_queue,
     }
   }
+
   // TODO (felix): Here we could also order the pipelines by any
   // criteria (e.g. the pipeline_type) in case we want that. Currently
   // they are ordered in the way they are defined in the zuul config.
