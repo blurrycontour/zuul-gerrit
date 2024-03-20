@@ -34,6 +34,24 @@
       "parentUuid": "b24af3eb_1a05e1cc",
       "revId": "e4245dda789930c297ec510a0554809df8d1759b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f347ca1f_02ddf08a",
+        "filename": "playbooks/zuul-nox/post-system-logs.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-20T15:18:32Z",
+      "side": 1,
+      "message": "We could. I think we should keep the unittests on as consistent a platform as possible though. So would change py311 at the same time. That said maybe we should rebase the pkg_resource cleanup and py312 stack off of this change as they are somewhat orthogonal now.",
+      "parentUuid": "643bb106_767bd7cb",
+      "revId": "e4245dda789930c297ec510a0554809df8d1759b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
