@@ -28,6 +28,7 @@ import PipelineSummary from '../containers/status/PipelineSummary'
 
 import { fetchStatusIfNeeded } from '../actions/status'
 
+
 function PipelineOverviewPage({ pipelines, tenant, darkMode, fetchStatusIfNeeded }) {
 
   useEffect(() => {
@@ -68,19 +69,38 @@ PipelineOverviewPage.propTypes = {
   fetchStatusIfNeeded: PropTypes.func,
 }
 
+const countItems = (pipeline) => {
+  let count = 0
+  pipeline.change_queues.map(queue => (
+    queue.heads.map(head => (
+      head.map(() => (
+        count++
+      ))
+    ))
+  ))
+  return count
+}
+
+const sortPipelines = (a, b) => {
+  if (a._count > b._count) {
+    return -1
+  }
+  if (b._count > a._count) {
+    return 1
+  }
+  return 0
+}
+
 function mapStateToProps(state) {
   let pipelines = []
   if (state.status.status) {
-    // TODO (felix): Here we could filter out the pipeline data from
-    // the status.json and if necessary "reformat" it to only contain
-    // the relevant information for this component (e.g. drop all
-    // job related information which isn't shown).
-    pipelines = state.status.status.pipelines
+    // Count number of items per pipeline/queue and sort the pipelines
+    // by number of items (desc).
+    // TODO (felix): Make filtering optional via a switch (default: on)
+    pipelines = state.status.status.pipelines.map(ppl => (
+      { ...ppl, _count: countItems(ppl) }
+    )).sort((a, b) => sortPipelines(a, b)).filter(ppl => ppl._count > 0)
   }
-  // TODO (felix): Here we could also order the pipelines by any
-  // criteria (e.g. the pipeline_type) in case we want that. Currently
-  // they are ordered in the way they are defined in the zuul config.
-  // The sorting could also be done via the filter toolbar.
   return {
     pipelines,
     tenant: state.tenant,
