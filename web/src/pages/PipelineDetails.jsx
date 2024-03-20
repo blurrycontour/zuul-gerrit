@@ -128,11 +128,15 @@ function PipelineDetailsPage({ pipeline, isFetching, tenant, darkMode, fetchStat
           }}
         >
 
-          {pipeline.change_queues.map((queue, idx) => (
-            <GalleryItem key={idx}>
-              <ChangeQueue queue={queue} pipeline={pipeline}/>
-            </GalleryItem>
-          ))}
+          {
+            pipeline.change_queues.filter(
+              queue => queue.heads.length > 0
+            ).map((queue, idx) => (
+              <GalleryItem key={idx}>
+                <ChangeQueue queue={queue} pipeline={pipeline}/>
+              </GalleryItem>
+            ))
+          }
         </Gallery>
       </PageSection>
     </>
