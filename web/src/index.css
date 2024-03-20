@@ -183,6 +183,10 @@ a.refresh {
 
 /* Status page */
 
+.zuul-show-pipeline-switch {
+    padding-left: var(--pf-global--spacer--sm);
+}
+
 .zuul-remaining-time {
     text-align: right;
 }
