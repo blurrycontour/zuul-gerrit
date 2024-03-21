@@ -31,18 +31,12 @@ import {
   Dropdown,
   DropdownItem,
   ExpandableSection,
-  Grid,
-  GridItem,
   KebabToggle,
 } from '@patternfly/react-core'
 import {
   AngleDoubleUpIcon,
   BanIcon,
-  OutlinedClockIcon,
-  StopwatchIcon,
 } from '@patternfly/react-icons'
-
-import { IconProperty, formatTime } from '../../Misc'
 
 import {
   calculateQueueItemTimes,
@@ -50,9 +44,9 @@ import {
   getRefs,
   JobLink,
   JobResultOrStatus,
-  QueueItemProgressbar,
 } from './Misc'
 
+import QueueItemProgress from './QueueItemProgress'
 
 function QueueItem({ item, tenant }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -76,14 +70,6 @@ function QueueItem({ item, tenant }) {
 
   const times = calculateQueueItemTimes(item)
 
-  // TODO (felix): The same snippet is used in the QueueItemPopover
-  // component. Maybe we could try to "merge" both components (have a
-  // "normal" variant and a popover variant)?
-  let remainingTime = 'unknown'
-  if (times.remaining !== null) {
-    remainingTime = formatTime(times.remaining)
-  }
-
   const dropdownItems = [
     <DropdownItem
       key="dequeue"
@@ -106,28 +92,6 @@ function QueueItem({ item, tenant }) {
       Promote
     </DropdownItem>
   ]
-
-  // TODO (felix): The same snippet is also used in the QueueItemPopover
-  // component. Maybe we could try to "merge" both components (have a
-  // "normal" variant and a popover variant)?
-  const formatEnqueueTime = (ms) => {
-    let hours = 60 * 60 * 1000
-    let now = Date.now()
-    let delta = now - ms
-    let text = formatTime(delta)
-    let color = 'var(--pf-global--success-color--100)'
-
-    // TODO (felix): Those color "thresholds" are currently the same for
-    // each job. Maybe we could define those based on the average job
-    // run time (which would be the remaining time, right?).
-    if (delta > (4 * hours)) {
-      color = 'var(--pf-global--danger-color--100)'
-    } else if (delta > (2 * hours)) {
-      color = 'var(--pf-global--warning-color--100)'
-    }
-
-    return <span style={{ color: color }}>{text}</span>
-  }
 
   const renderJobList = (jobs) => {
     return (
@@ -173,32 +137,15 @@ function QueueItem({ item, tenant }) {
             : ''}
           <CardTitle>
             {getRefs(item).map((change, idx) => (
-              <span key={idx}>
+              <div key={idx}>
                 {change.project} <ChangeLink change={change} />
-              </span>
+              </div>
             ))}
           </CardTitle>
         </CardHeader>
         {item.live === true ?
           <CardBody>
-            <Grid className="zuul-compact-grid">
-              <GridItem>
-                <QueueItemProgressbar item={item} />
-              </GridItem>
-              <GridItem span={6}>
-                {/* TODO (felix): Show the remaining time behind the
-                progress bar like PF4 is doing:
-                https://v4-archive.patternfly.org/v4/components/progress#outside
-
-                This would also be achieved by converting the
-                QueueItemProgressbar to use a PF4 Progress component.
-              */}
-                <IconProperty icon={<StopwatchIcon />} value={`${remainingTime}`} />
-              </GridItem>
-              <GridItem span={6}>
-                <IconProperty icon={<OutlinedClockIcon />} value={formatEnqueueTime(item.enqueue_time)} />
-              </GridItem>
-            </Grid>
+            <QueueItemProgress item={item} times={times} />
             <Link
               to={tenant.linkPrefix + '/status/change/' + getRefs(item)[0].id}
               className="zuul-change-link"
