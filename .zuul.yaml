@@ -242,6 +242,9 @@
     requires:
       - python-builder-3.11-bookworm-container-image
       - python-base-3.11-bookworm-container-image
+    ansible-split-streams: true
+    post-run:
+      - playbooks/image/test-image.yaml
     provides: zuul-container-image
     vars: &zuul_image_vars
       promote_container_image_method: intermediate-registry
