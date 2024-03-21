@@ -173,10 +173,8 @@ class DatabaseSession(object):
         buildset_table = self.connection.zuul_buildset_table
         provides_table = self.connection.zuul_provides_table
 
-        # contains_eager allows us to perform eager loading on the
-        # buildset *and* use that table in filters (unlike
-        # joinedload).
-        q = self.session().query(self.connection.buildModel).\
+        q = self.session().query(self.connection.buildModel.id).\
+            distinct().\
             join(self.connection.buildSetModel).\
             join(self.connection.refModel)
         # Avoid joining the provides table unless necessary; postgres
@@ -186,33 +184,6 @@ class DatabaseSession(object):
         # the query.
         if provides:
             q = q.outerjoin(self.connection.providesModel)
-        q = q.options(orm.contains_eager(self.connection.buildModel.buildset),
-                      orm.contains_eager(self.connection.buildModel.ref),
-                      orm.selectinload(self.connection.buildModel.provides),
-                      orm.selectinload(self.connection.buildModel.artifacts))
-        # If the query planner isn't able to reduce either the number
-        # of rows returned by the buildset or build tables, then it
-        # tends to produce a very slow query.  This hint produces
-        # better results, but only in those cases.  When we can narrow
-        # things down with indexes, it's better to omit the hint.
-        # job_name is a tricky one.  It is indexed, but if there are a
-        # lot of rows, it is better to include the hint, but if there
-        # are few, it is better to not include it.  We include the hint
-        # regardless of whether job_name is specified (optimizing for
-        # the more common case).
-        if not (project or change or uuid):
-            q = q.with_hint(build_table, 'USE INDEX (PRIMARY)', 'mysql')
-
-        if query_timeout:
-            # For MySQL, we can add a query hint directly.
-            q = q.prefix_with(
-                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
-                dialect='mysql')
-            # For Postgres, we add a comment that we parse in our
-            # event handler.
-            q = q.with_statement_hint(
-                f'/* statement_timeout={query_timeout} */',
-                dialect_name='postgresql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilterFuzzy(q, buildset_table.c.pipeline, pipeline)
@@ -254,10 +225,41 @@ class DatabaseSession(object):
             q = q.order_by(buildset_table.c.id.desc())
         else:
             q = q.order_by(build_table.c.id.desc())
-        q = q.limit(limit).offset(offset)
+
+        # contains_eager allows us to perform eager loading on the
+        # buildset *and* use that table in filters (unlike
+        # joinedload).
+        bq = self.session().query(self.connection.buildModel).\
+            join(self.connection.buildSetModel).\
+            join(self.connection.refModel).\
+            options(orm.contains_eager(self.connection.buildModel.buildset),
+                    orm.contains_eager(self.connection.buildModel.ref),
+                    orm.selectinload(self.connection.buildModel.provides),
+                    orm.selectinload(self.connection.buildModel.artifacts))
+
+        if query_timeout:
+            # For MySQL, we can add a query hint directly.
+            bq = bq.prefix_with(
+                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
+                dialect='mysql')
+            # For Postgres, we add a comment that we parse in our
+            # event handler.
+            bq = bq.with_statement_hint(
+                f'/* statement_timeout={query_timeout} */',
+                dialect_name='postgresql')
+
+        bq = bq.\
+            filter(self.connection.buildModel.id.in_(q))
+
+        if sort_by_buildset:
+            bq = bq.order_by(buildset_table.c.id.desc())
+        else:
+            bq = bq.order_by(build_table.c.id.desc())
+
+        bq = bq.limit(limit).offset(offset)
 
         try:
-            return q.all()
+            return bq.all()
         except sqlalchemy.orm.exc.NoResultFound:
             return []
 
@@ -306,25 +308,10 @@ class DatabaseSession(object):
         build_table = self.connection.zuul_build_table
         buildset_table = self.connection.zuul_buildset_table
 
-        # contains_eager allows us to perform eager loading on the
-        # buildset *and* use that table in filters (unlike
-        # joinedload).
-        q = self.session().query(self.connection.buildModel).\
+        q = self.session().query(self.connection.buildModel.id).\
+            distinct().\
             join(self.connection.buildSetModel).\
-            join(self.connection.refModel).\
-            options(orm.contains_eager(self.connection.buildModel.buildset),
-                    orm.contains_eager(self.connection.buildModel.ref))
-
-        if query_timeout:
-            # For MySQL, we can add a query hint directly.
-            q = q.prefix_with(
-                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
-                dialect='mysql')
-            # For Postgres, we add a comment that we parse in our
-            # event handler.
-            q = q.with_statement_hint(
-                f'/* statement_timeout={query_timeout} */',
-                dialect_name='postgresql')
+            join(self.connection.refModel)
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
@@ -345,11 +332,34 @@ class DatabaseSession(object):
         if result is None:
             q = q.filter(build_table.c.result != None)  # noqa
 
-        q = q.order_by(build_table.c.end_time.desc())
-        q = q.limit(limit).offset(offset)
+        # contains_eager allows us to perform eager loading on the
+        # buildset *and* use that table in filters (unlike
+        # joinedload).
+        bq = self.session().query(self.connection.buildModel).\
+            join(self.connection.buildSetModel).\
+            join(self.connection.refModel).\
+            options(orm.contains_eager(self.connection.buildModel.buildset),
+                    orm.contains_eager(self.connection.buildModel.ref))
+
+        if query_timeout:
+            # For MySQL, we can add a query hint directly.
+            bq = bq.prefix_with(
+                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
+                dialect='mysql')
+            # For Postgres, we add a comment that we parse in our
+            # event handler.
+            bq = bq.with_statement_hint(
+                f'/* statement_timeout={query_timeout} */',
+                dialect_name='postgresql')
+
+        bq = bq.\
+            filter(self.connection.buildModel.id.in_(q)).\
+            order_by(build_table.c.end_time.desc()).\
+            limit(limit).\
+            offset(offset)
 
         try:
-            return q.all()
+            return bq.all()
         except sqlalchemy.orm.exc.NoResultFound:
             return []
 
@@ -394,24 +404,10 @@ class DatabaseSession(object):
         buildset_table = self.connection.zuul_buildset_table
         ref_table = self.connection.zuul_ref_table
 
-        # See note above about the hint.
-        q = self.session().query(self.connection.buildSetModel).\
+        q = self.session().query(self.connection.buildSetModel.id).\
+            distinct().\
             join(self.connection.buildSetRefModel).\
-            join(self.connection.refModel).\
-            options(orm.contains_eager(self.connection.buildSetModel.refs))
-        if not (project or change or uuid):
-            q = q.with_hint(buildset_table, 'USE INDEX (PRIMARY)', 'mysql')
-
-        if query_timeout:
-            # For MySQL, we can add a query hint directly.
-            q = q.prefix_with(
-                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
-                dialect='mysql')
-            # For Postgres, we add a comment that we parse in our
-            # event handler.
-            q = q.with_statement_hint(
-                f'/* statement_timeout={query_timeout} */',
-                dialect_name='postgresql')
+            join(self.connection.refModel)
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilterFuzzy(q, buildset_table.c.pipeline, pipeline)
@@ -435,13 +431,32 @@ class DatabaseSession(object):
 
         if updated_max:
             q = q.filter(buildset_table.c.updated < updated_max)
+        q = q.order_by(buildset_table.c.id.desc())
 
-        q = q.order_by(buildset_table.c.id.desc()).\
+        bq = self.session().query(self.connection.buildSetModel).\
+            join(self.connection.buildSetRefModel).\
+            join(self.connection.refModel).\
+            options(orm.contains_eager(self.connection.buildSetModel.refs))
+
+        if query_timeout:
+            # For MySQL, we can add a query hint directly.
+            bq = bq.prefix_with(
+                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
+                dialect='mysql')
+            # For Postgres, we add a comment that we parse in our
+            # event handler.
+            bq = bq.with_statement_hint(
+                f'/* statement_timeout={query_timeout} */',
+                dialect_name='postgresql')
+
+        bq = bq.\
+            filter(self.connection.buildSetModel.id.in_(q)).\
+            order_by(buildset_table.c.id.desc()).\
             limit(limit).\
             offset(offset)
 
         try:
-            return q.all()
+            return bq.all()
         except sqlalchemy.orm.exc.NoResultFound:
             return []
 
