@@ -381,6 +381,44 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.data["status"], "MERGED")
         self.assertEqual(C.data["status"], "MERGED")
 
+    def test_dependency_on_merged_cycle(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        B = self.fake_gerrit.addFakeChange("org/project1", "master", "B")
+        C = self.fake_gerrit.addFakeChange("org/project2", "master", "C")
+
+        # A -> B -> C -> B (via commit-depends)
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, C.data["url"]
+        )
+        C.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            C.subject, B.data["url"]
+        )
+
+        # Start jobs for A while B + C are still open so they get
+        # enqueued as a non-live item ahead of A.
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Fake merge of change B + C while those changes are
+        # still part of a non-live item as dependency for A.
+        B.setMerged()
+        C.setMerged()
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.fake_gerrit.addEvent(C.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name="project-job", result="SUCCESS", changes="3,1 2,1 1,1"),
+        ], ordered=False)
+
     def test_dependent_change_on_cycle(self):
         self.executor_server.hold_jobs_in_build = True
 
