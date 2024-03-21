@@ -1633,11 +1633,18 @@ class PipelineManager(metaclass=ABCMeta):
         # Verify that the cycle dependency graph is correct
         cycle = self.cycleForChange(
             item.changes[0], dependency_graph, item.event, debug=False)
-        cycle = cycle or [item.changes[0]]
+        cycle = set(cycle or [item.changes[0]])
         item_cycle = set(item.changes)
-        if set(cycle) != item_cycle:
+        # We don't consider merged dependencies when building the
+        # dependency graph, so we need to ignore differences resulting
+        # from changes that have been merged in the meantime.  Put any
+        # missing merged changes back in the cycle for comparison
+        # purposes.
+        merged_changes = set(c for c in (item_cycle - cycle) if c.is_merged)
+        cycle |= merged_changes
+        if cycle != item_cycle:
             log.info("Item cycle has changed: %s, now: %s, was: %s", item,
-                     set(cycle), item_cycle)
+                     cycle, item_cycle)
             self.removeItem(item)
             if item.live:
                 self.reEnqueueChanges(item, item.changes)
