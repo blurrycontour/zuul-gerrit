@@ -18,6 +18,7 @@ import { Link } from 'react-router-dom'
 import {
   Label,
   Progress,
+  ProgressMeasureLocation,
   ProgressVariant,
   Tooltip,
 } from '@patternfly/react-core'
@@ -351,10 +352,10 @@ function JobProgressBar({ job, elapsedTime, remainingTime }) {
   return (
     <Progress
       aria-label={`${job.name}-progress`}
-      className={progressPercent === 0 ? 'zuul-animated-progress' : 'zuul-progress'}
+      className={progressPercent === 0 ? 'zuul-progress-animated' : 'zuul-progress'}
       variant={job.pre_fail ? ProgressVariant.danger : ''}
       value={progressPercent}
-      // measureLocation={ProgressMeasureLocation.inside}
+      measureLocation={ProgressMeasureLocation.inside}
       label={remainingTimeStr}
       valueText={remainingTimeStr}
     />
