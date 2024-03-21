@@ -307,6 +307,7 @@ class BubblewrapDriver(Driver, WrapperInterface):
                      '/etc/alternatives',
                      '/etc/ssl/certs',
                      '/etc/subuid',
+                     '/etc/containers',
                      ]:
             if os.path.exists(path):
                 bwrap_command.extend(['--ro-bind', path, path])
