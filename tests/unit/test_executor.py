@@ -490,6 +490,42 @@ class TestExecutorRepos(ZuulTestCase, ExecutorReposMixin):
         ]
         self.assertBuildStates(states, projects)
 
+    def test_repo_state_file(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        build = self.getBuildByName('project-merge')
+        path = os.path.join(build.jobdir.log_root, 'workspace-repos.json')
+        with open(path, 'r') as f:
+            data = json.load(f)
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # Don't check the timestamp, but verify it exists
+        self.assertIsNotNone(data['merge_ops'][1].pop('timestamp', None))
+        self.assertEqual(
+            data['merge_ops'],
+            [{'cmd': ['git', 'fetch', 'origin', 'refs/changes/01/1/1'],
+              'path': 'review.example.com/org/project1'},
+             {'cmd': ['git',
+                      'merge',
+                      '-m',
+                      "Merge 'refs/changes/01/1/1'",
+                      '-s',
+                      'resolve',
+                      'FETCH_HEAD'],
+              'path': 'review.example.com/org/project1'},
+             {'cmd': ['git', 'checkout', 'master'],
+              'path': 'review.example.com/org/project1'}])
+        self.assertEqual(
+            set(data['repo_state']['review.example.com/org/project1'].keys()),
+            {'refs/heads/master', 'refs/remotes/origin/master',
+             'refs/tags/init'})
+
 
 class TestExecutorRepoRoles(ZuulTestCase, ExecutorReposMixin):
     tenant_config_file = 'config/executor-repos/main.yaml'
