@@ -15,25 +15,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { IconProperty, formatTime } from '../../Misc'
 import { connect } from 'react-redux'
 
 import {
-  Grid,
-  GridItem,
   Popover,
 } from '@patternfly/react-core'
-import {
-  OutlinedClockIcon,
-  StopwatchIcon,
-} from '@patternfly/react-icons'
 
 import {
   calculateQueueItemTimes,
   ChangeLink,
-  QueueItemProgressbar,
   getRefs
 } from './Misc'
+
+import QueueItemProgress from './QueueItemProgress'
 
 function QueueItemPopover({ item, triggerElement, tenant }) {
   // TODO (felix): Move the triggerElement to be used as children
@@ -41,32 +35,9 @@ function QueueItemPopover({ item, triggerElement, tenant }) {
   // a little nicer.
   const times = calculateQueueItemTimes(item)
 
-  let remainingTime = 'unknown'
-  if (times.remaining !== null) {
-    remainingTime = formatTime(times.remaining)
-  }
-
-  const formatEnqueueTime = (ms) => {
-    let hours = 60 * 60 * 1000
-    let now = Date.now()
-    let delta = now - ms
-    let text = formatTime(delta)
-    let color = 'var(--pf-global--success-color--100)'
-
-    // TODO (felix): Those color "thresholds" are currently the same for
-    // each job. Maybe we could define those based on the average job
-    // run time (which would be the remaining time, right?).
-    if (delta > (4 * hours)) {
-      color = 'var(--pf-global--danger-color--100)'
-    } else if (delta > (2 * hours)) {
-      color = 'var(--pf-global--warning-color--100)'
-    }
-
-    return <span style={{ color: color }}>{text}</span>
-  }
-
   return (
     <Popover
+      className="zuul-queue-item-popover"
       aria-label="QueueItem Popover"
       headerContent={
         getRefs(item).map((change, idx) => (
@@ -76,24 +47,7 @@ function QueueItemPopover({ item, triggerElement, tenant }) {
         ))
       }
       bodyContent={
-        <Grid hasGutter>
-          <GridItem span={12}>
-            <QueueItemProgressbar item={item} />
-          </GridItem>
-          <GridItem span={6}>
-            {/* TODO (felix): Show the remaining time behind the
-                progress bar like PF4 is doing:
-                https://v4-archive.patternfly.org/v4/components/progress#outside
-
-                This would also be achieved by converting the
-                QueueItemProgressbar to use a PF4 Progress component.
-              */}
-            <IconProperty icon={<StopwatchIcon />} value={`${remainingTime}`} />
-          </GridItem>
-          <GridItem span={6}>
-            <IconProperty icon={<OutlinedClockIcon />} value={formatEnqueueTime(item.enqueue_time)} />
-          </GridItem>
-        </Grid>
+        <QueueItemProgress item={item} times={times} />
       }
       footerContent={
         <Link to={tenant.linkPrefix + '/status/change/' + getRefs(item)[0].id}>Show details</Link>
