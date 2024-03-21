@@ -314,11 +314,34 @@ a.refresh {
     border-radius: 3px;
 }
 
+.zuul-job-result-label.pf-c-label .pf-c-label__content {
+    width: 100%;
+    display: block;
+    text-align: center;
+}
+
+/* Remove grid gap for job progress bars to align them with the
+   width of the result labels. */
+.pf-c-progress.zuul-progress,
+.pf-c-progress.zuul-progress-animated {
+    --pf-c-progress--GridGap: 0;
+}
+
+/* Make job progress bars the same width as the job result labels */
 .zuul-progress div.pf-c-progress__bar {
     width: 100px;
 }
 
-.zuul-animated-progress div.pf-c-progress__bar {
+.zuul-progress .pf-c-progress__indicator,
+.zuul-progress-animated .pf-c-progress__indicator {
+    border-radius: 3px;
+}
+
+.zuul-progress-animated div.pf-c-progress__bar::before {
+    border-radius: 3px;
+}
+
+.zuul-progress-animated div.pf-c-progress__bar {
     width: 100px;
     background-image: linear-gradient(
         -45deg,
