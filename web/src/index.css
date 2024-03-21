@@ -191,6 +191,15 @@ a.refresh {
     cursor: default;
 }
 
+.pf-c-popover.zuul-queue-item-popover .pf-c-popover__content h6 {
+    margin-bottom: 0;
+    margin-top: 5px;
+}
+
+.pf-c-popover.zuul-queue-item-popover .pf-c-popover__footer {
+    margin-top: 8px;
+}
+
 /* Override PF4 padding values on compact cards to make them even more
    compact. */
 .pf-c-card.zuul-compact-card .pf-c-card__header {
