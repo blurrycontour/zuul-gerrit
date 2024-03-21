@@ -1,4 +1,5 @@
 # Copyright (c) 2019 Red Hat, Inc.
+# Copyright (c) 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +19,19 @@ FROM docker.io/library/node:16-bookworm as js-builder
 COPY web /tmp/src
 # Explicitly run the Javascript build
 RUN cd /tmp/src && yarn install -d && yarn build
+
+# We need skopeo >=v1.14.0 to negotioate with newer docker; once this
+# is available in debian we can drop the custom build.
+FROM golang:1.22-bookworm as go-builder
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get -y install libgpgme-dev libassuan-dev \
+                       libbtrfs-dev libdevmapper-dev pkg-config && \
+    git clone https://github.com/containers/skopeo /go/src/github.com/containers/skopeo &&\
+    cd /go/src/github.com/containers/skopeo && \
+    git checkout v1.15.0 && \
+    make bin/skopeo
 
 FROM docker.io/opendevorg/python-builder:3.11-bookworm as builder
 ENV DEBIAN_FRONTEND=noninteractive
@@ -68,14 +82,10 @@ FROM zuul as zuul-executor
 ENV DEBIAN_FRONTEND=noninteractive
 COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
 COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
+COPY --from=go-builder /go/src/github.com/containers/skopeo/bin/skopeo /usr/local/bin/skopeo
 # The oc and kubectl binaries are large and have the same hash.
 # Copy them only once and use a symlink to save space.
 RUN ln -s /usr/local/bin/oc /usr/local/bin/kubectl
-
-RUN apt-get update \
-  && apt-get install -y skopeo \
-  && apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
 
 CMD ["/usr/local/bin/zuul-executor", "-f"]
 
