@@ -1552,6 +1552,7 @@ class AnsibleJob(object):
         zuul_resources = self.prepareNodes(args)  # set self.host_list
         self.prepareVars(args, zuul_resources)   # set self.original_hostvars
         self.writeDebugInventory()
+        self.writeRepoStateFile(repos)
 
         # Early abort if abort requested
         if self.aborted:
@@ -1593,6 +1594,35 @@ class AnsibleJob(object):
         # TODO do we want to log the secret data here?
         self.log.debug("Sending result: %s", result_data)
         self.executor_server.completeBuild(self.build_request, result_data)
+
+    def writeRepoStateFile(self, repos):
+        # Write out the git operation performed up to this point
+        repo_state_file = os.path.join(self.jobdir.log_root,
+                                       'workspace-repos.json')
+        # First make a connection+project_name -> path mapping
+        workspace_paths = {}
+        for project in self.arguments['projects']:
+            repo = repos.get(project['canonical_name'])
+            if repo:
+                workspace_paths[(project['connection'], project['name'])] =\
+                    repo.workspace_project_path
+        repo_state = {}
+        for connection_name, connection_value in self.repo_state.items():
+            for project_name, project_value in connection_value.items():
+                # We may have data in self.repo_state for repos that
+                # are not present in the work dir (ie, they are used
+                # for roles).  To keep things simple for now, we will
+                # omit that, but we could add them later.
+                workspace_project_path = workspace_paths.get(
+                    (connection_name, project_name))
+                if workspace_project_path:
+                    repo_state[workspace_project_path] = project_value
+        repo_state_data = dict(
+            repo_state=repo_state,
+            merge_ops=[o.toDict() for o in self.merge_ops],
+        )
+        with open(repo_state_file, 'w') as f:
+            json.dump(repo_state_data, f, sort_keys=True, indent=2)
 
     def getResultData(self):
         data = {}
