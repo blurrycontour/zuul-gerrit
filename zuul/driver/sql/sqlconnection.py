@@ -394,24 +394,12 @@ class DatabaseSession(object):
         buildset_table = self.connection.zuul_buildset_table
         ref_table = self.connection.zuul_ref_table
 
-        # See note above about the hint.
-        q = self.session().query(self.connection.buildSetModel).\
+        q = self.session().query(self.connection.buildSetModel.id).\
             join(self.connection.buildSetRefModel).\
-            join(self.connection.refModel).\
-            options(orm.contains_eager(self.connection.buildSetModel.refs))
+            join(self.connection.refModel)
+
         if not (project or change or uuid):
             q = q.with_hint(buildset_table, 'USE INDEX (PRIMARY)', 'mysql')
-
-        if query_timeout:
-            # For MySQL, we can add a query hint directly.
-            q = q.prefix_with(
-                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
-                dialect='mysql')
-            # For Postgres, we add a comment that we parse in our
-            # event handler.
-            q = q.with_statement_hint(
-                f'/* statement_timeout={query_timeout} */',
-                dialect_name='postgresql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilterFuzzy(q, buildset_table.c.pipeline, pipeline)
@@ -435,13 +423,36 @@ class DatabaseSession(object):
 
         if updated_max:
             q = q.filter(buildset_table.c.updated < updated_max)
+        q = q.order_by(buildset_table.c.id.desc())
 
-        q = q.order_by(buildset_table.c.id.desc()).\
+        # See note above about the hint.
+        bq = self.session().query(self.connection.buildSetModel).\
+            join(self.connection.buildSetRefModel).\
+            join(self.connection.refModel).\
+            options(orm.contains_eager(self.connection.buildSetModel.refs))
+
+        if not (project or change or uuid):
+            bq = bq.with_hint(buildset_table, 'USE INDEX (PRIMARY)', 'mysql')
+
+        if query_timeout:
+            # For MySQL, we can add a query hint directly.
+            bq = bq.prefix_with(
+                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
+                dialect='mysql')
+            # For Postgres, we add a comment that we parse in our
+            # event handler.
+            bq = bq.with_statement_hint(
+                f'/* statement_timeout={query_timeout} */',
+                dialect_name='postgresql')
+
+        bq = bq.\
+            filter(self.connection.buildSetModel.id.in_(q)).\
+            order_by(buildset_table.c.id.desc()).\
             limit(limit).\
             offset(offset)
 
         try:
-            return q.all()
+            return bq.all()
         except sqlalchemy.orm.exc.NoResultFound:
             return []
 
