@@ -50,6 +50,23 @@
       "message": "Two problems with this:\n1) It adds an extra 30 seconds to the unit test run\n2) It isn\u0027t actually enough to ensure we don\u0027t race when we run this in the gate.  You\u0027d be amazed how long python can go without switching context when the system is heavily loaded running the full test suite.\n\nSo instead, I think you should remove the pause, and replace it with a check for a flag file.  See test_early_failure for a reference.",
       "revId": "39041de24eaaef55e9ef51b2810dd55f3d9eb93f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a621bbad_1145f9a1",
+        "filename": "tests/fixtures/config/pre-post-fail/git/common-config/zuul.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-22T18:00:02Z",
+      "side": 1,
+      "message": "Oh, forgot to mention, you could add \"attempts: 2\" here and shave even more time off the test and drop 3 lines from the test assertions since it will run 3 fewer jobs.  Test is equally valid.",
+      "revId": "39041de24eaaef55e9ef51b2810dd55f3d9eb93f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
