@@ -16,6 +16,24 @@
       "message": "Is this needed? I\u0027m also not sure if we should send merger ops via the merge completed event.",
       "revId": "eb64430866e4bdf310bdb50be870b631a5178d8d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d0a2ba5_bb2deb44",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6782,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-22T13:31:14Z",
+      "side": 1,
+      "message": "Nope, it\u0027s left over, and I agree we should not.  It\u0027s much more efficient to just get them from the executor.",
+      "parentUuid": "de1e0b1c_4e8524ff",
+      "revId": "eb64430866e4bdf310bdb50be870b631a5178d8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
