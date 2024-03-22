@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b30f518f_67c0cdc4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 30491
+      },
+      "writtenOn": "2024-03-22T07:05:40Z",
+      "side": 1,
+      "message": "Awkward skopeo has so many deps on C libs. :/",
+      "revId": "179fa02ed0aa85f30cf4da8d23585bfee93270d7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
