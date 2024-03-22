@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de1e0b1c_4e8524ff",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6782,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-03-22T08:47:30Z",
+      "side": 1,
+      "message": "Is this needed? I\u0027m also not sure if we should send merger ops via the merge completed event.",
+      "revId": "eb64430866e4bdf310bdb50be870b631a5178d8d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
