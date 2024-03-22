@@ -69,6 +69,42 @@
       "parentUuid": "3dc6335e_6b141452",
       "revId": "7dab084d0d298f64d1f066f07678fe3182c4e080",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89e0ebb2_738bc205",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-03-22T19:15:19Z",
+      "side": 1,
+      "message": "I am not sure to understand, someone may already infect an existing zuul_console daemon to stream fake output. And I thought such vars could not be set by the user (without adding a new host).\n\nSo we need to ensure this setting only applies to newly added hosts, assuming this is possible, could we support this setup to make zuul_stream works for hosts that are only reachable through a ssh tunnel?",
+      "parentUuid": "fbaaa642_e256b2f0",
+      "revId": "7dab084d0d298f64d1f066f07678fe3182c4e080",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9919a3a2_f52609d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-03-22T19:15:19Z",
+      "side": 1,
+      "message": "Oh right, we would need a secure channel to send such info from ansible to the executor process, which we presently don\u0027t have.",
+      "parentUuid": "68bff5ed_382802ef",
+      "revId": "7dab084d0d298f64d1f066f07678fe3182c4e080",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
