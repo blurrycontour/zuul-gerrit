@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83490a4f_cbbbccca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-22T17:15:24Z",
+      "side": 1,
+      "message": "The reasoning behind this update to the change makes a lot of sense to me. I\u0027m not approving because quay is currently having a major outage so we probably want to wait for that to resolve otherwise we will just spin our wheels.",
+      "revId": "632839804ca46b6d7c971d97e0f2aba35a3bbf29",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
