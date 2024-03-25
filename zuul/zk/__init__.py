@@ -16,7 +16,7 @@ from configparser import ConfigParser
 from threading import Thread
 from typing import List, Callable
 
-from kazoo.client import KazooClient
+import kazoo.client
 from kazoo.exceptions import NoNodeError, NodeExistsError
 from kazoo.handlers.threading import KazooTimeoutError
 from kazoo.protocol.states import KazooState
@@ -24,6 +24,10 @@ from kazoo.protocol.states import KazooState
 from zuul.lib.config import get_default
 from zuul.zk.exceptions import NoClientException
 from zuul.zk.handler import PoolSequentialThreadingHandler
+from zuul.zk.vendor.client import ZuulKazooClient
+from zuul.zk.vendor.connection import ZuulConnectionHandler
+
+kazoo.client.ConnectionHandler = ZuulConnectionHandler
 
 
 class ZooKeeperClient(object):
@@ -140,7 +144,7 @@ class ZooKeeperClient(object):
                 args['keyfile'] = self.tls_key
                 args['certfile'] = self.tls_cert
                 args['ca'] = self.tls_ca
-            self.client = KazooClient(**args)
+            self.client = ZuulKazooClient(**args)
             self.client.add_listener(self._connectionListener)
             # Manually retry initial connection attempt
             while True:
@@ -251,7 +255,7 @@ class ZooKeeperSimpleBase(metaclass=ABCMeta):
         self.client = client
 
     @property
-    def kazoo_client(self) -> KazooClient:
+    def kazoo_client(self) -> ZuulKazooClient:
         if not self.client.client:
             raise NoClientException()
         return self.client.client
