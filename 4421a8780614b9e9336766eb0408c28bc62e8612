@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5eda1a1_2ceca6d7",
+        "filename": "tests/fixtures/config/ansible-unreachable/git/org_project/playbooks/post.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-25T17:04:47Z",
+      "side": 1,
+      "message": "I know that this appears to run in testing just fine, but doesn\u0027t a task like this need to be delegated to localhost because you\u0027re attempting to run something on a remote node that is unreachable? Or does debug always run on localhost?",
+      "revId": "4421a8780614b9e9336766eb0408c28bc62e8612",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8654640_120f8bab",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3024,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-25T17:04:47Z",
+      "side": 1,
+      "message": "Note this filename change appears to have happened in the past and this change is merely correcting the comment.",
+      "range": {
+        "startLine": 3024,
+        "startChar": 27,
+        "endLine": 3024,
+        "endChar": 44
+      },
+      "revId": "4421a8780614b9e9336766eb0408c28bc62e8612",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
