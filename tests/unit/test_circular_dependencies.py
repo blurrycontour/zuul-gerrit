@@ -4074,8 +4074,10 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_github.openFakePullRequest("gh/project", "master", "A")
         B = self.fake_github.openFakePullRequest("gh/project1", "master", "B")
+        C = self.fake_github.openFakePullRequest("gh/project1", "master", "B")
         A.addReview('derp', 'APPROVED')
         B.addReview('derp', 'APPROVED')
+        C.addReview('derp', 'APPROVED')
         B.addLabel("approved")
 
         # A <-> B
@@ -4087,6 +4089,10 @@ class TestGithubCircularDependencies(ZuulTestCase):
         )
 
         self.fake_github.emitEvent(A.addLabel("approved"))
+        self.waitUntilSettled()
+        # Put an indepedente change behind this pair to test that it
+        # gets reset.
+        self.fake_github.emitEvent(C.addLabel("approved"))
         self.waitUntilSettled()
 
         # Change draft status of A so it can no longer merge. Note that we
@@ -4103,6 +4109,7 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.assertEqual(len(B.comments), 2)
         self.assertFalse(A.is_merged)
         self.assertFalse(B.is_merged)
+        self.assertTrue(C.is_merged)
 
         self.assertIn("failed to merge",
                       A.comments[-1])
@@ -4121,6 +4128,24 @@ class TestGithubCircularDependencies(ZuulTestCase):
                       B.comments[-1]))
         self.assertFalse(re.search('Change .*? is needed',
                                    B.comments[-1]))
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS",
+                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
+            dict(name="project-job", result="SUCCESS",
+                 changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}"),
+            dict(name="project1-job", result="SUCCESS",
+                 changes=(f"{B.number},{B.head_sha} {A.number},{A.head_sha} "
+                          f"{C.number},{C.head_sha}")),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes=(f"{B.number},{B.head_sha} {A.number},{A.head_sha} "
+                          f"{C.number},{C.head_sha}")),
+            dict(name="project1-job", result="SUCCESS",
+                 changes=f"{C.number},{C.head_sha}"),
+            dict(name="project-vars-job", result="SUCCESS",
+                 changes=f"{C.number},{C.head_sha}"),
+        ], ordered=False)
 
     def test_dependency_refresh(self):
         # Test that when two changes are put into a cycle, the
