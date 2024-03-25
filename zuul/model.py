@@ -20,7 +20,6 @@ import json
 import hashlib
 import logging
 import math
-import os
 from functools import partial, total_ordering
 import threading
 
@@ -6176,8 +6175,18 @@ class Ref(object):
             short_name=self.project.name.split('/')[-1],
             canonical_hostname=self.project.canonical_hostname,
             canonical_name=self.project.canonical_name,
-            src_dir=os.path.join('src', self.project.canonical_name),
         )
+        d['change_url'] = self.url
+
+        commit_id = None
+        if self.oldrev and self.oldrev != '0' * 40:
+            d['oldrev'] = self.oldrev
+            commit_id = self.oldrev
+        if self.newrev and self.newrev != '0' * 40:
+            d['newrev'] = self.newrev
+            commit_id = self.newrev
+        if commit_id:
+            d['commit_id'] = commit_id
         return d
 
 
@@ -6209,6 +6218,12 @@ class Tag(Ref):
         super(Tag, self).__init__(project)
         self.tag = None
         self.containing_branches = []
+
+    def toDict(self):
+        # Render to a dict to use in passing json to the executor
+        d = super(Tag, self).toDict()
+        d["tag"] = self.tag
+        return d
 
     def serialize(self):
         d = super().serialize()
@@ -6388,9 +6403,13 @@ class Change(Branch):
     def toDict(self):
         # Render to a dict to use in passing json to the executor
         d = super(Change, self).toDict()
+        d.pop('oldrev', None)
+        d.pop('newrev', None)
         d['change'] = str(self.number)
-        d['change_url'] = self.url
         d['patchset'] = str(self.patchset)
+        d['commit_id'] = self.commit_id
+        d['change_message'] = self.message
+        d['topic'] = self.topic
         return d
 
 

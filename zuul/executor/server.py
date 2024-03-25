@@ -2619,6 +2619,14 @@ class AnsibleJob(object):
         if 'change_message' in zuul_vars:
             zuul_vars['change_message'] = yaml.mark_strings_unsafe(
                 zuul_vars['change_message'])
+        for item in zuul_vars['items']:
+            if 'change_message' in item:
+                item['change_message'] = yaml.mark_strings_unsafe(
+                    item['change_message'])
+        for ref in zuul_vars.get('buildset_refs', []):
+            if 'change_message' in ref:
+                ref['change_message'] = yaml.mark_strings_unsafe(
+                    ref['change_message'])
 
         with open(self.jobdir.zuul_vars, 'w') as zuul_vars_yaml:
             zuul_vars_yaml.write(

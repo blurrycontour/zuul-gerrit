@@ -1237,6 +1237,16 @@ class TestWeb(BaseTestWeb):
                 'buildset': None,
                 'branch': 'master',
                 'ref': None,
+                'buildset_refs': [
+                    {'branch': 'master',
+                     'change_url': None,
+                     'project': {
+                         'canonical_hostname': 'review.example.com',
+                         'canonical_name':
+                         'review.example.com/org/project1',
+                         'name': 'org/project1',
+                         'short_name': 'project1'},
+                     'src_dir': 'src/review.example.com/org/project1'}],
                 'pipeline': 'check',
                 'post_review': False,
                 'job': 'project-test1',
@@ -1318,6 +1328,17 @@ class TestWeb(BaseTestWeb):
                     'src_dir': 'src/review.example.com/org/noop-project'},
                 'projects': {},
                 'ref': None,
+                'buildset_refs': [
+                    {'branch': 'master',
+                     'change_url': None,
+                     'project': {
+                         'canonical_hostname': 'review.example.com',
+                         'canonical_name':
+                         'review.example.com/org/noop-project',
+                         'name': 'org/noop-project',
+                         'short_name': 'noop-project'},
+                     'src_dir':
+                     'src/review.example.com/org/noop-project'}],
                 'tenant': 'tenant-one',
                 'timeout': None,
                 'voting': True}}
