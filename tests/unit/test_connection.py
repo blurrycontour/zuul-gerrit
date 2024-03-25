@@ -78,6 +78,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
         artifact_table = table_prefix + 'zuul_artifact'
         provides_table = table_prefix + 'zuul_provides'
         build_event_table = table_prefix + 'zuul_build_event'
+        buildset_event_table = table_prefix + 'zuul_buildset_event'
 
         self.assertEqual(9, len(insp.get_columns(ref_table)))
         self.assertEqual(11, len(insp.get_columns(buildset_table)))
@@ -86,6 +87,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
         self.assertEqual(5, len(insp.get_columns(artifact_table)))
         self.assertEqual(3, len(insp.get_columns(provides_table)))
         self.assertEqual(5, len(insp.get_columns(build_event_table)))
+        self.assertEqual(5, len(insp.get_columns(buildset_event_table)))
 
     def test_sql_tables_created(self):
         "Test the tables for storing results are created properly"
@@ -105,6 +107,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
         artifact_table = table_prefix + 'zuul_artifact'
         provides_table = table_prefix + 'zuul_provides'
         build_event_table = table_prefix + 'zuul_build_event'
+        buildset_event_table = table_prefix + 'zuul_buildset_event'
 
         indexes_ref = insp.get_indexes(ref_table)
         indexes_buildset = insp.get_indexes(buildset_table)
@@ -113,6 +116,7 @@ class TestSQLConnectionMysql(ZuulTestCase):
         indexes_artifact = insp.get_indexes(artifact_table)
         indexes_provides = insp.get_indexes(provides_table)
         indexes_build_event = insp.get_indexes(build_event_table)
+        indexes_buildset_event = insp.get_indexes(buildset_event_table)
 
         self.assertEqual(8, len(indexes_ref))
         self.assertEqual(2, len(indexes_buildset))
@@ -121,12 +125,13 @@ class TestSQLConnectionMysql(ZuulTestCase):
         self.assertEqual(1, len(indexes_artifact))
         self.assertEqual(1, len(indexes_provides))
         self.assertEqual(1, len(indexes_build_event))
+        self.assertEqual(1, len(indexes_buildset_event))
 
         # check if all indexes are prefixed
         if table_prefix:
             indexes = (indexes_ref + indexes_buildset + indexes_buildset_ref +
                        indexes_build + indexes_artifact + indexes_provides +
-                       indexes_build_event)
+                       indexes_build_event + indexes_buildset_event)
             for index in indexes:
                 self.assertTrue(index['name'].startswith(table_prefix))
 
@@ -353,6 +358,8 @@ class TestSQLConnectionMysql(ZuulTestCase):
                 f"delete from {self.expected_table_prefix}zuul_buildset_ref;"))
             result = conn.execute(sa.text(
                 f"delete from {self.expected_table_prefix}zuul_build;"))
+            result = conn.execute(sa.text(
+                f"delete from {self.expected_table_prefix}zuul_buildset_event;"))
             result = conn.execute(sa.text(
                 f"delete from {self.expected_table_prefix}zuul_buildset;"))
             result = conn.execute(sa.text("commit;"))
