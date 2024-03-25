@@ -75,6 +75,14 @@ class SQLReporter(BaseReporter):
                 branch=getattr(change, 'branch', ''),
             )
             db_buildset.refs.append(ref)
+        event_change = item.getEventChange()
+        if event_change:
+            db_buildset.createBuildSetEvent(
+                event_time=datetime.datetime.fromtimestamp(
+                    item.event.timestamp, tz=datetime.timezone.utc),
+                event_type='triggered',
+                description=f'Triggered by {event_change.toString()}',
+            )
         return db_buildset
 
     def reportBuildsetStart(self, buildset):

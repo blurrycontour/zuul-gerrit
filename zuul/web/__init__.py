@@ -296,10 +296,31 @@ class BuildConverter:
         return ret
 
 
+class BuildsetEventConverter:
+    # A class to encapsulate the conversion of database BuildsetEvent
+    # objects to API output.
+    def toDict(event):
+        event_time = _datetimeToString(event.event_time)
+        ret = {
+            'event_time': event_time,
+            'event_type': event.event_type,
+            'description': event.description,
+        }
+        return ret
+
+    def schema(builds=False):
+        ret = {
+            'event_time': str,
+            'event_type': str,
+            'description': str,
+        }
+        return Prop('The buildset event', ret)
+
+
 class BuildsetConverter:
     # A class to encapsulate the conversion of database Buildset
     # objects to API output.
-    def toDict(buildset, builds=[]):
+    def toDict(buildset, builds=None, events=None):
         event_timestamp = _datetimeToString(buildset.event_timestamp)
         start = _datetimeToString(buildset.first_build_start_time)
         end = _datetimeToString(buildset.last_build_end_time)
@@ -319,12 +340,12 @@ class BuildsetConverter:
             ],
         }
         if builds:
-            ret['builds'] = []
-        for build in builds:
-            ret['builds'].append(BuildConverter.toDict(build))
+            ret['builds'] = [BuildConverter.toDict(b) for b in builds]
+        if events:
+            ret['events'] = [BuildsetEventConverter.toDict(e) for e in events]
         return ret
 
-    def schema(builds=False):
+    def schema(builds=False, events=False):
         ret = {
             '_id': str,
             'uuid': str,
@@ -341,6 +362,8 @@ class BuildsetConverter:
         }
         if builds:
             ret['builds'] = [BuildConverter.schema()]
+        if events:
+            ret['events'] = [BuildsetEventConverter.schema()]
         return Prop('The buildset', ret)
 
 
@@ -1974,7 +1997,8 @@ class ZuulWebAPI(object):
         code=200,
         content_type='application/json',
         description='Returns the list of buildsets',
-        schema=Prop('The list of buildsets', [BuildsetConverter.schema()]),
+        schema=Prop('The list of buildsets', [BuildsetConverter.schema(
+            builds=True, events=True)]),
     )
     @openapi_response(404, 'Tenant not found')
     def buildsets(self, tenant_name, tenant, auth, project=None,
@@ -2007,13 +2031,21 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi_response(
+        code=200,
+        content_type='application/json',
+        description='Returns a buildset',
+        schema=BuildsetConverter.schema(),
+    )
+    @openapi_response(404, 'Tenant not found')
     def buildset(self, tenant_name, tenant, auth, uuid):
         connection = self._get_connection()
 
         data = connection.getBuildset(tenant_name, uuid)
         if not data:
             raise cherrypy.HTTPError(404, "Buildset not found")
-        data = BuildsetConverter.toDict(data, data.builds)
+        data = BuildsetConverter.toDict(data, data.builds,
+                                        data.buildset_events)
         return data
 
     @cherrypy.expose
