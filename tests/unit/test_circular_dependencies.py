@@ -16,6 +16,7 @@
 
 import re
 import textwrap
+import json
 
 from zuul.model import PromoteEvent
 
@@ -4301,6 +4302,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         for item in pipeline.getAllItems():
             cycle = {c.number for c in item.changes}
             self.assertEqual(expected_cycle, cycle)
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '3')
 
         # Now we remove the dependency on E.  This re-enqueues ABC and E.
 
@@ -4329,6 +4332,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.assertEqual(len(list(pipeline.getAllItems())), 3)
         for item in pipeline.getAllItems():
             self.assertEqual(len(item.changes), 1)
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '3')
 
         # Remove the first change from the queue by forcing a
         # dependency on D.
@@ -4340,6 +4345,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.assertEqual(len(list(pipeline.getAllItems())), 2)
         for item in pipeline.getAllItems():
             self.assertEqual(len(item.changes), 1)
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '3')
 
         # B and C are still in the queue.  Put them
         # back into a bundle.
@@ -4358,6 +4365,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         for item in pipeline.getAllItems():
             cycle = {c.number for c in item.changes}
             self.assertEqual(expected_cycle, cycle)
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '3')
 
         # All done.
         self.executor_server.hold_jobs_in_build = False
@@ -4390,6 +4399,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.assertEqual(len(list(pipeline.getAllItems())), 1)
         for item in pipeline.getAllItems():
             self.assertEqual(len(item.changes), 1)
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '1')
 
         B.body = "{}\n\nDepends-On: {}\n".format(
             B.subject, A.url
@@ -4407,6 +4418,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         for item in pipeline.getAllItems():
             cycle = {c.number for c in item.changes}
             self.assertEqual(expected_cycle, cycle)
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '1')
 
         # All done.
         self.executor_server.hold_jobs_in_build = False
@@ -4469,6 +4482,9 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         abce = [A, B, C, E]
         self.assertEqual(len(pipeline.queues), 1)
         self.assertQueueCycles(pipeline, 0, [abce])
+        for item in pipeline.getAllItems():
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '3')
 
         # Now we remove the dependency on E.
 
@@ -4482,6 +4498,9 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         abc = [A, B, C]
         # ABC<nonlive>, E<live>
         self.assertQueueCycles(pipeline, 0, [abc, [E]])
+        for item in pipeline.getAllItems():
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '3')
 
         # Now remove all dependencies for the three remaining changes.
         A.body = A.subject
@@ -4500,6 +4519,9 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.assertQueueCycles(pipeline, 0, [[A], [B]])
         self.assertQueueCycles(pipeline, 1, [[A], [B], [C]])
         self.assertQueueCycles(pipeline, 2, [[A]])
+        for item in pipeline.getAllItems():
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '3')
 
         # Verify that we can put B and C into a bundle.
         C.body = "{}\n\nDepends-On: {}\n".format(
@@ -4507,11 +4529,17 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         )
         self.fake_github.emitEvent(C.getPullRequestEditedEvent(C.body))
         self.waitUntilSettled()
+        for item in pipeline.getAllItems():
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '3')
         B.body = "{}\n\nDepends-On: {}\n".format(
             B.subject, C.url
         )
         self.fake_github.emitEvent(B.getPullRequestEditedEvent(B.body))
         self.waitUntilSettled()
+        for item in pipeline.getAllItems():
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '3')
         self.assertEqual(len(pipeline.queues), 2)
         bc = [B, C]
         self.assertQueueCycles(pipeline, 0, [[A]])
@@ -4546,6 +4574,8 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.assertEqual(len(list(pipeline.getAllItems())), 1)
         for item in pipeline.getAllItems():
             self.assertEqual(len(item.changes), 1)
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '1')
 
         B.body = "{}\n\nDepends-On: {}\n".format(
             B.subject, A.url
@@ -4559,6 +4589,10 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.fake_github.emitEvent(A.getPullRequestEditedEvent(A.body))
         self.waitUntilSettled()
         self.assertEqual(len(list(pipeline.getAllItems())), 1)
+        for item in pipeline.getAllItems():
+            self.assertEqual(len(item.changes), 2)
+            # Assert we get the same triggering change every time
+            self.assertEqual(json.loads(item.event.ref)['stable_id'], '1')
         self.assertEqual(len(pipeline.queues), 1)
         ab = [A, B]
         self.assertQueueCycles(pipeline, 0, [ab])

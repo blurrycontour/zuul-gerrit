@@ -489,11 +489,15 @@ class PipelineManager(metaclass=ABCMeta):
 
     def reEnqueueChanges(self, item, changes):
         for change in changes:
+            orig_ref = None
+            if item.event:
+                orig_ref = item.event.ref
             event = EnqueueEvent(self.pipeline.tenant.name,
                                  self.pipeline.name,
                                  change.project.canonical_hostname,
                                  change.project.name,
-                                 change=change._id())
+                                 change=change._id(),
+                                 orig_ref=orig_ref)
             event.zuul_event_id = item.event.zuul_event_id
             self.sched.pipeline_management_events[
                 self.pipeline.tenant.name][self.pipeline.name].put(event)
