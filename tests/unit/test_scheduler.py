@@ -6804,6 +6804,21 @@ class TestChangeQueues(ZuulTestCase):
         known upfront and the queues are pre-seeded.
         """
         self._test_dependent_queues_per_branch('org/project')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.queue.'
+            'integrated.branch.master.current_changes',
+            value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.queue.'
+            'integrated.branch.master.window',
+            value='20', kind='g')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.queue.'
+            'integrated.branch.master.resident_time', kind='ms')
+        self.assertReportedStat(
+            'zuul.tenant.tenant-one.pipeline.gate.queue.'
+            'integrated.branch.master.total_changes', value='1',
+            kind='c')
 
     def test_dependent_queues_per_branch_no_config(self):
         """
