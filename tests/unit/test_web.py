@@ -2040,6 +2040,12 @@ class TestBuildInfo(BaseTestWeb):
             "api/tenant/tenant-one/buildset/%s" % project_bs['uuid']).json()
         self.assertEqual(3, len(buildset["builds"]))
 
+        print(buildset["events"])
+        self.assertEqual(1, len(buildset["events"]))
+        self.assertEqual('triggered', buildset["events"][0]['event_type'])
+        self.assertEqual('Triggered by GerritChange org/project 1,1',
+                         buildset["events"][0]['description'])
+
         project_test1_build = [x for x in buildset["builds"]
                                if x["job_name"] == "project-test1"][0]
         self.assertEqual('SUCCESS', project_test1_build['result'])
