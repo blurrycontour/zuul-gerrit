@@ -236,6 +236,8 @@ class AnsibleManager:
         result = False
         try:
             extra_packages = self._getAnsible(version).extra_packages
+            if not extra_packages:
+                return True
 
             # Formerly this used pkg_resources which has been deprecated. If
             # there is a better way to accomplish this task please change
@@ -248,19 +250,21 @@ class AnsibleManager:
             command += extra_packages
             ret = subprocess.run(command,
                                  stdout=subprocess.PIPE,
-                                 stderr=subprocess.STDOUT)
-            to_be_installed = json.loads(ret.stdout)["install"]
+                                 stderr=subprocess.PIPE)
+            if ret.stdout:
+                to_be_installed = json.loads(ret.stdout)["install"]
+            else:
+                to_be_installed = None
             # We check manually so that we can log the missing packages
             # properly. We also need to check the the JSON output to determine
             # if any changes were necessary.
             if to_be_installed:
-                self.log.error(
-                    'Ansible version %s installation is missing packages' %
-                    version)
                 missing = ["%s %s" %
                            (x["metadata"]["name"], x["metadata"]["version"])
                            for x in to_be_installed]
-                self.log.debug("These packages are missing: %s", missing)
+                self.log.error(
+                    'Ansible version %s installation is missing packages %s',
+                    version, missing)
             else:
                 result = True
         except Exception:
