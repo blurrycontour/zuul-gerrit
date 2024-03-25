@@ -18,15 +18,14 @@
 import json
 
 from importlib import metadata as importlib_metadata
-import pkg_resources
 
-release_string = importlib_metadata.distribution('zuul').version
+zuul_distribution = importlib_metadata.distribution('zuul')
+release_string = zuul_distribution.version
 
 is_release = None
 git_version = None
 try:
-    _metadata = json.loads(
-        pkg_resources.get_distribution('zuul').get_metadata('pbr.json'))
+    _metadata = json.loads(zuul_distribution.read_text('pbr.json'))
     if _metadata:
         is_release = _metadata['is_release']
         git_version = _metadata['git_version']
