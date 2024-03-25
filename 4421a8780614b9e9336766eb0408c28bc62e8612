@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f15deb6_2dcbc150",
+        "filename": "tests/fixtures/config/ansible-unreachable/git/org_project/playbooks/post.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-25T17:09:04Z",
+      "side": 1,
+      "message": "Yep, debug is an action plugin that runs locally.",
+      "parentUuid": "b5eda1a1_2ceca6d7",
+      "revId": "4421a8780614b9e9336766eb0408c28bc62e8612",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8654640_120f8bab",
