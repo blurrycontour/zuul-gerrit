@@ -46,7 +46,8 @@ class TestMysqlDatabase(DBBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        f = MySQLSchemaFixture()
+        f = MySQLSchemaFixture(self.id(), self.random_databases,
+                               self.delete_databases)
         self.useFixture(f)
 
         config = dict(dburi=f.dburi)
@@ -433,7 +434,8 @@ class TestPostgresqlDatabase(DBBaseTestCase):
     def setUp(self):
         super().setUp()
 
-        f = PostgresqlSchemaFixture()
+        f = PostgresqlSchemaFixture(self.id(), self.random_databases,
+                                    self.delete_databases)
         self.useFixture(f)
         self.db = f
 
