@@ -1005,6 +1005,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
 
     def stop(self):
         for build in self.running_builds:
+            build.aborted = True
             build.release()
         super(RecordingExecutorServer, self).stop()
 
@@ -1312,7 +1313,7 @@ class FakeNodepool(object):
 
 
 class ChrootedKazooFixture(fixtures.Fixture):
-    def __init__(self, test_id):
+    def __init__(self, test_id, random_databases, delete_databases):
         super(ChrootedKazooFixture, self).__init__()
 
         if 'ZOOKEEPER_2181_TCP' in os.environ:
@@ -1358,22 +1359,28 @@ class ChrootedKazooFixture(fixtures.Fixture):
             self.zookeeper_port = int(port)
 
         self.test_id = test_id
+        self.random_databases = random_databases
+        self.delete_databases = delete_databases
 
     def _setUp(self):
-        # Make sure the test chroot paths do not conflict
-        random_bits = ''.join(random.choice(string.ascii_lowercase +
-                                            string.ascii_uppercase)
-                              for x in range(8))
+        if self.random_databases:
+            # Make sure the test chroot paths do not conflict
+            random_bits = ''.join(random.choice(string.ascii_lowercase +
+                                                string.ascii_uppercase)
+                                  for x in range(8))
 
-        rand_test_path = '%s_%s_%s' % (random_bits, os.getpid(), self.test_id)
-        self.zookeeper_chroot = f"/test/{rand_test_path}"
+            test_path = '%s_%s_%s' % (random_bits, os.getpid(), self.test_id)
+        else:
+            test_path = self.test_id.split('.')[-1]
+        self.zookeeper_chroot = f"/test/{test_path}"
 
         self.zk_hosts = '%s:%s%s' % (
             self.zookeeper_host,
             self.zookeeper_port,
             self.zookeeper_chroot)
 
-        self.addCleanup(self._cleanup)
+        if self.delete_databases:
+            self.addCleanup(self._cleanup)
 
         # Ensure the chroot path exists and clean up any pre-existing znodes.
         _tmp_client = kazoo.client.KazooClient(
@@ -1385,8 +1392,9 @@ class ChrootedKazooFixture(fixtures.Fixture):
         )
         _tmp_client.start()
 
-        if _tmp_client.exists(self.zookeeper_chroot):
-            _tmp_client.delete(self.zookeeper_chroot, recursive=True)
+        if self.random_databases:
+            if _tmp_client.exists(self.zookeeper_chroot):
+                _tmp_client.delete(self.zookeeper_chroot, recursive=True)
 
         _tmp_client.ensure_path(self.zookeeper_chroot)
         _tmp_client.stop()
@@ -1494,14 +1502,27 @@ class ZuulWebFixture(fixtures.Fixture):
 
 
 class MySQLSchemaFixture(fixtures.Fixture):
-    def setUp(self):
-        super(MySQLSchemaFixture, self).setUp()
+    log = logging.getLogger('zuul.test.MySQLSchemaFixture')
 
-        random_bits = ''.join(random.choice(string.ascii_lowercase +
-                                            string.ascii_uppercase)
-                              for x in range(8))
-        self.name = '%s_%s' % (random_bits, os.getpid())
-        self.passwd = uuid.uuid4().hex
+    def __init__(self, test_id, random_databases, delete_databases):
+        super().__init__()
+        self.test_id = test_id
+        self.random_databases = random_databases
+        self.delete_databases = delete_databases
+
+    def setUp(self):
+        super().setUp()
+
+        if self.random_databases:
+            random_bits = ''.join(random.choice(string.ascii_lowercase +
+                                                string.ascii_uppercase)
+                                  for x in range(8))
+            self.name = '%s_%s' % (random_bits, os.getpid())
+            self.passwd = uuid.uuid4().hex
+        else:
+            self.name = self.test_id.split('.')[-1]
+            self.passwd = self.name
+        self.log.debug("Creating database %s", self.name)
         self.host = os.environ.get('ZUUL_MYSQL_HOST', '127.0.0.1')
         self.port = int(os.environ.get('ZUUL_MYSQL_PORT', 3306))
         db = pymysql.connect(host=self.host,
@@ -1518,6 +1539,12 @@ class MySQLSchemaFixture(fixtures.Fixture):
                 cur.execute("grant all on {name}.* to '{name}'@''".format(
                     name=self.name))
                 cur.execute("flush privileges")
+        except pymysql.err.ProgrammingError as e:
+            if e.args[0] == 1007:
+                # Database exists
+                pass
+            else:
+                raise
         finally:
             db.close()
 
@@ -1529,9 +1556,11 @@ class MySQLSchemaFixture(fixtures.Fixture):
                 port=self.port
             )
         self.addDetail('dburi', testtools.content.text_content(self.dburi))
-        self.addCleanup(self.cleanup)
+        if self.delete_databases:
+            self.addCleanup(self.cleanup)
 
     def cleanup(self):
+        self.log.debug("Deleting database %s", self.name)
         db = pymysql.connect(host=self.host,
                              port=self.port,
                              user="openstack_citest",
@@ -1548,14 +1577,23 @@ class MySQLSchemaFixture(fixtures.Fixture):
 
 
 class PostgresqlSchemaFixture(fixtures.Fixture):
-    def setUp(self):
-        super(PostgresqlSchemaFixture, self).setUp()
+    def __init__(self, test_id, random_databases, delete_databases):
+        super().__init__()
+        self.test_id = test_id
+        self.random_databases = random_databases
+        self.delete_databases = delete_databases
 
-        # Postgres lowercases user and table names during creation but not
-        # during authentication. Thus only use lowercase chars.
-        random_bits = ''.join(random.choice(string.ascii_lowercase)
+    def setUp(self):
+        super().setUp()
+
+        if self.random_databases:
+            # Postgres lowercases user and table names during creation but not
+            # during authentication. Thus only use lowercase chars.
+            random_bits = ''.join(random.choice(string.ascii_lowercase)
                               for x in range(8))
-        self.name = '%s_%s' % (random_bits, os.getpid())
+            self.name = '%s_%s' % (random_bits, os.getpid())
+        else:
+            self.name = self.test_id.split('.')[-1]
         self.passwd = uuid.uuid4().hex
         self.host = os.environ.get('ZUUL_POSTGRES_HOST', '127.0.0.1')
         db = psycopg2.connect(host=self.host,
@@ -1573,7 +1611,8 @@ class PostgresqlSchemaFixture(fixtures.Fixture):
             name=self.name, passwd=self.passwd, host=self.host)
 
         self.addDetail('dburi', testtools.content.text_content(self.dburi))
-        self.addCleanup(self.cleanup)
+        if self.delete_databases:
+            self.addCleanup(self.cleanup)
 
     def cleanup(self):
         db = psycopg2.connect(host=self.host,
@@ -1628,6 +1667,11 @@ def cpu_times(self):
 class BaseTestCase(testtools.TestCase):
     log = logging.getLogger("zuul.test")
     wait_timeout = 90
+    # These can be unset to use predictable database fixtures that
+    # persist across an upgrade functional test run.
+    random_databases = True
+    delete_databases = True
+    use_tmpdir = True
 
     def attachLogs(self, *args):
         def reader():
@@ -1737,8 +1781,10 @@ class BaseTestCase(testtools.TestCase):
 
     def setupZK(self):
         self.zk_chroot_fixture = self.useFixture(
-            ChrootedKazooFixture(self.id())
-        )
+            ChrootedKazooFixture(self.id(),
+                                 self.random_databases,
+                                 self.delete_databases,
+                                 ))
 
     def getZKWatches(self):
         # TODO: The client.command method used here returns only the
@@ -2055,13 +2101,16 @@ class ZuulTestCase(BaseTestCase):
         self.setupZK()
         self.fake_nodepool = FakeNodepool(self.zk_chroot_fixture)
 
-        if not KEEP_TEMPDIRS:
-            tmp_root = self.useFixture(fixtures.TempDir(
-                rootdir=os.environ.get("ZUUL_TEST_ROOT"))
-            ).path
+        if self.use_tmpdir:
+            if not KEEP_TEMPDIRS:
+                tmp_root = self.useFixture(fixtures.TempDir(
+                    rootdir=os.environ.get("ZUUL_TEST_ROOT"))
+                                           ).path
+            else:
+                tmp_root = tempfile.mkdtemp(
+                    dir=os.environ.get("ZUUL_TEST_ROOT", None))
         else:
-            tmp_root = tempfile.mkdtemp(
-                dir=os.environ.get("ZUUL_TEST_ROOT", None))
+            tmp_root = os.environ.get("ZUUL_TEST_ROOT", '/tmp')
         self.test_root = os.path.join(tmp_root, "zuul-test")
         self.upstream_root = os.path.join(self.test_root, "upstream")
         self.merger_src_root = os.path.join(self.test_root, "merger-git")
@@ -2071,14 +2120,14 @@ class ZuulTestCase(BaseTestCase):
         self.executor_state_root = os.path.join(self.test_root, "executor-lib")
         self.jobdir_root = os.path.join(self.test_root, "builds")
 
-        if os.path.exists(self.test_root):
+        if os.path.exists(self.test_root) and self.init_repos:
             shutil.rmtree(self.test_root)
-        os.makedirs(self.test_root)
-        os.makedirs(self.upstream_root)
-        os.makedirs(self.state_root)
-        os.makedirs(self.merger_state_root)
-        os.makedirs(self.executor_state_root)
-        os.makedirs(self.jobdir_root)
+        os.makedirs(self.test_root, exist_ok=True)
+        os.makedirs(self.upstream_root, exist_ok=True)
+        os.makedirs(self.state_root, exist_ok=True)
+        os.makedirs(self.merger_state_root, exist_ok=True)
+        os.makedirs(self.executor_state_root, exist_ok=True)
+        os.makedirs(self.jobdir_root, exist_ok=True)
 
         # Make per test copy of Configuration.
         self.config = self.setup_config(self.config_file)
@@ -2139,6 +2188,8 @@ class ZuulTestCase(BaseTestCase):
         gerritconnection.GerritEventConnector.delay = 0.0
 
         self.changes = FakeChangeDB()
+        if self.load_change_db:
+            self.loadChangeDB()
 
         self.additional_event_queues = []
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
@@ -2272,12 +2323,12 @@ class ZuulTestCase(BaseTestCase):
         def _setup_fixture(config, section_name):
             if (config.get(section_name, 'dburi') ==
                     '$MYSQL_FIXTURE_DBURI$'):
-                f = MySQLSchemaFixture()
+                f = MySQLSchemaFixture(self.id(), self.random_databases, self.delete_databases)
                 self.useFixture(f)
                 config.set(section_name, 'dburi', f.dburi)
             elif (config.get(section_name, 'dburi') ==
                   '$POSTGRESQL_FIXTURE_DBURI$'):
-                f = PostgresqlSchemaFixture()
+                f = PostgresqlSchemaFixture(self.id(), self.random_databases, self.delete_databases)
                 self.useFixture(f)
                 config.set(section_name, 'dburi', f.dburi)
 
@@ -2314,15 +2365,16 @@ class ZuulTestCase(BaseTestCase):
                         config.remove_option('scheduler', cfg_attr)
 
             if tenant_config:
-                git_path = os.path.join(
-                    os.path.dirname(
-                        os.path.join(FIXTURE_DIR, tenant_config)),
-                    'git')
-                if os.path.exists(git_path):
-                    for reponame in os.listdir(git_path):
-                        project = reponame.replace('_', '/')
-                        self.copyDirToRepo(project,
-                                           os.path.join(git_path, reponame))
+                if self.init_repos:
+                    git_path = os.path.join(
+                        os.path.dirname(
+                            os.path.join(FIXTURE_DIR, tenant_config)),
+                        'git')
+                    if os.path.exists(git_path):
+                        for reponame in os.listdir(git_path):
+                            project = reponame.replace('_', '/')
+                            self.copyDirToRepo(project,
+                                               os.path.join(git_path, reponame))
         # Make test_root persist after ansible run for .flag test
         config.set('executor', 'trusted_rw_paths', self.test_root)
 
@@ -2354,10 +2406,11 @@ class ZuulTestCase(BaseTestCase):
                 if name.startswith('^'):
                     continue
                 untrusted_projects.append(name)
-                self.init_repo(name)
-                self.addCommitToRepo(name, 'initial commit',
-                                     files={'README': ''},
-                                     branch='master', tag='init')
+                if self.init_repos:
+                    self.init_repo(name)
+                    self.addCommitToRepo(name, 'initial commit',
+                                         files={'README': ''},
+                                         branch='master', tag='init')
             if 'job' in item:
                 if 'run' in item['job']:
                     files['%s' % item['job']['run']] = ''
@@ -2384,9 +2437,10 @@ class ZuulTestCase(BaseTestCase):
         config.set('scheduler', 'tenant_config',
                    os.path.join(FIXTURE_DIR, f.name))
 
-        self.init_repo('org/common-config')
-        self.addCommitToRepo('org/common-config', 'add content from fixture',
-                             files, branch='master', tag='init')
+        if self.init_repos:
+            self.init_repo('org/common-config')
+            self.addCommitToRepo('org/common-config', 'add content from fixture',
+                                 files, branch='master', tag='init')
 
         return True
 
