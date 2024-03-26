@@ -97,6 +97,17 @@
       python_version: "3.11"
 
 - job:
+    name: zuul-nox-upgrade
+    parent: zuul-nox
+    run: playbooks/zuul-upgrade/run.yaml
+    failure-output:
+      # This matches stestr output when a test fails
+      # {1} tests.unit.test_blah [5.743446s] ... FAILED
+      - '\{\d+\} (.*?) \[[\d\.]+s\] \.\.\. FAILED'
+    vars:
+      nox_session: upgrade
+
+- job:
     # Zuul cient uses this job so we can't just delete it yet.
     name: zuul-tox-zuul-client
     parent: zuul-nox
@@ -375,6 +386,7 @@
         - zuul-nox-py311
         - zuul-nox-py311-multi-scheduler
         - zuul-nox-py312
+        - zuul-nox-upgrade
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
@@ -409,6 +421,7 @@
             nodeset: ubuntu-jammy
         - zuul-nox-py311
         - zuul-nox-py312
+        - zuul-nox-upgrade
         - zuul-build-dashboard
         - nodejs-run-lint:
             vars:
