@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a3f866a_0a2cb611",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2024-03-26T18:18:05Z",
+      "side": 1,
+      "message": "@Blair, Not sure what is going on with python 3.12. I can\u0027t reproduce. Was this job just added recently?",
+      "revId": "434a49eadd9edb16dc1f6b3f42ce1be97a02fea6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

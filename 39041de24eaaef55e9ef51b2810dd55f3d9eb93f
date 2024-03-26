@@ -52,6 +52,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0876422_dff88c1f",
+        "filename": "tests/fixtures/config/pre-post-fail/git/common-config/playbooks/post-fail.yaml",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2024-03-26T18:18:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aad5f482_708a1e29",
+      "revId": "39041de24eaaef55e9ef51b2810dd55f3d9eb93f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "a621bbad_1145f9a1",
