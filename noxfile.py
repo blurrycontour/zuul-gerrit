@@ -97,6 +97,23 @@ def tests(session):
 
 
 @nox.session(python='3')
+def upgrade(session):
+    set_standard_env_vars(session)
+    session.install('-r', 'requirements.txt',
+                    '-r', 'test-requirements.txt')
+    session.install('-e', '.')
+    session.run_always('zuul-manage-ansible', '-v')
+    procs = max(int(multiprocessing.cpu_count() * 0.75), 1)
+    session.run('stestr', 'run', '--test-path', './tests/upgrade',
+                '--slowest', f'--concurrency={procs}',
+                *session.posargs)
+    # Output the test log to stdout so we have a copy of even the
+    # successful output.  We capture and output instead of just
+    # streaming it so that it's not interleaved.
+    session.run('stestr', 'last', '--all-attachments')
+
+
+@nox.session(python='3')
 def remote(session):
     set_standard_env_vars(session)
     session.install('-r', 'requirements.txt',
