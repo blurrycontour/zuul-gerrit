@@ -36,9 +36,10 @@ from zuul.merger.merger import Repo
 from zuul.model import MergeRequest, EnqueueEvent, DequeueEvent
 from zuul.zk.change_cache import ChangeKey
 
+from tests.util import random_sha1
 from tests.base import (AnsibleZuulTestCase, BaseTestCase,
                         ZuulGithubAppTestCase, ZuulTestCase,
-                        simple_layout, random_sha1, iterate_timeout)
+                        simple_layout, iterate_timeout)
 from tests.base import ZuulWebFixture
 
 EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {}, -1)

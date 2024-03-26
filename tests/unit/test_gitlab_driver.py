@@ -23,8 +23,13 @@ import time
 from zuul.lib import strings
 from zuul.zk.layout import LayoutState
 
-from tests.base import random_sha1, simple_layout, skipIfMultiScheduler
-from tests.base import ZuulTestCase, ZuulWebFixture
+from tests.base import (
+    ZuulTestCase,
+    ZuulWebFixture,
+    simple_layout,
+    skipIfMultiScheduler,
+)
+from tests.util import random_sha1
 
 from testtools.matchers import MatchesRegex
 
