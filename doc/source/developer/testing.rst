@@ -14,7 +14,7 @@ the environment being simulated in the test:
 .. autoclass:: tests.base.ZuulTestCase
    :members:
 
-.. autoclass:: tests.base.FakeGerritConnection
+.. autoclass:: tests.fakegerrit.FakeGerritConnection
    :members:
    :inherited-members:
 

@@ -13,24 +13,452 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import functools
-import urllib
+
 from collections import defaultdict
-
 import datetime
-
-import github3.exceptions
+import functools
+import json
+import logging
+import os
 import re
 import time
-
-import graphene
-from requests import HTTPError
-from requests.structures import CaseInsensitiveDict
+import urllib
+import uuid
+import string
+import random
 
 from tests.fake_graphql import FakeGithubQuery
-from zuul.driver.github.githubconnection import utc
+import zuul.driver.github.githubconnection as githubconnection
+from zuul.driver.github.githubconnection import utc, GithubClientManager
+from tests.util import random_sha1
+
+import git
+import github3.exceptions
+import graphene
+import requests
+from requests.structures import CaseInsensitiveDict
+import requests_mock
 
 FAKE_BASE_URL = 'https://example.com/api/v3/'
+
+
+class GithubChangeReference(git.Reference):
+    _common_path_default = "refs/pull"
+    _points_to_commits_only = True
+
+
+class FakeGithubPullRequest(object):
+
+    def __init__(self, github, number, project, branch,
+                 subject, upstream_root, files=None, number_of_commits=1,
+                 writers=[], body=None, body_text=None, draft=False,
+                 mergeable=True, base_sha=None):
+        """Creates a new PR with several commits.
+        Sends an event about opened PR.
+
+        If the `files` argument is provided it must be a dictionary of
+        file names OR FakeFile instances -> content.
+        """
+        self.github = github
+        self.source = github
+        self.number = number
+        self.project = project
+        self.branch = branch
+        self.subject = subject
+        self.body = body
+        self.body_text = body_text
+        self.draft = draft
+        self.mergeable = mergeable
+        self.number_of_commits = 0
+        self.upstream_root = upstream_root
+        # Dictionary of FakeFile -> content
+        self.files = {}
+        self.comments = []
+        self.labels = []
+        self.statuses = {}
+        self.reviews = []
+        self.writers = []
+        self.admins = []
+        self.updated_at = None
+        self.head_sha = None
+        self.is_merged = False
+        self.merge_message = None
+        self.state = 'open'
+        self.url = 'https://%s/%s/pull/%s' % (github.server, project, number)
+        self.base_sha = base_sha
+        self.pr_ref = self._createPRRef(base_sha=base_sha)
+        self._addCommitToRepo(files=files)
+        self._updateTimeStamp()
+
+    def addCommit(self, files=None, delete_files=None):
+        """Adds a commit on top of the actual PR head."""
+        self._addCommitToRepo(files=files, delete_files=delete_files)
+        self._updateTimeStamp()
+
+    def forcePush(self, files=None):
+        """Clears actual commits and add a commit on top of the base."""
+        self._addCommitToRepo(files=files, reset=True)
+        self._updateTimeStamp()
+
+    def getPullRequestOpenedEvent(self):
+        return self._getPullRequestEvent('opened')
+
+    def getPullRequestSynchronizeEvent(self):
+        return self._getPullRequestEvent('synchronize')
+
+    def getPullRequestReopenedEvent(self):
+        return self._getPullRequestEvent('reopened')
+
+    def getPullRequestClosedEvent(self):
+        return self._getPullRequestEvent('closed')
+
+    def getPullRequestEditedEvent(self, old_body=None):
+        return self._getPullRequestEvent('edited', old_body)
+
+    def addComment(self, message):
+        self.comments.append(message)
+        self._updateTimeStamp()
+
+    def getIssueCommentAddedEvent(self, text):
+        name = 'issue_comment'
+        data = {
+            'action': 'created',
+            'issue': {
+                'number': self.number
+            },
+            'comment': {
+                'body': text
+            },
+            'repository': {
+                'full_name': self.project
+            },
+            'sender': {
+                'login': 'ghuser'
+            }
+        }
+        return (name, data)
+
+    def getCommentAddedEvent(self, text):
+        name, data = self.getIssueCommentAddedEvent(text)
+        # A PR comment has an additional 'pull_request' key in the issue data
+        data['issue']['pull_request'] = {
+            'url': 'http://%s/api/v3/repos/%s/pull/%s' % (
+                self.github.server, self.project, self.number)
+        }
+        return (name, data)
+
+    def getReviewAddedEvent(self, review):
+        name = 'pull_request_review'
+        data = {
+            'action': 'submitted',
+            'pull_request': {
+                'number': self.number,
+                'title': self.subject,
+                'updated_at': self.updated_at,
+                'base': {
+                    'ref': self.branch,
+                    'repo': {
+                        'full_name': self.project
+                    }
+                },
+                'head': {
+                    'sha': self.head_sha
+                }
+            },
+            'review': {
+                'state': review
+            },
+            'repository': {
+                'full_name': self.project
+            },
+            'sender': {
+                'login': 'ghuser'
+            }
+        }
+        return (name, data)
+
+    def addLabel(self, name):
+        if name not in self.labels:
+            self.labels.append(name)
+            self._updateTimeStamp()
+            return self._getLabelEvent(name)
+
+    def removeLabel(self, name):
+        if name in self.labels:
+            self.labels.remove(name)
+            self._updateTimeStamp()
+            return self._getUnlabelEvent(name)
+
+    def _getLabelEvent(self, label):
+        name = 'pull_request'
+        data = {
+            'action': 'labeled',
+            'pull_request': {
+                'number': self.number,
+                'updated_at': self.updated_at,
+                'base': {
+                    'ref': self.branch,
+                    'repo': {
+                        'full_name': self.project
+                    }
+                },
+                'head': {
+                    'sha': self.head_sha
+                }
+            },
+            'label': {
+                'name': label
+            },
+            'sender': {
+                'login': 'ghuser'
+            }
+        }
+        return (name, data)
+
+    def _getUnlabelEvent(self, label):
+        name = 'pull_request'
+        data = {
+            'action': 'unlabeled',
+            'pull_request': {
+                'number': self.number,
+                'title': self.subject,
+                'updated_at': self.updated_at,
+                'base': {
+                    'ref': self.branch,
+                    'repo': {
+                        'full_name': self.project
+                    }
+                },
+                'head': {
+                    'sha': self.head_sha,
+                    'repo': {
+                        'full_name': self.project
+                    }
+                }
+            },
+            'label': {
+                'name': label
+            },
+            'sender': {
+                'login': 'ghuser'
+            }
+        }
+        return (name, data)
+
+    def editBody(self, body):
+        old_body = self.body
+        self.body = body
+        self._updateTimeStamp()
+        return self.getPullRequestEditedEvent(old_body=old_body)
+
+    def _getRepo(self):
+        repo_path = os.path.join(self.upstream_root, self.project)
+        return git.Repo(repo_path)
+
+    def _createPRRef(self, base_sha=None):
+        base_sha = base_sha or 'refs/tags/init'
+        repo = self._getRepo()
+        return GithubChangeReference.create(
+            repo, self.getPRReference(), base_sha)
+
+    def _addCommitToRepo(self, files=None, delete_files=None, reset=False):
+        repo = self._getRepo()
+        ref = repo.references[self.getPRReference()]
+        if reset:
+            self.number_of_commits = 0
+            ref.set_object('refs/tags/init')
+        self.number_of_commits += 1
+        repo.head.reference = ref
+        repo.head.reset(working_tree=True)
+        repo.git.clean('-x', '-f', '-d')
+
+        if files:
+            # Normalize the dictionary of 'Union[str,FakeFile] -> content'
+            # to 'FakeFile -> content'.
+            normalized_files = {}
+            for fn, content in files.items():
+                if isinstance(fn, FakeFile):
+                    normalized_files[fn] = content
+                else:
+                    normalized_files[FakeFile(fn)] = content
+            self.files.update(normalized_files)
+        elif not delete_files:
+            fn = '%s-%s' % (self.branch.replace('/', '_'), self.number)
+            content = f"test {self.branch} {self.number}\n"
+            self.files.update({FakeFile(fn): content})
+
+        msg = self.subject + '-' + str(self.number_of_commits)
+        for fake_file, content in self.files.items():
+            fn = os.path.join(repo.working_dir, fake_file.filename)
+            with open(fn, 'w') as f:
+                f.write(content)
+            repo.index.add([fn])
+
+        if delete_files:
+            for fn in delete_files:
+                if fn in self.files:
+                    del self.files[fn]
+                fn = os.path.join(repo.working_dir, fn)
+                repo.index.remove([fn])
+
+        self.head_sha = repo.index.commit(msg).hexsha
+        repo.create_head(self.getPRReference(), self.head_sha, force=True)
+        self.pr_ref.set_commit(self.head_sha)
+        # Create an empty set of statuses for the given sha,
+        # each sha on a PR may have a status set on it
+        self.statuses[self.head_sha] = []
+        repo.head.reference = 'master'
+        repo.head.reset(working_tree=True)
+        repo.git.clean('-x', '-f', '-d')
+        repo.heads['master'].checkout()
+
+    def _updateTimeStamp(self):
+        self.updated_at = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.localtime())
+
+    def getPRHeadSha(self):
+        repo = self._getRepo()
+        return repo.references[self.getPRReference()].commit.hexsha
+
+    def addReview(self, user, state, granted_on=None):
+        gh_time_format = '%Y-%m-%dT%H:%M:%SZ'
+        # convert the timestamp to a str format that would be returned
+        # from github as 'submitted_at' in the API response
+
+        if granted_on:
+            granted_on = datetime.datetime.utcfromtimestamp(granted_on)
+            submitted_at = time.strftime(
+                gh_time_format, granted_on.timetuple())
+        else:
+            # github timestamps only down to the second, so we need to make
+            # sure reviews that tests add appear to be added over a period of
+            # time in the past and not all at once.
+            if not self.reviews:
+                # the first review happens 10 mins ago
+                offset = 600
+            else:
+                # subsequent reviews happen 1 minute closer to now
+                offset = 600 - (len(self.reviews) * 60)
+
+            granted_on = datetime.datetime.utcfromtimestamp(
+                time.time() - offset)
+            submitted_at = time.strftime(
+                gh_time_format, granted_on.timetuple())
+
+        self.reviews.append(FakeGHReview({
+            'state': state,
+            'user': {
+                'login': user,
+                'email': user + "@example.com",
+            },
+            'submitted_at': submitted_at,
+        }))
+
+    def getPRReference(self):
+        return '%s/head' % self.number
+
+    def _getPullRequestEvent(self, action, old_body=None):
+        name = 'pull_request'
+        data = {
+            'action': action,
+            'number': self.number,
+            'pull_request': {
+                'number': self.number,
+                'title': self.subject,
+                'updated_at': self.updated_at,
+                'base': {
+                    'ref': self.branch,
+                    'repo': {
+                        'full_name': self.project
+                    }
+                },
+                'head': {
+                    'sha': self.head_sha,
+                    'repo': {
+                        'full_name': self.project
+                    }
+                },
+                'body': self.body
+            },
+            'sender': {
+                'login': 'ghuser'
+            },
+            'repository': {
+                'full_name': self.project,
+            },
+            'installation': {
+                'id': 123,
+            },
+            'changes': {},
+            'labels': [{'name': l} for l in self.labels]
+        }
+        if old_body:
+            data['changes']['body'] = {'from': old_body}
+        return (name, data)
+
+    def getCommitStatusEvent(self, context, state='success', user='zuul'):
+        name = 'status'
+        data = {
+            'state': state,
+            'sha': self.head_sha,
+            'name': self.project,
+            'description': 'Test results for %s: %s' % (self.head_sha, state),
+            'target_url': 'http://zuul/%s' % self.head_sha,
+            'branches': [],
+            'context': context,
+            'sender': {
+                'login': user
+            }
+        }
+        return (name, data)
+
+    def getCheckRunRequestedEvent(self, cr_name, app="zuul"):
+        name = "check_run"
+        data = {
+            "action": "rerequested",
+            "check_run": {
+                "head_sha": self.head_sha,
+                "name": cr_name,
+                "app": {
+                    "slug": app,
+                },
+            },
+            "repository": {
+                "full_name": self.project,
+            },
+        }
+        return (name, data)
+
+    def getCheckRunAbortEvent(self, check_run):
+        # A check run aborted event can only be created from a FakeCheckRun as
+        # we need some information like external_id which is "calculated"
+        # during the creation of the check run.
+        name = "check_run"
+        data = {
+            "action": "requested_action",
+            "requested_action": {
+                "identifier": "abort",
+            },
+            "check_run": {
+                "head_sha": self.head_sha,
+                "name": check_run["name"],
+                "app": {
+                    "slug": check_run["app"]
+                },
+                "external_id": check_run["external_id"],
+            },
+            "repository": {
+                "full_name": self.project,
+            },
+        }
+
+        return (name, data)
+
+    def setMerged(self, commit_message):
+        self.is_merged = True
+        self.merge_message = commit_message
+
+        repo = self._getRepo()
+        repo.heads[self.branch].commit = repo.commit(self.head_sha)
 
 
 class FakeUser(object):
@@ -603,7 +1031,7 @@ class FakeResponse(object):
                 text = '{} {}'.format(self.status_code, self.data)
             else:
                 text = '{} {}'.format(self.status_code, self.status_message)
-            raise HTTPError(text, response=self)
+            raise requests.HTTPError(text, response=self)
 
 
 class FakeGithubSession(object):
@@ -920,3 +1348,288 @@ class FakeGithubEnterpriseClient(FakeGithubClient):
             'installed_version': self.version,
         }
         return data
+
+
+class FakeGithubClientManager(GithubClientManager):
+    github_class = FakeGithubClient
+    github_enterprise_class = FakeGithubEnterpriseClient
+
+    log = logging.getLogger("zuul.test.FakeGithubClientManager")
+
+    def __init__(self, connection_config):
+        super().__init__(connection_config)
+        self.record_clients = False
+        self.recorded_clients = []
+        self.github_data = None
+
+    def getGithubClient(self,
+                        project_name=None,
+                        zuul_event_id=None):
+        client = super().getGithubClient(
+            project_name=project_name,
+            zuul_event_id=zuul_event_id)
+
+        # Some tests expect the installation id as part of the
+        if self.app_id:
+            inst_id = self.installation_map.get(project_name)
+            client.setInstId(inst_id)
+
+        # The super method creates a fake github client with empty data so
+        # add it here.
+        client.setData(self.github_data)
+
+        if self.record_clients:
+            self.recorded_clients.append(client)
+        return client
+
+    def _prime_installation_map(self):
+        # Only valid if installed as a github app
+        if not self.app_id:
+            return
+
+        # github_data.repos is a hash like
+        # { ('org', 'project1'): <dataobj>
+        #   ('org', 'project2'): <dataobj>,
+        #   ('org2', 'project1'): <dataobj>, ... }
+        #
+        # we don't care about the value. index by org, e.g.
+        #
+        #  {
+        #    'org': ('project1', 'project2')
+        #    'org2': ('project1', 'project2')
+        #  }
+        orgs = defaultdict(list)
+        project_id = 1
+        for org, project in self.github_data.repos:
+            # Each entry is in the format for "repositories" response
+            # of GET /installation/repositories
+            orgs[org].append({
+                'id': project_id,
+                'name': project,
+                'full_name': '%s/%s' % (org, project)
+                # note, lots of other stuff that's not relevant
+            })
+            project_id += 1
+
+        self.log.debug("GitHub installation mapped to: %s" % orgs)
+
+        # Mock response to GET /app/installations
+        app_json = []
+        app_projects = []
+        app_id = 1
+
+        # Ensure that we ignore suspended apps
+        app_json.append(
+            {
+                'id': app_id,
+                'suspended_at': '2021-09-23T01:43:44Z',
+                'suspended_by': {
+                    'login': 'ianw',
+                    'type': 'User',
+                    'id': 12345
+                }
+            })
+        app_projects.append([])
+        app_id += 1
+
+        for org, projects in orgs.items():
+            # We respond as if each org is a different app instance
+            #
+            # Below we will be sent the app_id in a token to query
+            # what projects this app exports.  Keep the projects in a
+            # sequential list so we can just look up "projects for app
+            # X" == app_projects[X]
+            app_projects.append(projects)
+            app_json.append(
+                {
+                    'id': app_id,
+                    # Acutally none of this matters, and there's lots
+                    # more in a real response.  Padded out just for
+                    # example sake.
+                    'account': {
+                        'login': org,
+                        'id': 1234,
+                        'type': 'User',
+                    },
+                    'permissions': {
+                        'checks': 'write',
+                        'metadata': 'read',
+                        'contents': 'read'
+                    },
+                    'events': ['push',
+                               'pull_request'
+                               ],
+                    'suspended_at': None,
+                    'suspended_by': None,
+                }
+            )
+            app_id += 1
+
+        # TODO(ianw) : we could exercise the pagination paths ...
+        with requests_mock.Mocker() as m:
+            m.get('%s/app/installations' % self.base_url, json=app_json)
+
+            def repositories_callback(request, context):
+                # FakeGithubSession gives us an auth token "token
+                # token-X" where "X" corresponds to the app id we want
+                # the projects for.  apps start at id "1", so the projects
+                # to return for this call are app_projects[token-1]
+                token = int(request.headers['Authorization'][12:])
+                projects = app_projects[token - 1]
+                return {
+                    'total_count': len(projects),
+                    'repositories': projects
+                }
+            m.get('%s/installation/repositories?per_page=100' % self.base_url,
+                  json=repositories_callback)
+
+            # everything mocked now, call real implementation
+            super()._prime_installation_map()
+
+
+class FakeGithubConnection(githubconnection.GithubConnection):
+    log = logging.getLogger("zuul.test.FakeGithubConnection")
+    client_manager_class = FakeGithubClientManager
+
+    def __init__(self, driver, connection_name, connection_config,
+                 changes_db=None, upstream_root=None, git_url_with_auth=False):
+        super(FakeGithubConnection, self).__init__(driver, connection_name,
+                                                   connection_config)
+        self.connection_name = connection_name
+        self.pr_number = 0
+        self.pull_requests = changes_db
+        self.statuses = {}
+        self.upstream_root = upstream_root
+        self.merge_failure = False
+        self.merge_not_allowed_count = 0
+
+        self.github_data = FakeGithubData(changes_db)
+        self._github_client_manager.github_data = self.github_data
+
+        self.git_url_with_auth = git_url_with_auth
+
+    def setZuulWebPort(self, port):
+        self.zuul_web_port = port
+
+    def openFakePullRequest(self, project, branch, subject, files=[],
+                            body=None, body_text=None, draft=False,
+                            mergeable=True, base_sha=None):
+        self.pr_number += 1
+        pull_request = FakeGithubPullRequest(
+            self, self.pr_number, project, branch, subject, self.upstream_root,
+            files=files, body=body, body_text=body_text, draft=draft,
+            mergeable=mergeable, base_sha=base_sha)
+        self.pull_requests[self.pr_number] = pull_request
+        return pull_request
+
+    def getPushEvent(self, project, ref, old_rev=None, new_rev=None,
+                     added_files=None, removed_files=None,
+                     modified_files=None):
+        if added_files is None:
+            added_files = []
+        if removed_files is None:
+            removed_files = []
+        if modified_files is None:
+            modified_files = []
+        if not old_rev:
+            old_rev = '0' * 40
+        if not new_rev:
+            new_rev = random_sha1()
+        name = 'push'
+        data = {
+            'ref': ref,
+            'before': old_rev,
+            'after': new_rev,
+            'repository': {
+                'full_name': project
+            },
+            'commits': [
+                {
+                    'added': added_files,
+                    'removed': removed_files,
+                    'modified': modified_files
+                }
+            ]
+        }
+        return (name, data)
+
+    def getBranchProtectionRuleEvent(self, project, action):
+        name = 'branch_protection_rule'
+        data = {
+            'action': action,
+            'rule': {},
+            'repository': {
+                'full_name': project,
+            }
+        }
+        return (name, data)
+
+    def getRepositoryEvent(self, repository, action, changes):
+        name = 'repository'
+        data = {
+            'action': action,
+            'changes': changes,
+            'repository': repository,
+        }
+        return (name, data)
+
+    def emitEvent(self, event, use_zuulweb=False):
+        """Emulates sending the GitHub webhook event to the connection."""
+        name, data = event
+        payload = json.dumps(data).encode('utf8')
+        secret = self.connection_config['webhook_token']
+        signature = githubconnection._sign_request(payload, secret)
+        headers = {'x-github-event': name,
+                   'x-hub-signature': signature,
+                   'x-github-delivery': str(uuid.uuid4())}
+
+        if use_zuulweb:
+            return requests.post(
+                'http://127.0.0.1:%s/api/connection/%s/payload'
+                % (self.zuul_web_port, self.connection_name),
+                json=data, headers=headers)
+        else:
+            data = {'headers': headers, 'body': data}
+            self.event_queue.put(data)
+            return data
+
+    def addProject(self, project):
+        # use the original method here and additionally register it in the
+        # fake github
+        super(FakeGithubConnection, self).addProject(project)
+        self.getGithubClient(project.name).addProject(project)
+
+    def getGitUrl(self, project):
+        if self.git_url_with_auth:
+            auth_token = ''.join(
+                random.choice(string.ascii_lowercase) for x in range(8))
+            prefix = 'file://x-access-token:%s@' % auth_token
+        else:
+            prefix = ''
+        if self.repo_cache:
+            return prefix + os.path.join(self.repo_cache, str(project))
+        return prefix + os.path.join(self.upstream_root, str(project))
+
+    def real_getGitUrl(self, project):
+        return super(FakeGithubConnection, self).getGitUrl(project)
+
+    def setCommitStatus(self, project, sha, state, url='', description='',
+                        context='default', user='zuul', zuul_event_id=None):
+        # record that this got reported and call original method
+        self.github_data.reports.append(
+            (project, sha, 'status', (user, context, state)))
+        super(FakeGithubConnection, self).setCommitStatus(
+            project, sha, state,
+            url=url, description=description, context=context)
+
+    def labelPull(self, project, pr_number, label, zuul_event_id=None):
+        # record that this got reported
+        self.github_data.reports.append((project, pr_number, 'label', label))
+        pull_request = self.pull_requests[int(pr_number)]
+        pull_request.addLabel(label)
+
+    def unlabelPull(self, project, pr_number, label, zuul_event_id=None):
+        # record that this got reported
+        self.github_data.reports.append((project, pr_number, 'unlabel', label))
+        pull_request = self.pull_requests[pr_number]
+        pull_request.removeLabel(label)
