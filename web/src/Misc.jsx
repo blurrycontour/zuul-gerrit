@@ -92,6 +92,14 @@ function buildExternalTableLink(ref) {
   return null
 }
 
+function describeRef(ref) {
+  if (ref.change) {
+    return `Change ${ref.change}`
+  } else {
+    return `Ref ${ref.ref}`
+  }
+}
+
 function renderRefInfo(ref) {
   const refinfo = ref.branch ? (
     <>
@@ -172,4 +180,4 @@ function setDarkMode(darkMode) {
   }
 }
 
-export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, renderRefInfo, ConditionalWrapper, resolveDarkMode, setDarkMode }
+export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, describeRef, renderRefInfo, ConditionalWrapper, resolveDarkMode, setDarkMode }
