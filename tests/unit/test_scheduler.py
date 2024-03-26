@@ -534,12 +534,6 @@ class TestScheduler(ZuulTestCase):
         for build in self.history:
             self.assertTrue(build.parameters['zuul']['voting'])
 
-        # TODO: remove after we have tests that really exercise this;
-        # for now this verifies we can save and load the changedb (if
-        # popuplated by gerrit changes).
-        self.saveChangeDB()
-        self.loadChangeDB()
-
     def test_zk_profile(self):
         command_socket = self.scheds.first.sched.config.get(
             'scheduler', 'command_socket')

@@ -95,6 +95,17 @@ def tests(session):
     session.run('stestr', 'run', '--slowest', f'--concurrency={procs}',
                 *session.posargs)
 
+@nox.session(python='3')
+def tests(session):
+    set_standard_env_vars(session)
+    session.install('-r', 'requirements.txt',
+                    '-r', 'test-requirements.txt')
+    session.install('-e', '.')
+    session.run_always('zuul-manage-ansible', '-v')
+    procs = max(int(multiprocessing.cpu_count() * 0.75), 1)
+    session.run('stestr', 'run', '--test-path', './tests/upgrade',
+                '--slowest', f'--concurrency={procs}',
+                *session.posargs)
 
 @nox.session(python='3')
 def remote(session):
