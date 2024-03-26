@@ -484,12 +484,15 @@ class TestRequiredSQLConnection(BaseTestCase):
             if self.config.get(section_name, 'driver') == 'sql':
                 if (self.config.get(section_name, 'dburi') ==
                         '$MYSQL_FIXTURE_DBURI$'):
-                    f = MySQLSchemaFixture()
+                    f = MySQLSchemaFixture(self.id(), self.random_databases,
+                                           self.delete_databases)
                     self.useFixture(f)
                     self.config.set(section_name, 'dburi', f.dburi)
                 elif (self.config.get(section_name, 'dburi') ==
                       '$POSTGRESQL_FIXTURE_DBURI$'):
-                    f = PostgresqlSchemaFixture()
+                    f = PostgresqlSchemaFixture(self.id(),
+                                                self.random_databases,
+                                                self.delete_databases)
                     self.useFixture(f)
                     self.config.set(section_name, 'dburi', f.dburi)
         self.connections = zuul.lib.connections.ConnectionRegistry()
