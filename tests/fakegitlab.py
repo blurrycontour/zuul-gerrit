@@ -454,8 +454,8 @@ class FakeGitlabMergeRequest(object):
     def __init__(self, gitlab, number, project, branch,
                  subject, upstream_root, files=[], description='',
                  base_sha=None):
-        self.gitlab = gitlab
-        self.source = gitlab
+        self.source_hostname = gitlab.canonical_hostname
+        self.gitlab_server = gitlab.server
         self.number = number
         self.project = project
         self.branch = branch
@@ -474,7 +474,7 @@ class FakeGitlabMergeRequest(object):
         self.labels = []
         self.notes = []
         self.url = "https://%s/%s/merge_requests/%s" % (
-            self.gitlab.server, self.project, self.number)
+            self.gitlab_server, self.project, self.number)
         self.base_sha = base_sha
         self.approved = False
         self.blocking_discussions_resolved = True
@@ -619,10 +619,10 @@ class FakeGitlabMergeRequest(object):
         self.mergeMergeRequest()
         return self.getMergeRequestEvent(action='merge')
 
-    def getMergeRequestMergedPushEvent(self, added_files=None,
+    def getMergeRequestMergedPushEvent(self, gitlab, added_files=None,
                                        removed_files=None,
                                        modified_files=None):
-        return self.gitlab.getPushEvent(
+        return gitlab.getPushEvent(
             project=self.project,
             branch='refs/heads/%s' % self.branch,
             before=random_sha1(),

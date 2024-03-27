@@ -59,8 +59,8 @@ class FakeGithubPullRequest(object):
         If the `files` argument is provided it must be a dictionary of
         file names OR FakeFile instances -> content.
         """
-        self.github = github
-        self.source = github
+        self.source_hostname = github.canonical_hostname
+        self.github_server = github.server
         self.number = number
         self.project = project
         self.branch = branch
@@ -84,7 +84,8 @@ class FakeGithubPullRequest(object):
         self.is_merged = False
         self.merge_message = None
         self.state = 'open'
-        self.url = 'https://%s/%s/pull/%s' % (github.server, project, number)
+        self.url = 'https://%s/%s/pull/%s' % (self.github_server,
+                                              project, number)
         self.base_sha = base_sha
         self.pr_ref = self._createPRRef(base_sha=base_sha)
         self._addCommitToRepo(files=files)
@@ -143,7 +144,7 @@ class FakeGithubPullRequest(object):
         # A PR comment has an additional 'pull_request' key in the issue data
         data['issue']['pull_request'] = {
             'url': 'http://%s/api/v3/repos/%s/pull/%s' % (
-                self.github.server, self.project, self.number)
+                self.github_server, self.project, self.number)
         }
         return (name, data)
 
@@ -950,29 +951,17 @@ class FakePull(object):
         self._fake_pull_request.reviews.append(review)
         return review
 
-    @property
-    def head(self):
-        client = FakeGithubClient(
-            data=self._fake_pull_request.github.github_data)
-        repo = client.repo_from_project(self._fake_pull_request.project)
-        return repo.commit(self._fake_pull_request.head_sha)
-
-    def commits(self):
-        # since we don't know all commits of a pr we just return here a list
-        # with the head_sha as the only commit
-        return [self.head]
-
     def as_dict(self):
         pr = self._fake_pull_request
-        connection = pr.github
+        server = pr.github_server
         data = {
             'number': pr.number,
             'title': pr.subject,
             'url': 'https://%s/api/v3/%s/pulls/%s' % (
-                connection.server, pr.project, pr.number
+                server, pr.project, pr.number
             ),
             'html_url': 'https://%s/%s/pull/%s' % (
-                connection.server, pr.project, pr.number
+                server, pr.project, pr.number
             ),
             'updated_at': pr.updated_at,
             'base': {
@@ -1144,7 +1133,7 @@ class FakeGithubSession(object):
             project, pr_number = match.groups()
             project = urllib.parse.unquote(project)
             pr = self.client._data.pull_requests[int(pr_number)]
-            conn = pr.github
+            conn = self.client._data.fake_github_connection
 
             # record that this got reported
             self.client._data.reports.append(
@@ -1217,12 +1206,13 @@ class FakeBranchProtectionRule:
         self.require_codeowners_review = False
 
 
-class FakeGithubData(object):
-    def __init__(self, pull_requests):
+class FakeGithubData:
+    def __init__(self, pull_requests, fake_github_connection):
         self.pull_requests = pull_requests
         self.repos = {}
         self.reports = []
         self.fail_check_run_creation = False
+        self.fake_github_connection = fake_github_connection
 
     def __repr__(self):
         return ("pull_requests:%s repos:%s reports:%s "
@@ -1503,7 +1493,7 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         self.merge_failure = False
         self.merge_not_allowed_count = 0
 
-        self.github_data = FakeGithubData(changes_db)
+        self.github_data = FakeGithubData(changes_db, self)
         self._github_client_manager.github_data = self.github_data
 
         self.git_url_with_auth = git_url_with_auth
