@@ -38,8 +38,8 @@ class FakePagurePullRequest(object):
     def __init__(self, pagure, number, project, branch,
                  subject, upstream_root, files={}, number_of_commits=1,
                  initial_comment=None):
-        self.pagure = pagure
-        self.source = pagure
+        self.source_hostname = pagure.canonical_hostname
+        self.pagure_server = pagure.server
         self.number = number
         self.project = project
         self.branch = branch
@@ -61,7 +61,7 @@ class FakePagurePullRequest(object):
         self.upstream_root = upstream_root
         self.cached_merge_status = 'MERGE'
         self.url = "https://%s/%s/pull-request/%s" % (
-            self.pagure.server, self.project, self.number)
+            self.pagure_server, self.project, self.number)
         self.is_merged = False
         self.pr_ref = self._createPRRef()
         self._addCommitInPR(files=files)

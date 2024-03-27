@@ -35,7 +35,7 @@ class GerritReporter(BaseReporter):
         self._create_comment = action.pop('comment', True)
         self._submit = action.pop('submit', False)
         self._checks_api = action.pop('checks-api', None)
-        self._labels = action
+        self._labels = {str(k): v for k, v in action.items()}
 
     def __repr__(self):
         return f"<GerritReporter: {self._action}>"
