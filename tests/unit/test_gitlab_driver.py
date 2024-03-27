@@ -263,7 +263,8 @@ class TestGitlabDriver(ZuulTestCase):
 
         state1 = self.scheds.first.sched.local_layout_state.get("tenant-one")
         self.fake_gitlab.emitEvent(A.getMergeRequestMergedEvent())
-        self.fake_gitlab.emitEvent(A.getMergeRequestMergedPushEvent())
+        self.fake_gitlab.emitEvent(A.getMergeRequestMergedPushEvent(
+            self.fake_gitlab))
         self.waitUntilSettled()
         self.assertEqual(2, len(self.history))
         self.assertHistory([{'name': 'project-post-job'},
@@ -282,6 +283,7 @@ class TestGitlabDriver(ZuulTestCase):
         state1 = self.scheds.first.sched.local_layout_state.get("tenant-one")
         self.fake_gitlab.emitEvent(A.getMergeRequestMergedEvent())
         self.fake_gitlab.emitEvent(A.getMergeRequestMergedPushEvent(
+            self.fake_gitlab,
             modified_files=['.zuul.yaml']))
         self.waitUntilSettled()
         self.assertEqual(2, len(self.history))
