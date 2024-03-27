@@ -30,6 +30,7 @@ import {
   ToolbarGroup,
   ToolbarItem,
   ToolbarToggleGroup,
+  Tooltip,
 } from '@patternfly/react-core'
 import { FilterIcon, SearchIcon } from '@patternfly/react-icons'
 
@@ -149,6 +150,7 @@ function FilterToolbar(props) {
           isOpen={isCategoryDropdownOpen}
           dropdownItems={filterCategories.filter(
             (category) => (category.type === 'search' ||
+              category.type === 'fuzzy-search' ||
               category.type === 'select' ||
               category.type === 'ternary' ||
               category.type === 'checkbox')
@@ -176,6 +178,31 @@ function FilterToolbar(props) {
             placeholder={category.placeholder}
             onKeyDown={(event) => handleInputSend(event, category)}
           />
+          <Button
+            variant={ButtonVariant.control}
+            aria-label="search button for search input"
+            onClick={(event) => handleInputSend(event, category)}
+          >
+            <SearchIcon />
+          </Button>
+        </InputGroup>
+      )
+    } else if (category.type === 'fuzzy-search') {
+      return (
+        <InputGroup>
+          <Tooltip
+            content="Wildcard search with * placeholders">
+            <TextInput
+              name={`${category.key}-input`}
+              id={`${category.key}-input`}
+              type="search"
+              aria-label={`${category.key} filter`}
+              onChange={handleInputChange}
+              value={inputValue}
+              placeholder={category.placeholder}
+              onKeyDown={(event) => handleInputSend(event, category)}
+            />
+          </Tooltip>
           <Button
             variant={ButtonVariant.control}
             aria-label="search button for search input"
