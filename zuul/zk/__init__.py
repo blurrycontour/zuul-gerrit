@@ -83,8 +83,13 @@ class ZooKeeperClient(object):
 
         .. warning:: This method must not block.
         """
+        session_id = 0
+        if client_id := self.client.client_id:
+            session_id, _ = client_id
+
         if state == KazooState.LOST:
-            self.log.debug("ZooKeeper connection: LOST")
+            self.log.debug("ZooKeeper connection (session: %#x): LOST",
+                           session_id)
             self.was_lost = True
             for listener in self.on_connection_lost_listeners:
                 try:
@@ -92,14 +97,16 @@ class ZooKeeperClient(object):
                 except Exception:
                     self.log.exception("Exception calling listener:")
         elif state == KazooState.SUSPENDED:
-            self.log.debug("ZooKeeper connection: SUSPENDED")
+            self.log.debug("ZooKeeper connection (session: %#x): SUSPENDED",
+                           session_id)
             for listener in self.on_suspended_listeners:
                 try:
                     listener()
                 except Exception:
                     self.log.exception("Exception calling listener:")
         else:
-            self.log.debug("ZooKeeper connection: CONNECTED")
+            self.log.debug("ZooKeeper connection (session: %#x): CONNECTED",
+                           session_id)
             # Create a throwaway thread since zk operations can't
             # happen in this one.
             if self.was_lost:
