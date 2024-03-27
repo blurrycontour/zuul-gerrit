@@ -60,7 +60,7 @@ class TestGerritCRD(ZuulTestCase):
         A.setDependsOn(AM1, 1)
         AM1.setDependsOn(AM2, 1)
 
-        url = url_fmt.format(baseurl=B.gerrit.baseurl.rstrip('/'),
+        url = url_fmt.format(baseurl=B.gerrit_baseurl.rstrip('/'),
                              project=B.project,
                              change_no=B.number,
                              change_id=B.data['id'])
@@ -281,7 +281,7 @@ class TestGerritCRD(ZuulTestCase):
 
         # A Depends-On: B
 
-        url = url_fmt.format(baseurl=B.gerrit.baseurl.rstrip('/'),
+        url = url_fmt.format(baseurl=B.gerrit_baseurl.rstrip('/'),
                              project=B.project,
                              change_no=B.number)
         A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
