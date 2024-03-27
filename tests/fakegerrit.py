@@ -50,8 +50,6 @@ class FakeGerritChange(object):
                  status='NEW', upstream_root=None, files={},
                  parent=None, merge_parents=None, merge_files=None,
                  topic=None, empty=False):
-        self.gerrit = gerrit
-        self.source = gerrit
         self.reported = 0
         self.queried = 0
         self.patchsets = []
@@ -87,7 +85,7 @@ class FakeGerritChange(object):
             'subject': subject,
             'submitRecords': [],
             'hashtags': [],
-            'url': '%s/%s' % (self.gerrit.baseurl.rstrip('/'), number)}
+            'url': '%s/%s' % (gerrit.baseurl.rstrip('/'), number)}
 
         if topic:
             self.data['topic'] = topic

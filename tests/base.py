@@ -25,11 +25,12 @@ import itertools
 import json
 import logging
 import os
+import pickle
 import random
 import re
 from collections import defaultdict, namedtuple
 from queue import Queue
-from typing import Callable, Optional, Generator, List, Dict
+from typing import Generator, List
 from unittest.case import skipIf
 import zlib
 
@@ -68,7 +69,7 @@ from kazoo.exceptions import NoNodeError
 
 from zuul import model
 from zuul.model import (
-    BuildRequest, Change, MergeRequest, WebInfo, HoldRequest
+    BuildRequest, MergeRequest, WebInfo, HoldRequest
 )
 
 from zuul.driver.zuul import ZuulDriver
@@ -214,15 +215,35 @@ def registerProjects(source_name, client, config):
                 client.addProjectByName(project)
 
 
+class FakeChangeDB:
+    def __init__(self):
+        # A dictionary of server -> dict as below
+        self.servers = {}
+
+    def getServerChangeDB(self, server):
+        """Returns a dictionary for the specified server; key -> Change.  The
+        key is driver dependent, but typically the change/PR/MR id.
+
+        """
+        return self.servers.setdefault(server, {})
+
+    def save(self, path):
+        with open(path, 'wb') as f:
+            pickle.dump(self.servers, f, pickle.HIGHEST_PROTOCOL)
+
+    def load(self, path):
+        with open(path, 'rb') as f:
+            self.servers = pickle.load(f)
+
+
 class StatException(Exception):
     # Used by assertReportedStat
     pass
 
 
 class GerritDriverMock(GerritDriver):
-    def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
-                 upstream_root: str, additional_event_queues, poller_events,
-                 add_cleanup: Callable[[Callable[[], None]], None]):
+    def __init__(self, registry, changes, upstream_root,
+                 additional_event_queues, poller_events, add_cleanup):
         super(GerritDriverMock, self).__init__()
         self.registry = registry
         self.changes = changes
@@ -232,7 +253,8 @@ class GerritDriverMock(GerritDriver):
         self.add_cleanup = add_cleanup
 
     def getConnection(self, name, config):
-        db = self.changes.setdefault(config['server'], {})
+        server = config['server']
+        db = self.changes.getServerChangeDB(server)
         poll_event = self.poller_events.setdefault(name, threading.Event())
         ref_event = self.poller_events.setdefault(name + '-ref',
                                                   threading.Event())
@@ -250,10 +272,8 @@ class GerritDriverMock(GerritDriver):
 
 
 class GithubDriverMock(GithubDriver):
-    def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
-                 config: ConfigParser, upstream_root: str,
-                 additional_event_queues,
-                 git_url_with_auth: bool):
+    def __init__(self, registry, changes, config, upstream_root,
+                 additional_event_queues, git_url_with_auth):
         super(GithubDriverMock, self).__init__()
         self.registry = registry
         self.changes = changes
@@ -264,7 +284,7 @@ class GithubDriverMock(GithubDriver):
 
     def getConnection(self, name, config):
         server = config.get('server', 'github.com')
-        db = self.changes.setdefault(server, {})
+        db = self.changes.getServerChangeDB(server)
         connection = tests.fakegithub.FakeGithubConnection(
             self, name, config,
             changes_db=db,
@@ -277,8 +297,8 @@ class GithubDriverMock(GithubDriver):
 
 
 class PagureDriverMock(PagureDriver):
-    def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
-                 upstream_root: str, additional_event_queues):
+    def __init__(self, registry, changes, upstream_root,
+                 additional_event_queues):
         super(PagureDriverMock, self).__init__()
         self.registry = registry
         self.changes = changes
@@ -287,7 +307,7 @@ class PagureDriverMock(PagureDriver):
 
     def getConnection(self, name, config):
         server = config.get('server', 'pagure.io')
-        db = self.changes.setdefault(server, {})
+        db = self.changes.getServerChangeDB(server)
         connection = tests.fakepagure.FakePagureConnection(
             self, name, config,
             changes_db=db,
@@ -297,8 +317,7 @@ class PagureDriverMock(PagureDriver):
 
 
 class GitlabDriverMock(GitlabDriver):
-    def __init__(self, registry, changes: Dict[str, Dict[str, Change]],
-                 config: ConfigParser, upstream_root: str,
+    def __init__(self, registry, changes, config, upstream_root,
                  additional_event_queues):
         super(GitlabDriverMock, self).__init__()
         self.registry = registry
@@ -309,7 +328,7 @@ class GitlabDriverMock(GitlabDriver):
 
     def getConnection(self, name, config):
         server = config.get('server', 'gitlab.com')
-        db = self.changes.setdefault(server, {})
+        db = self.changes.getServerChangeDB(server)
         connection = tests.fakegitlab.FakeGitlabConnection(
             self, name, config,
             changes_db=db,
@@ -1430,12 +1449,9 @@ class WebProxyFixture(fixtures.Fixture):
 
 
 class ZuulWebFixture(fixtures.Fixture):
-    def __init__(self,
-                 changes: Dict[str, Dict[str, Change]], config: ConfigParser,
-                 additional_event_queues, upstream_root: str,
-                 poller_events, git_url_with_auth: bool,
-                 add_cleanup: Callable[[Callable[[], None]], None],
-                 test_root: str, info: Optional[WebInfo] = None):
+    def __init__(self, changes, config, additional_event_queues,
+                 upstream_root, poller_events, git_url_with_auth,
+                 add_cleanup, test_root, info=None):
         super(ZuulWebFixture, self).__init__()
         self.config = config
         self.connections = TestConnectionRegistry(
@@ -2122,7 +2138,7 @@ class ZuulTestCase(BaseTestCase):
         gerritsource.GerritSource.replication_retry_interval = 0.5
         gerritconnection.GerritEventConnector.delay = 0.0
 
-        self.changes: Dict[str, Dict[str, Change]] = {}
+        self.changes = FakeChangeDB()
 
         self.additional_event_queues = []
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
@@ -3459,6 +3475,14 @@ class ZuulTestCase(BaseTestCase):
         request.max_count = count
         request.node_expiration = node_hold_expiration
         self.sched_zk_nodepool.storeHoldRequest(request)
+
+    def saveChangeDB(self):
+        path = os.path.join(self.test_root, "changes.json")
+        self.changes.save(path)
+
+    def loadChangeDB(self):
+        path = os.path.join(self.test_root, "changes.json")
+        self.changes.load(path)
 
 
 class AnsibleZuulTestCase(ZuulTestCase):
