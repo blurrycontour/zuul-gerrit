@@ -18,6 +18,41 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "610232fa_ca74c210",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-28T21:51:09Z",
+      "side": 1,
+      "message": "I believe that\u0027s the case.",
+      "parentUuid": "21284255_75ab4d39",
+      "revId": "66ad44a3152086f9e69354b75710287772581aab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "894c9259_320a40d5",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-03-28T21:51:09Z",
+      "side": 1,
+      "message": "At this point, we can\u0027t trust the path; we\u0027re setting the entire ref state for the repository and only the input data to this function is canonical.  So if we\u0027re going to write out the pointed-to commit sha from a signed tag, we\u0027re going to need to either get it from the hash or add it to the refstate that the merger returns and plumb it through.  But since i can \"git show tagsha\" and see the commit, I\u0027m optimistic that we should be able to get that directly from git here.",
+      "revId": "66ad44a3152086f9e69354b75710287772581aab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9cefc7b_06ffee5a",
