@@ -554,6 +554,15 @@ class Repo(object):
                     repo.odb.info(binsha)
                     f.write(f'{hexsha} {path}\n'.encode(encoding))
                     msg = f"Set reference {path} at {hexsha} in {repo.git_dir}"
+                    if path.startswith('refs/tags/'):
+                        tagsha = repo.commit(hexsha).hexsha
+                        if tagsha != hexsha:
+                            # If repo.commit() is not an identity function that
+                            # implies we are an annotated or signed tag which
+                            # refers to another commit. We must handle this
+                            # special case when packing refs
+                            f.write(f'^{tagsha}\n'.encode(encoding))
+                            msg += f" with tag target {tagsha}"
                     if log:
                         log.debug(msg)
                     else:
