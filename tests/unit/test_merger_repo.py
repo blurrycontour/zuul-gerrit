@@ -231,9 +231,12 @@ class TestMergerRepo(ZuulTestCase):
                          'none@example.org', 'User Name', '0', '0')
         repo = git.Repo(self.workspace_root)
         new_sha = repo.heads.foobar.commit.hexsha
+        new_tag = repo.create_tag('a_tag', ref=new_sha, message='test tag')
+        new_tag_sha = new_tag.object.hexsha
 
         work_repo.setRefs({
             'refs/heads/master': new_sha,
+            'refs/tags/a_tag': new_tag_sha,
             'refs/remotes/origin/master': new_sha,
             'refs/heads/broken': 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
         })
@@ -243,6 +246,11 @@ class TestMergerRepo(ZuulTestCase):
         work_repo.setRefs({'refs/heads/master': remote_sha})
         self.assertEqual(work_repo.getBranchHead('master').hexsha, remote_sha)
         self.assertNotIn('master', repo.remotes.origin.refs)
+
+        # Git tags have a special packed-refs format. Check that we can
+        # describe a_tag successfully which implies we wrote packed-refs
+        # for that tag properly
+        repo.git.describe('a_tag')
 
     def test_set_remote_ref(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')

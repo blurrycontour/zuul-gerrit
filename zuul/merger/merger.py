@@ -554,6 +554,12 @@ class Repo(object):
                     repo.odb.info(binsha)
                     f.write(f'{hexsha} {path}\n'.encode(encoding))
                     msg = f"Set reference {path} at {hexsha} in {repo.git_dir}"
+                    if path.startswith('refs/tags/'):
+                        # Tags are special as they have a ref for the tag
+                        # object and a ref for the target commit
+                        tag_target_hexsha = repo.tag(path).commit.hexsha
+                        f.write(f'^{tag_target_hexsha}\n'.encode(encoding))
+                        msg += f" with tag target {tag_target_hexsha}"
                     if log:
                         log.debug(msg)
                     else:
