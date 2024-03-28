@@ -231,9 +231,20 @@ class TestMergerRepo(ZuulTestCase):
                          'none@example.org', 'User Name', '0', '0')
         repo = git.Repo(self.workspace_root)
         new_sha = repo.heads.foobar.commit.hexsha
+        # Unsigned regular tags are a simple refname to a commit
+        unsigned_tag = repo.create_tag('unsigned', ref=new_sha)
+        unsigned_sha = unsigned_tag.object.hexsha
+        # Annotated tags (and signed tags) create an annotate object that
+        # has its own sha that refers to another commit sha. We must
+        # handle both cases in ref packing.
+        annotated_tag = repo.create_tag('annotated', ref=new_sha,
+                                        message='test annotated tag')
+        annotated_sha = annotated_tag.object.hexsha
 
         work_repo.setRefs({
             'refs/heads/master': new_sha,
+            'refs/tags/unsigned': unsigned_sha,
+            'refs/tags/annotated': annotated_sha,
             'refs/remotes/origin/master': new_sha,
             'refs/heads/broken': 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
         })
@@ -243,6 +254,20 @@ class TestMergerRepo(ZuulTestCase):
         work_repo.setRefs({'refs/heads/master': remote_sha})
         self.assertEqual(work_repo.getBranchHead('master').hexsha, remote_sha)
         self.assertNotIn('master', repo.remotes.origin.refs)
+
+        packed_refs_path = os.path.join(self.workspace_root,
+                                        '.git', 'packed-refs')
+        with open(packed_refs_path) as f:
+            print(f.read())
+
+        # Reread the tags from packed-refs
+        repo = git.Repo(self.workspace_root)
+        # Git tags have a special packed-refs format. Check that we can
+        # describe both unsigned and annotated tags successfully which implies
+        # we wrote packed-refs for that tag properly
+        repo.git.describe('unsigned')
+        repo.git.describe('annotated')
+        assert False
 
     def test_set_remote_ref(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')

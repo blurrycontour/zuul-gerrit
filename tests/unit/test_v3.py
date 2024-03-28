@@ -494,6 +494,18 @@ class TestBranchTag(ZuulTestCase):
             dict(name='test-job', result='SUCCESS', ref='refs/tags/foo')],
             ordered=False)
 
+    def test_no_branch_match_annotated_tag(self):
+        # Test that tag jobs run with no explicit branch matchers against
+        # annotated tags.
+        event = self.fake_gerrit.addFakeTag('org/project', 'master',
+                                            'foo', 'test message')
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='central-job', result='SUCCESS', ref='refs/tags/foo'),
+            dict(name='test-job', result='SUCCESS', ref='refs/tags/foo')],
+            ordered=False)
+
     def test_no_branch_match_multi_branch(self):
         # Test that tag jobs run with no explicit branch matchers in a
         # multi-branch project (where jobs generally get implied
