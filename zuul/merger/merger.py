@@ -551,11 +551,12 @@ class Repo(object):
                     # Attempt a lookup for the side effect of
                     # verifying the object exists.
                     binsha = gitdb.util.to_bin_sha(hexsha)
-                    repo.odb.info(binsha)
+                    oinfo = repo.odb.info(binsha)
                     f.write(f'{hexsha} {path}\n'.encode(encoding))
                     msg = f"Set reference {path} at {hexsha} in {repo.git_dir}"
-                    if path.startswith('refs/tags/'):
-                        tagsha = repo.commit(hexsha).hexsha
+                    if oinfo.type == b'tag':
+                        tagobj = git.Object.new_from_sha(repo, binsha)
+                        tagsha = tagobject.object.hexsha
                         if tagsha != hexsha:
                             # If repo.commit() is not an identity function that
                             # implies we are an annotated or signed tag which
