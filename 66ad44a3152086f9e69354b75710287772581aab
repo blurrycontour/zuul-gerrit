@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21284255_75ab4d39",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-28T21:41:53Z",
+      "side": 1,
+      "message": "It isn\u0027t super clear to me if `refs[path]` will resolve to the tag object or the commit the tag refers to. I\u0027ve written this change as if it were the tag object proper and not the referred to commit.",
+      "revId": "66ad44a3152086f9e69354b75710287772581aab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9cefc7b_06ffee5a",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1155,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-03-28T21:41:53Z",
+      "side": 1,
+      "message": "This appears to be the input datastructure for the above method that would determine if `refs[path]` is the tag object or referred to commit. But I\u0027m not sure what this projects dict contains.",
+      "revId": "66ad44a3152086f9e69354b75710287772581aab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
