@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    The Gerrit driver learned a new trigger condition called `approve-change`.
+    This is similar to `approve`, but only triggers when the value of the
+    approval changes instead of simply being present
