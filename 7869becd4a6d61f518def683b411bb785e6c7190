@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b046b2d_843dcbe8",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 36622
+      },
+      "writtenOn": "2024-04-01T16:05:52Z",
+      "side": 1,
+      "message": "word is awkward\nmaybe reword to\n\nThis means that it only matches when a user modifies an approval score instead of any comment where the score is also present",
+      "range": {
+        "startLine": 413,
+        "startChar": 62,
+        "endLine": 413,
+        "endChar": 69
+      },
+      "revId": "7869becd4a6d61f518def683b411bb785e6c7190",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
