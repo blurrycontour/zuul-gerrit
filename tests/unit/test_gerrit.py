@@ -1305,3 +1305,30 @@ class TestGerritDriver(ZuulTestCase):
         self.assertHistory([
             dict(name='check-job', result='SUCCESS', changes='1,1'),
         ])
+
+    @simple_layout('layouts/gerrit-approval-change.yaml')
+    def test_approval_change(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.data['hashtags'] = ['check']
+        self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2))
+        self.waitUntilSettled()
+
+        # Does not meet pipeline requirements, because old value is not present
+        self.assertHistory([])
+
+        # Still not sufficient because old value matches new value
+        self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2, old_value=2))
+        self.waitUntilSettled()
+        self.assertHistory([])
+
+        # Old value present, but new value is insufficient
+        self.fake_gerrit.addEvent(A.addApproval('Code-Review', 0, old_value=2))
+        self.waitUntilSettled()
+        self.assertHistory([])
+
+        # This should work now
+        self.fake_gerrit.addEvent(A.addApproval('Code-Review', 2, old_value=0))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ])

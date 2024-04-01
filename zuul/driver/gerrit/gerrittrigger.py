@@ -52,6 +52,10 @@ class GerritTrigger(BaseTrigger):
             for approval_dict in to_list(trigger.get('approval')):
                 for key, val in approval_dict.items():
                     approvals[key] = val
+            approval_changes = {}
+            for approval_dict in to_list(trigger.get('approval-change')):
+                for key, val in approval_dict.items():
+                    approval_changes[key] = val
             # Backwards compat for *_filter versions of these args
             attrname = 'comment' if 'comment' in trigger else 'comment_filter'
             with pcontext.confAttr(trigger, attrname) as attr:
@@ -96,6 +100,7 @@ class GerritTrigger(BaseTrigger):
                 branches=branches,
                 refs=refs,
                 event_approvals=approvals,
+                event_approval_changes=approval_changes,
                 comments=comments,
                 emails=emails,
                 usernames=usernames,
@@ -153,6 +158,7 @@ def getSchema():
         'ref': scalar_or_list(v.Any(ZUUL_REGEX, str)),
         'ignore-deletes': bool,
         'approval': scalar_or_list(variable_dict),
+        'approval-change': scalar_or_list(variable_dict),
         'require-approval': scalar_or_list(approval),
         'reject-approval': scalar_or_list(approval),
         'added': scalar_or_list(v.Any(ZUUL_REGEX, str)),

@@ -735,7 +735,7 @@ class FakeGerritChange(object):
         return event
 
     def addApproval(self, category, value, username='reviewer_john',
-                    granted_on=None, message='', tag=None):
+                    granted_on=None, message='', tag=None, old_value=None):
         if not granted_on:
             granted_on = time.time()
         approval = {
@@ -749,6 +749,8 @@ class FakeGerritChange(object):
             'grantedOn': int(granted_on),
             '__tag': tag,  # Not available in ssh api
         }
+        if old_value is not None:
+            approval['oldValue'] = str(old_value)
         for i, x in enumerate(self.patchsets[-1]['approvals'][:]):
             if x['by']['username'] == username and x['type'] == category:
                 del self.patchsets[-1]['approvals'][i]
