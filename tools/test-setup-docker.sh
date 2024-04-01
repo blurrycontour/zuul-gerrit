@@ -28,7 +28,9 @@ else
 fi
 
 # Select docker-compose or podman-compose
-if command -v docker-compose > /dev/null; then
+if docker compose > /dev/null 2> /dev/null; then
+  COMPOSE="docker compose"
+elif command -v docker-compose > /dev/null; then
   COMPOSE=docker-compose
 elif command -v podman-compose > /dev/null; then
   COMPOSE=podman-compose
@@ -40,10 +42,10 @@ fi
 
 MYSQL="${DOCKER} exec zuul-test-mysql mysql  -u root -pinsecure_worker"
 
-if [ "${COMPOSE}" == "docker-compose" ]; then
-  ${ROOTCMD} docker-compose rm -sf
-else
+if [ "${COMPOSE}" == "podman-compose" ]; then
   ${ROOTCMD} podman-compose down
+else
+  ${ROOTCMD} ${COMPOSE} rm -sf
 fi
 
 CA_DIR=$SCRIPT_DIR/ca
