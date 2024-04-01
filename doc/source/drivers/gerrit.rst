@@ -404,6 +404,14 @@ Trigger Configuration
       Example: ``Code-Review: 2`` matches a ``+2`` vote on the code
       review category.  Multiple approvals may be listed.
 
+   .. attr:: approval-change
+
+      This is only used for ``comment-added`` events. It works the same way as
+      ``approval``, with the additional requirement that the approval value
+      must have changed from its previous value. This means that it only
+      matches when a user modifies an approval score instead of any comment
+      where the score is present.
+
    .. attr:: email
 
       This is used for any event.  It takes a regex applied on the
