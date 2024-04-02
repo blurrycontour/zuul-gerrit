@@ -22,6 +22,30 @@
       },
       "revId": "7869becd4a6d61f518def683b411bb785e6c7190",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c0bca82_c63e001d",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 36622
+      },
+      "writtenOn": "2024-04-02T14:31:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b046b2d_843dcbe8",
+      "range": {
+        "startLine": 413,
+        "startChar": 62,
+        "endLine": 413,
+        "endChar": 69
+      },
+      "revId": "7869becd4a6d61f518def683b411bb785e6c7190",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
