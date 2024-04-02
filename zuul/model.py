@@ -1807,6 +1807,144 @@ class NodeRequest(object):
         return request
 
 
+class NodesetRequest:
+
+    STATE_REQUESTED = "requested"
+    STATE_ACCEPTED = "accepted"
+    STATE_FULFILLED = "fulfilled"
+    STATE_FAILED = "failed"
+
+    FINAL_STATES = (
+        STATE_FULFILLED,
+        STATE_FAILED,
+    )
+
+    _local_attrs = ("path", "stat", "lock", "_lscores",)
+
+    def __init__(self, labels, uuid=None, state=STATE_REQUESTED,
+                 provider_nodes=None):
+        self._set(
+            uuid=uuid or uuid4().hex,
+            state=state,
+            labels=labels,
+            provider_nodes=provider_nodes or [],
+            # Attributes related to ZK (not serialized)
+            path=None,
+            stat=None,
+            lock=None,
+            is_locked=False,
+            # Attributes set by the launcher
+            _lscores=None,
+        )
+
+    def __repr__(self):
+        return (f"<NodesetRequest uuid={self.uuid}, state={self.state},"
+                f" labels={self.labels}, path={self.path}>")
+
+    def __setattr__(self, name, value):
+        if name in self._local_attrs:
+            super().__setattr__(name, value)
+        else:
+            raise Exception(
+                f"Unable to modify {repr(self)} attributes directly")
+
+    def _set(self, **attrs):
+        for name, value in attrs.items():
+            super().__setattr__(name, value)
+
+    @property
+    def ltime(self):
+        return self.stat.czxid
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(**data)
+
+    def toDict(self):
+        return dict(
+            uuid=self.uuid,
+            state=self.state,
+            labels=self.labels,
+            provider_nodes=self.provider_nodes,
+        )
+
+    def updateFromDict(self, d):
+        self._set(
+            state=d["state"],
+            labels=d["labels"],
+            provider_nodes=d["provider_nodes"],
+        )
+
+
+class ProviderNode:
+
+    STATE_REQUESTED = "requested"
+    STATE_BUILDING = "building"
+    STATE_READY = "ready"
+    STATE_FAILED = "failed"
+    STATE_USED = "used"
+    STATE_HOLD = "hold"
+
+    OK_STATES = (
+        STATE_READY,
+        STATE_FAILED,
+    )
+
+    _local_attrs = ("provider", "path", "stat", "lock", "_lscores",)
+
+    def __init__(self, *, label, uuid=None, state=STATE_REQUESTED):
+        self._set(
+            uuid=uuid or uuid4().hex,
+            state=state,
+            label=label,
+            # Attributes related to ZK (not serialized)
+            provider=None,
+            path=None,
+            stat=None,
+            lock=None,
+            is_locked=False,
+            # Attributes set by the launcher
+            _lscores=None,
+        )
+
+    def __repr__(self):
+        return (f"<ProviderNode uuid={self.uuid}, state={self.state},"
+                f" path={self.path}>")
+
+    def __setattr__(self, name, value):
+        if name in self._local_attrs:
+            super().__setattr__(name, value)
+        else:
+            raise Exception(
+                f"Unable to modify {repr(self)} attributes directly")
+
+    def _set(self, **attrs):
+        for name, value in attrs.items():
+            super().__setattr__(name, value)
+
+    @property
+    def ltime(self):
+        return self.stat.czxid
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(**data)
+
+    def toDict(self):
+        return dict(
+            uuid=self.uuid,
+            state=self.state,
+            label=self.label,
+        )
+
+    def updateFromDict(self, d):
+        self._set(
+            uuid=d["uuid"],
+            state=d["state"],
+            label=d["label"],
+        )
+
+
 class Secret(ConfigObject):
     """A collection of private data.
 
