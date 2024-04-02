@@ -38,6 +38,7 @@ from zuul.zk.exceptions import LockException
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.job_request_queue import JobRequestEvent
 from zuul.zk.merger import MergerApi
+from zuul.zk.launcher import LauncherClientApi, LauncherServerApi
 from zuul.zk.layout import LayoutStateStore, LayoutState
 from zuul.zk.locks import locked
 from zuul.zk.nodepool import ZooKeeperNodepool
@@ -48,7 +49,11 @@ from zuul.zk.sharding import (
     NODE_BYTE_SIZE_LIMIT,
 )
 from zuul.zk.components import (
-    BaseComponent, ComponentRegistry, ExecutorComponent, COMPONENT_REGISTRY
+    BaseComponent,
+    ComponentRegistry,
+    ExecutorComponent,
+    LauncherComponent,
+    COMPONENT_REGISTRY
 )
 from tests.base import (
     BaseTestCase, HoldableExecutorApi, HoldableMergerApi,
@@ -2117,3 +2122,139 @@ class TestPipelineInit(ZooKeeperBaseTestCase):
         pipeline.manager = mock.Mock()
         pipeline.state.refresh(context)
         self.assertEqual(pipeline.state.layout_uuid, layout.uuid)
+
+
+class TestLauncherApi(ZooKeeperBaseTestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.component_info = LauncherComponent(self.zk_client, "test")
+        self.component_info.ready = True
+        self.component_info.register()
+        self.client = LauncherClientApi(self.zk_client)
+        self.server = LauncherServerApi(
+            self.zk_client, self.component_registry, self.component_info,
+            lambda: None)
+        self.addCleanup(self.server.stop)
+
+    def test_launcher(self):
+        labels = ["foo", "bar"]
+        request = model.NodesetRequest(labels)
+        self.client.submit(request)
+
+        # Wait for request to show up in the cache
+        for _ in iterate_timeout(10, "request to show up"):
+            request_list = self.server.getNodesetRequests()
+            if len(request_list):
+                break
+
+        self.assertEqual(len(request_list), 1)
+        for req in request_list:
+            request = self.server.getNodesetRequest(req.uuid)
+            self.assertIs(request, req)
+            self.assertIsNotNone(request)
+            self.assertEqual(labels, request.labels)
+            self.assertIsNotNone(request.path)
+            self.assertIsNotNone(request.stat)
+
+        self.server.lockRequest(request)
+        self.assertIsNotNone(request.lock)
+        for _ in iterate_timeout(10, "request to be locked"):
+            if request.is_locked:
+                break
+
+        # Create provider nodes for the requested labels
+        request_uuid = uuid.UUID(request.uuid)
+        for i, label in enumerate(request.labels):
+            # Create deterministic provider node UUIDs by using
+            # the request UUID as namespace.
+            node_uuid = uuid.uuid5(request_uuid, f"{i}-{label}").hex
+            node = model.ProviderNode(uuid=node_uuid, label=label)
+            self.server.requestProviderNode(label, node)
+
+        # Wait for the nodes to show up in the cache
+        for _ in iterate_timeout(10, "nodes to show up"):
+            provider_nodes = self.server.getProviderNodes()
+            if len(provider_nodes) == 2:
+                break
+
+        # Accept and update the nodeset request
+        self.server.updateNodesetRequest(
+            request,
+            state=model.NodesetRequest.STATE_ACCEPTED,
+            provider_nodes=[n.path for n in provider_nodes])
+
+        # "Fulfill" requested provider nodes
+        for node in self.server.getMatchingProviderNodes():
+            self.server.lockNode(node)
+            self.assertIsNotNone(node.lock)
+            for _ in iterate_timeout(10, "node to be locked"):
+                if node.is_locked:
+                    break
+            self.server.updateNode(
+                node,
+                state=model.ProviderNode.STATE_READY
+            )
+            self.server.unlockNode(node)
+            self.assertIsNone(node.lock)
+            for _ in iterate_timeout(10, "node to be unlocked"):
+                if not node.is_locked:
+                    break
+
+        # Wait for nodes to show up be ready and unlocked
+        for _ in iterate_timeout(10, "nodes to be ready"):
+            requested_nodes = [self.server.getProviderNode(p)
+                               for p in request.provider_nodes]
+            if len(requested_nodes) != 2:
+                continue
+            if all(n.state == model.ProviderNode.STATE_READY
+                   and not n.is_locked for n in requested_nodes):
+                break
+
+        # Mark the request as fulfilled + unlock
+        self.server.updateNodesetRequest(
+            request,
+            state=model.NodesetRequest.STATE_FULFILLED,
+        )
+        self.server.unlockRequest(request)
+        self.assertIsNone(request.lock)
+        for _ in iterate_timeout(10, "request to be unlocked"):
+            if not request.is_locked:
+                break
+
+        # Should be a no-op
+        self.server.cleanupNodes()
+
+        # Remove request and wait for it to be removed from the cache
+        self.client.remove(request)
+        for _ in iterate_timeout(10, "request to be removed"):
+            request_list = self.server.getNodesetRequests()
+            if not len(request_list):
+                break
+
+        not_request = self.server.getNodesetRequest(request.uuid)
+        self.assertIsNone(not_request)
+
+        # Make sure we still have the provider nodes
+        provider_nodes = self.server.getProviderNodes()
+        self.assertEqual(len(provider_nodes), 2)
+
+        # Mark nodes as used
+        for node in provider_nodes:
+            self.client.lockNode(node)
+            self.assertIsNotNone(node.lock)
+            for _ in iterate_timeout(10, "wait for lock to show up"):
+                if node.is_locked:
+                    break
+            self.client.updateNode(
+                node,
+                state=model.ProviderNode.STATE_USED,
+            )
+            self.client.unlockNode(node)
+
+        # Cleanup used nodes and wait for them to be removed from the cache
+        for _ in iterate_timeout(10, "nodes to be removed"):
+            self.server.cleanupNodes()
+            provider_nodes = self.server.getProviderNodes()
+            if not provider_nodes:
+                break
