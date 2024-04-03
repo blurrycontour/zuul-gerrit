@@ -177,7 +177,9 @@ class DatabaseSession(object):
             self.connection.buildModel.id.label('inner_id')).\
             distinct().\
             join(self.connection.buildSetModel).\
-            join(self.connection.refModel)
+            join(self.connection.refModel).\
+            with_hint(build_table, 'USE INDEX (PRIMARY)', 'mysql')
+
         # Avoid joining the provides table unless necessary; postgres
         # has created some poor query plans in that case.  Currently
         # the only time this gets called with provides is from the
@@ -316,7 +318,8 @@ class DatabaseSession(object):
             self.connection.buildModel.end_time.label('inner_end_time')).\
             distinct().\
             join(self.connection.buildSetModel).\
-            join(self.connection.refModel)
+            join(self.connection.refModel).\
+            with_hint(build_table, 'USE INDEX (PRIMARY)', 'mysql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
