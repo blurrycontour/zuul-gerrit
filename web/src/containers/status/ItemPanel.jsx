@@ -121,7 +121,7 @@ class ItemPanel extends React.Component {
     }
     return (
       <small>
-        <a href={change.url}>
+        <a href={change.url} onClick={(e) => e.stopPropagation()}>
           {changeText !== '' ? (
             <abbr title={changeTitle}>{changeText}</abbr>) : changeTitle}
         </a>
