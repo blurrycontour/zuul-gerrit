@@ -128,8 +128,8 @@ class DatabaseSession(object):
         return value
 
     def _getFuzzyFilterOp(self, column, value):
-        value = self._sanitizeSubstringQuery(value)
         if isinstance(value, str) and "*" in value:
+            value = self._sanitizeSubstringQuery(value)
             return column.like(value.replace("*", "%"), escape="$")
         else:
             return column == value
