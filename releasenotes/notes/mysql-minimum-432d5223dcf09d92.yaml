@@ -1,0 +1,4 @@
+---
+upgrade:
+  - |
+    If using MySQL then MySQL version 8.0 at a minimum is recommended.
