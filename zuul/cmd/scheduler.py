@@ -41,8 +41,15 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
                                  'will distribute work to mergers.')
         parser.add_argument('--wait-for-init', dest='wait_for_init',
                             action='store_true',
+                            default=self.envBool('ZUUL_WAIT_FOR_INIT'),
                             help='Wait until all tenants are fully loaded '
-                                 'before beginning to process events.')
+                                 'before beginning to process events. '
+                            '(also available as ZUUL_WAIT_FOR_INIT).')
+        parser.add_argument('--disable-pipelines', dest='disable_pipelines',
+                            action='store_true',
+                            default=self.envBool('ZUUL_DISABLE_PIPELINES'),
+                            help='Discard all pipeline related events '
+                            '(also available as ZUUL_DISABLE_PIPELINES).')
         self.addSubCommands(parser, zuul.scheduler.COMMANDS)
         return parser
 
@@ -86,7 +93,8 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.configure_connections(require_sql=True)
         self.sched = zuul.scheduler.Scheduler(self.config,
                                               self.connections, self,
-                                              self.args.wait_for_init)
+                                              self.args.wait_for_init,
+                                              self.args.disable_pipelines)
         if self.args.validate_tenants is None:
             self.connections.registerScheduler(self.sched)
             self.connections.load(self.sched.zk_client,

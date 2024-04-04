@@ -211,9 +211,10 @@ class Scheduler(threading.Thread):
     _executor_client_class = ExecutorClient
 
     def __init__(self, config, connections, app, wait_for_init,
-                 testonly=False):
+                 disable_pipelines=False, testonly=False):
         threading.Thread.__init__(self)
         self.daemon = True
+        self.disable_pipelines = disable_pipelines
         self._profile_pipelines = set()
         self.wait_for_init = wait_for_init
         self.hostname = socket.getfqdn()
@@ -2589,10 +2590,11 @@ class Scheduler(threading.Thread):
                     return
             log.debug("Processing trigger event %s", event)
             try:
-                if isinstance(event, SupercedeEvent):
-                    self._doSupercedeEvent(event)
-                else:
-                    self._process_trigger_event(tenant, pipeline, event)
+                if not self.disable_pipelines:
+                    if isinstance(event, SupercedeEvent):
+                        self._doSupercedeEvent(event)
+                    else:
+                        self._process_trigger_event(tenant, pipeline, event)
             finally:
                 self.pipeline_trigger_events[tenant.name][
                     pipeline.name
@@ -2709,7 +2711,8 @@ class Scheduler(threading.Thread):
             log = get_annotated_logger(self.log, event.zuul_event_id)
             log.debug("Processing management event %s", event)
             try:
-                self._process_management_event(event)
+                if not self.disable_pipelines:
+                    self._process_management_event(event)
             finally:
                 self.pipeline_management_events[tenant.name][
                     pipeline.name
@@ -2751,7 +2754,8 @@ class Scheduler(threading.Thread):
             )
             log.debug("Processing result event %s", event)
             try:
-                self._process_result_event(event, pipeline)
+                if not self.disable_pipelines:
+                    self._process_result_event(event, pipeline)
             finally:
                 self.pipeline_result_events[tenant.name][
                     pipeline.name
