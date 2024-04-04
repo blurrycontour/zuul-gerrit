@@ -9423,3 +9423,20 @@ class TestWaitForInit(ZuulTestCase):
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+
+class TestDisablePipelines(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+    disable_pipelines = True
+
+    def test_disable_pipelines(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertHistory([])
