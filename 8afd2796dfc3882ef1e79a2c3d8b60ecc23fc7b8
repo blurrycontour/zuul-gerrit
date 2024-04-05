@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cb2fc27_f91160fc",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5378,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-05T23:47:36Z",
+      "side": 1,
+      "message": "You should be able to do isInstance(Change) here.  We rely on that extensively.",
+      "revId": "8afd2796dfc3882ef1e79a2c3d8b60ecc23fc7b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
