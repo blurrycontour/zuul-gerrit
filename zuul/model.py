@@ -5374,9 +5374,17 @@ class QueueItem(zkobject.ZKObject):
                         for a in artifacts:
                             change = self.getChangeForJob(_job)
                             a.update({'project': change.project.name,
-                                      'change': change.number,
-                                      'patchset': change.patchset,
                                       'job': build.job.name})
+                            if (hasattr(change, 'number') and
+                                hasattr(change, 'patchset')):
+                                # This is a Proper change
+                                a['change'] = change.number
+                                a['patchset'] = change.patchset
+                            else:
+                                # This is a tag/branch/ref
+                                a['ref'] = change.ref
+                                a['oldrev'] = change.oldrev
+                                a['newrev'] = change.newrev
                         self.log.debug(
                             "Found live artifacts: %s", repr(artifacts))
                         data.extend(artifacts)
