@@ -419,6 +419,18 @@ class TestMysqlDatabase(DBBaseTestCase):
         self.assertEqual(type(col == "foo"), type(filter))
         self.assertEqual("job-name", filter.right.value)
 
+        filter = session._getFuzzyFilterOp(col, "job%name")
+        self.assertEqual(type(col == "foo"), type(filter))
+        self.assertEqual("job%name", filter.right.value)
+
+        filter = session._getFuzzyFilterOp(col, "job$name")
+        self.assertEqual(type(col == "foo"), type(filter))
+        self.assertEqual("job$name", filter.right.value)
+
+        filter = session._getFuzzyFilterOp(col, "job_name")
+        self.assertEqual(type(col == "foo"), type(filter))
+        self.assertEqual("job_name", filter.right.value)
+
         filter = session._getFuzzyFilterOp(col, "*job*name*")
         self.assertEqual(type(col.like("foo")), type(filter))
         self.assertEqual("$", filter.modifiers["escape"])
