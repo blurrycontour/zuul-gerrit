@@ -16,6 +16,29 @@
       "message": "You should be able to do isInstance(Change) here.  We rely on that extensively.",
       "revId": "8afd2796dfc3882ef1e79a2c3d8b60ecc23fc7b8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93d5bc5e_6c746bba",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5383,
+      "author": {
+        "id": 10961
+      },
+      "writtenOn": "2024-04-06T22:31:24Z",
+      "side": 1,
+      "message": "It seems \u0027else\u0027 case is handling only tag event. But if item was enqueued for periodic/post pipeline then item doesn\u0027t have `change.oldrev` and `change.newrev` fields (example from inventory.yaml in periodic pipeline https://zuul.opendev.org/t/openstack/build/aab542e044d64b01b2a902a78f0fac9c/log/zuul-info/inventory.yaml ).\n\nException example for periodic pipeline:\n\n```\n2024-03-30 04:17:47,677 ERROR   zuul.Pipeline.yyy.periodic: [e: 6c70f43fe0bb4000a8451cd687347599] Exception while executing job \u003cFrozenJob tests\u003e for change \u003cBranch 0x7fcec014ab90 tests refs/heads/master updated None..None\u003e:\nTraceback (most recent call last):\n  File \"/usr/local/lib/python3.11/site-packages/zuul/manager/__init__.py\", line 1050, in _executeJobs\n    self.sched.executor.execute(\n  File \"/usr/local/lib/python3.11/site-packages/zuul/executor/client.py\", line 63, in execute\n    params \u003d zuul.executor.common.construct_build_params(\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/zuul/executor/common.py\", line 97, in construct_build_params\n    ) \u003d item.getJobParentData(job)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/zuul/model.py\", line 5992, in getJobParentData\n    artifact_data \u003d job.artifact_data or self.getArtifactData(job)\n                                         ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/local/lib/python3.11/site-packages/zuul/model.py\", line 5975, in getArtifactData\n    self.providesRequirements(job, data)\n  File \"/usr/local/lib/python3.11/site-packages/zuul/model.py\", line 5784, in providesRequirements\n    \u0027change\u0027: self.change.number,\n              ^^^^^^^^^^^^^^^^^^\nAttributeError: \u0027Branch\u0027 object has no attribute \u0027number\u0027\n```",
+      "range": {
+        "startLine": 5383,
+        "startChar": 30,
+        "endLine": 5383,
+        "endChar": 33
+      },
+      "revId": "8afd2796dfc3882ef1e79a2c3d8b60ecc23fc7b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
