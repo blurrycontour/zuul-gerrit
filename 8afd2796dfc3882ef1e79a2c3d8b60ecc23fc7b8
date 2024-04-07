@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4fe1d5f1_28b1f8f5",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5378,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-07T13:14:12Z",
+      "side": 1,
+      "message": "unresolving",
+      "parentUuid": "7cb2fc27_f91160fc",
+      "revId": "8afd2796dfc3882ef1e79a2c3d8b60ecc23fc7b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "93d5bc5e_6c746bba",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -55,6 +73,24 @@
       "side": 1,
       "message": "Not sure if you saw my patchset comment, but it basically says we should have no else case because it should not be supported at all.",
       "parentUuid": "93d5bc5e_6c746bba",
+      "revId": "8afd2796dfc3882ef1e79a2c3d8b60ecc23fc7b8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bab64559_ff65e90d",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5383,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-07T13:14:12Z",
+      "side": 1,
+      "message": "unresolving",
+      "parentUuid": "6b1152cb_3b0b4396",
       "revId": "8afd2796dfc3882ef1e79a2c3d8b60ecc23fc7b8",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
