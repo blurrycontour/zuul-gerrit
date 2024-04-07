@@ -177,8 +177,20 @@ class DatabaseSession(object):
             self.connection.buildModel.id.label('inner_id')).\
             distinct().\
             join(self.connection.buildSetModel).\
-            join(self.connection.refModel).\
-            with_hint(build_table, 'USE INDEX (PRIMARY)', 'mysql')
+            join(self.connection.refModel)
+
+        # If the query planner isn't able to reduce either the number
+        # of rows returned by the buildset or build tables, then it
+        # tends to produce a very slow query.  This hint produces
+        # better results, but only in those cases.  When we can narrow
+        # things down with indexes, it's better to omit the hint.
+        # job_name is a tricky one.  It is indexed, but if there are a
+        # lot of rows, it is better to include the hint, but if there
+        # are few, it is better to not include it.  We include the hint
+        # regardless of whether job_name is specified (optimizing for
+        # the more common case).
+        if not (project or change or uuid):
+            q = q.with_hint(build_table, 'USE INDEX (PRIMARY)', 'mysql')
 
         # Avoid joining the provides table unless necessary; postgres
         # has created some poor query plans in that case.  Currently
@@ -318,8 +330,11 @@ class DatabaseSession(object):
             self.connection.buildModel.end_time.label('inner_end_time')).\
             distinct().\
             join(self.connection.buildSetModel).\
-            join(self.connection.refModel).\
-            with_hint(build_table, 'USE INDEX (PRIMARY)', 'mysql')
+            join(self.connection.refModel)
+
+        # See note above about the hint.
+        if not (project):
+            q = q.with_hint(build_table, 'USE INDEX (PRIMARY)', 'mysql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilter(q, buildset_table.c.pipeline, pipeline)
