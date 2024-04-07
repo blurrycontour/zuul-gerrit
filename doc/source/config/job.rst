@@ -299,6 +299,13 @@ Here is an example of two job definitions:
       returned by the `provides` jobs will be made available to the
       `requires` job.
 
+      If the child change is enqueued after the moment the `provides`
+      job has finished artifacts are still made available to the
+      `requires` job.
+
+      If `provides` job has failed, then `requires` job is marked
+      as failed and won't be run.
+
       When inheriting jobs or applying variants, the list of
       `requires` is extended (`requires` specified in a job definition
       are added to any supplied by their parents).
@@ -905,6 +912,11 @@ Here is an example of two job definitions:
       start executing this job until all of its dependencies have
       completed successfully or have been paused, and if one or more of
       them fail, this job will not be run.
+
+      The dependent job is provided with :ref:`artifacts <return_artifacts>`
+      returned by preceeding jobs, e.g. if jobC depends on jobB, jobB
+      depends on jobA, then jobC is provided with artifacts from both jobA
+      and jobB.
 
       The format for this attribute is either a list of strings or
       dictionaries.  Strings are interpreted as job names,

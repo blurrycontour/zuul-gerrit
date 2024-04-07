@@ -164,6 +164,14 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
                    configured shared queues as well as circular
                    dependencies.
 
+         .. note:: Since this pipeline manager filters intermediate
+                   buildsets using it for jobs with `requires`/`provides`
+                   attributes is unreliable.  In this case jobs of in
+                   between buildsets can be unexpectedly skipped and
+                   `requires` job won't be made available with all
+                   artifacts it was receiving in ``independent``
+                   pipeline.
+
    .. attr:: post-review
       :default: false
 
