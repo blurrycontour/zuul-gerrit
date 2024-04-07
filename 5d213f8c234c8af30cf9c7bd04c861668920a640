@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "979b63d2_4f9f401a",
+        "filename": "doc/source/config/pipeline.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-07T13:11:42Z",
+      "side": 1,
+      "message": "Let\u0027s see how Clark\u0027s change ends up before we merge this.  My recommendation is that we don\u0027t support them at all in non-change pipelines, so this would need to say something to that effect.",
+      "revId": "5d213f8c234c8af30cf9c7bd04c861668920a640",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
