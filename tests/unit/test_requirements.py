@@ -12,9 +12,52 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import datetime
 import time
+from unittest import mock
 
-from tests.base import ZuulTestCase, simple_layout
+from zuul.driver.util import TimeOffset
+
+from tests.base import ZuulTestCase, BaseTestCase, simple_layout
+
+
+class TestTimeOffset(BaseTestCase):
+    def test_time_offset(self):
+        now = datetime.datetime.utcnow()
+        one_week_ago = now - datetime.timedelta(days=7)
+        yesterday = now - datetime.timedelta(days=1)
+
+        for k in ['48h', '48 h']:
+            offset_48h = TimeOffset(k)
+            self.assertTrue(one_week_ago < offset_48h)
+            self.assertTrue(one_week_ago <= offset_48h)
+            self.assertTrue(yesterday > offset_48h)
+            self.assertTrue(yesterday >= offset_48h)
+
+        for k in ['5weekdays', '5 weekdays']:
+            offset_5wkd = TimeOffset(k)
+            self.assertTrue(one_week_ago < offset_5wkd)
+            self.assertTrue(one_week_ago <= offset_5wkd)
+            self.assertTrue(yesterday > offset_5wkd)
+            self.assertTrue(yesterday >= offset_5wkd)
+
+    @mock.patch('zuul.driver.util.datetime', wraps=datetime)
+    def test_weekdays(self, mock_datetime):
+        # An arbitrary date.  This is a Thursday.
+        piday = datetime.datetime(2024, 3, 14, 8, 0, 0)
+        mock_datetime.datetime.utcnow.return_value = piday
+
+        thu = datetime.datetime(2024, 3, 7, 8, 0, 0)
+        fri = datetime.datetime(2024, 3, 8, 8, 0, 0)
+        mon = datetime.datetime(2024, 3, 11, 8, 0, 0)
+        tue = datetime.datetime(2024, 3, 12, 8, 0, 0)
+        wed = datetime.datetime(2024, 3, 13, 8, 0, 0)
+
+        self.assertTrue(wed == TimeOffset('1 weekday'))
+        self.assertTrue(tue == TimeOffset('2 weekday'))
+        self.assertTrue(mon == TimeOffset('3 weekday'))
+        self.assertTrue(fri == TimeOffset('4 weekday'))
+        self.assertTrue(thu == TimeOffset('5 weekday'))
 
 
 class TestRequirementsApprovalNewerThan(ZuulTestCase):

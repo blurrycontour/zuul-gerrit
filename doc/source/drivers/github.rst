@@ -628,7 +628,8 @@ enqueued into the pipeline.
          If present, the code review must be older than this amount of
          time to match.  Provide a time interval as a number with a
          suffix of "w" (weeks), "d" (days), "h" (hours), "m"
-         (minutes), "s" (seconds).  Example ``48h`` or ``2d``.
+         (minutes), "s" (seconds), or "weekdays".  Example ``48h`` or
+         ``2d``.
 
       .. attr:: newer-than
 
@@ -726,7 +727,8 @@ enqueued into the pipeline.
          If present, the code review must be older than this amount of
          time to match.  Provide a time interval as a number with a
          suffix of "w" (weeks), "d" (days), "h" (hours), "m"
-         (minutes), "s" (seconds).  Example ``48h`` or ``2d``.
+         (minutes), "s" (seconds), or "weekdays".  Example ``48h`` or
+         ``2d``.
 
       .. attr:: newer-than
 

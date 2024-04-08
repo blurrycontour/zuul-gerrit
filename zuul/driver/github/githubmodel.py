@@ -16,13 +16,13 @@
 # under the License.
 
 import copy
+import datetime
 import re
 import re2
-import time
 
 from zuul.model import Change, TriggerEvent, EventFilter, RefFilter
 from zuul.model import FalseWithReason
-from zuul.driver.util import time_to_seconds, to_list
+from zuul.driver.util import TimeOffset, to_list
 
 
 EMPTY_GIT_REF = '0' * 40  # git sha of all zeros, used during creates/deletes
@@ -461,14 +461,13 @@ class GithubRefFilter(RefFilter):
                 elif k == 'email':
                     r['email'] = re.compile(v)
                 elif k == 'newer-than':
-                    r[k] = time_to_seconds(v)
+                    r[k] = TimeOffset(v)
                 elif k == 'older-than':
-                    r[k] = time_to_seconds(v)
+                    r[k] = TimeOffset(v)
         return reviews
 
     def _match_review_required_review(self, rreview, review):
         # Check if the required review and review match
-        now = time.time()
         by = review.get('by', {})
         for k, v in rreview.items():
             if k == 'username':
@@ -478,12 +477,14 @@ class GithubRefFilter(RefFilter):
                 if (not v.search(by.get('email', ''))):
                     return False
             elif k == 'newer-than':
-                t = now - v
-                if (review['grantedOn'] < t):
+                value = datetime.datetime.utcfromtimestamp(
+                    review['grantedOn'])
+                if value < v:
                     return False
             elif k == 'older-than':
-                t = now - v
-                if (review['grantedOn'] >= t):
+                value = datetime.datetime.utcfromtimestamp(
+                    review['grantedOn'])
+                if value >= v:
                     return False
             elif k == 'type':
                 if review['type'] != v:

@@ -14,13 +14,13 @@
 # under the License.
 
 import copy
-import time
-import urllib.parse
+import datetime
 import dateutil.parser
+import urllib.parse
 
 from zuul.model import EventFilter, RefFilter
 from zuul.model import Change, TriggerEvent, FalseWithReason
-from zuul.driver.util import time_to_seconds, to_list, make_regex
+from zuul.driver.util import TimeOffset, to_list, make_regex
 from zuul import exceptions
 from zuul.zk.change_cache import ChangeKey
 
@@ -671,17 +671,16 @@ class GerritRefFilter(RefFilter):
                     a['email'] = make_regex(v, parse_context)
             if 'newer-than' in a:
                 with parse_context.confAttr(a, 'newer-than') as v:
-                    a['newer-than'] = time_to_seconds(v)
+                    a['newer-than'] = TimeOffset(v)
             if 'older-than' in a:
                 with parse_context.confAttr(a, 'older-than') as v:
-                    a['older-than'] = time_to_seconds(v)
+                    a['older-than'] = TimeOffset(v)
         return approvals
 
     def _match_approval_required_approval(self, rapproval, approval):
         # Check if the required approval and approval match
         if 'description' not in approval:
             return False
-        now = time.time()
         by = approval.get('by', {})
         for k, v in rapproval.items():
             if k == 'username':
@@ -691,12 +690,14 @@ class GerritRefFilter(RefFilter):
                 if (not v.search(by.get('email', ''))):
                     return False
             elif k == 'newer-than':
-                t = now - v
-                if (approval['grantedOn'] < t):
+                value = datetime.datetime.utcfromtimestamp(
+                    approval['grantedOn'])
+                if value < v:
                     return False
             elif k == 'older-than':
-                t = now - v
-                if (approval['grantedOn'] >= t):
+                value = datetime.datetime.utcfromtimestamp(
+                    approval['grantedOn'])
+                if value >= v:
                     return False
             else:
                 if not isinstance(v, list):

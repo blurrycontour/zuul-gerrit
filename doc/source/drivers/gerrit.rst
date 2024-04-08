@@ -572,7 +572,7 @@ order to be enqueued into the pipeline.
          If present, the approval must be older than this amount of time
          to match.  Provide a time interval as a number with a suffix of
          "w" (weeks), "d" (days), "h" (hours), "m" (minutes), "s"
-         (seconds).  Example ``48h`` or ``2d``.
+         (seconds), or "weekdays".  Example ``48h`` or ``2d``.
 
       .. attr:: newer-than
 
@@ -650,7 +650,7 @@ order to be enqueued into the pipeline.
          If present, the approval must be older than this amount of time
          to match.  Provide a time interval as a number with a suffix of
          "w" (weeks), "d" (days), "h" (hours), "m" (minutes), "s"
-         (seconds).  Example ``48h`` or ``2d``.
+         (seconds), or "weekdays".  Example ``48h`` or ``2d``.
 
       .. attr:: newer-than
 

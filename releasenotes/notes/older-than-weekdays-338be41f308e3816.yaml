@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    The ``older-than`` and ``newer-than`` approval and pipeline
+    requirements of the Gerrit and GitHub drivers now support weekdays
+    (a pipeline can require a review newer than "2 weekdays" and not
+    be thwarted by the weekend).
