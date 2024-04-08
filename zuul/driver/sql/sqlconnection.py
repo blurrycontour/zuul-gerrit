@@ -174,10 +174,10 @@ class DatabaseSession(object):
         provides_table = self.connection.zuul_provides_table
 
         q = self.session().query(
-            self.connection.buildModel.id.label('inner_id')).\
-            distinct().\
+            self.connection.buildModel.id).\
             join(self.connection.buildSetModel).\
-            join(self.connection.refModel)
+            join(self.connection.refModel).\
+            group_by(self.connection.buildModel.id)
 
         # If the query planner isn't able to reduce either the number
         # of rows returned by the buildset or build tables, then it
@@ -241,8 +241,26 @@ class DatabaseSession(object):
         else:
             q = q.order_by(build_table.c.id.desc())
 
-        q = q.limit(limit).offset(offset).subquery()
+        q = q.limit(limit).offset(offset)
 
+        if query_timeout:
+            # For MySQL, we can add a query hint directly.
+            q = q.prefix_with(
+                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
+                dialect='mysql')
+            # For Postgres, we add a comment that we parse in our
+            # event handler.
+            q = q.with_statement_hint(
+                f'/* statement_timeout={query_timeout} */',
+                dialect_name='postgresql')
+
+        ids = [x[0] for x in q.all()]
+        # We use two queries here, principally because mariadb does
+        # not produce a reasonable plan if we combine these into one
+        # query with a join, and neither mysql nor mariadb support
+        # using limit inside a subquery that is used with the "in"
+        # operator.  Therefore, we run a query to get the ids, then
+        # run a second to load the data.
         # contains_eager allows us to perform eager loading on the
         # buildset *and* use that table in filters (unlike
         # joinedload).
@@ -254,6 +272,8 @@ class DatabaseSession(object):
                     orm.selectinload(self.connection.buildModel.provides),
                     orm.selectinload(self.connection.buildModel.artifacts))
 
+        bq = bq.filter(self.connection.buildModel.id.in_(ids))
+
         if sort_by_buildset:
             # If we don't need the builds to be strictly ordered, this
             # query can be much faster as it may avoid the use of a
@@ -261,19 +281,6 @@ class DatabaseSession(object):
             bq = bq.order_by(buildset_table.c.id.desc())
         else:
             bq = bq.order_by(build_table.c.id.desc())
-
-        bq = bq.join(q, self.connection.buildModel.id == q.c.inner_id)
-
-        if query_timeout:
-            # For MySQL, we can add a query hint directly.
-            bq = bq.prefix_with(
-                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
-                dialect='mysql')
-            # For Postgres, we add a comment that we parse in our
-            # event handler.
-            bq = bq.with_statement_hint(
-                f'/* statement_timeout={query_timeout} */',
-                dialect_name='postgresql')
 
         try:
             return bq.all()
@@ -326,11 +333,11 @@ class DatabaseSession(object):
         buildset_table = self.connection.zuul_buildset_table
 
         q = self.session().query(
-            self.connection.buildModel.id.label('inner_id'),
-            self.connection.buildModel.end_time.label('inner_end_time')).\
-            distinct().\
+            self.connection.buildModel.id,
+            self.connection.buildModel.end_time).\
             join(self.connection.buildSetModel).\
-            join(self.connection.refModel)
+            join(self.connection.refModel).\
+            group_by(self.connection.buildModel.id)
 
         # See note above about the hint.
         if not (project):
@@ -357,9 +364,20 @@ class DatabaseSession(object):
 
         q = q.order_by(build_table.c.end_time.desc()).\
             limit(limit).\
-            offset(offset).\
-            subquery()
+            offset(offset)
 
+        if query_timeout:
+            # For MySQL, we can add a query hint directly.
+            q = q.prefix_with(
+                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
+                dialect='mysql')
+            # For Postgres, we add a comment that we parse in our
+            # event handler.
+            q = q.with_statement_hint(
+                f'/* statement_timeout={query_timeout} */',
+                dialect_name='postgresql')
+
+        ids = [x[0] for x in q.all()]
         # contains_eager allows us to perform eager loading on the
         # buildset *and* use that table in filters (unlike
         # joinedload).
@@ -367,21 +385,9 @@ class DatabaseSession(object):
             join(self.connection.buildSetModel).\
             join(self.connection.refModel).\
             options(orm.contains_eager(self.connection.buildModel.buildset),
-                    orm.contains_eager(self.connection.buildModel.ref))
-        bq = bq.order_by(build_table.c.id.desc())
-
-        if query_timeout:
-            # For MySQL, we can add a query hint directly.
-            bq = bq.prefix_with(
-                f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
-                dialect='mysql')
-            # For Postgres, we add a comment that we parse in our
-            # event handler.
-            bq = bq.with_statement_hint(
-                f'/* statement_timeout={query_timeout} */',
-                dialect_name='postgresql')
-
-        bq = bq.join(q, self.connection.buildModel.id == q.c.inner_id)
+                    orm.contains_eager(self.connection.buildModel.ref)).\
+            filter(self.connection.buildModel.id.in_(ids)).\
+            order_by(build_table.c.end_time.desc())
 
         try:
             return bq.all()
@@ -430,10 +436,10 @@ class DatabaseSession(object):
         ref_table = self.connection.zuul_ref_table
 
         q = self.session().query(
-            self.connection.buildSetModel.id.label('inner_id')).\
-            distinct().\
+            self.connection.buildSetModel.id).\
             join(self.connection.buildSetRefModel).\
-            join(self.connection.refModel)
+            join(self.connection.refModel).\
+            group_by(self.connection.buildSetModel.id)
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilterFuzzy(q, buildset_table.c.pipeline, pipeline)
@@ -459,27 +465,26 @@ class DatabaseSession(object):
             q = q.filter(buildset_table.c.updated < updated_max)
         q = q.order_by(buildset_table.c.id.desc()).\
             limit(limit).\
-            offset(offset).\
-            subquery()
-
-        bq = self.session().query(self.connection.buildSetModel).\
-            join(self.connection.buildSetRefModel).\
-            join(self.connection.refModel).\
-            options(orm.contains_eager(self.connection.buildSetModel.refs))
-        bq = bq.order_by(buildset_table.c.id.desc())
+            offset(offset)
 
         if query_timeout:
             # For MySQL, we can add a query hint directly.
-            bq = bq.prefix_with(
+            q = q.prefix_with(
                 f'/*+ MAX_EXECUTION_TIME({query_timeout}) */',
                 dialect='mysql')
             # For Postgres, we add a comment that we parse in our
             # event handler.
-            bq = bq.with_statement_hint(
+            q = q.with_statement_hint(
                 f'/* statement_timeout={query_timeout} */',
                 dialect_name='postgresql')
 
-        bq = bq.join(q, self.connection.buildSetModel.id == q.c.inner_id)
+        ids = [x[0] for x in q.all()]
+        bq = self.session().query(self.connection.buildSetModel).\
+            join(self.connection.buildSetRefModel).\
+            join(self.connection.refModel).\
+            options(orm.contains_eager(self.connection.buildSetModel.refs)).\
+            filter(self.connection.buildSetModel.id.in_(ids)).\
+            order_by(buildset_table.c.id.desc())
 
         try:
             return bq.all()
