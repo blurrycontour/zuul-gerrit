@@ -2477,6 +2477,45 @@ class TestGerritCircularDependencies(ZuulTestCase):
     def test_job_deduplication_semaphore_resources_first(self):
         self._test_job_deduplication_semaphore()
 
+    def _merge_noop_pair(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+
+        # A <-> B
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(B.data['status'], 'MERGED')
+
+    @simple_layout('layouts/job-dedup-noop.yaml')
+    def test_job_deduplication_buildsets(self):
+        self._merge_noop_pair()
+        self._merge_noop_pair()
+        self._merge_noop_pair()
+
+        buildsets = self.scheds.first.connections.connections[
+            'database'].getBuildsets()
+        self.assertEqual(len(buildsets), 3)
+
+        # If we accidentally limit by rows, we should get fewer than 2
+        # buildsets returned here.
+        buildsets = self.scheds.first.connections.connections[
+            'database'].getBuildsets(limit=2)
+        self.assertEqual(len(buildsets), 2)
+
     # Start check tests
 
     def _test_job_deduplication_check(self):
