@@ -574,6 +574,7 @@ class JobParser(object):
                       'files': to_list(str),
                       'secrets': to_list(vs.Any(secret, str)),
                       'irrelevant-files': to_list(str),
+                      'inherit-files': bool,
                       # validation happens in NodeSetParser
                       'nodeset': vs.Any(dict, str),
                       'timeout': int,
@@ -630,6 +631,7 @@ class JobParser(object):
         'match-on-config-updates',
         'workspace-scheme',
         'deduplicate',
+        'inherit-files',
     ]
 
     def __init__(self, pcontext):
