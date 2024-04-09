@@ -17,6 +17,7 @@
 import copy
 import datetime
 import itertools
+import hashlib
 import json
 import logging
 import paramiko
@@ -885,8 +886,36 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             # already merged. So even if it is "ABANDONED", we should not
             # ignore it.
             if (not dep.is_merged) and dep not in needs_changes:
-                git_needs_changes.append(dep_key.reference)
-                needs_changes.add(dep_key.reference)
+                # Create a fake change without using ChangeKey to prevent
+                # adding a change to the cache
+                reference = dict(
+                    connection_name=self.connection_name,
+                    project_name=None,
+                    change_type="GerritChange",
+                    stable_id=str(dep_num),
+                    revision=str(int(dep_ps) + 1),
+                )
+                check_reference = json.dumps(reference, sort_keys=True)
+                check_msg = check_reference.encode('utf8')
+                check_hash = hashlib.sha256(check_msg).hexdigest()
+
+                # Create a fake object instead of ChangeKey
+                class Object(object):
+                    pass
+
+                check_change = Object()
+                check_change._hash = check_hash
+                check_dep = self._change_cache.get(check_change)
+
+                # Check if the change is depending on an older commit than what
+                # is the latest. If it is, then it might already be merged. In
+                # this case, call isMerged() to verify and don't use the cached
+                # version. This is necessary in the case of merge-mode
+                # cherry-pick. A change's parent may point to old patchset of a
+                # dependency but still be allowed to gate.
+                if (not check_dep) or check_dep and not self.isMerged(dep):
+                    git_needs_changes.append(dep_key.reference)
+                    needs_changes.add(dep_key.reference)
 
         compat_needs_changes = []
         for (dep_num, dep_ps) in self._getDependsOnFromCommit(
