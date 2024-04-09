@@ -1062,10 +1062,11 @@ Here is an example of two job definitions:
    .. attr:: files
 
       This indicates that the job should only run on changes where the
-      specified files are modified.  Unlike **branches**, this value
-      is subject to inheritance and overriding, so only the final
-      value is used to determine if the job should run. This is a
-      :ref:`regular expression <regex>` or list of regular expressions.
+      specified files are modified.  If the parent job has defined this
+      attribute, it is usually overwritten by the child unless the
+      parent job is `abstract`. In that case the `files` attribute of
+      parent and child are combined.  This is a :ref:`regular expression
+      <regex>` or list of regular expressions.
 
       .. warning::
 
