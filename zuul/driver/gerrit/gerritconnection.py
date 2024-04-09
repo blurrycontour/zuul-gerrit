@@ -884,7 +884,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             # This is a git commit dependency. So we only ignore it if it is
             # already merged. So even if it is "ABANDONED", we should not
             # ignore it.
-            if (not dep.is_merged) and dep not in needs_changes:
+            if (not self.isMerged(dep)) and dep not in needs_changes:
                 git_needs_changes.append(dep_key.reference)
                 needs_changes.add(dep_key.reference)
 
