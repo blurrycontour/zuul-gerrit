@@ -1334,3 +1334,45 @@ class TestGerritDriver(ZuulTestCase):
         self.assertHistory([
             dict(name='check-job', result='SUCCESS', changes='1,1'),
         ])
+
+
+class TestGerritForceUpdateParent(ZuulTestCase):
+    config_file = 'zuul-gerrit-force-update.conf'
+
+    @simple_layout('layouts/simple.yaml')
+    def test_force_update_parent_dependency(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(2))
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        B.setDependsOn(A, 1)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+            dict(name='check-job', result='SUCCESS', changes='1,1 2,1'),
+        ])
+
+        # # So is this
+        # B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        # B.setDependsOn(A, 1)
+        # self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        # self.waitUntilSettled()
+
+        # self.assertHistory([
+        #     dict(name='check-job', result='SUCCESS', changes='1,1'),
+        #     dict(name='check-job', result='SUCCESS', changes='1,1 2,1'),
+        # ])
+
+        # # This is not
+        # C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        # C.setDependsOn(B, 1)
+        # self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        # self.waitUntilSettled()
+
+        # self.assertHistory([
+        #     dict(name='check-job', result='SUCCESS', changes='1,1'),
+        #     dict(name='check-job', result='SUCCESS', changes='1,1 2,1'),
+        # ])
