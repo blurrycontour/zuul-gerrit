@@ -1393,14 +1393,13 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self.changes[self.change_number] = c
         return c
 
-    def addFakeTag(self, project, branch, tag):
+    def addFakeTag(self, project, branch, tag, message=None):
         path = os.path.join(self.upstream_root, project)
         repo = git.Repo(path)
         commit = repo.heads[branch].commit
-        newrev = commit.hexsha
         ref = 'refs/tags/' + tag
-
-        git.Tag.create(repo, tag, commit)
+        t = git.Tag.create(repo, tag, commit, logmsg=message)
+        newrev = t.object.hexsha
 
         event = {
             "type": "ref-updated",
