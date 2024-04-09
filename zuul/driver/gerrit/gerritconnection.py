@@ -879,8 +879,13 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                       change, dep_num, dep_ps)
             dep_key = ChangeKey(self.connection_name, None,
                                 'GerritChange', str(dep_num), str(dep_ps))
-            dep = self._getChange(dep_key, history=history,
-                                  event=event)
+            # Because a git-dependent change might already be merged, cause
+            # that change to refresh so that it will reference the latest
+            # patchset.
+            refresh = (dep_num, dep_ps) not in history
+            dep = self._getChange(
+                dep_key, refresh=refresh, history=history,
+                event=event)
             # This is a git commit dependency. So we only ignore it if it is
             # already merged. So even if it is "ABANDONED", we should not
             # ignore it.
