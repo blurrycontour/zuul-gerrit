@@ -881,10 +881,22 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                 'GerritChange', str(dep_num), str(dep_ps))
             dep = self._getChange(dep_key, history=history,
                                   event=event)
+            # Check if the change is depending on an older commit than what
+            # is the latest. If it is, then it might already be merged. In
+            # this case, call isMerged() to verify and don't use the cached
+            # version. This is necessary in the case of merge-mode cherry-pick.
+            # A change's parent may point to old patchset of a dependency but
+            # still be allowed to gate.
+            check_dep_key = ChangeKey(self.connection_name, None,
+                                      'GerritChange', str(dep_num),
+                                      str(dep_ps + 1))
+            check_dep = self._getChange(check_dep_key)
+
             # This is a git commit dependency. So we only ignore it if it is
             # already merged. So even if it is "ABANDONED", we should not
             # ignore it.
-            if (not dep.is_merged) and dep not in needs_changes:
+            if dep not in needs_changes and not (
+                dep.is_merged or not check_dep or self.isMerged(dep)):
                 git_needs_changes.append(dep_key.reference)
                 needs_changes.add(dep_key.reference)
 
