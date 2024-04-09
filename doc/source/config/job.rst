@@ -1092,6 +1092,17 @@ Here is an example of two job definitions:
          ``git commit --allow-empty`` (which can be used in order to
          run all jobs).
 
+   .. attr:: inherit-files
+      :default: false
+
+      If this is set to ``true`` and the job has a parent, this
+      will additionally lookup the ``job.files`` and ``job.irrelevant-files``
+      regular expressions of the parent job when evaluating whether
+      this job should run.  This acts as if the ``job.files`` and
+      ``job.irrelevant-files`` attributes of parent and child were combined.
+      The evaluation stops, if a match is positive or there are no more
+      parent jobs with the ``job.inherit-files`` attribute set to ``true``.
+
    .. attr:: match-on-config-updates
       :default: true
 
