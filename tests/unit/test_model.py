@@ -115,22 +115,22 @@ class TestJob(BaseTestCase):
     def test_change_matches_returns_false_for_matched_skip_if(self):
         change = model.Change('project')
         change.files = ['/COMMIT_MSG', 'docs/foo']
-        self.assertFalse(self.job.changeMatchesFiles(change))
+        self.assertFalse(self.job.changeMatchesFiles(change, self.layout))
 
     def test_change_matches_returns_false_for_single_matched_skip_if(self):
         change = model.Change('project')
         change.files = ['docs/foo']
-        self.assertFalse(self.job.changeMatchesFiles(change))
+        self.assertFalse(self.job.changeMatchesFiles(change, self.layout))
 
     def test_change_matches_returns_true_for_unmatched_skip_if(self):
         change = model.Change('project')
         change.files = ['/COMMIT_MSG', 'foo']
-        self.assertTrue(self.job.changeMatchesFiles(change))
+        self.assertTrue(self.job.changeMatchesFiles(change, self.layout))
 
     def test_change_matches_returns_true_for_single_unmatched_skip_if(self):
         change = model.Change('project')
         change.files = ['foo']
-        self.assertTrue(self.job.changeMatchesFiles(change))
+        self.assertTrue(self.job.changeMatchesFiles(change, self.layout))
 
     def test_job_sets_defaults_for_boolean_attributes(self):
         self.assertIsNotNone(self.job.voting)
@@ -302,8 +302,109 @@ class TestJob(BaseTestCase):
         change.files = ['/COMMIT_MSG', 'ignored-file']
         item = self.queue.enqueueChanges([change], None)
 
-        self.assertTrue(base.changeMatchesFiles(change))
-        self.assertFalse(python27.changeMatchesFiles(change))
+        self.assertTrue(base.changeMatchesFiles(change, self.layout))
+        self.assertFalse(python27.changeMatchesFiles(change, self.layout))
+
+        self.pipeline.manager.getFallbackLayout = mock.Mock(return_value=None)
+        with self.zk_context as ctx:
+            item.freezeJobGraph(self.layout, ctx,
+                                skip_file_matcher=False,
+                                redact_secrets_and_keys=False)
+        self.assertEqual([], item.getJobs())
+
+    @mock.patch("zuul.model.zkobject.ZKObject._save")
+    def test_inhert_file_matcher_explicitly(self, save_mock):
+        base = self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'base',
+            'parent': None,
+            'files': ['^file1$'],
+            'timeout': 30,
+        }, None)
+        self.layout.addJob(base)
+        python27 = self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'python27',
+            'parent': 'base',
+            'timeout': 40,
+            'files': ['^file2$'],
+            'inherit-files': True,
+        }, None)
+        self.layout.addJob(python27)
+
+        project_config = self.pcontext.project_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'project',
+            'gate': {
+                'jobs': [
+                    {'python27': {'run': 'playbooks/python27.yaml'}}
+                ]
+            }
+        })
+        self.layout.addProjectConfig(project_config)
+
+        change = model.Change(self.project)
+        change.branch = 'master'
+        change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
+        change.files = ['/COMMIT_MSG', 'file1']
+        item = self.queue.enqueueChanges([change], None)
+
+        self.assertTrue(base.changeMatchesFiles(change, self.layout))
+        self.assertTrue(python27.changeMatchesFiles(change, self.layout))
+
+        self.pipeline.manager.getFallbackLayout = mock.Mock(return_value=None)
+        with self.zk_context as ctx:
+            item.freezeJobGraph(self.layout, ctx,
+                                skip_file_matcher=False,
+                                redact_secrets_and_keys=False)
+        self.assertEqual(len(item.getJobs()), 1)
+        job = item.getJobs()[0]
+        self.assertEqual(job.name, 'python27')
+
+    @mock.patch("zuul.model.zkobject.ZKObject._save")
+    def test_inhert_irrelevant_files_explicitly(self, save_mock):
+        base = self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'base',
+            'parent': None,
+            'irrelevant-files': ['^file1$'],
+            'timeout': 30,
+        }, None)
+        self.layout.addJob(base)
+        python27 = self.pcontext.job_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'python27',
+            'parent': 'base',
+            'timeout': 40,
+            'inherit-files': True,
+        }, None)
+        self.layout.addJob(python27)
+
+        project_config = self.pcontext.project_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'project',
+            'gate': {
+                'jobs': [
+                    'python27',
+                ]
+            }
+        })
+        self.layout.addProjectConfig(project_config)
+
+        change = model.Change(self.project)
+        change.branch = 'master'
+        change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
+        change.files = ['/COMMIT_MSG', 'file1']
+        item = self.queue.enqueueChanges([change], None)
+
+        self.assertFalse(base.changeMatchesFiles(change, self.layout))
+        self.assertFalse(python27.changeMatchesFiles(change, self.layout))
 
         self.pipeline.manager.getFallbackLayout = mock.Mock(return_value=None)
         with self.zk_context as ctx:
