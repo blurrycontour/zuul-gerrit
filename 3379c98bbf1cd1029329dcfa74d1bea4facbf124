@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a639bf43_281fd4f0",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-09T00:09:49Z",
+      "side": 1,
+      "message": "My only thought is maybe the secondary queries should have a comment indicating that split queries is better for performance across most databases? Just to avoid future maintainers refactoring into a combined query again.",
+      "revId": "3379c98bbf1cd1029329dcfa74d1bea4facbf124",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
