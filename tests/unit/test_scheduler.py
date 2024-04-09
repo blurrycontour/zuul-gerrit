@@ -1470,8 +1470,8 @@ class TestScheduler(ZuulTestCase):
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
-        self.assertEqual(A.queried, 2)  # Initial and isMerged
-        self.assertEqual(B.queried, 3)  # Initial A, refresh from B, isMerged
+        self.assertEqual(A.queried, 3)  # Initial, isMerged, and refresh
+        self.assertEqual(B.queried, 4)  # Initial A, refresh from B, isMerged, and refresh
 
     def test_connection_cache_cleanup(self):
         "Test that cached changes are correctly cleaned up"
