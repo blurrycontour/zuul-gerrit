@@ -2692,6 +2692,7 @@ class Job(ConfigObject):
         d['override_checkout'] = self.override_checkout
         d['files'] = self._files
         d['irrelevant_files'] = self._irrelevant_files
+        d['inherit_files'] = self.inherit_files
         d['variant_description'] = self.variant_description
         if self.source_context:
             d['source_context'] = self.source_context.toDict()
@@ -2761,8 +2762,9 @@ class Job(ConfigObject):
             _branches=(),
             file_matcher=None,
             _files=(),
-            irrelevant_file_matcher=None,  # skip-if
+            irrelevant_file_matcher_list=None,  # skip-if
             _irrelevant_files=(),
+            inherit_files=False,
             match_on_config_updates=True,
             deduplicate='auto',
             tags=frozenset(),
@@ -3178,10 +3180,10 @@ class Job(ConfigObject):
     def setIrrelevantFileMatcher(self, irrelevant_files):
         # Set the irrelevant file matcher to match any of the change files
         self._irrelevant_files = irrelevant_files
-        matchers = []
+        self.irrelevant_file_matcher_list = []
         for fn in irrelevant_files:
-            matchers.append(change_matcher.FileMatcher(ZuulRegex(fn)))
-        self.irrelevant_file_matcher = change_matcher.MatchAllFiles(matchers)
+            self.irrelevant_file_matcher_list.append(
+                change_matcher.FileMatcher(ZuulRegex(fn)))
 
     def updateVariables(self, other_vars, other_extra_vars, other_host_vars,
                         other_group_vars):
@@ -3429,16 +3431,51 @@ class Job(ConfigObject):
 
         return True
 
-    def changeMatchesFiles(self, change):
+    def changeMatchesFilesSelf(self, change, irrelevantMatcherList):
         if self.file_matcher and not self.file_matcher.matches(change):
             return False
 
-        # NB: This is a negative match.
-        if (self.irrelevant_file_matcher and
-            self.irrelevant_file_matcher.matches(change)):
-            return False
+        if len(irrelevantMatcherList) > 0:
+            # NB: This is a negative match.
+            irrelevantMatcher = change_matcher.MatchAllFiles(
+                irrelevantMatcherList)
+            if irrelevantMatcher.matches(change):
+                return False
 
         return True
+
+    def buildIrrelevantList(self):
+        matcherList = []
+
+        contextJob = self
+        while contextJob:
+            if contextJob.irrelevant_file_matcher_list:
+                matcherList.extend(contextJob.irrelevant_file_matcher_list)
+
+            if not contextJob.inherit_files:
+                break
+
+            contextJob = contextJob.parent
+
+        return matcherList
+
+    def changeMatchesFiles(self, change, irrelevantMatcherList=None):
+        if irrelevantMatcherList is None:
+            irrelevantMatcherList = self.buildIrrelevantList()
+
+        matchesSelf = self.changeMatchesFilesSelf(change,
+                                                  irrelevantMatcherList)
+
+        if not self.inherit_files:
+            return matchesSelf
+
+        # We want to explicitly evaluate the files and
+        # irrelevant-files of the parent
+        if not matchesSelf and not self.isBase():
+            return self.parent.changeMatchesFiles(change,
+                                                  irrelevantMatcherList)
+
+        return matchesSelf
 
 
 class JobProject(ConfigObject):
