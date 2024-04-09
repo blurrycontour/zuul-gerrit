@@ -3429,13 +3429,26 @@ class Job(ConfigObject):
 
         return True
 
-    def changeMatchesFiles(self, change):
+    def changeMatchesFilesSelf(self, change):
+
         if self.file_matcher and not self.file_matcher.matches(change):
             return False
 
         # NB: This is a negative match.
         if (self.irrelevant_file_matcher and
             self.irrelevant_file_matcher.matches(change)):
+            return False
+
+        return True
+
+    def changeMatchesFiles(self, change):
+        if not self.changeMatchesFilesSelf(change):
+
+            # Match against the files (and irrelevant_files) lists of
+            # any abstract parent job
+            if not self.isBase() and self.parent.abstract:
+                return self.parent.changeMatchesFiles(change)
+
             return False
 
         return True
