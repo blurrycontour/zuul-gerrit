@@ -149,6 +149,9 @@
       python_use_pyenv: true
       nox_force_python: "3.12"
       python_version: "3.12"
+      # Sacrifice build time for faster runtime
+      python_pyenv_python_cflags: '-march=native -mtune=native'
+      python_pyenv_python_configure_opts: '--enable-optimizations --with-lto'
 
 - job:
     name: zuul-build-dashboard
