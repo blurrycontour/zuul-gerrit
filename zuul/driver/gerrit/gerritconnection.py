@@ -18,6 +18,7 @@ import collections
 import copy
 import datetime
 import enum
+import hashlib
 import itertools
 import json
 import logging
@@ -408,6 +409,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             'max_dependencies', None)
         if self.max_dependencies is not None:
             self.max_dependencies = int(self.max_dependencies)
+        self.force_update_parent_dependency = self.connection_config.get(
+            'force_update_parent_dependency', False)
+        if self.force_update_parent_dependency in [
+                'true', 'True', '1', 1, 'TRUE', True]:
+            self.force_update_parent_dependency = True
         self.event_source = self.EVENT_SOURCE_NONE
         # TODO(corvus): Document this when the checks api is stable;
         # it's not useful without it.
@@ -801,14 +807,66 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                       change, dep_num, dep_ps)
             dep_key = ChangeKey(self.connection_name, None,
                                 'GerritChange', str(dep_num), str(dep_ps))
-            dep = self._getChange(dep_key, history=history,
-                                  event=event)
+            # Because a git-dependent change might already be merged, cause
+            # that change to refresh so that it will reference the latest
+            # patchset.
+            refresh = (dep_num, dep_ps) not in history
+            dep = self._getChange(
+                dep_key, refresh=refresh, history=history,
+                event=event)
             # This is a git commit dependency. So we only ignore it if it is
             # already merged. So even if it is "ABANDONED", we should not
             # ignore it.
             if (not dep.is_merged) and dep not in needs_changes:
-                git_needs_changes.append(dep_key.reference)
-                needs_changes.add(dep_key.reference)
+                # Attempt to find the latest parent of a needed_change
+                # and set that as the parent. This is useful in cases where
+                # you don't want to have to update dependencies for large
+                # relation chains (i.e. 50 patches are in relation, and
+                # one change has a single commit message update)
+                if self.force_update_parent_dependency:
+                    latest_needed_change = None
+                    latest_reference = None
+                    # Attempt to find the latest patchset, but limit
+                    # how far we go to a 100 revisions
+                    for increment in range(1, 100):
+                        reference = dict(
+                            connection_name=self.connection_name,
+                            project_name=None,
+                            change_type="GerritChange",
+                            stable_id=str(dep_num),
+                            revision=str(int(dep_ps) + 1),
+                        )
+                        check_reference = json.dumps(reference, sort_keys=True)
+                        check_msg = check_reference.encode('utf8')
+                        check_hash = hashlib.sha256(check_msg).hexdigest()
+
+                        # Create a fake object instead of ChangeKey to prevent
+                        # actually creating a ChangeKey
+                        class Object(object):
+                            pass
+
+                        check_change = Object()
+                        check_change._hash = check_hash
+                        new_needed_change = self._change_cache.get(
+                            check_change)
+                        if new_needed_change:
+                            latest_needed_change = new_needed_change
+                            latest_reference = check_reference
+                            if latest_needed_change.is_merged:
+                                break
+                        else:
+                            break
+
+                    if latest_needed_change
+                        and not latest_needed_change.is_merged:
+                        git_needs_changes.append(latest_reference)
+                        needs_changes.add(latest_reference)
+                    else:
+                        git_needs_changes.append(dep_key.reference)
+                        needs_changes.add(dep_key.reference)
+                else:
+                    git_needs_changes.append(dep_key.reference)
+                    needs_changes.add(dep_key.reference)
 
         compat_needs_changes = []
         for (dep_num, dep_ps) in self._getDependsOnFromCommit(
