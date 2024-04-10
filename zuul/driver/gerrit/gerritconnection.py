@@ -1067,9 +1067,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             return True
         if change.wip:
             return False
-        if change.missing_labels > set(allow_needs):
+        missing_labels = change.missing_labels - set(allow_needs)
+        if missing_labels:
             self.log.debug("Unable to merge due to "
-                           "missing labels: %s", change.missing_labels)
+                           "missing labels: %s", missing_labels)
             return False
         for sr in change.submit_requirements:
             if sr.get('status') == 'UNSATISFIED':
