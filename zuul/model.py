@@ -5367,12 +5367,16 @@ class QueueItem(zkobject.ZKObject):
                         return False
                     if not build.result and not build.paused:
                         return False
+                    change = self.getChangeForJob(_job)
+                    if not isinstance(change, Change):
+                        # Speculative artifacts for non speculative objects
+                        # does not make sense.
+                        return False
                     if data is not None:
                         artifacts = get_artifacts_from_result_data(
                             build.result_data,
                             logger=self.log)
                         for a in artifacts:
-                            change = self.getChangeForJob(_job)
                             a.update({'project': change.project.name,
                                       'change': change.number,
                                       'patchset': change.patchset,
