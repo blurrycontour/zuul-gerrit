@@ -16,6 +16,23 @@
       "message": "Let me know if this is an acceptable solution. I don\u0027t know the performance impacts of this which is the only concern I have.",
       "revId": "ccf73ef39643c35bbda1b533566e674e28f2e0e6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cab0aacd_1d3aad53",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-11T18:14:20Z",
+      "side": 1,
+      "message": "I suspect that the .append() and .add() here may need updated information in the case of a cherry pick merge too? The reason is we know that the dep_ps value is out of date here after a cherry pick which is why the old code isn\u0027t working right? In that case we want refer to the actual merged dep_ps rather than the old stale one in our dep_key.\n\nPretty sure its stale because the old dep_ps is part of dep_key constructed on line 880.",
+      "revId": "ccf73ef39643c35bbda1b533566e674e28f2e0e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
