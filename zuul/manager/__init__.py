@@ -478,6 +478,9 @@ class PipelineManager(metaclass=ABCMeta):
             for item_change in item.changes:
                 if item_change.equals(change):
                     if len(item.changes) > 1:
+                        # We need to cancel all jobs here as setting
+                        # dequeued needing change will skip all jobs.
+                        self.cancelJobs(item)
                         msg = ("Dependency cycle change "
                                f"{change.url} abandoned.")
                         item.setDequeuedNeedingChange(msg)

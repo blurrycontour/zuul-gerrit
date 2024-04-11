@@ -1175,6 +1175,33 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
         self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "-1")
 
+    def test_abandon_cancel_jobs(self):
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange("org/project7", "master", "A")
+        B = self.fake_gerrit.addFakeChange("org/project7", "master", "B")
+
+        # A <-> B (via commit-depends)
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.fake_gerrit.addEvent(B.getChangeAbandonedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name="project7-parent-job", result="ABORTED", changes="2,1 1,1"),
+        ], ordered=False)
+
     def test_cycle_merge_conflict(self):
         self.hold_merge_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
