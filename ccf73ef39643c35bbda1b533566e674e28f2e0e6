@@ -33,6 +33,24 @@
       "message": "I suspect that the .append() and .add() here may need updated information in the case of a cherry pick merge too? The reason is we know that the dep_ps value is out of date here after a cherry pick which is why the old code isn\u0027t working right? In that case we want refer to the actual merged dep_ps rather than the old stale one in our dep_key.\n\nPretty sure its stale because the old dep_ps is part of dep_key constructed on line 880.",
       "revId": "ccf73ef39643c35bbda1b533566e674e28f2e0e6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77265589_193e4789",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 889,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2024-04-11T19:22:37Z",
+      "side": 1,
+      "message": "I don\u0027t think that is necessary. We only need to know if the dependency is merged. If it is, then it won\u0027t get added to the needs_changes list which prevents it from allowing to be gated. The dep reference will actually not change in cherry-pick (without a new patchset that is). Consider Change A and B in a relation chain. The user only updates A. B\u0027s parent is still pointing to A1, not A2. When A gets merged, we only want to know that it is merged and tell B that it is no longer needed to depend on A.",
+      "parentUuid": "cab0aacd_1d3aad53",
+      "revId": "ccf73ef39643c35bbda1b533566e674e28f2e0e6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
