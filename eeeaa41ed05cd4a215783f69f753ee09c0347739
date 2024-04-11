@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a9c62c5_35dff704",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2024-04-11T19:38:47Z",
+      "side": 1,
+      "message": "Updated to reduce performance impact as much as possible",
+      "revId": "eeeaa41ed05cd4a215783f69f753ee09c0347739",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
