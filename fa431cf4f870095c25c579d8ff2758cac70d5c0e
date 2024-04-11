@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95ef2ece_eb6bc67e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33934
+      },
+      "writtenOn": "2024-04-11T17:38:43Z",
+      "side": 1,
+      "message": "I added a new test that exposes the bug with the old code, and is fixed by my change.",
+      "revId": "fa431cf4f870095c25c579d8ff2758cac70d5c0e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
