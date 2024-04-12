@@ -1059,6 +1059,25 @@ class TestGerritConnection(ZuulTestCase):
         self.assertEqual(A.queried, 3)
         self.assertEqual(A.data['status'], 'MERGED')
 
+    def test_submit_missing_labels(self):
+        # This test checks that missing labels will not allow a change to
+        # enqueued. Specifically in this case the Code-Review and Verified is
+        # missing (but Verified is ignored because Zuul will score it)
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertHistory([])
+
+        # Even adding the Verified score already provided by Zuul will not
+        # cause the change to gate
+        self.fake_gerrit.addEvent(A.addApproval('Verified', 2))
+
+        # Reapply this score to trigger gate, which shouldn't happen because of
+        # the still missing Code-Review label
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertHistory([])
+
 
 class TestGerritUnicodeRefs(ZuulTestCase):
     config_file = 'zuul-gerrit-web.conf'
