@@ -222,6 +222,17 @@ class TestMergerRepo(ZuulTestCase):
         item = {"ref": "refs/heads/feature"}
         work_repo.rebaseMerge(item, "master")
 
+    def test_squash_merge_empty(self):
+        parent_path = os.path.join(self.upstream_root, 'org/project1')
+        work_repo = Repo(parent_path, self.workspace_root,
+                         "none@example.org", "User Name", "0", "0")
+        item = {
+            "ref": "refs/heads/master",
+            "number": "123",
+            "patchset": "1",
+        }
+        work_repo.squashMerge(item)
+
     def test_set_refs(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         remote_sha = self.create_commit('org/project1')
