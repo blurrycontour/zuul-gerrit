@@ -1954,6 +1954,71 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         prev_layout = new_layout
 
 
+class TestGithubLockedBranches(ZuulTestCase):
+    config_file = 'zuul-github-driver.conf'
+    tenant_config_file = 'config/locked-branches/main.yaml'
+    scheduler_count = 1
+
+    def test_exclude_locked_branches(self):
+        tenant = self.scheds.first.sched.abide.tenants\
+            .get('tenant-one')
+
+        project1 = tenant.untrusted_projects[0]
+        project2 = tenant.untrusted_projects[1]
+        project3 = tenant.untrusted_projects[2]
+
+        tpc1 = tenant.project_configs[project1.canonical_name]
+        tpc2 = tenant.project_configs[project2.canonical_name]
+        tpc3 = tenant.project_configs[project3.canonical_name]
+
+        # projects 1 and 2  should have parsed master
+        self.assertIn('master', tpc1.parsed_branch_config.keys())
+        self.assertIn('master', tpc2.parsed_branch_config.keys())
+        # project 3 should not because it excludes unprotected
+        self.assertEqual(0, len(tpc3.parsed_branch_config.keys()))
+
+        # now lock project2 and trigger reload
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project2')
+        rule = repo._set_branch_protection('master', True)
+        rule.lock_branch = True
+
+        pevent = self.fake_github.getPushEvent(project='org/project2',
+                                               ref='refs/heads/master')
+        self.fake_github.emitEvent(pevent)
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        tpc1 = tenant.project_configs[project1.canonical_name]
+        tpc2 = tenant.project_configs[project2.canonical_name]
+        tpc3 = tenant.project_configs[project3.canonical_name]
+
+        # project2 should no longer have a master branch
+        self.assertIn('master', tpc1.parsed_branch_config.keys())
+        self.assertEqual(0, len(tpc2.parsed_branch_config.keys()))
+        self.assertEqual(0, len(tpc3.parsed_branch_config.keys()))
+
+        # Lock project 3 as well and ensure it's still excluded
+        repo = github.repo_from_project('org/project3')
+        rule = repo._set_branch_protection('master', True)
+        rule.lock_branch = True
+
+        pevent = self.fake_github.getPushEvent(project='org/project3',
+                                               ref='refs/heads/master')
+        self.fake_github.emitEvent(pevent)
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        tpc1 = tenant.project_configs[project1.canonical_name]
+        tpc2 = tenant.project_configs[project2.canonical_name]
+        tpc3 = tenant.project_configs[project3.canonical_name]
+
+        # project3 is still excluded, but for a different reason
+        self.assertIn('master', tpc1.parsed_branch_config.keys())
+        self.assertEqual(0, len(tpc2.parsed_branch_config.keys()))
+        self.assertEqual(0, len(tpc3.parsed_branch_config.keys()))
+
+
 class TestGithubWebhook(ZuulTestCase):
     config_file = 'zuul-github-driver.conf'
     scheduler_count = 1
