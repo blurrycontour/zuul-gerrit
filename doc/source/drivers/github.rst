@@ -804,8 +804,9 @@ The rules prevent Pull requests to be merged on defined branches if they are
 not met. For instance a branch might require that specific status are marked
 as ``success`` before allowing the merge of the Pull request.
 
-Zuul provides the attribute tenant.untrusted-projects.exclude-unprotected-branches.
-This attribute is by default set to ``false`` but we recommend to set it to
+Zuul provides the attribute
+:attr:`tenant.untrusted-projects.exclude-unprotected-branches`. This
+attribute is by default set to ``false`` but we recommend to set it to
 ``true`` for the whole tenant. By doing so Zuul will benefit from:
 
  - exluding in-repo development branches used to open Pull requests. This will
@@ -815,6 +816,10 @@ This attribute is by default set to ``false`` but we recommend to set it to
    to define whether a Pull request must enter the gate pipeline. As of now
    Zuul only takes in account "Require status checks to pass before merging" and
    the checked status checkboxes.
+
+Likewise, it is recommended to set the
+:attr:`tenant.untrusted-projects.exclude-locked-branches` setting to
+avoid expending resources on read-only branches.
 
 With the use of the reference pipelines below, the Zuul project recommends to
 set the minimum following settings:
