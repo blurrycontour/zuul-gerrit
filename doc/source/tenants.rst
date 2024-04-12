@@ -210,13 +210,20 @@ configuration. Some examples of tenant definitions are:
             exclude-unprotected-branches. This currently only affects
             GitHub and GitLab projects.
 
+         .. attr:: exclude-locked-branches
+
+            Define if locked branches should be processed.
+            Defaults to the tenant wide setting of
+            exclude-locked-branches. This currently only affects
+            GitHub projects.
+
          .. attr:: include-branches
 
             A list of regexes matching branches which should be
             processed.  If omitted, all branches are included.
-            Operates after *exclude-unprotected-branches* and so may
-            be used to further reduce the set of branches (but not
-            increase it).
+            Operates after *exclude-unprotected-branches* and
+            *exclude-locked-branches* and so may be used to further
+            reduce the set of branches (but not increase it).
 
             It has priority over *exclude-branches*.
 
@@ -224,9 +231,9 @@ configuration. Some examples of tenant definitions are:
 
             A list of regexes matching branches which should be
             processed.  If omitted, all branches are included.
-            Operates after *exclude-unprotected-branches* and so may
-            be used to further reduce the set of branches (but not
-            increase it).
+            Operates after *exclude-unprotected-branches* and
+            *exclude-locked-branches* and so may be used to further
+            reduce the set of branches (but not increase it).
 
             It will not exclude a branch which already matched
             *include-branches*.
@@ -376,6 +383,15 @@ configuration. Some examples of tenant definitions are:
       can be limited to the protected branches which are gated. This
       is a tenant wide setting and can be overridden per project.
       This currently only affects GitHub and GitLab projects.
+
+   .. attr:: exclude-locked-branches
+      :default: false
+
+      Some code review systems support read-only, or "locked"
+      branches.  Enabling this setting will cause Zuul to ignore these
+      branches.  This is a tenant wide setting and can be overridden
+      per project.  This currently only affects GitHub and GitLab
+      projects.
 
    .. attr:: default-parent
       :default: base

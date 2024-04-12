@@ -312,7 +312,7 @@ class ZKBranchCacheMixin:
         :returns: The list of branch names.
         """
         exclude_unprotected = tenant.getExcludeUnprotectedBranches(project)
-        exclude_locked = False
+        exclude_locked = tenant.getExcludeLockedBranches(project)
         branches = None
 
         required_flags = self._getProjectBranchesRequiredFlags(

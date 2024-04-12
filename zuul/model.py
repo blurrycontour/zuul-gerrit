@@ -7171,6 +7171,7 @@ class TenantProjectConfig(object):
         # The tenant's default setting of exclude_unprotected_branches will
         # be overridden by this one if not None.
         self.exclude_unprotected_branches = None
+        self.exclude_locked_branches = None
         self.include_branches = None
         self.exclude_branches = None
         self.always_dynamic_branches = None
@@ -8394,6 +8395,7 @@ class Tenant(object):
         self.max_job_timeout = 10800
         self.max_dependencies = None
         self.exclude_unprotected_branches = False
+        self.exclude_locked_branches = False
         self.default_base_job = None
         self.layout = None
         # The unparsed configuration from the main zuul config for
@@ -8557,10 +8559,16 @@ class Tenant(object):
         # match wins. The order is project -> tenant (default is false).
         project_config = self.project_configs.get(project.canonical_name)
         if project_config.exclude_unprotected_branches is not None:
-            exclude_unprotected = project_config.exclude_unprotected_branches
-        else:
-            exclude_unprotected = self.exclude_unprotected_branches
-        return exclude_unprotected
+            return project_config.exclude_unprotected_branches
+        return self.exclude_unprotected_branches
+
+    def getExcludeLockedBranches(self, project):
+        # Evaluate if locked branches should be excluded or not. The first
+        # match wins. The order is project -> tenant (default is false).
+        project_config = self.project_configs.get(project.canonical_name)
+        if project_config.exclude_locked_branches is not None:
+            return project_config.exclude_locked_branches
+        return self.exclude_locked_branches
 
     def addConfigProject(self, tpc):
         self.config_projects.append(tpc.project)

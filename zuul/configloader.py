@@ -1652,6 +1652,7 @@ class TenantParser(object):
         'exclude': to_list(classes),
         'shadow': to_list(str),
         'exclude-unprotected-branches': bool,
+        'exclude-locked-branches': bool,
         'extra-config-paths': no_dup_config_paths,
         'load-branch': str,
         'include-branches': to_list(str),
@@ -1696,6 +1697,7 @@ class TenantParser(object):
                   'max-job-timeout': int,
                   'source': self.validateTenantSources(),
                   'exclude-unprotected-branches': bool,
+                  'exclude-locked-branches': bool,
                   'allowed-triggers': to_list(str),
                   'allowed-reporters': to_list(str),
                   'allowed-labels': to_list(str),
@@ -1736,6 +1738,9 @@ class TenantParser(object):
         if conf.get('exclude-unprotected-branches') is not None:
             tenant.exclude_unprotected_branches = \
                 conf['exclude-unprotected-branches']
+        if conf.get('exclude-locked-branches') is not None:
+            tenant.exclude_locked_branches = \
+                conf['exclude-locked-branches']
         if conf.get('admin-rules') is not None:
             tenant.admin_rules = as_list(conf['admin-rules'])
         if conf.get('access-rules') is not None:
@@ -1902,6 +1907,7 @@ class TenantParser(object):
             project_include = current_include
             shadow_projects = []
             project_exclude_unprotected_branches = None
+            project_exclude_locked_branches = None
             project_include_branches = None
             project_exclude_branches = None
             project_always_dynamic_branches = None
@@ -1924,6 +1930,8 @@ class TenantParser(object):
                 project_include = frozenset(project_include - project_exclude)
             project_exclude_unprotected_branches = conf[project_name].get(
                 'exclude-unprotected-branches', None)
+            project_exclude_locked_branches = conf[project_name].get(
+                'exclude-locked-branches', None)
             project_include_branches = conf[project_name].get(
                 'include-branches', None)
             if project_include_branches is not None:
@@ -1969,6 +1977,8 @@ class TenantParser(object):
         tenant_project_config.shadow_projects = shadow_projects
         tenant_project_config.exclude_unprotected_branches = \
             project_exclude_unprotected_branches
+        tenant_project_config.exclude_locked_branches = \
+            project_exclude_locked_branches
         tenant_project_config.include_branches = project_include_branches
         tenant_project_config.exclude_branches = project_exclude_branches
         tenant_project_config.always_dynamic_branches = \
