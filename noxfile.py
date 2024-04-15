@@ -107,6 +107,10 @@ def upgrade(session):
     session.run('stestr', 'run', '--test-path', './tests/upgrade',
                 '--slowest', f'--concurrency={procs}',
                 *session.posargs)
+    # Output the test log to stdout so we have a copy of even the
+    # successful output.  We capture and output instead of just
+    # streaming it so that it's not interleaved.
+    session.run('stestr', 'last', '--all-attachments')
 
 
 @nox.session(python='3')
