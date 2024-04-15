@@ -1,0 +1,5 @@
+- name: Copy logs from old side of test run
+  delegate_to: localhost
+  shell: |
+    mkdir logs/old
+    mv work/logs/* logs/old
