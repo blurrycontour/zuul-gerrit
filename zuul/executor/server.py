@@ -2742,7 +2742,7 @@ class AnsibleJob(object):
         logging_config.writeJson(self.jobdir.logging_json)
 
     def writeAnsibleConfig(self, jobdir_playbook):
-        callback_path = self.callback_dir
+        callback_path = os.path.join(self.callback_dir, 'always')
         with open(jobdir_playbook.ansible_config, 'w') as config:
             config.write('[defaults]\n')
             config.write('inventory = %s\n' % jobdir_playbook.inventory)
@@ -2758,8 +2758,10 @@ class AnsibleJob(object):
             # Disable the Zuul callback plugins for the freeze playbooks
             # as that output is verbose and would be confusing for users.
             if jobdir_playbook != self.jobdir.freeze_playbook:
-                config.write('callback_plugins = %s\n' % callback_path)
+                callback_path += ':' + os.path.join(
+                    self.callback_dir, 'normal')
                 config.write('stdout_callback = zuul_stream\n')
+            config.write('callback_plugins = %s\n' % callback_path)
             config.write('filter_plugins = %s\n'
                          % self.filter_dir)
             config.write('nocows = True\n')  # save useless stat() calls
