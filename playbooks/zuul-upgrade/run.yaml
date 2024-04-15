@@ -5,6 +5,8 @@
       ref: 'origin/{{ zuul.branch }}'
     - role: nox
       nox_extra_args: '-v -- tests.upgrade.test_upgrade_old'
+    - role: fetch-subunit-output
+    - role: move-logs
     - role: checkout
       ref: '{{ zuul.branch }}'
     - role: nox

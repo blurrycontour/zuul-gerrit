@@ -23,6 +23,7 @@ class TestUpgradeOld(ZuulTestCase):
     use_tmpdir = False
     init_repos = True
     load_change_db = False
+    always_attach_logs = True
 
     def assertFinalState(self):
         # In this test, we expect to shut down in a non-final state,

@@ -1673,6 +1673,7 @@ class BaseTestCase(testtools.TestCase):
     random_databases = True
     delete_databases = True
     use_tmpdir = True
+    always_attach_logs = False
 
     def attachLogs(self, *args):
         def reader():
@@ -1725,7 +1726,10 @@ class BaseTestCase(testtools.TestCase):
             if (os.environ.get('OS_LOG_CAPTURE') == 'True' or
                 os.environ.get('OS_LOG_CAPTURE') == '1'):
                 self._log_stream = StringIO()
-                self.addOnException(self.attachLogs)
+                if self.always_attach_logs:
+                    self.addCleanup(self.attachLogs)
+                else:
+                    self.addOnException(self.attachLogs)
             else:
                 self._log_stream = sys.stdout
         else:
