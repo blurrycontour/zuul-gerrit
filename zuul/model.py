@@ -3695,10 +3695,10 @@ class JobGraph(object):
 
     def getParentJobsRecursively(self, job, skip_soft=False):
         all_dependency_uuids = set()
-        uuids_to_iterate = set([(job.uuid, False)])
+        uuids_to_iterate = set([job.uuid])
         ancestor_uuids = set()
         while len(uuids_to_iterate) > 0:
-            (current_uuid, current_data) = uuids_to_iterate.pop()
+            current_uuid = uuids_to_iterate.pop()
             if current_uuid in ancestor_uuids:
                 current_job = self.getJobFromUuid(current_uuid)
                 raise Exception("Dependency cycle detected in job %s" %
@@ -3716,8 +3716,7 @@ class JobGraph(object):
                 all_dependency_uuids.add(current_uuid)
             new_dependency_uuids = (set(current_dependency_uuids.keys()) -
                                     all_dependency_uuids)
-            for u in new_dependency_uuids:
-                uuids_to_iterate.add((u, current_dependency_uuids[u]['soft']))
+            uuids_to_iterate.update(new_dependency_uuids)
         return [self.getJobFromUuid(u) for u in all_dependency_uuids]
 
     def getProjectMetadata(self, name):

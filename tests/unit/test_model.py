@@ -620,6 +620,33 @@ class TestGraph(BaseTestCase):
         self.assertEqual(set(graph.getParentJobsRecursively(child)),
                          set(parents) - set([parents[3]]))
 
+    def test_soft_dependency_mixed_cycle(self):
+        # This is a regression test to make sure we are not processing
+        # jobs twice, when mixing soft/hard dependencies to a job.
+        graph = model.JobGraph({})
+        parent = FakeFrozenJob("parent")
+        graph.addJob(parent)
+
+        intermediate = FakeFrozenJob("intermediate")
+        intermediate.dependencies = frozenset([
+            # Hard dependency to parent
+            model.JobDependency(parent.name)
+        ])
+        graph.addJob(intermediate)
+
+        child = FakeFrozenJob("child")
+        child.dependencies = frozenset([
+            # Soft dependency to parent
+            model.JobDependency(parent.name, soft=True),
+            # Dependency to intermediate, which has a hard dependency
+            # to parent.
+            model.JobDependency(intermediate.name),
+        ])
+        graph.addJob(child)
+
+        # We don't expect this to raise an exception
+        graph.freezeDependencies()
+
 
 class TestTenant(BaseTestCase):
     def test_add_project(self):
