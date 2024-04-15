@@ -57,6 +57,8 @@ def construct_build_params(uuid, connections, job, item, pipeline,
         buildset=item.current_build_set.uuid,
         ref=change.ref,
         buildset_refs=[c.toDict() for c in item.changes],
+        build_refs=[c.toDict() for c in item.changes
+                    if c.cache_key in job.all_refs],
         pipeline=pipeline.name,
         post_review=pipeline.post_review,
         job=job.name,
@@ -78,6 +80,11 @@ def construct_build_params(uuid, connections, job, item, pipeline,
             job.workspace_scheme)
     # Fixup the src_dir for the refs based on this job
     for r in zuul_params['buildset_refs']:
+        r['src_dir'] = make_src_dir(
+            r['project']['canonical_hostname'],
+            r['project']['name'],
+            job.workspace_scheme)
+    for r in zuul_params['build_refs']:
         r['src_dir'] = make_src_dir(
             r['project']['canonical_hostname'],
             r['project']['name'],
