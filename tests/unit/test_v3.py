@@ -8140,6 +8140,45 @@ class TestJsonStringResults(AnsibleZuulTestCase):
         self.assertNotIn('this is a secret string', text_log)
 
 
+class TestSetupUnreachable(AnsibleZuulTestCase):
+    tenant_config_file = 'config/setup-unreachable/main.yaml'
+
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+    def test_setup_unreachable(self):
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+        self.executor_server.keep_jobdir = True
+        self.fake_nodepool.remote_ansible = True
+        self.fake_nodepool.connection_port = 255
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='setup-unreachable', result=None, changes='1,1'),
+            dict(name='setup-unreachable-ignore',
+                 result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        for build in self.history:
+            build = self.history[0]
+            output_path = os.path.join(build.jobdir.root,
+                                       'work/logs/job-output.txt')
+            with open(output_path) as f:
+                job_output = f.read()
+                self.log.debug(job_output)
+            if build.name == 'setup-unreachable':
+                self.assertNotIn("The run playbook did run", job_output)
+            if build.name == 'setup-unreachable-ignore':
+                self.assertIn("The run playbook did run", job_output)
+
+
 class TestUnreachable(AnsibleZuulTestCase):
     tenant_config_file = 'config/ansible-unreachable/main.yaml'
 

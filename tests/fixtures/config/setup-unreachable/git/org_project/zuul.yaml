@@ -1,0 +1,43 @@
+- pipeline:
+    name: check
+    manager: independent
+    post-review: true
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+    failure:
+      gerrit:
+        Verified: -1
+
+- job:
+    name: base
+    parent: null
+
+- job:
+    name: setup-unreachable
+    attempts: 1
+    run: playbooks/run.yaml
+    nodeset:
+      nodes:
+        - name: unreachable
+          label: unreachable
+
+- job:
+    name: setup-unreachable-ignore
+    attempts: 1
+    run: playbooks/run.yaml
+    ignore-setup-failure: true
+    nodeset:
+      nodes:
+        - name: unreachable
+          label: unreachable
+
+- project:
+    name: org/project
+    check:
+      jobs:
+        - setup-unreachable
+        - setup-unreachable-ignore

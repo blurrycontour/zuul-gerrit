@@ -995,6 +995,7 @@ class AnsibleJob(object):
         else:
             self.failure_output = '[]'
         self.early_failure = False
+        self.ignore_setup_failure = bool(self.job.ignore_setup_failure)
 
         self.zuul_event_id = self.arguments["zuul_event_id"]
         # Record ansible version being used for the cleanup phase
@@ -1792,10 +1793,17 @@ class AnsibleJob(object):
         # between here and the hosts in the inventory; return them and
         # reschedule the job.
 
+        # There is an option to ignore errors from the two playbooks
+        # below.  That is to support a use case wher if a host is
+        # unreachable, we should still proceed (a later playbook may
+        # cause it to become reachable).  In the case of the freeze
+        # playbook, we just won't have all of the variables set.
+
         self.writeSetupInventory()
         setup_status, setup_code = self.runAnsibleSetup(
             self.jobdir.setup_playbook, self.ansible_version)
-        if setup_status != self.RESULT_NORMAL or setup_code != 0:
+        if (not self.ignore_setup_failure) and (
+                setup_status != self.RESULT_NORMAL or setup_code != 0):
             if setup_status == self.RESULT_TIMED_OUT:
                 error_detail = "Ansible setup timeout"
             elif setup_status == self.RESULT_UNREACHABLE:
@@ -1809,14 +1817,12 @@ class AnsibleJob(object):
                             self.original_hostvars)
         freeze_status, freeze_code = self.runAnsibleFreeze(
             self.jobdir.freeze_playbook, self.ansible_version)
-        # We ignore the return code because we run this playbook on
-        # all hosts, even ones which we didn't run the setup playbook
-        # on.  If a host is unreachable, we should still proceed (a
-        # later playbook may cause it to become reachable).  We just
-        # won't have all of the variables set.
-        if freeze_status != self.RESULT_NORMAL:
+        if (not self.ignore_setup_failure) and (
+                freeze_status != self.RESULT_NORMAL or freeze_code != 0):
             if freeze_status == self.RESULT_TIMED_OUT:
                 error_detail = "Ansible variable freeze timeout"
+            elif setup_status == self.RESULT_UNREACHABLE:
+                error_detail = "Host unreachable"
             return result, error_detail
 
         self.loadFrozenHostvars()
@@ -2694,6 +2700,10 @@ class AnsibleJob(object):
                 self.unreachable_nodes.add(node)
         except Exception:
             self.log.error("Error updating unreachable hosts:")
+        try:
+            os.unlink(self.jobdir.job_unreachable_file)
+        except Exception:
+            self.log.error("Error deleting unreachable hosts file:")
 
     def writeDebugInventory(self):
         # This file is unused by Zuul, but the base jobs copy it to logs
