@@ -1,0 +1,6 @@
+- name: Copy logs from old side of test run
+  delegate_to: localhost
+  shell: |
+    mkdir {{ zuul.executor.work_root }}/oldlogs
+    mv {{ zuul.executor.work_root }}/logs/* {{ zuul.executor.work_root }}/oldlogs
+    mv {{ zuul.executor.work_root }}/oldlogs {{ zuul.executor.work_root }}/logs/old
