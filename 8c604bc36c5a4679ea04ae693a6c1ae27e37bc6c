@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "721e5464_e0034816",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 36948
+      },
+      "writtenOn": "2024-04-15T13:06:47Z",
+      "side": 1,
+      "message": "Hi,\n\nI have created a dedicated yaml attribute as requested. However, the unit test `test_circular_dependencies.TestGerritCircularDependencies.test_cross_tenant_cycle` fails now for py311 and passes for py312. After staring at it for quite a while, I do not know how my addition could have possibly caused that.\n\nAlso, I am sure I would have to create unit tests for my new attribute. Are `unit/test_model.py` and `unit/test_scheduler.py` the correct place to do this?",
+      "revId": "8c604bc36c5a4679ea04ae693a6c1ae27e37bc6c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
