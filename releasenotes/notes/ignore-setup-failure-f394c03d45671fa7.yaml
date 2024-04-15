@@ -1,0 +1,9 @@
+---
+upgrade:
+  - |
+    Previously, Zuul would ignore unreachable host errors for some
+    types of nodes (e.g., kubernetes pods or network appliances) if
+    encountered during the setup phase of a job.  Zuul will now treat
+    these as errors that should cause the job to be retried, however,
+    a new job attribute, :attr:`job.ignore-setup-failure`, is
+    available to retain the old behavior.

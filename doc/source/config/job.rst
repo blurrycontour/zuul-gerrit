@@ -484,6 +484,19 @@ Here is an example of two job definitions:
       controls the number of attempts to make before an error is
       reported.
 
+   .. attr:: ignore-setup-failure
+      :default: False
+
+      Before Zuul runs any user-supplied playbooks, it runs some
+      internal setup steps.  If an error (such as an unreachable host)
+      is encountered during this phase, Zuul will typically restart
+      the job in the same way as it would if it encountered the same
+      error during a pre-run playbook.  However, if the user expects
+      one or more of the job's nodes to be unreachable at the start of
+      the job and then later become reachable as a result of
+      user-supplied actions in the pre-run playbook, this option may
+      be enabled to ignore errors during the setup phase or the job.
+
    .. attr:: pre-run
 
       The name of a playbook or list of playbooks to run before the
