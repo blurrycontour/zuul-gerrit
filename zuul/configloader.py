@@ -604,6 +604,7 @@ class JobParser(object):
                       'workspace-scheme': vs.Any('golang', 'flat', 'unique'),
                       'deduplicate': vs.Any(bool, 'auto'),
                       'failure-output': to_list(str),
+                      'ignore-setup-failure': bool
     }
 
     job_name = {vs.Required('name'): str}
@@ -630,6 +631,7 @@ class JobParser(object):
         'match-on-config-updates',
         'workspace-scheme',
         'deduplicate',
+        'ignore-setup-failure',
     ]
 
     def __init__(self, pcontext):

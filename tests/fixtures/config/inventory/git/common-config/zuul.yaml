@@ -103,6 +103,7 @@
 - job:
     name: network
     files: network.txt
+    ignore-setup-failure: true
     nodeset:
       nodes:
         - name: controller

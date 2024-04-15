@@ -2307,6 +2307,7 @@ class FrozenJob(zkobject.ZKObject):
                   'config_hash',
                   'deduplicate',
                   'failure_output',
+                  'ignore_setup_failure',
                   )
 
     job_data_attributes = ('artifact_data',
@@ -2448,6 +2449,9 @@ class FrozenJob(zkobject.ZKObject):
         # in Job.freezeJob so that FrozenJobs are identical regardless
         # of whether they have been deserialized.
         data = super().deserialize(raw, context)
+
+        # MODEL_API < 27
+        data.setdefault('ignore_setup_failure', None)
 
         if hasattr(self, 'nodeset_alternatives'):
             alts = self.nodeset_alternatives
@@ -2727,6 +2731,7 @@ class Job(ConfigObject):
         d['match_on_config_updates'] = self.match_on_config_updates
         d['deduplicate'] = self.deduplicate
         d['failure_output'] = self.failure_output
+        d['ignore_setup_failure'] = self.ignore_setup_failure
         if self.isBase():
             d['parent'] = None
         elif self.parent:
@@ -2807,6 +2812,7 @@ class Job(ConfigObject):
             post_review=None,
             workspace_scheme=SCHEME_GOLANG,
             failure_output=(),
+            ignore_setup_failure=None,
         )
 
         # These are generally internal attributes which are not
