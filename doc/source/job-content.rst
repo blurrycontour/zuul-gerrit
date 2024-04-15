@@ -650,6 +650,166 @@ The following variables related to the queue item are available:
          Change
             The topic of the change (if any).
 
+   .. var:: build_refs
+      :type: list
+
+      A list of dictionaries, each representing a ref associated with
+      this build.  Normally there is only one item in this list, but
+      if the queue item is a dependency cycle, more than one item in
+      the cycle requested the job be run, and the job has been
+      deduplicated, then each item for which this build is being run
+      will be present.  It is possible for a job to be deduplicated
+      against all items in the cycle, only some of them, or none.  If
+      deduplication happens for some or none, then multiple builds of
+      the job will be run, and this variable will indicate for which
+      of those items this particular build applies.
+
+      .. var:: branch
+
+         This field is present for the following item types:
+
+         Branch
+            The item's branch (without the `refs/heads/` prefix).
+
+         Change
+            The target branch of the change (without the `refs/heads/`
+            prefix).
+
+      .. var:: change
+
+         This field is present for the following item type:
+
+         Change
+            The identifier for the change.
+
+      .. var:: change_message
+
+         This field is present for the following item type:
+
+         Change
+            The commit or pull request message of the change.  When
+            Zuul runs Ansible, this variable is tagged with the
+            ``!unsafe`` YAML tag so that Ansible will not interpolate
+            values into it.  Note, however, that the `inventory.yaml`
+            file placed in the build's workspace for debugging and
+            inspection purposes does not inclued the ``!unsafe`` tag.
+
+      .. var:: change_url
+
+         This field is present for the following item type:
+
+         Change
+            The URL to the source location of the given change.
+            E.g., `https://review.example.org/#/c/123456/` or
+            `https://github.com/example/example/pull/1234`.
+
+      .. var:: patchset
+
+         This field is present for the following item types:
+
+         Change
+            The patchset identifier for the change.  If a change is
+            revised, this will have a different value.
+
+      .. var:: project
+
+         The item's project.  This is a data structure with the
+         following fields:
+
+         .. var:: name
+
+            The name of the project, excluding hostname.  E.g.,
+            `org/project`.
+
+         .. var:: short_name
+
+            The name of the project, excluding directories or
+            organizations.  E.g., `project`.
+
+         .. var:: canonical_hostname
+
+            The canonical hostname where the project lives.  E.g.,
+            `git.example.com`.
+
+         .. var:: canonical_name
+
+            The full canonical name of the project including hostname.
+            E.g., `git.example.com/org/project`.
+
+         .. var:: src_dir
+
+            The path to the source code on the remote host, relative
+            to the home dir of the remote user.
+            E.g., `src/git.example.com/org/project`.
+
+      .. var:: oldrev
+
+         This field is present for the following item types:
+
+         Branch
+            If the item was enqueued as the result of a change merging
+            or being pushed to the branch, the git sha of the old
+            revision will be included here.
+
+         Tag
+            If the item was enqueued as the result of a tag being
+            deleted, the previous git sha of the tag will be included
+            here.  If the tag was created, this variable will be
+            undefined.
+
+         Ref
+            If the item was enqueued as the result of a ref being
+            deleted, the previous git sha of the ref will be included
+            here.  If the ref was created, this variable will be
+            undefined.
+
+      .. var:: newrev
+
+         This field is present for the following item types:
+
+         Branch
+            If the item was enqueued as the result of a change merging
+            or being pushed to the branch, the git sha of the new
+            revision will be included here.
+
+         Tag
+            If the item was enqueued as the result of a tag being
+            created, the new git sha of the tag will be included here.
+            If the tag was deleted, this variable will be undefined.
+
+         Ref
+            If the item was enqueued as the result of a ref being
+            created, the new git sha of the ref will be included here.
+            If the ref was deleted, this variable will be undefined.
+
+      .. var:: commit_id
+
+         This field is present for the following item types:
+
+         Branch
+            The git sha of the branch.  Identical to ``newrev`` or
+            ``oldrev`` if defined.
+         Tag
+            The git sha of the tag.  Identical to ``newrev`` or
+            ``oldrev`` if defined.
+         Ref
+            The git sha of the ref.  Identical to ``newrev`` or
+            ``oldrev`` if defined.
+
+      .. var:: tag
+
+         This field is present for the following item types:
+
+         Tag
+            The name of the item's tag (without the `refs/tags/` prefix).
+
+      .. var:: topic
+
+         This field is present for the following item types:
+
+         Change
+            The topic of the change (if any).
+
    .. var:: buildset_refs
       :type: list
 
