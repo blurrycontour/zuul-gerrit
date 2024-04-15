@@ -83,6 +83,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f60d468_2f99119b",
+        "filename": "tools/decrypt_secret.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 34620
+      },
+      "writtenOn": "2024-04-15T14:43:15Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "342e8fa5_1f01e0c9",
+      "revId": "b2c07d43d6faedfc883dfbdb0aed0968a84222ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9960b64_b9bece39",
