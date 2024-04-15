@@ -677,7 +677,8 @@ class Repo(object):
             # merger/executor path details
             repo.git.commit(
                 message='Merge change %s,%s' % (
-                    item['number'], item['patchset']))
+                    item['number'], item['patchset']),
+                allow_empty=True)
         return repo.head.commit
 
     def rebaseMerge(self, item, base, zuul_event_id=None, timestamp=None):
