@@ -12,6 +12,7 @@
           - org/project3
           - org/project5
           - org/project6
+          - org/project7
       github:
         untrusted-projects:
           - gh/project
