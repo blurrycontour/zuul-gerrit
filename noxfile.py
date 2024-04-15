@@ -99,6 +99,9 @@ def tests(session):
 @nox.session(python='3')
 def upgrade(session):
     set_standard_env_vars(session)
+    # Disable log capture so that we get logs on the old side even if
+    # it doesn't fail.
+    set_env(session, 'OS_LOG_CAPTURE', '0')
     session.install('-r', 'requirements.txt',
                     '-r', 'test-requirements.txt')
     session.install('-e', '.')
