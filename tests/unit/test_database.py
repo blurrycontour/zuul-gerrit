@@ -43,6 +43,8 @@ class DBBaseTestCase(BaseTestCase):
 
 
 class TestMysqlDatabase(DBBaseTestCase):
+    always_attach_logs = True
+
     def setUp(self):
         super().setUp()
 
