@@ -10,14 +10,15 @@ can watch long-running jobs in progress.
 Streaming job output
 --------------------
 
-All jobs run with the :py:mod:`zuul.ansible.base.callback.zuul_stream` callback
+All jobs run with the
+:py:mod:`zuul.ansible.base.callback.normal.zuul_stream` callback
 plugin enabled, which writes the build log to a file so that the
-:py:class:`zuul.lib.log_streamer.LogStreamer` can provide the data on demand
-over the finger protocol. Finally, :py:class:`zuul.web.LogStreamHandler`
-exposes that log stream over a websocket connection as part of
-:py:class:`zuul.web.ZuulWeb`.
+:py:class:`zuul.lib.log_streamer.LogStreamer` can provide the data on
+demand over the finger protocol. Finally,
+:py:class:`zuul.web.LogStreamHandler` exposes that log stream over a
+websocket connection as part of :py:class:`zuul.web.ZuulWeb`.
 
-.. autoclass:: zuul.ansible.base.callback.zuul_stream.CallbackModule
+.. autoclass:: zuul.ansible.base.callback.normal.zuul_stream.CallbackModule
    :members:
 
 .. autoclass:: zuul.lib.log_streamer.LogStreamer
@@ -25,7 +26,7 @@ exposes that log stream over a websocket connection as part of
 .. autoclass:: zuul.web.ZuulWeb
 
 In addition to real-time streaming, Zuul also installs another callback module,
-:py:mod:`zuul.ansible.base.callback.zuul_json.CallbackModule` that collects all
+:py:mod:`zuul.ansible.base.callback.normal.zuul_json.CallbackModule` that collects all
 of the information about a given run into a json file which is written to the
 work dir so that it can be published along with build logs.
 
