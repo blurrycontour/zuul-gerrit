@@ -62,3 +62,13 @@ class TestUpgradeOld(ZuulTestCase):
         ], ordered=False)
         self.assertEqual(len(self.builds), 2)
         self.saveChangeDB()
+        # Shutdown the scheduler now before it gets any aborted events
+        self.scheds.execute(lambda app: app.sched.stop())
+        self.scheds.execute(lambda app: app.sched.join())
+        # Then release the executor jobs and stop the executors
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.scheds.execute(lambda app: app.sched.executor.stop())
+        # Tell the base class shutdown method that we don't have any
+        # schedulers so it doesn't try to shut them down again.
+        self.scheds.instances = []
