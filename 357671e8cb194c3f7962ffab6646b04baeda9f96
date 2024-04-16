@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a5d8793_a4198e88",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 701,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-16T10:02:19Z",
+      "side": 1,
+      "message": "With the changes in Iab8f99d4c4f40c44d630120c458539060cc725b5 the `change_url` will always be present (not only for Changes). This is also a bug in the current documentation.",
+      "revId": "357671e8cb194c3f7962ffab6646b04baeda9f96",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
