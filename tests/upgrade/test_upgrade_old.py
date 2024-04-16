@@ -62,3 +62,6 @@ class TestUpgradeOld(ZuulTestCase):
         ], ordered=False)
         self.assertEqual(len(self.builds), 2)
         self.saveChangeDB()
+        # Null out the running builds so that they aren't released
+        # then aborted/stopped during shutdown
+        self.executor_server.running_builds = []
