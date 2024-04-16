@@ -62,3 +62,7 @@ class TestUpgradeOld(ZuulTestCase):
         ], ordered=False)
         self.assertEqual(len(self.builds), 2)
         self.saveChangeDB()
+        # Make sure we don't send any ABORTED build events as we shut
+        # down
+        for worker in list(self.executor_server.job_workers.values()):
+            worker._send_aborted = lambda: None
