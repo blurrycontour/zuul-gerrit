@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58710709_9e4172ba",
+        "filename": "tests/base.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1375,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-17T23:50:58Z",
+      "side": 1,
+      "message": "This works because the old and new test classes both call their test case `test_upgrade`. So both sides will end up talking to the same databases.",
+      "revId": "39d8c58f85a544674536fe248060b1ef6d954148",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c7c3c46_9df788cc",
+        "filename": "tests/upgrade/test_upgrade_old.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-17T23:50:58Z",
+      "side": 1,
+      "message": "The test case has already done a stop and join of the schedulers on line 66-67. Is this necessary?",
+      "revId": "39d8c58f85a544674536fe248060b1ef6d954148",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
