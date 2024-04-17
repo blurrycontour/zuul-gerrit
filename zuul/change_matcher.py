@@ -148,18 +148,18 @@ class MatchAllFiles(AbstractMatchFiles):
     def matches(self, change):
         # NOTE(yoctozepto): make irrelevant files matcher match when
         # there are no files to check - return False (NB: reversed)
-        if not (hasattr(change, 'files') and change.files):
+        if not hasattr(change, 'files'):
             return False
-        if len(change.files) == 1 and self.commit_regex.match(change.files[0]):
+        files = [c for c in change.files
+                 if not self.commit_regex.match(c)]
+        if not files:
             return False
-        for file_ in change.files:
+        for file_ in files:
             matched_file = False
             for regex in self.regexes:
                 if regex.match(file_):
                     matched_file = True
                     break
-            if self.commit_regex.match(file_):
-                matched_file = True
             if not matched_file:
                 return False
         return True
@@ -170,11 +170,13 @@ class MatchAnyFiles(AbstractMatchFiles):
     def matches(self, change):
         # NOTE(yoctozepto): make files matcher match when
         # there are no files to check - return True
-        if not (hasattr(change, 'files') and change.files):
+        if not hasattr(change, 'files'):
             return True
-        if len(change.files) == 1 and self.commit_regex.match(change.files[0]):
+        files = [c for c in change.files
+                 if not self.commit_regex.match(c)]
+        if not files:
             return True
-        for file_ in change.files:
+        for file_ in files:
             for regex in self.regexes:
                 if regex.match(file_):
                     return True
