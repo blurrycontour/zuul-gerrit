@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2d238bd_a11f7607",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3481,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-17T23:10:25Z",
+      "side": 1,
+      "message": "We\u0027re using pickle to serialize not json. It may be less confusing for future debugging (if say you have to open the file) if the file suffix didn\u0027t indicate json should be in the file.",
+      "range": {
+        "startLine": 3481,
+        "startChar": 45,
+        "endLine": 3481,
+        "endChar": 57
+      },
+      "revId": "416023bf6f1037dc1f8c8e3096312ddb8ecb8084",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3dc07613_27a4f9a3",
+        "filename": "tests/fakegitlab.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-17T23:10:25Z",
+      "side": 1,
+      "message": "This gitlab argument is added because having a self.gitlab on FakeGitlabMergeRequest would not be serializable.\n\n/me just writing down the reason for this change which updates tests in test_gitlab_driver.py.",
+      "revId": "416023bf6f1037dc1f8c8e3096312ddb8ecb8084",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "afe85247_64b1502e",
+        "filename": "zuul/driver/gerrit/gerritreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-17T23:10:25Z",
+      "side": 1,
+      "message": "This is where we convert the ZuulConfigKey objects to strings?",
+      "revId": "416023bf6f1037dc1f8c8e3096312ddb8ecb8084",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
