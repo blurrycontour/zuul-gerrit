@@ -93,6 +93,14 @@ class ZuulRegex:
             return not self.re.search(subject)
         return self.re.search(subject)
 
+    def toDict(self):
+        # This is used in user-facing serialization, like zuul-web, to
+        # match job syntax.
+        return {
+            "regex": self.pattern,
+            "negate": self.negate,
+        }
+
     def serialize(self):
         return {
             "pattern": self.pattern,

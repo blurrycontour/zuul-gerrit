@@ -3467,6 +3467,36 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(B.data['status'], 'MERGED')
         self.assertEqual(B.reported, 2)
 
+    def _test_files_negated_jobs(self, should_skip):
+        "Test that jobs with negated files filter run only when appropriate"
+        if should_skip:
+            files = {'dontrun': 'me\n'}
+        else:
+            files = {'dorun': 'please!\n'}
+
+        change = self.fake_gerrit.addFakeChange('org/project',
+                                                'master',
+                                                'test files',
+                                                files=files)
+        self.fake_gerrit.addEvent(change.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        tested_change_ids = [x.changes[0] for x in self.history
+                             if x.name == 'project-test-files']
+
+        if should_skip:
+            self.assertEqual([], tested_change_ids)
+        else:
+            self.assertIn(change.data['number'], tested_change_ids)
+
+    @simple_layout('layouts/files-negate.yaml')
+    def test_files_negated_no_match_skips_job(self):
+        self._test_files_negated_jobs(should_skip=True)
+
+    @simple_layout('layouts/files-negate.yaml')
+    def test_files_negated_match_runs_job(self):
+        self._test_files_negated_jobs(should_skip=False)
+
     def _test_irrelevant_files_jobs(self, should_skip):
         "Test that jobs with irrelevant-files filter run only when appropriate"
         if should_skip:
@@ -3496,6 +3526,42 @@ class TestScheduler(ZuulTestCase):
     @simple_layout('layouts/irrelevant-files.yaml')
     def test_irrelevant_files_no_match_runs_job(self):
         self._test_irrelevant_files_jobs(should_skip=False)
+
+    def _test_irrelevant_files_negated_jobs(self, should_skip):
+        "Test that jobs with irrelevant-files filter run only when appropriate"
+        if should_skip:
+            files = {'ignoreme': 'ignored\n'}
+        else:
+            files = {'respectme': 'please!\n'}
+
+        change = self.fake_gerrit.addFakeChange('org/project',
+                                                'master',
+                                                'test irrelevant-files',
+                                                files=files)
+        self.fake_gerrit.addEvent(change.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        tested_change_ids = [x.changes[0] for x in self.history
+                             if x.name == 'project-test-irrelevant-files']
+
+        if should_skip:
+            self.assertEqual([], tested_change_ids)
+        else:
+            self.assertIn(change.data['number'], tested_change_ids)
+
+    @simple_layout('layouts/irrelevant-files-negate.yaml')
+    def test_irrelevant_files_negated_match_skips_job(self):
+        # Anything other than "respectme" is irrelevant. This adds
+        # "README" which is irrelevant, and "ignoreme" which is
+        # irrelevant, so the job should not run.
+        self._test_irrelevant_files_negated_jobs(should_skip=True)
+
+    @simple_layout('layouts/irrelevant-files-negate.yaml')
+    def test_irrelevant_files_negated_no_match_runs_job(self):
+        # Anything other than "respectme" is irrelevant. This adds
+        # "README" which is irrelevant, and "respecme" which *is*
+        # relevant, so the job should run.
+        self._test_irrelevant_files_negated_jobs(should_skip=False)
 
     @simple_layout('layouts/inheritance.yaml')
     def test_inherited_jobs_keep_matchers(self):
