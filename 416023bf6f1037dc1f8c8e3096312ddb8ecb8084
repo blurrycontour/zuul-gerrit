@@ -26,6 +26,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "bf61be05_60cb178b",
+        "filename": "tests/base.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 3481,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-17T23:13:53Z",
+      "side": 1,
+      "message": "Oops!",
+      "parentUuid": "a2d238bd_a11f7607",
+      "revId": "416023bf6f1037dc1f8c8e3096312ddb8ecb8084",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "3dc07613_27a4f9a3",
         "filename": "tests/fakegitlab.py",
         "patchSetId": 3
@@ -54,6 +72,24 @@
       "writtenOn": "2024-04-17T23:10:25Z",
       "side": 1,
       "message": "This is where we convert the ZuulConfigKey objects to strings?",
+      "revId": "416023bf6f1037dc1f8c8e3096312ddb8ecb8084",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32532c42_6cf71876",
+        "filename": "zuul/driver/gerrit/gerritreporter.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-17T23:13:53Z",
+      "side": 1,
+      "message": "Yep, mostly for debug log purposes.",
+      "parentUuid": "afe85247_64b1502e",
       "revId": "416023bf6f1037dc1f8c8e3096312ddb8ecb8084",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
