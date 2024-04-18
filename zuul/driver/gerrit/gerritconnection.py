@@ -1163,6 +1163,15 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         #               here to keep logs clean.
         if data.get('type') in GerritEventConnector.IGNORED_EVENTS:
             return
+        # Due to notedb, an high percentage of all events Zuul
+        # processes are ref-updated of the /meta ref, and that is
+        # unlikely to be used in Zuul.  Skip those here so that we
+        # reduce traffic on the event queue.
+        if data.get('type') == 'ref-updated':
+            refname = data.get('refUpdate', {}).get('refName', '')
+            if (refname.startswith('refs/changes/') and
+                refname.endswith('/meta')):
+                return
 
         event_uuid = uuid4().hex
         attributes = {
