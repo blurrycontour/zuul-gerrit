@@ -33,6 +33,24 @@
       "message": "The test case has already done a stop and join of the schedulers on line 66-67. Is this necessary?",
       "revId": "39d8c58f85a544674536fe248060b1ef6d954148",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "836f80c0_c362f464",
+        "filename": "tests/upgrade/test_upgrade_old.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-18T00:21:04Z",
+      "side": 1,
+      "message": "No -- in fact, we should just update this, thanks.",
+      "parentUuid": "0c7c3c46_9df788cc",
+      "revId": "39d8c58f85a544674536fe248060b1ef6d954148",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
