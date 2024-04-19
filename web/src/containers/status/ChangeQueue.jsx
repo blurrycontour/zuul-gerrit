@@ -28,8 +28,146 @@ import {
 import QueueItem from './QueueItem'
 import { getQueueItemIconConfig } from './Misc'
 
+// This function will create a "tree-like" data structure to visualize
+// multiple branches in a single ChangeQueue.
+// The data structure is basically a linked-list that contains
+// additional branches for items that are no longer relevant for the
+// main branch (e.g. merge conflicts in a dependent pipeline). The base
+// for the data structure is the "items_behind" relation of queue items.
+// As a result, each queue item will have a single item_behind in the
+// the main branch, while all other items_behind are moved to different
+// branches.
+//
+// In the example below the items A, B, D and F build the "main" branch,
+// while the items C and E create new branches (e.g. due to merge
+// conflicts). G is the item behind E, so it will also be part of the
+// branch starting with E.
+//
+// A
+// |
+// B
+// |-C
+// D
+// |-E
+// | |
+// F G
+const createTree = (head) => {
+  // Root of the tree/linked list
+  let tree = null
+
+  // Map for easier lookup of items by their id
+  const itemsById = {}
+  // Create a copy of the original queue, so we can remove the current
+  // node while iterating over the list. Once the list is empty, we
+  // know that we have seen all items in the queue.
+  //let head = JSON.parse(JSON.stringify(_head))
+
+  // First iteration: Create map for "lookup by id"
+  head.forEach(item => {
+    itemsById[item.id] = item
+  })
+
+  // Second iteration: Move each item to the correct position within
+  // the tree
+  head.forEach(node => {
+    // node._next builds a linked-list to visualize the "main" branch
+    // of the queue.
+    node._next = null
+    // Branches will contain all items_behind which are not part of
+    // main branch.
+    node._branches = []
+
+    // Create the root of the tree
+    if (tree === null) {
+      tree = node
+    }
+
+    if (node.items_behind.length === 0) {
+      // Basically a continue for the forEach loop
+      return
+    }
+
+    // Copy the items_behind, so we pop() already assigned items without
+    // affecting the original array.
+    const items_behind = node.items_behind.slice()
+    if (items_behind.length > 1) {
+      // The last element in the list is the item_behind on the "main"
+      // branch
+      const item_behind = itemsById[items_behind.pop()]
+      node._next = item_behind
+      // All other items_behind are failing ones, so they should be
+      // added to separate branches
+      items_behind.forEach(item => {
+        const item_behind = itemsById[item]
+        node._branches.push(item_behind)
+      })
+    } else {
+      // We have only one element, so add it to the main branch
+      const item_behind = itemsById[items_behind.pop()]
+      node._next = item_behind
+    }
+  })
+
+  return tree
+}
+
+const Branch = ({ item, newBranch = false }) => {
+  // Recursively render QueueItems to visualize a ChangeQueue.
+  const iconConfig = getQueueItemIconConfig(item)
+  const Icon = iconConfig.icon
+
+  const step = (
+    <>
+      <ProgressStep
+        variant={iconConfig.variant}
+        id={item.id}
+        titleId={item.id}
+        icon={<Icon />}
+        style={{ marginBottom: '16px' }}
+        key={`ps-${item.id}`}
+      >
+        <QueueItem item={item} />
+        {/* To visualize a new branch, we put a ProgressStepper within
+            the current ProgressStep. */}
+        {item._branches.map((branch, idx) => (
+          <Branch item={branch} newBranch={true} key={`br-${item.id}-${idx}`} />
+        ))}
+      </ProgressStep>
+      {/* Items in the same branch must come after the current
+          ProgressStep. We don't want them to be nested. */}
+      {item._next !== null ? <Branch item={item._next} /> : ''}
+    </>
+  )
+
+  const wrappedStep = (
+    <div className="zuul-branch-wrapper">
+      <ProgressStepper isVertical className="zuul-queue-branch">
+        {step}
+      </ProgressStepper>
+    </div>
+  )
+
+  // If we want to start a new branch, we have to wrap the current
+  // branch into a new ProgressStepper.
+  if (newBranch) {
+    return wrappedStep
+  }
+
+  // Otherwise, just return the current step
+  return step
+}
+
+Branch.propTypes = {
+  item: PropTypes.object.isRequired,
+  newBranch: PropTypes.bool,
+}
 
 function ChangeQueue({ queue }) {
+  // TODO (felix): Use useMemo hook to cache the rendered tree across re-renders
+  const trees = []
+  queue.heads.forEach(head => (
+    trees.push(createTree(head))
+  ))
   return (
     <>
       <Card isPlain className="zuul-change-queue">
@@ -43,26 +181,11 @@ function ChangeQueue({ queue }) {
           : ''}
         <CardBody>
           <Panel>
-            <ProgressStepper isVertical>
-              {queue.heads.map(head => (
-                head.map(item => {
-                  const iconConfig = getQueueItemIconConfig(item)
-                  const Icon = iconConfig.icon
-                  return (
-                    <ProgressStep
-                      variant={iconConfig.variant}
-                      id={item.id}
-                      titleId={item.id}
-                      icon={<Icon />}
-                      style={{ marginBottom: '16px' }}
-                      key={item.id}
-                    >
-                      <QueueItem item={item} />
-                    </ProgressStep>
-                  )
-                })
-              ))}
-            </ProgressStepper>
+            {trees.map(tree => (
+              <ProgressStepper key={tree.id} isVertical>
+                <Branch item={tree} />
+              </ProgressStepper>
+            ))}
           </Panel>
         </CardBody>
       </Card >
