@@ -352,6 +352,19 @@ a.refresh {
     animation: progress-bar-stripes 1s linear infinite;
 }
 
+.pf-c-progress-stepper.zuul-queue-branch {
+    margin-top: 20px;
+}
+
+.zuul-branch-wrapper::before {
+    content: "";
+    position: absolute;
+    border-bottom: var(--pf-c-progress-stepper__step-connector--before--BorderRightWidth) solid var(--pf-c-progress-stepper__step-connector--before--BorderRightColor);
+    left: 15px;
+    height: 14px;
+    width: 40px;
+}
+
 .zuul-pipeline-header h3 {
     font-weight: var(--pf-global--FontWeight--bold);
 }
