@@ -484,7 +484,7 @@ class Pipeline(object):
         A description of which events should be processed
 
     Manager
-        Responsible for enqueing and dequeing Changes
+        Responsible for enqueueing and dequeueing Changes
 
     Reporter
         Communicates success and failure results somewhere
