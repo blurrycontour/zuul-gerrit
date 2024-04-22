@@ -723,10 +723,11 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         else:
             change.base_sha = None
         change.owner = change.mr['author'].get('username')
-        # Files changes are not part of the Merge Request data
-        # See api/merge_requests.html#get-single-mr-changes
-        # this endpoint includes file changes information
-        change.files = None
+        # Files changes are not part of the Merge Request data, so we
+        # always request the Zuul merger fetch them.  But don't
+        # overwrite the returned value if it has completed.
+        if not change.files:
+            change.files = None
         change.title = change.mr['title']
         change.open = change.mr['state'] == 'opened'
         change.is_merged = change.mr['state'] == 'merged'
