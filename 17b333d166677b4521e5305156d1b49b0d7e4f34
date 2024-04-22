@@ -16,6 +16,24 @@
       "message": "This is not used.",
       "revId": "17b333d166677b4521e5305156d1b49b0d7e4f34",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78ab0527_d5b0cd9b",
+        "filename": "tools/zuul-keys-migrate.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 34620
+      },
+      "writtenOn": "2024-04-22T13:34:41Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "86709d14_8d85a350",
+      "revId": "17b333d166677b4521e5305156d1b49b0d7e4f34",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
