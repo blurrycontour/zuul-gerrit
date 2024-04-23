@@ -111,7 +111,7 @@ const createTree = (_head) => {
   return tree
 }
 
-const Branch = ({ item, newBranch = false }) => {
+const Branch = ({ item, pipeline, newBranch = false }) => {
   // Recursively render QueueItems to visualize a ChangeQueue.
   const iconConfig = getQueueItemIconConfig(item)
   const Icon = iconConfig.icon
@@ -126,16 +126,16 @@ const Branch = ({ item, newBranch = false }) => {
         style={{ marginBottom: '16px' }}
         key={item.id}
       >
-        <QueueItem item={item} />
+        <QueueItem item={item} pipeline={pipeline} />
         {/* To visualize a new branch, we put a ProgressStepper within
             the current ProgressStep. */}
         {item._branches.map(branch => (
-          <Branch item={branch} newBranch={true} key={item.id} />
+          <Branch item={branch} pipeline={pipeline} newBranch={true} key={item.id} />
         ))}
       </ProgressStep>
       {/* Items in the same branch must come after the current
           ProgressStep. We don't want them to be nested. */}
-      {item._next !== null ? <Branch item={item._next} /> : ''}
+      {item._next !== null ? <Branch item={item._next} pipeline={pipeline} /> : ''}
     </>
   )
 
@@ -159,10 +159,11 @@ const Branch = ({ item, newBranch = false }) => {
 
 Branch.propTypes = {
   item: PropTypes.object.isRequired,
+  pipeline: PropTypes.object.isRequired,
   newBranch: PropTypes.bool,
 }
 
-function ChangeQueue({ queue }) {
+function ChangeQueue({ queue, pipeline }) {
   const trees = []
   queue.heads.forEach(head => (
     trees.push(createTree(head))
@@ -182,7 +183,7 @@ function ChangeQueue({ queue }) {
           <Panel>
             {trees.map(tree => (
               <ProgressStepper key={tree.id} isVertical>
-                <Branch item={tree} />
+                <Branch item={tree} pipeline={pipeline} />
               </ProgressStepper>
             ))}
           </Panel>
@@ -194,6 +195,7 @@ function ChangeQueue({ queue }) {
 
 ChangeQueue.propTypes = {
   queue: PropTypes.object,
+  pipeline: PropTypes.object,
   tenant: PropTypes.object,
 }
 
