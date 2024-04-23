@@ -26,6 +26,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef467bda_33c3e1ae",
+        "filename": "doc/source/operation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-23T16:23:28Z",
+      "side": 1,
+      "message": "Now I\u0027m confused by your comment.  As the docs say, this option only makes sense set for all or none.  The option is explicitly to create \"no working zuul\".  I\u0027m open to changing the text, but you actually did understand it correctly, it just seems like the use case of \"create no working zuul\" didn\u0027t register.  The idea is to be able to create a standby zuul with a warmed config cache.  To do that, you need schedulers running that don\u0027t process pipeline events.  This does that.",
+      "parentUuid": "8201071b_de65e78e",
+      "revId": "7253052687d95a71739c50d88aa4652a9ef1fc63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "54fe48b4_e9d3b084",
         "filename": "zuul/cmd/scheduler.py",
         "patchSetId": 1
@@ -37,6 +55,24 @@
       "writtenOn": "2024-04-23T16:17:00Z",
       "side": 1,
       "message": "The default returned by envBool will be None when no default is supplied. This is a falsey value but may be confusing in contexts like --help output. May be better to set a default of False here explicitly.",
+      "revId": "7253052687d95a71739c50d88aa4652a9ef1fc63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d7b2300_f61d720a",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-23T16:23:28Z",
+      "side": 1,
+      "message": "The default value here does not automatically appear in the help output, so I think we can leave this in the current pythonic idiom.",
+      "parentUuid": "54fe48b4_e9d3b084",
       "revId": "7253052687d95a71739c50d88aa4652a9ef1fc63",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -54,6 +90,24 @@
       "writtenOn": "2024-04-23T16:17:00Z",
       "side": 1,
       "message": "See above.",
+      "revId": "7253052687d95a71739c50d88aa4652a9ef1fc63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cade7c02_f35038e3",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-23T16:23:28Z",
+      "side": 1,
+      "message": "Ditto.",
+      "parentUuid": "0b60a30b_90ad51c1",
       "revId": "7253052687d95a71739c50d88aa4652a9ef1fc63",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
