@@ -1569,7 +1569,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                         if change.data["lastUpdated"] >= cut_off_time
                     ]
                 if part.startswith('topic:'):
-                    topic = part[len('topic:'):].strip().strip('"\'')
+                    topic = part[len('topic:'):].strip().strip('{}')
                     l = [
                         change for change in l
                         if 'topic' in change.data
