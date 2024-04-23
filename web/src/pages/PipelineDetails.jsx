@@ -83,7 +83,7 @@ function PipelineDetailsPage({ pipeline, isFetching, tenant, darkMode, fetchStat
               queue => queue.heads.length > 0
             ).map((queue, idx) => (
               <GalleryItem key={idx}>
-                <ChangeQueue queue={queue} />
+                <ChangeQueue queue={queue} pipeline={pipeline} />
               </GalleryItem>
             ))
           }
