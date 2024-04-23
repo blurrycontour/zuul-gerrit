@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8201071b_de65e78e",
+        "filename": "doc/source/operation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-23T16:17:00Z",
+      "side": 1,
+      "message": "I find this statement to be a bit confusing. This option is only helpful if at least some zuul schedulers are processing pipelines and others are not. Otherwise you either have no working zuul at all or a normal zuul operating as before this change.",
+      "range": {
+        "startLine": 82,
+        "startChar": 26,
+        "endLine": 85,
+        "endChar": 5
+      },
+      "revId": "7253052687d95a71739c50d88aa4652a9ef1fc63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54fe48b4_e9d3b084",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-23T16:17:00Z",
+      "side": 1,
+      "message": "The default returned by envBool will be None when no default is supplied. This is a falsey value but may be confusing in contexts like --help output. May be better to set a default of False here explicitly.",
+      "revId": "7253052687d95a71739c50d88aa4652a9ef1fc63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b60a30b_90ad51c1",
+        "filename": "zuul/cmd/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-23T16:17:00Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "7253052687d95a71739c50d88aa4652a9ef1fc63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
