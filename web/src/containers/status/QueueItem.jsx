@@ -14,9 +14,10 @@
 
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 
 import {
+  Button,
   Card,
   CardActions,
   CardTitle,
@@ -31,6 +32,8 @@ import {
   DropdownItem,
   ExpandableSection,
   KebabToggle,
+  Modal,
+  ModalVariant,
 } from '@patternfly/react-core'
 import {
   AngleDoubleUpIcon,
@@ -47,36 +50,117 @@ import {
 
 import QueueItemProgress from './QueueItemProgress'
 
-function QueueItem({ item, tenant }) {
-  const [isOpen, setIsOpen] = useState(false)
+import { dequeue, dequeue_ref, promote } from '../../api'
+import { addDequeueError, addPromoteError } from '../../actions/adminActions'
+import { addNotification } from '../../actions/notifications'
+import { fetchStatusIfNeeded } from '../../actions/status'
+
+function QueueItem({ item, pipeline, tenant, user }) {
+  const [isAdminActionsOpen, setIsAdminActionsOpen] = useState(false)
+  const [isDequeueModalOpen, setIsDequeueModalOpen] = useState(false)
+  const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false)
   const [isJobsExpanded, setIsJobsExpanded] = useState(false)
+
+  const dispatch = useDispatch()
 
   const onJobsToggle = (isExpanded) => {
     setIsJobsExpanded(isExpanded)
   }
 
   const onSelect = () => {
-    setIsOpen(!isOpen)
+    setIsAdminActionsOpen(!isAdminActionsOpen)
   }
 
   const showDequeueModal = () => {
-    // TODO (felix): Implement
+    setIsDequeueModalOpen(true)
   }
 
-  const showCancelModal = () => {
-    // TODO (felix): Implement
+  const showPromoteModal = () => {
+    setIsPromoteModalOpen(true)
+  }
+
+  const confirmDequeue = () => {
+    const ref = getRefs(item)[0]
+    // Use the first ref as a proxy for the item since queue
+    // commands operate on changes
+    let projectName = ref.project
+    let refId = ref.id || 'N/A'
+    let refRef = ref.ref
+
+    // close the modal
+    setIsDequeueModalOpen(false)
+
+    // post-merge
+    if (/^[0-9a-f]{40}$/.test(refId)) {
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, refRef)
+        .then(() => {
+          dispatch(fetchStatusIfNeeded(tenant))
+        })
+        .catch(error => {
+          dispatch(addDequeueError(error))
+        })
+      // pre-merge, ie we have a change id
+    } else if (refId !== 'N/A') {
+      dequeue(tenant.apiPrefix, projectName, pipeline.name, refId)
+        .then(() => {
+          dispatch(fetchStatusIfNeeded(tenant))
+        })
+        .catch(error => {
+          dispatch(addDequeueError(error))
+        })
+    } else {
+      dispatch(addNotification({
+        url: null,
+        status: 'Invalid change ' + refRef + ' on project ' + projectName,
+        text: '',
+        type: 'error',
+      }))
+    }
+  }
+
+  const confirmPromote = () => {
+    const ref = getRefs(item)[0]
+    let refId = ref.id || 'NA'
+
+    // close the modal
+    setIsPromoteModalOpen(false)
+
+    if (refId !== 'N/A') {
+      promote(tenant.apiPrefix, pipeline.name, [refId,])
+        .then(() => {
+          dispatch(fetchStatusIfNeeded(tenant))
+        })
+        .catch(error => {
+          dispatch(addPromoteError(error))
+        })
+    } else {
+      dispatch(addNotification({
+        url: null,
+        status: 'Invalid change ' + refId + ' for promotion',
+        text: '',
+        type: 'error'
+      }))
+    }
+  }
+
+  const cancelDequeue = () => {
+    setIsDequeueModalOpen(false)
+  }
+
+  const cancelPromote = () => {
+    setIsPromoteModalOpen(false)
   }
 
   const times = calculateQueueItemTimes(item)
 
-  const dropdownItems = [
+  const adminActions = [
     <DropdownItem
       key="dequeue"
       icon={<BanIcon style={{
         color: 'var(--pf-global--danger-color--100)',
       }} />}
       description="Stop all jobs for this change"
-      onClick={showDequeueModal()}
+      onClick={() => showDequeueModal()}
     >
       Dequeue
     </DropdownItem>,
@@ -86,11 +170,61 @@ function QueueItem({ item, tenant }) {
         color: 'var(--pf-global--default-color--200)',
       }} />}
       description="Promote this change to the top of the queue"
-      onClick={showCancelModal()}
+      onClick={() => showPromoteModal()}
     >
       Promote
     </DropdownItem>
   ]
+
+  const renderDequeueModal = () => {
+    const ref = getRefs(item)[0]
+    let projectName = ref.project
+    let refId = ref.id || ref.ref
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        isOpen={isDequeueModalOpen}
+        title="You are about to dequeue a change"
+        onClose={cancelDequeue}
+        actions={[
+          <Button key="deq_confirm" variant="primary" onClick={confirmDequeue}>
+            Confirm
+          </Button>,
+          <Button key="deq_cancel" variant="link" onClick={cancelDequeue}>
+            Cancel
+          </Button>,
+        ]}>
+        <p>
+          Please confirm that you want to cancel <strong>all ongoing builds</strong> on
+          change <strong>{refId}</strong> for project <strong>{projectName}</strong>.
+        </p>
+      </Modal>
+    )
+  }
+
+
+  const renderPromoteModal = () => {
+    const ref = getRefs(item)[0]
+    let refId = ref.id || 'N/A'
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        isOpen={isPromoteModalOpen}
+        title="You are about to promote a change"
+        onClose={cancelPromote}
+        actions={[
+          <Button key="prom_confirm" variant="primary" onClick={confirmPromote}>
+            Confirm
+          </Button>,
+          <Button key="prom_cancel" variant="link" onClick={cancelPromote}>
+            Cancel
+          </Button>,
+        ]}
+      >
+        <p>Please confirm that you want to promote a change <strong>{refId}</strong>.</p>
+      </Modal>
+    )
+  }
 
   const renderJobList = (jobs) => {
     return (
@@ -121,14 +255,14 @@ function QueueItem({ item, tenant }) {
     <>
       <Card isCompact className={`zuul-compact-card ${item.live === true ? 'zuul-queue-item' : ''}`}>
         <CardHeader>
-          {item.live === true ?
+          {item.live === true && user.isAdmin && user.scope.indexOf(tenant.name) !== -1 ?
             <CardActions>
               <Dropdown
                 onSelect={onSelect}
-                toggle={<KebabToggle onToggle={setIsOpen} />}
-                isOpen={isOpen}
+                toggle={<KebabToggle onToggle={setIsAdminActionsOpen} />}
+                isOpen={isAdminActionsOpen}
                 isPlain
-                dropdownItems={dropdownItems}
+                dropdownItems={adminActions}
                 position={'right'}
                 style={{ width: '28px' }}
               />
@@ -157,13 +291,20 @@ function QueueItem({ item, tenant }) {
           </CardBody>
           : ''}
       </Card >
+      {renderDequeueModal()}
+      {renderPromoteModal()}
     </>
   )
 }
 
 QueueItem.propTypes = {
   item: PropTypes.object,
+  pipeline: PropTypes.object,
   tenant: PropTypes.object,
+  user: PropTypes.object,
 }
 
-export default connect((state) => ({ tenant: state.tenant }))(QueueItem)
+export default connect(state => ({
+  tenant: state.tenant,
+  user: state.user,
+}))(QueueItem)
