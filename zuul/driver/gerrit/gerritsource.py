@@ -29,6 +29,12 @@ from zuul.lib.dependson import find_dependency_headers
 from zuul.zk.change_cache import ChangeKey
 
 
+TOPIC_QUERY_ESCAPE = str.maketrans({
+    '{': '',
+    '}': '',
+})
+
+
 def noneOrStr(val):
     if val is None:
         return None
@@ -165,7 +171,7 @@ class GerritSource(BaseSource):
             history = []
         history.append(topic)
 
-        query = 'status:open topic:"%s"' % topic
+        query = 'status:open topic:{%s}' % topic.translate(TOPIC_QUERY_ESCAPE)
         results = self.connection.simpleQuery(query)
         for result in results:
             change_key = ChangeKey(self.connection.connection_name, None,
