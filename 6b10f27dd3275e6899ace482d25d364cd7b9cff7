@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a117030_1c8ec163",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-23T14:49:27Z",
+      "side": 1,
+      "message": "It does -- so this probably either warrants proper handling of curly brace quoting, or a release note and a note in the gerrit driver docs noting the limitation.\n\nSince the limitation is only needed by the ssh driver, and we recommend configurations use http now for all queries and reporting to gerrit, I think we should limit this fix to the ssh code path as well.",
+      "revId": "6b10f27dd3275e6899ace482d25d364cd7b9cff7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
