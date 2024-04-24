@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6ab4b9c_3a56ab4a",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 696,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-24T18:39:28Z",
+      "side": 1,
+      "message": "Returning False here instead of true means we\u0027re actually inverting the check. A value less than the config value v is not newer than the supplied config value.\n\nThis isn\u0027t\u0027 a regression, but I wonder if a slightly clearer way to express this is:\n\n```\nelif k \u003d\u003d \u0027newer-than\u0027:\n    value \u003d datetime.datetime.utcfromtimestamp(\n        approval[\u0027grantedOn\u0027])\n    # We are interested in knowing when the requirement is not met\n    return not (value \u003e\u003d v)\n```",
+      "revId": "d7e375cc21402eba6ea43054074830c52dcc2c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
