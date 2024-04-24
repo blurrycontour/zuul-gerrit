@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -22,6 +22,10 @@ import {
   GalleryItem,
   PageSection,
   PageSectionVariants,
+  Switch,
+  Toolbar,
+  ToolbarContent,
+  ToolbarItem,
 } from '@patternfly/react-core'
 
 import PipelineSummary from '../containers/status/PipelineSummary'
@@ -50,7 +54,40 @@ TenantStats.propTypes = {
   stats: PropTypes.object,
 }
 
+function PipelineGallery({ pipelines, tenant, showEmptyPipelines }) {
+  // Filter out empty pipelines if necessary
+  if (!showEmptyPipelines) {
+    pipelines = pipelines.filter(ppl => ppl._count > 0)
+  }
+
+  return (
+    <Gallery
+      hasGutter
+      minWidths={{
+        default: '450px',
+      }}
+    >
+      {pipelines.map(pipeline => (
+        <GalleryItem key={pipeline.name}>
+          <PipelineSummary pipeline={pipeline} tenant={tenant} showEmptyQueues={showEmptyPipelines} />
+        </GalleryItem>
+      ))}
+    </Gallery>
+  )
+}
+
+PipelineGallery.propTypes = {
+  pipelines: PropTypes.array,
+  tenant: PropTypes.object,
+  showEmptyPipelines: PropTypes.bool,
+}
+
 function PipelineOverviewPage({ pipelines, stats, isFetching, tenant, darkMode, fetchStatusIfNeeded }) {
+  const [showEmptyPipelines, setShowEmptyPipelines] = useState(false)
+
+  const onShowEmptyPipelinesToggle = (isChecked) => {
+    setShowEmptyPipelines(isChecked)
+  }
 
   useEffect(() => {
     document.title = 'Zuul Status'
@@ -67,20 +104,26 @@ function PipelineOverviewPage({ pipelines, stats, isFetching, tenant, darkMode, 
     <>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <TenantStats stats={stats} />
+        <Toolbar>
+          <ToolbarContent>
+            <ToolbarItem>
+              <span>Show empty pipelines</span>{' '}
+              <Switch
+                id="empty-pipeline-switch"
+                aria-label="Show empty pipelines"
+                isChecked={showEmptyPipelines}
+                onChange={onShowEmptyPipelinesToggle}
+              />
+            </ToolbarItem>
+          </ToolbarContent>
+        </Toolbar>
       </PageSection>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
-        <Gallery
-          hasGutter
-          minWidths={{
-            default: '450px',
-          }}
-        >
-          {pipelines.map(pipeline => (
-            <GalleryItem key={pipeline.name}>
-              <PipelineSummary pipeline={pipeline} tenant={tenant} />
-            </GalleryItem>
-          ))}
-        </Gallery>
+        <PipelineGallery
+          pipelines={pipelines}
+          tenant={tenant}
+          showEmptyPipelines={showEmptyPipelines}
+        />
       </PageSection>
     </>
   )
@@ -116,7 +159,7 @@ function mapStateToProps(state) {
     // TODO (felix): Make filtering optional via a switch (default: on)
     pipelines = state.status.status.pipelines.map(ppl => (
       { ...ppl, _count: countItems(ppl) }
-    )).filter(ppl => ppl._count > 0)
+    ))
     stats = {
       trigger_event_queue: state.status.status.trigger_event_queue,
       management_event_queue: state.status.status.management_event_queue,
