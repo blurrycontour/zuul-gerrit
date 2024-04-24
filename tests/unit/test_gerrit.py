@@ -973,6 +973,38 @@ class TestGerritConnection(ZuulTestCase):
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
 
+    def test_ignored_events(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        event_queue = self.fake_gerrit.gerrit_event_connector.event_queue
+
+        # Hold the lock so the scheduler does not pull any events from
+        # the queue
+        with self.scheds[0].sched.run_handler_lock:
+            # This is ignored unconditionally
+            self.fake_gerrit.addEvent({
+                "type": "cache-eviction",
+            })
+            self.assertEqual(0, len(event_queue._listEvents()))
+            # This is ignored for meta refs only
+            self.fake_gerrit.addEvent({
+                "type": "ref-updated",
+                "submitter": {
+                    "name": "User Name",
+                },
+                "refUpdate": {
+                    "oldRev": '0',
+                    "newRev": '0',
+                    "refName": 'refs/changes/01/1/meta',
+                    "project": 'org/project',
+                }
+            })
+            self.assertEqual(0, len(event_queue._listEvents()))
+            # This is not ignored
+            A.setMerged()
+            self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+            self.assertEqual(1, len(event_queue._listEvents()))
+        self.waitUntilSettled()
+
     def test_submit_requirements(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
