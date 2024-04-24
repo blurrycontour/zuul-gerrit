@@ -27,8 +27,30 @@ import {
 import PipelineSummary from '../containers/status/PipelineSummary'
 
 import { fetchStatusIfNeeded } from '../actions/status'
+import { Fetching } from '../containers/Fetching'
 
-function PipelineOverviewPage({ pipelines, tenant, darkMode, fetchStatusIfNeeded }) {
+
+function TenantStats({ stats }) {
+  return (
+    <>
+      <p>
+        Queue lengths:{' '}
+        <span>
+          {stats.trigger_event_queue ? stats.trigger_event_queue.length : '0'}
+        </span> trigger events,{' '}
+        <span>
+          {stats.management_event_queue ? stats.management_event_queue.length : '0'}
+        </span> management events.
+      </p>
+    </>
+  )
+}
+
+TenantStats.propTypes = {
+  stats: PropTypes.object,
+}
+
+function PipelineOverviewPage({ pipelines, stats, isFetching, tenant, darkMode, fetchStatusIfNeeded }) {
 
   useEffect(() => {
     document.title = 'Zuul Status'
@@ -37,8 +59,15 @@ function PipelineOverviewPage({ pipelines, tenant, darkMode, fetchStatusIfNeeded
     }
   }, [tenant, fetchStatusIfNeeded])
 
+  if (isFetching) {
+    return <Fetching />
+  }
+
   return (
     <>
+      <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+        <TenantStats stats={stats} />
+      </PageSection>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <Gallery
           hasGutter
@@ -51,9 +80,7 @@ function PipelineOverviewPage({ pipelines, tenant, darkMode, fetchStatusIfNeeded
               <PipelineSummary pipeline={pipeline} tenant={tenant} />
             </GalleryItem>
           ))}
-
         </Gallery>
-
       </PageSection>
     </>
   )
@@ -62,6 +89,8 @@ function PipelineOverviewPage({ pipelines, tenant, darkMode, fetchStatusIfNeeded
 
 PipelineOverviewPage.propTypes = {
   pipelines: PropTypes.array,
+  stats: PropTypes.object,
+  isFetching: PropTypes.bool,
   tenant: PropTypes.object,
   preferences: PropTypes.object,
   darkMode: PropTypes.bool,
@@ -70,12 +99,17 @@ PipelineOverviewPage.propTypes = {
 
 function mapStateToProps(state) {
   let pipelines = []
+  let stats = {}
   if (state.status.status) {
     // TODO (felix): Here we could filter out the pipeline data from
     // the status.json and if necessary "reformat" it to only contain
     // the relevant information for this component (e.g. drop all
     // job related information which isn't shown).
     pipelines = state.status.status.pipelines
+    stats = {
+      trigger_event_queue: state.status.status.trigger_event_queue,
+      management_event_queue: state.status.status.management_event_queue,
+    }
   }
   // TODO (felix): Here we could also order the pipelines by any
   // criteria (e.g. the pipeline_type) in case we want that. Currently
@@ -83,6 +117,8 @@ function mapStateToProps(state) {
   // The sorting could also be done via the filter toolbar.
   return {
     pipelines,
+    stats,
+    isFetching: state.status.isFetching,
     tenant: state.tenant,
     darkMode: state.preferences.darkMode,
   }
