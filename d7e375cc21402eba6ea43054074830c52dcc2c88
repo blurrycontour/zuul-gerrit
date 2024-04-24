@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "146fc7c1_0fed06a5",
+        "filename": "zuul/driver/gerrit/gerritmodel.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 696,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-24T20:20:35Z",
+      "side": 1,
+      "message": "Yes; I wrote it that way but then reverted back to this so that reviewing the diff would be easier.  :)",
+      "parentUuid": "d6ab4b9c_3a56ab4a",
+      "revId": "d7e375cc21402eba6ea43054074830c52dcc2c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "7ecb64b8_a3cabbf6",
         "filename": "zuul/driver/util.py",
         "patchSetId": 1
