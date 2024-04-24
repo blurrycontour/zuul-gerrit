@@ -16,6 +16,29 @@
       "message": "Returning False here instead of true means we\u0027re actually inverting the check. A value less than the config value v is not newer than the supplied config value.\n\nThis isn\u0027t\u0027 a regression, but I wonder if a slightly clearer way to express this is:\n\n```\nelif k \u003d\u003d \u0027newer-than\u0027:\n    value \u003d datetime.datetime.utcfromtimestamp(\n        approval[\u0027grantedOn\u0027])\n    # We are interested in knowing when the requirement is not met\n    return not (value \u003e\u003d v)\n```",
       "revId": "d7e375cc21402eba6ea43054074830c52dcc2c88",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ecb64b8_a3cabbf6",
+        "filename": "zuul/driver/util.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-24T18:40:12Z",
+      "side": 1,
+      "message": "Because point is being updated each time through the loop its weekday() value shifts on each iteration and it indexes into the offset list properly.",
+      "range": {
+        "startLine": 62,
+        "startChar": 46,
+        "endLine": 62,
+        "endChar": 61
+      },
+      "revId": "d7e375cc21402eba6ea43054074830c52dcc2c88",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
