@@ -27,9 +27,30 @@ import {
 import PipelineSummary from '../containers/status/PipelineSummary'
 
 import { fetchStatusIfNeeded } from '../actions/status'
+import { Fetching } from '../containers/Fetching'
 
 
-function PipelineOverviewPage({ pipelines, tenant, darkMode, fetchStatusIfNeeded }) {
+function TenantStats({ stats }) {
+  return (
+    <>
+      <p>
+        Queue lengths:{' '}
+        <span>
+          {stats.trigger_event_queue ? stats.trigger_event_queue.length : '0'}
+        </span> trigger events,{' '}
+        <span>
+          {stats.management_event_queue ? stats.management_event_queue.length : '0'}
+        </span> management events.
+      </p>
+    </>
+  )
+}
+
+TenantStats.propTypes = {
+  stats: PropTypes.object,
+}
+
+function PipelineOverviewPage({ pipelines, stats, isFetching, tenant, darkMode, fetchStatusIfNeeded }) {
 
   useEffect(() => {
     document.title = 'Zuul Status'
@@ -38,8 +59,15 @@ function PipelineOverviewPage({ pipelines, tenant, darkMode, fetchStatusIfNeeded
     }
   }, [tenant, fetchStatusIfNeeded])
 
+  if (isFetching) {
+    return <Fetching />
+  }
+
   return (
     <>
+      <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+        <TenantStats stats={stats} />
+      </PageSection>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <Gallery
           hasGutter
@@ -52,9 +80,7 @@ function PipelineOverviewPage({ pipelines, tenant, darkMode, fetchStatusIfNeeded
               <PipelineSummary pipeline={pipeline} tenant={tenant} />
             </GalleryItem>
           ))}
-
         </Gallery>
-
       </PageSection>
     </>
   )
@@ -63,6 +89,8 @@ function PipelineOverviewPage({ pipelines, tenant, darkMode, fetchStatusIfNeeded
 
 PipelineOverviewPage.propTypes = {
   pipelines: PropTypes.array,
+  stats: PropTypes.object,
+  isFetching: PropTypes.bool,
   tenant: PropTypes.object,
   preferences: PropTypes.object,
   darkMode: PropTypes.bool,
@@ -93,6 +121,7 @@ const sortPipelines = (a, b) => {
 
 function mapStateToProps(state) {
   let pipelines = []
+  let stats = {}
   if (state.status.status) {
     // Count number of items per pipeline/queue and sort the pipelines
     // by number of items (desc).
@@ -100,9 +129,15 @@ function mapStateToProps(state) {
     pipelines = state.status.status.pipelines.map(ppl => (
       { ...ppl, _count: countItems(ppl) }
     )).sort((a, b) => sortPipelines(a, b)).filter(ppl => ppl._count > 0)
+    stats = {
+      trigger_event_queue: state.status.status.trigger_event_queue,
+      management_event_queue: state.status.status.management_event_queue,
+    }
   }
   return {
     pipelines,
+    stats,
+    isFetching: state.status.isFetching,
     tenant: state.tenant,
     darkMode: state.preferences.darkMode,
   }
