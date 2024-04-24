@@ -61,7 +61,7 @@ QueueItemSquare.propTypes = {
 }
 
 
-function QueueSummary({ pipeline, pipelineType }) {
+function QueueSummary({ pipeline, pipelineType, showEmptyQueues }) {
 
   const sortQueues = (a, b) => {
     const totalQueueItems_a = a.heads.reduce(
@@ -86,11 +86,12 @@ function QueueSummary({ pipeline, pipelineType }) {
   // visualization (e.g. independent pipelines like check where each
   // change/item is enqueued in it's own queue by design).
   if (['dependent'].indexOf(pipelineType) > -1) {
+    let changeQueues = pipeline.change_queues
+    if (!showEmptyQueues) {
+      changeQueues = changeQueues.filter(queue => queue.heads.length > 0)
+    }
     return (
-      // TODO (felix): Make filtering optional via a switch (default: on)
-      pipeline.change_queues.filter(
-        queue => queue.heads.length > 0
-      ).sort(
+      changeQueues.sort(
         (a, b) => sortQueues(a, b)
       ).map((queue) => (
         <Flex key={`${queue.name}${queue.branch}`}>
@@ -133,9 +134,10 @@ function QueueSummary({ pipeline, pipelineType }) {
 QueueSummary.propTypes = {
   pipeline: PropTypes.object,
   pipelineType: PropTypes.string,
+  showEmptyQueues: PropTypes.bool,
 }
 
-function PipelineSummary({ pipeline, tenant }) {
+function PipelineSummary({ pipeline, tenant, showEmptyQueues }) {
 
   const pipelineType = pipeline.manager || 'unknown'
   const itemCount = pipeline._count
@@ -148,7 +150,7 @@ function PipelineSummary({ pipeline, tenant }) {
         <PipelineIcon pipelineType={pipelineType} />
         <Link
           to={`${tenant.linkPrefix}/status/pipeline/${pipeline.name}`}
-          style={{color: '#363636'}}
+          style={{ color: '#363636' }}
         >
           {pipeline.name}
         </Link>
@@ -168,7 +170,7 @@ function PipelineSummary({ pipeline, tenant }) {
         </Tooltip>
       </CardTitle>
       <CardBody>
-        <QueueSummary pipeline={pipeline} pipelineType={pipelineType} />
+        <QueueSummary pipeline={pipeline} pipelineType={pipelineType} showEmptyQueues={showEmptyQueues} />
       </CardBody>
 
     </Card>
@@ -178,6 +180,7 @@ function PipelineSummary({ pipeline, tenant }) {
 PipelineSummary.propTypes = {
   pipeline: PropTypes.object,
   tenant: PropTypes.object,
+  showEmptyQueues: PropTypes.bool,
 }
 
 export default PipelineSummary
