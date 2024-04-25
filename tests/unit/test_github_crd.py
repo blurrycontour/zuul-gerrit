@@ -215,3 +215,41 @@ class TestGithubCrossRepoDeps(ZuulTestCase):
 
         # The job should be aborted since B was updated while enqueued.
         self.assertHistory([dict(name='project3-test', result='ABORTED')])
+
+    @simple_layout('layouts/crd-github.yaml', driver='github')
+    def test_crd_dependent_close_reopen(self):
+        """
+        Test that closing and reopening PR correctly re-enqueues the
+        dependent change in the correct order.
+        """
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_github.openFakePullRequest('org/project3', 'master', 'A')
+        B = self.fake_github.openFakePullRequest(
+            'org/project4', 'master', 'B',
+            body=f"Depends-On: https://github.com/org/project3/pull/{A.number}"
+        )
+
+        self.fake_github.emitEvent(B.getPullRequestEditedEvent())
+        self.waitUntilSettled()
+
+        # Close and reopen PR A
+        self.fake_github.emitEvent(A.getPullRequestClosedEvent())
+        self.fake_github.emitEvent(A.getPullRequestReopenedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        # The changes for the job from project4 should include the project3
+        # PR content
+        changes = self.getJobFromHistory(
+            'project4-test', 'org/project4',
+            result="SUCCESS").changes
+
+        self.assertEqual(
+            changes, f"{A.number},{A.head_sha} {B.number},{B.head_sha}")
+
+        self.assertTrue(A.is_merged)
+        self.assertTrue(B.is_merged)
