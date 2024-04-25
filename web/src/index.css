@@ -233,6 +233,10 @@ a.refresh {
     margin-left: 4px;
 }
 
+.zuul-pipeline-link {
+    color: #363636;
+}
+
 .zuul-item-square {
     cursor: pointer;
     opacity: 0.7;
@@ -723,6 +727,9 @@ details.foldable[open] summary::before {
     background: var(--pf-global--palette--red-50);
 }
 
+/*
+ * Dark Mode overrides
+ */
 .pf-theme-dark .pf-c-nav__link {
   color: #fff !important;
 }
@@ -760,4 +767,36 @@ details.foldable[open] summary::before {
 
 .pf-theme-dark .pf-c-empty-state {
     color: #fff !important;
+}
+
+.pf-theme-dark .zuul-pipeline-link {
+    color: var(--pf-global--Color--100);
+}
+
+.pf-theme-dark .zuul-item-square-success {
+    color: var(--pf-global--palette--green-300) !important;
+}
+
+.pf-theme-dark .zuul-item-square-success svg:hover {
+    color: var(--pf-global--palette--green-500) !important;
+}
+
+.pf-theme-dark .zuul-item-square-danger svg:hover {
+    color: var(--pf-global--palette--red-200) !important;
+}
+
+.pf-theme-dark .zuul-item-square-pending {
+    color: var(--pf-global--palette--white) !important;
+}
+
+.pf-theme-dark .zuul-item-square-pending svg:hover {
+    color: var(--pf-global--palette--black-300) !important;
+}
+
+.pf-theme-dark .zuul-queue-item-popover {
+    color: var(--pf-global--Color--100);
+}
+
+.pf-theme-dark .progress {
+    background-color: var(--pf-global--palette--black-500);
 }
