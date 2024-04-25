@@ -19,6 +19,8 @@
       github:
         - event: pull_request
           action: edited
+        - event: pull_request
+          action: reopened
     start:
       github: {}
     success:
