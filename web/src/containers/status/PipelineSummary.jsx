@@ -130,7 +130,7 @@ function PipelineSummary({ pipeline, tenant, showEmptyQueues }) {
         <PipelineIcon pipelineType={pipelineType} />
         <Link
           to={`${tenant.linkPrefix}/status/pipeline/${pipeline.name}`}
-          style={{ color: '#363636' }}
+          className="zuul-pipeline-link"
         >
           {pipeline.name}
         </Link>
