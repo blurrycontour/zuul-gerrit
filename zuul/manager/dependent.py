@@ -183,7 +183,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
         return True
 
     def getMissingNeededChanges(self, changes, change_queue, event,
-                                dependency_graph=None, warnings=None):
+                                dependency_graph=None, warnings=None,
+                                item=None):
         log = get_annotated_logger(self.log, event)
         changes_needed = []
         abort = False
@@ -231,7 +232,7 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                         log.debug("  Needed change is in cycle")
                         continue
                     if self.isChangeAlreadyInQueue(
-                            needed_change, change_queue):
+                            needed_change, change_queue, item):
                         log.debug("  Needed change is already "
                                   "ahead in the queue")
                         continue
