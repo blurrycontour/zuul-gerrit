@@ -297,19 +297,17 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             # skipped and doesn't need to see all of them.  Otherwise,
             # it may be a surprise and it may be better to include the
             # job in the report.
-            if (build.error_detail and
-                'Skipped due to child_jobs' in build.error_detail):
+            if (
+                build.error_detail and
+                'Skipped due to child_jobs' in build.error_detail
+            ):
                 skipped += 1
                 continue
-            if not job.voting:
-                voting = ' (non-voting)'
-            else:
-                voting = ''
 
-            if config and config.has_option(
-                'zuul', 'report_times'):
-                report_times = config.getboolean(
-                    'zuul', 'report_times')
+            voting = '✓' if job.voting else '❌'
+
+            if config and config.has_option('zuul', 'report_times'):
+                report_times = config.getboolean('zuul', 'report_times')
             else:
                 report_times = True
 
@@ -318,18 +316,16 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
                 m, s = divmod(dt, 60)
                 h, m = divmod(m, 60)
                 if h:
-                    elapsed = ' in %dh %02dm %02ds' % (h, m, s)
+                    elapsed = f'{h:d}h {m:02d} {s:02d}'
                 elif m:
-                    elapsed = ' in %dm %02ds' % (m, s)
+                    elapsed = f'{m:d} {s:02d}'
                 else:
-                    elapsed = ' in %ds' % (s)
+                    elapsed = f'{s:d}'
             else:
                 elapsed = ''
-            if build.error_detail:
-                error = ' ' + build.error_detail
-            else:
-                error = ''
-            name = job.name + ' '
+
+            error = build.error_detail
+            name = job.name
             # TODO(mordred) The gerrit consumption interface depends on
             # something existing in the url field and don't have a great
             # behavior defined for url being none/missing. Put name into
@@ -348,11 +344,16 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
     def _formatItemReportJobs(self, item):
         # Return the list of jobs portion of the report
-        ret = ''
+        ret = []
         jobs_fields, skipped = self._getItemReportJobsFields(item)
+        if jobs_fields:
+            ret.extend([
+                '| Name | URL | Result | Error | Elapsed | Voting |',
+                '| ---- | --- | ------ | ----- | ------- | ------ |',
+            ])
         for job_fields in jobs_fields:
-            ret += '- %s%s : %s%s%s%s\n' % job_fields[:6]
+            ret.append('| %s | %s | %s | %s | %s | %s |\n' % job_fields[:6])
         if skipped:
-            jobtext = 'job' if skipped == 1 else 'jobs'
-            ret += 'Skipped %i %s\n' % (skipped, jobtext)
-        return ret
+            ret.append('')
+            ret.append(f'Skipped {skipped} job{"s" if skipped > 1 else ""}')
+        return '\n'.join(ret)
