@@ -14,8 +14,15 @@
 # under the License.
 
 import abc
+import collections
 import logging
+
 from zuul.lib.config import get_default
+
+JobStatus = collections.namedtuple(
+    'JobStatus',
+    ['name', 'url', 'result', 'error', 'elapsed', 'voting', 'success_message'],
+)
 
 
 class BaseReporter(object, metaclass=abc.ABCMeta):
@@ -333,7 +340,10 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             # during result formatting
             success_message = job.success_message
             jobs_fields.append(
-                (name, url, result, error, elapsed, voting, success_message))
+                JobStatus(
+                    name, url, result, error, elapsed, voting, success_message
+                )
+            )
         return jobs_fields, skipped
 
     def _formatItemReportJobs(self, item):
