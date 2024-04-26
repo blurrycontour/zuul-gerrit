@@ -33,6 +33,24 @@
       "message": "Similar to `_removeAbandonedChangeExamineItem()` I think we need to cancel jobs before setting it dequeued needing change. (see comment in line 513).",
       "revId": "516780f9e7611a5ed72019af82d1dbc14d68a8c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df516041_5843a686",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-26T10:43:23Z",
+      "side": 1,
+      "message": "(in case this item has multiple changes)",
+      "parentUuid": "273cd115_fdc3d651",
+      "revId": "516780f9e7611a5ed72019af82d1dbc14d68a8c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
