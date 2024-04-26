@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2533a35_d7f1d08a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 502,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-26T21:19:59Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "472a04f1_0afadf38",
+      "revId": "516780f9e7611a5ed72019af82d1dbc14d68a8c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "273cd115_fdc3d651",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-04-26T10:43:23Z",
       "side": 1,
       "message": "(in case this item has multiple changes)",
+      "parentUuid": "273cd115_fdc3d651",
+      "revId": "516780f9e7611a5ed72019af82d1dbc14d68a8c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3d9121c_b0fb2b44",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-26T21:19:59Z",
+      "side": 1,
+      "message": "cancelJobs will cancel jobs for all items behind it as well.  So the only jobs that could still be running would be jobs for items ahead of a change we removed in the first loop.  But there shouldn\u0027t be any changes ahead of that change that depend on it.  Therefore, I think we can omit it here.",
       "parentUuid": "273cd115_fdc3d651",
       "revId": "516780f9e7611a5ed72019af82d1dbc14d68a8c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
