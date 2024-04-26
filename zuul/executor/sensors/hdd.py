@@ -26,9 +26,12 @@ def get_avail_hdd_inode_pct(path):
     blocks_percent = (blocks_used / s.f_blocks) * 100
     blocks_percent_avail = 100.0 - blocks_percent
 
-    files_used = float(s.f_files - s.f_ffree)
-    files_percent = (files_used / s.f_files) * 100
-    files_percent_avail = 100.0 - files_percent
+    try:
+        files_used = float(s.f_files - s.f_ffree)
+        files_percent = (files_used / s.f_files) * 100
+        files_percent_avail = 100.0 - files_percent
+    except ZeroDivisionError:
+        files_percent_avail = 100.0  # Assume no limit if f_files=0.
 
     return (blocks_percent_avail, files_percent_avail)
 
