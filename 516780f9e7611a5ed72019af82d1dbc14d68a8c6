@@ -87,6 +87,24 @@
       "parentUuid": "273cd115_fdc3d651",
       "revId": "516780f9e7611a5ed72019af82d1dbc14d68a8c6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fe75f21_5b1c3958",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 539,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-27T07:14:26Z",
+      "side": 1,
+      "message": "Ack, I think you are right.",
+      "parentUuid": "f3d9121c_b0fb2b44",
+      "revId": "516780f9e7611a5ed72019af82d1dbc14d68a8c6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
