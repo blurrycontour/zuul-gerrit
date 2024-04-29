@@ -359,7 +359,7 @@ class PragmaParser(object):
     schema = vs.Schema(pragma)
 
     def __init__(self, pcontext):
-        self.log = logging.getLogger("zuul.PragmaParser")
+        self.log = pcontext.log
         self.pcontext = pcontext
 
     def fromYaml(self, conf):
@@ -385,7 +385,7 @@ class PragmaParser(object):
 
 class NodeSetParser(object):
     def __init__(self, pcontext):
-        self.log = logging.getLogger("zuul.NodeSetParser")
+        self.log = pcontext.log
         self.pcontext = pcontext
         self.anonymous = False
         self.schema = self.getSchema(False)
@@ -497,7 +497,7 @@ class NodeSetParser(object):
 
 class SecretParser(object):
     def __init__(self, pcontext):
-        self.log = logging.getLogger("zuul.SecretParser")
+        self.log = pcontext.log
         self.pcontext = pcontext
         self.schema = self.getSchema()
 
@@ -633,7 +633,7 @@ class JobParser(object):
     ]
 
     def __init__(self, pcontext):
-        self.log = logging.getLogger("zuul.JobParser")
+        self.log = pcontext.log
         self.pcontext = pcontext
 
     def fromYaml(self, conf,
@@ -977,7 +977,7 @@ class JobParser(object):
 
 class ProjectTemplateParser(object):
     def __init__(self, pcontext):
-        self.log = logging.getLogger("zuul.ProjectTemplateParser")
+        self.log = pcontext.log
         self.pcontext = pcontext
         self.schema = self.getSchema()
         self.not_pipelines = ['name', 'description', 'templates',
@@ -1067,7 +1067,7 @@ class ProjectTemplateParser(object):
 
 class ProjectParser(object):
     def __init__(self, pcontext):
-        self.log = logging.getLogger("zuul.ProjectParser")
+        self.log = pcontext.log
         self.pcontext = pcontext
         self.schema = self.getSchema()
 
@@ -1194,7 +1194,7 @@ class PipelineParser(object):
     }
 
     def __init__(self, pcontext):
-        self.log = logging.getLogger("zuul.PipelineParser")
+        self.log = pcontext.log
         self.pcontext = pcontext
         self.schema = self.getSchema()
 
@@ -1411,7 +1411,7 @@ class PipelineParser(object):
 
 class SemaphoreParser(object):
     def __init__(self, pcontext):
-        self.log = logging.getLogger("zuul.SemaphoreParser")
+        self.log = pcontext.log
         self.pcontext = pcontext
         self.schema = self.getSchema()
 
@@ -1436,7 +1436,7 @@ class SemaphoreParser(object):
 
 class QueueParser:
     def __init__(self, pcontext):
-        self.log = logging.getLogger("zuul.QueueParser")
+        self.log = pcontext.log
         self.pcontext = pcontext
         self.schema = self.getSchema()
 
@@ -1470,8 +1470,8 @@ class QueueParser:
 
 
 class AuthorizationRuleParser(object):
-    def __init__(self):
-        self.log = logging.getLogger("zuul.AuthorizationRuleParser")
+    def __init__(self, log):
+        self.log = log
         self.schema = self.getSchema()
 
     def getSchema(self):
@@ -1503,8 +1503,8 @@ class AuthorizationRuleParser(object):
 
 
 class GlobalSemaphoreParser(object):
-    def __init__(self):
-        self.log = logging.getLogger("zuul.GlobalSemaphoreParser")
+    def __init__(self, log):
+        self.log = log
         self.schema = self.getSchema()
 
     def getSchema(self):
@@ -1524,8 +1524,8 @@ class GlobalSemaphoreParser(object):
 
 
 class ApiRootParser(object):
-    def __init__(self):
-        self.log = logging.getLogger("zuul.ApiRootParser")
+    def __init__(self, log):
+        self.log = log
         self.schema = self.getSchema()
 
     def getSchema(self):
@@ -1547,7 +1547,8 @@ class ApiRootParser(object):
 class ParseContext(object):
     """Hold information about a particular run of the parser"""
 
-    def __init__(self, connections, scheduler, tenant, ansible_manager):
+    def __init__(self, connections, scheduler, tenant, ansible_manager, log):
+        self.log = log
         self.loading_errors = model.LoadingErrors()
         self.connections = connections
         self.scheduler = scheduler
@@ -1633,8 +1634,8 @@ class ParseContext(object):
 
 class TenantParser(object):
     def __init__(self, connections, zk_client, scheduler, merger, keystorage,
-                 zuul_globals, statsd, unparsed_config_cache):
-        self.log = logging.getLogger("zuul.TenantParser")
+                 zuul_globals, statsd, unparsed_config_cache, log):
+        self.log = log
         self.connections = connections
         self.zk_client = zk_client
         self.scheduler = scheduler
@@ -1726,7 +1727,7 @@ class TenantParser(object):
         self.getSchema()(conf)
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
-                                tenant, ansible_manager)
+                                tenant, ansible_manager, self.log)
         if conf.get('max-dependencies') is not None:
             tenant.max_dependencies = conf['max-dependencies']
         if conf.get('max-nodes-per-job') is not None:
@@ -2669,11 +2670,13 @@ class TenantParser(object):
 
 
 class ConfigLoader(object):
-    log = logging.getLogger("zuul.ConfigLoader")
-
     def __init__(self, connections, zk_client, zuul_globals,
                  unparsed_config_cache, statsd=None, scheduler=None,
-                 merger=None, keystorage=None):
+                 merger=None, keystorage=None, log=None):
+        if log is None:
+            self.log = logging.getLogger("zuul.ConfigLoader")
+        else:
+            self.log = logging.getLogger(f"{log.name}.ConfigLoader")
         self.connections = connections
         self.zk_client = zk_client
         self.globals = zuul_globals
@@ -2682,10 +2685,10 @@ class ConfigLoader(object):
         self.keystorage = keystorage
         self.tenant_parser = TenantParser(
             connections, zk_client, scheduler, merger, keystorage,
-            zuul_globals, statsd, unparsed_config_cache)
-        self.authz_rule_parser = AuthorizationRuleParser()
-        self.global_semaphore_parser = GlobalSemaphoreParser()
-        self.api_root_parser = ApiRootParser()
+            zuul_globals, statsd, unparsed_config_cache, self.log)
+        self.authz_rule_parser = AuthorizationRuleParser(self.log)
+        self.global_semaphore_parser = GlobalSemaphoreParser(self.log)
+        self.api_root_parser = ApiRootParser(self.log)
 
     def expandConfigPath(self, config_path):
         if config_path:
@@ -2985,7 +2988,7 @@ class ConfigLoader(object):
         tenant = item.pipeline.tenant
         log = get_annotated_logger(self.log, zuul_event_id)
         pcontext = ParseContext(self.connections, self.scheduler,
-                                tenant, ansible_manager)
+                                tenant, ansible_manager, log)
         if include_config_projects:
             config = model.ParsedConfig()
             for project in tenant.config_projects:

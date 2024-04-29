@@ -1000,21 +1000,22 @@ class Scheduler(threading.Thread):
                                "pipeline stats:")
 
     def prime(self, config):
-        self.log.info("Priming scheduler config")
+        log = logging.getLogger(f"{self.log.name}.Prime")
+        log.info("Priming scheduler config")
         start = time.monotonic()
 
         if self.system_config_cache.is_valid:
-            self.log.info("Using system config from Zookeeper")
+            log.info("Using system config from Zookeeper")
             self.updateSystemConfig()
         else:
-            self.log.info("Creating initial system config")
+            log.info("Creating initial system config")
             # This verifies the voluptuous schema
-            self.primeSystemConfig()
+            self.primeSystemConfig(log)
 
         loader = configloader.ConfigLoader(
             self.connections, self.zk_client, self.globals,
             self.unparsed_config_cache, self.statsd,
-            self, self.merger, self.keystore)
+            self, self.merger, self.keystore, log)
         new_tenants = (set(self.unparsed_abide.tenants)
                        - self.abide.tenants.keys())
 
@@ -1029,12 +1030,12 @@ class Scheduler(threading.Thread):
                     # we are starting from an empty layout state and there
                     # should be no concurrent read locks.
                     lock_ctx = tenant_write_lock(self.zk_client,
-                                                 tenant_name, self.log)
+                                                 tenant_name, log)
                     timer_ctx = self.statsd_timer(
                         f'{stats_key}.reconfiguration_time')
                 else:
                     lock_ctx = tenant_read_lock(self.zk_client,
-                                                tenant_name, self.log)
+                                                tenant_name, log)
                     timer_ctx = nullcontext()
 
                 with lock_ctx as tlock, timer_ctx:
@@ -1090,8 +1091,8 @@ class Scheduler(threading.Thread):
         self.last_reconfigured = int(time.time())
 
         duration = round(time.monotonic() - start, 3)
-        self.log.info("Config priming complete (duration: %s seconds)",
-                      duration)
+        log.info("Config priming complete (duration: %s seconds)",
+                 duration)
         self.primed_event.set()
         self.wake_event.set()
         self.component_info.state = self.component_info.RUNNING
@@ -1257,7 +1258,7 @@ class Scheduler(threading.Thread):
             raise RuntimeError("No key store password configured!")
 
     def runTenantLayoutUpdates(self):
-        log = logging.getLogger("zuul.Scheduler.LayoutUpdate")
+        log = logging.getLogger(f"{self.log.name}.LayoutUpdate")
         # Only run this after config priming is complete
         self.primed_event.wait()
         while not self._stopped:
@@ -1280,7 +1281,7 @@ class Scheduler(threading.Thread):
                             self.updateSystemConfig()
 
                         with tenant_read_lock(self.zk_client, tenant_name,
-                                              self.log, blocking=False):
+                                              log, blocking=False):
                             remote_state = self.tenant_layout_state.get(
                                 tenant_name)
                             local_state = self.local_layout_state.get(
@@ -1319,7 +1320,7 @@ class Scheduler(threading.Thread):
         loader = configloader.ConfigLoader(
             self.connections, self.zk_client, self.globals,
             self.unparsed_config_cache, self.statsd, self,
-            self.merger, self.keystore)
+            self.merger, self.keystore, log)
         # Since we are using the ZK 'locked' context manager (in order
         # to have a non-blocking lock) with a threading lock, we need
         # to pass -1 as the timeout value here as the default value
@@ -1410,7 +1411,7 @@ class Scheduler(threading.Thread):
         loader = configloader.ConfigLoader(
             self.connections, self.zk_client, self.globals,
             self.unparsed_config_cache, self.statsd,
-            self, self.merger, self.keystore)
+            self, self.merger, self.keystore, self.log)
         tenant_config, script = self._checkTenantSourceConf(self.config)
         unparsed_abide = loader.readConfig(
             tenant_config,
@@ -1466,7 +1467,7 @@ class Scheduler(threading.Thread):
             loader = configloader.ConfigLoader(
                 self.connections, self.zk_client, self.globals,
                 self.unparsed_config_cache, self.statsd,
-                self, self.merger, self.keystore)
+                self, self.merger, self.keystore, self.log)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             old_unparsed_abide = self.unparsed_abide
             self.unparsed_abide = loader.readConfig(
@@ -1595,7 +1596,7 @@ class Scheduler(threading.Thread):
         loader = configloader.ConfigLoader(
             self.connections, self.zk_client, self.globals,
             self.unparsed_config_cache, self.statsd,
-            self, self.merger, self.keystore)
+            self, self.merger, self.keystore, log)
         loader.loadTPCs(self.abide, self.unparsed_abide,
                         [event.tenant_name])
         stats_key = f'zuul.tenant.{event.tenant_name}'
@@ -2210,7 +2211,7 @@ class Scheduler(threading.Thread):
                 # There may still be more events to process
                 self.wake_event.set()
 
-    def primeSystemConfig(self):
+    def primeSystemConfig(self, log):
         # Strictly speaking, we don't need this lock since it's
         # guaranteed to be single-threaded, but it's used here for
         # consistency and future-proofing.
@@ -2218,7 +2219,7 @@ class Scheduler(threading.Thread):
             loader = configloader.ConfigLoader(
                 self.connections, self.zk_client, self.globals,
                 self.unparsed_config_cache, self.statsd,
-                self, self.merger, self.keystore)
+                self, self.merger, self.keystore, log)
             tenant_config, script = self._checkTenantSourceConf(self.config)
             self.unparsed_abide = loader.readConfig(
                 tenant_config, from_script=script)
@@ -2241,7 +2242,7 @@ class Scheduler(threading.Thread):
             loader = configloader.ConfigLoader(
                 self.connections, self.zk_client, self.globals,
                 self.unparsed_config_cache, self.statsd,
-                self, self.merger, self.keystore)
+                self, self.merger, self.keystore, self.log)
 
             tenant_names = set(self.abide.tenants)
             deleted_tenants = tenant_names.difference(
