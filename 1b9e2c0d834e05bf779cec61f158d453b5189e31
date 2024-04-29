@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9d162d5_acb622b7",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-04-29T14:39:33Z",
+      "side": 1,
+      "message": "I\u0027m not seeing where change.files is initially set prior to calling _updateChange() on change. Do we run the risk of having AttributeError called here bceause change object has no attribute files?",
+      "revId": "1b9e2c0d834e05bf779cec61f158d453b5189e31",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
