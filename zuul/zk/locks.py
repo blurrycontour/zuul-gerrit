@@ -88,20 +88,32 @@ def locked(lock, blocking=True, timeout=None):
 
 
 @contextmanager
-def tenant_read_lock(client, tenant_name, blocking=True):
+def tenant_read_lock(client, tenant_name, log=None, blocking=True):
     safe_tenant = quote_plus(tenant_name)
+    if blocking and log:
+        log.debug("Wait for %s read tenant lock", tenant_name)
     with locked(
         SessionAwareReadLock(
             client.client,
             f"{TENANT_LOCK_ROOT}/{safe_tenant}"),
         blocking=blocking
     ) as lock:
-        yield lock
+        try:
+            if log:
+                log.debug("Aquired %s read tenant lock", tenant_name)
+            yield lock
+        finally:
+            if log:
+                log.debug("Released %s read tenant lock", tenant_name)
 
 
 @contextmanager
-def tenant_write_lock(client, tenant_name, blocking=True, identifier=None):
+def tenant_write_lock(client, tenant_name, log=None, blocking=True,
+                      identifier=None):
     safe_tenant = quote_plus(tenant_name)
+    if blocking and log:
+        log.debug("Wait for %s write tenant lock (id: %s)",
+                  tenant_name, identifier)
     with locked(
         SessionAwareWriteLock(
             client.client,
@@ -109,7 +121,15 @@ def tenant_write_lock(client, tenant_name, blocking=True, identifier=None):
             identifier=identifier),
         blocking=blocking,
     ) as lock:
-        yield lock
+        try:
+            if log:
+                log.debug("Aquired %s write tenant lock (id: %s)",
+                          tenant_name, identifier)
+            yield lock
+        finally:
+            if log:
+                log.debug("Released %s write tenant lock (id: %s)",
+                          tenant_name, identifier)
 
 
 @contextmanager

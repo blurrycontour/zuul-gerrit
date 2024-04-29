@@ -1047,7 +1047,7 @@ class Client(zuul.cmd.ZuulApp):
         safe_tenant = urllib.parse.quote_plus(args.tenant)
         safe_pipeline = urllib.parse.quote_plus(args.pipeline)
         COMPONENT_REGISTRY.create(zk_client)
-        with tenant_read_lock(zk_client, args.tenant):
+        with tenant_read_lock(zk_client, args.tenant, self.log):
             path = f'/zuul/tenant/{safe_tenant}/pipeline/{safe_pipeline}'
             pipeline = Pipeline(args.tenant, args.pipeline)
             with pipeline_lock(
