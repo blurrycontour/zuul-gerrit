@@ -50,7 +50,7 @@ class TestConfigLoader(ZuulTestCase):
         loader.loadAuthzRules(abide, unparsed_abide)
 
         for tenant_name in unparsed_abide.tenants:
-            tlock = tenant_read_lock(self.zk_client, tenant_name)
+            tlock = tenant_read_lock(self.zk_client, tenant_name, self.log)
             # Consider all caches valid (min. ltime -1)
             min_ltimes = defaultdict(lambda: defaultdict(lambda: -1))
             with tlock:
