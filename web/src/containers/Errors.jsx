@@ -22,6 +22,8 @@ import {
   EmptyStateIcon,
   EmptyStatePrimary,
   EmptyStateVariant,
+  PageSection,
+  PageSectionVariants,
   Title,
 } from '@patternfly/react-core'
 
@@ -29,17 +31,19 @@ function EmptyPage(props) {
   const { title, icon, linkTarget, linkText } = props
 
   return (
-    <EmptyState variant={EmptyStateVariant.small}>
-      <EmptyStateIcon icon={icon} />
-      <Title headingLevel="h4" size="lg">
-        {title}
-      </Title>
-      <EmptyStatePrimary>
-        <Link to={linkTarget}>
-          <Button variant="link">{linkText}</Button>
-        </Link>
-      </EmptyStatePrimary>
-    </EmptyState>
+    <PageSection variant={PageSectionVariants.light}>
+      <EmptyState variant={EmptyStateVariant.small}>
+        <EmptyStateIcon icon={icon} />
+        <Title headingLevel="h4" size="lg">
+          {title}
+        </Title>
+        <EmptyStatePrimary>
+          <Link to={linkTarget}>
+            <Button variant="link">{linkText}</Button>
+          </Link>
+        </EmptyStatePrimary>
+      </EmptyState>
+    </PageSection>
   )
 }
 

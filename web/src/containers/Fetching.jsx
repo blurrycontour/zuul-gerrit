@@ -20,6 +20,8 @@ import {
   Title,
   EmptyState,
   EmptyStateVariant,
+  PageSection,
+  PageSectionVariants,
   Spinner,
 } from '@patternfly/react-core'
 
@@ -62,12 +64,14 @@ Fetchable.propTypes = {
 
 function Fetching() {
   return (
-    <EmptyState variant={EmptyStateVariant.small}>
-      <Spinner />
-      <Title headingLevel="h4" size="lg">
-        Fetching info...
-      </Title>
-    </EmptyState>
+    <PageSection variant={PageSectionVariants.light}>
+      <EmptyState variant={EmptyStateVariant.small}>
+        <Spinner />
+        <Title headingLevel="h4" size="lg">
+          Fetching info...
+        </Title>
+      </EmptyState>
+    </PageSection>
   )
 }
 
