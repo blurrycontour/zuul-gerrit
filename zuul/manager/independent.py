@@ -80,7 +80,7 @@ class IndependentPipelineManager(PipelineManager):
         return True
 
     def getMissingNeededChanges(self, changes, change_queue, event,
-                                dependency_graph=None):
+                                dependency_graph=None, item=None):
         log = get_annotated_logger(self.log, event)
 
         if self.pipeline.ignore_dependencies:

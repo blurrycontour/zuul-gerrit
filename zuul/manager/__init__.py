@@ -312,10 +312,15 @@ class PipelineManager(metaclass=ABCMeta):
                     return True
         return False
 
-    def isChangeAlreadyInQueue(self, change, change_queue):
+    def isChangeAlreadyInQueue(self, change, change_queue, item=None):
         # Checks any item in the specified change queue
-        for item in change_queue.queue:
-            for c in item.changes:
+        # If item is supplied, only consider items ahead of the
+        # supplied item (ie, is the change already in the queue ahead
+        # of this item?).
+        for queue_item in change_queue.queue:
+            if queue_item is item:
+                break
+            for c in queue_item.changes:
                 if change.equals(c):
                     return True
         return False
@@ -419,13 +424,18 @@ class PipelineManager(metaclass=ABCMeta):
         return True
 
     def getMissingNeededChanges(self, changes, change_queue, event,
-                                dependency_graph=None):
+                                dependency_graph=None, item=None):
         """Check that all needed changes are ahead in the queue.
 
         Return a list of any that are missing.  If it is not possible
         to correct the missing changes, "abort" will be true.
 
+        If item is supplied, only consider items ahead of the supplied
+        item when determining whether needed changes are already ahead
+        in the queue.
+
         :returns: (abort, needed_changes)
+
         """
         return False, []
 
@@ -472,23 +482,71 @@ class PipelineManager(metaclass=ABCMeta):
     def removeAbandonedChange(self, change, event):
         log = get_annotated_logger(self.log, event)
         log.debug("Change %s abandoned, removing", change)
-        for item in self.pipeline.getAllItems():
-            if not item.live:
+        for queue in self.pipeline.queues:
+            # Below we need to remove dependent changes of abandoned
+            # changes we remove here, but only if both are live.
+            # Therefore, track the changes we remove independently for
+            # each shared queue (since different queues may have
+            # different live/non-live changes).
+            changes_removed = set()
+            for item in queue.queue:
+                if not item.live:
+                    continue
+                self._removeAbandonedChangeExamineItem(
+                    change, item, changes_removed)
+            # Abbreviated version of dependency check; we're not going
+            # to check everything (processOneItem will take care of
+            # that), but we will remove any changes that depend on any
+            # changes we just removed; we can do that without
+            # recreating the full dependency graphs.
+            if not changes_removed:
                 continue
-            for item_change in item.changes:
-                if item_change.equals(change):
-                    if len(item.changes) > 1:
-                        # We need to cancel all jobs here as setting
-                        # dequeued needing change will skip all jobs.
-                        self.cancelJobs(item)
-                        msg = ("Dependency cycle change "
-                               f"{change.url} abandoned.")
+            for item in queue.queue:
+                if not item.live:
+                    continue
+                self._removeAbandonedChangeDependentsExamineItem(
+                    log, item, changes_removed)
+
+    def _removeAbandonedChangeExamineItem(self, change, item, changes_removed):
+        # The inner loop from the first part of removeAbandonedChange.
+        for item_change in item.changes:
+            if item_change.equals(change):
+                if len(item.changes) > 1:
+                    # We need to cancel all jobs here as setting
+                    # dequeued needing change will skip all jobs.
+                    self.cancelJobs(item)
+                    msg = ("Dependency cycle change "
+                           f"{change.url} abandoned.")
+                    item.setDequeuedNeedingChange(msg)
+                    try:
+                        self.reportItem(item)
+                    except exceptions.MergeFailure:
+                        pass
+                self.removeItem(item)
+                changes_removed.update(item.changes)
+                return
+
+    def _removeAbandonedChangeDependentsExamineItem(
+            self, log, item, changes_removed):
+        # The inner loop from the second part of removeAbandonedChange.
+        for item_change in item.changes:
+            for needed_change in self.resolveChangeReferences(
+                    item_change.getNeedsChanges(
+                        self.useDependenciesByTopic(item_change.project))):
+                for removed_change in changes_removed:
+                    if needed_change.equals(removed_change):
+                        log.debug("Change %s depends on abandoned change %s, "
+                                  "removing", item_change, removed_change)
+                        msg = f'Change {removed_change} is needed.'
                         item.setDequeuedNeedingChange(msg)
-                        try:
-                            self.reportItem(item)
-                        except exceptions.MergeFailure:
-                            pass
-                    self.removeItem(item)
+                        if item.live:
+                            try:
+                                self.reportItem(item)
+                            except exceptions.MergeFailure:
+                                pass
+                            self.dequeueItem(item)
+                            changes_removed.update(item.changes)
+                            return
 
     def reEnqueueChanges(self, item, changes):
         for change in changes:
@@ -1659,7 +1717,8 @@ class PipelineManager(metaclass=ABCMeta):
 
         abort, needs_changes = self.getMissingNeededChanges(
             item.changes, change_queue, item.event,
-            dependency_graph=dependency_graph)
+            dependency_graph=dependency_graph,
+            item=item)
         if not (meets_reqs and not needs_changes):
             # It's not okay to enqueue this change, we should remove it.
             log.info("Dequeuing %s because "
