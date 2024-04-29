@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cd8969b_2344b3a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2024-04-29T18:07:59Z",
+      "side": 1,
+      "message": "mobile view is not optimal, with many changes in a pipeline there is no line break while horizontal scroll is also not appearing. Generally right side margin is missing.",
+      "revId": "719ba5078711c1f4c20731170bc7d03c1c7db3cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
