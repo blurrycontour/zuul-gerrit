@@ -177,7 +177,7 @@ class GithubReporter(BaseReporter):
             sha = change.newrev
         state = self._commit_status
 
-        url = item.formatStatusUrl()
+        url = item.formatItemUrl()
 
         description = '%s status: %s' % (item.pipeline.name,
                                          self._commit_status)
@@ -275,7 +275,7 @@ class GithubReporter(BaseReporter):
             change, self.config, self.context, message
         )
 
-        details_url = item.formatStatusUrl()
+        details_url = item.formatItemUrl()
 
         # Check for inline comments that can be reported via checks API
         file_comments = self.getFileComments(item, change)

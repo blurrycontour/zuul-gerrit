@@ -1254,7 +1254,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             checkinfo['started'] = fmt(item.enqueue_time)
             if item.report_time:
                 checkinfo['finished'] = fmt(item.report_time)
-            url = item.formatStatusUrl()
+            url = item.formatItemUrl()
             if url:
                 checkinfo['url'] = url
         if checkinfo:
@@ -1299,7 +1299,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 if file_comments:
                     if self.version >= (2, 15, 0):
                         file_comments = copy.deepcopy(file_comments)
-                        url = item.formatStatusUrl()
+                        url = item.formatItemUrl()
                         for comments in itertools.chain(
                                 file_comments.values()):
                             for comment in comments:
