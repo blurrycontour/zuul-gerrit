@@ -923,7 +923,7 @@ class TestAuthorizationRuleParser(ZuulTestCase):
         rule_d = {'name': 'my-rule',
                   'conditions': {'sub': 'user1'}
                  }
-        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        rule = AuthorizationRuleParser(self.log).fromYaml(rule_d)
         self.assertEqual('my-rule', rule.name)
         claims = {'iss': 'my-idp',
                   'sub': 'user1',
@@ -939,7 +939,7 @@ class TestAuthorizationRuleParser(ZuulTestCase):
                   'conditions': {'sub': 'user1',
                                  'iss': 'my-idp'}
                  }
-        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        rule = AuthorizationRuleParser(self.log).fromYaml(rule_d)
         self.assertEqual('my-rule', rule.name)
         claims = {'iss': 'my-idp',
                   'sub': 'user1',
@@ -958,7 +958,7 @@ class TestAuthorizationRuleParser(ZuulTestCase):
                                   'iss': 'my-2nd-idp'}
                                 ]
                  }
-        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        rule = AuthorizationRuleParser(self.log).fromYaml(rule_d)
         self.assertEqual('my-rule', rule.name)
         claims = {'iss': 'my-idp',
                   'sub': 'user1',
@@ -981,7 +981,7 @@ class TestAuthorizationRuleParser(ZuulTestCase):
                                   'iss': 'my-2nd-idp'}
                                 ],
                  }
-        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        rule = AuthorizationRuleParser(self.log).fromYaml(rule_d)
         self.assertEqual('my-rule', rule.name)
         claims = {'iss': 'my-idp',
                   'sub': 'user1',
@@ -1001,7 +1001,7 @@ class TestAuthorizationRuleParser(ZuulTestCase):
                   'conditions': [{'hello.this.is': 'a complex value'},
                                 ],
                  }
-        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        rule = AuthorizationRuleParser(self.log).fromYaml(rule_d)
         self.assertEqual('my-rule', rule.name)
         claims = {'iss': 'my-idp',
                   'hello': {
@@ -1023,7 +1023,7 @@ class TestAuthorizationRuleParser(ZuulTestCase):
                                  },
                                 ],
                  }
-        rule = AuthorizationRuleParser().fromYaml(rule_d)
+        rule = AuthorizationRuleParser(self.log).fromYaml(rule_d)
         self.assertEqual('my-rule', rule.name)
         claims = {'iss': 'my-idp',
                   'hello': {
