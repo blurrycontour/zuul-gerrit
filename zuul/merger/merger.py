@@ -378,14 +378,26 @@ class Repo(object):
     def _reset(local_path, env, log=None):
         messages = []
         repo = Repo._createRepoObject(local_path, env)
-        origin = repo.remotes.origin
+
+        origin_refs = {}
+        head_refs = {}
+        zuul_refs = {}
+
+        # Get all of the local and remote refs in the repo at once.
+        for commit, ref in Repo._getRefs(repo):
+            if ref.startswith('refs/remotes/origin/'):
+                origin_refs[ref[20:]] = commit
+            if ref.startswith('refs/heads/'):
+                head_refs[ref[11:]] = commit
+            if ref.startswith('refs/zuul/'):
+                zuul_refs[ref] = commit
 
         # Detach HEAD so we can work with references without interfering
         # with any active branch. Any remote ref will do as long as it can
         # be dereferenced to an existing commit.
-        for ref in origin.refs:
+        for ref, commit in origin_refs.items():
             try:
-                repo.head.reference = ref.commit
+                repo.head.reference = commit
                 break
             except Exception:
                 if log:
@@ -404,26 +416,25 @@ class Repo(object):
         zuul_refs_to_keep = [
             "refs/zuul/fetch",  # ref to last FETCH_HEAD
         ]
-        remote_heads = {r.remote_head for r in origin.refs}
-        for ref in repo.heads:
-            if ref.name not in remote_heads:
+        for ref in head_refs.keys():
+            if ref not in origin_refs:
                 if log:
                     log.debug("Delete stale local ref %s", ref)
                 else:
                     messages.append("Delete stale local ref %s" % ref)
                 repo.delete_head(ref, force=True)
             else:
-                zuul_refs_to_keep.append(Repo.refNameToZuulRef(ref.name))
+                zuul_refs_to_keep.append(Repo.refNameToZuulRef(ref))
 
         # Delete local zuul refs when the related branch no longer exists
-        for ref in (r for r in repo.refs if r.path.startswith("refs/zuul/")):
-            if ref.path in zuul_refs_to_keep:
+        for ref in zuul_refs.keys():
+            if ref in zuul_refs_to_keep:
                 continue
             if log:
                 log.debug("Delete stale Zuul ref %s", ref)
             else:
                 messages.append("Delete stale Zuul ref {}".format(ref))
-            Repo._deleteRef(ref.path, repo)
+            Repo._deleteRef(ref, repo)
 
         Repo._cleanup_leaked_rebase_dirs(local_path, log, messages)
 
@@ -435,11 +446,11 @@ class Repo(object):
             Repo._cleanup_leaked_ref_dirs(local_path, log, messages)
 
         # Update our local heads to match the remote
-        for ref in origin.refs:
-            if ref.remote_head == 'HEAD':
+        for ref, commit in origin_refs.items():
+            if ref == 'HEAD':
                 continue
-            repo.create_head('refs/heads/' + ref.remote_head,
-                             ref.commit,
+            repo.create_head('refs/heads/' + ref,
+                             commit,
                              force=True)
         return messages
 
@@ -491,10 +502,10 @@ class Repo(object):
 
     def getRefs(self, zuul_event_id=None):
         repo = self.createRepoObject(zuul_event_id)
-        return repo.refs
+        return Repo._getRefs(repo)
 
-    def getPackedRefs(self, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
+    @staticmethod
+    def _getRefs(repo):
         refs = repo.git.for_each_ref(
             '--format=%(objectname) %(refname)'
         )
@@ -1125,7 +1136,7 @@ class Merger(object):
         projects = repo_state.setdefault(connection_name, {})
         project = projects.setdefault(project_name, {})
 
-        for commit, ref in repo.getPackedRefs():
+        for commit, ref in repo.getRefs():
             if ref.startswith('refs/zuul/'):
                 continue
             if ref.startswith('refs/remotes/'):
