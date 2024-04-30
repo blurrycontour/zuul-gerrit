@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c6a3ec4_60db3bd7",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "e88294e3_61080e86",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "223f003d_25faab1a",
@@ -37,6 +55,24 @@
         "endLine": 284,
         "endChar": 64
       },
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bd1b32c_fe382bd1",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "223f003d_25faab1a",
       "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -64,6 +100,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b115dd8_a8911438",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "00be3395_de8f3fe1",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "020a24b2_ee7a894d",
@@ -81,6 +135,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d9dfd74_d409f4c2",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "020a24b2_ee7a894d",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a26072e_da0ed004",
@@ -94,6 +166,24 @@
       "writtenOn": "2024-04-30T11:01:43Z",
       "side": 1,
       "message": "nit: Seeing this method during review I\u0027m always wondering what exactly we fetch here. For me `_getProjectBranchesRequiredFlags` would be more clear.\n\nI think I\u0027m also getting a bit confused here as we DO seem to use the `_fetch...()` naming convention for methods that call out to some API.",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1abe0b2_fdb6828e",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1833,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Done.  I named it this way because it\u0027s essentially an outsourced part of the branch fetching method, but after several local-only refactorings, this ended up being called from the getProjectBranches method, so even according to my own original naming scheme for this, it should be called _getProjectBranchesRequiredFlags.",
+      "parentUuid": "0a26072e_da0ed004",
       "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -117,6 +207,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "df2c075d_e03d854c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1847,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "I would rather keep this in the drivers themselves.  I\u0027m anticipating a future where most or all of the flags are defined entirely in the drivers themselves, so ZKChangeCacheMixin won\u0027t even contain the word \"protected\".  We can\u0027t do that yet because of backwards compatability with the current system, but after we remove that deprecation, we can finish the move.  (Obviously this also depends on a little bit of refactoring/abstraction in tenant loading, but I think that is possible.)",
+      "parentUuid": "67db898b_d3e35309",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f48ceac5_a4a3e3de",
         "filename": "zuul/driver/github/githubconnection.py",
         "patchSetId": 9
@@ -128,6 +236,24 @@
       "writtenOn": "2024-04-30T11:01:43Z",
       "side": 1,
       "message": "Is it correct, that protected branches are not marked `present`? More generally it sounds like in case a branch is not present we would not have any `BranchInfo` at all, so maybe we don\u0027t need a `present` flag at all.",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3056f6cf_5d700a1c",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1866,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "We could *probably* set present here and it would be okay, however, if PRESENT is not in required_flags, then we\u0027re being told we performed a query where PRESENT was not a valid result.  But we do know that any branch that exists is present.  :)\n\nI think either approach is fine, and neither should be considered correct or incorrect.  We should never be asked to do anything that requires a valid present flag without having performed a query that supplies that first.  In other words, we could set the present flag here, but we\u0027re never going to check its value without first performing a query that would explicitly set it.\n\nAt the moment I wrote this, I just happened to think that following the explicit path seemed best and perhaps most likely to avoid problems in the future.  I\u0027m 50/50 on this and I could be convinced to change it, but I won\u0027t unless you feel strongly about it.\n\nAnd it\u0027s also probably true that we don\u0027t need a present flag.  I wrote it this way to maximize symmetry between the project flags and the branch flags, but I\u0027m pretty sure we could remove it.  If we do so, then consider this BranchInfo serialization: [0, 1]\n\nThat means: flags\u003dset() and valid_flags\u003d{BranchFlag.PRESENT}.\n\nCompare to the current code: [1, 1]\nMeaning: flags\u003d{BranchFlag.PRESENT} valid_flags\u003d{BranchFlag.PRESENT}.\n\nThat\u0027s the symmetry I\u0027m referring to, and I think it\u0027s a bit more intuitive even if not strictly necessary.  I\u0027d prefer to keep it this way unless you feel very strongly.  :)",
+      "parentUuid": "f48ceac5_a4a3e3de",
       "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -151,6 +277,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9211d8e0_c4b3b9e4",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1883,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "I\u0027d like to advocate for this change.\n\nThe double-negative is fairly difficult to deal with.  Now that this method has been decoupled from the tenant configurating driving it, if we take a step back, I think this makes the most sense now:\n\nIf the calling context needs a list of protected branches, it calls fetchProjectBranchesREST(protected\u003dTrue)\n\nIf the calling context needs a list of all branches, it calls fetchProjectBranchesREST(protected\u003dFalse)\n\nEspecially since it matches the REST api parameter.\n\nBut I recognize you\u0027re concerned with how that last statement reads.\n\nHow about we change it to \"protected_only\"?\n\n(An alternative might be to default it to None and call fetchBranches() with no argument, but I liked the explicit contrast between the two invocations in the method above; it seemed more clear to me.)",
+      "parentUuid": "270bb9ca_7bbbe5c7",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b2dc70b1_ccd2ba86",
         "filename": "zuul/driver/gitlab/gitlabconnection.py",
         "patchSetId": 9
@@ -162,6 +306,24 @@
       "writtenOn": "2024-04-30T11:01:43Z",
       "side": 1,
       "message": "Same question as for the Github driver: why are protected branches not marked `present`?",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4ac6fc1_772b5f7b",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Let\u0027s discuss there.",
+      "parentUuid": "b2dc70b1_ccd2ba86",
       "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -183,6 +345,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d1a97d3_539ce31b",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Done.  Because of that, I\u0027m dropping all the set usage (but a neat thing about IntFlag is you can still use \"foo in bar\", so I\u0027ve kept that where it reads nicer than foo \u0026 bar).",
+      "parentUuid": "0f71d207_e73fc94c",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2e0da2b0_32eedf8d",
@@ -200,6 +380,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9f55f2d_7eae6f4c",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Removed.",
+      "parentUuid": "2e0da2b0_32eedf8d",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e333732_f4f6e08f",
@@ -213,6 +411,24 @@
       "writtenOn": "2024-04-30T11:01:43Z",
       "side": 1,
       "message": "nit: does this method need to be marked as internal? It seems to be used as part of the branch cache mixin.",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4978ceb_4770a5c1",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "0e333732_f4f6e08f",
       "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -240,6 +456,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "511a150d_59a9bc14",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "fed011ac_1a510e3c",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0776f7a7_87d81498",
@@ -259,6 +493,24 @@
         "endLine": 477,
         "endChar": 65
       },
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73f94073_48892ba0",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:22:20Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "0776f7a7_87d81498",
       "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
