@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e55ac3d_580f9c3b",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:31:53Z",
+      "side": 1,
+      "message": "Just so I understand: that situation would be hasNextPage\u003dtrue and endCursor\u003dnull ?\n\nI think that would be an exceptional situation and not something I would expect according to the docs:\n\n\u003e You can continue to send queries with the new pageInfo.endCursor value returned in the response until there are no pages left to traverse, indicated by pageInfo.hasNextPage returning false.\n\nhttps://docs.github.com/en/graphql/guides/using-pagination-in-the-graphql-api\n\nSince it shouldn\u0027t happen, I think the treaceback that would result would be fine in that situation.",
+      "parentUuid": "0e0acfca_e0dfe607",
+      "revId": "eaa052a0abe9ac9d1455ac5dd76d921018efa43b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "baa80dfb_bf507bce",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-30T12:06:27Z",
       "side": 1,
       "message": "same Q as above",
+      "revId": "eaa052a0abe9ac9d1455ac5dd76d921018efa43b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef40717d_494dffe5",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:31:53Z",
+      "side": 1,
+      "message": "Ack.",
+      "parentUuid": "baa80dfb_bf507bce",
       "revId": "eaa052a0abe9ac9d1455ac5dd76d921018efa43b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
