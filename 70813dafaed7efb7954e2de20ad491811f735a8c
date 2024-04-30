@@ -1,0 +1,266 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e88294e3_61080e86",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "unrelated: Maybe we can change the message here to \"Updated branches for ...\" so we can distinguish it from the log in line #331",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "223f003d_25faab1a",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "I think this should be an abstract method in `ZKBranchCacheMixin`.",
+      "range": {
+        "startLine": 284,
+        "startChar": 30,
+        "endLine": 284,
+        "endChar": 64
+      },
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00be3395_de8f3fe1",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "same here",
+      "range": {
+        "startLine": 291,
+        "startChar": 53,
+        "endLine": 291,
+        "endChar": 75
+      },
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "020a24b2_ee7a894d",
+        "filename": "zuul/connection/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "nit: generator expression can be passed to `sorted()` w/o creating a list first.",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a26072e_da0ed004",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1833,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "nit: Seeing this method during review I\u0027m always wondering what exactly we fetch here. For me `_getProjectBranchesRequiredFlags` would be more clear.\n\nI think I\u0027m also getting a bit confused here as we DO seem to use the `_fetch...()` naming convention for methods that call out to some API.",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67db898b_d3e35309",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1847,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "Could this method be moved to the `ZKChangeCacheMixin`? It\u0027s true that not all drivers support protected/locked branches, but those flags will be ignored anyways in that case.",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f48ceac5_a4a3e3de",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1866,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "Is it correct, that protected branches are not marked `present`? More generally it sounds like in case a branch is not present we would not have any `BranchInfo` at all, so maybe we don\u0027t need a `present` flag at all.",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "270bb9ca_7bbbe5c7",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1883,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "I would keep this as `exclude_unprotected` as `protected` sounds like it will ONLY return unprotected branches when set to `False` (which is not the case).",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2dc70b1_ccd2ba86",
+        "filename": "zuul/driver/gitlab/gitlabconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 622,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "Same question as for the Github driver: why are protected branches not marked `present`?",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f71d207_e73fc94c",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "nit: you could use `Flag` (or `IntFlag`) in place of `Enum`. This way the bit operations are supported directly. So instead of `flags |\u003d flag.value` you can do `flags |\u003d flag` or `valid_flags \u0026 BranchFlag.PRESENT`, which I personally find a bit cleaner.",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e0da2b0_32eedf8d",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "nit: this method seems to be unused",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e333732_f4f6e08f",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "nit: does this method need to be marked as internal? It seems to be used as part of the branch cache mixin.",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fed011ac_1a510e3c",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 437,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "It looks like this should be `valid_flags`",
+      "range": {
+        "startLine": 437,
+        "startChar": 24,
+        "endLine": 437,
+        "endChar": 31
+      },
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0776f7a7_87d81498",
+        "filename": "zuul/zk/branch_cache.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 477,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T11:01:43Z",
+      "side": 1,
+      "message": "nit: `set()` can also take a generator expression, so no need to create a list first.",
+      "range": {
+        "startLine": 477,
+        "startChar": 33,
+        "endLine": 477,
+        "endChar": 65
+      },
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
