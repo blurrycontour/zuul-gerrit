@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7916a79_64ecc3b8",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T13:15:37Z",
+      "side": 1,
+      "message": "Just wondering if we could replace the regex match here with `if c !\u003d \u0027/COMMIT_MSG\u0027`.",
+      "revId": "2b6de810ca97d4d344df951bf094c6c04ab82ee9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
