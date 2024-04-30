@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e0acfca_e0dfe607",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T12:06:27Z",
+      "side": 1,
+      "message": "Do we need to check that cursor doesn\u0027t become `None` and break out of the loop if that\u0027s the case?",
+      "revId": "eaa052a0abe9ac9d1455ac5dd76d921018efa43b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "baa80dfb_bf507bce",
+        "filename": "zuul/driver/github/graphql/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-04-30T12:06:27Z",
+      "side": 1,
+      "message": "same Q as above",
+      "revId": "eaa052a0abe9ac9d1455ac5dd76d921018efa43b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
