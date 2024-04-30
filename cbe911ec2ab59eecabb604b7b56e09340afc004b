@@ -16,6 +16,24 @@
       "message": "This string is a regex with the beginning and end of line anchors. However, on line 151 we\u0027re doing a simple string comparison rather than a regex check. I think that means it will always fail the check on line 151 because we don\u0027t actually have a regex in the gerrit output.",
       "revId": "cbe911ec2ab59eecabb604b7b56e09340afc004b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5b9fae9_28688aac",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T23:09:28Z",
+      "side": 1,
+      "message": "Yeah that was bad copypasta.",
+      "parentUuid": "fcba99b6_8d6dbc40",
+      "revId": "cbe911ec2ab59eecabb604b7b56e09340afc004b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
