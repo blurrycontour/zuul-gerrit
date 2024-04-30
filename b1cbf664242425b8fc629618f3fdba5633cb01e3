@@ -16,6 +16,24 @@
       "message": "I mentioned this in the matrix room as well, but I am suspicious of this method name. If repo.git.for_each_ref really is only looking at refs in packfiles then we could potentially miss refs. There was a fallback before 2e785ac7b69b8730525a4fc3c7463799e19baf60 that seemed to handle this case but that was removed in this simplification change.\n\nAssuming this was a safe simplification to make that would imply this method name of getPackedRefs() is misleading as we\u0027re getting all refs? If it is accurate then I think we may need the fallback in the reset usage otherwse we may not reset everything if the refs are loose?",
       "revId": "b1cbf664242425b8fc629618f3fdba5633cb01e3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9e023bb_68b98948",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 512,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-04-30T22:44:55Z",
+      "side": 1,
+      "message": "To my knowledge, this includes all refs.  I do not know why the original author named the method this way or why they thought the fallback was necessary.  I\u0027m fine with a rename.",
+      "parentUuid": "d65f70dc_c9eb4105",
+      "revId": "b1cbf664242425b8fc629618f3fdba5633cb01e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
