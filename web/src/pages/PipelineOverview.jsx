@@ -19,6 +19,7 @@ import PropTypes from 'prop-types'
 import * as moment_tz from 'moment-timezone'
 
 import {
+  Bullseye,
   Gallery,
   GalleryItem,
   Level,
@@ -137,6 +138,11 @@ function PipelineOverviewPage({
           showAllPipelines={showAllPipelines}
         />
       </PageSection>
+      <PageSection variant={PageSectionVariants.dark} className="zuul-page-footer">
+        <Bullseye>
+          Zuul Version: {stats.zuul_version}
+        </Bullseye>
+      </PageSection>
     </>
   )
 
@@ -177,6 +183,7 @@ function mapStateToProps(state) {
       trigger_event_queue: state.status.status.trigger_event_queue,
       management_event_queue: state.status.status.management_event_queue,
       last_reconfigured: state.status.status.last_reconfigured,
+      zuul_version: state.status.status.zuul_version,
     }
   }
 

@@ -380,6 +380,10 @@ a.refresh {
     width: 40px;
 }*/
 
+.zuul-page-footer {
+    background-color: var(--pf-global--palette--black-900) !important;
+}
+
 .zuul-pipeline-header h3 {
     font-weight: var(--pf-global--FontWeight--bold);
 }
