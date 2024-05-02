@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01905482_821aca93",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-02T09:24:11Z",
+      "side": 1,
+      "message": "You can see this when the information is fetched for the page content itself, e.g. the build information on the build result page and the buildset information on the buildset result page, e.g. https://imgur.com/a/E5alBdj.\n\n\nThe task summary / output tab on the build result page uses the same Fetching component, but it\u0027s already put on a white background, so that\u0027s ok.\n\nRegarding the EmptyPage, this is basically the same: When the build or buildset itself cannot be found, e.g. https://imgur.com/a/8qCh0UW.",
+      "revId": "770f7cda6a56e29f26f9595a8ad22ea89bd25f5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
