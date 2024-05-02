@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db51a049_71eb5179",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:16:38Z",
+      "side": 1,
+      "message": "Could this be: `let tree \u003d head[0]` ?",
+      "revId": "7416623afdefb00ebd0faf32fabd6e1be7b2c06c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e798fd3c_ad07bfe5",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:16:38Z",
+      "side": 1,
+      "message": "it looks like this could be changed to `else if (item_behind.length \u003d\u003d 1)`, then we could drop the return block above.",
+      "range": {
+        "startLine": 104,
+        "startChar": 6,
+        "endLine": 104,
+        "endChar": 10
+      },
+      "revId": "7416623afdefb00ebd0faf32fabd6e1be7b2c06c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4feadab_203fd6bc",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:16:38Z",
+      "side": 1,
+      "message": "Could it be possible that two tree root share the same id? If so, it might be safer to generate the key using `trees.map((tree, idx) \u003d\u003e`",
+      "range": {
+        "startLine": 185,
+        "startChar": 31,
+        "endLine": 185,
+        "endChar": 34
+      },
+      "revId": "7416623afdefb00ebd0faf32fabd6e1be7b2c06c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
