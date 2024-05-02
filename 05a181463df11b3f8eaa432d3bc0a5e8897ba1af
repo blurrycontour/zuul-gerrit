@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be227a3b_72c040c0",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:20:09Z",
+      "side": 1,
+      "message": "Why not declaring the variable here, e.g. `const stats \u003d {` ?",
+      "revId": "05a181463df11b3f8eaa432d3bc0a5e8897ba1af",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
