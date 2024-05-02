@@ -223,6 +223,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "da32a72c_ae1cbf9b",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1847,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-02T10:59:29Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "df2c075d_e03d854c",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f48ceac5_a4a3e3de",
@@ -258,6 +276,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d46b1222_83ee4715",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1866,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-02T10:59:29Z",
+      "side": 1,
+      "message": "Yeah, I think that makes sense. The flags shouldn\u0027t be interpreted as properties of a branch, but rather which kind of queries they satisfy.",
+      "parentUuid": "3056f6cf_5d700a1c",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "270bb9ca_7bbbe5c7",
@@ -289,6 +325,24 @@
       "side": 1,
       "message": "I\u0027d like to advocate for this change.\n\nThe double-negative is fairly difficult to deal with.  Now that this method has been decoupled from the tenant configurating driving it, if we take a step back, I think this makes the most sense now:\n\nIf the calling context needs a list of protected branches, it calls fetchProjectBranchesREST(protected\u003dTrue)\n\nIf the calling context needs a list of all branches, it calls fetchProjectBranchesREST(protected\u003dFalse)\n\nEspecially since it matches the REST api parameter.\n\nBut I recognize you\u0027re concerned with how that last statement reads.\n\nHow about we change it to \"protected_only\"?\n\n(An alternative might be to default it to None and call fetchBranches() with no argument, but I liked the explicit contrast between the two invocations in the method above; it seemed more clear to me.)",
       "parentUuid": "270bb9ca_7bbbe5c7",
+      "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "482340ed_a9e78c43",
+        "filename": "zuul/driver/github/githubconnection.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1883,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-02T10:59:29Z",
+      "side": 1,
+      "message": "yep, `protected_only` wfm",
+      "parentUuid": "9211d8e0_c4b3b9e4",
       "revId": "70813dafaed7efb7954e2de20ad491811f735a8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
