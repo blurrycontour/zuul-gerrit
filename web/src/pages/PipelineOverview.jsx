@@ -16,10 +16,13 @@ import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
+import * as moment_tz from 'moment-timezone'
 
 import {
   Gallery,
   GalleryItem,
+  Level,
+  LevelItem,
   PageSection,
   PageSectionVariants,
   Switch,
@@ -34,24 +37,31 @@ import { fetchStatusIfNeeded } from '../actions/status'
 import { Fetching } from '../containers/Fetching'
 
 
-function TenantStats({ stats }) {
+function TenantStats({ stats, timezone }) {
   return (
-    <>
-      <p>
-        Queue lengths:{' '}
-        <span>
-          {stats.trigger_event_queue ? stats.trigger_event_queue.length : '0'}
-        </span> trigger events,{' '}
-        <span>
-          {stats.management_event_queue ? stats.management_event_queue.length : '0'}
-        </span> management events.
-      </p>
-    </>
+    <Level>
+      <LevelItem>
+        <p>
+          Queue lengths:{' '}
+          <span>
+            {stats.trigger_event_queue ? stats.trigger_event_queue.length : '0'}
+          </span> trigger events,{' '}
+          <span>
+            {stats.management_event_queue ? stats.management_event_queue.length : '0'}
+          </span> management events.
+        </p>
+      </LevelItem>
+      <LevelItem>
+        Last reconfigured:{' '}
+        {moment_tz.utc(stats.last_reconfigured).tz(timezone).fromNow()}
+      </LevelItem>
+    </Level>
   )
 }
 
 TenantStats.propTypes = {
   stats: PropTypes.object,
+  timezone: PropTypes.object,
 }
 
 function PipelineGallery({ pipelines, tenant, showEmptyPipelines }) {
@@ -82,7 +92,9 @@ PipelineGallery.propTypes = {
   showEmptyPipelines: PropTypes.bool,
 }
 
-function PipelineOverviewPage({ pipelines, stats, isFetching, tenant, darkMode, fetchStatusIfNeeded }) {
+function PipelineOverviewPage({
+  pipelines, stats, isFetching, tenant, darkMode, timezone, fetchStatusIfNeeded
+}) {
   const [showEmptyPipelines, setShowEmptyPipelines] = useState(false)
 
   const onShowEmptyPipelinesToggle = (isChecked) => {
@@ -103,7 +115,7 @@ function PipelineOverviewPage({ pipelines, stats, isFetching, tenant, darkMode, 
   return (
     <>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
-        <TenantStats stats={stats} />
+        <TenantStats stats={stats} timezone={timezone} />
         <Toolbar>
           <ToolbarContent>
             <ToolbarItem>
@@ -137,6 +149,7 @@ PipelineOverviewPage.propTypes = {
   tenant: PropTypes.object,
   preferences: PropTypes.object,
   darkMode: PropTypes.bool,
+  timezone: PropTypes.object,
   fetchStatusIfNeeded: PropTypes.func,
 }
 
@@ -163,6 +176,7 @@ function mapStateToProps(state) {
     stats = {
       trigger_event_queue: state.status.status.trigger_event_queue,
       management_event_queue: state.status.status.management_event_queue,
+      last_reconfigured: state.status.status.last_reconfigured,
     }
   }
 
@@ -176,6 +190,7 @@ function mapStateToProps(state) {
     isFetching: state.status.isFetching,
     tenant: state.tenant,
     darkMode: state.preferences.darkMode,
+    timezone: state.timezone,
   }
 }
 
