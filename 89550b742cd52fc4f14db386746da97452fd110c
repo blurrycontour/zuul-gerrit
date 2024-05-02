@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fd073e6_af4d7e3a",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:03:36Z",
+      "side": 1,
+      "message": "Not sure how the project is displayed in red for failing buildset, but I don\u0027t think that\u0027s necessary, the bullet on the left side, the timer and one of the job box is already red, which looks enough. I think it would look better if the project name was always displayed in black",
+      "revId": "89550b742cd52fc4f14db386746da97452fd110c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b529bec5_2dbf7656",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:03:36Z",
+      "side": 1,
+      "message": "It does not seems like this show more details, perhaps this should be renamed `fullscreen` or something like that?",
+      "revId": "89550b742cd52fc4f14db386746da97452fd110c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3d64598_451a5c08",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:03:36Z",
+      "side": 1,
+      "message": "It looks like the tenant is only used for generating the link, so I was wondering if we shouldn\u0027t pass the url from here, e.g. by renaming the `tenant` property into `url`.",
+      "range": {
+        "startLine": 51,
+        "startChar": 59,
+        "endLine": 51,
+        "endChar": 65
+      },
+      "revId": "89550b742cd52fc4f14db386746da97452fd110c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
