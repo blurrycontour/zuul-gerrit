@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef26d9d1_9771275b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:22:03Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "c5e57e48ae200d5c047051287e543b8c2b7a3a3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba173133_763454a5",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:22:03Z",
+      "side": 1,
+      "message": "I think this needs some padding, after clicking on the button, the border overlap with the label. Perhaps the border should be removed?",
+      "range": {
+        "startLine": 120,
+        "startChar": 15,
+        "endLine": 120,
+        "endChar": 21
+      },
+      "revId": "c5e57e48ae200d5c047051287e543b8c2b7a3a3d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
