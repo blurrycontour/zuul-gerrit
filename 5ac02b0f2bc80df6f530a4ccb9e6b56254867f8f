@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c728b23_12e9f53c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T18:47:16Z",
+      "side": 1,
+      "message": "Thanks, I\u0027m putting -1 because of the usability concern I raised in the routes.js change.",
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6acaad4f_d5369488",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T18:47:16Z",
+      "side": 1,
+      "message": "should `-1` be a constant or this predicate a moved to have function to help reader, e.g. `isPipelineDependent`?",
+      "range": {
+        "startLine": 56,
+        "startChar": 44,
+        "endLine": 56,
+        "endChar": 46
+      },
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24f1c40a_f4abf2cc",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T18:47:16Z",
+      "side": 1,
+      "message": "Perhaps we should filter empty queues, the openstack status page looks a bit weird for the gate when most queues are empty.",
+      "range": {
+        "startLine": 58,
+        "startChar": 15,
+        "endLine": 58,
+        "endChar": 28
+      },
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fb6b310_3173e390",
+        "filename": "web/src/routes.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T18:47:16Z",
+      "side": 1,
+      "message": "Might be safer to add a new route for the component, presently the status page does not seem usable. How about adding a new `/status/pipelines` path?",
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
