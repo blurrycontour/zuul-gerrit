@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9eb77815_9cd04d94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:06:27Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "25d6e587e60cd34ddf9389741130894dd670e56f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b4b8c31_a6b81004",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:06:27Z",
+      "side": 1,
+      "message": "it doesn\u0027t looks like this function needs to be in scope of QueueSummary, I think it would help review if this was moved to the top-level. Is it the same as the one used in PipelineDetails?",
+      "revId": "25d6e587e60cd34ddf9389741130894dd670e56f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
