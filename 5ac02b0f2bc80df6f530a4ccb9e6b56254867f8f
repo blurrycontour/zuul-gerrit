@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c77ded00_7a67904d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:33:37Z",
+      "side": 1,
+      "message": "Removing my -1 since we can view that stack as all-or-nothing.",
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6acaad4f_d5369488",
@@ -31,6 +48,30 @@
       "writtenOn": "2024-05-02T18:47:16Z",
       "side": 1,
       "message": "should `-1` be a constant or this predicate a moved to have function to help reader, e.g. `isPipelineDependent`?",
+      "range": {
+        "startLine": 56,
+        "startChar": 44,
+        "endLine": 56,
+        "endChar": 46
+      },
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e2ac16a_ba6677b6",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-02T19:33:37Z",
+      "side": 1,
+      "message": "I meant, I think it would help if this check was implemented as a `isPipelineDependent` predicate function.",
+      "parentUuid": "6acaad4f_d5369488",
       "range": {
         "startLine": 56,
         "startChar": 44,
