@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a35a878_71c18369",
+        "filename": "releasenotes/notes/gerrit-approval-changes-9d0510e4ad71d990.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-03T22:41:51Z",
+      "side": 1,
+      "message": "Let\u0027s avoid personifying Zuul.\n\nPlease link to the docs.\n\nTypo: s/approve/approval/",
+      "revId": "3dee9adfc2c5c86bca2afeadc72de22a42711368",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
