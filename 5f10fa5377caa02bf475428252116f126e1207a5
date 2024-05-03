@@ -33,6 +33,24 @@
       "message": "When I first read this before reading any of the test config or implementation code I half assumed that this was a boolean flag applying to approvals. Eg something like:\n\n```\n    trigger:\n      gerrit:\n        - event: comment-added\n          approval:\n            Code-Review: 2\n          approval-change: true\n```\n\nAfter reading the code I see that this initial impression was wrong and this works exactly the same way as a normal approval except that it adds the necessary condition of the vote changing as well.\n\nMaybe we can make this more clear by update the docs to say something like:\n\n```\n      This is only used for ``comment-added`` events. It works in exactly\n      the same way as ``approval``, with the additional requirement that\n      the approval value must have changed from its previous value. This\n      means that it only matches when a user modifies an approval score\n      instead of any comment where the score is present.\n```",
       "revId": "5f10fa5377caa02bf475428252116f126e1207a5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84b30d06_e04e6588",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 414,
+      "author": {
+        "id": 33934
+      },
+      "writtenOn": "2024-05-03T22:18:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe8e6a4c_c837c28c",
+      "revId": "5f10fa5377caa02bf475428252116f126e1207a5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
