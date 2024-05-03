@@ -45,7 +45,7 @@ class Nodepool(object):
                 zk_client,
                 enable_node_request_cache=True,
                 node_request_event_callback=self._handleNodeRequestEvent,
-                connection_suspended_callback=self.stop_watcher_event,
+                connection_suspended_callback=self.stop_watcher_event.set,
                 enable_node_cache=True)
             self.election = NodepoolEventElection(zk_client)
             self.event_thread = threading.Thread(target=self.runEventElection)
