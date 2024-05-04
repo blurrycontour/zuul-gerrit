@@ -22,6 +22,24 @@
       },
       "revId": "ffb615e6c7b6812e74c9ef827701300a8cdc6b4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec115af7_735e4fbb",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-04T14:14:44Z",
+      "side": 1,
+      "message": "I think that may lead people to believe it\u0027s a boolean, which is what originally confused Clark.",
+      "parentUuid": "be83d2f1_93834d91",
+      "revId": "ffb615e6c7b6812e74c9ef827701300a8cdc6b4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
