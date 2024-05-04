@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be83d2f1_93834d91",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-05-04T13:02:18Z",
+      "side": 1,
+      "message": "Perhaps `approval-changed` would look better?",
+      "range": {
+        "startLine": 407,
+        "startChar": 22,
+        "endLine": 407,
+        "endChar": 28
+      },
+      "revId": "ffb615e6c7b6812e74c9ef827701300a8cdc6b4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
