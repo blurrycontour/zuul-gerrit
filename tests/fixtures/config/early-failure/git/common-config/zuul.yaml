@@ -48,6 +48,11 @@
 
 - job:
     name: pre-failure
+    # Set attempts to a value less than the default of three but greater
+    # than 1 which results in no retries. This ensures testing covers code
+    # paths for retries without extra unnecesasry retries which make the
+    # tests run longer.
+    attempts: 2
     files:
       - pre-failure.txt
     pre-run:
