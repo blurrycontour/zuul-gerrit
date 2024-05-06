@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f978494_c2dd92c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-06T07:13:53Z",
+      "side": 1,
+      "message": "lgtm, though I\u0027m wondering if this should rather be part of the zuul-client",
+      "revId": "73b290bc87d818d72f15b0b8c8ec3ab211870dde",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
