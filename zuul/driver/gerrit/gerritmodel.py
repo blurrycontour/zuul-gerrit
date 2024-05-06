@@ -280,11 +280,11 @@ class GerritTriggerEvent(TriggerEvent):
 
 class GerritEventFilter(EventFilter):
     def __init__(self, connection_name, trigger, types=[], branches=[],
-                 refs=[], event_approvals={}, comments=[], emails=[],
-                 usernames=[], required_approvals=[], reject_approvals=[],
-                 added=[], removed=[],
-                 uuid=None, scheme=None, ignore_deletes=True,
-                 require=None, reject=None, parse_context=None):
+                 refs=[], event_approvals={}, event_approval_changes={},
+                 comments=[], emails=[], usernames=[], required_approvals=[],
+                 reject_approvals=[], added=[], removed=[], uuid=None,
+                 scheme=None, ignore_deletes=True, require=None, reject=None,
+                 parse_context=None):
 
         EventFilter.__init__(self, connection_name, trigger)
 
@@ -323,6 +323,7 @@ class GerritEventFilter(EventFilter):
         self.added = added
         self.removed = removed
         self.event_approvals = event_approvals
+        self.event_approval_changes = event_approval_changes
         self.uuid = uuid
         self.scheme = scheme
         self.ignore_deletes = ignore_deletes
@@ -346,6 +347,9 @@ class GerritEventFilter(EventFilter):
         if self.event_approvals:
             ret += ' event_approvals: %s' % ', '.join(
                 ['%s:%s' % a for a in self.event_approvals.items()])
+        if self.event_approval_changes:
+            ret += ' event_approval_changes: %s' % ', '.join(
+                ['%s:%s' % a for a in self.event_approval_changes.items()])
         if self._comments:
             ret += ' comments: %s' % ', '.join(self._comments)
         if self._emails:
@@ -456,6 +460,19 @@ class GerritEventFilter(EventFilter):
             if not matches_approval:
                 return FalseWithReason("Approvals %s do not match %s" % (
                     self.event_approvals, event.approvals))
+
+        for category, value in self.event_approval_changes.items():
+            matches_approval = False
+            for eapp in event.approvals:
+                if (eapp['description'] == category and
+                        int(eapp['value']) == int(value) and
+                        'oldValue' in eapp and
+                        int(eapp['value']) != int(eapp['oldValue'])):
+                    matches_approval = True
+            if not matches_approval:
+                return FalseWithReason(
+                    "Changed approvals %s do not match %s" % (
+                        self.event_approval_changes, event.approvals))
 
         # hashtags are ORed
         if self.added:
