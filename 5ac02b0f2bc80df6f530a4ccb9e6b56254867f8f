@@ -84,6 +84,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2b241ba8_bcc1edc3",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-07T12:35:22Z",
+      "side": 1,
+      "message": "AFAIK that is the typical solution in JavaScript to check if an element is part of a list, but I can move it to a helper function if you want.",
+      "parentUuid": "5e2ac16a_ba6677b6",
+      "range": {
+        "startLine": 56,
+        "startChar": 44,
+        "endLine": 56,
+        "endChar": 46
+      },
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "24f1c40a_f4abf2cc",
         "filename": "web/src/containers/status/PipelineSummary.jsx",
         "patchSetId": 5
@@ -95,6 +119,30 @@
       "writtenOn": "2024-05-02T18:47:16Z",
       "side": 1,
       "message": "Perhaps we should filter empty queues, the openstack status page looks a bit weird for the gate when most queues are empty.",
+      "range": {
+        "startLine": 58,
+        "startChar": 15,
+        "endLine": 58,
+        "endChar": 28
+      },
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37734c0a_32d75fad",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-07T12:35:22Z",
+      "side": 1,
+      "message": "This is implemented in https://review.opendev.org/c/zuul/zuul/+/916288 (I just noted that it\u0027s not mentioned in the commit message, I will update that) and https://review.opendev.org/c/zuul/zuul/+/916974 adds a toggle to show/hide empty pipelines and queues.\n\nWe could also think about splitting the behaviour for pipelines and queues. E.g. Always hide empty queues, but provide a toggle to hide/show empty pipelines. In that case I\u0027d say we continue the discussion about this in https://review.opendev.org/c/zuul/zuul/+/916974.",
+      "parentUuid": "24f1c40a_f4abf2cc",
       "range": {
         "startLine": 58,
         "startChar": 15,
