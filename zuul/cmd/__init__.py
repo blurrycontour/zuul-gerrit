@@ -18,7 +18,6 @@ import abc
 import argparse
 import configparser
 import daemon
-import extras
 import io
 import json
 import logging
@@ -30,12 +29,15 @@ import sys
 import traceback
 import threading
 
-yappi = extras.try_import('yappi')
-objgraph = extras.try_import('objgraph')
+try:
+    import yappi
+except ImportError:
+    yappi = None
 
-# as of python-daemon 1.6 it doesn't bundle pidlockfile anymore
-# instead it depends on lockfile-0.9.1 which uses pidfile.
-pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
+try:
+    import objgraph
+except ImportError:
+    objgraph = None
 
 from zuul.ansible import logconfig
 import zuul.lib.connections
@@ -240,7 +242,7 @@ class ZuulDaemonApp(ZuulApp, metaclass=abc.ABCMeta):
         self.readConfig()
 
         pid_fn = self.getPidFile()
-        pid = pid_file_module.TimeoutPIDLockFile(pid_fn, 10)
+        pid = daemon.pidfile.TimeoutPIDLockFile(pid_fn, 10)
 
         # Early register the stack dump handler for all zuul apps. This makes
         # it possible to also gather stack dumps during startup hangs.

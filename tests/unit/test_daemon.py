@@ -17,19 +17,15 @@ import logging
 import os
 import sys
 
-import extras
+import daemon.pidfile
 import fixtures
 import testtools
 
 from tests.base import iterate_timeout
 
-# as of python-daemon 1.6 it doesn't bundle pidlockfile anymore
-# instead it depends on lockfile-0.9.1 which uses pidfile.
-pid_file_module = extras.try_imports(['daemon.pidlockfile', 'daemon.pidfile'])
-
 
 def daemon_test(pidfile, flagfile):
-    pid = pid_file_module.TimeoutPIDLockFile(pidfile, 10)
+    pid = daemon.pidfile.TimeoutPIDLockFile(pidfile, 10)
     with daemon.DaemonContext(pidfile=pid):
         for x in iterate_timeout(30, "flagfile to be removed"):
             if not os.path.exists(flagfile):
