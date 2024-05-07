@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aacb8201_a970c76c",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-07T13:08:04Z",
+      "side": 1,
+      "message": "That might be a matter of taste, but I find early return statements easier to read and understand than else-if branches.",
+      "parentUuid": "e798fd3c_ad07bfe5",
+      "range": {
+        "startLine": 104,
+        "startChar": 6,
+        "endLine": 104,
+        "endChar": 10
+      },
+      "revId": "7416623afdefb00ebd0faf32fabd6e1be7b2c06c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c4feadab_203fd6bc",
         "filename": "web/src/containers/status/ChangeQueue.jsx",
         "patchSetId": 9
@@ -54,6 +78,30 @@
       "writtenOn": "2024-05-02T19:16:38Z",
       "side": 1,
       "message": "Could it be possible that two tree root share the same id? If so, it might be safer to generate the key using `trees.map((tree, idx) \u003d\u003e`",
+      "range": {
+        "startLine": 185,
+        "startChar": 31,
+        "endLine": 185,
+        "endChar": 34
+      },
+      "revId": "7416623afdefb00ebd0faf32fabd6e1be7b2c06c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0284e58_5fc536be",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-07T13:08:04Z",
+      "side": 1,
+      "message": "The ids are based on the uuids of the queue items. I assume that a queue item should only be listed once in the status.json, so they should also only be part of a single tree (unless there is a bug in the code). Having multiple trees should also be a rare edge case (when a queue consists of multiple heads, so multiple (failing) queue items at the beginning of the queue).",
+      "parentUuid": "c4feadab_203fd6bc",
       "range": {
         "startLine": 185,
         "startChar": 31,
