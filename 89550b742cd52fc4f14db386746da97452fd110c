@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "040ad2ee_4bf73811",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-07T12:56:45Z",
+      "side": 1,
+      "message": "Interesting, I didn\u0027t notice that during development and I agree that this is a little too much. I will fix it.",
+      "parentUuid": "2fd073e6_af4d7e3a",
+      "revId": "89550b742cd52fc4f14db386746da97452fd110c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b529bec5_2dbf7656",
         "filename": "web/src/containers/status/QueueItem.jsx",
         "patchSetId": 7
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-02T19:03:36Z",
       "side": 1,
       "message": "It does not seems like this show more details, perhaps this should be renamed `fullscreen` or something like that?",
+      "revId": "89550b742cd52fc4f14db386746da97452fd110c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e88b2740_9c9646cc",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-07T12:56:45Z",
+      "side": 1,
+      "message": "I think \"Show details\" is a phrase that is typically used for links like this. It also switches to another view within the Zuul UI. I\u0027m also planning to do a rework of the \"single change panel/view\" once the status page is done, then it should show more details ;-)",
+      "parentUuid": "b529bec5_2dbf7656",
       "revId": "89550b742cd52fc4f14db386746da97452fd110c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
