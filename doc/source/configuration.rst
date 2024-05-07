@@ -413,6 +413,16 @@ The following section of ``zuul.conf`` is used by the merger:
 
       Value in seconds.
 
+   .. attr:: sync_timeout
+      :default: 30
+
+      Timeout for git mirror sync operations. This can be useful when
+      dealing with large repos replicated on mirrors used to fetching changes.
+      If there is no reference available yet on mirror, wait specified timeout
+      before trying to fetch again.
+
+      Value in seconds.
+
    .. attr:: git_user_email
 
       Value to pass to `git config user.email
