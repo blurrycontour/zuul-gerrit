@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e49cf85_34ab014e",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1336,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-07T22:34:44Z",
+      "side": 1,
+      "message": "Maybe consider updating this string as well so that it follows the new \"review data\" approach for the phase one review posting?",
+      "revId": "ed27059fffa97c7d820dc39537ba6fc76e799fdf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
