@@ -1324,15 +1324,16 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                   data)
                         break
                     except HTTPConflictException:
-                        log.exception("Conflict submitting data to gerrit.")
+                        log.exception(
+                            "Conflict submitting review data to gerrit.")
                         break
                     except HTTPBadRequestException:
                         log.exception(
-                            "Bad request submitting check data to gerrit.")
+                            "Bad request submitting review data to gerrit.")
                         break
                     except Exception as e:
                         log.exception(
-                            "Error submitting data to gerrit "
+                            "Error submitting review data to gerrit "
                             "on attempt %s: %s",
                             x, e)
                         time.sleep(x * self.submit_retry_backoff)
@@ -1347,11 +1348,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     break
                 except HTTPBadRequestException:
                     log.exception(
-                        "Bad request submitting check data to gerrit.")
+                        "Bad request submitting change in gerrit.")
                     break
                 except Exception as e:
                     log.exception(
-                        "Error submitting data to gerrit on attempt %s: %s",
+                        "Error submitting change in gerrit on attempt %s: %s",
                         x, e)
                     time.sleep(x * self.submit_retry_backoff)
 

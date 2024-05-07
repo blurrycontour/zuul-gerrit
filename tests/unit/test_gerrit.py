@@ -374,7 +374,7 @@ class TestGerritWeb(ZuulTestCase):
             for x in full_logs.output:
                 self.log.debug(x)
             self.assertRegexInList(
-                r'Error submitting data to gerrit on attempt 3: '
+                r'Error submitting change in gerrit on attempt 3: '
                 'Received response 403: submit not permitted',
                 full_logs.output)
 
