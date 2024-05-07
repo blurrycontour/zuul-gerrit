@@ -8,7 +8,6 @@ PyYAML>=5.1.0
 paramiko>=2.0.1
 GitPython>=2.1.8
 python-daemon>=2.0.4
-extras
 statsd>=3.0
 prometheus-client
 voluptuous>=0.10.2
