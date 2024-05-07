@@ -6281,7 +6281,7 @@ class TestEarlyFailure(AnsibleZuulTestCase):
 
         self.log.debug("Wait for all jobs to finish")
         for _ in iterate_timeout(30, 'all jobs finished'):
-            if len(self.builds) == 1 and len(self.history) == 4:
+            if len(self.builds) == 1 and len(self.history) == 3:
                 break
             for b in self.builds[:]:
                 if b.name == 'pre-failure':
@@ -6320,7 +6320,6 @@ class TestEarlyFailure(AnsibleZuulTestCase):
         self.waitUntilSettled()
 
         self.assertHistory([
-            dict(name='pre-failure', result=None, changes='1,1'),
             dict(name='pre-failure', result=None, changes='1,1'),
             dict(name='pre-failure', result=None, changes='1,1'),
             dict(name='wait', result='ABORTED', changes='1,1 2,1'),
