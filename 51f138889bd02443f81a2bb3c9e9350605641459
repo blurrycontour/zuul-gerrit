@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0616bd1_3f4ec2e3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-08T13:22:18Z",
+      "side": 1,
+      "message": "The check whether there is any remaining quota is currently done independently for each node request based on cached information about existing nodes. This means that concurrently processed requests will not consider each other\u0027s resource usage and there might be a small delay until new nodes show up in the cache.\n\nSame is true for the tenant quota that also considers resources used by other providers, so there can be more requests in parallel that might not consider each other\u0027s resource requirements.\n\nWith the proposed non-coordinating launcher approach the main difference would be that the possibility for quota races would increase when scaling up the launcher instances (more requests processed in parallel). The accuracy would probably be similar to the that of the tenant quota today.\n\nWays to account for that effect on calculated quota (in order of preference):\n- provider quota calculation is best-effort similar to the tenant quota today; consider/document potential \"overshoot\" when setting resource limits\n- calculate quota when assigning requests to providers, but also re-calculate/check the quota limits on provider level and reject a request if it would exceed the quota limits (used quota might still be a bit off)\n- use a combination of coordination (lock) for the global request queue (inc. quota calculation) as proposed in the spec and non-coordinating for provider processing as proposed in this change (this might allow more precise quota calculations than what we have today)\n- synchronize quota reservation/calculation (optional?; might slow down overall request processing)",
+      "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
