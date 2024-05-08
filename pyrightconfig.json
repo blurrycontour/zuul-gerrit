@@ -1,0 +1,11 @@
+{
+  "include": [
+    "zuul",
+  ],
+  "ignore": [
+    "zuul/sphinx/ansible.py",
+    "zuul/ansible/**",
+  ],
+  "typeCheckingMode": "off",
+  "reportUnboundVariable": true
+}

@@ -78,9 +78,12 @@ def docs(session):
 @nox.session(python='3')
 def linters(session):
     set_standard_env_vars(session)
-    session.install('flake8', 'openapi-spec-validator')
+    session.install('-r', 'requirements.txt',
+                    '-r', 'test-requirements.txt')
+    session.install('flake8', 'openapi-spec-validator', 'pyright')
     session.run('flake8')
     session.run('openapi-spec-validator', 'web/public/openapi.yaml')
+    session.run('pyright')
 
 
 @nox.session(python='3')
