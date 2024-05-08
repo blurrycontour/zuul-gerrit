@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "128e2d69_c1d1c061",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-08T11:57:11Z",
+      "side": 1,
+      "message": "I think the color comes from Patternfly as this is a \"failing\" step in the ProgressStepper: https://v4-archive.patternfly.org/v4/components/progress-stepper#with-a-failure.\n\nI tried to override the color, but I have to say that the red color in the title makes it a lot easier to spot failing items, so I\u0027d keep that for now as is.",
+      "parentUuid": "040ad2ee_4bf73811",
+      "revId": "89550b742cd52fc4f14db386746da97452fd110c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b529bec5_2dbf7656",
         "filename": "web/src/containers/status/QueueItem.jsx",
         "patchSetId": 7
