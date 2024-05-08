@@ -197,7 +197,11 @@ class App extends React.Component {
       } else if (!info.tenant) {
         // Multi tenant, look for tenant name in url
         whiteLabel = false
-        this.props.dispatch(fetchTenantsIfNeeded())
+        // Fetch tenants only when auth is done or not required
+        // Otherwise it would enter a loop when api-root auth is configured
+        if (!info.capabilities.auth.read_protected || user.data) {
+          this.props.dispatch(fetchTenantsIfNeeded())
+        }
 
         const match = matchPath(
           this.props.location.pathname, { path: '/t/:tenant' })
