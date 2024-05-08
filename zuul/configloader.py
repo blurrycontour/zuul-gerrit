@@ -89,7 +89,7 @@ def no_dup_config_paths(v):
         for x in v:
             check_config_path(x)
     elif isinstance(v, str):
-        check_config_path(x)
+        check_config_path(v)
     else:
         raise vs.Invalid("Expected str or list of str for extra-config-paths")
 
