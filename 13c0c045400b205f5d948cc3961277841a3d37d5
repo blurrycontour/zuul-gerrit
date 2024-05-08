@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45cf8ccf_924b7b41",
+        "filename": "pyrightconfig.json",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-08T16:35:50Z",
+      "side": 1,
+      "message": "The table at https://github.com/microsoft/pyright/blob/main/docs/configuration.md#diagnostic-settings-defaults specifies which rules are enabled when typeCheckingMode is set to off. Useful for understanding what checks are done in addition to reportUnboundVariable here. My read on this is that only a few supporting rules are properly enabled (these likely won\u0027t help us much) and then some possibly useful rules are enabled as warnings not errors.\n\nI suspect that merging this as is may be of minimal benefit, but there are other rules we could add in later like reportDeprecated and reportInvalidStringEscapeSequence that could be useful as well. I would be on board with using pyright to catch these other items even though we wlikely on\u0027t use type checking proper.",
+      "revId": "13c0c045400b205f5d948cc3961277841a3d37d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
