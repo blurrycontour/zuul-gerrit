@@ -21,6 +21,8 @@ ARG IMAGE_FLAVOR=
 FROM docker.io/library/node:16-bookworm as js-builder
 
 COPY web /tmp/src
+# Remove when re-ansi is updated to use a newer version of rescript instead of bs-platform
+RUN apt-get update && apt-get install -y python-is-python3
 # Explicitly run the Javascript build
 RUN cd /tmp/src && yarn install -d && yarn build
 
