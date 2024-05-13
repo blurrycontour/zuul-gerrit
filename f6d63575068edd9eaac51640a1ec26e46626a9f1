@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97037f89_e47bd73e",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-13T21:31:42Z",
+      "side": 1,
+      "message": "The current page honors the pipeline definition order so that an operator can define the pipelines in whatever order they prefer.  For example, opendev uses something akin to patch lifecycle, so check comes first, then gate, then post-merge.  Here you note that the pipelines should be sorted according to what is most important.  I think it\u0027s an open question whether the most important is the one with the most items in it, or if importance is dependent on workflow (for example, in opendev, the periodic pipeline routinely has the most items in it, but is the least important, so it is manually listed last).\n\nI also wonder if the order of the pipelines changing would be difficult to deal with (especially if check and gate both have between 9 and 10 items and switch back and forth).\n\nI\u0027m not sure how to resolve this, as both use cases seem sensible (1: focus on importance related to lifecycle; 2: focus on importance related te resource usage; a third option might be importance related to overall failure rate!)\n\nMaybe we need selectable sort options?",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b5741e9_1c9b3f3a",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-13T21:31:42Z",
+      "side": 1,
+      "message": "I would add \"see the entire list of configured pipelines\" as a use case.  That would suggest this should be an option.  This may have been implicit, but it\u0027s probably good to explicitly list it.",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e52c8813_99b8e98e",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-13T21:31:42Z",
+      "side": 1,
+      "message": "Clarification: filter by change or project exists, but queue does not.",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cecd01d5_18943568",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-13T21:31:42Z",
+      "side": 1,
+      "message": "Clarification: bookmark by change or project exists (eg https://zuul.opendev.org/t/openstack/status#neutron ) but maybe you were thinking of the queue.",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "629434e6_39d76c61",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-13T21:31:42Z",
+      "side": 1,
+      "message": "I would add: see all of the pipelines my change is currently included in.  (to deal with the semi-common case of, say, multiple check pipelines, or even seeing that a change is simultaneously in check and gate)",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
