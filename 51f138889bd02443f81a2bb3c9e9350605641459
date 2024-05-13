@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2cfcd502_4d89cb97",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-13T22:41:17Z",
+      "side": 1,
+      "message": "To clarify, the current version of the spec does not have a thundering herd problem either.  It avoids that by having two loops: a global request assignment loop, then individual provider loops.  Much like the current zuul event dispatch system.\n\nIf I understand your proposal correctly, this would allow multiple launchers to run the global request assignment loop simultaneously; that reduces a potential bottleneck in processing.\n\nOne of the goals of the spec was to be able to be more deliberate about which providers handle which requests, so I think having multiple launchers run the global assignment loop simultaneously but using implicit coordination to decide which requests they handle makes sense.  The actual substance of the assignment loop (deciding which providers should handle requests based on some limited things now (such as available quota and types) and possibly more complex ideas later (like costs, time of day, anything else) remains.\n\nIt also removes the per-provider lock (see below for more about that).",
+      "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d0616bd1_3f4ec2e3",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -14,6 +31,41 @@
       "writtenOn": "2024-05-08T13:22:18Z",
       "side": 1,
       "message": "The check whether there is any remaining quota is currently done independently for each node request based on cached information about existing nodes. This means that concurrently processed requests will not consider each other\u0027s resource usage and there might be a small delay until new nodes show up in the cache.\n\nSame is true for the tenant quota that also considers resources used by other providers, so there can be more requests in parallel that might not consider each other\u0027s resource requirements.\n\nWith the proposed non-coordinating launcher approach the main difference would be that the possibility for quota races would increase when scaling up the launcher instances (more requests processed in parallel). The accuracy would probably be similar to the that of the tenant quota today.\n\nWays to account for that effect on calculated quota (in order of preference):\n- provider quota calculation is best-effort similar to the tenant quota today; consider/document potential \"overshoot\" when setting resource limits\n- calculate quota when assigning requests to providers, but also re-calculate/check the quota limits on provider level and reject a request if it would exceed the quota limits (used quota might still be a bit off)\n- use a combination of coordination (lock) for the global request queue (inc. quota calculation) as proposed in the spec and non-coordinating for provider processing as proposed in this change (this might allow more precise quota calculations than what we have today)\n- synchronize quota reservation/calculation (optional?; might slow down overall request processing)",
+      "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9504f7d_4013d04a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-13T22:41:17Z",
+      "side": 1,
+      "message": "In your first paragraph, you say \"is currently done\" but do you mean \"this proposed update to the spec\"?  That\u0027s the only interpretation that makes sense to me, and it took me a while to get there, so I wanted to double check.\n\nI think that, if we decide this is worth doing, then the first option is acceptable.  I think I like the second one better since it gets things moving faster and is more robust.  It probably needs the idea of a \"temporary rejection\".\n\nSeparate, but related: this update also proposes removing the per-provider lock.\n\nThat has implications related to quota (as you note) and also rate limits.  In many installations (perhaps most) a limiting factor is the cloud rate limit.  So any system that has more than one provider issuing cloud api calls will, in effect, have similar problems to the quota problem you describe.  The solutions may be similar:\n\n- accept that providers will hit rate limit and eventually recover\n- [temporarily] reject the request if the provider hits rate limit\n- [this one doesn\u0027t apply]\n- synchronize rate limit calculations (will slow overall request processing)\n\nOne way to look at this is that the current version of the spec has a global request lock in order to make correct quota calculations.  And it has a per-provider lock to make correct rate limit calculations.  These global locks slow down processing somewhat, but they allow us to do these calculations correctly with only the caveat that the quota or rate limit values need to be correct in zk once for each iteration (ie, for rate limit, record the current rate info at the end of the loop and restore it at the start).  Removing those locks means we either need to store a lot more data in zk (option #4) or accept some slop.",
+      "parentUuid": "d0616bd1_3f4ec2e3",
+      "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1ca923b_9aa35513",
+        "filename": "zuul/zk/launcher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-13T22:41:17Z",
+      "side": 1,
+      "message": "Spec says all.",
       "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
