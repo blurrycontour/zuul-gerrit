@@ -1238,12 +1238,13 @@ class Merger(object):
         return orig_commit, commit
 
     def _mergeItem(self, item, recent, repo_state, zuul_event_id,
-                   branches=None, process_worker=None):
+                   branches=None, process_worker=None, comment=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         log.debug("Processing ref %s for project %s/%s / %s uuid %s" %
                   (item['ref'], item['connection'],
                    item['project'], item['branch'],
                    item['buildset_uuid']))
+        log.debug("Processing change with event comment %s", comment)
         repo = self.getRepo(item['connection'], item['project'])
         key = (item['connection'], item['project'], item['branch'])
 
@@ -1302,7 +1303,7 @@ class Merger(object):
 
     def mergeChanges(self, items, files=None, dirs=None, repo_state=None,
                      repo_locks=None, branches=None, zuul_event_id=None,
-                     process_worker=None, errors=None):
+                     process_worker=None, errors=None, comment=None):
         """Merge changes
 
         Call Merger.updateRepo() first.
@@ -1336,7 +1337,8 @@ class Merger(object):
                     orig_commit, commit = self._mergeItem(
                         item, recent, repo_state, zuul_event_id,
                         branches=branches,
-                        process_worker=process_worker)
+                        process_worker=process_worker,
+                        comment=comment)
                 except BrokenProcessPool:
                     raise
                 except Exception:

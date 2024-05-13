@@ -310,7 +310,8 @@ class BaseMergeServer(metaclass=ABCMeta):
             branches=args.get('branches'),
             repo_locks=self.repo_locks,
             zuul_event_id=zuul_event_id,
-            errors=errors)
+            errors=errors,
+            comment=merge_request.comment)
 
         if ret is not None:
             result['merged'] = True

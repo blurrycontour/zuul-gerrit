@@ -3887,7 +3887,8 @@ class MergeRequest(JobRequest):
 
     def __init__(self, uuid, job_type, build_set_uuid, tenant_name,
                  pipeline_name, event_id, precedence=None, state=None,
-                 result_path=None, span_context=None, span_info=None):
+                 result_path=None, span_context=None, span_info=None,
+                 comment=None):
         super().__init__(uuid, precedence, state, result_path, span_context)
         self.job_type = job_type
         self.build_set_uuid = build_set_uuid
@@ -3895,6 +3896,7 @@ class MergeRequest(JobRequest):
         self.pipeline_name = pipeline_name
         self.event_id = event_id
         self.span_info = span_info
+        self.comment = comment
 
     def toDict(self):
         d = super().toDict()
@@ -3905,6 +3907,7 @@ class MergeRequest(JobRequest):
             "pipeline_name": self.pipeline_name,
             "event_id": self.event_id,
             "span_info": self.span_info,
+            "comment": self.comment,
         })
         return d
 
@@ -3922,6 +3925,7 @@ class MergeRequest(JobRequest):
             result_path=data["result_path"],
             span_context=data.get("span_context"),
             span_info=data.get("span_info"),
+            comment=data.get("comment"),
         )
 
     def __repr__(self):
@@ -4830,6 +4834,7 @@ class EventInfo:
         self.timestamp = time.time()
         self.span_context = None
         self.ref = None
+        self.comment = None
 
     @classmethod
     def fromEvent(cls, event, event_ref_key):
@@ -4837,6 +4842,10 @@ class EventInfo:
         tinfo.zuul_event_id = event.zuul_event_id
         tinfo.timestamp = event.timestamp
         tinfo.span_context = event.span_context
+        if not isinstance(event, ChangeManagementEvent):
+            tinfo.comment = event.comment
+        else:
+            tinfo.comment = None
         if event_ref_key:
             tinfo.ref = event_ref_key
         else:
@@ -4851,6 +4860,7 @@ class EventInfo:
         tinfo.span_context = d["span_context"]
         # MODEL_API <= 26
         tinfo.ref = d.get("ref")
+        tinfo.comment = d.get("comment")
         return tinfo
 
     def toDict(self):
@@ -4859,6 +4869,7 @@ class EventInfo:
             "timestamp": self.timestamp,
             "span_context": self.span_context,
             "ref": self.ref,
+            "comment": self.comment,
         }
 
 
