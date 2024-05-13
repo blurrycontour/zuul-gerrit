@@ -16,6 +16,24 @@
       "message": "This breaks the idempotency of the the trigger event system.  The pipeline defines the workflow for queue items, which is why we watch comments in pipeline definitions.  If we have jobs act on comments, it would make it possible to have behavior that can only be caused by certain event triggers.  That would make it difficult, for example, to re-enqueue an item in case of some error and get the expected result.\n\nRegarding mergers: they likewise act on project configuration; anything that adjusts their behavior should be a characteristic of the project, not the queue item.",
       "revId": "5790d511738113215b965725dbd1a74650fcf7f1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "142fe529_1c886344",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 35923
+      },
+      "writtenOn": "2024-05-13T15:11:37Z",
+      "side": 1,
+      "message": "Understood. Just sharing our changes that are already working in Zuul v2 fork with Jenkins jobs and needed for our projects CI/CD systems to work on new version.\nIf community will not benefit from this one, then we will manage this ourselves internally.",
+      "parentUuid": "12f99197_66835a36",
+      "revId": "5790d511738113215b965725dbd1a74650fcf7f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
