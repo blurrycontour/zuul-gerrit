@@ -20,6 +20,47 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f8372faa_1ab447d4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-14T06:48:50Z",
+      "side": 1,
+      "message": "Ack. And yes, only the current Nodepool launcher implementation has a thundering herd problem. Sorry for not being clear about that.",
+      "parentUuid": "2cfcd502_4d89cb97",
+      "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cb0c47e_5de91b87",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-14T06:48:50Z",
+      "side": 1,
+      "message": "As Jim pointed out in his comment above: only the current Nodepool launcher implementation has this thundering herd problem.",
+      "range": {
+        "startLine": 26,
+        "startChar": 48,
+        "endLine": 26,
+        "endChar": 71
+      },
+      "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d0616bd1_3f4ec2e3",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -55,6 +96,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3d9b0f68_ba43a380",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-14T06:48:50Z",
+      "side": 1,
+      "message": "With \"currently done\" I was talking about the quota implementation as it is today in Nodepool. My comment was comparing the current way of quota handling in Nodepool with how the quota COULD be handled when using the approach proposed here.\n\nThe change as-is doesn\u0027t have any kind of quota handling atm. as I was mainly focusing on the way requests are handled and comparing/contrasting them as good as possible. If we think that might be worth prototyping I\u0027m happy to do that.\n\nRe. rate limiting we already have a per-launcher rate limit in the current Nodepool implementation. I\u0027d assume that when running multiple launcher instances for the same provider this setting would need to be adjusted accordingly in case of multiple launchers for the same provider.\n\nOf course, a more sophisticated provider rate limit implementation could tune the request rate dynamically or we could handle rate limit error as you proposed, but I\u0027m not sure if it\u0027s worth doing.\n\nIf launchers frequently hit the provider rate limit and those limits can not be increased, there is probably not point in running X number of launchers. So I think the main concern here might be bursts of requests which I think could be handled with some kind of static provider per-launcher rate-limit.\n\nMaybe one option could be to configure a static per-provider rate limit that is then shared between the online provider launchers (e.g. based on the info from the component registry).",
+      "parentUuid": "a9504f7d_4013d04a",
+      "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a1ca923b_9aa35513",
         "filename": "zuul/zk/launcher.py",
         "patchSetId": 2
@@ -66,6 +125,24 @@
       "writtenOn": "2024-05-13T22:41:17Z",
       "side": 1,
       "message": "Spec says all.",
+      "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b1b2bc1_0d845c6b",
+        "filename": "zuul/zk/launcher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-14T06:48:50Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a1ca923b_9aa35513",
       "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
