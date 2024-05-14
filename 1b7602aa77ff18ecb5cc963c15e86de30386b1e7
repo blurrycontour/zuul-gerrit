@@ -176,6 +176,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfcfe4a3_a9717980",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6136,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T23:54:28Z",
+      "side": 1,
+      "message": "Ack this was sort of a minor concern and I think the meaning can be inferred from the text anyway. Worst case you can look at the code for more context.",
+      "parentUuid": "3d739e72_f6baf4fc",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7f963b8_77f25725",
@@ -312,6 +330,24 @@
       "side": 1,
       "message": "This is an error and should set builds\u003dTrue and events\u003dTrue because we return that data in this method.  Fixed.",
       "parentUuid": "655b0b4f_f08cf56d",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06eba6fe_2ef9cd57",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2037,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T23:54:28Z",
+      "side": 1,
+      "message": "The updated patchset modified the buildsets() api call but not this buildset() api call. Should we update both?",
+      "parentUuid": "bfdf28e5_3494359a",
       "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
