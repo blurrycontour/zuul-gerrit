@@ -112,10 +112,10 @@ def construct_build_params(uuid, connections, job, item, pipeline,
         params['branch'] = change.branch
     else:
         params['branch'] = None
-    merge_rs = item.current_build_set.merge_repo_state
-    params['merge_repo_state_ref'] = merge_rs and merge_rs.getPath()
-    extra_rs = item.current_build_set.extra_repo_state
-    params['extra_repo_state_ref'] = extra_rs and extra_rs.getPath()
+    params['merge_repo_state_ref'] = \
+        item.current_build_set._merge_repo_state_path
+    params['extra_repo_state_ref'] = \
+        item.current_build_set._extra_repo_state_path
 
     params['ssh_keys'] = []
     if pipeline.post_review:
