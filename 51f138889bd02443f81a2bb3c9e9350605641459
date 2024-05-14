@@ -114,6 +114,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8e0fdadc_b84a129f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-14T13:28:37Z",
+      "side": 1,
+      "message": "Oh! Then in that case, regarding your first paragraph in the original comment: there is no provider quota race problem in nodepool today because every provider is handled by only one launcher (running more than one launcher with a single provider is off-label and not supported).\n\nBut yes to what you wrote in the second paragraph: tenant quota today is slightly racy, and that is a known design compromise.\n\nI\u0027ve been considering this change an exercise in evaluating a proposed change to the spec, so I think the best target of comparison is to that spec.  We\u0027ve already decided to approve the spec, which achieves cooperative launching via explicit coordination and locking.  That improves the speed of request handling, as well as giving us options for improving the behavior, while maintaining the accuracy of quota and rate calculations.  I see it as this change is to evaluate a further revision of that where we would potentially loosen those guarantees in exchange for more speed.\n\n\u003e The change as-is doesn\u0027t have any kind of quota handling atm. as I was mainly focusing on the way requests are handled and comparing/contrasting them as good as possible. If we think that might be worth prototyping I\u0027m happy to do that.\n\nI don\u0027t think this change needs to actually prototype the quota handling, I thought you just wrote this to benchmark speed.  We would only need to consider the speed of quota handling if we were to do something like continuously update quota values (option #4).  Neither of us want to do that.\n\n\u003e Re. rate limiting we already have a per-launcher rate limit in the current Nodepool implementation. I\u0027d assume that when running multiple launcher instances for the same provider this setting would need to be adjusted accordingly in case of multiple launchers for the same provider.\n\nNo, the design in the spec does not need adjusting like that, because the design in the spec never has more than one launcher drive a provider at the same time.  There is a provider lock, which means that it can perform accurate rate limit calculations for each provider, even across multiple launchers.",
+      "parentUuid": "3d9b0f68_ba43a380",
+      "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a1ca923b_9aa35513",
         "filename": "zuul/zk/launcher.py",
         "patchSetId": 2
