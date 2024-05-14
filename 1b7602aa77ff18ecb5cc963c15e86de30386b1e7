@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10d059d9_7ae083f8",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 714,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T21:48:00Z",
+      "side": 1,
+      "message": "Looks like self.buildset_events is created/managed via the BuildSetModel backref on line 748?",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02abe9f1_766c35bf",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 716,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T21:48:00Z",
+      "side": 1,
+      "message": "This follows the pattern of other parts of the code. I guess we\u0027re already in a parent scope\u0027s transaction and don\u0027t need to commit things here?",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e1d30fb_ad6c7a84",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T21:48:00Z",
+      "side": 1,
+      "message": "Looks like mysql/mariadb should automatically create an index on foreign keys but postgres doesn\u0027t. Good idea to be explicit here in that case.",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a56c1c69_efa277a5",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T21:48:00Z",
+      "side": 1,
+      "message": "I think this change needs an alembic migration too since we\u0027re changing the tablename in the database. Without that our queries won\u0027t map to the correct name in the db for existing installations.\n\nThat might be best done in a separate change so that the distinct db updates are in separate commits?",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02e56694_84197b94",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6136,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T21:48:00Z",
+      "side": 1,
+      "message": "Is the order of self.ref and self.oldrev here backwards relative to the string substition?\n\n```\nBranch fooproject deletes 1234567oldrev from deletedbranch\n```\n\nIs sort of how I woudl expect that to be written but we flip the order of the last two items. Also I\u0027m not sure if the type(self).__name__ works as a prefix. Might want to be just before deletedbranch instead?",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7f963b8_77f25725",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6140,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T21:48:00Z",
+      "side": 1,
+      "message": "See above, I think the order is correct here for ref and newrev but not sure about the type(self).__name__ prefix.",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "181e1bfe_62a96ebe",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6144,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T21:48:00Z",
+      "side": 1,
+      "message": "See above about the prefix.",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e620be78_b973fee7",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6384,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T21:48:00Z",
+      "side": 1,
+      "message": "I think this may also have the oddness with the class name coming before the project name but less so since its pure data and doesn\u0027t try to describe relationships between the items being interpolated like the other messages do.",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "655b0b4f_f08cf56d",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2037,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-05-14T21:48:00Z",
+      "side": 1,
+      "message": "Does the call here not passing in builds or events mean that we\u0027ll never add those items to the schema? Maybe we should make those non optional items and return empty lists if there are no builds or events rather than not supplying the info.",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
