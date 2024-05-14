@@ -923,6 +923,10 @@ class PipelineState(zkobject.ZKObject):
         items_referenced_by_builds = set()
         for i in known_item_objs:
             build_set = i.current_build_set
+            # Drop some attributes from local objects to save memory
+            build_set._set(_files=None,
+                           _merge_repo_state=None,
+                           _extra_repo_state=None)
             job_graph = build_set.job_graph
             if not job_graph:
                 continue
@@ -4337,9 +4341,12 @@ class BuildSet(zkobject.ZKObject):
             merge_state=self.NEW,
             nodeset_info={},  # job -> dict of nodeset info
             node_requests={},  # job -> request id
-            files=None,
-            merge_repo_state=None,  # The repo_state of the original merge
-            extra_repo_state=None,  # Repo state for any additional projects
+            _files=None,  # The files object if loaded
+            _files_path=None,  # The ZK path to the files object
+            _merge_repo_state=None,  # The repo_state of the original merge
+            _merge_repo_state_path=None,  # ZK path for above
+            _extra_repo_state=None,  # Repo state for any additional projects
+            _extra_repo_state_path=None,  # ZK path for above
             tries={},
             files_state=self.NEW,
             repo_state_state=self.NEW,
@@ -4359,7 +4366,7 @@ class BuildSet(zkobject.ZKObject):
         )
 
     def setFiles(self, items):
-        if self.files is not None:
+        if self._files_path is not None:
             raise Exception("Repo files can not be updated")
         if not self._active_context:
             raise Exception("setFiles must be used with a context manager")
@@ -4373,12 +4380,24 @@ class BuildSet(zkobject.ZKObject):
         repo_files = RepoFiles.new(self._active_context,
                                    connections=connections,
                                    _buildset_path=self.getPath())
-        self.files = repo_files
+        self._files = repo_files
+        self._files_path = repo_files.getPath()
 
-    @property
-    def repo_state(self):
+    def getRepoState(self, context):
+        if self._merge_repo_state_path and self._merge_repo_state is None:
+            try:
+                self._set(_merge_repo_state=MergeRepoState.fromZK(
+                    context, self._merge_repo_state_path))
+            except Exception:
+                self.log.exception("Failed to restore merge repo state")
+        if self._extra_repo_state_path and self._extra_repo_state is None:
+            try:
+                self._set(_extra_repo_state=ExtraRepoState.fromZK(
+                    context, self._extra_repo_state_path))
+            except Exception:
+                self.log.exception("Failed to restore extra repo state")
         d = {}
-        for rs in (self.merge_repo_state, self.extra_repo_state):
+        for rs in (self._merge_repo_state, self._extra_repo_state):
             if not rs:
                 continue
             for connection in rs.state.keys():
@@ -4386,6 +4405,16 @@ class BuildSet(zkobject.ZKObject):
                     d[connection] = {}
                 d[connection].update(rs.state.get(connection, {}))
         return d
+
+    def getFiles(self, context):
+        if self._files is not None:
+            return self._files
+        try:
+            self._set(_files=RepoFiles.fromZK(context,
+                                              self._files_path))
+        except Exception:
+            self.log.exception("Failed to restore repo files")
+        return self._files
 
     def setConfigErrors(self, config_errors):
         if not self._active_context:
@@ -4406,7 +4435,7 @@ class BuildSet(zkobject.ZKObject):
         return bool(errs)
 
     def setMergeRepoState(self, repo_state):
-        if self.merge_repo_state is not None:
+        if self._merge_repo_state_path is not None:
             raise Exception("Merge repo state can not be updated")
         if not self._active_context:
             raise Exception("setMergeRepoState must be used "
@@ -4414,10 +4443,11 @@ class BuildSet(zkobject.ZKObject):
         rs = MergeRepoState.new(self._active_context,
                                 state=repo_state,
                                 _buildset_path=self.getPath())
-        self.merge_repo_state = rs
+        self._merge_repo_state = rs
+        self._merge_repo_state_path = rs.getPath()
 
     def setExtraRepoState(self, repo_state):
-        if self.extra_repo_state is not None:
+        if self._extra_repo_state_path is not None:
             raise Exception("Extra repo state can not be updated")
         if not self._active_context:
             raise Exception("setExtraRepoState must be used "
@@ -4425,7 +4455,8 @@ class BuildSet(zkobject.ZKObject):
         rs = ExtraRepoState.new(self._active_context,
                                 state=repo_state,
                                 _buildset_path=self.getPath())
-        self.extra_repo_state = rs
+        self._extra_repo_state = rs
+        self._extra_repo_state_path = rs.getPath()
 
     def getPath(self):
         return f"{self.item.getPath()}/buildset/{self.uuid}"
@@ -4456,11 +4487,9 @@ class BuildSet(zkobject.ZKObject):
             "merge_state": self.merge_state,
             "nodeset_info": self.nodeset_info,
             "node_requests": self.node_requests,
-            "files": self.files and self.files.getPath(),
-            "merge_repo_state": (self.merge_repo_state.getPath()
-                                 if self.merge_repo_state else None),
-            "extra_repo_state": (self.extra_repo_state.getPath()
-                                 if self.extra_repo_state else None),
+            "files": self._files_path,
+            "merge_repo_state": self._merge_repo_state_path,
+            "extra_repo_state": self._extra_repo_state_path,
             "tries": self.tries,
             "files_state": self.files_state,
             "repo_state_state": self.repo_state_state,
@@ -4484,41 +4513,11 @@ class BuildSet(zkobject.ZKObject):
         # child objects.
         self._set(uuid=data["uuid"])
 
-        # If we already have a repo files, we don't need to
-        # deserialize since it's immutable.
-        if self.files is not None:
-            data["files"] = self.files
-        else:
-            try:
-                if data["files"]:
-                    data["files"] = RepoFiles.fromZK(context, data["files"])
-            except Exception:
-                self.log.exception("Failed to restore repo files")
-                data["files"] = None
-
-        # If we already have a repo state, we don't need to
-        # deserialize since it's immutable.
-        if self.merge_repo_state is not None:
-            data['merge_repo_state'] = self.merge_repo_state
-        else:
-            try:
-                if data['merge_repo_state']:
-                    data['merge_repo_state'] = MergeRepoState.fromZK(
-                        context, data["merge_repo_state"])
-            except Exception:
-                self.log.exception("Failed to restore merge repo state")
-                data['merge_repo_state'] = None
-
-        if self.extra_repo_state is not None:
-            data['extra_repo_state'] = self.extra_repo_state
-        else:
-            try:
-                if data['extra_repo_state']:
-                    data['extra_repo_state'] = ExtraRepoState.fromZK(
-                        context, data["extra_repo_state"])
-            except Exception:
-                self.log.exception("Failed to restore extra repo state")
-                data['extra_repo_state'] = None
+        # These three values are immutable, and not kept in memory
+        # unless accessed.
+        data['_files_path'] = data.pop('files')
+        data['_merge_repo_state_path'] = data.pop('merge_repo_state')
+        data['_extra_repo_state_path'] = data.pop('extra_repo_state')
 
         config_errors = data.get('config_errors')
         if config_errors:
