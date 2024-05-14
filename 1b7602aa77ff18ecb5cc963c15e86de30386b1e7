@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f0bb522_aef4c097",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 714,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-14T22:36:44Z",
+      "side": 1,
+      "message": "Yep, existing pattern shared by all these objects.",
+      "parentUuid": "10d059d9_7ae083f8",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02abe9f1_766c35bf",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-14T21:48:00Z",
       "side": 1,
       "message": "This follows the pattern of other parts of the code. I guess we\u0027re already in a parent scope\u0027s transaction and don\u0027t need to commit things here?",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20fd06e9_cdbb101f",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 716,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-14T22:36:44Z",
+      "side": 1,
+      "message": "Exactly.",
+      "parentUuid": "02abe9f1_766c35bf",
       "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d44f3383_22371bd9",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-14T22:36:44Z",
+      "side": 1,
+      "message": "Yes, also this forces our name for the keys, so we know they will have that name in the future if we need to change it.  This is something we corrected for all existing indexes in the recent big migration.",
+      "parentUuid": "5e1d30fb_ad6c7a84",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a56c1c69_efa277a5",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-05-14T21:48:00Z",
       "side": 1,
       "message": "I think this change needs an alembic migration too since we\u0027re changing the tablename in the database. Without that our queries won\u0027t map to the correct name in the db for existing installations.\n\nThat might be best done in a separate change so that the distinct db updates are in separate commits?",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82468a34_7598050b",
+        "filename": "zuul/driver/sql/sqlconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-14T22:36:44Z",
+      "side": 1,
+      "message": "This just changes the name of the constant, not the value.  The constant had an extra S that the value did not (and similar constants were also not plural).  Now everything matches.  No migration needed.",
+      "parentUuid": "a56c1c69_efa277a5",
       "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -88,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3d739e72_f6baf4fc",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6136,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-14T22:36:44Z",
+      "side": 1,
+      "message": "This is exactly the format used in the logs, and I wanted to be consistent.  They are the way they are so that the fields are in the same order.  We could change it, but I don\u0027t think it\u0027s that important right now.  I\u0027m sure the type method works -- it works in the logs today, and it\u0027s checked in a unit test in this change.",
+      "parentUuid": "02e56694_84197b94",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f7f963b8_77f25725",
         "filename": "zuul/model.py",
         "patchSetId": 3
@@ -99,6 +189,24 @@
       "writtenOn": "2024-05-14T21:48:00Z",
       "side": 1,
       "message": "See above, I think the order is correct here for ref and newrev but not sure about the type(self).__name__ prefix.",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83b5e9e4_1e7ef8c1",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6140,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-14T22:36:44Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f7f963b8_77f25725",
       "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -120,6 +228,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "deec57ff_e4346162",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6144,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-14T22:36:44Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "181e1bfe_62a96ebe",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e620be78_b973fee7",
@@ -137,6 +263,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e8e393f_700f3b34",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 6384,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-14T22:36:44Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e620be78_b973fee7",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "655b0b4f_f08cf56d",
@@ -150,6 +294,24 @@
       "writtenOn": "2024-05-14T21:48:00Z",
       "side": 1,
       "message": "Does the call here not passing in builds or events mean that we\u0027ll never add those items to the schema? Maybe we should make those non optional items and return empty lists if there are no builds or events rather than not supplying the info.",
+      "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfdf28e5_3494359a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2037,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-14T22:36:44Z",
+      "side": 1,
+      "message": "This is an error and should set builds\u003dTrue and events\u003dTrue because we return that data in this method.  Fixed.",
+      "parentUuid": "655b0b4f_f08cf56d",
       "revId": "1b7602aa77ff18ecb5cc963c15e86de30386b1e7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
