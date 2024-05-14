@@ -1237,11 +1237,12 @@ class PipelineManager(metaclass=ABCMeta):
             # full set of config and project repos.  This lets us
             # catch syntax errors in config repos even though we won't
             # actually run with that config.
+            files = build_set.getFiles(self.current_context)
             if trusted_updates:
                 log.debug("Loading dynamic layout (phase 1)")
                 trusted_layout = loader.createDynamicLayout(
                     item,
-                    build_set.files,
+                    files,
                     additional_project_branches,
                     self.sched.ansible_manager,
                     include_config_projects=True,
@@ -1256,7 +1257,7 @@ class PipelineManager(metaclass=ABCMeta):
                 log.debug("Loading dynamic layout (phase 2)")
                 untrusted_layout = loader.createDynamicLayout(
                     item,
-                    build_set.files,
+                    files,
                     additional_project_branches,
                     self.sched.ansible_manager,
                     include_config_projects=False,
@@ -1503,7 +1504,7 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug('Needed projects: %s', project_cnames)
 
         # Filter projects for ones that are already in repo state
-        repo_state = item.current_build_set.repo_state
+        repo_state = item.current_build_set.getRepoState(self.current_context)
         connections = self.sched.connections.connections
         for connection in repo_state.keys():
             canonical_hostname = connections[connection].canonical_hostname
@@ -1535,7 +1536,7 @@ class PipelineManager(metaclass=ABCMeta):
         build_set = item.current_build_set
         # If we skipped the initial repo state (for branch/ref items),
         # we need to include the merger items for the final repo state.
-        if build_set.merge_repo_state is None:
+        if build_set._merge_repo_state_path is None:
             new_items.extend(build_set.merger_items)
 
         for project in projects:
