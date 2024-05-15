@@ -132,6 +132,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "13e1a253_e5c52513",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-15T12:05:23Z",
+      "side": 1,
+      "message": "I\u0027ve update the commit message with more details about quota/rate-limit handling and tried to make it more clear which implementation/proposal I\u0027m referring to.",
+      "parentUuid": "8e0fdadc_b84a129f",
+      "revId": "51f138889bd02443f81a2bb3c9e9350605641459",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a1ca923b_9aa35513",
         "filename": "zuul/zk/launcher.py",
         "patchSetId": 2
