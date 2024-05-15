@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ce4d49a_948729f2",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4349,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-15T11:12:51Z",
+      "side": 1,
+      "message": "nit: Since we access the `*_repo_state_path` attributes as part of the \"public API\" of a buildset I think we should remove the underscore prefix for those.",
+      "revId": "2ba68eacd86fedcca2501df287df88ef7ce59aa3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
