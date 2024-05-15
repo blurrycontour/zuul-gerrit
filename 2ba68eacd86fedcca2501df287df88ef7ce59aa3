@@ -16,6 +16,24 @@
       "message": "nit: Since we access the `*_repo_state_path` attributes as part of the \"public API\" of a buildset I think we should remove the underscore prefix for those.",
       "revId": "2ba68eacd86fedcca2501df287df88ef7ce59aa3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "711efbea_e50f6b30",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4349,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-15T13:37:25Z",
+      "side": 1,
+      "message": "I used underscores here to remind us that this isn\u0027t a zk attribute (just like _old_jobs and _old_job_graph).  That\u0027s generally the case for most of these zkobjects.\n\nI\u0027m not too bothered by that slight adjustment of the underscore (after all, in all of the codebase, zuul is its only consumer, so private/public can have some wiggle room), but if it bothers you, we could add an accessor method that publicises it.",
+      "parentUuid": "1ce4d49a_948729f2",
+      "revId": "2ba68eacd86fedcca2501df287df88ef7ce59aa3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
