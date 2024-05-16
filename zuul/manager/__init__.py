@@ -28,7 +28,7 @@ from zuul.lib.tarjan import strongly_connected_components
 import zuul.lib.tracing as tracing
 from zuul.model import (
     Change, PipelineState, PipelineChangeList, QueueItem,
-    filter_severity, EnqueueEvent, QueryCache
+    filter_severity, EnqueueEvent
 )
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.exceptions import LockException
@@ -235,7 +235,6 @@ class PipelineManager(metaclass=ABCMeta):
 
     def resolveChangeKeys(self, change_keys):
         resolved_changes = []
-        query_cache = QueryCache()
         for key in change_keys:
             change = self._change_cache.get(key.reference)
             if change is None:
@@ -252,8 +251,7 @@ class PipelineManager(metaclass=ABCMeta):
                         and self.useDependenciesByTopic(change.project))
                     if (update_commit_dependencies
                             or update_topic_dependencies):
-                        self.updateCommitDependencies(
-                            query_cache, change, event=None)
+                        self.updateCommitDependencies(change, event=None)
                 self._change_cache[change.cache_key] = change
             resolved_changes.append(change)
         return resolved_changes
@@ -332,7 +330,7 @@ class PipelineManager(metaclass=ABCMeta):
         if not isinstance(change, model.Change):
             return
 
-        query_cache = QueryCache()
+        self.sched.query_cache.clearIfOlderThan(event)
         to_refresh = set()
         for item in self.pipeline.getAllItems():
             for item_change in item.changes:
@@ -346,7 +344,7 @@ class PipelineManager(metaclass=ABCMeta):
                         to_refresh.add(item_change)
 
         for existing_change in to_refresh:
-            self.updateCommitDependencies(query_cache, existing_change, event)
+            self.updateCommitDependencies(existing_change, event)
 
     def reportEnqueue(self, item):
         if not self.pipeline.state.disabled:
@@ -849,7 +847,7 @@ class PipelineManager(metaclass=ABCMeta):
         ) - set(cycle)
 
     def getDependencyGraph(self, change, dependency_graph, event,
-                           update_deps=False, query_cache=None,
+                           update_deps=False,
                            history=None, quiet=False, indent=''):
         log = get_annotated_logger(self.log, event)
         if not quiet:
@@ -860,11 +858,10 @@ class PipelineManager(metaclass=ABCMeta):
             return
         if history is None:
             history = set()
-        if query_cache is None:
-            query_cache = QueryCache()
+        self.sched.query_cache.clearIfOlderThan(event)
         history.add(change)
         if update_deps:
-            self.updateCommitDependencies(query_cache, change, event)
+            self.updateCommitDependencies(change, event)
         for needed_change in self.resolveChangeReferences(
                 change.getNeedsChanges(
                     self.useDependenciesByTopic(change.project))):
@@ -893,7 +890,7 @@ class PipelineManager(metaclass=ABCMeta):
             if needed_change not in history:
                 self.getDependencyGraph(needed_change,
                                         dependency_graph, event,
-                                        update_deps, query_cache,
+                                        update_deps,
                                         history, quiet, indent + ' ')
 
     def getQueueConfig(self, project):
@@ -999,8 +996,10 @@ class PipelineManager(metaclass=ABCMeta):
                     self.pipeline.tenant.name][other_pipeline.name
                         ].put_supercede(event)
 
-    def updateCommitDependencies(self, query_cache, change, event):
+    def updateCommitDependencies(self, change, event):
         log = get_annotated_logger(self.log, event)
+        query_cache = self.sched.query_cache
+        query_cache.clearIfOlderThan(event)
 
         must_update_commit_deps = (
             not hasattr(event, "zuul_event_ltime")
