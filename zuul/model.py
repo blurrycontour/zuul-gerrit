@@ -151,8 +151,22 @@ def filter_severity(error_list, errors=True, warnings=True):
 class QueryCache:
     """Cache query information while processing dependencies"""
 
-    def __init__(self):
+    def __init__(self, zk_client):
+        self.zk_client = zk_client
+        self.ltime = 0
+        self.clear(0)
+
+    def clear(self, ltime):
+        self.ltime = ltime
         self.topic_queries = {}
+
+    def clearIfOlderThan(self, event):
+        if not hasattr(event, "zuul_event_ltime"):
+            return
+        ltime = event.zuul_event_ltime
+        if ltime > self.ltime:
+            ltime = self.zk_client.getCurrentLtime()
+            self.clear(ltime)
 
 
 class ZuulMark:
