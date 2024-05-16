@@ -9361,7 +9361,7 @@ class TestEventProcessing(ZuulTestCase):
         orig = zuul.scheduler.Scheduler._forward_trigger_event
 
         def patched_forward(obj, *args, **kw):
-            if args[1].name == 'tenant-one':
+            if args[2].name == 'tenant-one':
                 raise Exception("test")
             return orig(obj, *args, **kw)
 
