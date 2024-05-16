@@ -1573,10 +1573,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
         C.addApproval("Code-Review", 2)
         D.addApproval("Code-Review", 2)
 
-        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
-        self.fake_gerrit.addEvent(B.addApproval("Approved", 1))
-        self.fake_gerrit.addEvent(C.addApproval("Approved", 1))
-        self.fake_gerrit.addEvent(D.addApproval("Approved", 1))
+        # Add the approvals first, then add the events to ensure we
+        # are not racing gerrit approval changes.
+        events = [c.addApproval("Approved", 1) for c in [A, B, C, D]]
+        for event in events:
+            self.fake_gerrit.addEvent(event)
         self.waitUntilSettled()
 
         self.assertEqual(A.data["status"], "NEW")
@@ -3499,15 +3500,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(0, counters[('changes', '1', 'submitted_together')])
         self.assertEqual(0, counters[('changes', '2', 'submitted_together')])
         self.assertEqual(0, counters[('changes', '3', 'submitted_together')])
-        # This query happens once for each event in the scheduler,
-        # then once for each change in the pipeline if there's more
-        # than one (cache is in play here).
-        # * A: 1x scheduler, 0x pipeline
-        # * A+B: 1x scheduler, 1x pipeline
-        # * A+B+C: 1x scheduler, 1x pipeline
+        # This query happens once for each event in the scheduler.
         qstring = ('?n=500&o=CURRENT_REVISION&o=CURRENT_COMMIT&'
                    'q=status%3Aopen%20topic%3A%22test-topic%22')
-        self.assertEqual(5, counters[('changes', qstring)])
+        self.assertEqual(3, counters[('changes', qstring)])
         self.assertHistory([
             dict(name="project-job", changes="1,1"),
 
@@ -3653,13 +3649,13 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(len(C.patchsets[-1]["approvals"]), 1)
         self.assertEqual(C.patchsets[-1]["approvals"][0]["type"], "Verified")
         self.assertEqual(C.patchsets[-1]["approvals"][0]["value"], "1")
-        self.assertEqual(A.queried, 3)
-        self.assertEqual(B.queried, 3)
-        self.assertEqual(C.queried, 3)
-        self.assertEqual(D.queried, 3)
-        self.assertEqual(E.queried, 3)
-        self.assertEqual(F.queried, 3)
-        self.assertEqual(G.queried, 3)
+        self.assertEqual(A.queried, 2)
+        self.assertEqual(B.queried, 2)
+        self.assertEqual(C.queried, 2)
+        self.assertEqual(D.queried, 2)
+        self.assertEqual(E.queried, 2)
+        self.assertEqual(F.queried, 2)
+        self.assertEqual(G.queried, 2)
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS",
                  changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
