@@ -55,7 +55,7 @@ class BaseWithWeb(ZuulTestCase):
         self.zuul_ini_config = FakeConfig(self.config_ini_data)
         # Start the web server
         self.web = self.useFixture(
-            ZuulWebFixture(self.changes, self.config,
+            ZuulWebFixture(self.config, self.test_config,
                            self.additional_event_queues, self.upstream_root,
                            self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
@@ -3737,7 +3737,7 @@ class TestWebStartup(ZuulTestCase):
     def _start_web(self):
         # Start the web server
         self.web = ZuulWebFixture(
-            self.changes, self.config, self.additional_event_queues,
+            self.config, self.test_config, self.additional_event_queues,
             self.upstream_root, self.poller_events,
             self.git_url_with_auth, self.addCleanup, self.test_root,
             info=zuul.model.WebInfo.fromConfig(self.zuul_ini_config))

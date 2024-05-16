@@ -335,7 +335,7 @@ class TestStreaming(TestStreamingBase):
         '''
         # Start the web server
         web = self.useFixture(
-            ZuulWebFixture(self.changes, self.config,
+            ZuulWebFixture(self.config, self.test_config,
                            self.additional_event_queues, self.upstream_root,
                            self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
@@ -418,7 +418,7 @@ class TestStreaming(TestStreamingBase):
     def test_websocket_streaming(self):
         # Start the web server
         web = self.useFixture(
-            ZuulWebFixture(self.changes, self.config,
+            ZuulWebFixture(self.config, self.test_config,
                            self.additional_event_queues, self.upstream_root,
                            self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
@@ -494,7 +494,7 @@ class TestStreaming(TestStreamingBase):
     def test_websocket_hangup(self):
         # Start the web server
         web = self.useFixture(
-            ZuulWebFixture(self.changes, self.config,
+            ZuulWebFixture(self.config, self.test_config,
                            self.additional_event_queues, self.upstream_root,
                            self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
@@ -647,7 +647,7 @@ class TestAuthWebsocketStreaming(TestStreamingBase):
     def test_auth_websocket_streaming(self):
         # Start the web server
         web = self.useFixture(
-            ZuulWebFixture(self.changes, self.config,
+            ZuulWebFixture(self.config, self.test_config,
                            self.additional_event_queues, self.upstream_root,
                            self.poller_events,
                            self.git_url_with_auth, self.addCleanup,
