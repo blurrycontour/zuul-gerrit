@@ -59,21 +59,22 @@ from zuul.model import (
     BuildStatusEvent,
     Change,
     ChangeManagementEvent,
-    PipelinePostConfigEvent,
-    SemaphoreReleaseEvent,
-    PipelineSemaphoreReleaseEvent,
     DequeueEvent,
     EnqueueEvent,
     FilesChangesCompletedEvent,
     HoldRequest,
     MergeCompletedEvent,
     NodesProvisionedEvent,
+    PipelinePostConfigEvent,
+    PipelineSemaphoreReleaseEvent,
     PromoteEvent,
+    QueryCache,
     ReconfigureEvent,
-    TenantReconfigureEvent,
-    UnparsedAbideConfig,
+    SemaphoreReleaseEvent,
     SupercedeEvent,
     SystemAttributes,
+    TenantReconfigureEvent,
+    UnparsedAbideConfig,
     STATE_FAILED,
     SEVERITY_WARNING,
 )
@@ -2541,6 +2542,7 @@ class Scheduler(threading.Thread):
         span.set_attribute("reconfigure_tenant", reconfigure_tenant)
         event.span_context = tracing.getSpanContext(span)
 
+        query_cache = QueryCache()
         for pipeline in tenant.layout.pipelines.values():
             # For most kinds of dependencies, it's sufficient to check
             # if this change is already in the pipeline, because the
@@ -2558,7 +2560,8 @@ class Scheduler(threading.Thread):
             # manager, but the result of the work goes into the change
             # cache, so it's not wasted; it's just less parallelized.
             if isinstance(change, Change):
-                pipeline.manager.updateCommitDependencies(change, event)
+                pipeline.manager.updateCommitDependencies(query_cache,
+                                                          change, event)
             if (
                 pipeline.manager.eventMatches(event, change)
                 or pipeline.manager.isChangeRelevantToPipeline(change)

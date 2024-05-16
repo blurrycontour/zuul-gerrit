@@ -858,27 +858,20 @@ class TestGerritFake(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         data = self._get_tuple(1)
         self.assertEqual(data, [])
-        ret = self.fake_gerrit._getSubmittedTogether(A, None)
-        self.assertEqual(ret, [])
 
         # A dependent series (B->A)
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         B.setDependsOn(A, 1)
         data = self._get_tuple(2)
         self.assertEqual(data, [(1, 1), (2, 1)])
-        # The Gerrit connection method filters out the queried change
-        ret = self.fake_gerrit._getSubmittedTogether(B, None)
-        self.assertEqual(ret, [(1, 1)])
 
         # A topic cycle
-        C1 = self.fake_gerrit.addFakeChange('org/project', 'master', 'C1',
-                                            topic='test-topic')
+        self.fake_gerrit.addFakeChange('org/project', 'master', 'C1',
+                                       topic='test-topic')
         self.fake_gerrit.addFakeChange('org/project', 'master', 'C2',
                                        topic='test-topic')
         data = self._get_tuple(3)
         self.assertEqual(data, [])
-        ret = self.fake_gerrit._getSubmittedTogether(C1, None)
-        self.assertEqual(ret, [])
 
     @gerrit_config(submit_whole_topic=True)
     def test_submitted_together_whole_topic(self):
@@ -890,8 +883,6 @@ class TestGerritFake(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         data = self._get_tuple(1)
         self.assertEqual(data, [])
-        ret = self.fake_gerrit._getSubmittedTogether(A, None)
-        self.assertEqual(ret, [])
 
         # A dependent series (B->A)
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
@@ -899,19 +890,15 @@ class TestGerritFake(ZuulTestCase):
         data = self._get_tuple(2)
         self.assertEqual(data, [(1, 1), (2, 1)])
         # The Gerrit connection method filters out the queried change
-        ret = self.fake_gerrit._getSubmittedTogether(B, None)
-        self.assertEqual(ret, [(1, 1)])
 
         # A topic cycle
-        C1 = self.fake_gerrit.addFakeChange('org/project', 'master', 'C1',
-                                            topic='test-topic')
+        self.fake_gerrit.addFakeChange('org/project', 'master', 'C1',
+                                       topic='test-topic')
         self.fake_gerrit.addFakeChange('org/project', 'master', 'C2',
                                        topic='test-topic')
         data = self._get_tuple(3)
         self.assertEqual(data, [(3, 1), (4, 1)])
         # The Gerrit connection method filters out the queried change
-        ret = self.fake_gerrit._getSubmittedTogether(C1, None)
-        self.assertEqual(ret, [(4, 1)])
 
         # Test also the query used by the GerritConnection:
         ret = self.fake_gerrit._simpleQuery('status:open topic:test-topic')
@@ -1213,7 +1200,8 @@ class TestGerritMaxDeps(ZuulTestCase):
 
         # This is not
         C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
-        C.setDependsOn(B, 1)
+        C.data['commitMessage'] = '%s\n\nDepends-On: %s\nDepends-On: %s\n' % (
+            C.subject, A.data['id'], B.data['id'])
         self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
 
