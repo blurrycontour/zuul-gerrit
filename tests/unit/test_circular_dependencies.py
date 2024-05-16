@@ -24,6 +24,7 @@ from zuul.model import PromoteEvent
 from tests.base import (
     iterate_timeout,
     simple_layout,
+    gerrit_config,
     ZuulGithubAppTestCase,
     ZuulTestCase,
 )
@@ -3405,8 +3406,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
     # End check tests
 
+    @gerrit_config(submit_whole_topic=True)
     def test_submitted_together(self):
-        self.fake_gerrit._fake_submit_whole_topic = True
         A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
                                            topic='test-topic')
         B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
@@ -3444,10 +3445,10 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "MERGED")
 
+    @gerrit_config(submit_whole_topic=True)
     def test_submitted_together_storm(self):
         # Test that if many changes are uploaded with the same topic,
         # we handle queries efficiently.
-        self.fake_gerrit._fake_submit_whole_topic = True
         self.waitUntilSettled()
         A = self.fake_gerrit.addFakeChange('org/project', "master", "A",
                                            topic='test-topic')
@@ -3510,9 +3511,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="project2-job", changes="2,1 1,1 3,1"),
         ], ordered=False)
 
+    @gerrit_config(submit_whole_topic=True)
     def test_submitted_together_git(self):
-        self.fake_gerrit._fake_submit_whole_topic = True
-
         A = self.fake_gerrit.addFakeChange('org/project1', "master", "A")
         B = self.fake_gerrit.addFakeChange('org/project1', "master", "B")
         C = self.fake_gerrit.addFakeChange('org/project1', "master", "C")
@@ -3547,9 +3547,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
                  changes="1,1 2,1 3,1"),
         ], ordered=False)
 
+    @gerrit_config(submit_whole_topic=True)
     def test_submitted_together_git_topic(self):
-        self.fake_gerrit._fake_submit_whole_topic = True
-
         A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
                                            topic='test-topic')
         B = self.fake_gerrit.addFakeChange('org/project1', "master", "B",
@@ -3630,8 +3629,8 @@ class TestGerritCircularDependencies(ZuulTestCase):
         ], ordered=False)
 
     @simple_layout('layouts/submitted-together-per-branch.yaml')
+    @gerrit_config(submit_whole_topic=True)
     def test_submitted_together_per_branch(self):
-        self.fake_gerrit._fake_submit_whole_topic = True
         self.create_branch('org/project2', 'stable/foo')
         A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
                                            topic='test-topic')
