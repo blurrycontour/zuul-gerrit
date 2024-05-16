@@ -269,6 +269,7 @@ class Scheduler(threading.Thread):
 
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
+        self.query_cache = QueryCache(self.zk_client)
         self.system = ZuulSystem(self.zk_client)
 
         self.zuul_version = get_version_string()
@@ -2406,7 +2407,6 @@ class Scheduler(threading.Thread):
         self.log.debug("Finished connection cache maintenance")
 
     def process_tenant_trigger_queue(self, tenant):
-        query_cache = QueryCache()
         try:
             with trigger_queue_lock(
                 self.zk_client, tenant.name, blocking=False
@@ -2444,8 +2444,7 @@ class Scheduler(threading.Thread):
                                 links=[
                                     trace.Link(trigger_span.get_span_context())
                                 ]):
-                            self._forward_trigger_event(query_cache,
-                                                        event, tenant)
+                            self._forward_trigger_event(event, tenant)
                     except Exception:
                         log.exception("Unable to forward event %s "
                                       "to tenant %s", event, tenant.name)
@@ -2456,7 +2455,7 @@ class Scheduler(threading.Thread):
             self.log.debug("Skipping locked trigger event queue in tenant %s",
                            tenant.name)
 
-    def _forward_trigger_event(self, query_cache, event, tenant):
+    def _forward_trigger_event(self, event, tenant):
         log = get_annotated_logger(self.log, event.zuul_event_id)
         trusted, project = tenant.getProject(event.canonical_project_name)
 
@@ -2561,8 +2560,7 @@ class Scheduler(threading.Thread):
             # manager, but the result of the work goes into the change
             # cache, so it's not wasted; it's just less parallelized.
             if isinstance(change, Change):
-                pipeline.manager.updateCommitDependencies(query_cache,
-                                                          change, event)
+                pipeline.manager.updateCommitDependencies(change, event)
             if (
                 pipeline.manager.eventMatches(event, change)
                 or pipeline.manager.isChangeRelevantToPipeline(change)
