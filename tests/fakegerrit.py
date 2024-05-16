@@ -723,6 +723,7 @@ class GerritWebServer(object):
                                   r'\?parent=1')
             change_search_re = re.compile(r'/a/changes/\?n=500.*&q=(.*)')
             version_re = re.compile(r'/a/config/server/version')
+            info_re = re.compile(r'/a/config/server/info')
             head_re = re.compile(r'/a/projects/(.*)/HEAD')
 
             def do_POST(self):
@@ -776,6 +777,9 @@ class GerritWebServer(object):
                 m = self.version_re.match(path)
                 if m:
                     return self.version()
+                m = self.info_re.match(path)
+                if m:
+                    return self.info()
                 m = self.head_re.match(path)
                 if m:
                     return self.head(m.group(1))
@@ -952,6 +956,40 @@ class GerritWebServer(object):
 
             def version(self):
                 self.send_data('3.0.0-some-stuff')
+                self.end_headers()
+
+            def info(self):
+                # This is not complete; see documentation for
+                # additional fields.
+                data = {
+                    "accounts": {
+                        "visibility": "ALL",
+                        "default_display_name": "FULL_NAME"
+                    },
+                    "change": {
+                        "allow_blame": True,
+                        "disable_private_changes": True,
+                        "update_delay": 300,
+                        "mergeability_computation_behavior":
+                        "API_REF_UPDATED_AND_CHANGE_REINDEX",
+                        "enable_robot_comments": True,
+                        "conflicts_predicate_enabled": True
+                    },
+                    "gerrit": {
+                        "all_projects": "All-Projects",
+                        "all_users": "All-Users",
+                        "doc_search": True,
+                    },
+                    "note_db_enabled": True,
+                    "sshd": {},
+                    "suggest": {"from": 0},
+                    "user": {"anonymous_coward_name": "Name of user not set"},
+                    "receive": {"enable_signed_push": False},
+                    "submit_requirement_dashboard_columns": []
+                }
+                if fake_gerrit._fake_submit_whole_topic:
+                    data['change']['submit_whole_topic'] = True
+                self.send_data(data)
                 self.end_headers()
 
             def head(self, project):

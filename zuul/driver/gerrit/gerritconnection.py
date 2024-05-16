@@ -176,7 +176,6 @@ class QueryHistory:
     class Query(enum.Enum):
         SEEN = 1  # Not a real query, just that we've seen the change
         CHANGE = 2  # The main change query
-        SUBMITTED_TOGETHER = 3  # The submitted-together query
 
     def __init__(self):
         self.queries = collections.defaultdict(lambda: dict())
@@ -519,6 +518,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.watched_checkers = []
         self.project_checker_map = {}
         self.version = (0, 0, 0)
+        self.submit_whole_topic = None
         self.ssh_timeout = SSH_TIMEOUT
 
         self.baseurl = self.connection_config.get(
@@ -818,32 +818,6 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 records.append(result)
         return [(x.number, x.current_patchset) for x in records]
 
-    def _getSubmittedTogether(self, change, event):
-        if not self.session:
-            return []
-        # We could probably ask for everything in one query, but it
-        # might be extremely large, so just get the change ids here
-        # and then query the individual changes.
-        log = get_annotated_logger(self.log, event)
-        log.debug("Updating %s: Looking for changes submitted together",
-                  change)
-        ret = []
-        try:
-            data = self.get(f'changes/{change.number}/submitted_together')
-        except Exception:
-            log.error("Unable to find changes submitted together for %s",
-                      change)
-            return ret
-        for c in data:
-            dep_change = c['_number']
-            dep_ps = c['revisions'][c['current_revision']]['_number']
-            if str(dep_change) == str(change.number):
-                continue
-            log.debug("Updating %s: Found change %s,%s submitted together",
-                      change, dep_change, dep_ps)
-            ret.append((dep_change, dep_ps))
-        return ret
-
     def _updateChange(self, key, change, event, history,
                       allow_key_update=False):
         log = get_annotated_logger(self.log, event)
@@ -977,120 +951,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 log.exception("Failed to get commit-needed change %s,%s",
                               dep_num, dep_ps)
 
-        for (dep_num, dep_ps) in self._getSubmittedTogether(change, event):
-            try:
-                log.debug("Updating %s: Getting submitted-together "
-                          "change %s,%s",
-                          change, dep_num, dep_ps)
-                # The query above will have returned a set of changes
-                # that are submitted together along with this one.
-                # That set includes:
-                # * Any git-dependent change if we're not being cherry-picked
-                # * Any change with the same topic if submitWholeTopic is set
-
-                # The first is a one-way dependency, the second is
-                # simultaneous.  We are unable to distinguish the two
-                # based only on the results of the submitted-together
-                # query.  Therefore, while we know that we need to add
-                # the dep to our dependency list, we don't know
-                # whether we need to add ourselves to the dep list.
-
-                # In order to find that out, we will need to run the
-                # submitted-together query for each dep as well.  But
-                # if we've already queried the dep, we don't need to
-                # do it again, and if this change already appears in
-                # the dep's dependencies, we also don't need to query
-                # again.
-                dep_key = ChangeKey(self.connection_name, None,
-                                    'GerritChange', str(dep_num), str(dep_ps))
-                dep = self._getChange(
-                    dep_key, refresh=False, history=history,
-                    event=event)
-                refresh = True
-                if (history.getByKey(history.Query.CHANGE, dep_key) or
-                    history.getByKey(history.Query.SUBMITTED_TOGETHER,
-                                     dep_key)):
-                    refresh = False
-                if (key in dep.compat_needs_changes and
-                    key in dep.compat_needed_by_changes):
-                    refresh = False
-                # Gerrit changes to be submitted together do not
-                # necessarily get posted with dependency cycles using
-                # git trees and depends-on. However, they are
-                # functionally equivalent to a stack of changes with
-                # cycles using those methods. Here we set
-                # needs_changes and needed_by_changes as if there were
-                # a cycle. This ensures Zuul's cycle handling manages
-                # the submitted together changes properly.
-                if dep.open and dep not in needs_changes:
-                    compat_needs_changes.append(dep_key.reference)
-                    needs_changes.add(dep_key.reference)
-                if (dep.open and dep.is_current_patchset
-                    and dep not in needed_by_changes):
-                    compat_needed_by_changes.append(dep_key.reference)
-                    needed_by_changes.add(dep_key.reference)
-                if refresh:
-                    # We may need to update the deps dependencies (as
-                    # explained above).
-                    history.add(history.Query.SUBMITTED_TOGETHER, dep)
-                    self.updateSubmittedTogether(log, dep, history, event)
-            except GerritEventProcessingException:
-                raise
-            except Exception:
-                log.exception("Failed to get commit-needed change %s,%s",
-                              dep_num, dep_ps)
-
         return dict(
             git_needs_changes=git_needs_changes,
             compat_needs_changes=compat_needs_changes,
             git_needed_by_changes=git_needed_by_changes,
             compat_needed_by_changes=compat_needed_by_changes,
         )
-
-    def updateSubmittedTogether(self, log, change, history, event):
-        # This method is very similar to the last part of
-        # _updateChangeDependencies, but it updates the other
-        # direction and does so without performing a full change
-        # query.
-        extra = {
-            'compat_needs_changes': change.compat_needs_changes[:],
-            'compat_needed_by_changes': change.compat_needed_by_changes[:],
-        }
-        update = False
-        for (dep_num, dep_ps) in self._getSubmittedTogether(change, event):
-            try:
-                log.debug("Updating %s: Getting reverse submitted-together "
-                          "change %s,%s",
-                          change, dep_num, dep_ps)
-                dep_key = ChangeKey(self.connection_name, None,
-                                    'GerritChange', str(dep_num), str(dep_ps))
-                dep = self._getChange(
-                    dep_key, refresh=False, history=history,
-                    event=event)
-                if (dep.open and
-                    dep_key.reference not in
-                    extra['compat_needs_changes']):
-                    extra['compat_needs_changes'].append(dep_key.reference)
-                    update = True
-                if (dep.open and
-                    dep.is_current_patchset and
-                    dep_key.reference not in
-                    extra['compat_needed_by_changes']):
-                    extra['compat_needed_by_changes'].append(dep_key.reference)
-                    update = True
-            except GerritEventProcessingException:
-                raise
-            except Exception:
-                log.exception("Failed to get commit-needed change %s,%s",
-                              dep_num, dep_ps)
-        if update:
-            # Actually update the dep in the change cache.
-            def _update_change(c):
-                for k, v in extra.items():
-                    setattr(c, k, v)
-            self._change_cache.updateChangeWithRetry(
-                change.cache_stat.key, change, _update_change,
-                allow_key_update=False)
 
     def isMerged(self, change, head=None):
         self.log.debug("Checking if change %s is merged" % change)
@@ -1771,6 +1637,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.log.info("Remote version is: %s (parsed as %s)" %
                       (version, self.version))
 
+    def _getRemoteInfo(self):
+        info = self.get('config/server/info')
+        change_info = info.get('change', {})
+        self.submit_whole_topic = change_info.get('submit_whole_topic', False)
+        self.log.info("Remote submitWholeTopic: %s", self.submit_whole_topic)
+
     def refWatcherCallback(self, data):
         event = {
             'type': 'ref-updated',
@@ -1785,11 +1657,15 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
     def onLoad(self, zk_client, component_registry):
         self.log.debug("Starting Gerrit Connection/Watchers")
-        try:
-            if self.session:
+        if self.session:
+            try:
                 self._getRemoteVersion()
-        except Exception:
-            self.log.exception("Unable to determine remote Gerrit version")
+            except Exception:
+                self.log.exception("Unable to determine remote Gerrit version")
+            try:
+                self._getRemoteInfo()
+            except Exception:
+                self.log.exception("Unable to fetch remote Gerrit info")
 
         # Set the project branch cache to read only if no scheduler is
         # provided to prevent fetching the branches from the connection.
