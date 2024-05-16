@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import Counter
 import re
 import textwrap
 import json
@@ -3442,6 +3443,72 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(B.reported, 3)
         self.assertEqual(A.data["status"], "MERGED")
         self.assertEqual(B.data["status"], "MERGED")
+
+    def test_submitted_together_storm(self):
+        # Test that if many changes are uploaded with the same topic,
+        # we handle queries efficiently.
+        self.fake_gerrit._fake_submit_whole_topic = True
+        self.waitUntilSettled()
+        A = self.fake_gerrit.addFakeChange('org/project', "master", "A",
+                                           topic='test-topic')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        B = self.fake_gerrit.addFakeChange('org/project1', "master", "B",
+                                           topic='test-topic')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        C = self.fake_gerrit.addFakeChange('org/project2', "master", "C",
+                                           topic='test-topic')
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Output all the queries seen for debugging
+        for q in self.fake_gerrit.api_calls:
+            self.log.debug("Query: %s", q)
+
+        gets = [q[1] for q in self.fake_gerrit.api_calls if q[0] == 'GET']
+        counters = Counter()
+        for q in gets:
+            parts = q.split('/')[2:]
+            if len(parts) > 2 and parts[2] == 'revisions':
+                parts.pop(3)
+            if 'q=message' in parts[1]:
+                parts[1] = 'message'
+            counters[tuple(parts)] += 1
+        # Ensure that we don't run these queries more than once for each change
+        qstring = ('o=DETAILED_ACCOUNTS&o=CURRENT_REVISION&'
+                   'o=CURRENT_COMMIT&o=CURRENT_FILES&o=LABELS&'
+                   'o=DETAILED_LABELS&o=ALL_REVISIONS')
+        self.assertEqual(1, counters[('changes', f'1?{qstring}')])
+        self.assertEqual(1, counters[('changes', f'2?{qstring}')])
+        self.assertEqual(1, counters[('changes', f'3?{qstring}')])
+        self.assertEqual(1, counters[('changes', '1', 'revisions', 'related')])
+        self.assertEqual(1, counters[('changes', '2', 'revisions', 'related')])
+        self.assertEqual(1, counters[('changes', '3', 'revisions', 'related')])
+        self.assertEqual(1, counters[
+            ('changes', '1', 'revisions', 'files?parent=1')])
+        self.assertEqual(1, counters[
+            ('changes', '2', 'revisions', 'files?parent=1')])
+        self.assertEqual(1, counters[
+            ('changes', '3', 'revisions', 'files?parent=1')])
+        self.assertEqual(3, counters[('changes', 'message')])
+        # These queries need to run more often
+        self.assertEqual(3, counters[('changes', '1', 'submitted_together')])
+        self.assertEqual(2, counters[('changes', '2', 'submitted_together')])
+        self.assertEqual(1, counters[('changes', '3', 'submitted_together')])
+        self.assertHistory([
+            dict(name="project-job", changes="1,1"),
+
+            dict(name="project-job", changes="1,1 2,1"),
+            dict(name="project1-job", changes="1,1 2,1"),
+            dict(name="project-vars-job", changes="1,1 2,1"),
+
+            dict(name="project-job", changes="2,1 1,1 3,1"),
+            dict(name="project1-job", changes="2,1 1,1 3,1"),
+            dict(name="project-vars-job", changes="2,1 1,1 3,1"),
+            dict(name="project2-job", changes="2,1 1,1 3,1"),
+        ], ordered=False)
 
     def test_submitted_together_git(self):
         self.fake_gerrit._fake_submit_whole_topic = True
