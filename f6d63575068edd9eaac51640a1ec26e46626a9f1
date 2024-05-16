@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1dbeedad_529990ec",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-16T09:48:56Z",
+      "side": 1,
+      "message": "It\u0027s a good point that the \"importance\" might vary from deployment to deployment. For most tenants in our deployment, gate is the most important pipeline, whereby periodic pipelines could be sorted last. So my current idea would be something like: Order by pipeline type (dependent -\u003e independent -\u003e \u003cothers\u003e -\u003e periodic) and for each pipeline type order by number of items. At least for our deployment this would be a good improvement. (I think I could have been clearer on this point in the spec).\n\nI was also thinking about a selectable sort option, but this might need some more work/exploration to do it right. Do you think we could agree on a sorting option to start with and implement that later on? Otherwise, we could keep the sort order for now (as defined in the zuul config) and do that later on.\n\nRegarding the changing in order during reload: That\u0027s also something we have to deal with, but I assume the impact wouldn\u0027t be too big if we include the order by pipeline type. In the current version of the status page, the auto-reload also often shifts the pipelines back and forth on the screen although the ordering itself doesn\u0027t change. But this is mainly because it shows also all items and jobs which makes each pipeline take a lot more space.",
+      "parentUuid": "97037f89_e47bd73e",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4b5741e9_1c9b3f3a",
         "filename": "doc/source/developer/specs/status-page-2.0.rst",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2024-05-13T21:31:42Z",
       "side": 1,
       "message": "I would add \"see the entire list of configured pipelines\" as a use case.  That would suggest this should be an option.  This may have been implicit, but it\u0027s probably good to explicitly list it.",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5c16086_0cb6cd55",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-16T09:48:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4b5741e9_1c9b3f3a",
       "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bd5c6e00_101b4d30",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-16T09:48:56Z",
+      "side": 1,
+      "message": "Ack, although the current implementation is more like a wildcard filter for the content on this page. It also works for pipeline names, but only if they match the search string exactly. I was more thinking about an \"advanced\" filtering like we have on the builds and buildsets page. Maybe I rephrase this to \"Improve the current filtering\".",
+      "parentUuid": "e52c8813_99b8e98e",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cecd01d5_18943568",
         "filename": "doc/source/developer/specs/status-page-2.0.rst",
         "patchSetId": 1
@@ -65,6 +119,24 @@
       "writtenOn": "2024-05-13T21:31:42Z",
       "side": 1,
       "message": "Clarification: bookmark by change or project exists (eg https://zuul.opendev.org/t/openstack/status#neutron ) but maybe you were thinking of the queue.",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a99aaaa_9e477352",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-16T09:48:56Z",
+      "side": 1,
+      "message": "To be honest, I wasn\u0027t aware that the current filter on the status page is populated to the URL, so I will rephrase this use case as well.\n\nSimilar to my comment above, I was thinking about bookmark a status page for a specific project, change, ... (like for the builds and buildsets pages). I will rephrase this use case to be more specific on this.",
+      "parentUuid": "cecd01d5_18943568",
       "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -82,6 +154,24 @@
       "writtenOn": "2024-05-13T21:31:42Z",
       "side": 1,
       "message": "I would add: see all of the pipelines my change is currently included in.  (to deal with the semi-common case of, say, multiple check pipelines, or even seeing that a change is simultaneously in check and gate)",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b8f302c_57e88c19",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-16T09:48:56Z",
+      "side": 1,
+      "message": "I see this more as a use case for the single change panel (where it\u0027s also currently visible).\n\nAs for the status page I\u0027m not sure if this is a \"feature\" in the current implementation. Sure, the same change will be shown in each pipeline it is enqueued, but most of the time you won\u0027t be able to spot this as there are so many changes shown - except you filter for this specific change.\n\nIn the new status page it would be similar. The change will be shown in each pipeline it is enqueued, but as it\u0027s only a box/square you won\u0027t notice that unless you filter only for this change.\n\nWhen viewing a change in the single change panel on the other hand it\u0027s very clear to see if the change is enqueued in multiple pipelines.",
+      "parentUuid": "629434e6_39d76c61",
       "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
