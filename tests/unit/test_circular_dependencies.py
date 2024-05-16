@@ -3576,11 +3576,11 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(0, counters[('changes', '1', 'submitted_together')])
         self.assertEqual(0, counters[('changes', '2', 'submitted_together')])
         self.assertEqual(0, counters[('changes', '3', 'submitted_together')])
-        # This query happens once for each event.
+        # This query happens once for each event (but is cached).
         # * A+B+C: 3x scheduler, 0x pipeline
         qstring = ('?n=500&o=CURRENT_REVISION&o=CURRENT_COMMIT&'
                    'q=status%3Aopen%20topic%3A%22test-topic%22')
-        self.assertEqual(3, counters[('changes', qstring)])
+        self.assertEqual(1, counters[('changes', qstring)])
         self.assertHistory([
             dict(name="project-job", changes="3,1 2,1 1,1"),
             dict(name="project1-job", changes="3,1 2,1 1,1"),
