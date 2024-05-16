@@ -148,6 +148,13 @@ def filter_severity(error_list, errors=True, warnings=True):
             )]
 
 
+class QueryCache:
+    """Cache query information while processing dependencies"""
+
+    def __init__(self):
+        self.topic_queries = {}
+
+
 class ZuulMark:
     # The yaml mark class differs between the C and python versions.
     # The C version does not provide a snippet, and also appears to

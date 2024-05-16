@@ -154,6 +154,9 @@ class GerritSource(BaseSource):
                 changes.append(change)
         return changes
 
+    def useDependenciesByTopic(self):
+        return bool(self.connection.submit_whole_topic)
+
     def getChangesByTopic(self, topic, changes=None, history=None):
         if not topic:
             return []

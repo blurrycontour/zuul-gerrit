@@ -3454,6 +3454,7 @@ class TestGerritCircularDependencies(ZuulTestCase):
                                            topic='test-topic')
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
+
         B = self.fake_gerrit.addFakeChange('org/project1', "master", "B",
                                            topic='test-topic')
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
@@ -3494,10 +3495,19 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(1, counters[
             ('changes', '3', 'revisions', 'files?parent=1')])
         self.assertEqual(3, counters[('changes', 'message')])
-        # These queries need to run more often
-        self.assertEqual(3, counters[('changes', '1', 'submitted_together')])
-        self.assertEqual(2, counters[('changes', '2', 'submitted_together')])
-        self.assertEqual(1, counters[('changes', '3', 'submitted_together')])
+        # These queries are no longer used
+        self.assertEqual(0, counters[('changes', '1', 'submitted_together')])
+        self.assertEqual(0, counters[('changes', '2', 'submitted_together')])
+        self.assertEqual(0, counters[('changes', '3', 'submitted_together')])
+        # This query happens once for each event in the scheduler,
+        # then once for each change in the pipeline if there's more
+        # than one.
+        # * A: 1x scheduler, 0x pipeline
+        # * A+B: 1x scheduler, 1x pipeline
+        # * A+B+C: 1x scheduler, 1x pipeline
+        qstring = ('?n=500&o=CURRENT_REVISION&o=CURRENT_COMMIT&'
+                   'q=status%3Aopen%20topic%3A%22test-topic%22')
+        self.assertEqual(5, counters[('changes', qstring)])
         self.assertHistory([
             dict(name="project-job", changes="1,1"),
 
@@ -3509,6 +3519,75 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="project1-job", changes="2,1 1,1 3,1"),
             dict(name="project-vars-job", changes="2,1 1,1 3,1"),
             dict(name="project2-job", changes="2,1 1,1 3,1"),
+        ], ordered=False)
+
+    @gerrit_config(submit_whole_topic=True)
+    def test_submitted_together_storm_fast(self):
+        # Test that if many changes are uploaded with the same topic,
+        # we handle queries efficiently.
+
+        # This mimics the changes being uploaded in rapid succession.
+        self.waitUntilSettled()
+        with self.scheds.first.sched.run_handler_lock:
+            A = self.fake_gerrit.addFakeChange('org/project', "master", "A",
+                                               topic='test-topic')
+            self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+
+            B = self.fake_gerrit.addFakeChange('org/project1', "master", "B",
+                                               topic='test-topic')
+            self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+
+            C = self.fake_gerrit.addFakeChange('org/project2', "master", "C",
+                                               topic='test-topic')
+            self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Output all the queries seen for debugging
+        for q in self.fake_gerrit.api_calls:
+            self.log.debug("Query: %s", q)
+
+        gets = [q[1] for q in self.fake_gerrit.api_calls if q[0] == 'GET']
+        counters = Counter()
+        for q in gets:
+            parts = q.split('/')[2:]
+            if len(parts) > 2 and parts[2] == 'revisions':
+                parts.pop(3)
+            if 'q=message' in parts[1]:
+                parts[1] = 'message'
+            counters[tuple(parts)] += 1
+        # Ensure that we don't run these queries more than once for each change
+        qstring = ('o=DETAILED_ACCOUNTS&o=CURRENT_REVISION&'
+                   'o=CURRENT_COMMIT&o=CURRENT_FILES&o=LABELS&'
+                   'o=DETAILED_LABELS&o=ALL_REVISIONS')
+        self.assertEqual(1, counters[('changes', f'1?{qstring}')])
+        self.assertEqual(1, counters[('changes', f'2?{qstring}')])
+        self.assertEqual(1, counters[('changes', f'3?{qstring}')])
+        self.assertEqual(1, counters[('changes', '1', 'revisions', 'related')])
+        self.assertEqual(1, counters[('changes', '2', 'revisions', 'related')])
+        self.assertEqual(1, counters[('changes', '3', 'revisions', 'related')])
+        self.assertEqual(1, counters[
+            ('changes', '1', 'revisions', 'files?parent=1')])
+        self.assertEqual(1, counters[
+            ('changes', '2', 'revisions', 'files?parent=1')])
+        self.assertEqual(1, counters[
+            ('changes', '3', 'revisions', 'files?parent=1')])
+        self.assertEqual(3, counters[('changes', 'message')])
+        # These queries are no longer used
+        self.assertEqual(0, counters[('changes', '1', 'submitted_together')])
+        self.assertEqual(0, counters[('changes', '2', 'submitted_together')])
+        self.assertEqual(0, counters[('changes', '3', 'submitted_together')])
+        # This query happens once for each event in the scheduler,
+        # then once for each change in the pipeline if there's more
+        # than one.
+        # * A+B+C: 3x scheduler, 0x pipeline
+        qstring = ('?n=500&o=CURRENT_REVISION&o=CURRENT_COMMIT&'
+                   'q=status%3Aopen%20topic%3A%22test-topic%22')
+        self.assertEqual(3, counters[('changes', qstring)])
+        self.assertHistory([
+            dict(name="project-job", changes="3,1 2,1 1,1"),
+            dict(name="project1-job", changes="3,1 2,1 1,1"),
+            dict(name="project-vars-job", changes="3,1 2,1 1,1"),
+            dict(name="project2-job", changes="3,1 2,1 1,1"),
         ], ordered=False)
 
     @gerrit_config(submit_whole_topic=True)
@@ -3576,13 +3655,13 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertEqual(len(C.patchsets[-1]["approvals"]), 1)
         self.assertEqual(C.patchsets[-1]["approvals"][0]["type"], "Verified")
         self.assertEqual(C.patchsets[-1]["approvals"][0]["value"], "1")
-        self.assertEqual(A.queried, 8)
-        self.assertEqual(B.queried, 8)
-        self.assertEqual(C.queried, 8)
-        self.assertEqual(D.queried, 8)
-        self.assertEqual(E.queried, 8)
-        self.assertEqual(F.queried, 8)
-        self.assertEqual(G.queried, 8)
+        self.assertEqual(A.queried, 3)
+        self.assertEqual(B.queried, 3)
+        self.assertEqual(C.queried, 3)
+        self.assertEqual(D.queried, 3)
+        self.assertEqual(E.queried, 3)
+        self.assertEqual(F.queried, 3)
+        self.assertEqual(G.queried, 3)
         self.assertHistory([
             dict(name="project1-job", result="SUCCESS",
                  changes="1,1 2,1 3,1 4,1 5,1 6,1 7,1",
