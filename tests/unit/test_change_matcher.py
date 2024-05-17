@@ -121,6 +121,39 @@ class TestMatchAllFiles(BaseTestFilesMatcher):
         self._test_matches(True, files=['docs/foo'])
 
 
+class TestMatchAllFilesNegate(BaseTestFilesMatcher):
+
+    def setUp(self):
+        super().setUp()
+        self.matcher = cm.MatchAllFiles(
+            [cm.FileMatcher(ZuulRegex('^docs/.*$', negate=True))])
+
+    def test_matches_returns_false_when_files_attr_missing(self):
+        delattr(self.change, 'files')
+        self._test_matches(False)
+
+    def test_matches_returns_false_when_no_files(self):
+        self._test_matches(False)
+
+    def test_matches_returns_false_when_not_all_files_match(self):
+        self._test_matches(False, files=['/COMMIT_MSG', 'docs/foo', 'foo/bar'])
+
+    def test_matches_returns_false_when_single_file_does_not_match(self):
+        self._test_matches(False, files=['docs/foo'])
+
+    def test_matches_returns_false_when_commit_message_matches(self):
+        self._test_matches(False, files=['/COMMIT_MSG'])
+
+    def test_matches_returns_false_when_all_files_match(self):
+        self._test_matches(False, files=['/COMMIT_MSG', 'docs/foo'])
+
+    def test_matches_returns_false_when_single_file_matches(self):
+        self._test_matches(False, files=['docs/foo'])
+
+    def test_matches_returns_true_when_no_files_match(self):
+        self._test_matches(True, files=['foo'])
+
+
 class TestMatchAnyFiles(BaseTestFilesMatcher):
 
     def setUp(self):
@@ -146,6 +179,33 @@ class TestMatchAnyFiles(BaseTestFilesMatcher):
 
     def test_matches_returns_false_when_no_matching_files(self):
         self._test_matches(False, files=['/COMMIT_MSG', 'foo/bar'])
+
+
+class TestMatchAnyFilesNegate(BaseTestFilesMatcher):
+
+    def setUp(self):
+        super().setUp()
+        self.matcher = cm.MatchAnyFiles(
+            [cm.FileMatcher(ZuulRegex('^docs/.*$', negate=True))])
+
+    def test_matches_returns_true_when_files_attr_missing(self):
+        delattr(self.change, 'files')
+        self._test_matches(True)
+
+    def test_matches_returns_true_when_no_files(self):
+        self._test_matches(True)
+
+    def test_matches_returns_true_when_only_commit_message(self):
+        self._test_matches(True, files=['/COMMIT_MSG'])
+
+    def test_matches_returns_true_when_some_files_match(self):
+        self._test_matches(True, files=['/COMMIT_MSG', 'docs/foo', 'foo/bar'])
+
+    def test_matches_returns_false_when_single_file_matches(self):
+        self._test_matches(False, files=['docs/foo'])
+
+    def test_matches_returns_true_when_no_matching_files(self):
+        self._test_matches(True, files=['/COMMIT_MSG', 'foo/bar'])
 
 
 class TestMatchAll(BaseTestMatcher):

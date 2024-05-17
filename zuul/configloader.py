@@ -571,9 +571,9 @@ class JobParser(object):
                       'semaphores': to_list(vs.Any(semaphore, str)),
                       'tags': to_list(str),
                       'branches': to_list(vs.Any(ZUUL_REGEX, str)),
-                      'files': to_list(str),
+                      'files': to_list(vs.Any(ZUUL_REGEX, str)),
                       'secrets': to_list(vs.Any(secret, str)),
-                      'irrelevant-files': to_list(str),
+                      'irrelevant-files': to_list(vs.Any(ZUUL_REGEX, str)),
                       # validation happens in NodeSetParser
                       'nodeset': vs.Any(dict, str),
                       'timeout': int,
@@ -941,9 +941,18 @@ class JobParser(object):
         if branches:
             job.setBranchMatcher(branches)
         if 'files' in conf:
-            job.setFileMatcher(as_list(conf['files']))
+            with self.pcontext.confAttr(conf, 'files') as conf_files:
+                job.setFileMatcher([
+                    make_regex(x, self.pcontext)
+                    for x in as_list(conf_files)
+                ])
         if 'irrelevant-files' in conf:
-            job.setIrrelevantFileMatcher(as_list(conf['irrelevant-files']))
+            with self.pcontext.confAttr(conf,
+                                        'irrelevant-files') as conf_ifiles:
+                job.setIrrelevantFileMatcher([
+                    make_regex(x, self.pcontext)
+                    for x in as_list(conf_ifiles)
+                ])
         if 'failure-output' in conf:
             failure_output = as_list(conf['failure-output'])
             # Test compilation to detect errors, but the zuul_stream

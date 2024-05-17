@@ -42,7 +42,6 @@ import jsonpath_rw
 
 from zuul import change_matcher
 from zuul.lib.config import get_default
-from zuul.lib.re2util import ZuulRegex
 from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.capabilities import capabilities_registry
@@ -3169,18 +3168,20 @@ class Job(ConfigObject):
 
     def setFileMatcher(self, files):
         # Set the file matcher to match any of the change files
-        self._files = files
+        # Input is a list of ZuulRegex objects
+        self._files = [x.toDict() for x in files]
         matchers = []
-        for fn in files:
-            matchers.append(change_matcher.FileMatcher(ZuulRegex(fn)))
+        for zuul_regex in files:
+            matchers.append(change_matcher.FileMatcher(zuul_regex))
         self.file_matcher = change_matcher.MatchAnyFiles(matchers)
 
     def setIrrelevantFileMatcher(self, irrelevant_files):
         # Set the irrelevant file matcher to match any of the change files
-        self._irrelevant_files = irrelevant_files
+        # Input is a list of ZuulRegex objects
+        self._irrelevant_files = [x.toDict() for x in irrelevant_files]
         matchers = []
-        for fn in irrelevant_files:
-            matchers.append(change_matcher.FileMatcher(ZuulRegex(fn)))
+        for zuul_regex in irrelevant_files:
+            matchers.append(change_matcher.FileMatcher(zuul_regex))
         self.irrelevant_file_matcher = change_matcher.MatchAllFiles(matchers)
 
     def updateVariables(self, other_vars, other_extra_vars, other_host_vars,
