@@ -33,8 +33,9 @@ from zuul.zk.locks import CONNECTION_LOCK_ROOT, locked, SessionAwareLock
 BUILDSET_TABLE = 'zuul_buildset'
 REF_TABLE = 'zuul_ref'
 BUILDSET_REF_TABLE = 'zuul_buildset_ref'
+BUILDSET_EVENT_TABLE = 'zuul_buildset_event'
 BUILD_TABLE = 'zuul_build'
-BUILD_EVENTS_TABLE = 'zuul_build_event'
+BUILD_EVENT_TABLE = 'zuul_build_event'
 ARTIFACT_TABLE = 'zuul_artifact'
 PROVIDES_TABLE = 'zuul_provides'
 
@@ -498,6 +499,8 @@ class DatabaseSession(object):
 
         q = self.session().query(self.connection.buildSetModel).\
             options(orm.joinedload(self.connection.buildSetModel.refs)).\
+            options(orm.joinedload(
+                self.connection.buildSetModel.buildset_events)).\
             options(orm.joinedload(self.connection.buildSetModel.builds).
                     subqueryload(self.connection.buildModel.artifacts)).\
             options(orm.joinedload(self.connection.buildSetModel.builds).
@@ -527,6 +530,9 @@ class DatabaseSession(object):
                 ),
                 orm.selectinload(
                     self.connection.buildSetModel.refs,
+                ),
+                orm.selectinload(
+                    self.connection.buildSetModel.buildset_events,
                 ),
                 orm.selectinload(
                     self.connection.buildSetModel.builds,
@@ -724,6 +730,15 @@ class SQLConnection(BaseConnection):
                 session.flush()
                 return b
 
+            def createBuildSetEvent(self, *args, **kw):
+                session = orm.session.Session.object_session(self)
+                e = BuildSetEventModel(*args, **kw)
+                e.buildset_id = self.id
+                self.buildset_events.append(e)
+                session.add(e)
+                session.flush()
+                return e
+
         class BuildSetRefModel(Base):
             __tablename__ = self.table_prefix + BUILDSET_REF_TABLE
             __table_args__ = (
@@ -741,6 +756,24 @@ class SQLConnection(BaseConnection):
                      buildset_id)
             sa.Index(self.table_prefix + 'zuul_buildset_ref_ref_id_idx',
                      ref_id)
+
+        class BuildSetEventModel(Base):
+            __tablename__ = self.table_prefix + BUILDSET_EVENT_TABLE
+            id = sa.Column(sa.Integer, primary_key=True)
+            buildset_id = sa.Column(sa.Integer, sa.ForeignKey(
+                self.table_prefix + BUILDSET_TABLE + ".id",
+                name=(self.table_prefix +
+                      'zuul_buildset_event_buildset_id_fkey'),
+            ))
+            event_time = sa.Column(sa.DateTime)
+            event_type = sa.Column(sa.String(255))
+            description = sa.Column(sa.TEXT())
+            buildset = orm.relationship(BuildSetModel,
+                                        backref=orm.backref(
+                                            "buildset_events",
+                                            cascade="all, delete-orphan"))
+            sa.Index(self.table_prefix + 'zuul_buildset_event_buildset_id_idx',
+                     buildset_id)
 
         class BuildModel(Base):
             __tablename__ = self.table_prefix + BUILD_TABLE
@@ -860,7 +893,7 @@ class SQLConnection(BaseConnection):
                      build_id)
 
         class BuildEventModel(Base):
-            __tablename__ = self.table_prefix + BUILD_EVENTS_TABLE
+            __tablename__ = self.table_prefix + BUILD_EVENT_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
             build_id = sa.Column(sa.Integer, sa.ForeignKey(
                 self.table_prefix + BUILD_TABLE + ".id",
@@ -878,6 +911,9 @@ class SQLConnection(BaseConnection):
 
         self.buildEventModel = BuildEventModel
         self.zuul_build_event_table = self.buildEventModel.__table__
+
+        self.buildSetEventModel = BuildSetEventModel
+        self.zuul_buildset_event_table = self.buildSetEventModel.__table__
 
         self.providesModel = ProvidesModel
         self.zuul_provides_table = self.providesModel.__table__
