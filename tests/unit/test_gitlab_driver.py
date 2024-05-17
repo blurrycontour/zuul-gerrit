@@ -917,6 +917,39 @@ class TestGitlabDriver(ZuulTestCase):
         self.assertEqual(2, len(self.history))
 
     @simple_layout('layouts/files-gitlab.yaml', driver='gitlab')
+    def test_changed_file_match_filter_refresh(self):
+        # Test that a refresh of a MR doesn't overwrite the change
+        # files list supplied by a zuul merger.
+        self.hold_merge_jobs_in_queue = True
+        path = os.path.join(self.upstream_root, 'org/project')
+        base_sha = git.Repo(path).head.object.hexsha
+
+        files = {}
+        # This files causes project-test1 to run
+        files["foobar-requires"] = "test"
+        # File "to-be-removed" is not included, so -test2 should not run.
+        A = self.fake_gitlab.openFakeMergeRequest(
+            'org/project', 'master', 'A', files=files, base_sha=base_sha)
+
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+
+        for x in self.merger_api.all():
+            if x.job_type == 'fileschanges':
+                self.merger_api.release(x)
+
+        self.waitUntilSettled()
+        self.fake_gitlab.emitEvent(A.getMergeRequestCommentedEvent(
+            'test comment'))
+        self.waitUntilSettled()
+        self.hold_merge_jobs_in_queue = False
+        self.merger_api.release()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS'),
+        ])
+
+    @simple_layout('layouts/files-gitlab.yaml', driver='gitlab')
     def test_changed_and_reverted_file_not_match_filter(self):
         path = os.path.join(self.upstream_root, 'org/project')
         base_sha = git.Repo(path).head.object.hexsha
