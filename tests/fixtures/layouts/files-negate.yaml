@@ -26,5 +26,5 @@
       jobs:
         - project-test-files:
             files:
-              - regex: ^(dontrun|README|/COMMIT_MSG)$
+              - regex: ^(dontrun|README)$
                 negate: true
