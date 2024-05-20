@@ -1867,7 +1867,7 @@ class PipelineManager(metaclass=ABCMeta):
                         node_request, priority)
         return (changed, nnfi)
 
-    def processQueue(self):
+    def processQueue(self, tenant_lock):
         # Do whatever needs to be done for each change in the queue
         self.log.debug("Starting queue processor: %s" % self.pipeline.name)
         changed = False
@@ -1876,6 +1876,7 @@ class PipelineManager(metaclass=ABCMeta):
             queue_changed = False
             nnfi = None  # Nearest non-failing item
             for item in queue.queue[:]:
+                self.sched.abortIfPendingReconfig(tenant_lock)
                 item_changed, nnfi = self._processOneItem(
                     item, nnfi)
                 if item_changed:
