@@ -1857,14 +1857,16 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
         valid_flags = BranchFlag.CLEAR
         branch_infos = {}
-        if BranchFlag.PROTECTED in required_flags:
-            valid_flags |= BranchFlag.PROTECTED
+        protected_and_locked = BranchFlag.PROTECTED | BranchFlag.LOCKED
+        if (protected_and_locked & required_flags):
+            valid_flags |= protected_and_locked
             for branch_name, locked in \
                 self.graphql_client.fetch_branch_protection(
                     github, project).items():
                 bi = branch_infos.setdefault(
                     branch_name, BranchInfo(branch_name))
                 bi.protected = True
+                bi.locked = locked
         if BranchFlag.PRESENT in required_flags:
             valid_flags |= BranchFlag.PRESENT
             for branch_name in self._fetchProjectBranchesREST(
