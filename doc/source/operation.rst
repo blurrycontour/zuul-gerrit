@@ -65,6 +65,32 @@ changes to the configuration stored in ZooKeeper and automatically
 update their configuration in the background without interrupting
 processing.
 
+Advanced Options
+~~~~~~~~~~~~~~~~
+
+These options are not necessary under normal conditions, but may be
+useful in some complex environments.
+
+The ``--wait-for-init`` option (or ``ZUUL_WAIT_FOR_INIT`` environment
+variable) will cause the scheduler to wait until all tenants
+have been initialized before it begins processing pipelines.  This may
+help large systems with excess scheduler capacity perform a rolling
+restart of schedulers more quickly.
+
+The ``--disable-pipelines`` option (or ``ZUUL_DISABLE_PIPELINES``
+environment variable) will cause the scheduler to silently discard all
+pipeline related events.  This allows the scheduler to create and
+maintain all of the configuration of a running system without running
+any jobs or making any reports.
+
+This option is not intended for normal use, and is only useful for
+certain testing and backup-related activities.  Because any scheduler
+connected to ZooKeeper can process events, it does not make sense to
+mix values of this option.  Normal production Zuul systems that are
+intended to process events should not set this option on any
+schedulers.  To use this option on a standby or testing cluster, set
+it on all schedulers.
+
 .. _backup:
 
 Backup and Restoration

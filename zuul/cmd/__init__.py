@@ -162,6 +162,16 @@ class ZuulApp(object):
 
         return parser
 
+    def envBool(self, name, default=None):
+        """Get the named variable from the environment and
+        convert to boolean"""
+        val = os.getenv(name)
+        if val is None:
+            return default
+        if val.lower() in ['false', '0']:
+            return False
+        return True
+
     def readConfig(self):
         safe_env = {
             k: v for k, v in os.environ.items()
