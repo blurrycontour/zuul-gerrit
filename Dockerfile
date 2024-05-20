@@ -14,6 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Set this to "-debug" to build a debug image (includes gdb, debug
+# symbols, and is quite a bit larger).
+ARG IMAGE_FLAVOR=
+
 FROM docker.io/library/node:16-bookworm as js-builder
 
 COPY web /tmp/src
@@ -65,8 +69,9 @@ RUN /output/install-from-bindep \
   && echo $OPENSHIFT_SHA /tmp/openshift-install/openshift-client.tgz | sha256sum --check \
   && tar xvfz openshift-client.tgz -C /tmp/openshift-install
 
-FROM docker.io/opendevorg/python-base:3.11-bookworm as zuul
+FROM docker.io/opendevorg/python-base:3.11-bookworm${IMAGE_FLAVOR} as zuul
 ENV DEBIAN_FRONTEND=noninteractive
+ARG IMAGE_FLAVOR=
 
 COPY --from=builder /output/ /output
 RUN /output/install-from-bindep zuul_base \
@@ -75,7 +80,14 @@ RUN /output/install-from-bindep zuul_base \
 # This enables git protocol v2 which is more efficient at negotiating
 # refs.  This can be removed after the images are built with git 2.26
 # where it becomes the default.
-  && git config --system protocol.version 2
+  && git config --system protocol.version 2 \
+# If we are building a debug image, add gdb
+  && if [ "x$IMAGE_FLAVOR" = "x-debug" ]; then \
+        apt-get update \
+     && apt-get install -y gdb \
+     && apt-get clean \
+     && rm -rf /var/lib/apt/lists/*; \
+     fi
 
 VOLUME /var/lib/zuul
 CMD ["/usr/local/bin/zuul"]
