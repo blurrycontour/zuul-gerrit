@@ -1872,12 +1872,14 @@ class PipelineManager(metaclass=ABCMeta):
         self.log.debug("Starting queue processor: %s" % self.pipeline.name)
         changed = False
         change_keys = set()
+        tenant_lock = self.pipeline.manager.current_context.lock
         for queue in self.pipeline.queues[:]:
             queue_changed = False
             nnfi = None  # Nearest non-failing item
             for item in queue.queue[:]:
                 item_changed, nnfi = self._processOneItem(
                     item, nnfi)
+                self.sched.abortIfPendingReconfig(tenant_lock)
                 if item_changed:
                     queue_changed = True
                 self.reportStats(item)

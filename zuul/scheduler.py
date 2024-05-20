@@ -120,6 +120,10 @@ from zuul.zk.election import SessionAwareElection
 RECONFIG_LOCK_ID = "RECONFIG"
 
 
+class PendingReconfiguration(Exception):
+    pass
+
+
 class FullReconfigureCommand(commandsocket.Command):
     name = 'full-reconfigure'
     help = 'Perform a reconfiguration of all tenants'
@@ -2178,6 +2182,7 @@ class Scheduler(threading.Thread):
                 ) as tlock:
                     if not self.isTenantLayoutUpToDate(tenant_name):
                         continue
+                    tlock.watch_for_contenders()
 
                     # Get tenant again, as it might have been updated
                     # by a tenant reconfig or layout change.
@@ -2189,6 +2194,10 @@ class Scheduler(threading.Thread):
                         self.process_tenant_trigger_queue(tenant)
 
                     self.process_pipelines(tenant, tlock)
+            except PendingReconfiguration:
+                self.log.debug("Stopping tenant %s pipeline processing due to "
+                               "pending reconfig", tenant_name)
+                self.wake_event.set()
             except LockException:
                 self.log.debug("Skipping locked tenant %s",
                                tenant.name)
@@ -2257,11 +2266,7 @@ class Scheduler(threading.Thread):
         for pipeline in tenant.layout.pipelines.values():
             if self._stopped:
                 return
-            if RECONFIG_LOCK_ID in tenant_lock.contenders():
-                self.log.debug("Stopping tenant %s pipeline processing due to "
-                               "pending reconfig", tenant.name)
-                self.wake_event.set()
-                return
+            self.abortIfPendingReconfig(tenant_lock)
             stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
             try:
                 with (pipeline_lock(
@@ -2282,6 +2287,10 @@ class Scheduler(threading.Thread):
                         pipeline.summary.update(ctx, self.globals)
                         if self.statsd:
                             self._contextStats(ctx, stats_key)
+            except PendingReconfiguration:
+                # Don't do anything else here and let the next level up
+                # handle it.
+                raise
             except LockException:
                 self.log.debug("Skipping locked pipeline %s in tenant %s",
                                pipeline.name, tenant.name)
@@ -2330,6 +2339,10 @@ class Scheduler(threading.Thread):
             pipeline.state.isDirty(self.zk_client.client),
         ))
 
+    def abortIfPendingReconfig(self, tenant_lock):
+        if tenant_lock.contender_present(RECONFIG_LOCK_ID):
+            raise PendingReconfiguration()
+
     def _process_pipeline(self, tenant, pipeline):
         # Return whether or not we refreshed the pipeline.
 
@@ -2342,6 +2355,7 @@ class Scheduler(threading.Thread):
 
         stats_key = f'zuul.tenant.{tenant.name}.pipeline.{pipeline.name}'
         ctx = pipeline.manager.current_context
+        tenant_lock = ctx.lock
         with self.statsd_timer(f'{stats_key}.refresh'):
             pipeline.change_list.refresh(ctx)
             pipeline.summary.refresh(ctx)
@@ -2357,11 +2371,16 @@ class Scheduler(threading.Thread):
             # whereas trigger events cause us to execute builds.
             self.process_pipeline_result_queue(tenant, pipeline)
             self.process_pipeline_trigger_queue(tenant, pipeline)
+        self.abortIfPendingReconfig(tenant_lock)
         try:
             with self.statsd_timer(f'{stats_key}.process'):
                 while not self._stopped and pipeline.manager.processQueue():
-                    pass
+                    self.abortIfPendingReconfig(tenant_lock)
             pipeline.state.cleanup(ctx)
+        except PendingReconfiguration:
+            # Don't do anything else here and let the next level up
+            # handle it.
+            raise
         except Exception:
             self.log.exception("Exception in pipeline processing:")
             pipeline._exception_count += 1
@@ -2568,9 +2587,11 @@ class Scheduler(threading.Thread):
                 ].put(event.driver_name, event)
 
     def process_pipeline_trigger_queue(self, tenant, pipeline):
+        tenant_lock = pipeline.manager.current_context.lock
         for event in self.pipeline_trigger_events[tenant.name][pipeline.name]:
             if self._stopped:
                 return
+            self.abortIfPendingReconfig(tenant_lock)
             log = get_annotated_logger(self.log, event.zuul_event_id)
             if not isinstance(event, SupercedeEvent):
                 local_state = self.local_layout_state[tenant.name]
@@ -2701,11 +2722,13 @@ class Scheduler(threading.Thread):
                 self.reconfigure_event_queue.task_done()
 
     def process_pipeline_management_queue(self, tenant, pipeline):
+        tenant_lock = pipeline.manager.current_context.lock
         for event in self.pipeline_management_events[tenant.name][
             pipeline.name
         ]:
             if self._stopped:
                 return
+            self.abortIfPendingReconfig(tenant_lock)
             log = get_annotated_logger(self.log, event.zuul_event_id)
             log.debug("Processing management event %s", event)
             try:
@@ -2740,10 +2763,11 @@ class Scheduler(threading.Thread):
             )
 
     def process_pipeline_result_queue(self, tenant, pipeline):
+        tenant_lock = pipeline.manager.current_context.lock
         for event in self.pipeline_result_events[tenant.name][pipeline.name]:
             if self._stopped:
                 return
-
+            self.abortIfPendingReconfig(tenant_lock)
             log = get_annotated_logger(
                 self.log,
                 event=getattr(event, "zuul_event_id", None),
