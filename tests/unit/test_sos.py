@@ -13,12 +13,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import threading
 import time
+from unittest import mock
 
 import zuul.model
 
 from tests.base import iterate_timeout, ZuulTestCase, simple_layout
 from zuul.zk.locks import SessionAwareWriteLock, TENANT_LOCK_ROOT
+from zuul.scheduler import PendingReconfiguration
 
 
 class TestScaleOutScheduler(ZuulTestCase):
@@ -245,6 +248,72 @@ class TestScaleOutScheduler(ZuulTestCase):
                         for a in self.scheds.instances]
         self.assertTrue(all(l == new.uuid for l in layout_uuids))
         self.waitUntilSettled()
+
+    def test_reconfigure_xxx(self):
+        # Create a second scheduler instance
+        app = self.createScheduler()
+        app.start()
+        self.assertEqual(len(self.scheds), 2)
+
+        for _ in iterate_timeout(10, "Wait until priming is complete"):
+            old = self.scheds.first.sched.tenant_layout_state.get("tenant-one")
+            if old is not None:
+                break
+
+        for _ in iterate_timeout(
+                10, "Wait for all schedulers to have the same layout state"):
+            layout_states = [a.sched.local_layout_state.get("tenant-one")
+                             for a in self.scheds.instances]
+            if all(l == old for l in layout_states):
+                break
+        self.waitUntilSettled()
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        first = self.scheds.first.sched
+        second = app.sched
+        origAbortIfPendingReconfig = second.abortIfPendingReconfig
+        started_event = threading.Event()
+
+        def abortIfPendingReconfig(tenant_lock):
+            started_event.set()
+            for _ in iterate_timeout(
+                    30, "Wait for first scheduler to request lock"):
+                if 'RECONFIG' in tenant_lock._zuul_seen_contender_names:
+                    break
+            try:
+                origAbortIfPendingReconfig(tenant_lock)
+            except PendingReconfiguration:
+                raise
+            raise Exception("Expectend PendingReconfiguration exception")
+
+        # Prepare the second scheduler to pause inside the pending
+        # reconfig check method so that we can release it when we
+        # expect it to notice a pending reconfig.
+        with mock.patch.object(
+            second, "abortIfPendingReconfig", abortIfPendingReconfig
+        ):
+            # Pause the first scheduler while we submit an event that
+            # we expect the second scheduler to act on.
+            with first.run_handler_lock:
+                self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+                # Wait for the second scheduler to get to the point
+                # where it is ready to act on the event and is then
+                # paused (as described above).
+                started_event.wait()
+            # At this point, the second scheduler is about to check
+            # for a pending reconfig, and the first is idle.  Release
+            # the first and schedule a reconfig.
+            self.scheds.first.sched.reconfigure(self.scheds.first.config)
+
+        # As soon as the pending reconfig lock shows up, the
+        # second scheduler should be released, and everything
+        # proceeds.
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
 
     def test_live_reconfiguration_del_pipeline(self):
         # Test pipeline deletion while changes are enqueued
