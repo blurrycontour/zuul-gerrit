@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "14d75579_372dd551",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-21T18:01:53Z",
+      "side": 1,
+      "message": "Yeah, perhaps the easiest way forward would be to stick with the current manual sort for now, and then after the end of the refactoring series, put a standalone change to sort by type,length that we can evaluate separately.  I do agree that doing that will make things a bit more stable, but I also worry that with many different independent pipelines of varying importance that may still end up being unintuitive for folks.  The more pipelines people have, the more likely they are to be annoyed that they have to actually read all of their names to find the one that they want rather than using spatial memory.\n\n(And yes, I agree that the current shifting based on layout constraints is also not ideal for the same reason and I look forward to the improvement there.  :)",
+      "parentUuid": "1dbeedad_529990ec",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4b5741e9_1c9b3f3a",
         "filename": "doc/source/developer/specs/status-page-2.0.rst",
         "patchSetId": 1
@@ -141,6 +159,29 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2b30d1c_17d93b59",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-21T18:01:53Z",
+      "side": 1,
+      "message": "One more I just thought of:\n\nFollow a change through multiple pipelines including pre- and post-merge.\n\nThis one is tricky.  Imagine that you\u0027re an opendev admin, and you propose a change to a service configuration; it goes through check and is approved, it goes through gate and is merged, one of the change-based post-merge pipelines runs some jobs; one of the ref-based post-merge pipelines runs some jobs, then perhaps a timer-based pipeline runs some jobs.  We often watch that progression in real-time, so we know when production changes are actually deployed, so being able to see what\u0027s going on even as a change mutates form from a gerrit change to a ref-update is helpful.\n\n[I\u0027m not saying we need to support exactly the same workflow here, but we should have an answer for how that will change.]",
+      "range": {
+        "startLine": 68,
+        "startChar": 35,
+        "endLine": 68,
+        "endChar": 42
+      },
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "629434e6_39d76c61",
@@ -190,6 +231,24 @@
       "side": 1,
       "message": "This comment wasn\u0027t meant to be \"resolved\", not sure why gerrit did that.",
       "parentUuid": "6b8f302c_57e88c19",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba2b861d_176cf21a",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-05-21T18:01:53Z",
+      "side": 1,
+      "message": "[I\u0027m always accidentally resolving things too.  I wish we could toggle it without leaving another comment.]\n\nI agree that a single change panel with multiple pipelines is likely to satisfy this use case.  Just want to make sure we note it; the existing text only has a singular \"pipeline\".",
+      "parentUuid": "b72e0aaa_e4459103",
       "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
