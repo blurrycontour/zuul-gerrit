@@ -50,6 +50,7 @@ from zuul.lib import tracing
 from zuul.zk import zkobject
 from zuul.zk.blob_store import BlobStore
 from zuul.zk.change_cache import ChangeKey
+from zuul.zk.components import COMPONENT_REGISTRY
 from zuul.exceptions import (
     SEVERITY_ERROR,
     SEVERITY_WARNING,
@@ -4687,9 +4688,14 @@ class BuildSet(zkobject.ZKObject):
                 self.configured = True
 
     def _toChangeDict(self, item, change):
+        if COMPONENT_REGISTRY.model_api < 28:
+            change_dict = change.toDict()
+        else:
+            change_dict = dict(
+                ref=change.cache_key,
+            )
         # Inject bundle_id to dict if available, this can be used to decide
         # if changes belongs to the same bunbdle
-        change_dict = change.toDict()
         if len(item.changes) > 1:
             change_dict['bundle_id'] = item.uuid
         return change_dict

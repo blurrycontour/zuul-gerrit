@@ -148,3 +148,21 @@ class TestGithubModelUpgrade(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS'),
             dict(name='project-test2', result='SUCCESS'),
         ], ordered=False)
+
+    @model_version(27)
+    @simple_layout('layouts/simple.yaml')
+    def test_model_27(self):
+        # This excercises the old side of the buildset
+        # dependent_changes upgrade.  We don't need to perform an
+        # upgrade in this test since the only behavior switch is on
+        # the write side.  The read side will be tested in the new
+        # case by the standard test suite, and in the old case by this
+        # test.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS'),
+        ], ordered=False)
