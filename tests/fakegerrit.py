@@ -50,6 +50,7 @@ class FakeGerritChange(object):
                  status='NEW', upstream_root=None, files={},
                  parent=None, merge_parents=None, merge_files=None,
                  topic=None, empty=False):
+        self.cherry_pick = False
         self.source_hostname = gerrit.canonical_hostname
         self.gerrit_baseurl = gerrit.baseurl
         self.reported = 0
@@ -198,6 +199,26 @@ class FakeGerritChange(object):
              'uploader': {'email': 'user@example.com',
                           'name': 'User name',
                           'username': 'user'}}
+        self.data['currentPatchSet'] = d
+        self.patchsets.append(d)
+        self.data['submitRecords'] = self.getSubmitRecords()
+
+    def addCherryPickPatchset(self):
+        path = os.path.join(self.upstream_root, self.project)
+        repo = git.Repo(path)
+        self.latest_patchset += 1
+        prev = self.patchsets[-1]
+        d = {
+            'approvals': prev['approvals'],
+            'createdOn': time.time(),
+            'files': prev['files'],
+            'number': str(self.latest_patchset),
+            'ref': 'refs/changes/%s/%s/%s' % (str(self.number).zfill(2)[-2:],
+                                              self.number,
+                                              self.latest_patchset),
+            'revision': repo.heads[self.branch].commit.hexsha,
+            'uploader': prev['uploader'],
+        }
         self.data['currentPatchSet'] = d
         self.patchsets.append(d)
         self.data['submitRecords'] = self.getSubmitRecords()
@@ -574,6 +595,10 @@ class FakeGerritChange(object):
                 },
                 "files": files
             }
+        if self.cherry_pick:
+            submit_type = 'CHERRY_PICK'
+        else:
+            submit_type = 'MERGE_IF_NECESSARY'
         data = {
             "id": self.project + '~' + self.branch + '~' + self.data['id'],
             "project": self.project,
@@ -590,7 +615,8 @@ class FakeGerritChange(object):
             "current_revision": self.patchsets[-1]['revision'],
             "revisions": revisions,
             "requirements": [],
-            "work_in_progresss": self.data.get('wip', False)
+            "work_in_progresss": self.data.get('wip', False),
+            "submit_type": submit_type,
         }
         if 'parents' in self.data:
             data['parents'] = self.data['parents']
@@ -613,7 +639,9 @@ class FakeGerritChange(object):
                         self.depends_on_patchset - 1]['revision'],
                 },
                 "_change_number": self.depends_on_change.number,
-                "_revision_number": self.depends_on_patchset
+                "_revision_number": self.depends_on_patchset,
+                "_current_revision_number":
+                self.depends_on_change.latest_patchset,
             })
         for (needed_by_change, needed_by_patchset) in self.needed_by_changes:
             changes.append({
@@ -623,6 +651,7 @@ class FakeGerritChange(object):
                 },
                 "_change_number": needed_by_change.number,
                 "_revision_number": needed_by_patchset,
+                "_current_revision_number": needed_by_change.latest_patchset,
             })
         return {"changes": changes}
 
@@ -653,8 +682,13 @@ class FakeGerritChange(object):
 
         repo.head.reference = self.branch
         repo.head.reset(working_tree=True)
-        repo.git.merge('-s', 'resolve', self.patchsets[-1]['ref'])
+        if self.cherry_pick:
+            repo.git.cherry_pick(self.patchsets[-1]['ref'], allow_empty=True)
+        else:
+            repo.git.merge('-s', 'resolve', self.patchsets[-1]['ref'])
         repo.heads[self.branch].commit = repo.head.commit
+        if self.cherry_pick:
+            self.addCherryPickPatchset()
 
     def setReported(self):
         self.reported += 1
