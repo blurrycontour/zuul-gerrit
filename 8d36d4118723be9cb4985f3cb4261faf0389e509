@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84f0b96d_f174de3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2024-05-21T12:26:09Z",
+      "side": 1,
+      "message": "patch set 8 is a rebase to resolve merge conflict.",
+      "revId": "8d36d4118723be9cb4985f3cb4261faf0389e509",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
