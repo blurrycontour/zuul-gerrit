@@ -7613,6 +7613,10 @@ class TestSchedulerMerges(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange(project, 'master', 'A')
         B = self.fake_gerrit.addFakeChange(project, 'master', 'B')
         C = self.fake_gerrit.addFakeChange(project, 'master', 'C')
+        if mode == 'cherry-pick':
+            A.cherry_pick = True
+            B.cherry_pick = True
+            C.cherry_pick = True
         A.addApproval('Code-Review', 2)
         B.addApproval('Code-Review', 2)
         C.addApproval('Code-Review', 2)
