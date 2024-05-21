@@ -4077,6 +4077,8 @@ class TestScheduler(ZuulTestCase):
             'tenant-one', EMPTY_LAYOUT_STATE)
         self.waitUntilSettled()
 
+        # Layout last reconfigured time resolution is 1 second
+        time.sleep(1)
         command_socket = self.scheds.first.config.get(
             'scheduler', 'command_socket')
         with socket.socket(socket.AF_UNIX, socket.SOCK_STREAM) as s:
