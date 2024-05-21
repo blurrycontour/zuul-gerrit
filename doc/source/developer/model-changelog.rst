@@ -210,3 +210,9 @@ Version 28
 :Prior Zuul version: 10.1.0
 :Description: Store repo state in blobstore.
               Affects schedulers and executor.
+
+Version 29
+----------
+:Prior Zuul version: 10.1.0
+:Description: Store BuildSet.dependent_changes as change refs.
+              Affects schedulers.

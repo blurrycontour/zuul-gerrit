@@ -1118,6 +1118,24 @@ class PipelineManager(metaclass=ABCMeta):
         log = get_annotated_logger(self.log, item.event)
         log.debug("Executing jobs for %s", item)
         build_set = item.current_build_set
+
+        # dependent_changes is either fully populated (old) or a list of
+        # change refs we need to convert into the change dict)
+        if (build_set.dependent_changes and
+            'change_message' in build_set.dependent_changes[0]):
+            # MODEL_API < 29
+            dependent_changes = build_set.dependent_changes
+        else:
+            resolved_changes = self.resolveChangeReferences(
+                [c['ref'] for c in build_set.dependent_changes])
+            dependent_changes = []
+            for resolved_change, orig_dict in zip(resolved_changes,
+                                                  build_set.dependent_changes):
+                change_dict = resolved_change.toDict()
+                if 'bundle_id' in orig_dict:
+                    change_dict['bundle_id'] = orig_dict['bundle_id']
+                dependent_changes.append(change_dict)
+
         for job in jobs:
             log.debug("Found job %s for %s", job, item)
             try:
@@ -1125,7 +1143,7 @@ class PipelineManager(metaclass=ABCMeta):
                 nodes = build_set.getJobNodeList(job)
                 self.sched.executor.execute(
                     job, nodes, item, self.pipeline, zone,
-                    build_set.dependent_changes,
+                    dependent_changes,
                     build_set.merger_items)
                 job.setWaitingStatus('executor')
             except Exception:
