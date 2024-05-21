@@ -1320,3 +1320,141 @@ class TestGerritDriver(ZuulTestCase):
         self.assertHistory([
             dict(name='check-job', result='SUCCESS', changes='1,1'),
         ])
+
+
+class TestGerritCherryPickSSH(ZuulTestCase):
+    @simple_layout('layouts/cherry-pick.yaml')
+    def test_gerrit_cherry_pick_ssh(self):
+        # Test the simple case case where we approve A then B.
+        # Because the gerrit driver doesn't store the new patchset
+        # that is created on a cherry-pick at the time of submission,
+        # this test actually works because we intentionally
+        # erroneously mark the old revision as merged.  So when we
+        # enqueue B, it sees its dependency of 1,1 as merged (even
+        # though 1,2 was what was actually created-and-merged.  This
+        # test is here to ensure that works.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.cherry_pick = True
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.cherry_pick = True
+        B.setDependsOn(A, 1)
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ])
+
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+            dict(name='check-job', result='SUCCESS', changes='2,1'),
+        ])
+    # Unlike the web test below, we are unable to handle a case where
+    # we add a patchset to change A before enqueing B, because the ssh
+    # query does not tell us the current patchset of dependencies, so
+    # there is no corresponding test for the ssh code path.
+
+
+class TestGerritCherryPickWeb(ZuulTestCase):
+    config_file = 'zuul-gerrit-web.conf'
+
+    @simple_layout('layouts/cherry-pick.yaml')
+    def test_gerrit_cherry_pick_web(self):
+        # Test the simple case case where we approve A then B.
+        # Because the gerrit driver doesn't store the new patchset
+        # that is created on a cherry-pick at the time of submission,
+        # this test actually works because we intentionally
+        # erroneously mark the old revision as merged.  So when we
+        # enqueue B, it sees its dependency of 1,1 as merged (even
+        # though 1,2 was what was actually created-and-merged.  This
+        # test is here to ensure that works.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.cherry_pick = True
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.cherry_pick = True
+        B.setDependsOn(A, 1)
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ])
+
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+            dict(name='check-job', result='SUCCESS', changes='2,1'),
+        ])
+
+    @simple_layout('layouts/cherry-pick.yaml')
+    def test_gerrit_cherry_pick_web_with_update(self):
+        # Test updating A behind B's back then approving B.
+        # Unlike the test above, this test forces the issue of
+        # patchset updates by having the user create a second patchset
+        # on A before anything is enqueued.  But B still depends on
+        # the first patchset of A.  So when the gerrit driver
+        # intentionally erroneously marks 1,2 as merged, that won't
+        # help B since it points at 1,1.  However, the web query code
+        # path will update B's dependency to point at 1,2 in the case
+        # of a cherry-pick, and we will query 1,2 and discover that it
+        # is merged, so B can proceed.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.cherry_pick = True
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.cherry_pick = True
+        # Set the dependency on the first patchset of A
+        B.setDependsOn(A, 1)
+        # Then add a new patchset to A, so that B points to an old
+        # version.
+        A.addPatchset()
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,2'),
+        ])
+
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,2'),
+            dict(name='check-job', result='SUCCESS', changes='2,1'),
+        ])
+
+    @simple_layout('layouts/cherry-pick.yaml')
+    def test_gerrit_cherry_pick_web_with_update_queue(self):
+        # Test that two cherry-pick changes enqued simultaneously work
+        # This test should exercise the code path where the second
+        # change remains blissfully unaware that there ever was a
+        # 1,3 patchset.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.cherry_pick = True
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.cherry_pick = True
+        # Set the dependency on the first patchset of A
+        B.setDependsOn(A, 1)
+        # Then add a new patchset to A, so that B points to an old
+        # version.
+        A.addPatchset()
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        B.addApproval('Approved', 1)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,2'),
+            dict(name='check-job', result='SUCCESS', changes='1,2 2,1'),
+        ])

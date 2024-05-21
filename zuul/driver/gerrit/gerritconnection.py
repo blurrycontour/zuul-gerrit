@@ -126,6 +126,7 @@ class GerritChangeData(object):
         self.data = data
         self.files = files
         self.zuul_query_ltime = zuul_query_ltime
+        self.submit_type = 'MERGE_IF_NECESSARY'
 
         if fmt == self.SSH:
             self.parseSSH(data)
@@ -161,15 +162,23 @@ class GerritChangeData(object):
         self.needed_by = []
         self.depends_on = None
         current_rev = data['revisions'][data['current_revision']]
+        self.submit_type = data.get('submit_type', self.submit_type)
         for change in related['changes']:
+            # For cherry-pick only, allow the dependency to float to
+            # the latest revision since Gerrit will not prohibit
+            # merges with dependencies on older versions.  We also
+            # want Zuul to test the latest patchset if possible, since
+            # that is what will end up being merged.
+            if self.submit_type == 'CHERRY_PICK':
+                ps = change['_current_revision_number']
+            else:
+                ps = change['_revision_number']
             for parent in current_rev['commit']['parents']:
                 if change['commit']['commit'] == parent['commit']:
-                    self.depends_on = (change['_change_number'],
-                                       change['_revision_number'])
+                    self.depends_on = (change['_change_number'], ps)
                     break
             else:
-                self.needed_by.append((change['_change_number'],
-                                       change['_revision_number']))
+                self.needed_by.append((change['_change_number'], ps))
 
 
 class QueryHistory:
@@ -967,6 +976,14 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             return True
 
         data = self.queryChange(change.number)
+        # Note: in the case of a cherry-pick there will be a new
+        # patchset (i.e., change.patchset might be 3 while
+        # data.current_patchset would be 4).  We could add a new
+        # change to the cache here, but that would be more expensive.
+        # Also, the ssh-query code path with cherry-pick does not have
+        # a way of determining the current patchset for dependencies,
+        # so in that case, it is useful for any changes still pointing
+        # at this old version to think it is merged.
         key = ChangeKey(self.connection_name, None,
                         'GerritChange', str(change.number),
                         str(change.patchset))
