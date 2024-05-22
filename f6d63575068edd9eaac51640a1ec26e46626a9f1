@@ -182,6 +182,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6726a1f_69cd4255",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-22T07:38:21Z",
+      "side": 1,
+      "message": "I imagine it would be great to have something like this, but that might indeed be tricky and not possible without any API changes that allow us to identify the change (or the item(s) related to the change) in different pipelines - especially the timer/ref-based ones.\n\nThis might also be more of a \"single change panel\" use case, but I will add it to the list. I think this might work well with what I have in mind for the single change panel after the status view is done - not saying it would be easy to implement.\n\nI\u0027m a little confused by your last sentence:\n\u003e I\u0027m not saying we need to support exactly the same workflow here, but we should have an answer for how that will change.\n\nDo you see this as \"fulfilled\" by the current implementation of the status page? In my opinion this would be a new use case. I mean: On the current status page this works if you know what to look for (the change) and where (in which pipelines). But this only works if the amount of items on the status page is manageable and not too crowded.",
+      "parentUuid": "e2b30d1c_17d93b59",
+      "range": {
+        "startLine": 68,
+        "startChar": 35,
+        "endLine": 68,
+        "endChar": 42
+      },
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "629434e6_39d76c61",
