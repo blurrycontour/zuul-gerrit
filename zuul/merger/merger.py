@@ -801,7 +801,9 @@ class Repo(object):
         return False
 
     def getFiles(self, files, dirs=[], branch=None, commit=None,
-                 zuul_event_id=None):
+                 zuul_event_id=None, errors=None, gen_script=None,
+                 pipeline_name=None, gen_script_wrapper=None,
+                 comment=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         ret = {}
         repo = self.createRepoObject(zuul_event_id)
@@ -809,6 +811,41 @@ class Repo(object):
             head = repo.heads[branch].commit
         else:
             head = repo.commit(commit)
+        gen_script_exists = (gen_script and
+            os.path.exists(os.path.join(self.local_path, gen_script)))
+        if gen_script_exists and gen_script_wrapper:
+            self.log.debug(
+                "Running gen-script %s for commit %s branch %s",
+                gen_script, commit, branch)
+            context = gen_script_wrapper.getExecutionContext()
+            popen = context.getPopen(
+                work_dir=self.local_path,
+                ssh_auth_sock='/root/.ssh')
+            proc = popen(
+                [gen_script, '--pipeline', pipeline_name, '--comment', comment],
+                cwd=self.local_path,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                # Either this must be present, or we need the
+                # --new-session argument for bwrap.
+                start_new_session=True,
+                env={'PATH': '/usr/local/bin:/usr/bin'},
+            )
+            rc = proc.wait()
+            if rc:
+                self.log.exception(
+                    "Error running gen-script for commit %s ref %s",
+                    commit, branch)
+                if errors is not None:
+                    gen_err_msg = (
+                        f"Error running gen-script for "
+                        f"commit {commit} branch {branch} "
+                        "with error\n"
+                        f"{exc.output.decode('utf-8')}"
+                    )
+                    errors.append(gen_err_msg)
+                return None
         log.debug("Getting files for %s at %s", self.local_path, head.hexsha)
         tree = head.tree
         for fn in files:
@@ -819,6 +856,11 @@ class Repo(object):
                 ret[fn] = tree[fn].data_stream.read().decode('utf8')
             else:
                 ret[fn] = None
+            if (gen_script_exists and
+                os.path.exists(os.path.join(self.local_path, fn))):
+                with open(os.path.join(self.local_path, fn),
+                    'r', encoding='utf-8') as f:
+                    ret[fn] = f.read()
         if dirs:
             for dn in dirs:
                 try:
@@ -848,6 +890,17 @@ class Repo(object):
                     if not _ignored(blob) and blob.path.endswith(".yaml"):
                         ret[blob.path] = blob.data_stream.read().decode(
                             'utf-8')
+
+            for dn in dirs:
+                if (gen_script_exists and
+                    os.path.exists(os.path.join(self.local_path, dn))):
+                    for filename in os.listdir(
+                        os.path.join(self.local_path, dn)):
+                        if filename.endswith(".yaml"):
+                            with open(os.path.join(self.local_path, dn, filename),
+                                'r', encoding='utf-8') as f:
+                                ret[os.path.join(dn, filename)] = f.read()
+
         return ret
 
     def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
@@ -1350,14 +1403,28 @@ class Merger(object):
                         errors.append(err_msg)
                     return None
                 if files or dirs:
+                    project_name = item['project']
+                    project = (None if self.projects is None else
+                        (self.projects[project_name]
+                            if project_name in self.projects.keys() else None))
+                    gen_script = (project['gen-script'] if pipeline_name and
+                        project and 'gen-script' in project.keys() and
+                        project['gen-script'] else None)
                     repo = self.getRepo(item['connection'], item['project'])
-                    repo_files = repo.getFiles(files, dirs, commit=commit)
+                    repo_files = repo.getFiles(files, dirs, commit=commit,
+                        errors=errors, gen_script=gen_script,
+                        pipeline_name=pipeline_name,
+                        gen_script_wrapper=self.connections.drivers['bubblewrap'],
+                        comment=comment)
+                    if repo_files is None:
+                        return None
                     key = item['connection'], item['project'], item['branch']
                     read_files[key] = dict(
                         connection=item['connection'],
                         project=item['project'],
                         branch=item['branch'],
-                        files=repo_files)
+                        files=repo_files,
+                        generated=gen_script is not None)
         return (
             commit.hexsha, list(read_files.values()), repo_state, recent,
             orig_commit
@@ -1425,7 +1492,8 @@ class Merger(object):
                 item_in_branches = repo.contains(item['newrev'])
         return (True, repo_state, item_in_branches)
 
-    def getFiles(self, connection_name, project_name, branch, files, dirs=[]):
+    def getFiles(self, connection_name, project_name, branch, files, dirs=[],
+        pipeline_name=None):
         """Get file contents on branch.
 
         Call Merger.updateRepo() first to make sure the repo is up to
@@ -1439,7 +1507,14 @@ class Merger(object):
         repo.reset()
         # This does not fetch, update, or reset, it operates on the
         # working state.
-        return repo.getFiles(files, dirs, branch=branch)
+        project = (None if self.projects is None else
+            (self.projects[project_name] if project_name in self.projects.keys()
+            else None))
+        gen_script = (project['gen-script'] if pipeline_name and project and
+            'gen-script' in project.keys() and project['gen-script'] else None)
+        return repo.getFiles(files, dirs, branch=branch, gen_script=gen_script,
+            pipeline_name=pipeline_name,
+            gen_script_wrapper=self.connections.drivers['bubblewrap'])
 
     def getFilesChanges(self, connection_name, project_name, branch,
                         tosha=None, zuul_event_id=None):
