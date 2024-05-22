@@ -2072,6 +2072,10 @@ class PipelineManager(metaclass=ABCMeta):
                 change.project.connection_name)
             source.setChangeAttributes(
                 change, containing_branches=event.item_in_branches)
+        for files in event.files:
+            if 'generated' in files.keys() and files['generated']:
+                source.setChangeAttributes(
+                    item.changes[0], files=files['files'])
         with build_set.activeContext(self.current_context):
             build_set.setMergeRepoState(event.repo_state)
             build_set.merge_state = build_set.COMPLETE

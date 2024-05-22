@@ -19,6 +19,7 @@ import socket
 import sys
 import threading
 import time
+import yaml
 from abc import ABCMeta
 from configparser import ConfigParser
 
@@ -91,6 +92,10 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         self.merge_root = get_default(config, component, 'git_dir',
                                       '/var/lib/zuul/{}-git'.format(component))
+
+        self.projects = get_default(config, 'merger', 'projects', None)
+        if self.projects:
+            self.projects = yaml.safe_load(self.projects)
 
         self.config = config
 
@@ -273,9 +278,11 @@ class BaseMergeServer(metaclass=ABCMeta):
         try:
             self._update(connection_name, project_name)
             with lock:
-                files = self.merger.getFiles(connection_name, project_name,
-                                             args['branch'], args['files'],
-                                             args.get('dirs'))
+                files = self.merger.getFiles(
+                    connection_name, project_name,
+                    args['branch'], args['files'],
+                    args.get('dirs'),
+                    pipeline_name=merge_request.pipeline_name)
         except Exception:
             result = dict(update=False)
         else:
@@ -311,7 +318,8 @@ class BaseMergeServer(metaclass=ABCMeta):
             repo_locks=self.repo_locks,
             zuul_event_id=zuul_event_id,
             errors=errors,
-            comment=merge_request.comment)
+            comment=merge_request.comment,
+            pipeline_name=merge_request.pipeline_name)
 
         if ret is not None:
             result['merged'] = True
