@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "291b1a0d_17f25859",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1882,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-22T12:45:54Z",
+      "side": 1,
+      "message": "Maybe it would be better to move this check to the top of the loop so that we always  have a full iteration inc. stats reporting.",
+      "revId": "80f9df31b6618f584f11eb80dabefd5bc2bc2109",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9abff031_c93be4cd",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2358,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-05-22T12:45:54Z",
+      "side": 1,
+      "message": "I think that\u0027s using the wrong (pipeline) lock here. We need the tenant r/w lock.",
+      "revId": "80f9df31b6618f584f11eb80dabefd5bc2bc2109",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
