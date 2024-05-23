@@ -50,6 +50,7 @@ from zuul.lib import tracing
 from zuul.zk import zkobject
 from zuul.zk.blob_store import BlobStore
 from zuul.zk.change_cache import ChangeKey
+from zuul.zk.components import COMPONENT_REGISTRY
 from zuul.exceptions import (
     SEVERITY_ERROR,
     SEVERITY_WARNING,
@@ -925,7 +926,8 @@ class PipelineState(zkobject.ZKObject):
             # Drop some attributes from local objects to save memory
             build_set._set(_files=None,
                            _merge_repo_state=None,
-                           _extra_repo_state=None)
+                           _extra_repo_state=None,
+                           _repo_state=RepoState())
             job_graph = build_set.job_graph
             if not job_graph:
                 continue
@@ -4248,6 +4250,43 @@ class RepoFiles(zkobject.ShardedZKObject):
         return json.dumps(data, sort_keys=True).encode("utf8")
 
 
+class RepoState:
+    def __init__(self):
+        self.state = {}
+        self.state_keys = {}
+
+    def load(self, blobstore, key):
+        # Load a single project-repo-state from the blobstore and
+        # combine it with existing projects in this repo state.
+        if key in self.state_keys.values():
+            return
+        data = blobstore.get(key)
+        repo_state = json.loads(data.decode('utf-8'))
+        # Format is {connection: {project: state}}
+        for connection_name, connection_data in repo_state.items():
+            projects = self.state.setdefault(connection_name, {})
+            projects.update(connection_data)
+            for project_name, project_data in connection_data.items():
+                self.state_keys[(connection_name, project_name)] = key
+
+    def add(self, blobstore, repo_state):
+        # Split the incoming repo_state into individual
+        # project-repo-state objects in the blob store.
+        for connection_name, connection_data in repo_state.items():
+            projects = self.state.setdefault(connection_name, {})
+            for project_name, project_data in connection_data.items():
+                project_dict = {project_name: project_data}
+                connection_dict = {connection_name: project_dict}
+                serialized = json_dumps(
+                    connection_dict, sort_keys=True).encode("utf8")
+                key = blobstore.put(serialized)
+                projects.update(project_dict)
+                self.state_keys[(connection_name, project_name)] = key
+
+    def getKeys(self):
+        return self.state_keys.values()
+
+
 class BaseRepoState(zkobject.ShardedZKObject):
     """RepoState holds the repo state for a buildset
 
@@ -4348,6 +4387,7 @@ class BuildSet(zkobject.ZKObject):
             _merge_repo_state_path=None,  # ZK path for above
             _extra_repo_state=None,  # Repo state for any additional projects
             _extra_repo_state_path=None,  # ZK path for above
+            repo_state_keys=[],  # Refs (links) to blobstore repo_state
             tries={},
             files_state=self.NEW,
             repo_state_state=self.NEW,
@@ -4364,6 +4404,7 @@ class BuildSet(zkobject.ZKObject):
             # Cached job graph of previous layout; not serialized
             _old_job_graph=None,
             _old_jobs={},
+            _repo_state=RepoState(),
         )
 
     def setFiles(self, items):
@@ -4385,6 +4426,10 @@ class BuildSet(zkobject.ZKObject):
         self._files_path = repo_files.getPath()
 
     def getRepoState(self, context):
+        d = self._getRepoStateFromBlobstore(context)
+        if d:
+            return d
+        # MODEL_API < 28
         if self._merge_repo_state_path and self._merge_repo_state is None:
             try:
                 self._set(_merge_repo_state=MergeRepoState.fromZK(
@@ -4406,6 +4451,12 @@ class BuildSet(zkobject.ZKObject):
                     d[connection] = {}
                 d[connection].update(rs.state.get(connection, {}))
         return d
+
+    def _getRepoStateFromBlobstore(self, context):
+        blobstore = BlobStore(context)
+        for link in self.repo_state_keys:
+            self._repo_state.load(blobstore, link)
+        return self._repo_state.state
 
     def getFiles(self, context):
         if self._files is not None:
@@ -4436,11 +4487,22 @@ class BuildSet(zkobject.ZKObject):
         return bool(errs)
 
     def setMergeRepoState(self, repo_state):
-        if self._merge_repo_state_path is not None:
-            raise Exception("Merge repo state can not be updated")
         if not self._active_context:
             raise Exception("setMergeRepoState must be used "
                             "with a context manager")
+        new = COMPONENT_REGISTRY.model_api >= 28
+        if (self._merge_repo_state_path is not None or
+            self._extra_repo_state_path is not None):
+            new = False
+        if new:
+            blobstore = BlobStore(self._active_context)
+            self._repo_state.add(blobstore, repo_state)
+            for key in self._repo_state.getKeys():
+                if key not in self.repo_state_keys:
+                    self.repo_state_keys.append(key)
+            return
+        if self._merge_repo_state_path is not None:
+            raise Exception("Merge repo state can not be updated")
         rs = MergeRepoState.new(self._active_context,
                                 state=repo_state,
                                 _buildset_path=self.getPath())
@@ -4448,11 +4510,22 @@ class BuildSet(zkobject.ZKObject):
         self._merge_repo_state_path = rs.getPath()
 
     def setExtraRepoState(self, repo_state):
-        if self._extra_repo_state_path is not None:
-            raise Exception("Extra repo state can not be updated")
         if not self._active_context:
             raise Exception("setExtraRepoState must be used "
                             "with a context manager")
+        new = COMPONENT_REGISTRY.model_api >= 28
+        if (self._merge_repo_state_path is not None or
+            self._extra_repo_state_path is not None):
+            new = False
+        if new:
+            blobstore = BlobStore(self._active_context)
+            self._repo_state.add(blobstore, repo_state)
+            for key in self._repo_state.getKeys():
+                if key not in self.repo_state_keys:
+                    self.repo_state_keys.append(key)
+            return
+        if self._extra_repo_state_path is not None:
+            raise Exception("Extra repo state can not be updated")
         rs = ExtraRepoState.new(self._active_context,
                                 state=repo_state,
                                 _buildset_path=self.getPath())
@@ -4491,6 +4564,7 @@ class BuildSet(zkobject.ZKObject):
             "files": self._files_path,
             "merge_repo_state": self._merge_repo_state_path,
             "extra_repo_state": self._extra_repo_state_path,
+            "repo_state_keys": self.repo_state_keys,
             "tries": self.tries,
             "files_state": self.files_state,
             "repo_state_state": self.repo_state_state,
@@ -6044,6 +6118,7 @@ class QueueItem(zkobject.ZKObject):
                 for secret in pb['secrets'].values():
                     if isinstance(secret, dict) and 'blob' in secret:
                         keys.add(secret['blob'])
+            keys.update(self.current_build_set.repo_state_keys)
         return keys
 
     def getEventChange(self):

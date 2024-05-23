@@ -1198,6 +1198,7 @@ class TestWeb(BaseTestWeb):
             'override_checkout': None,
             'merge_repo_state_ref': None,
             'extra_repo_state_ref': None,
+            'repo_state_keys': [],
             'playbooks': [{
                 'connection': 'gerrit',
                 'project': 'common-config',
@@ -1309,6 +1310,7 @@ class TestWeb(BaseTestWeb):
             'projects': [],
             'merge_repo_state_ref': None,
             'extra_repo_state_ref': None,
+            'repo_state_keys': [],
             'secret_vars': None,
             'ssh_keys': [],
             'timeout': None,

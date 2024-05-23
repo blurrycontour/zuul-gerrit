@@ -204,3 +204,9 @@ Version 27
 :Prior Zuul version: 10.0.0
 :Description: Refactor branch cache.
               Affects schedulers and web.
+
+Version 28
+----------
+:Prior Zuul version: 10.1.0
+:Description: Store repo state in blobstore.
+              Affects schedulers and executor.
