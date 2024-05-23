@@ -156,8 +156,11 @@
     # This could probably use some refactoring to have a base unittest job
     # that isn't python version specific.
     parent: zuul-nox-py311
+    nodeset:
+      nodes:
+        - name: ubuntu-noble
+          label: ubuntu-noble
     vars:
-      python_use_pyenv: true
       nox_force_python: "3.12"
       python_version: "3.12"
 
