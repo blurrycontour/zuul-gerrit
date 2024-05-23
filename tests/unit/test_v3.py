@@ -9583,6 +9583,24 @@ class TestUnsafeVars(AnsibleZuulTestCase):
         with open(p) as f:
             return f.read()
 
+    def test_mark_unsafe(self):
+        self.executor_server.keep_jobdir = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master',
+                                           'unsafecommitmessage')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        build = self.getJobFromHistory('testjob')
+        path = os.path.join(build.jobdir.root,
+                            'ansible', 'zuul_vars.yaml')
+
+        with open(path, 'r') as f:
+            inventory = yamlutil.ansible_unsafe_load(f)
+
+        # The repr for an AnsibleUnsafeStr object does not include the
+        # value, so we use that here to assert that the commit message
+        # does not appear without an unsafe marking.
+        self.assertFalse('unsafecommitmessage' in repr(inventory))
+
     def test_unsafe_vars(self):
         self.executor_server.keep_jobdir = True
 
