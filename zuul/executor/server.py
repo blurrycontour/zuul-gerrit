@@ -75,6 +75,7 @@ from zuul.model import (
     FrozenJob,
     Job,
     MergeRepoState,
+    RepoState,
 )
 import zuul.model
 from zuul.nodepool import Nodepool
@@ -1287,21 +1288,31 @@ class AnsibleJob(object):
                 )
 
     def loadRepoState(self):
-        merge_rs_path = self.arguments['merge_repo_state_ref']
-        with self.executor_server.zk_context as ctx:
-            merge_repo_state = merge_rs_path and MergeRepoState.fromZK(
-                ctx, merge_rs_path)
-            extra_rs_path = self.arguments['extra_repo_state_ref']
-            extra_repo_state = extra_rs_path and ExtraRepoState.fromZK(
-                ctx, extra_rs_path)
-        d = {}
-        # Combine the two
-        for rs in (merge_repo_state, extra_repo_state):
-            if not rs:
-                continue
-            for connection in rs.state.keys():
-                d.setdefault(connection, {}).update(
-                    rs.state.get(connection, {}))
+        repo_state_keys = self.arguments.get('repo_state_keys')
+        if repo_state_keys:
+            repo_state = RepoState()
+            with self.executor_server.zk_context as ctx:
+                blobstore = BlobStore(ctx)
+                for link in repo_state_keys:
+                    repo_state.load(blobstore, link)
+            d = repo_state.state
+        else:
+            # MODEL_API < 28
+            merge_rs_path = self.arguments['merge_repo_state_ref']
+            with self.executor_server.zk_context as ctx:
+                merge_repo_state = merge_rs_path and MergeRepoState.fromZK(
+                    ctx, merge_rs_path)
+                extra_rs_path = self.arguments['extra_repo_state_ref']
+                extra_repo_state = extra_rs_path and ExtraRepoState.fromZK(
+                    ctx, extra_rs_path)
+            d = {}
+            # Combine the two
+            for rs in (merge_repo_state, extra_repo_state):
+                if not rs:
+                    continue
+                for connection in rs.state.keys():
+                    d.setdefault(connection, {}).update(
+                        rs.state.get(connection, {}))
         # Ensure that we have an origin ref for every local branch.
         # Some of these will be overwritten later as we merge changes,
         # but for starters, we can use the current head of each

@@ -7135,10 +7135,11 @@ class TestSecrets(ZuulTestCase):
         with self.scheds.first.sched.createZKContext(None, self.log)\
              as context:
             bs = BlobStore(context)
-            self.assertEqual(len(bs), 1)
+            # 1 secret, 2 repo states (project1 and common-config)
+            self.assertEqual(len(bs), 3)
 
             self.scheds.first.sched._runBlobStoreCleanup()
-            self.assertEqual(len(bs), 1)
+            self.assertEqual(len(bs), 3)
 
             self.executor_server.hold_jobs_in_build = False
             self.executor_server.release()

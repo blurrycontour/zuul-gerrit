@@ -148,3 +148,40 @@ class TestGithubModelUpgrade(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS'),
             dict(name='project-test2', result='SUCCESS'),
         ], ordered=False)
+
+    @model_version(27)
+    @simple_layout('layouts/two-projects-integrated.yaml')
+    def test_model_27_28(self):
+        # This excercises the repo state blobstore upgrade
+        self.hold_merge_jobs_in_queue = True
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        jobs = list(self.merger_api.queued())
+        self.merger_api.release(jobs[0])
+        self.waitUntilSettled()
+
+        # Perform the upgrade between the first and second merge jobs
+        # to verify that we don't lose the data from the first merge
+        # job.
+        self.model_test_component_info.model_api = 28
+        jobs = list(self.merger_api.queued())
+        self.merger_api.release(jobs[0])
+        self.waitUntilSettled()
+
+        worker = list(self.executor_server.job_workers.values())[0]
+        gerrit_repo_state = worker.repo_state['gerrit']
+        self.assertTrue('org/common-config' in gerrit_repo_state)
+        self.assertTrue('org/project1' in gerrit_repo_state)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='integration', result='SUCCESS'),
+        ], ordered=False)

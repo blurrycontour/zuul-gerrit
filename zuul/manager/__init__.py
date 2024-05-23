@@ -27,7 +27,7 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.tarjan import strongly_connected_components
 import zuul.lib.tracing as tracing
 from zuul.model import (
-    Change, PipelineState, PipelineChangeList, QueueItem,
+    Change, PipelineState, PipelineChangeList,
     filter_severity, EnqueueEvent
 )
 from zuul.zk.change_cache import ChangeKey
@@ -1492,7 +1492,7 @@ class PipelineManager(metaclass=ABCMeta):
                                    files_state=build_set.PENDING)
         return False
 
-    def scheduleGlobalRepoState(self, item: QueueItem) -> bool:
+    def scheduleGlobalRepoState(self, item):
         log = item.annotateLogger(self.log)
 
         tenant = item.pipeline.tenant
@@ -1536,7 +1536,9 @@ class PipelineManager(metaclass=ABCMeta):
         build_set = item.current_build_set
         # If we skipped the initial repo state (for branch/ref items),
         # we need to include the merger items for the final repo state.
-        if build_set._merge_repo_state_path is None:
+        # MODEL_API < 28
+        if (build_set._merge_repo_state_path is None and
+            not build_set.repo_state_keys):
             new_items.extend(build_set.merger_items)
 
         for project in projects:
