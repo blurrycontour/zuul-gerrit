@@ -612,7 +612,7 @@ class TestScaleOutScheduler(ZuulTestCase):
         self.fake_nodepool.unpause()
         self.waitUntilSettled()
 
-    @simple_layout('layouts/timer-jitter.yaml')
+    @simple_layout('layouts/timer-jitter-slow.yaml')
     def test_timer_multi_scheduler(self):
         # Test that two schedulers create exactly the same timer jobs
         # including jitter.
