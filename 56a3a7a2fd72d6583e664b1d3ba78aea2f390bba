@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "61c1ee0b_bf3640f9",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-05-24T10:20:28Z",
+      "side": 1,
+      "message": "The use cases below don\u0027t necessarily fit to a single scope mentioned here. Maybe it is a bit misleading if we split the use cases by role. I started with those as \"user stories\" and those typically include the role of the user. However, after writing them down I found that they were a little short for user stories, so I rephrased it to \"use cases\".\n\nNow regarding the scopes/roles: The idea behind these scopes is to explain the problem I see with the current status page and how it might be improved. Currently, the status page shows a lot of data and I think it could be improved by splitting those data in different scopes - some scopes are more relevant for \"operator-like\" roles while others are more relevant for \"developer-like\" roles. \"operator\" and \"developer\" are no fixed terms here, it was just the first thing that came to my mind.\n\nSo my rough idea is: While \"operators\" are more interested in the overall state of the tenant, they often use the status page as entry point to Zuul (1. scope). So the data that is shown there should - in my opinion - give a good overview about the tenant, but should not distract with too much detail. \"Developers\" on the other hand usually have a change they are currently developing and are interested in the state of this change. They usually submit their change to some kind of versioning system (like github or gerrit) and enter the Zuul UI from there (3. scope). The 2. scope comes in between those. It provides more details on a single pipeline, shows the changes in their context and serves as a transition point between the 1. and 3. scope.\n\nMaybe I should add some of this information to the spec to make it more clear what the scopes/roles are about. However, they are no fixed terms and mainly used as an explanation.",
+      "parentUuid": "89815822_53b198d1",
+      "revId": "56a3a7a2fd72d6583e664b1d3ba78aea2f390bba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "13107100_6225caa8",
         "filename": "doc/source/developer/specs/status-page-2.0.rst",
         "patchSetId": 3
