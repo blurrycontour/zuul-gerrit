@@ -17,6 +17,7 @@ import cherrypy
 import socket
 from collections import defaultdict
 from contextlib import suppress
+import traceback
 
 from opentelemetry import trace
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
@@ -2781,6 +2782,7 @@ class ZuulWeb(object):
                     "Unable to update layout due to incomplete branch "
                     "cache, possibly due to in-progress tenant "
                     "reconfiguration; will retry")
+                self.log.info(traceback.format_exc())
                 success = False
         self.log.debug("Done updating layout state")
         return success
