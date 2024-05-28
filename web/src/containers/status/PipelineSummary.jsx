@@ -29,7 +29,11 @@ import {
 import { SquareIcon } from '@patternfly/react-icons'
 
 import QueueItemPopover from './QueueItemPopover'
-import { PipelineIcon, getQueueItemIconConfig } from './Misc'
+import {
+  PipelineIcon,
+  getQueueItemIconConfig,
+} from './Misc'
+import { makeQueryString } from '../FilterToolbar'
 
 function QueueItemSquareWithPopover({ item }) {
   return (
@@ -62,13 +66,13 @@ QueueItemSquare.propTypes = {
 
 
 function QueueSummary({ pipeline, pipelineType, showAllQueues }) {
+  let changeQueues = pipeline.change_queues
   // Dependent pipelines usually come with named queues, so we will
   // visualize each queue individually. For other pipeline types, we
   // will consolidate all heads as a single queue to simplify the
   // visualization (e.g. independent pipelines like check where each
   // change/item is enqueued in it's own queue by design).
   if (['dependent'].indexOf(pipelineType) > -1) {
-    let changeQueues = pipeline.change_queues
     if (!showAllQueues) {
       changeQueues = changeQueues.filter(queue => queue.heads.length > 0)
     }
@@ -97,7 +101,7 @@ function QueueSummary({ pipeline, pipelineType, showAllQueues }) {
         display={{ default: 'inlineFlex' }}
         spaceItems={{ default: 'spaceItemsNone' }}
       >
-        {pipeline.change_queues.map((queue) => (
+        {changeQueues.map((queue) => (
           queue.heads.map((head) => (
             head.map((item) => (
               <FlexItem key={item.id}>
@@ -117,7 +121,7 @@ QueueSummary.propTypes = {
   showAllQueues: PropTypes.bool,
 }
 
-function PipelineSummary({ pipeline, tenant, showAllQueues }) {
+function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
 
   const pipelineType = pipeline.manager || 'unknown'
   const itemCount = pipeline._count
@@ -129,7 +133,10 @@ function PipelineSummary({ pipeline, tenant, showAllQueues }) {
       >
         <PipelineIcon pipelineType={pipelineType} />
         <Link
-          to={`${tenant.linkPrefix}/status/pipeline/${pipeline.name}`}
+          to={{
+            pathname: `${tenant.linkPrefix}/status/pipeline/${pipeline.name}`,
+            search: encodeURI(makeQueryString(filters)),
+          }}
           className="zuul-pipeline-link"
         >
           {pipeline.name}
@@ -161,6 +168,7 @@ PipelineSummary.propTypes = {
   pipeline: PropTypes.object,
   tenant: PropTypes.object,
   showAllQueues: PropTypes.bool,
+  filters: PropTypes.object,
 }
 
 export default PipelineSummary

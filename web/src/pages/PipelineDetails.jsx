@@ -15,9 +15,14 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter, useLocation, useHistory } from 'react-router-dom'
 
 import {
+  Button,
+  EmptyState,
+  EmptyStateBody,
+  EmptyStateIcon,
+  EmptyStateSecondaryActions,
   Gallery,
   GalleryItem,
   Grid,
@@ -29,7 +34,7 @@ import {
   TextContent,
   TextVariants,
 } from '@patternfly/react-core'
-import { StreamIcon } from '@patternfly/react-icons'
+import { BuildIcon, StreamIcon } from '@patternfly/react-icons'
 
 import ChangeQueue from '../containers/status/ChangeQueue'
 import { PipelineIcon } from '../containers/status/Misc'
@@ -37,6 +42,37 @@ import { fetchStatusIfNeeded } from '../actions/status'
 import { EmptyPage } from '../containers/Errors'
 import { Fetching, ReloadButton } from '../containers/Fetching'
 import { useDocumentVisibility, useInterval } from '../Hooks'
+import {
+  FilterToolbar,
+  getFiltersFromUrl,
+} from '../containers/FilterToolbar'
+import {
+  filterPipelines,
+  handleFilterChange,
+  filterInputValidation,
+  onClearFilters,
+} from '../containers/status/Misc'
+
+const filterCategories = [
+  {
+    key: 'project',
+    title: 'Project',
+    placeholder: 'Filter by Project...',
+    type: 'fuzzy-search',
+  },
+  {
+    key: 'change',
+    title: 'Change',
+    placeholder: 'Filter by Change...',
+    type: 'search',
+  },
+  {
+    key: 'queue',
+    title: 'Queue',
+    placeholder: 'Filter by Queue...',
+    type: 'fuzzy-search',
+  }
+]
 
 function PipelineStats({ pipeline }) {
   return (
@@ -92,11 +128,15 @@ PipelineDetails.propTypes = {
 }
 
 function PipelineDetailsPage({
-  pipeline, isFetching, tenant, darkMode, autoReload, fetchStatusIfNeeded
+  pipeline, isFetching, tenant, darkMode, autoReload, fetchStatusIfNeeded, isEmpty
 }) {
   const [isReloading, setIsReloading] = useState(false)
 
   const isDocumentVisible = useDocumentVisibility()
+
+  const location = useLocation()
+  const history = useHistory()
+  const filters = getFiltersFromUrl(location, filterCategories)
 
   const updateData = useCallback((tenant) => {
     if (tenant.name) {
@@ -141,9 +181,16 @@ function PipelineDetailsPage({
   return (
     <>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+        <FilterToolbar
+          filterCategories={filterCategories}
+          onFilterChange={(newFilters) => {handleFilterChange(newFilters, location, history)}}
+          filters={filters}
+          filterInputValidation={filterInputValidation}
+        />
         <PipelineDetails pipeline={pipeline} isReloading={isReloading} reloadCallback={() => updateData(tenant)} />
       </PageSection>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+        {!isEmpty &&
         <Title headingLevel="h3">
           <StreamIcon
             style={{
@@ -153,6 +200,7 @@ function PipelineDetailsPage({
           />{' '}
           Queues
         </Title>
+        }
         <Gallery
           hasGutter
           minWidths={{
@@ -170,6 +218,21 @@ function PipelineDetailsPage({
             ))
           }
         </Gallery>
+        {isEmpty &&
+          <EmptyState>
+            <EmptyStateIcon icon={BuildIcon} />
+            <Title headingLevel="h1">No items found</Title>
+            <EmptyStateBody>
+              No items match this filter criteria. Remove some filters or
+              clear all to show results.
+            </EmptyStateBody>
+            <EmptyStateSecondaryActions>
+              <Button variant="link" onClick={() => onClearFilters(location, history, filterCategories)}>
+                Clear all filters
+              </Button>
+            </EmptyStateSecondaryActions>
+          </EmptyState>
+        }
       </PageSection>
     </>
   )
@@ -183,18 +246,27 @@ PipelineDetailsPage.propTypes = {
   darkMode: PropTypes.bool,
   autoReload: PropTypes.bool.isRequired,
   fetchStatusIfNeeded: PropTypes.func.isRequired,
+  isEmpty: PropTypes.bool,
 }
 
 function mapStateToProps(state, ownProps) {
   let pipeline = null
   if (state.status.status) {
+    const filters = getFiltersFromUrl(ownProps.location, filterCategories)
+    // we need to work on a copy of the state..pipelines, because when mutating
+    // the original, we couldn't reset or change the filters without reloading
+    // from the backend first.
+    let pipelines = global.structuredClone(state.status.status.pipelines)
+    pipelines = filterPipelines(pipelines, filters, filterCategories)
     // Filter the state for this specific pipeline
-    state.status.status.pipelines.filter(
+    pipelines.filter(
       ppl => (ppl.name === ownProps.match.params.pipelineName)
     ).map(
       ppl => (pipeline = ppl)
     )
   }
+
+  const isEmpty = pipeline && pipeline.change_queues.map(q => q.heads.length).reduce((a, len) => a + len) === 0
 
   return {
     pipeline,
@@ -202,6 +274,7 @@ function mapStateToProps(state, ownProps) {
     tenant: state.tenant,
     darkMode: state.preferences.darkMode,
     autoReload: state.preferences.autoReload,
+    isEmpty,
   }
 }
 
