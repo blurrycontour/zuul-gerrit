@@ -19,8 +19,10 @@ import { Link } from 'react-router-dom'
 import {
   Button,
   EmptyState,
+  EmptyStateBody,
   EmptyStateIcon,
   EmptyStatePrimary,
+  EmptyStateSecondaryActions,
   EmptyStateVariant,
   Title,
 } from '@patternfly/react-core'
@@ -50,4 +52,31 @@ EmptyPage.propTypes = {
   linkText: PropTypes.string.isRequired,
 }
 
-export { EmptyPage }
+function EmptyBox(props) {
+  const { title, icon, action, onAction, children } = props
+  return (
+    <EmptyState>
+      <EmptyStateIcon icon={icon} />
+      <Title headingLevel="h1">{title}</Title>
+      <EmptyStateBody>
+        {children}
+      </EmptyStateBody>
+      <EmptyStateSecondaryActions>
+        <Button variant="link" onClick={onAction}>
+          {action}
+        </Button>
+      </EmptyStateSecondaryActions>
+    </EmptyState>
+  )
+}
+
+EmptyBox.propTypes = {
+  title: PropTypes.string.isRequired,
+  icon: PropTypes.func.isRequired,
+  action: PropTypes.string.isRequired,
+  onAction: PropTypes.func.isRequired,
+  children: PropTypes.node,
+}
+
+
+export { EmptyBox, EmptyPage }
