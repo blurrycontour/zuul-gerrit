@@ -15,7 +15,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import * as moment_tz from 'moment-timezone'
 
@@ -27,18 +27,55 @@ import {
   PageSection,
   PageSectionVariants,
   Switch,
-  Toolbar,
-  ToolbarContent,
   ToolbarItem,
   Tooltip,
 } from '@patternfly/react-core'
+import { StreamIcon } from '@patternfly/react-icons'
 
 import PipelineSummary from '../containers/status/PipelineSummary'
 
 import { fetchStatusIfNeeded } from '../actions/status'
 import { Fetching, ReloadButton } from '../containers/Fetching'
+import {
+  FilterToolbar,
+  getFiltersFromUrl,
+  isFilterActive,
+} from '../containers/FilterToolbar'
+import {
+  clearFilters,
+  filterInputValidation,
+  filterPipelines,
+  handleFilterChange,
+} from '../containers/status/Filters'
+import { EmptyBox } from '../containers/Errors'
 import { useDocumentVisibility, useInterval } from '../Hooks'
 
+const filterCategories = [
+  {
+    key: 'pipeline',
+    title: 'Pipeline',
+    placeholder: 'Filter by pipeline...',
+    type: 'fuzzy-search',
+  },
+  {
+    key: 'queue',
+    title: 'Queue',
+    placeholder: 'Filter by Queue...',
+    type: 'fuzzy-search',
+  },
+  {
+    key: 'project',
+    title: 'Project',
+    placeholder: 'Filter by Project...',
+    type: 'fuzzy-search',
+  },
+  {
+    key: 'change',
+    title: 'Change',
+    placeholder: 'Filter by Change...',
+    type: 'fuzzy-search',
+  },
+]
 
 function TenantStats({ stats, timezone, isReloading, reloadCallback }) {
   return (
@@ -80,25 +117,37 @@ TenantStats.propTypes = {
   reloadCallback: PropTypes.func.isRequired,
 }
 
-function PipelineGallery({ pipelines, tenant, showAllPipelines }) {
+function PipelineGallery({ pipelines, tenant, showAllPipelines, isLoading, filters, onClearFilters }) {
   // Filter out empty pipelines if necessary
   if (!showAllPipelines) {
     pipelines = pipelines.filter(ppl => ppl._count > 0)
   }
 
   return (
-    <Gallery
-      hasGutter
-      minWidths={{
-        sm: '450px',
-      }}
-    >
-      {pipelines.map(pipeline => (
-        <GalleryItem key={pipeline.name}>
-          <PipelineSummary pipeline={pipeline} tenant={tenant} showAllQueues={showAllPipelines} />
-        </GalleryItem>
-      ))}
-    </Gallery>
+    <>
+      <Gallery
+        hasGutter
+        minWidths={{
+          sm: '450px',
+        }}
+      >
+        {pipelines.map(pipeline => (
+          <GalleryItem key={pipeline.name}>
+            <PipelineSummary pipeline={pipeline} tenant={tenant} showAllQueues={showAllPipelines} filters={filters} />
+          </GalleryItem>
+        ))}
+      </Gallery>
+
+      {!isLoading && pipelines.length === 0 && (
+        <EmptyBox title="No items found"
+          icon={StreamIcon}
+          action="Clear all filters"
+          onAction={onClearFilters}>
+          No items match this filter criteria. Remove some filters or
+          clear all to show results.
+        </EmptyBox>
+      )}
+    </>
   )
 }
 
@@ -106,6 +155,9 @@ PipelineGallery.propTypes = {
   pipelines: PropTypes.array,
   tenant: PropTypes.object,
   showAllPipelines: PropTypes.bool,
+  isLoading: PropTypes.bool,
+  filters: PropTypes.object,
+  onClearFilters: PropTypes.func,
 }
 
 function PipelineOverviewPage({
@@ -113,11 +165,27 @@ function PipelineOverviewPage({
 }) {
   const [showAllPipelines, setShowAllPipelines] = useState(false)
   const [isReloading, setIsReloading] = useState(false)
+  const location = useLocation()
+  const history = useHistory()
+  const filters = getFiltersFromUrl(location, filterCategories)
+  const filterActive = isFilterActive(filters)
 
   const isDocumentVisible = useDocumentVisibility()
 
   const onShowAllPipelinesToggle = (isChecked) => {
     setShowAllPipelines(isChecked)
+  }
+
+  const onFilterChanged = (newFilters) => {
+    handleFilterChange(newFilters, location, history)
+    // show all pipelines when filtering, hide when not
+    setShowAllPipelines(isFilterActive(newFilters))
+  }
+
+  const onClearFilters = () => {
+    clearFilters(location, history, filterCategories)
+    // reset `showAllPipelines` when clearing filters
+    setShowAllPipelines(false)
   }
 
   const updateData = useCallback((tenant) => {
@@ -150,6 +218,19 @@ function PipelineOverviewPage({
     return <Fetching />
   }
 
+  const allPipelinesSwitch = (
+    <Switch
+      className="zuul-show-pipeline-switch"
+      id="all-pipeline-switch"
+      aria-label="Show all pipelines"
+      label="Show all pipelines"
+      isReversed
+      isChecked={showAllPipelines}
+      isDisabled={filterActive}
+      onChange={onShowAllPipelinesToggle}
+    />
+  )
+
   return (
     <>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
@@ -159,26 +240,27 @@ function PipelineOverviewPage({
           isReloading={isReloading}
           reloadCallback={() => updateData(tenant)}
         />
-        <Toolbar>
-          <ToolbarContent>
-            <ToolbarItem>
-              <span>Show all pipelines</span>{' '}
-              <Switch
-                className="zuul-show-pipeline-switch"
-                id="all-pipeline-switch"
-                aria-label="Show all pipelines"
-                isChecked={showAllPipelines}
-                onChange={onShowAllPipelinesToggle}
-              />
-            </ToolbarItem>
-          </ToolbarContent>
-        </Toolbar>
+        <FilterToolbar
+          filterCategories={filterCategories}
+          onFilterChange={onFilterChanged}
+          filters={filters}
+          filterInputValidation={filterInputValidation}
+        >
+          <ToolbarItem>
+            {filterActive ?
+              <Tooltip content="Disabled when filtering">{allPipelinesSwitch}</Tooltip> :
+              allPipelinesSwitch}
+          </ToolbarItem>
+        </FilterToolbar>
       </PageSection>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <PipelineGallery
           pipelines={pipelines}
           tenant={tenant}
           showAllPipelines={showAllPipelines}
+          isLoading={isFetching}
+          filters={filters}
+          onClearFilters={onClearFilters}
         />
       </PageSection>
     </>
@@ -210,12 +292,19 @@ const countItems = (pipeline) => {
   return count
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
   let pipelines = []
   let stats = {}
   if (state.status.status) {
+    const filters = getFiltersFromUrl(ownProps.location, filterCategories)
+    // we need to work on a copy of the state..pipelines, because when mutating
+    // the original, we couldn't reset or change the filters without reloading
+    // from the backend first.
+    pipelines = global.structuredClone(state.status.status.pipelines)
+    pipelines = filterPipelines(pipelines, filters, filterCategories, true)
+
     // TODO (felix): Make filtering optional via a switch (default: on)
-    pipelines = state.status.status.pipelines.map(ppl => (
+    pipelines = pipelines.map(ppl => (
       { ...ppl, _count: countItems(ppl) }
     ))
     stats = {
