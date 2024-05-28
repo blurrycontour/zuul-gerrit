@@ -112,6 +112,15 @@ const createTree = (head) => {
 }
 
 const Branch = ({ item, pipeline, newBranch = false }) => {
+  // hack: prevent null reference exceptions when filtering for items in queues
+  // that have other items that don't match the filter. The cause is not clear
+  // to me at the moment: createTree never returns an undefined tree, but here,
+  // for the above case, item(=tree) can be (temporarily) undefined. Mabye some
+  // React component/state caching issue?
+  if (!item) {
+    return <></>
+  }
+
   // Recursively render QueueItems to visualize a ChangeQueue.
   const iconConfig = getQueueItemIconConfig(item)
   const Icon = iconConfig.icon
