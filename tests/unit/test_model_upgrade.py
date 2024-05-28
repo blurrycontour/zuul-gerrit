@@ -14,13 +14,21 @@
 
 import json
 
-from zuul.zk.components import ComponentRegistry
-
+from zuul.zk.components import (
+    COMPONENT_REGISTRY,
+    ComponentRegistry,
+    SchedulerComponent,
+)
 from tests.base import (
+    BaseTestCase,
     ZuulTestCase,
     simple_layout,
     iterate_timeout,
 )
+from zuul.zk import ZooKeeperClient
+from zuul.zk.branch_cache import BranchCache, BranchFlag
+from zuul.zk.zkobject import ZKContext
+from tests.unit.test_zk import DummyConnection
 
 
 def model_version(version):
@@ -148,3 +156,168 @@ class TestGithubModelUpgrade(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS'),
             dict(name='project-test2', result='SUCCESS'),
         ], ordered=False)
+
+
+class TestBranchCacheUpgrade(BaseTestCase):
+    def setUp(self):
+        super().setUp()
+
+        self.setupZK()
+
+        self.zk_client = ZooKeeperClient(
+            self.zk_chroot_fixture.zk_hosts,
+            tls_cert=self.zk_chroot_fixture.zookeeper_cert,
+            tls_key=self.zk_chroot_fixture.zookeeper_key,
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca)
+        self.addCleanup(self.zk_client.disconnect)
+        self.zk_client.connect()
+        self.model_test_component_info = SchedulerComponent(
+            self.zk_client, 'test_component')
+        self.model_test_component_info.register(26)
+        self.component_registry = ComponentRegistry(self.zk_client)
+        COMPONENT_REGISTRY.create(self.zk_client)
+
+    def test_branch_cache_upgrade(self):
+        conn = DummyConnection()
+        cache = BranchCache(self.zk_client, conn, self.component_registry)
+
+        # Test all of the different combinations of old branch cache data:
+
+        # project0: failed both queries
+        # project1: protected and queried both
+        # project2: protected and only queried unprotected
+        # project3: protected and only queried protected
+        # project4: unprotected and queried both
+        # project5: unprotected and only queried unprotected
+        # project6: unprotected and only queried protected
+        # project7: both and queried both
+        # project8: both and only queried unprotected
+        # project9: both and only queried protected
+
+        data = {
+            'default_branch': {},
+            'merge_modes': {},
+            'protected': {
+                'project0': None,
+                'project1': ['protected_branch'],
+                # 'project2':
+                'project3': ['protected_branch'],
+                'project4': [],
+                # 'project5':
+                'project6': [],
+                'project7': ['protected_branch'],
+                # 'project8':
+                'project9': ['protected_branch'],
+            },
+            'remainder': {
+                'project0': None,
+                'project1': [],
+                'project2': ['protected_branch'],
+                # 'project3':
+                'project4': ['unprotected_branch'],
+                'project5': ['unprotected_branch'],
+                # 'project6':
+                'project7': ['unprotected_branch'],
+                'project8': ['protected_branch', 'unprotected_branch'],
+                # 'project9':
+            }
+        }
+        ctx = ZKContext(self.zk_client, None, None, self.log)
+        data = json.dumps(data, sort_keys=True).encode("utf8")
+        cache.cache._save(ctx, data)
+        cache.cache.refresh(ctx)
+
+        expected = {
+            'project0': {
+                'completed': BranchFlag.CLEAR,
+                'failed': BranchFlag.PROTECTED | BranchFlag.PRESENT,
+                'branches': {}
+            },
+            'project1': {
+                'completed': BranchFlag.PROTECTED | BranchFlag.PRESENT,
+                'failed': BranchFlag.CLEAR,
+                'branches': {
+                    'protected_branch': {'protected': True},
+                }
+            },
+            'project2': {
+                'completed': BranchFlag.PRESENT,
+                'failed': BranchFlag.CLEAR,
+                'branches': {
+                    'protected_branch': {'present': True},
+                }
+            },
+            'project3': {
+                'completed': BranchFlag.PROTECTED,
+                'failed': BranchFlag.CLEAR,
+                'branches': {
+                    'protected_branch': {'protected': True},
+                }
+            },
+            'project4': {
+                'completed': BranchFlag.PROTECTED | BranchFlag.PRESENT,
+                'failed': BranchFlag.CLEAR,
+                'branches': {
+                    'unprotected_branch': {'present': True},
+                }
+            },
+            'project5': {
+                'completed': BranchFlag.PRESENT,
+                'failed': BranchFlag.CLEAR,
+                'branches': {
+                    'unprotected_branch': {'present': True},
+                }
+            },
+            'project6': {
+                'completed': BranchFlag.PROTECTED,
+                'failed': BranchFlag.CLEAR,
+                'branches': {}
+            },
+            'project7': {
+                'completed': BranchFlag.PROTECTED | BranchFlag.PRESENT,
+                'failed': BranchFlag.CLEAR,
+                'branches': {
+                    'protected_branch': {'protected': True},
+                    'unprotected_branch': {'present': True},
+                }
+            },
+            'project8': {
+                'completed': BranchFlag.PRESENT,
+                'failed': BranchFlag.CLEAR,
+                'branches': {
+                    'protected_branch': {'present': True},
+                    'unprotected_branch': {'present': True},
+                }
+            },
+            'project9': {
+                'completed': BranchFlag.PROTECTED,
+                'failed': BranchFlag.CLEAR,
+                'branches': {
+                    'protected_branch': {'protected': True},
+                }
+            },
+        }
+
+        for project_name, project in expected.items():
+            cache_project = cache.cache.projects[project_name]
+            self.assertEqual(
+                project['completed'],
+                cache_project.completed_flags,
+            )
+            self.assertEqual(
+                project['failed'],
+                cache_project.failed_flags,
+            )
+            for branch_name, branch in project['branches'].items():
+                cache_branch = cache_project.branches[branch_name]
+                self.assertEqual(
+                    branch.get('protected'),
+                    cache_branch.protected,
+                )
+                self.assertEqual(
+                    branch.get('present'),
+                    cache_branch.present,
+                )
+            for branch_name in cache_project.branches.keys():
+                if branch_name not in project['branches']:
+                    raise Exception(f"Unexpected branch {branch_name}")

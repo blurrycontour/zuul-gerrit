@@ -264,7 +264,7 @@ class BranchCacheZKObject(ShardedZKObject):
             projects[project_name] = project_info
             if branches is None:
                 project_info.failed_flags |= BranchFlag.PROTECTED
-            elif branches:
+            else:
                 project_info.completed_flags |= BranchFlag.PROTECTED
                 for branch_name in branches:
                     project_info.branches[branch_name] = BranchInfo(
@@ -278,14 +278,14 @@ class BranchCacheZKObject(ShardedZKObject):
                                             model.ALL_MERGE_MODES),
                     data['default_branch'].get(project_name, 'master'))
                 projects[project_name] = project_info
-                if branches is None:
-                    project_info.failed_flags |= BranchFlag.PRESENT
-                elif branches:
-                    project_info.completed_flags |= BranchFlag.PRESENT
-                    for branch_name in branches:
-                        # Create a branchinfo object
-                        project_info.branches[branch_name] = BranchInfo(
-                            branch_name, present=True)
+            if branches is None:
+                project_info.failed_flags |= BranchFlag.PRESENT
+            else:
+                project_info.completed_flags |= BranchFlag.PRESENT
+                for branch_name in branches:
+                    # Create a branchinfo object
+                    project_info.branches[branch_name] = BranchInfo(
+                        branch_name, present=True)
         data.clear()
         data['projects'] = projects
 
