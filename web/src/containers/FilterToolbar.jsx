@@ -280,6 +280,7 @@ function FilterToolbar(props) {
               {renderFilterDropdown()}
             </ToolbarGroup>
           </ToolbarToggleGroup>
+          {props.children}
         </ToolbarContent>
       </Toolbar>
     </>
@@ -291,6 +292,7 @@ FilterToolbar.propTypes = {
   filters: PropTypes.object.isRequired,
   filterCategories: PropTypes.array.isRequired,
   filterInputValidation: PropTypes.func.isRequired,
+  children: PropTypes.node,
 }
 
 function getChipsFromFilters(filters, category) {
@@ -371,4 +373,8 @@ function makeQueryString(filters) {
   return queryString
 }
 
-export { makeQueryString, FilterToolbar, getFiltersFromUrl, writeFiltersToUrl }
+function isFilterActive(filters) {
+  return Object.values(filters).some(f => f.length > 0)
+}
+
+export { makeQueryString, FilterToolbar, getFiltersFromUrl, writeFiltersToUrl, isFilterActive }
