@@ -269,108 +269,22 @@ class GerritEventConnector(threading.Thread):
         log.debug("Handling event received %ss ago, delaying %ss",
                   now - timestamp, delay)
         time.sleep(delay)
-        event = GerritTriggerEvent()
-        event.timestamp = timestamp
-        event.connection_name = self.connection.connection_name
-        event.zuul_event_id = zuul_event_id
 
-        event.type = data.get('type')
-        event.uuid = data.get('uuid')
-
-        # This catches when a change is merged, as it could potentially
-        # have merged layout info which will need to be read in.
-        # Ideally this would be done with a refupdate event so as to catch
-        # directly pushed things as well as full changes being merged.
-        # But we do not yet get files changed data for pure refupdate events.
-        # TODO(jlk): handle refupdated events instead of just changes
-        if event.type == 'change-merged':
-            event.branch_updated = True
-        event.trigger_name = 'gerrit'
-        change = data.get('change')
-        event.project_hostname = self.connection.canonical_hostname
-        if change:
-            event.project_name = change.get('project')
-            event.branch = change.get('branch')
-            event.change_number = str(change.get('number'))
-            event.change_url = change.get('url')
-            patchset = data.get('patchSet')
-            if patchset:
-                event.patch_number = str(patchset.get('number'))
-                event.ref = patchset.get('ref')
-            event.approvals = data.get('approvals', [])
-            event.comment = data.get('comment')
-            patchsetcomments = data.get('patchSetComments', {}).get(
-                "/PATCHSET_LEVEL")
-            if patchsetcomments:
-                event.patchsetcomments = []
-                for patchsetcomment in patchsetcomments:
-                    event.patchsetcomments.append(
-                        patchsetcomment.get('message'))
-            event.added = data.get('added')
-            event.removed = data.get('removed')
-        refupdate = data.get('refUpdate')
-        if refupdate:
-            event.project_name = refupdate.get('project')
-            event.ref = refupdate.get('refName')
-            event.oldrev = refupdate.get('oldRev')
-            event.newrev = refupdate.get('newRev')
-        if event.project_name is None:
-            # ref-replica* events
-            event.project_name = data.get('project')
-        if event.type == 'project-created':
-            event.project_name = data.get('projectName')
-        if event.type == 'project-head-updated':
-            event.project_name = data.get('projectName')
-            event.ref = data.get('newHead')
-            event.branch = event.ref[len('refs/heads/'):]
-            event.default_branch_changed = True
+        # In order to perform connection hygene actions like those
+        # below, the preFilter method must pass relevant events
+        # through to get to this point.
+        event = GerritTriggerEvent.fromGerritEventDict(
+            data, timestamp, self.connection, zuul_event_id)
+        if event.default_branch_changed:
             self.log.debug('Updating default branch for %s to %s',
                            event.project_name, event.branch)
             self.connection._branch_cache.setProjectDefaultBranch(
                 event.project_name, event.branch)
-        # Map the event types to a field name holding a Gerrit
-        # account attribute. See Gerrit stream-event documentation
-        # in cmd-stream-events.html
-        accountfield_from_type = {
-            'patchset-created': 'uploader',
-            'draft-published': 'uploader',  # Gerrit 2.5/2.6
-            'change-abandoned': 'abandoner',
-            'change-restored': 'restorer',
-            'change-merged': 'submitter',
-            'merge-failed': 'submitter',  # Gerrit 2.5/2.6
-            'comment-added': 'author',
-            'ref-updated': 'submitter',
-            'reviewer-added': 'reviewer',  # Gerrit 2.5/2.6
-            'topic-changed': 'changer',
-            'hashtags-changed': 'editor',
-            'vote-deleted': 'deleter',
-            'project-created': None,  # Gerrit 2.14
-            'pending-check': None,  # Gerrit 3.0+
-            'project-head-updated': None,
-        }
-        event.account = None
-        if event.type in accountfield_from_type:
-            field = accountfield_from_type[event.type]
-            if field:
-                event.account = data.get(accountfield_from_type[event.type])
-        else:
+        if event._accountfield_unknown:
             log.warning("Received unrecognized event type '%s' "
                         "from Gerrit. Can not get account information." %
                         (event.type,))
-
-        # This checks whether the event created or deleted a branch so
-        # that Zuul may know to perform a reconfiguration on the
-        # project.
-        branch_refs = 'refs/heads/'
-        if (event.type == 'ref-updated' and
-            ((not event.ref.startswith('refs/')) or
-             event.ref.startswith(branch_refs))):
-
-            if event.ref.startswith(branch_refs):
-                event.branch = event.ref[len(branch_refs):]
-            else:
-                event.branch = event.ref
-
+        if event._branch_ref_update:
             self.connection.clearConnectionCacheOnBranchEvent(event)
 
         change = self._getChange(event, connection_event.zuul_event_ltime)
@@ -494,6 +408,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.client = None
         self.watched_checkers = []
         self.project_checker_map = {}
+        self.watched_event_filters = []
         self.version = (0, 0, 0)
         self.ssh_timeout = SSH_TIMEOUT
 
@@ -572,6 +487,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         # add uuids from checkers_to_watch
         for x in uuids_to_watch:
             self.watched_checkers.add(x)
+
+    def setWatchedEventFilters(self, filters):
+        self.log.debug("Setting watched event filters to %s", filters)
+        self.watched_event_filters = filters
 
     def toDict(self):
         d = super().toDict()
@@ -1181,6 +1100,19 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             if (refname.startswith('refs/changes/') and
                 refname.endswith('/meta')):
                 return
+
+        # Partially realize a GerritTriggerEvent with enough
+        # information to determine branches/refs/etc.
+        event = GerritTriggerEvent.fromGerritEventDict(
+            data, None, self, None)
+
+        for event_filter in self.watched_event_filters:
+            r = event_filter.preFilter(event)
+            if r:
+                break
+        else:
+            self.log.debug("Event did not match pre-filters %s", event)
+            return
 
         event_uuid = uuid4().hex
         attributes = {

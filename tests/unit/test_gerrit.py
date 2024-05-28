@@ -999,6 +999,20 @@ class TestGerritConnection(ZuulTestCase):
                 }
             })
             self.assertEqual(0, len(event_queue._listEvents()))
+            # This is ignored because the ref doesn't match the pre-filter
+            self.fake_gerrit.addEvent({
+                "type": "ref-updated",
+                "submitter": {
+                    "name": "User Name",
+                },
+                "refUpdate": {
+                    "oldRev": '0',
+                    "newRev": '0',
+                    "refName": 'refs/something/else',
+                    "project": 'org/project',
+                }
+            })
+            self.assertEqual(0, len(event_queue._listEvents()))
             # This is not ignored
             A.setMerged()
             self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
