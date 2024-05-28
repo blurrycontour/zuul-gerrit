@@ -15,7 +15,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
+import { withRouter, useLocation, useHistory } from 'react-router-dom'
 
 import {
   Flex,
@@ -37,6 +37,42 @@ import { fetchStatusIfNeeded } from '../actions/status'
 import { EmptyPage } from '../containers/Errors'
 import { Fetching, ReloadButton } from '../containers/Fetching'
 import { useDocumentVisibility, useInterval } from '../Hooks'
+import {
+  FilterToolbar,
+  getFiltersFromUrl,
+} from '../containers/FilterToolbar'
+import {
+  filterPipelines,
+  handleFilterChange,
+  filterInputValidation,
+  clearFilters,
+
+} from '../containers/status/Filters'
+import {
+  isPipelineEmpty,
+} from '../containers/status/Misc'
+import { EmptyBox } from '../containers/Errors'
+
+const filterCategories = [
+  {
+    key: 'project',
+    title: 'Project',
+    placeholder: 'Filter by Project...',
+    type: 'fuzzy-search',
+  },
+  {
+    key: 'change',
+    title: 'Change',
+    placeholder: 'Filter by Change...',
+    type: 'fuzzy-search',
+  },
+  {
+    key: 'queue',
+    title: 'Queue',
+    placeholder: 'Filter by Queue...',
+    type: 'fuzzy-search',
+  }
+]
 
 function PipelineStats({ pipeline }) {
   return (
@@ -96,11 +132,15 @@ PipelineDetails.propTypes = {
 }
 
 function PipelineDetailsPage({
-  pipeline, isFetching, tenant, darkMode, autoReload, fetchStatusIfNeeded
+  pipeline, isFetching, tenant, darkMode, autoReload, fetchStatusIfNeeded, isEmpty
 }) {
   const [isReloading, setIsReloading] = useState(false)
 
   const isDocumentVisible = useDocumentVisibility()
+
+  const location = useLocation()
+  const history = useHistory()
+  const filters = getFiltersFromUrl(location, filterCategories)
 
   const updateData = useCallback((tenant) => {
     if (tenant.name) {
@@ -145,9 +185,16 @@ function PipelineDetailsPage({
   return (
     <>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+        <FilterToolbar
+          filterCategories={filterCategories}
+          onFilterChange={(newFilters) => {handleFilterChange(newFilters, location, history)}}
+          filters={filters}
+          filterInputValidation={filterInputValidation}
+        />
         <PipelineDetails pipeline={pipeline} isReloading={isReloading} reloadCallback={() => updateData(tenant)} />
       </PageSection>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+        {!isEmpty &&
         <Title headingLevel="h3">
           <StreamIcon
             style={{
@@ -157,6 +204,7 @@ function PipelineDetailsPage({
           />{' '}
           Queues
         </Title>
+        }
         <Gallery
           hasGutter
           minWidths={{
@@ -173,6 +221,15 @@ function PipelineDetailsPage({
             ))
           }
         </Gallery>
+        {isEmpty &&
+          <EmptyBox title="No items found"
+                    icon={StreamIcon}
+                    action="Clear all filters"
+                    onAction={() => clearFilters(location, history, filterCategories)}>
+            No items match this filter criteria. Remove some filters or
+            clear all to show results.
+          </EmptyBox>
+        }
       </PageSection>
     </>
   )
@@ -186,18 +243,23 @@ PipelineDetailsPage.propTypes = {
   darkMode: PropTypes.bool,
   autoReload: PropTypes.bool.isRequired,
   fetchStatusIfNeeded: PropTypes.func.isRequired,
+  isEmpty: PropTypes.bool,
 }
 
 function mapStateToProps(state, ownProps) {
   let pipeline = null
   if (state.status.status) {
+    const filters = getFiltersFromUrl(ownProps.location, filterCategories)
+    // we need to work on a copy of the state..pipelines, because when mutating
+    // the original, we couldn't reset or change the filters without reloading
+    // from the backend first.
+    const pipelines = global.structuredClone(state.status.status.pipelines)
     // Filter the state for this specific pipeline
-    state.status.status.pipelines.filter(
-      ppl => (ppl.name === ownProps.match.params.pipelineName)
-    ).map(
-      ppl => (pipeline = ppl)
-    )
+    pipeline = filterPipelines(pipelines, filters, filterCategories, false)
+      .find((p) => p.name === ownProps.match.params.pipelineName) || null
   }
+
+  const isEmpty = pipeline && isPipelineEmpty(pipeline)
 
   return {
     pipeline,
@@ -205,6 +267,7 @@ function mapStateToProps(state, ownProps) {
     tenant: state.tenant,
     darkMode: state.preferences.darkMode,
     autoReload: state.preferences.autoReload,
+    isEmpty,
   }
 }
 
