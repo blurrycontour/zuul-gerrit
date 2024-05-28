@@ -482,12 +482,21 @@ function getRefs(item) {
   return 'refs' in item ? item.refs : [item]
 }
 
+function isPipelineEmpty(pipeline) {
+  return (
+    pipeline.change_queues
+      .map(q => q.heads.flat().length)
+      .reduce((a, len) => a + len, 0) === 0
+  )
+}
+
 export {
   calculateQueueItemTimes,
   ChangeLink,
   getJobStrResult,
   getQueueItemIconConfig,
   getRefs,
+  isPipelineEmpty,
   JobLink,
   JobResultOrStatus,
   QueueItemProgressbar,

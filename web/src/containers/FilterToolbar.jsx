@@ -69,7 +69,10 @@ function FilterToolbar(props) {
       return
     }
 
-    const validationResult = filterInputValidation(category.key, inputValue)
+    // trim whitespace from the search term
+    const _inputValue = inputValue.trim()
+
+    const validationResult = filterInputValidation(category.key, _inputValue)
     if (!validationResult.success) {
       dispatch(addNotification(
         {
@@ -84,9 +87,9 @@ function FilterToolbar(props) {
     const prevFilters = filters[category.key]
     const newFilters = {
       ...filters,
-      [category.key]: prevFilters.includes(inputValue)
+      [category.key]: prevFilters.includes(_inputValue)
         ? prevFilters
-        : [...prevFilters, inputValue],
+        : [...prevFilters, _inputValue],
     }
 
     // Clear the input field
@@ -280,6 +283,7 @@ function FilterToolbar(props) {
               {renderFilterDropdown()}
             </ToolbarGroup>
           </ToolbarToggleGroup>
+          {props.children}
         </ToolbarContent>
       </Toolbar>
     </>
@@ -291,6 +295,7 @@ FilterToolbar.propTypes = {
   filters: PropTypes.object.isRequired,
   filterCategories: PropTypes.array.isRequired,
   filterInputValidation: PropTypes.func.isRequired,
+  children: PropTypes.node,
 }
 
 function getChipsFromFilters(filters, category) {
@@ -371,4 +376,28 @@ function makeQueryString(filters) {
   return queryString
 }
 
-export { makeQueryString, FilterToolbar, getFiltersFromUrl, writeFiltersToUrl }
+function isFilterActive(filters) {
+  return Object.values(filters).some(f => f.length > 0)
+}
+
+function applyFilter(haystack, searchTerms, fuzzy) {
+  if (fuzzy) {
+    searchTerms = searchTerms.map(s => s.replace(/\*/g, '(.*)'))
+  }
+  const searchPatterns = searchTerms.map(s => new RegExp(`^${s}$`))
+  for (const text of haystack) {
+    if (searchPatterns.some(p => p.test(text))) {
+      return true
+    }
+  }
+  return false
+}
+
+export {
+  applyFilter,
+  FilterToolbar,
+  getFiltersFromUrl,
+  isFilterActive,
+  makeQueryString,
+  writeFiltersToUrl,
+}
