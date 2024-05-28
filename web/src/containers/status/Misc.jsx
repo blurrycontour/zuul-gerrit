@@ -41,6 +41,7 @@ import {
 } from '@patternfly/react-icons'
 
 import { ExternalLink, formatTime } from '../../Misc'
+import { writeFiltersToUrl } from '../FilterToolbar'
 
 const QUEUE_ITEM_ICON_CONFIGS = {
   SUCCESS: {
@@ -476,14 +477,114 @@ function getRefs(item) {
   return 'refs' in item ? item.refs : [item]
 }
 
+function applyFilter(haystack, searchTerms, fuzzy) {
+  if (fuzzy) {
+    searchTerms = searchTerms.map(s => s.replace(/\*/g, '(.*)'))
+  }
+  const searchPatterns = searchTerms.map(s => new RegExp(`^${s}$`))
+  for (const text of haystack) {
+    if (searchPatterns.some(p => p.test(text))) {
+      return true
+    }
+  }
+  return false
+}
+
+function handleFilterChange(newFilters, location, history) {
+  writeFiltersToUrl(newFilters, location, history)
+}
+
+function onClearFilters(location, history, filterCategories) {
+  // Delete the values for each filter category
+  const filters = filterCategories.reduce((filterDict, category) => {
+    filterDict[category.key] = []
+    return filterDict
+  }, {})
+  handleFilterChange(filters, location, history)
+}
+
+function filterInputValidation(_, filterValue) {
+  // Input value should not be empty for all cases
+  if (!filterValue) {
+    return {
+      success: false,
+      message: 'Input should not be empty'
+    }
+  }
+
+  return {
+    success: true
+  }
+}
+
+function filterPipelines(pipelines, filters, filterCategories) {
+  // get rid of limit/skip pagination filters that come from the FilterToolbar
+  // by going over the valid FILTER_CATEGORIES
+  for (const category of filterCategories) {
+    const key = category['key']
+    const fuzzy = category['type'] === 'fuzzy-search'
+    const filter = filters[key]
+    if (filter.length === 0) {
+      continue
+    }
+
+    switch (key) {
+      case 'pipeline':
+        pipelines = pipelines.filter(p => applyFilter([p.name], filter, fuzzy))
+        break
+      case 'queue':
+        for (const p of pipelines) {
+          p.change_queues = p.change_queues.filter(
+            q => applyFilter([q.name], filter, fuzzy)
+          )
+        }
+        break
+      case 'project':
+        for (const p of pipelines) {
+          for (const q of p.change_queues) {
+            q.heads = q.heads.filter(h => {
+              const projects = h.map(item => item.refs).flat().map(ref => ref.project)
+              return applyFilter(projects, filter, fuzzy)
+            })
+          }
+        }
+        break
+      case 'change': {
+        // here we filter only for change number
+        // so we are only interested in the first part of the id
+        // being of format {change_num},{patchset/commit}
+        const _filter = filter.map(f => `${f},*`)
+        for (const p of pipelines) {
+          for (const q of p.change_queues) {
+            q.heads = q.heads.filter(h => {
+              const ids = h.map(item => item.refs).flat().map(ref => ref.id)
+              return applyFilter(ids, _filter, true)
+            })
+          }
+        }
+        break
+      }
+      default:
+        // this should not happen
+        break
+    }
+  }
+  return pipelines
+}
+
 export {
   calculateQueueItemTimes,
   ChangeLink,
+  filterInputValidation,
+  filterPipelines,
   getJobStrResult,
   getQueueItemIconConfig,
   getRefs,
+  handleFilterChange,
   JobLink,
   JobResultOrStatus,
+  onClearFilters,
   QueueItemProgressbar,
   PipelineIcon,
+  writeFiltersToUrl,
 }
