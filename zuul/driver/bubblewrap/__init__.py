@@ -33,6 +33,11 @@ from typing import Dict, List  # noqa
 from zuul.driver import (Driver, WrapperInterface)
 from zuul.execution_context import BaseExecutionContext
 
+# Increase the OOM badness score by about 20% of the available RAM.
+# This should be sufficient to make child processes the target of the
+# oom killer.
+OOM_SCORE_ADJ = 200
+
 
 class WrappedPopen(object):
     def __init__(self, command, fds):
@@ -272,6 +277,9 @@ class BubblewrapDriver(Driver, WrapperInterface):
             'setpriv',
             '--ambient-caps',
             '-all',
+            'choom',
+            '-n', str(OOM_SCORE_ADJ),
+            '--',
             'bwrap',
             '--dir', '/tmp',
             '--tmpfs', '/tmp',
