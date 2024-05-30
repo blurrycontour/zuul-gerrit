@@ -82,6 +82,9 @@ class Executor(zuul.cmd.ZuulDaemonApp):
     def run(self):
         self.handleCommands()
 
+        self.setup_logging('executor', 'log_config')
+        self.log = logging.getLogger("zuul.Executor")
+
         self.configure_connections(source_only=True, check_bwrap=True)
 
         if self.config.has_option('executor', 'job_dir'):
@@ -95,9 +98,6 @@ class Executor(zuul.cmd.ZuulDaemonApp):
             self.job_dir = '/var/lib/zuul/builds'
             if not os.path.exists(self.job_dir):
                 os.mkdir(self.job_dir)
-
-        self.setup_logging('executor', 'log_config')
-        self.log = logging.getLogger("zuul.Executor")
 
         self.finger_port = int(
             get_default(self.config, 'executor', 'finger_port',
