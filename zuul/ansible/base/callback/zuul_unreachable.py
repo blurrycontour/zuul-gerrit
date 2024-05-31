@@ -48,8 +48,9 @@ class CallbackModule(default.CallbackModule):
         self.unreachable_hosts = set()
 
     def v2_runner_on_unreachable(self, result):
-        host = result._host.get_name()
-        if host not in self.unreachable_hosts:
-            self.unreachable_hosts.add(host)
-            with open(self.output_path, 'a') as f:
-                f.write('%s\n' % host)
+        if not result._task_fields["ignore_unreachable"]:
+            host = result._host.get_name()
+            if host not in self.unreachable_hosts:
+                self.unreachable_hosts.add(host)
+                with open(self.output_path, 'a') as f:
+                    f.write('%s\n' % host)
