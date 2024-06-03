@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "079792c10b805fcf54f4eef28901d64c66d05be5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5459be54_763a7b93",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-03T06:41:39Z",
+      "side": 1,
+      "message": "This just works when the executor process has a `oom_score_adj` of 0. However, with k8s this value is adjusted based on the QoS of the pod: https://kubernetes.io/docs/concepts/scheduling-eviction/node-pressure-eviction/#node-out-of-memory-behavior\n\nSo setting this to a fix value of 200 can actually increase the likelihood of OOM kills for the executors.",
+      "revId": "079792c10b805fcf54f4eef28901d64c66d05be5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
