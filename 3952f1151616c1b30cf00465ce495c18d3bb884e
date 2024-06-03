@@ -16,6 +16,24 @@
       "message": "Won\u0027t this just always set it to 1000 if the normal case is 0 in starting_score_adj and we\u0027re adding 200? Do you mean min to ensure we don\u0027t exceed 1000?",
       "revId": "3952f1151616c1b30cf00465ce495c18d3bb884e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4a176a4_084bd12c",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-03T16:13:24Z",
+      "side": 1,
+      "message": "Oops",
+      "parentUuid": "175057b5_cb28540e",
+      "revId": "3952f1151616c1b30cf00465ce495c18d3bb884e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
