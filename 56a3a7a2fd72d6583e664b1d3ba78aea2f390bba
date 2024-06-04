@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b599f5d_e0bc78de",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-06-04T16:52:27Z",
+      "side": 1,
+      "message": "I see, thanks, that makes sense. My concern then is that I think we need to consider a maintainer role for the pipeline scope (e.g. the status of the gate/periodic) vs a contributor role for the individual change.",
+      "parentUuid": "61c1ee0b_bf3640f9",
+      "revId": "56a3a7a2fd72d6583e664b1d3ba78aea2f390bba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "13107100_6225caa8",
