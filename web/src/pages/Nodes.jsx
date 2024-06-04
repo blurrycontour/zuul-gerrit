@@ -123,11 +123,13 @@ class NodesPage extends React.Component {
     ]
     let rows = []
     nodes.forEach((node) => {
+        const extid = typeof(node.external_id) === 'string'?
+              node.external_id : JSON.stringify(node.external_id)
         let r = [
             {title: node.id, props: {column: 'ID'}},
             {title: node.type.join(','), props: {column: 'Label' }},
             {title: node.connection_type, props: {column: 'Connection'}},
-            {title: <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant="inline-compact">{node.external_id}</ClipboardCopy>, props: {column: 'Server'}},
+            {title: <ClipboardCopy hoverTip="Copy" clickTip="Copied" variant="inline-compact">{extid}</ClipboardCopy>, props: {column: 'Server'}},
             {title: node.provider, props: {column: 'Provider'}},
             {title: node.state, props: {column: 'State'}},
             {title: moment.unix(node.state_time).fromNow(), props: {column: 'Age'}},
