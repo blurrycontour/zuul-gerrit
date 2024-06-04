@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fa11befe_1650c120",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-04T23:39:14Z",
+      "side": 1,
+      "message": "You could still gain control by sorting the files by prefixing numbers (but of course you\u0027d need to split/organize the objects into files to accommodate that).\n\nNot saying it\u0027s great, but it\u0027s an option.",
+      "parentUuid": "1ebece1c_f0bd19f0",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4b5741e9_1c9b3f3a",
         "filename": "doc/source/developer/specs/status-page-2.0.rst",
         "patchSetId": 1
@@ -214,6 +232,30 @@
       "side": 1,
       "message": "I imagine it would be great to have something like this, but that might indeed be tricky and not possible without any API changes that allow us to identify the change (or the item(s) related to the change) in different pipelines - especially the timer/ref-based ones.\n\nThis might also be more of a \"single change panel\" use case, but I will add it to the list. I think this might work well with what I have in mind for the single change panel after the status view is done - not saying it would be easy to implement.\n\nI\u0027m a little confused by your last sentence:\n\u003e I\u0027m not saying we need to support exactly the same workflow here, but we should have an answer for how that will change.\n\nDo you see this as \"fulfilled\" by the current implementation of the status page? In my opinion this would be a new use case. I mean: On the current status page this works if you know what to look for (the change) and where (in which pipelines). But this only works if the amount of items on the status page is manageable and not too crowded.",
       "parentUuid": "e2b30d1c_17d93b59",
+      "range": {
+        "startLine": 68,
+        "startChar": 35,
+        "endLine": 68,
+        "endChar": 42
+      },
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "125359fd_cb29d0b0",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-04T23:39:14Z",
+      "side": 1,
+      "message": "I don\u0027t know the answer to your first question yet, since I haven\u0027t looked at the new page with this in mind.\n\nI do agree that for this to work, you do need to know where to look for the change (but opendev admins know this -- they are explicitly monitoring a change to the system, so they know to expect a specific change and look for it).  The requirement that it not be too crowded, however, is not necessarily the case.  Due to an accident of history, the opendev continuous deployment jobs are actually in the openstack tenant, which is opendev\u0027s most populous tenant (and it frequently has large check and gate pipelines).  It\u0027s easy to search/filter check and gate for the change, and the deployment pipelines are always lightly populated (there is a natural limit to the number of simultaneous things that can be deployed -- often it\u0027s 1), so it\u0027s easy to watch those.\n\nNow that I think about this a bit more, I realize that I often filter the status page by project in this case.  So if you want to imagine this workflow, that\u0027s probably the easiest thing: filter for \"opendev/system-config\" on the openstack status page, and watch an item move from check, then gate then to a deploy pipeline.  Another wrinkle: some deployments happen in a periodic pipeline, so we\u0027re watching to see whether one of those started before or after a change merged.\n\nA single change panel would be great for this, and it would work for change-merged triggered pipelines, but not ref-updated ones (or periodic).",
+      "parentUuid": "c6726a1f_69cd4255",
       "range": {
         "startLine": 68,
         "startChar": 35,
