@@ -44,3 +44,20 @@ opentelemetry-exporter-otlp-proto-http
 confluent-kafka
 boto3
 google-cloud-pubsub
+# For openstack driver
+openstacksdk>=0.103.0,!=2.0.0
+rackspaceauth
+# For openshift driver
+openshift
+# For AWS driver
+boto3>=1.20.0
+# For gcloud driver
+google-api-python-client
+# For Azure driver
+azure-mgmt-compute
+azure-mgmt-network
+azure-mgmt-resource
+# For ibmvpc driver
+ibm-vpc
+ibm-platform-services
+ibm-cos-sdk>=2.11.0
