@@ -34,7 +34,6 @@ import cachecontrol
 from cachecontrol.cache import DictCache
 from cachecontrol.heuristics import BaseHeuristic
 import cachetools
-import iso8601
 import jwt
 import requests
 import github3
@@ -1194,7 +1193,7 @@ class GithubClientManager:
 
             data = response.json()
 
-            expiry = iso8601.parse_date(data['expires_at'])
+            expiry = datetime.datetime.fromisoformat(data['expires_at'])
             token = data['token']
 
             self.installation_token_cache[installation_id] = (token, expiry)
