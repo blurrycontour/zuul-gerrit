@@ -6,6 +6,15 @@ module.exports = function override(config, env) {
 };
 
 // use `customize-cra`
+function supportMJS(config) {
+   config.module.rules.push({
+     test: /\.mjs$/,
+     include: /node_modules/,
+     type: "javascript/auto"
+   });
+   return config;
+}
+
 const { override } = require("customize-cra");
 
-module.exports = override(rewiredEsbuild());
+module.exports = override(supportMJS, rewiredEsbuild());

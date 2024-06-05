@@ -10,7 +10,7 @@
     "@patternfly/react-charts": "^6.51.5",
     "@patternfly/react-core": "^4.198.5",
     "@patternfly/react-table": "^4.67.5",
-    "@softwarefactory-project/re-ansi": "^0.5.0",
+    "@softwarefactory-project/re-ansi": "file:/srv/softwarefactory-project.io/software-factory/re-ansi-pub",
     "axios": "^0.26.0",
     "broadcast-channel": "^4.5.0",
     "d3-graphviz": "2.6.1",
