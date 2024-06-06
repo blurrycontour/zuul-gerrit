@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f59c9fb_262812bb",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4428,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-06T12:37:45Z",
+      "side": 1,
+      "message": "This method seems to be only used to determine which projects need to be requested with the global repo state. It looks like we have all the information also in the state keys, so I think there is no need to load the blobs here if we\u0027d refactor this method to just return the info that the pipeline manager needs.",
+      "revId": "d077e4b71c96b26585d24e96380a5ce901d68d54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
