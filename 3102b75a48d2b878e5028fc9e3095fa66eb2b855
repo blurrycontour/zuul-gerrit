@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c595f23e_5c2552c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-06T22:15:42Z",
+      "side": 1,
+      "message": "Couple of minor things inline. I\u0027m happy for this to merge as is though.",
+      "revId": "3102b75a48d2b878e5028fc9e3095fa66eb2b855",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2884384_98575b93",
+        "filename": "zuul/executor/common.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-06T22:15:42Z",
+      "side": 1,
+      "message": "For the transition period we need to write data to both locations I guess? We should be careful we don\u0027t let this transition cleanup sit outstanding for a long time otherwise we\u0027ll be using strictly more data when the goal is to reduce.",
+      "revId": "3102b75a48d2b878e5028fc9e3095fa66eb2b855",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5688384_976072d7",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4261,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-06T22:15:42Z",
+      "side": 1,
+      "message": "Nit, it seems that the looking in the list of values for the state_keys dict is the primary operation we perform on this data structure. It might be slightly more efficient to store the data with the blob key as the dict key then membership lookups can be done with the hash lookup rather than a list scan.\n\nReturning values() vs keys() should be roughly equivalent so the improvement is minor.",
+      "revId": "3102b75a48d2b878e5028fc9e3095fa66eb2b855",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
