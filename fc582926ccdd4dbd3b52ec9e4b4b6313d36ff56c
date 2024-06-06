@@ -33,6 +33,23 @@
       "message": "am now able to see log that makes sense (we don\u0027t have the checks plugin enabled)\n\nzuul.GerritConnection - ERROR - [e: 12345678999999999999999987654321] Bad request submitting review data to gerrit.",
       "revId": "fc582926ccdd4dbd3b52ec9e4b4b6313d36ff56c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c36ba4f9_2569bcc0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33934
+      },
+      "writtenOn": "2024-06-06T16:43:49Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "fc582926ccdd4dbd3b52ec9e4b4b6313d36ff56c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
