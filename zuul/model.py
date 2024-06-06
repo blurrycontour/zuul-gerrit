@@ -4425,39 +4425,6 @@ class BuildSet(zkobject.ZKObject):
         self._files = repo_files
         self._files_path = repo_files.getPath()
 
-    def getRepoState(self, context):
-        d = self._getRepoStateFromBlobstore(context)
-        if d:
-            return d
-        # MODEL_API < 28
-        if self._merge_repo_state_path and self._merge_repo_state is None:
-            try:
-                self._set(_merge_repo_state=MergeRepoState.fromZK(
-                    context, self._merge_repo_state_path))
-            except Exception:
-                self.log.exception("Failed to restore merge repo state")
-        if self._extra_repo_state_path and self._extra_repo_state is None:
-            try:
-                self._set(_extra_repo_state=ExtraRepoState.fromZK(
-                    context, self._extra_repo_state_path))
-            except Exception:
-                self.log.exception("Failed to restore extra repo state")
-        d = {}
-        for rs in (self._merge_repo_state, self._extra_repo_state):
-            if not rs:
-                continue
-            for connection in rs.state.keys():
-                if connection not in d:
-                    d[connection] = {}
-                d[connection].update(rs.state.get(connection, {}))
-        return d
-
-    def _getRepoStateFromBlobstore(self, context):
-        blobstore = BlobStore(context)
-        for link in self.repo_state_keys:
-            self._repo_state.load(blobstore, link)
-        return self._repo_state.state
-
     def getFiles(self, context):
         if self._files is not None:
             return self._files
