@@ -16,6 +16,24 @@
       "message": "This method seems to be only used to determine which projects need to be requested with the global repo state. It looks like we have all the information also in the state keys, so I think there is no need to load the blobs here if we\u0027d refactor this method to just return the info that the pipeline manager needs.",
       "revId": "d077e4b71c96b26585d24e96380a5ce901d68d54",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40bb08ec_5c242dee",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4428,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-06T16:25:01Z",
+      "side": 1,
+      "message": "Here are two alternative ideas as followups that make this more efficient:\n* https://review.opendev.org/921459\n* https://review.opendev.org/921460",
+      "parentUuid": "1f59c9fb_262812bb",
+      "revId": "d077e4b71c96b26585d24e96380a5ce901d68d54",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
