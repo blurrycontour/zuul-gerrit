@@ -4258,6 +4258,8 @@ class RepoState:
     def load(self, blobstore, key):
         # Load a single project-repo-state from the blobstore and
         # combine it with existing projects in this repo state.
+        # We only need the sha (not the connection/project info).
+        key = key[2]
         if key in self.state_keys.values():
             return
         data = blobstore.get(key)
@@ -4284,7 +4286,11 @@ class RepoState:
                 self.state_keys[(connection_name, project_name)] = key
 
     def getKeys(self):
-        return self.state_keys.values()
+        # We return the connection, project, and blobstore sha so that
+        # the queue item can know which projects are in the repo state
+        # without needing to restore the actual blob.
+        for k, v in self.state_keys.items():
+            yield (k + (v,))
 
 
 class BaseRepoState(zkobject.ShardedZKObject):
@@ -4425,8 +4431,10 @@ class BuildSet(zkobject.ZKObject):
         self._files = repo_files
         self._files_path = repo_files.getPath()
 
-    def getRepoState(self, context):
-        d = self._getRepoStateFromBlobstore(context)
+    def getRepoStateProjects(self, context):
+        # TODO: merge and simplify this method after below backwards
+        # compat is removed.
+        d = self._getRepoStateProjectsFromKeys()
         if d:
             return d
         # MODEL_API < 28
@@ -4442,21 +4450,20 @@ class BuildSet(zkobject.ZKObject):
                     context, self._extra_repo_state_path))
             except Exception:
                 self.log.exception("Failed to restore extra repo state")
-        d = {}
+        d = []
         for rs in (self._merge_repo_state, self._extra_repo_state):
             if not rs:
                 continue
-            for connection in rs.state.keys():
-                if connection not in d:
-                    d[connection] = {}
-                d[connection].update(rs.state.get(connection, {}))
+            for connection, connection_data in rs.state.items():
+                for project in connection_data.keys():
+                    d.append((connection, project))
         return d
 
-    def _getRepoStateFromBlobstore(self, context):
-        blobstore = BlobStore(context)
-        for link in self.repo_state_keys:
-            self._repo_state.load(blobstore, link)
-        return self._repo_state.state
+    def _getRepoStateProjectsFromKeys(self):
+        d = []
+        for (connection, project, blobsha) in self.repo_state_keys:
+            d.append((connection, project))
+        return d
 
     def getFiles(self, context):
         if self._files is not None:

@@ -1504,13 +1504,14 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug('Needed projects: %s', project_cnames)
 
         # Filter projects for ones that are already in repo state
-        repo_state = item.current_build_set.getRepoState(self.current_context)
+        repo_state_projects = item.current_build_set.getRepoStateProjects(
+            self.current_context)
         connections = self.sched.connections.connections
-        for connection in repo_state.keys():
-            canonical_hostname = connections[connection].canonical_hostname
-            for project in repo_state[connection].keys():
-                canonical_project_name = canonical_hostname + '/' + project
-                project_cnames.discard(canonical_project_name)
+        for (connection_name, project_name) in repo_state_projects:
+            canonical_hostname = connections[
+                connection_name].canonical_hostname
+            canonical_project_name = canonical_hostname + '/' + project_name
+            project_cnames.discard(canonical_project_name)
 
         if not project_cnames:
             item.current_build_set.updateAttributes(
