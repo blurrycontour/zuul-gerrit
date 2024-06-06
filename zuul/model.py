@@ -1402,6 +1402,40 @@ class ApiRoot(ConfigObject):
         return f'<ApiRoot realm={self.default_auth_realm}>'
 
 
+class Image(ConfigObject):
+    """A zuul or cloud image.
+
+    Images are associated with labels and providers.
+    """
+
+    def __init__(self, name, image_type):
+        super().__init__()
+        self.name = name
+        self.type = image_type
+
+    def __repr__(self):
+        return '<Image %s>' % (self.name,)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, Image):
+            return False
+        return (self.name == other.name and
+                self.type == other.type)
+
+    def toDict(self):
+        return {
+            'name': self.name,
+            'type': self.type
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data["name"], data["type"])
+
+
 class Node(ConfigObject):
     """A single node for use by a job.
 
@@ -7654,6 +7688,7 @@ class UnparsedConfig(object):
         self.secrets = []
         self.semaphores = []
         self.queues = []
+        self.images = []
 
         # The list of files/dirs which this represents.
         self.files_examined = set()
@@ -7668,7 +7703,7 @@ class UnparsedConfig(object):
         source_contexts = {}
         for attr in ['pragmas', 'pipelines', 'jobs', 'project_templates',
                      'projects', 'nodesets', 'secrets', 'semaphores',
-                     'queues']:
+                     'queues', 'images']:
             # Make a deep copy of each of our attributes
             old_objlist = getattr(self, attr)
             new_objlist = copy.deepcopy(old_objlist)
@@ -7705,6 +7740,7 @@ class UnparsedConfig(object):
             self.secrets.extend(conf.secrets)
             self.semaphores.extend(conf.semaphores)
             self.queues.extend(conf.queues)
+            self.images.extend(conf.images)
             return
 
         if not isinstance(conf, list):
@@ -7736,6 +7772,8 @@ class UnparsedConfig(object):
                 self.queues.append(value)
             elif key == 'pragma':
                 self.pragmas.append(value)
+            elif key == 'image':
+                self.images.append(value)
             else:
                 raise ConfigItemUnknownError(item)
 
@@ -7754,6 +7792,7 @@ class ParsedConfig(object):
         self.secrets = []
         self.semaphores = []
         self.queues = []
+        self.images = []
 
     def copy(self):
         r = ParsedConfig()
@@ -7767,6 +7806,7 @@ class ParsedConfig(object):
         r.secrets = self.secrets[:]
         r.semaphores = self.semaphores[:]
         r.queues = self.queues[:]
+        r.images = self.images[:]
         return r
 
     def extend(self, conf):
@@ -7780,6 +7820,7 @@ class ParsedConfig(object):
             self.secrets.extend(conf.secrets)
             self.semaphores.extend(conf.semaphores)
             self.queues.extend(conf.queues)
+            self.images.extend(conf.images)
             for regex, projects in conf.projects_by_regex.items():
                 self.projects_by_regex.setdefault(regex, []).extend(projects)
             return
@@ -7822,6 +7863,7 @@ class Layout(object):
         self.secrets = {}
         self.semaphores = {}
         self.queues = {}
+        self.images = {}
         self.loading_errors = LoadingErrors()
 
     def getJob(self, name):
@@ -7930,6 +7972,9 @@ class Layout(object):
 
     def addQueue(self, queue):
         self._addIdenticalObject('Queue', self.queues, queue)
+
+    def addImage(self, image):
+        self._addIdenticalObject('Image', self.images, image)
 
     def addPipeline(self, pipeline):
         if pipeline.tenant is not self.tenant:
