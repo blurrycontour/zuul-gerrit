@@ -260,7 +260,7 @@ class LocalAccumulator:
 class ZuulSafeLoader(yaml.EncryptedLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'secret', 'pipeline',
                                  'project', 'project-template',
-                                 'semaphore', 'queue', 'pragma'))
+                                 'semaphore', 'queue', 'pragma', 'image'))
 
     def __init__(self, stream, source_context):
         wrapped_stream = io.StringIO(stream)
@@ -381,6 +381,30 @@ class PragmaParser(object):
                 source_context.implied_branches = [
                     change_matcher.BranchMatcher(make_regex(x, self.pcontext))
                     for x in as_list(branches)]
+
+
+class ImageParser(object):
+    image = {
+        '_source_context': model.SourceContext,
+        '_start_mark': model.ZuulMark,
+        vs.Required('name'): str,
+        vs.Required('type'): vs.Any('zuul', 'cloud'),
+    }
+    schema = vs.Schema(image)
+
+    def __init__(self, pcontext):
+        self.log = logging.getLogger("zuul.ImageParser")
+        self.pcontext = pcontext
+
+    def fromYaml(self, conf):
+        conf = copy_safe_config(conf)
+        self.schema(conf)
+
+        image = model.Image(conf['name'], conf['type'])
+        image.source_context = conf.get('_source_context')
+        image.start_mark = conf.get('_start_mark')
+        image.freeze()
+        return image
 
 
 class NodeSetParser(object):
@@ -1569,6 +1593,7 @@ class ParseContext(object):
         self.job_parser = JobParser(self)
         self.semaphore_parser = SemaphoreParser(self)
         self.queue_parser = QueueParser(self)
+        self.image_parser = ImageParser(self)
         self.project_template_parser = ProjectTemplateParser(self)
         self.project_parser = ProjectParser(self)
         acc = LocalAccumulator(self.loading_errors)
@@ -1654,7 +1679,8 @@ class TenantParser(object):
         self.unparsed_config_cache = unparsed_config_cache
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
-                     'project-template', 'nodeset', 'secret', 'queue')
+                     'project-template', 'nodeset', 'secret', 'queue',
+                     'image')
 
     project_dict = {str: {
         'include': to_list(classes),
@@ -2031,6 +2057,8 @@ class TenantParser(object):
         config_projects = []
         untrusted_projects = []
 
+        # TODO: Add nodepool objects here (image, etc) when ready to
+        # use zuul-launcher.
         default_include = frozenset(['pipeline', 'job', 'semaphore', 'project',
                                      'secret', 'project-template', 'nodeset',
                                      'queue'])
@@ -2405,6 +2433,15 @@ class TenantParser(object):
                     parsed_config.pipelines.append(
                         pcontext.pipeline_parser.fromYaml(config_pipeline))
 
+        for config_image in unparsed_config.images:
+            classes = self._getLoadClasses(tenant, config_image)
+            if 'image' not in classes:
+                continue
+            with pcontext.errorContext(stanza='image', conf=config_image):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.images.append(
+                        pcontext.image_parser.fromYaml(config_image))
+
         for config_nodeset in unparsed_config.nodesets:
             classes = self._getLoadClasses(tenant, config_nodeset)
             if 'nodeset' not in classes:
@@ -2521,12 +2558,14 @@ class TenantParser(object):
         for project_config in parsed_config.projects:
             _cache('projects', project_config)
 
+        for image in parsed_config.images:
+            _cache('images', image)
+
     def _addLayoutItems(self, layout, tenant, parsed_config,
-                        parse_context, skip_pipelines=False,
-                        skip_semaphores=False):
+                        parse_context, dynamic_layout=False):
         # TODO(jeblair): make sure everything needing
         # reference_exceptions has it; add tests if needed.
-        if not skip_pipelines:
+        if not dynamic_layout:
             for pipeline in parsed_config.pipelines:
                 with parse_context.errorContext(stanza='pipeline',
                                                 conf=pipeline):
@@ -2568,19 +2607,24 @@ class TenantParser(object):
                 with parse_context.accumulator.catchErrors():
                     pipeline.validateReferences(layout)
 
-        if skip_semaphores:
+        if dynamic_layout:
             # We should not actually update the layout with new
             # semaphores, but so that we can validate that the config
             # is correct, create a shadow layout here to which we add
             # new semaphores so validation is complete.
-            semaphore_layout = model.Layout(tenant)
+            shadow_layout = model.Layout(tenant)
         else:
-            semaphore_layout = layout
+            shadow_layout = layout
         for semaphore in parsed_config.semaphores:
             with parse_context.errorContext(stanza='semaphore',
                                             conf=semaphore):
                 with parse_context.accumulator.catchErrors():
-                    semaphore_layout.addSemaphore(semaphore)
+                    shadow_layout.addSemaphore(semaphore)
+        for image in parsed_config.images:
+            with parse_context.errorContext(stanza='image',
+                                            conf=image):
+                with parse_context.accumulator.catchErrors():
+                    shadow_layout.addImage(image)
 
         for queue in parsed_config.queues:
             with parse_context.errorContext(stanza='queue', conf=queue):
@@ -3038,12 +3082,11 @@ class ConfigLoader(object):
             # time. So we do not support dynamic semaphore
             # configuration changes.
             layout.semaphores = tenant.layout.semaphores
-            skip_pipelines = skip_semaphores = True
+            dynamic_layout = True
         else:
-            skip_pipelines = skip_semaphores = False
+            dynamic_layout = False
 
         self.tenant_parser._addLayoutItems(layout, tenant, config,
                                            pcontext,
-                                           skip_pipelines=skip_pipelines,
-                                           skip_semaphores=skip_semaphores)
+                                           dynamic_layout=dynamic_layout)
         return layout
