@@ -228,7 +228,7 @@ A more specific process definition follows:
 
 After a buildset reports with ``image-built: true``, Zuul will scan
 result data and for each artifact it finds, it will create an entry in
-ZooKeeper at `/zuul/images/<image_name>/<sequence>`.  Zuul will know
+ZooKeeper at `/zuul/images/<image_name>/<uuid>`.  Zuul will know
 not to emit any more `image-build` events for that image at this
 point.
 
@@ -298,6 +298,11 @@ long-standing goals:
   processes, each of which is capable of handling any number of
   providers.
 
+* Parallel processing without explicit coordination: a single launcher might
+  not be able to fully utilize a provider due to e.g. CPU or I/O constraints;
+  by having multiple launchers processing requests for a provider, we can
+  better use the available cloud resources.
+
 * More intentional request fulfillment: almost no intelligence goes
   into selecting which provider will fulfill a given node request; by
   assigning providers intentionally, we can more efficiently utilize
@@ -312,17 +317,40 @@ long-standing goals:
   nodesets with diverse node types (e.g., VM + static, or VM +
   container).
 
-Each zuul-launcher process will execute a number of processing loops
-in series; first a global request processing loop, and then a
-processing loop for each provider.  Each one will involve obtaining a
-ZooKeeper lock so that only one zuul-launcher process will perform
-each function at a time.
-
 Zuul-launcher will need to know about every connection in the system
-so that it may have a fuul copy of the configuration, but operators
+so that it may have a full copy of the configuration, but operators
 may wish to localize launchers to specific clouds.  To support this,
 zuul-launcher will take an optional command-line argument to indicate
 on which connections it should operate.
+
+Each zuul-launcher process will execute a number of processing loops
+in series; first a global request processing loop, and then a
+processing loop for each configured provider.
+
+Requests and nodes will be considered by a launcher based on a calculated
+score. For that we will use `Rendezvous/HRW (highest random weight) hashing
+<https://en.wikipedia.org/wiki/Rendezvous_hashing>`_ to build a priority list of
+candidate launchers. The launcher with the highest score will lock and process
+a request or node.
+
+The the hash will consist of the unique launcher indentifiers (e.g. the
+hostnames from the component registry) and the UUID of the request or node. The
+choosen hash function here needs to  be fast and doesn't have to be a
+cryptographic hash function (e.g MurmurHash).
+
+With this approach nodes/requests are essentially sharded between the available
+launchers, making explicit coordination mostly unnecessary. By that we can also
+avoid thundering herd effects and lock races that are observed in Nodepool
+today.
+
+The following edge cases need to be considered with this approach:
+
+* When a new launcher starts up it won't process any locked nodes/requests,
+  even though it might have a higher score than existing launchers.
+
+* When a launcher is shut down the node/request is unlocked and the remaining
+  launchers must decide based on the score who should continue with the
+  node/request.
 
 Currently a node request as a whole may be declined by providers.  We
 will make that more granular and store information about each node in
@@ -336,9 +364,11 @@ launchers can resume state machine processing.
 
 The individual provider loop will:
 
-* Lock a provider in ZooKeeper (`/zuul/provider/<name>`)
-* Iterate over every node assigned to that provider in a `building` state
+* Iterate over every matching node (highest score) assigned to that provider in
+  `requested` state
 
+  * If the node is locked by another launcher, continue with the next one
+  * Lock the node (if not already locked) and set state to `building`
   * Drive the state machine
   * If success, update request
   * If failure, determine if it's a temporary or permanent failure
@@ -347,9 +377,11 @@ The individual provider loop will:
 
 The global queue process will:
 
-* Lock the global queue
-* Iterate over every pending node request, and every node within that request
+* Iterate over every matching node request (highest score), and every node
+  within that request
 
+  * If the request is locked by another launcher, continue with the next one
+  * Lock the request (if not already locked)
   * If all providers have failed the request, clear all temp failures
   * If all providers have permanently failed the request, return error
   * Identify providers capable of fulfilling the request
@@ -357,6 +389,43 @@ The global queue process will:
   * If no providers with sufficient quota, assign it to first (highest
     priority) provider that can fulfill it later and pause that
     provider
+
+
+Quota Handling & Rate Limiting
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Due to additional the level of parallelization we need to consider quota
+handling (provider and tenant) as well as provider rate limits.
+
+The Nodepool launcher implementation as it is today will check whether there is
+any remaining quota independently for each node request. Quota calculations are
+based on cached information about existing nodes. This means that concurrently
+processed requests in different provider pools (Nodepool only supports one
+launcher per provider) will not consider each other's resource usage and there
+might also be a small delay until new nodes show up in the cache.
+
+The same is true for the tenant quota that considers resources used by
+all providers.
+
+With the new launcher architecture, the main difference will be that the
+possibility for quota races increases when scaling up the number launcher
+instances (more requests are processed in parallel).
+
+This means that we have to relax the provider quota guarantees that we have in
+Nodepool today. As a counter-measure we can calculate needed quota when
+assigning a request to a provider as well as on the provider level before
+actually acquiring resources. Additionally we can handled quota errors
+gracefully by re-assigning the node to a different provider.
+
+Rate limiting in Nodepool today works based on a rate-limiter with the
+rate configured at the provider level. Multiple provider pools will
+all respect the global provider rate limit. With multiple launchers for a
+single provider we can no longer rely on a fixed provider rate limit.
+
+Instead we need to handle rate-limits and API throttling in the respective
+drivers and adjust the request rate dynamically based on e.g. API response
+headers or errors.
+
 
 Configuration
 -------------
