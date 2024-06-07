@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9933a29_ea996fea",
+        "filename": "zuul/executor/common.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-07T00:52:19Z",
+      "side": 1,
+      "message": "Yes, though either the code above or below should be empty/null, so it\u0027s just a handful of bytes.  We won\u0027t be writing both for the same queue item.",
+      "parentUuid": "f2884384_98575b93",
+      "revId": "3102b75a48d2b878e5028fc9e3095fa66eb2b855",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c5688384_976072d7",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-06-06T22:15:42Z",
       "side": 1,
       "message": "Nit, it seems that the looking in the list of values for the state_keys dict is the primary operation we perform on this data structure. It might be slightly more efficient to store the data with the blob key as the dict key then membership lookups can be done with the hash lookup rather than a list scan.\n\nReturning values() vs keys() should be roughly equivalent so the improvement is minor.",
+      "revId": "3102b75a48d2b878e5028fc9e3095fa66eb2b855",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "adbdf334_1fbeeb38",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 4261,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-07T00:52:19Z",
+      "side": 1,
+      "message": "The main reason I went with this is the behavior on line 4284, to guarantee that we only have one entry for a given project.  So I think if we switched the hash direction here, we\u0027d probably need to switch that two, which balances things out.",
+      "parentUuid": "c5688384_976072d7",
       "revId": "3102b75a48d2b878e5028fc9e3095fa66eb2b855",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
