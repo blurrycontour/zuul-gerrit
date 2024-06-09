@@ -10,7 +10,7 @@
     "@patternfly/react-charts": "^6.51.5",
     "@patternfly/react-core": "^4.198.5",
     "@patternfly/react-table": "^4.67.5",
-    "@softwarefactory-project/re-ansi": "^0.5.0",
+    "@softwarefactory-project/re-ansi": "^0.7.2",
     "axios": "^0.26.0",
     "broadcast-channel": "^4.5.0",
     "d3-graphviz": "2.6.1",
@@ -62,7 +62,7 @@
     "start:multi": "REACT_APP_ZUUL_API='https://softwarefactory-project.io/zuul/api/' react-app-rewired start",
     "start": "react-app-rewired start",
     "build": "react-app-rewired --max_old_space_size=4096 build",
-    "test": "react-app-rewired test --env=jsdom --watchAll=false",
+    "test": "react-app-rewired test --env=jsdom --watchAll=false  --transformIgnorePatterns 'node_modules/(?!@softwarefactory-project)/' --transformIgnorePatterns 'node_modules/d3/'",
     "eject": "react-scripts eject",
     "lint": "eslint --ext .js --ext .jsx src",
     "lint-fix": "eslint --ext .js --ext .jsx --fix src"
