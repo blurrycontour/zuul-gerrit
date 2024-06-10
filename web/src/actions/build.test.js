@@ -29,3 +29,13 @@ it('processes job-output properly', () => {
   expect(tree).toEqual(
     {'icon': 'fa fa-file-o', 'nodes': [], 'text': 'http://test'})
 })
+
+it('processes filename with % properly', () => {
+  let obj = {children: [], mimetype: 'test', name: 'test%el'}
+  let tree = buildAction.renderTree(
+    {linkPrefix: 'test/'},
+    {log_url: 'http://test/', uuid: 'test'},
+    '/', obj, (a) => (a), (_log_url, path, name) => (path + name))
+  expect(tree).toEqual(
+    {'icon': 'fa fa-file-o', 'nodes': [], 'text': '/test%25el'})
+})
