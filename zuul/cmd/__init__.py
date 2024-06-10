@@ -47,6 +47,19 @@ def stack_dump_handler(signum, frame):
     log = logging.getLogger("zuul.stack_dump")
     log.debug("Beginning debug handler")
     try:
+        if yappi:
+            if yappi.is_running():
+                log.debug("Stopping Yappi")
+                yappi.stop()
+                yappi_out = io.StringIO()
+                yappi.get_func_stats().print_all(out=yappi_out)
+                yappi.get_thread_stats().print_all(out=yappi_out)
+                log.debug(yappi_out.getvalue())
+                yappi_out.close()
+                yappi.clear_stats()
+    except Exception:
+        log.exception("Yappi error:")
+    try:
         threads = {}
         for t in threading.enumerate():
             threads[t.ident] = t
@@ -66,22 +79,6 @@ def stack_dump_handler(signum, frame):
     except Exception:
         log.exception("Thread dump error:")
     try:
-        if yappi:
-            if not yappi.is_running():
-                log.debug("Starting Yappi")
-                yappi.start()
-            else:
-                log.debug("Stopping Yappi")
-                yappi.stop()
-                yappi_out = io.StringIO()
-                yappi.get_func_stats().print_all(out=yappi_out)
-                yappi.get_thread_stats().print_all(out=yappi_out)
-                log.debug(yappi_out.getvalue())
-                yappi_out.close()
-                yappi.clear_stats()
-    except Exception:
-        log.exception("Yappi error:")
-    try:
         if objgraph:
             log.debug("Most common types:")
             objgraph_out = io.StringIO()
@@ -90,6 +87,13 @@ def stack_dump_handler(signum, frame):
             objgraph_out.close()
     except Exception:
         log.exception("Objgraph error:")
+    try:
+        if yappi:
+            if not yappi.is_running():
+                log.debug("Starting Yappi")
+                yappi.start()
+    except Exception:
+        log.exception("Yappi error:")
     log.debug("End debug handler")
     signal.signal(signal.SIGUSR2, stack_dump_handler)
 
