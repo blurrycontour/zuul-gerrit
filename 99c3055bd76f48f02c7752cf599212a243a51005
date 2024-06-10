@@ -175,6 +175,24 @@
       "message": "These cache will grow without bound because we don\u0027t seem to prune entries ever (and I\u0027m not sure how we would do so effectively anyway, maybe we just cap the number of entries rather than make it time based or something smart?). Do we anticipate problems for long lived Zuul schedulers getting bloated via this cache?\n\nRelated: is it possible for the keys we\u0027re storing in this cache to cause us to hang onto other objects and leak them forever? I suspect that this is a bigger concern. `query_cache.topic_queries[query_cache_key] \u003d changes_by_topic`. I\u0027m particularly worried about the changes_by_topic entries potentially being expensive.",
       "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b845c8be_2f6bd3a7",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:45:40Z",
+      "side": 1,
+      "message": "I may have answered my own question. I thought we were creating a query cache in the scheduler and hanging onto it for a long period of time but it seems we\u0027re only creating it for each event? Similar with the processing in pipelines. That means the cache is short lived and can\u0027t leak long term.",
+      "parentUuid": "f7d13c3a_ce19954d",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
