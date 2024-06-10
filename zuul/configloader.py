@@ -2295,11 +2295,11 @@ class TenantParser(object):
         for conf_root in (ZUUL_CONF_ROOT + tpc.extra_config_files
                           + tpc.extra_config_dirs):
             for fn in sorted(files.keys()):
-                if not files.get(fn):
-                    continue
                 if not (fn == conf_root
                         or (conf_root in valid_dirs
                             and fn.startswith(f"{conf_root}/"))):
+                    continue
+                if not (file_data := files.get(fn)):
                     continue
                 # Warn if there is more than one configuration in a
                 # project-branch (unless an "extra" file/dir).  We
@@ -2323,7 +2323,7 @@ class TenantParser(object):
                 local_accumulator = error_accumulator.extend(
                     source_context=source_context)
                 incdata = self.loadProjectYAML(
-                    files[fn], source_context, local_accumulator)
+                    file_data, source_context, local_accumulator)
                 branch_cache.put(source_context.path, incdata, ltime)
         branch_cache.setValidFor(tpc, ZUUL_CONF_ROOT, ltime)
         if min_ltimes is not None:
