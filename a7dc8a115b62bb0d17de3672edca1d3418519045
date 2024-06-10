@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93753ca4_c97b498a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T23:33:48Z",
+      "side": 1,
+      "message": "We clear here instead of letting the call to updateCommitDependencies below do it because we may not make that call later?",
+      "revId": "a7dc8a115b62bb0d17de3672edca1d3418519045",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d8d72c4_45d20268",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 861,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T23:33:48Z",
+      "side": 1,
+      "message": "Sam question as above. The updateCommitDependencies call is conditional so we ensure we\u0027re clearing here instead?",
+      "revId": "a7dc8a115b62bb0d17de3672edca1d3418519045",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4dbd763f_afca3a8e",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T23:33:48Z",
+      "side": 1,
+      "message": "What sorts of events don\u0027t have an ltime? Wondering if it is safer to clear if there is no ltime rather than short circuiting.",
+      "revId": "a7dc8a115b62bb0d17de3672edca1d3418519045",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d57b5081_56ac1641",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T23:33:48Z",
+      "side": 1,
+      "message": "We move the ltime ahead to the current value rather than using the ltime from the event so that events between the event ltime and the current ltime will use the same cache values right? That might be worth a comment in the code. I know the commit message covers that but it is specific caching behavior that my not be obvious in the future just reading this.",
+      "revId": "a7dc8a115b62bb0d17de3672edca1d3418519045",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba079e19_19e953ac",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T23:33:48Z",
+      "side": 1,
+      "message": "Similar questions about leaking objects as on previous changes here. In this change the periodic clearing when new events arrive should ensure we don\u0027t grow tremendously avoiding any problems.",
+      "revId": "a7dc8a115b62bb0d17de3672edca1d3418519045",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
