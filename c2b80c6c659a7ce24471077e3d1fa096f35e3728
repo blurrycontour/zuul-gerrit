@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9aeb2b7d_3f6f025c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T21:50:53Z",
+      "side": 1,
+      "message": "I guess this works because zuul is event driven and any event arriving for change X that updates its topic to match changes A B and C would cause things to enqueue for X and ABC via that event. Similarly if you were to recheck A for example it would now know that X shares its topic because the event for X updated things for us?\n\nDoes this introduce the possibility for race conditions in event processing where we might not process things \"properly\" (maybe \"process things as expected by the end user\" is more accurate) if an update for X having a new topic to match A and a recheck on A arrive around the same time?\n\nSimilarly, what happens if we miss events? I guess that is an existing problem and we\u0027d ask users to reapply the update (which is possible for topic setting and recheck comments).",
+      "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdb7cf56_5c4074f8",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3468,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T21:50:53Z",
+      "side": 1,
+      "message": "Do we want to keep this debugging in the test? I guess it only emits if the test fails and then it could be useful. Just worried we might have hundreds of these log lines if things go wrong which might be more problematic.",
+      "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "683ef75e_e24ecffb",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1003,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T21:50:53Z",
+      "side": 1,
+      "message": "In what situation would the change not be in the query history datastructure but would be in the dep needs_changes/needed_by_changes lists? Seems like being in dep needs_changes/needed_by_changes would imply we were queried previously. Is this just a belts and suspedners check to ensure we don\u0027t update halfway?",
+      "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1223b7d2_cae23ef4",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1060,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T21:50:53Z",
+      "side": 1,
+      "message": "Related to the commit messages\u0027 paragraph about not being able to determine whether or not things are in a linear relationship or a circular one: we\u0027re doing the query here because in a linear relationship the results returned by gerrit for submitted together are linear and the resulting needed_by_changes and needs_changes below will be constructed properly?",
+      "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b093c4e1_79b45b7a",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1070,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T21:50:53Z",
+      "side": 1,
+      "message": "Based on the commit message it seemed like gerrit would only return entries for open deps when checking submitted together. Is this a side effect of our previously incorrect fake gerrit? Seems reasonable to keep for enforcing that we only care about open changes in testing things that will be submitted together, but I want to understand if this is required for some reason.",
+      "range": {
+        "startLine": 1070,
+        "startChar": 20,
+        "endLine": 1070,
+        "endChar": 28
+      },
+      "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
