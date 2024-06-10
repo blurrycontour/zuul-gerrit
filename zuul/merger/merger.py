@@ -556,6 +556,11 @@ class Repo(object):
         with open(refs_path, 'wb') as f:
             f.write(b'# pack-refs with: peeled fully-peeled sorted \n')
             sorted_paths = sorted(refs.keys())
+            msg = f"Setting {len(sorted_paths)} refs in {repo.git_dir}"
+            if log:
+                log.debug(msg)
+            else:
+                messages.append(msg)
             for path in sorted_paths:
                 hexsha = refs[path]
                 try:
@@ -564,7 +569,6 @@ class Repo(object):
                     binsha = gitdb.util.to_bin_sha(hexsha)
                     oinfo = repo.odb.info(binsha)
                     f.write(f'{hexsha} {path}\n'.encode(encoding))
-                    msg = f"Set reference {path} at {hexsha} in {repo.git_dir}"
                     if oinfo.type == b'tag':
                         # We are an annotated or signed tag which
                         # refers to another commit. We must handle this
@@ -572,11 +576,6 @@ class Repo(object):
                         tagobj = git.Object.new_from_sha(repo, binsha)
                         tagsha = tagobj.object.hexsha
                         f.write(f'^{tagsha}\n'.encode(encoding))
-                        msg += f" with tag target {tagsha}"
-                    if log:
-                        log.debug(msg)
-                    else:
-                        messages.append(msg)
                 except ValueError:
                     # If the object does not exist, skip setting it.
                     msg = (
