@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82e81d67_fa6409c6",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 859,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 0,
+      "message": "The removal of this short circuit is the one referred to in the second to last paragraph of the commit message?",
+      "revId": "5c78f61e899ded47e9e5fb314899e2e911e52974",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

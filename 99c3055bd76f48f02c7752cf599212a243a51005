@@ -1,0 +1,180 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b078dce7_00a26e37",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 1,
+      "message": "I thought submit-whole-topic was a Gerrit only thing and we instead emulated circular dependencies via depends on in other drivers? A bit confused by this paragraph as a whole based on this.",
+      "range": {
+        "startLine": 11,
+        "startChar": 22,
+        "endLine": 11,
+        "endChar": 49
+      },
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2504ab4_195d4ba7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 1,
+      "message": "This implies we\u0027re going to do the topic check that is described at the end of the previous paragraph? Otherwise we would miss the shared topic circular dependency construction?",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48d5e8e8_bd5a1adb",
+        "filename": "tests/fakegerrit.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 991,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 1,
+      "message": "If anyone else is reviewing this stack the update to the gerrit info data here is what necessitated the refactoring done in the parent change.",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64235d49_a8e6ef12",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3504,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 1,
+      "message": "The way this is worded almost makes it sounds like A+B+C should be 1x scheduler and 2x pipeline. But We\u0027re caching things so its only once per change in the pipeline total. Not sure how to make that more clear.",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99fe8d58_64265923",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3581,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 1,
+      "message": "I think this comment is not accurate for this test. All of the queries occur in the scheduler because we\u0027ve held the lock so the first thing that sees the changes is the scheduler rather than the pipeline for additional changes.",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2440c8c5_47629199",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1666,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 1,
+      "message": "For the vast number of installations checking this only on driver load is probably sufficient. But you can theoretically change this setting while zuul is running and I think if you restart quickly enough zuul won\u0027t notice.\n\nI wonder if this is worth a release note or documentation update to warn people that drivers like the gerrit driver should be fully restarted (via a zuul scheduler restart?) when changing settings like this in the gerrit service.\n\nSimilarly I wonder if when OpenDev does upgrades if the getRemoteVersion info is invalid until OpenDev does a weekly upgrade?",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "295eba8b_a08949a0",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 897,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 1,
+      "message": "Nit the indentation space count is changed by this change. Not sure if that was intentional. The new one space indentation might be a little harder to read? I havent\u0027 seen the output results so can\u0027t say for sure.",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7004a126_78e96491",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 1,
+      "message": "Nit can just return source.useDependenciesByTopic() here as we\u0027re already returning a boolean value.",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3003ae1_8ae43eef",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1063,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 1,
+      "message": "Why do we keep new_topic_needs_changes? Or why add a new list that stores the old data in it. Either way I think we have an extra list here that could be cleaned up as new_topic_needs_changes is only used in this append line.",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7d13c3a_ce19954d",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-10T22:42:55Z",
+      "side": 1,
+      "message": "These cache will grow without bound because we don\u0027t seem to prune entries ever (and I\u0027m not sure how we would do so effectively anyway, maybe we just cap the number of entries rather than make it time based or something smart?). Do we anticipate problems for long lived Zuul schedulers getting bloated via this cache?\n\nRelated: is it possible for the keys we\u0027re storing in this cache to cause us to hang onto other objects and leak them forever? I suspect that this is a bigger concern. `query_cache.topic_queries[query_cache_key] \u003d changes_by_topic`. I\u0027m particularly worried about the changes_by_topic entries potentially being expensive.",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
