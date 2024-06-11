@@ -22,6 +22,7 @@ documentation instead.
    enhanced-regional-executors
    kubernetes-operator
    nodepool-in-zuul
+   project-subscription
    tenant-resource-quota
    tenant-scoped-admin-web-API
    tracing
