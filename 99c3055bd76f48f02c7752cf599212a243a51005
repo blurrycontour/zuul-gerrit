@@ -24,6 +24,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af6c7853_fb10673d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:26:43Z",
+      "side": 1,
+      "message": "It\u0027s about this setting: https://zuul-ci.org/docs/zuul/latest/config/queue.html#attr-queue.dependencies-by-topic\n\nThat deals with topic dependencies in the pipeline processor, not in the gerrit event handler, so that\u0027s the gist of this paragraph.",
+      "parentUuid": "b078dce7_00a26e37",
+      "range": {
+        "startLine": 11,
+        "startChar": 22,
+        "endLine": 11,
+        "endChar": 49
+      },
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2504ab4_195d4ba7",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-06-10T22:42:55Z",
       "side": 1,
       "message": "This implies we\u0027re going to do the topic check that is described at the end of the previous paragraph? Otherwise we would miss the shared topic circular dependency construction?",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "694ff5a9_b6a53bb1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:26:43Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "c2504ab4_195d4ba7",
       "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -77,6 +119,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "22452e50_fe406f25",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3504,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:26:43Z",
+      "side": 1,
+      "message": "Maybe it should say just that.  :)",
+      "parentUuid": "64235d49_a8e6ef12",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "99fe8d58_64265923",
         "filename": "tests/unit/test_circular_dependencies.py",
         "patchSetId": 2
@@ -88,6 +148,24 @@
       "writtenOn": "2024-06-10T22:42:55Z",
       "side": 1,
       "message": "I think this comment is not accurate for this test. All of the queries occur in the scheduler because we\u0027ve held the lock so the first thing that sees the changes is the scheduler rather than the pipeline for additional changes.",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ecf7f81_cb42be45",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3581,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:26:43Z",
+      "side": 1,
+      "message": "True.",
+      "parentUuid": "99fe8d58_64265923",
       "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -111,6 +189,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "91fc906c_32ae0d07",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1666,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:26:43Z",
+      "side": 1,
+      "message": "Sounds reasonable.",
+      "parentUuid": "2440c8c5_47629199",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "295eba8b_a08949a0",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 2
@@ -122,6 +218,24 @@
       "writtenOn": "2024-06-10T22:42:55Z",
       "side": 1,
       "message": "Nit the indentation space count is changed by this change. Not sure if that was intentional. The new one space indentation might be a little harder to read? I havent\u0027 seen the output results so can\u0027t say for sure.",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6c1851e_7d9bdf7e",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 897,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:26:43Z",
+      "side": 1,
+      "message": "Unintentional.",
+      "parentUuid": "295eba8b_a08949a0",
       "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -145,6 +259,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5fd2761a_551a79f4",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:26:43Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7004a126_78e96491",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f3003ae1_8ae43eef",
         "filename": "zuul/manager/__init__.py",
         "patchSetId": 2
@@ -156,6 +288,24 @@
       "writtenOn": "2024-06-10T22:42:55Z",
       "side": 1,
       "message": "Why do we keep new_topic_needs_changes? Or why add a new list that stores the old data in it. Either way I think we have an extra list here that could be cleaned up as new_topic_needs_changes is only used in this append line.",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97d9e81d_2c38dde3",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1063,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:26:43Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f3003ae1_8ae43eef",
       "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -191,6 +341,24 @@
       "side": 1,
       "message": "I may have answered my own question. I thought we were creating a query cache in the scheduler and hanging onto it for a long period of time but it seems we\u0027re only creating it for each event? Similar with the processing in pipelines. That means the cache is short lived and can\u0027t leak long term.",
       "parentUuid": "f7d13c3a_ce19954d",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95e7c180_dcf30420",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:26:43Z",
+      "side": 1,
+      "message": "Yes, it is very short term -- even shorter than that -- it\u0027s basically just for the queries around the time we process a single pipeline queue item.",
+      "parentUuid": "b845c8be_2f6bd3a7",
       "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
