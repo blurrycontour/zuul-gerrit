@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff2f3271_b4a5f413",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:03:02Z",
+      "side": 1,
+      "message": "1st paragraph: basically -- but to clarify, it\u0027s more that if we get an event changing the topic of X to match ABC, then we don\u0027t need to query A,B,or C again because we know nothing about them has updated other than that they now also depend on X.  Yes to the rest of that paragraph.\n\n2nd paragraph: it can be a little racy, but mostly in the favor of what people would expect.  For example, if the recheck happened first, and the topic happened a split second later, by the time zuul queries gerrit for A, the topic change will have happened on gerrit\u0027s side, and zuul will see that X is now included in the topic (because it\u0027s in the submitted-together query), even before it processes the topic change of X.\n\nIn other words, this already the situation today.  We are just slightly more likely to catch up to reality faster today because we query too much.  But we should get there either way.\n\n3rd paragraph: yes, this doesn\u0027t solve missing events.  pubsub does that.",
+      "parentUuid": "9aeb2b7d_3f6f025c",
+      "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdb7cf56_5c4074f8",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-10T21:50:53Z",
       "side": 1,
       "message": "Do we want to keep this debugging in the test? I guess it only emits if the test fails and then it could be useful. Just worried we might have hundreds of these log lines if things go wrong which might be more problematic.",
+      "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "121ee65e_3ab016d5",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3468,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:03:02Z",
+      "side": 1,
+      "message": "Yes, this is very helpful when debugging.  It\u0027s only kept if it fails, and in the scheme of things, it\u0027s not very many lines.",
+      "parentUuid": "cdb7cf56_5c4074f8",
       "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75751cf3_18fcce80",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1003,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:03:02Z",
+      "side": 1,
+      "message": "Seems like you were referring to `compat_needs_changes` below on line 1014.\n\nThis is subtle -- two changes are involved here, the change we are handling the event for (X), and one of it\u0027s dependencies (A).\n\nIn line 1010-1011, we\u0027re checking if we have already performed a query for A (is A in history).\n\nIn line 1014-1015, we\u0027re checking if X is a topic dependency of A.\n\nSo we\u0027re checking if A is in the history datastructure and whether X is in the compat_needs_changes list (of A).  But your question is structured like we\u0027re checking the same change in both.  Hopefully that resolves the confusion?  Because I think you\u0027re right, lines 953-978 should guarantee the state you described in your comment.\n\nRegardless, lines 1009-1016 are implementing what\u0027s described in 998-1003.",
+      "parentUuid": "683ef75e_e24ecffb",
+      "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1223b7d2_cae23ef4",
@@ -69,6 +123,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "446ee69d_2ff21dda",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1060,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:03:02Z",
+      "side": 1,
+      "message": "Yes, I think.\n\nMaybe another way to look at it is that we always need to do the submitted-together query of the triggering change (X) and all of its dependencies (A).  We need to do that because we can\u0027t tell from X alone whether the dependencies are linear or circular, so we can\u0027t forcibly update A from a submitted-together query of X.\n\nSo this method is implementing the submitted-together query of A.  (The calling method is the submitted-together query of X.)",
+      "parentUuid": "1223b7d2_cae23ef4",
+      "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b093c4e1_79b45b7a",
@@ -82,6 +154,30 @@
       "writtenOn": "2024-06-10T21:50:53Z",
       "side": 1,
       "message": "Based on the commit message it seemed like gerrit would only return entries for open deps when checking submitted together. Is this a side effect of our previously incorrect fake gerrit? Seems reasonable to keep for enforcing that we only care about open changes in testing things that will be submitted together, but I want to understand if this is required for some reason.",
+      "range": {
+        "startLine": 1070,
+        "startChar": 20,
+        "endLine": 1070,
+        "endChar": 28
+      },
+      "revId": "c2b80c6c659a7ce24471077e3d1fa096f35e3728",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41b7e50f_89a2bdde",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1070,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:03:02Z",
+      "side": 1,
+      "message": "I think you are right and this could be removed but does not need to be.",
+      "parentUuid": "b093c4e1_79b45b7a",
       "range": {
         "startLine": 1070,
         "startChar": 20,
