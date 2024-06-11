@@ -2430,6 +2430,7 @@ class ZuulTestCase(BaseTestCase):
                 'org/common-config': {
                     'include': [
                         'image',
+                        'flavor',
                     ]}
             })
         else:
@@ -2446,6 +2447,7 @@ class ZuulTestCase(BaseTestCase):
                         name: {
                             'include': [
                                 'image',
+                                'flavor',
                             ]}
                     })
                 else:
