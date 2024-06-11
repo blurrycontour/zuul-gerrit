@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c3291ca_a014cbd9",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T21:27:33Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "af6607ec_299a4a0c",
+      "revId": "f9047557df84036ede1cec94d249060f4a694941",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c26ff786_ff30248b",
@@ -48,6 +66,30 @@
       "writtenOn": "2024-06-11T10:40:51Z",
       "side": 1,
       "message": "nit: I\u0027d prefer sticking to the term \"circular\" for those kind of dependencies.",
+      "range": {
+        "startLine": 992,
+        "startChar": 18,
+        "endLine": 992,
+        "endChar": 30
+      },
+      "revId": "f9047557df84036ede1cec94d249060f4a694941",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6521bc32_c5ec2a70",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 992,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T21:27:33Z",
+      "side": 1,
+      "message": "I agree, sorry that slipped in.  Probably not worth a respin since it\u0027s a comment but worth cleaning up later.",
+      "parentUuid": "c26ff786_ff30248b",
       "range": {
         "startLine": 992,
         "startChar": 18,
