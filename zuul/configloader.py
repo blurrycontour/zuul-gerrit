@@ -260,7 +260,8 @@ class LocalAccumulator:
 class ZuulSafeLoader(yaml.EncryptedLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'secret', 'pipeline',
                                  'project', 'project-template',
-                                 'semaphore', 'queue', 'pragma', 'image'))
+                                 'semaphore', 'queue', 'pragma',
+                                 'image', 'flavor'))
 
     def __init__(self, stream, source_context):
         wrapped_stream = io.StringIO(stream)
@@ -389,6 +390,7 @@ class ImageParser(object):
         '_start_mark': model.ZuulMark,
         vs.Required('name'): str,
         vs.Required('type'): vs.Any('zuul', 'cloud'),
+        'description': str,
     }
     schema = vs.Schema(image)
 
@@ -400,11 +402,36 @@ class ImageParser(object):
         conf = copy_safe_config(conf)
         self.schema(conf)
 
-        image = model.Image(conf['name'], conf['type'])
+        image = model.Image(conf['name'], conf['type'],
+                            conf.get('description'))
         image.source_context = conf.get('_source_context')
         image.start_mark = conf.get('_start_mark')
         image.freeze()
         return image
+
+
+class FlavorParser(object):
+    flavor = {
+        '_source_context': model.SourceContext,
+        '_start_mark': model.ZuulMark,
+        vs.Required('name'): str,
+        'description': str,
+    }
+    schema = vs.Schema(flavor)
+
+    def __init__(self, pcontext):
+        self.log = logging.getLogger("zuul.FlavorParser")
+        self.pcontext = pcontext
+
+    def fromYaml(self, conf):
+        conf = copy_safe_config(conf)
+        self.schema(conf)
+
+        flavor = model.Flavor(conf['name'], conf.get('description'))
+        flavor.source_context = conf.get('_source_context')
+        flavor.start_mark = conf.get('_start_mark')
+        flavor.freeze()
+        return flavor
 
 
 class NodeSetParser(object):
@@ -1594,6 +1621,7 @@ class ParseContext(object):
         self.semaphore_parser = SemaphoreParser(self)
         self.queue_parser = QueueParser(self)
         self.image_parser = ImageParser(self)
+        self.flavor_parser = FlavorParser(self)
         self.project_template_parser = ProjectTemplateParser(self)
         self.project_parser = ProjectParser(self)
         acc = LocalAccumulator(self.loading_errors)
@@ -1680,7 +1708,7 @@ class TenantParser(object):
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret', 'queue',
-                     'image')
+                     'image', 'flavor')
 
     project_dict = {str: {
         'include': to_list(classes),
@@ -2442,6 +2470,15 @@ class TenantParser(object):
                     parsed_config.images.append(
                         pcontext.image_parser.fromYaml(config_image))
 
+        for config_flavor in unparsed_config.flavors:
+            classes = self._getLoadClasses(tenant, config_flavor)
+            if 'flavor' not in classes:
+                continue
+            with pcontext.errorContext(stanza='flavor', conf=config_flavor):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.flavors.append(
+                        pcontext.flavor_parser.fromYaml(config_flavor))
+
         for config_nodeset in unparsed_config.nodesets:
             classes = self._getLoadClasses(tenant, config_nodeset)
             if 'nodeset' not in classes:
@@ -2561,6 +2598,9 @@ class TenantParser(object):
         for image in parsed_config.images:
             _cache('images', image)
 
+        for flavor in parsed_config.flavors:
+            _cache('flavors', flavor)
+
     def _addLayoutItems(self, layout, tenant, parsed_config,
                         parse_context, dynamic_layout=False):
         # TODO(jeblair): make sure everything needing
@@ -2625,6 +2665,11 @@ class TenantParser(object):
                                             conf=image):
                 with parse_context.accumulator.catchErrors():
                     shadow_layout.addImage(image)
+        for flavor in parsed_config.flavors:
+            with parse_context.errorContext(stanza='flavor',
+                                            conf=flavor):
+                with parse_context.accumulator.catchErrors():
+                    shadow_layout.addFlavor(flavor)
 
         for queue in parsed_config.queues:
             with parse_context.errorContext(stanza='queue', conf=queue):

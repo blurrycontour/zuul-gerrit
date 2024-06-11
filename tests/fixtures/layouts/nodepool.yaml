@@ -87,3 +87,6 @@
 - image:
     name: debian
     type: cloud
+
+- flavor:
+    name: normal
