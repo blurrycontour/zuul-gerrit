@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af6607ec_299a4a0c",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-11T10:40:51Z",
+      "side": 1,
+      "message": "nit: no need for the lambda indirection",
+      "revId": "f9047557df84036ede1cec94d249060f4a694941",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c26ff786_ff30248b",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 992,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-11T10:40:51Z",
+      "side": 1,
+      "message": "nit: I\u0027d prefer sticking to the term \"circular\" for those kind of dependencies.",
+      "range": {
+        "startLine": 992,
+        "startChar": 18,
+        "endLine": 992,
+        "endChar": 30
+      },
+      "revId": "f9047557df84036ede1cec94d249060f4a694941",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
