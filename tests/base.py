@@ -85,6 +85,7 @@ from zuul.driver.pagure import PagureDriver
 from zuul.driver.gitlab import GitlabDriver
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.elasticsearch import ElasticsearchDriver
+from zuul.driver.aws import AwsDriver
 from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import zkobject, ZooKeeperClient
@@ -391,6 +392,7 @@ class TestConnectionRegistry(ConnectionRegistry):
         self.registerDriver(GitlabDriverMock(
             self, test_config, config, upstream_root, additional_event_queues))
         self.registerDriver(ElasticsearchDriver())
+        self.registerDriver(AwsDriver())
 
 
 class FakeAnsibleManager(zuul.lib.ansible.AnsibleManager):
