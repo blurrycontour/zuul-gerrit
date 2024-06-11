@@ -1,4 +1,5 @@
 # Copyright 2015 Rackspace Australia
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -17,9 +18,6 @@ import re
 from collections import OrderedDict
 from urllib.parse import urlparse
 
-from zuul import model
-from zuul.driver.sql.sqlconnection import SQLConnection
-from zuul.driver.sql.sqlreporter import SQLReporter
 import zuul.driver.zuul
 import zuul.driver.gerrit
 import zuul.driver.git
@@ -33,6 +31,7 @@ import zuul.driver.mqtt
 import zuul.driver.pagure
 import zuul.driver.gitlab
 import zuul.driver.elasticsearch
+import zuul.driver.aws
 from zuul.connection import BaseConnection
 from zuul.driver import SourceInterface
 
@@ -64,6 +63,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.pagure.PagureDriver())
         self.registerDriver(zuul.driver.gitlab.GitlabDriver())
         self.registerDriver(zuul.driver.elasticsearch.ElasticsearchDriver())
+        self.registerDriver(zuul.driver.aws.AwsDriver())
 
     def registerDriver(self, driver):
         if driver.name in self.drivers:
@@ -169,7 +169,7 @@ class ConnectionRegistry(object):
 
         self.connections = connections
 
-    def getSqlConnection(self) -> SQLConnection:
+    def getSqlConnection(self):
         """
         Gets the SQL connection. This is either the connection
         described in the [database] section, or the first configured
@@ -183,7 +183,7 @@ class ConnectionRegistry(object):
             raise Exception("No SQL connections")
         return connection
 
-    def getSqlReporter(self, pipeline: model.Pipeline) -> SQLReporter:
+    def getSqlReporter(self, pipeline):
         """
         Gets the SQL reporter. Such reporter is based on
         `getSqlConnection`.
