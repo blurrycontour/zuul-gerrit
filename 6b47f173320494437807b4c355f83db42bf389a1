@@ -16,6 +16,24 @@
       "message": "See concerns about query caches being the source of potential memory leaks. I think this is still short lived enough that we should avoid problems?",
       "revId": "6b47f173320494437807b4c355f83db42bf389a1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c363e9b3_9ed33d54",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2409,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:27:47Z",
+      "side": 1,
+      "message": "Yep, this is also short lived so should be fine.",
+      "parentUuid": "b2b80c7b_eaee8a6f",
+      "revId": "6b47f173320494437807b4c355f83db42bf389a1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
