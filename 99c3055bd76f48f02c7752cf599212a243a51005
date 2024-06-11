@@ -135,6 +135,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e817203_a7b5315c",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3504,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T01:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22452e50_fe406f25",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "99fe8d58_64265923",
@@ -166,6 +184,24 @@
       "side": 1,
       "message": "True.",
       "parentUuid": "99fe8d58_64265923",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17bb34be_a62d047e",
+        "filename": "tests/unit/test_circular_dependencies.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3581,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T01:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ecf7f81_cb42be45",
       "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -205,6 +241,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6ba41af_219e43d5",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1666,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T01:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91fc906c_32ae0d07",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "295eba8b_a08949a0",
@@ -236,6 +290,24 @@
       "side": 1,
       "message": "Unintentional.",
       "parentUuid": "295eba8b_a08949a0",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a12bf27_8ad4ed8a",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 897,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T01:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6c1851e_7d9bdf7e",
       "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -275,6 +347,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19f30635_86d1bc9f",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T01:13:02Z",
+      "side": 1,
+      "message": "Er but we don\u0027t return if it\u0027s false.",
+      "parentUuid": "5fd2761a_551a79f4",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3003ae1_8ae43eef",
@@ -306,6 +396,24 @@
       "side": 1,
       "message": "Acknowledged",
       "parentUuid": "f3003ae1_8ae43eef",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d511ae06_a51aea07",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1063,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T01:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97d9e81d_2c38dde3",
       "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
