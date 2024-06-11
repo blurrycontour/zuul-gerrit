@@ -24,6 +24,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "252e4dd8_6961a4b8",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:09:40Z",
+      "side": 1,
+      "message": "or \"driver_config\".  I agree, but I also agree it\u0027s a nit, so I\u0027ll file it away for a rainy day.",
+      "parentUuid": "4e69d056_6124fc5f",
+      "range": {
+        "startLine": 294,
+        "startChar": 46,
+        "endLine": 294,
+        "endChar": 52
+      },
+      "revId": "5c78f61e899ded47e9e5fb314899e2e911e52974",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b69b6810_04b670d5",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-06-10T22:13:37Z",
       "side": 1,
       "message": "See above",
+      "range": {
+        "startLine": 339,
+        "startChar": 45,
+        "endLine": 339,
+        "endChar": 52
+      },
+      "revId": "5c78f61e899ded47e9e5fb314899e2e911e52974",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42918b3f_bc256ce1",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:09:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b69b6810_04b670d5",
       "range": {
         "startLine": 339,
         "startChar": 45,
@@ -70,6 +118,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7622a6f_a7aeddb4",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:09:40Z",
+      "side": 1,
+      "message": "yep",
+      "parentUuid": "30417e2a_8764d13c",
+      "range": {
+        "startLine": 362,
+        "startChar": 23,
+        "endLine": 362,
+        "endChar": 29
+      },
+      "revId": "5c78f61e899ded47e9e5fb314899e2e911e52974",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e4800f5_bce02b83",
@@ -83,6 +155,30 @@
       "writtenOn": "2024-06-10T22:13:37Z",
       "side": 1,
       "message": "See above.",
+      "range": {
+        "startLine": 1479,
+        "startChar": 23,
+        "endLine": 1479,
+        "endChar": 29
+      },
+      "revId": "5c78f61e899ded47e9e5fb314899e2e911e52974",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33e01fdd_373b55df",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1479,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:09:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9e4800f5_bce02b83",
       "range": {
         "startLine": 1479,
         "startChar": 23,
@@ -116,6 +212,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb223259_7a266b15",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1866,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:09:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "fc6d91b5_5a6974a0",
+      "range": {
+        "startLine": 1866,
+        "startChar": 28,
+        "endLine": 1866,
+        "endChar": 34
+      },
+      "revId": "5c78f61e899ded47e9e5fb314899e2e911e52974",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4ee10e8_8720d5a0",
@@ -129,6 +249,30 @@
       "writtenOn": "2024-06-10T22:13:37Z",
       "side": 1,
       "message": "See above.",
+      "range": {
+        "startLine": 1959,
+        "startChar": 26,
+        "endLine": 1959,
+        "endChar": 32
+      },
+      "revId": "5c78f61e899ded47e9e5fb314899e2e911e52974",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4083aa89_9d8c1969",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1959,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-11T00:09:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e4ee10e8_8720d5a0",
       "range": {
         "startLine": 1959,
         "startChar": 26,
