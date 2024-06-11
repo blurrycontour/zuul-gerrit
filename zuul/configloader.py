@@ -261,7 +261,7 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'secret', 'pipeline',
                                  'project', 'project-template',
                                  'semaphore', 'queue', 'pragma',
-                                 'image', 'flavor'))
+                                 'image', 'flavor', 'label'))
 
     def __init__(self, stream, source_context):
         wrapped_stream = io.StringIO(stream)
@@ -432,6 +432,33 @@ class FlavorParser(object):
         flavor.start_mark = conf.get('_start_mark')
         flavor.freeze()
         return flavor
+
+
+class LabelParser(object):
+    label = {
+        '_source_context': model.SourceContext,
+        '_start_mark': model.ZuulMark,
+        vs.Required('name'): str,
+        vs.Required('image'): str,
+        vs.Required('flavor'): str,
+        'description': str,
+    }
+    schema = vs.Schema(label)
+
+    def __init__(self, pcontext):
+        self.log = logging.getLogger("zuul.LabelParser")
+        self.pcontext = pcontext
+
+    def fromYaml(self, conf):
+        conf = copy_safe_config(conf)
+        self.schema(conf)
+
+        label = model.Label(conf['name'], conf['image'], conf['flavor'],
+                            conf.get('description'))
+        label.source_context = conf.get('_source_context')
+        label.start_mark = conf.get('_start_mark')
+        label.freeze()
+        return label
 
 
 class NodeSetParser(object):
@@ -1622,6 +1649,7 @@ class ParseContext(object):
         self.queue_parser = QueueParser(self)
         self.image_parser = ImageParser(self)
         self.flavor_parser = FlavorParser(self)
+        self.label_parser = LabelParser(self)
         self.project_template_parser = ProjectTemplateParser(self)
         self.project_parser = ProjectParser(self)
         acc = LocalAccumulator(self.loading_errors)
@@ -1708,7 +1736,7 @@ class TenantParser(object):
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret', 'queue',
-                     'image', 'flavor')
+                     'image', 'flavor', 'label')
 
     project_dict = {str: {
         'include': to_list(classes),
@@ -2479,6 +2507,15 @@ class TenantParser(object):
                     parsed_config.flavors.append(
                         pcontext.flavor_parser.fromYaml(config_flavor))
 
+        for config_label in unparsed_config.labels:
+            classes = self._getLoadClasses(tenant, config_label)
+            if 'label' not in classes:
+                continue
+            with pcontext.errorContext(stanza='label', conf=config_label):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.labels.append(
+                        pcontext.label_parser.fromYaml(config_label))
+
         for config_nodeset in unparsed_config.nodesets:
             classes = self._getLoadClasses(tenant, config_nodeset)
             if 'nodeset' not in classes:
@@ -2601,6 +2638,9 @@ class TenantParser(object):
         for flavor in parsed_config.flavors:
             _cache('flavors', flavor)
 
+        for label in parsed_config.labels:
+            _cache('labels', label)
+
     def _addLayoutItems(self, layout, tenant, parsed_config,
                         parse_context, dynamic_layout=False):
         # TODO(jeblair): make sure everything needing
@@ -2670,6 +2710,17 @@ class TenantParser(object):
                                             conf=flavor):
                 with parse_context.accumulator.catchErrors():
                     shadow_layout.addFlavor(flavor)
+        for label in parsed_config.labels:
+            with parse_context.errorContext(stanza='label',
+                                            conf=label):
+                with parse_context.accumulator.catchErrors():
+                    shadow_layout.addLabel(label)
+
+        # Verify the nodepool references in the shadow layout
+        for label in shadow_layout.labels.values():
+            with parse_context.errorContext(stanza='label', conf=label):
+                with parse_context.accumulator.catchErrors():
+                    label.validateReferences(layout)
 
         for queue in parsed_config.queues:
             with parse_context.errorContext(stanza='queue', conf=queue):

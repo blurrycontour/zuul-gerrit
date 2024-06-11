@@ -90,3 +90,8 @@
 
 - flavor:
     name: normal
+
+- label:
+    name: debian-normal
+    image: debian
+    flavor: normal

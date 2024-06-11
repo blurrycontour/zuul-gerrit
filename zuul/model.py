@@ -1518,6 +1518,57 @@ class Flavor(ConfigObject):
         return cls(data['name'], data['description'])
 
 
+class Label(ConfigObject):
+    """A node label.
+
+    Labels are associated with provider-specific instance types.
+    """
+
+    def __init__(self, name, image, flavor, description):
+        super().__init__()
+        self.name = name
+        self.image = image
+        self.flavor = flavor
+        self.description = description
+
+    def __repr__(self):
+        return '<Label %s>' % (self.name,)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, Label):
+            return False
+        return (self.name == other.name and
+                self.image == other.image and
+                self.flavor == other.flavor and
+                self.description == other.description)
+
+    def toDict(self):
+        return {
+            'name': self.name,
+            'image': self.image,
+            'flavor': self.flavor,
+            'description': self.description,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data['name'], data['image'], data['flavor'],
+                   data['description'])
+
+    def validateReferences(self, layout):
+        if not layout.images.get(self.image):
+            raise Exception(
+                f'The label "{self.name}" references an unknown image '
+                f'"{self.image}"')
+        if not layout.flavors.get(self.flavor):
+            raise Exception(
+                f'The label "{self.name}" references an unknown flavor '
+                f'"{self.flavor}"')
+
+
 class Node(ConfigObject):
     """A single node for use by a job.
 
@@ -7812,6 +7863,7 @@ class UnparsedConfig(object):
         self.queues = []
         self.images = []
         self.flavors = []
+        self.labels = []
 
         # The list of files/dirs which this represents.
         self.files_examined = set()
@@ -7826,7 +7878,7 @@ class UnparsedConfig(object):
         source_contexts = {}
         for attr in ['pragmas', 'pipelines', 'jobs', 'project_templates',
                      'projects', 'nodesets', 'secrets', 'semaphores',
-                     'queues', 'images', 'flavors']:
+                     'queues', 'images', 'flavors', 'labels']:
             # Make a deep copy of each of our attributes
             old_objlist = getattr(self, attr)
             new_objlist = copy.deepcopy(old_objlist)
@@ -7865,6 +7917,7 @@ class UnparsedConfig(object):
             self.queues.extend(conf.queues)
             self.images.extend(conf.images)
             self.flavors.extend(conf.flavors)
+            self.labels.extend(conf.labels)
             return
 
         if not isinstance(conf, list):
@@ -7900,6 +7953,8 @@ class UnparsedConfig(object):
                 self.images.append(value)
             elif key == 'flavor':
                 self.flavors.append(value)
+            elif key == 'label':
+                self.labels.append(value)
             else:
                 raise ConfigItemUnknownError(item)
 
@@ -7920,6 +7975,7 @@ class ParsedConfig(object):
         self.queues = []
         self.images = []
         self.flavors = []
+        self.labels = []
 
     def copy(self):
         r = ParsedConfig()
@@ -7935,6 +7991,7 @@ class ParsedConfig(object):
         r.queues = self.queues[:]
         r.images = self.images[:]
         r.flavors = self.flavors[:]
+        r.labels = self.labels[:]
         return r
 
     def extend(self, conf):
@@ -7950,6 +8007,7 @@ class ParsedConfig(object):
             self.queues.extend(conf.queues)
             self.images.extend(conf.images)
             self.flavors.extend(conf.flavors)
+            self.labels.extend(conf.labels)
             for regex, projects in conf.projects_by_regex.items():
                 self.projects_by_regex.setdefault(regex, []).extend(projects)
             return
@@ -7994,6 +8052,7 @@ class Layout(object):
         self.queues = {}
         self.images = {}
         self.flavors = {}
+        self.labels = {}
         self.loading_errors = LoadingErrors()
 
     def getJob(self, name):
@@ -8108,6 +8167,9 @@ class Layout(object):
 
     def addFlavor(self, flavor):
         self._addIdenticalObject('Flavor', self.flavors, flavor)
+
+    def addLabel(self, label):
+        self._addIdenticalObject('Label', self.labels, label)
 
     def addPipeline(self, pipeline):
         if pipeline.tenant is not self.tenant:
