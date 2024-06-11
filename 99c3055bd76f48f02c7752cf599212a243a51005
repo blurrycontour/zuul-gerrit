@@ -365,6 +365,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6512237_11e07d58",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 926,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-11T21:09:17Z",
+      "side": 1,
+      "message": "I think I had diff brain when I wrote that and could only see the changed portion of the diff. Sorry about that.",
+      "parentUuid": "19f30635_86d1bc9f",
+      "revId": "99c3055bd76f48f02c7752cf599212a243a51005",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3003ae1_8ae43eef",
