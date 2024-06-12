@@ -1524,6 +1524,42 @@ class Label(ConfigObject):
                 f'"{self.flavor}"')
 
 
+class Section(ConfigObject):
+    """A provider section.
+
+    A section is part (or all) of a cloud provider.  It might be a
+    region, or availability zone.
+    """
+
+    def __init__(self, name):
+        super().__init__()
+        self.name = name
+        # Required for basic functionality
+        self.parent = None
+        self.abstract = None
+        self.connection = None
+        self.description = None
+        # Unlike most config objects, the section is minimally parsed
+        # and only fully realized when creating a provider.
+        self.config = {}
+
+    def __repr__(self):
+        return '<Section %s>' % (self.name,)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, Section):
+            return False
+        return (self.name == other.name and
+                self.parent == other.parent and
+                self.abstract == other.abstract and
+                self.description == other.description and
+                self.connection == other.connection and
+                self.config == other.config)
+
+
 class Node(ConfigObject):
     """A single node for use by a job.
 
@@ -7779,6 +7815,7 @@ class UnparsedConfig(object):
         self.images = []
         self.flavors = []
         self.labels = []
+        self.sections = []
 
         # The list of files/dirs which this represents.
         self.files_examined = set()
@@ -7793,7 +7830,7 @@ class UnparsedConfig(object):
         source_contexts = {}
         for attr in ['pragmas', 'pipelines', 'jobs', 'project_templates',
                      'projects', 'nodesets', 'secrets', 'semaphores',
-                     'queues', 'images', 'flavors', 'labels']:
+                     'queues', 'images', 'flavors', 'labels', 'sections']:
             # Make a deep copy of each of our attributes
             old_objlist = getattr(self, attr)
             new_objlist = copy.deepcopy(old_objlist)
@@ -7833,6 +7870,7 @@ class UnparsedConfig(object):
             self.images.extend(conf.images)
             self.flavors.extend(conf.flavors)
             self.labels.extend(conf.labels)
+            self.sections.extend(conf.sections)
             return
 
         if not isinstance(conf, list):
@@ -7870,6 +7908,8 @@ class UnparsedConfig(object):
                 self.flavors.append(value)
             elif key == 'label':
                 self.labels.append(value)
+            elif key == 'section':
+                self.sections.append(value)
             else:
                 raise ConfigItemUnknownError(item)
 
@@ -7891,6 +7931,7 @@ class ParsedConfig(object):
         self.images = []
         self.flavors = []
         self.labels = []
+        self.sections = []
 
     def copy(self):
         r = ParsedConfig()
@@ -7907,6 +7948,7 @@ class ParsedConfig(object):
         r.images = self.images[:]
         r.flavors = self.flavors[:]
         r.labels = self.labels[:]
+        r.sections = self.sections[:]
         return r
 
     def extend(self, conf):
@@ -7923,6 +7965,7 @@ class ParsedConfig(object):
             self.images.extend(conf.images)
             self.flavors.extend(conf.flavors)
             self.labels.extend(conf.labels)
+            self.sections.extend(conf.sections)
             for regex, projects in conf.projects_by_regex.items():
                 self.projects_by_regex.setdefault(regex, []).extend(projects)
             return
@@ -7968,6 +8011,7 @@ class Layout(object):
         self.images = {}
         self.flavors = {}
         self.labels = {}
+        self.sections = {}
         self.loading_errors = LoadingErrors()
 
     def getJob(self, name):
@@ -8085,6 +8129,9 @@ class Layout(object):
 
     def addLabel(self, label):
         self._addIdenticalObject('Label', self.labels, label)
+
+    def addSection(self, section):
+        self._addIdenticalObject('Section', self.sections, section)
 
     def addPipeline(self, pipeline):
         if pipeline.tenant is not self.tenant:

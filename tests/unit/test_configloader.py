@@ -1332,3 +1332,7 @@ class TestNodepoolConfig(ZuulTestCase):
         self.assertEqual('debian-normal', label.name)
         self.assertEqual('debian', label.image)
         self.assertEqual('normal', label.flavor)
+        section = layout.sections['aws-base']
+        self.assertEqual('aws-base', section.name)
+        self.assertEqual(True, section.abstract)
+        self.assertTrue('launch-timeout' in section.config)

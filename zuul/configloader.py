@@ -1,4 +1,4 @@
-# Copyright 2023 Acme Gating, LLC
+# Copyright 2023-2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -261,7 +261,7 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'secret', 'pipeline',
                                  'project', 'project-template',
                                  'semaphore', 'queue', 'pragma',
-                                 'image', 'flavor', 'label'))
+                                 'image', 'flavor', 'label', 'section'))
 
     def __init__(self, stream, source_context):
         wrapped_stream = io.StringIO(stream)
@@ -459,6 +459,38 @@ class LabelParser(object):
         label.start_mark = conf.get('_start_mark')
         label.freeze()
         return label
+
+
+class SectionParser(object):
+    section = {
+        '_source_context': model.SourceContext,
+        '_start_mark': model.ZuulMark,
+        vs.Required('name'): str,
+        'parent': str,
+        'abstract': bool,
+        'connection': str,
+        'description': str,
+    }
+    schema = vs.Schema(section, extra=vs.ALLOW_EXTRA)
+
+    def __init__(self, pcontext):
+        self.log = logging.getLogger("zuul.SectionParser")
+        self.pcontext = pcontext
+
+    def fromYaml(self, conf):
+        conf = copy_safe_config(conf)
+        self.schema(conf)
+
+        section = model.Section(conf['name'])
+        section.parent = conf.get('parent')
+        section.abstract = conf.get('abstract')
+        section.connection = conf.get('connection')
+        section.description = conf.get('description')
+        section.source_context = conf.get('_source_context')
+        section.start_mark = conf.get('_start_mark')
+        section.config = conf
+        section.freeze()
+        return section
 
 
 class NodeSetParser(object):
@@ -1650,6 +1682,7 @@ class ParseContext(object):
         self.image_parser = ImageParser(self)
         self.flavor_parser = FlavorParser(self)
         self.label_parser = LabelParser(self)
+        self.section_parser = SectionParser(self)
         self.project_template_parser = ProjectTemplateParser(self)
         self.project_parser = ProjectParser(self)
         acc = LocalAccumulator(self.loading_errors)
@@ -1736,7 +1769,7 @@ class TenantParser(object):
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret', 'queue',
-                     'image', 'flavor', 'label')
+                     'image', 'flavor', 'label', 'section')
 
     project_dict = {str: {
         'include': to_list(classes),
@@ -2516,6 +2549,15 @@ class TenantParser(object):
                     parsed_config.labels.append(
                         pcontext.label_parser.fromYaml(config_label))
 
+        for config_section in unparsed_config.sections:
+            classes = self._getLoadClasses(tenant, config_section)
+            if 'section' not in classes:
+                continue
+            with pcontext.errorContext(stanza='section', conf=config_section):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.sections.append(
+                        pcontext.section_parser.fromYaml(config_section))
+
         for config_nodeset in unparsed_config.nodesets:
             classes = self._getLoadClasses(tenant, config_nodeset)
             if 'nodeset' not in classes:
@@ -2641,6 +2683,9 @@ class TenantParser(object):
         for label in parsed_config.labels:
             _cache('labels', label)
 
+        for section in parsed_config.sections:
+            _cache('sections', section)
+
     def _addLayoutItems(self, layout, tenant, parsed_config,
                         parse_context, dynamic_layout=False):
         # TODO(jeblair): make sure everything needing
@@ -2715,6 +2760,11 @@ class TenantParser(object):
                                             conf=label):
                 with parse_context.accumulator.catchErrors():
                     shadow_layout.addLabel(label)
+        for section in parsed_config.sections:
+            with parse_context.errorContext(stanza='section',
+                                            conf=section):
+                with parse_context.accumulator.catchErrors():
+                    shadow_layout.addSection(section)
 
         # Verify the nodepool references in the shadow layout
         for label in shadow_layout.labels.values():
