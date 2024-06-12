@@ -606,6 +606,9 @@ class FakeGitlabMergeRequest(object):
     def getMergeRequestOpenedEvent(self):
         return self.getMergeRequestEvent(action='open')
 
+    def getMergeRequestClosedEvent(self):
+        return self.getMergeRequestEvent(action='close')
+
     def getMergeRequestUpdatedEvent(self):
         self.addCommit()
         return self.getMergeRequestEvent(action='update',
