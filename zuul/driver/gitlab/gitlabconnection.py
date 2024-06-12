@@ -151,6 +151,8 @@ class GitlabEventConnector(threading.Thread):
                                                     event.change_number)
         if attrs['action'] == 'open':
             event.action = 'opened'
+        elif attrs['action'] == 'close':
+            event.action = 'closed'
         elif attrs['action'] == 'merge':
             event.action = 'merged'
         elif attrs['action'] == 'update' and attrs.get("oldrev"):

@@ -324,6 +324,23 @@ class TestGitlabDriver(ZuulTestCase):
         )
 
     @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
+    def test_dequeue_pull_abandoned(self):
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
+        self.fake_gitlab.emitEvent(A.getMergeRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.fake_gitlab.emitEvent(A.getMergeRequestClosedEvent())
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(2, len(self.history))
+        self.assertEqual(2, self.countJobResults(self.history, 'ABORTED'))
+
+    @simple_layout('layouts/basic-gitlab.yaml', driver='gitlab')
     def test_merge_request_commented(self):
 
         A = self.fake_gitlab.openFakeMergeRequest('org/project', 'master', 'A')
