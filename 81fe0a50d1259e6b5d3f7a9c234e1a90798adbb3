@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d520ed1_7b24d986",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-12T10:37:22Z",
+      "side": 1,
+      "message": "I\u0027m not quite sure I understand the impact this has on the scheduler run handler. Are we moving more i/o back into the run handler of the schedulers? Since the query cache is local to the schedulers, what\u0027s the impact when running with a few more (10+) scheduler instances?",
+      "revId": "81fe0a50d1259e6b5d3f7a9c234e1a90798adbb3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
