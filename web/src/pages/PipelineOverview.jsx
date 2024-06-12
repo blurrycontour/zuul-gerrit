@@ -35,10 +35,11 @@ import {
 import PipelineSummary from '../containers/status/PipelineSummary'
 
 import { fetchStatusIfNeeded } from '../actions/status'
-import { Fetching } from '../containers/Fetching'
+import { Fetching, ReloadButton } from '../containers/Fetching'
+import { useDocumentVisibility, useInterval } from '../Hooks'
 
 
-function TenantStats({ stats, timezone }) {
+function TenantStats({ stats, timezone, isReloading, reloadCallback }) {
   return (
     <Level>
       <LevelItem>
@@ -62,6 +63,10 @@ function TenantStats({ stats, timezone }) {
             {moment_tz.utc(stats.last_reconfigured).tz(timezone).fromNow()}
           </span>
         </Tooltip>
+        <ReloadButton
+          isReloading={isReloading}
+          reloadCallback={reloadCallback}
+        />
       </LevelItem>
     </Level>
   )
@@ -70,6 +75,8 @@ function TenantStats({ stats, timezone }) {
 TenantStats.propTypes = {
   stats: PropTypes.object,
   timezone: PropTypes.string,
+  isReloading: PropTypes.bool.isRequired,
+  reloadCallback: PropTypes.func.isRequired,
 }
 
 function PipelineGallery({ pipelines, tenant, showAllPipelines }) {
@@ -101,29 +108,56 @@ PipelineGallery.propTypes = {
 }
 
 function PipelineOverviewPage({
-  pipelines, stats, isFetching, tenant, darkMode, timezone, fetchStatusIfNeeded
+  pipelines, stats, isFetching, tenant, darkMode, autoReload, timezone, fetchStatusIfNeeded
 }) {
   const [showAllPipelines, setShowAllPipelines] = useState(false)
+  const [isReloading, setIsReloading] = useState(false)
+
+  const isDocumentVisible = useDocumentVisibility()
 
   const onShowAllPipelinesToggle = (isChecked) => {
     setShowAllPipelines(isChecked)
   }
 
+  const updateData = (tenant) => {
+    if (tenant.name) {
+      setIsReloading(true)
+      fetchStatusIfNeeded(tenant)
+        .then(() => {
+          setIsReloading(false)
+        })
+    }
+  }
+
   useEffect(() => {
     document.title = 'Zuul Status'
-    if (tenant.name) {
-      fetchStatusIfNeeded(tenant)
-    }
-  }, [tenant, fetchStatusIfNeeded])
+    // Initial data fetch
+    updateData(tenant)
+  }, [tenant])
 
-  if (isFetching) {
+  // Subsequent data fetches every 5 seconds if auto-reload is enabled
+  useInterval(() => {
+    if (isDocumentVisible && autoReload) {
+      updateData(tenant)
+    }
+    // Reset the interval on a manual refresh
+  }, isReloading ? null : 5000)
+
+  // Only show the fetching component on the initial data fetch, but
+  // not on subsequent reloads, as this would overlay the page data.
+  if (!isReloading && isFetching) {
     return <Fetching />
   }
 
   return (
     <>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
-        <TenantStats stats={stats} timezone={timezone} />
+        <TenantStats
+          stats={stats}
+          timezone={timezone}
+          isReloading={isReloading}
+          reloadCallback={() => updateData(tenant)}
+        />
         <Toolbar>
           <ToolbarContent>
             <ToolbarItem>
@@ -158,6 +192,7 @@ PipelineOverviewPage.propTypes = {
   tenant: PropTypes.object,
   preferences: PropTypes.object,
   darkMode: PropTypes.bool,
+  autoReload: PropTypes.bool.isRequired,
   timezone: PropTypes.string,
   fetchStatusIfNeeded: PropTypes.func,
 }
@@ -199,6 +234,7 @@ function mapStateToProps(state) {
     isFetching: state.status.isFetching,
     tenant: state.tenant,
     darkMode: state.preferences.darkMode,
+    autoReload: state.preferences.autoReload,
     timezone: state.timezone,
   }
 }
