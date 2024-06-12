@@ -729,6 +729,28 @@ details.foldable[open] summary::before {
 }
 
 /*
+ * Reload Button
+ */
+.zuul-reload-button {
+    cursor: pointer;
+    display: inline-block;
+    width: 120px;
+    height: 37px;
+}
+
+.zuul-reload-button-floating {
+    float: right;
+}
+
+.zuul-reload-button button {
+    padding-right: 4px;
+}
+
+.zuul-reload-spinner.pf-c-spinner {
+    --pf-c-spinner--Color: #FFFFFF;
+}
+
+/*
  * Dark Mode overrides
  */
 .pf-theme-dark .pf-c-nav__link {
