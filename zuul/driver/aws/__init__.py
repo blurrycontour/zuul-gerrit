@@ -12,12 +12,18 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from zuul.driver import Driver, ConnectionInterface
-from zuul.driver.aws import awsconnection
+from zuul.driver import Driver, ConnectionInterface, ProviderInterface
+from zuul.driver.aws import awsconnection, awsprovider
 
 
-class AwsDriver(Driver, ConnectionInterface):
+class AwsDriver(Driver, ConnectionInterface, ProviderInterface):
     name = 'aws'
 
     def getConnection(self, name, config):
         return awsconnection.AwsConnection(self, name, config)
+
+    def getProvider(self, connection, provider_config):
+        return awsprovider.AwsProvider(self, connection, provider_config)
+
+    def getProviderSchema(self):
+        return awsprovider.AwsProviderSchema().getProviderSchema()

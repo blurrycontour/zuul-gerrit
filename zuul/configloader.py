@@ -84,6 +84,13 @@ def as_list(item):
     return [item]
 
 
+# Allow "- foo" as a shorthand for "- {name: foo}"
+def dict_with_name(item):
+    if isinstance(item, str):
+        return {'name': item}
+    return item
+
+
 def no_dup_config_paths(v):
     if isinstance(v, list):
         for x in v:
@@ -261,7 +268,8 @@ class ZuulSafeLoader(yaml.EncryptedLoader):
     zuul_node_types = frozenset(('job', 'nodeset', 'secret', 'pipeline',
                                  'project', 'project-template',
                                  'semaphore', 'queue', 'pragma',
-                                 'image', 'flavor', 'label', 'section'))
+                                 'image', 'flavor', 'label', 'section',
+                                 'provider'))
 
     def __init__(self, stream, source_context):
         wrapped_stream = io.StringIO(stream)
@@ -470,6 +478,9 @@ class SectionParser(object):
         'abstract': bool,
         'connection': str,
         'description': str,
+        'images': [vs.Any(str, dict)],
+        'flavors': [vs.Any(str, dict)],
+        'labels': [vs.Any(str, dict)],
     }
     schema = vs.Schema(section, extra=vs.ALLOW_EXTRA)
 
@@ -481,6 +492,11 @@ class SectionParser(object):
         conf = copy_safe_config(conf)
         self.schema(conf)
 
+        # Mutate these into the expected form
+        conf['images'] = [dict_with_name(x) for x in conf.get('images', [])]
+        conf['flavors'] = [dict_with_name(x) for x in conf.get('flavors', [])]
+        conf['labels'] = [dict_with_name(x) for x in conf.get('labels', [])]
+
         section = model.Section(conf['name'])
         section.parent = conf.get('parent')
         section.abstract = conf.get('abstract')
@@ -491,6 +507,43 @@ class SectionParser(object):
         section.config = conf
         section.freeze()
         return section
+
+
+class ProviderParser(object):
+    provider = {
+        '_source_context': model.SourceContext,
+        '_start_mark': model.ZuulMark,
+        vs.Required('name'): str,
+        vs.Required('section'): str,
+        'images': [vs.Any(str, dict)],
+        'labels': [vs.Any(str, dict)],
+    }
+    schema = vs.Schema(provider, extra=vs.ALLOW_EXTRA)
+
+    def __init__(self, pcontext):
+        self.log = logging.getLogger("zuul.ProviderParser")
+        self.pcontext = pcontext
+
+    def fromYaml(self, conf):
+        conf = copy_safe_config(conf)
+        self.schema(conf)
+
+        if 'flavor' in conf:
+            raise Exception("Flavor configuration not permitted in Provider, "
+                            "only Section")
+
+        # Mutate these into the expected form
+        conf['images'] = [dict_with_name(x) for x in conf.get('images', [])]
+        conf['labels'] = [dict_with_name(x) for x in conf.get('labels', [])]
+
+        provider_config = model.ProviderConfig(conf['name'],
+                                               conf['section'])
+        provider_config.description = conf.get('description')
+        provider_config.source_context = conf.get('_source_context')
+        provider_config.start_mark = conf.get('_start_mark')
+        provider_config.config = conf
+        provider_config.freeze()
+        return provider_config
 
 
 class NodeSetParser(object):
@@ -1683,6 +1736,7 @@ class ParseContext(object):
         self.flavor_parser = FlavorParser(self)
         self.label_parser = LabelParser(self)
         self.section_parser = SectionParser(self)
+        self.provider_parser = ProviderParser(self)
         self.project_template_parser = ProjectTemplateParser(self)
         self.project_parser = ProjectParser(self)
         acc = LocalAccumulator(self.loading_errors)
@@ -1769,7 +1823,7 @@ class TenantParser(object):
 
     classes = vs.Any('pipeline', 'job', 'semaphore', 'project',
                      'project-template', 'nodeset', 'secret', 'queue',
-                     'image', 'flavor', 'label', 'section')
+                     'image', 'flavor', 'label', 'section', 'provider')
 
     project_dict = {str: {
         'include': to_list(classes),
@@ -2558,6 +2612,16 @@ class TenantParser(object):
                     parsed_config.sections.append(
                         pcontext.section_parser.fromYaml(config_section))
 
+        for config_provider in unparsed_config.providers:
+            classes = self._getLoadClasses(tenant, config_provider)
+            if 'provider' not in classes:
+                continue
+            with pcontext.errorContext(stanza='provider',
+                                       conf=config_provider):
+                with pcontext.accumulator.catchErrors():
+                    parsed_config.providers.append(
+                        pcontext.provider_parser.fromYaml(config_provider))
+
         for config_nodeset in unparsed_config.nodesets:
             classes = self._getLoadClasses(tenant, config_nodeset)
             if 'nodeset' not in classes:
@@ -2686,6 +2750,9 @@ class TenantParser(object):
         for section in parsed_config.sections:
             _cache('sections', section)
 
+        for provider in parsed_config.providers:
+            _cache('providers', provider)
+
     def _addLayoutItems(self, layout, tenant, parsed_config,
                         parse_context, dynamic_layout=False):
         # TODO(jeblair): make sure everything needing
@@ -2765,12 +2832,31 @@ class TenantParser(object):
                                             conf=section):
                 with parse_context.accumulator.catchErrors():
                     shadow_layout.addSection(section)
+        for provider_config in parsed_config.providers:
+            with parse_context.errorContext(stanza='provider',
+                                            conf=provider_config):
+                with parse_context.accumulator.catchErrors():
+                    shadow_layout.addProviderConfig(provider_config)
 
-        # Verify the nodepool references in the shadow layout
+        # Verify the nodepool references in the shadow (or real) layout
         for label in shadow_layout.labels.values():
             with parse_context.errorContext(stanza='label', conf=label):
                 with parse_context.accumulator.catchErrors():
                     label.validateReferences(layout)
+        # Add providers to the shadow (or real) layout
+        for provider_config in shadow_layout.provider_configs.values():
+            with parse_context.errorContext(stanza='provider',
+                                            conf=provider_config):
+                with parse_context.accumulator.catchErrors():
+                    flat_config = provider_config.flattenConfig(shadow_layout)
+                    connection_name = flat_config.get('connection')
+                    connection = parse_context.connections.connections[
+                        connection_name]
+                    schema = connection.driver.getProviderSchema()
+                    schema(flat_config)
+                    provider = connection.driver.getProvider(
+                        connection, flat_config)
+                    shadow_layout.addProvider(provider)
 
         for queue in parsed_config.queues:
             with parse_context.errorContext(stanza='queue', conf=queue):
