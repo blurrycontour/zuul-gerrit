@@ -335,6 +335,24 @@
       "parentUuid": "b72e0aaa_e4459103",
       "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62cddd7f_a2b26cc4",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-12T20:19:54Z",
+      "side": 1,
+      "message": "Unrelated to the above discussion I think for both developers and operators it is important to be able to find build results from the status page/panels and trace them to build logs to diagnose issues quickly. The entry on line 72 implies this will still be the case but I think this is improtant to call out as I regularly do this as both a zuul operator (determine if system is currently in a sad state) and as a developer (determine problems more quickly and respin if appropriate).",
+      "parentUuid": "ba2b861d_176cf21a",
+      "revId": "f6d63575068edd9eaac51640a1ec26e46626a9f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

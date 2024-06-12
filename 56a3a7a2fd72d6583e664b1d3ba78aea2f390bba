@@ -56,6 +56,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a08c776c_22ded0c1",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-12T20:19:54Z",
+      "side": 1,
+      "message": "It might also be good to show when a reconfiguration is in progress (and possibly when it started). Sometimes we\u0027re confused why things haven\u0027t taken effect yet and that is due to things being in process.",
+      "revId": "56a3a7a2fd72d6583e664b1d3ba78aea2f390bba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "13107100_6225caa8",
         "filename": "doc/source/developer/specs/status-page-2.0.rst",
         "patchSetId": 3
@@ -67,6 +84,41 @@
       "writtenOn": "2024-05-22T12:32:07Z",
       "side": 1,
       "message": "Not sure it is worth duplicating monitoring data in here, but it would be nice to know for a given pipeline:\n- if it is empty, when was the last time an item was processed?\n- the number of item that was processed\n- the buildset success/failure ratio",
+      "revId": "56a3a7a2fd72d6583e664b1d3ba78aea2f390bba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38344c5f_a9b2f2ad",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-12T20:19:54Z",
+      "side": 1,
+      "message": "I\u0027m not sure the buildset success/failure ration is going to be useful over time for installations like OpenDev\u0027s. Gates break regularly due to external factors for example. The first time this happens you\u0027ll get a good \"oh the ratio changed\" indication. But months later after this has occurred enough the ratio changes will just be noise.\n\nThis information is also not that important to zuul operators. I don\u0027t really care too much if people write jobs that fail a lot as long as zuul is accurately running the jobs and reporting the results. What we do care about as operators is whether or not hte system is failing leading to inaccurate results. But that won\u0027t be possible to determine via a pass/fail ratio.",
+      "parentUuid": "13107100_6225caa8",
+      "revId": "56a3a7a2fd72d6583e664b1d3ba78aea2f390bba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7dceefc_8d17f02c",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-12T20:19:54Z",
+      "side": 1,
+      "message": "Another use case that would be good to capture for developers is trying to better expose why things are not yet running. Whether that is waiting for a parent job or artificat dependency or nodes haven\u0027t been allocated or we are outside of the queue window etc one of the most common things we answer questions about in OpenDev is \"why did my jobs not run\" or \"why is my job not running yet\".\n\nThis next idea is probably well beyond the scope of this spec, but it might be cool to have a \"recent events processed by zuul and reason for action taken\" page in the dashboard somewhere. Then when we don\u0027t run jobs for a change we can have an entry that says something like \"for patchset 2 created on change 123456 no jobs were queued because no jobs matched\". Probably don\u0027t need to have records for the positive case since those will show up in the normal status dashboards. Think of this as a brainstorm and not anything I expect to get done as part of this spec.",
       "revId": "56a3a7a2fd72d6583e664b1d3ba78aea2f390bba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
