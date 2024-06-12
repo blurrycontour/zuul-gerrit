@@ -254,7 +254,18 @@ class JobVariant extends React.Component {
               item = value
             } else if (label === 'files') {
               nice_label = (<span><ClipboardCheckIcon />Files matchers</span>)
-              item = value
+              item = (
+                <span style={{ whiteSpace: 'pre-wrap' }}>
+                  <ReactJson
+                    src={value}
+                    name={null}
+                    collapsed={false}
+                    sortKeys={true}
+                    enableClipboard={false}
+                    displayDataTypes={false}
+                    theme={this.props.preferences.darkMode ? 'tomorrow' : 'rjv-default'}/>
+                </span>
+              )
             } else {
               item = value
             }
