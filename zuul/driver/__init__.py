@@ -303,3 +303,44 @@ class AuthenticatorInterface(object, metaclass=abc.ABCMeta):
         :rtype: list
         """
         raise NotImplementedError
+
+
+class ProviderInterface(object, metaclass=abc.ABCMeta):
+    """The provider interface to be implemented by a driver.
+
+    A driver which is able to communicate with a cloud should provide
+    this interface.
+
+    """
+
+    @abc.abstractmethod
+    def getProvider(self, connection, config=None):
+        """Create and return a new Provider object.
+
+        This method is required by the interface.
+
+        The provider object returned should inherit from the
+        :py:class:`~zuul.provider.BaseProvider` class.
+
+        :arg Connection connection: The Connection object associated
+            with the provider (as previously returned by getConnection).
+        :arg dict config: The flattened provider configuration from the
+            layout.
+
+        :returns: A new provider object.
+        :rtype: :py:class:`~zuul.provider.BaseProvider`
+
+        """
+        pass
+
+    @abc.abstractmethod
+    def getProviderSchema(self):
+        """Get the schema for this driver's providers.
+
+        This method is required by the interface.
+
+        :returns: A voluptuous schema.
+        :rtype: dict or Schema
+
+        """
+        pass

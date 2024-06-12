@@ -1336,3 +1336,9 @@ class TestNodepoolConfig(ZuulTestCase):
         self.assertEqual('aws-base', section.name)
         self.assertEqual(True, section.abstract)
         self.assertTrue('launch-timeout' in section.config)
+        provider_config = layout.provider_configs['aws-us-east-1-main']
+        self.assertEqual('aws-us-east-1-main', provider_config.name)
+        self.assertEqual('aws-us-east-1', provider_config.section)
+        provider = layout.providers['aws-us-east-1-main']
+        self.assertEqual(1, len(provider.labels))
+        self.assertEqual('debian-normal', provider.labels[0].name)
