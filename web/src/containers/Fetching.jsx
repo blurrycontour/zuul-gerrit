@@ -23,7 +23,29 @@ import {
   Spinner,
 } from '@patternfly/react-core'
 
-import { SyncIcon } from '@patternfly/react-icons'
+import { SyncAltIcon, SyncIcon } from '@patternfly/react-icons'
+
+function ReloadButton({ isReloading, reloadCallback }) {
+  return (
+    <span
+      className="zuul-reload-button"
+      onClick={() => reloadCallback()}
+    >
+      <Button
+        variant="plain"
+        isInline
+        icon={<SyncAltIcon />}
+        isLoading={isReloading}
+      />
+      {isReloading ? 'Reloading' : 'Reload'}
+    </span>
+  )
+}
+
+ReloadButton.propTypes = {
+  isReloading: PropTypes.bool.isRequired,
+  reloadCallback: PropTypes.func.isRequired,
+}
 
 function Fetchable(props) {
   const { isFetching, fetchCallback } = props
@@ -71,4 +93,4 @@ function Fetching() {
   )
 }
 
-export { Fetchable, Fetching }
+export { Fetchable, Fetching, ReloadButton }
