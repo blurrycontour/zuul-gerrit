@@ -14,6 +14,7 @@
 # under the License.
 
 import json
+from collections import defaultdict
 from collections.abc import MutableMapping
 from contextlib import suppress
 from functools import total_ordering
@@ -177,7 +178,10 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
             return None
 
         try:
-            return json.loads(data)['min_ltimes']
+            return defaultdict(
+                lambda: defaultdict(lambda: -1),
+                json.loads(data)['min_ltimes'],
+            )
         except Exception:
             return None
 

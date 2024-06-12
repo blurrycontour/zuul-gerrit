@@ -1797,11 +1797,11 @@ class Scheduler(threading.Thread):
                 event, needs_result=False)
 
         # Assemble a new list of min. ltimes of the project branch caches.
-        branch_cache_min_ltimes = {
+        branch_cache_min_ltimes = defaultdict(lambda: -1, {
             s.connection.connection_name:
                 s.getProjectBranchCacheLtime()
             for s in self.connections.getSources()
-        }
+        })
 
         # Make sure last_reconfigure_event_ltime never goes backward
         old_layout_state = self.tenant_layout_state.get(tenant.name)
