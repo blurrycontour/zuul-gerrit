@@ -34,6 +34,24 @@
       "parentUuid": "4d520ed1_7b24d986",
       "revId": "81fe0a50d1259e6b5d3f7a9c234e1a90798adbb3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66fff2b2_08a82c14",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-12T16:27:56Z",
+      "side": 1,
+      "message": "Regarding the last point: if an event will cause a change to be enqueued into multiple pipelines at the same time, and those pipelines are processed simultaneously on different schedulers, then those schedulers will race each other and perform the same queries at the same time.  One of them will update the cache, the remainder will lose the race and hit the change update check in the cache.\n\nIf they do not run exactly simultaneously, and one of them is able to complete the queries and update the change before the others, and the others get the cache update event and update their copy of the change, then the others will not need to perform the queries, and only one set will be performed.\n\nThis behavior is already present for at least the following cases:\n  * emulating submitWholeTopic\n  * cross-project dependencies with URLs\n\nNote that last one should already be quite common.\n\nThis change will extend the behavior to include any change in a gerrit with submitWholeTopic enabled.",
+      "parentUuid": "1a4fbf97_7f991289",
+      "revId": "81fe0a50d1259e6b5d3f7a9c234e1a90798adbb3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
