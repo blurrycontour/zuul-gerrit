@@ -37,9 +37,9 @@ cheroot!=8.1.*,!=8.2.*,!=8.3.0 # https://github.com/cherrypy/cheroot/issues/263
 elasticsearch<8.0.0
 PyMySQL
 psycopg2-binary
-opentelemetry-sdk
-opentelemetry-exporter-otlp-proto-grpc
-opentelemetry-exporter-otlp-proto-http
+opentelemetry-sdk>=1.25.0
+opentelemetry-exporter-otlp-proto-grpc>=1.25.0
+opentelemetry-exporter-otlp-proto-http>=1.25.0
 confluent-kafka
 boto3
 google-cloud-pubsub
