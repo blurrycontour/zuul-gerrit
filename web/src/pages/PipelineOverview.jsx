@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -35,10 +35,11 @@ import {
 import PipelineSummary from '../containers/status/PipelineSummary'
 
 import { fetchStatusIfNeeded } from '../actions/status'
-import { Fetching } from '../containers/Fetching'
+import { Fetchable, Fetching, ReloadButton } from '../containers/Fetching'
+import { useDocumentVisibility } from '../Hooks'
 
 
-function TenantStats({ stats, timezone }) {
+function TenantStats({ stats, timezone, isReloading, reloadCallback }) {
   return (
     <Level>
       <LevelItem>
@@ -62,6 +63,10 @@ function TenantStats({ stats, timezone }) {
             {moment_tz.utc(stats.last_reconfigured).tz(timezone).fromNow()}
           </span>
         </Tooltip>
+        <ReloadButton
+          isReloading={isReloading}
+          reloadCallback={reloadCallback}
+        />
       </LevelItem>
     </Level>
   )
@@ -101,29 +106,65 @@ PipelineGallery.propTypes = {
 }
 
 function PipelineOverviewPage({
-  pipelines, stats, isFetching, tenant, darkMode, timezone, fetchStatusIfNeeded
+  pipelines, stats, isFetching, tenant, darkMode, autoReload, timezone, fetchStatusIfNeeded
 }) {
   const [showAllPipelines, setShowAllPipelines] = useState(false)
+  const [isReloading, setIsReloading] = useState(false)
+
+  const isDocumentVisible = useDocumentVisibility()
 
   const onShowAllPipelinesToggle = (isChecked) => {
     setShowAllPipelines(isChecked)
   }
 
   useEffect(() => {
-    document.title = 'Zuul Status'
-    if (tenant.name) {
-      fetchStatusIfNeeded(tenant)
+    const updateData = (force) => {
+      if (force || (isDocumentVisible && autoReload)) {
+        setIsReloading(true)
+        fetchStatusIfNeeded(tenant)
+          .then(() => {
+            //timer = setTimeout(() => updateData(true), 5000)
+            setIsReloading(false)
+          })
+      }
     }
-  }, [tenant, fetchStatusIfNeeded])
 
-  if (isFetching) {
+    const delay = 5
+    document.title = 'Zuul Status'
+    // Initial data fetch
+    //updateData(true)
+    // Subsequent data fetches via timeout
+    let timer = null
+
+    if (tenant.name) {
+      timer = setTimeout(() => updateData(), delay * 1000);
+    }
+
+    // The "cleanup" code (return statement) is called before the hook is
+    // invoked again. So we use this to clear any existing timer. When the
+    // hook is invoked again ("setup" code), a new timeout might be created.
+    return () => {
+      if (timer) {
+        clearTimeout(timer)
+      }
+    }
+    // We provide the isReloading flag to the dependency array of useEffect,
+    // so we can invoke the useEffect hook simply by changing the flag. This
+    // is a lot simpler than explicitly calling the updateData function
+    // outside of the useEffect hook.
+  }, [tenant, autoReload, isDocumentVisible, fetchStatusIfNeeded, isReloading])
+
+
+  // Only show the fetching component on the initial data fetch, but
+  // not on subsequent reloads, as this would overlay the page data.
+  if (!isReloading && isFetching) {
     return <Fetching />
   }
 
   return (
     <>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
-        <TenantStats stats={stats} timezone={timezone} />
+        <TenantStats stats={stats} timezone={timezone} isReloading={isReloading} reloadCallback={() => setIsReloading(true)} />
         <Toolbar>
           <ToolbarContent>
             <ToolbarItem>
@@ -174,7 +215,11 @@ const countItems = (pipeline) => {
   return count
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
+  // TODO (felix): Check if the old state already contained a valid
+  // pipelines array. If so, set the isReloading flag instead of the
+  // isFetching flag based on the current isFetching value in the state.
+  // This should solve the isFetching/isReloading problem.
   let pipelines = []
   let stats = {}
   if (state.status.status) {
@@ -199,6 +244,7 @@ function mapStateToProps(state) {
     isFetching: state.status.isFetching,
     tenant: state.tenant,
     darkMode: state.preferences.darkMode,
+    autoReload: state.preferences.autoReload,
     timezone: state.timezone,
   }
 }
