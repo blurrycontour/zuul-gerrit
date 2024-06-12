@@ -6346,7 +6346,6 @@ class Change(Branch):
         self.is_current_patchset = True
         self.can_merge = False
         self.is_merged = False
-        self.failed_to_merge = False
         self.open = None
         self.owner = None
         self.topic = None
@@ -6380,7 +6379,6 @@ class Change(Branch):
         self.is_current_patchset = data.get("is_current_patchset", True)
         self.can_merge = data.get("can_merge", False)
         self.is_merged = data.get("is_merged", False)
-        self.failed_to_merge = data.get("failed_to_merge", False)
         self.open = data.get("open")
         self.owner = data.get("owner")
         self.topic = data.get("topic")
@@ -6403,7 +6401,6 @@ class Change(Branch):
             "is_current_patchset": self.is_current_patchset,
             "can_merge": self.can_merge,
             "is_merged": self.is_merged,
-            "failed_to_merge": self.failed_to_merge,
             "open": self.open,
             "owner": self.owner,
             "topic": self.topic,
