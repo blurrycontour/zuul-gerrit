@@ -2457,6 +2457,7 @@ class ZuulTestCase(BaseTestCase):
                         'image',
                         'flavor',
                         'label',
+                        'section',
                     ]}
             })
         else:
@@ -2475,6 +2476,7 @@ class ZuulTestCase(BaseTestCase):
                                 'image',
                                 'flavor',
                                 'label',
+                                'section',
                             ]}
                     })
                 else:
