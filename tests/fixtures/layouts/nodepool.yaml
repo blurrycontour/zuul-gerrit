@@ -102,8 +102,18 @@
     connection: aws
     boot-timeout: 120
     launch-timeout: 600
+    flavors:
+      - name: normal
+    images:
+      - name: debian
 
 - section:
     name: aws-us-east-1
     parent: aws-base
     region: us-east-1
+
+- provider:
+    name: aws-us-east-1-main
+    section: aws-us-east-1
+    labels:
+      - debian-normal
