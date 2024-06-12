@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
@@ -35,7 +35,8 @@ import ChangeQueue from '../containers/status/ChangeQueue'
 import { PipelineIcon } from '../containers/status/Misc'
 import { fetchStatusIfNeeded } from '../actions/status'
 import { EmptyPage } from '../containers/Errors'
-import { Fetching } from '../containers/Fetching'
+import { Fetching, ReloadButton } from '../containers/Fetching'
+import { useDocumentVisibility, useInterval } from '../Hooks'
 
 function PipelineStats({ pipeline }) {
   return (
@@ -52,12 +53,18 @@ PipelineStats.propTypes = {
   pipeline: PropTypes.object.isRequired,
 }
 
-function PipelineDetails({ pipeline }) {
+function PipelineDetails({ pipeline, isReloading, reloadCallback }) {
 
   const pipelineType = pipeline.manager || 'unknown'
 
   return (
     <>
+      <span className="zuul-reload-button-floating">
+        <ReloadButton
+          isReloading={isReloading}
+          reloadCallback={reloadCallback}
+        />
+      </span>
       <Title headingLevel="h1">
         <PipelineIcon pipelineType={pipelineType} />
         {pipeline.name}
@@ -80,18 +87,43 @@ function PipelineDetails({ pipeline }) {
 
 PipelineDetails.propTypes = {
   pipeline: PropTypes.object.isRequired,
+  isReloading: PropTypes.bool.isRequired,
+  reloadCallback: PropTypes.func.isRequired,
 }
 
-function PipelineDetailsPage({ pipeline, isFetching, tenant, darkMode, fetchStatusIfNeeded }) {
+function PipelineDetailsPage({
+  pipeline, isFetching, tenant, darkMode, autoReload, fetchStatusIfNeeded
+}) {
+  const [isReloading, setIsReloading] = useState(false)
+
+  const isDocumentVisible = useDocumentVisibility()
+
+  const updateData = useCallback((tenant) => {
+    if (tenant.name) {
+      setIsReloading(true)
+      fetchStatusIfNeeded(tenant)
+        .then(() => {
+          setIsReloading(false)
+        })
+    }
+  }, [setIsReloading, fetchStatusIfNeeded])
 
   useEffect(() => {
     document.title = 'Zuul Pipeline Details'
-    if (tenant.name) {
-      fetchStatusIfNeeded(tenant)
-    }
-  }, [tenant, fetchStatusIfNeeded])
+    // Initial data fetch
+    updateData(tenant)
+  }, [updateData, tenant])
 
-  if (pipeline === undefined || isFetching) {
+
+  // Subsequent data fetches every 5 seconds if auto-reload is enabled
+  useInterval(() => {
+    if (isDocumentVisible && autoReload) {
+      updateData(tenant)
+    }
+    // Reset the interval on a manual refresh
+  }, isReloading ? null : 5000)
+
+  if (pipeline === undefined || (!isReloading && isFetching)) {
     return <Fetching />
   }
 
@@ -109,7 +141,7 @@ function PipelineDetailsPage({ pipeline, isFetching, tenant, darkMode, fetchStat
   return (
     <>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
-        <PipelineDetails pipeline={pipeline} />
+        <PipelineDetails pipeline={pipeline} isReloading={isReloading} reloadCallback={() => updateData(tenant)} />
       </PageSection>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
         <Title headingLevel="h3">
@@ -133,7 +165,7 @@ function PipelineDetailsPage({ pipeline, isFetching, tenant, darkMode, fetchStat
               queue => queue.heads.length > 0
             ).map((queue, idx) => (
               <GalleryItem key={idx}>
-                <ChangeQueue queue={queue} pipeline={pipeline}/>
+                <ChangeQueue queue={queue} pipeline={pipeline} />
               </GalleryItem>
             ))
           }
@@ -149,6 +181,7 @@ PipelineDetailsPage.propTypes = {
   isFetching: PropTypes.bool,
   tenant: PropTypes.object,
   darkMode: PropTypes.bool,
+  autoReload: PropTypes.bool.isRequired,
   fetchStatusIfNeeded: PropTypes.func.isRequired,
 }
 
@@ -168,6 +201,7 @@ function mapStateToProps(state, ownProps) {
     isFetching: state.status.isFetching,
     tenant: state.tenant,
     darkMode: state.preferences.darkMode,
+    autoReload: state.preferences.autoReload,
   }
 }
 
