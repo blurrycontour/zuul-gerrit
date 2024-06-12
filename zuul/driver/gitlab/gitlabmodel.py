@@ -149,6 +149,11 @@ class GitlabTriggerEvent(TriggerEvent):
     def isMessageChanged(self):
         return bool(self.merge_request_description_changed)
 
+    def isChangeAbandoned(self):
+        if self.type == 'gl_merge_request':
+            return 'closed' == self.action
+        return False
+
 
 class GitlabEventFilter(EventFilter):
     def __init__(
