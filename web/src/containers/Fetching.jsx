@@ -23,7 +23,38 @@ import {
   Spinner,
 } from '@patternfly/react-core'
 
-import { SyncIcon } from '@patternfly/react-icons'
+import { SyncAltIcon, SyncIcon } from '@patternfly/react-icons'
+
+function ReloadButton({ isReloading, reloadCallback }) {
+  let content = null
+  if (isReloading) {
+    content = (
+      <>
+        <Spinner size="md" className="zuul-reload-spinner" />
+        {' '}<span>Reloading</span>
+      </>
+    )
+  } else {
+    content = (
+      <span>
+        <SyncAltIcon />{'  '}Reload
+      </span>
+    )
+  }
+
+  return (
+    <span className="zuul-reload-button"
+        onClick={() => reloadCallback()}>
+      <Button
+        variant="plain"
+        isInline
+        icon={<SyncAltIcon />}
+        isLoading={isReloading}
+      />
+      {isReloading ? "Reloading" : "Reload"}
+    </span>
+  )
+}
 
 function Fetchable(props) {
   const { isFetching, fetchCallback } = props
@@ -40,8 +71,8 @@ function Fetchable(props) {
       <Button
         variant="link"
         isInline icon={<SyncIcon />}
-        onClick={() => {fetchCallback({force: true})}}
-        style={{textDecoration: 'none'}}
+        onClick={() => { fetchCallback({ force: true }) }}
+        style={{ textDecoration: 'none' }}
       >
         refresh
       </Button>
@@ -49,7 +80,7 @@ function Fetchable(props) {
   }
 
   return (
-    <div style={{float: 'right'}}>
+    <div style={{ float: 'right' }}>
       {content}
     </div>
   )
@@ -71,4 +102,4 @@ function Fetching() {
   )
 }
 
-export { Fetchable, Fetching }
+export { Fetchable, Fetching, ReloadButton }
