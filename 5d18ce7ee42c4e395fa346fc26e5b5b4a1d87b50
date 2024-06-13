@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d36d441f_94a384c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2024-06-13T14:07:09Z",
+      "side": 1,
+      "message": "Verified this fixes the display. (zuul-stream-functional is a good job to look at)\n\nIt\u0027s not the prettiest display, a followup could render this a bit nicer next time someone has a minute - but it\u0027s not a react error, so yay!",
+      "revId": "5d18ce7ee42c4e395fa346fc26e5b5b4a1d87b50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
