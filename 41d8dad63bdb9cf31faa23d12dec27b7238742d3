@@ -16,6 +16,24 @@
       "message": "If this broke something, can you add a regression test for it?  We usually like to add tests when we fix bugs because that usually means there\u0027s a hole in testing.",
       "revId": "41d8dad63bdb9cf31faa23d12dec27b7238742d3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78f18aaf_c8c1e6e2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-06-13T14:15:08Z",
+      "side": 1,
+      "message": "True. I found this when trying out other experiments. I\u0027ll see if I can find a good test for it.",
+      "parentUuid": "9ebfb31a_727cd881",
+      "revId": "41d8dad63bdb9cf31faa23d12dec27b7238742d3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
