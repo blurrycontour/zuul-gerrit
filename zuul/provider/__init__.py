@@ -35,13 +35,29 @@ class BaseProviderLabel(metaclass=abc.ABCMeta):
         self.min_ready = config.get('min-ready', 0)
 
 
-class BaseProvider(metaclass=abc.ABCMeta):
-    """Base class for provider."""
+class BaseProviderEndpoint(metaclass=abc.ABCMeta):
+    """Base class for provider endpoints.
 
-    def __init__(self, driver, connection, config):
+    Providers and Sections are combined to describe clouds, and they
+    may not correspond exactly with the cloud's topology.  To
+    reconcile this, the Endpoint class is used for storing information
+    about what we would typically call a region of a cloud.  This is
+    the unit of visibility of instances, VPCs, images, etc.
+    """
+
+    def __init__(self, driver, connection):
         self.driver = driver
         self.connection = connection
 
+
+class BaseProvider(metaclass=abc.ABCMeta):
+    """Base class for provider."""
+
+    def __init__(self, driver, connection, canonical_name, config):
+        self.driver = driver
+        self.connection = connection
+
+        self.canonical_name = canonical_name
         self.name = config['name']
         self.section_name = config['section']
         self.description = config.get('description')
@@ -61,6 +77,11 @@ class BaseProvider(metaclass=abc.ABCMeta):
         :returns: a ProviderLabel subclass
         :rtype: ProviderLabel
         """
+        pass
+
+    @abc.abstractmethod
+    def getEndpoint(self):
+        """Get an endpoint for this provider"""
         pass
 
 

@@ -314,7 +314,7 @@ class ProviderInterface(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def getProvider(self, connection, config=None):
+    def getProvider(self, connection, canonical_name, config=None):
         """Create and return a new Provider object.
 
         This method is required by the interface.
@@ -324,6 +324,8 @@ class ProviderInterface(object, metaclass=abc.ABCMeta):
 
         :arg Connection connection: The Connection object associated
             with the provider (as previously returned by getConnection).
+        :arg str canonical_name: The canonical name of the ProviderConfig
+            object corresponding with this provider.
         :arg dict config: The flattened provider configuration from the
             layout.
 

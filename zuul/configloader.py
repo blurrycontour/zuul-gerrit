@@ -2855,7 +2855,8 @@ class TenantParser(object):
                     schema = connection.driver.getProviderSchema()
                     schema(flat_config)
                     provider = connection.driver.getProvider(
-                        connection, flat_config)
+                        connection, provider_config.canonical_name,
+                        flat_config)
                     shadow_layout.addProvider(provider)
 
         for queue in parsed_config.queues:

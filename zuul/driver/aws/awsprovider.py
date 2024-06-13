@@ -14,12 +14,14 @@
 
 import logging
 
+import boto3
 import voluptuous as vs
 
 from zuul.provider import (
     BaseProvider,
     BaseProviderSchema,
     BaseProviderLabel,
+    BaseProviderEndpoint,
 )
 
 
@@ -27,14 +29,46 @@ class AwsProviderLabel(BaseProviderLabel):
     pass
 
 
+class AwsProviderEndpoint(BaseProviderEndpoint):
+    """An AWS Endpoint corresponds to a single AWS region, and can include
+    multiple availability zones."""
+
+    def __init__(self, driver, connection, region):
+        super().__init__(driver, connection)
+        self.region = region
+
+        self.aws = boto3.Session(
+            aws_access_key_id=self.connection.access_key_id,
+            aws_secret_access_key=self.connection.secret_access_key,
+            profile_name=self.connection.profile,
+            region_name=region,
+        )
+        self.ec2_client = self.aws.client("ec2")
+        self.s3 = self.aws.resource('s3')
+        self.s3_client = self.aws.client('s3')
+        self.aws_quotas = self.aws.client("service-quotas")
+
+    def testListAmis(self):
+        # Just a demo method for testing
+        paginator = self.ec2_client.get_paginator('describe_images')
+        images = []
+        for page in paginator.paginate():
+            images.extend(page['Images'])
+        return images
+
+
 class AwsProvider(BaseProvider):
     log = logging.getLogger("zuul.AwsProvider")
 
-    def __init__(self, driver, connection, config):
-        super().__init__(driver, connection, config)
+    def __init__(self, driver, connection, canonical_name, config):
+        super().__init__(driver, connection, canonical_name, config)
+        self.region = config['region']
 
     def parseLabel(self, label_config):
         return AwsProviderLabel(label_config)
+
+    def getEndpoint(self):
+        return self.driver.getEndpoint(self)
 
 
 class AwsProviderSchema(BaseProviderSchema):

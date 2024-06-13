@@ -36,3 +36,7 @@ class TestAwsDriver(ZuulTestCase):
     def test_aws_config(self):
         aws_conn = self.scheds.first.sched.connections.connections['aws']
         self.assertEqual('fake', aws_conn.access_key_id)
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        provider = layout.providers['aws-us-east-1-main']
+        endpoint = provider.getEndpoint()
+        self.assertTrue(len(endpoint.testListAmis()) > 1)
