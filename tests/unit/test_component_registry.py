@@ -134,3 +134,15 @@ class TestComponentRegistry(ZuulTestCase):
         )
 
         self.assertComponentState("web", BaseComponent.RUNNING)
+
+    def test_launcher_component(self):
+        self.useFixture(
+            ZuulWebFixture(
+                self.changes, self.config, self.additional_event_queues,
+                self.upstream_root, self.poller_events,
+                self.git_url_with_auth, self.addCleanup, self.test_root
+            )
+        )
+
+        self.assertComponentState("launcher", BaseComponent.RUNNING)
+
