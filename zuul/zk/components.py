@@ -194,6 +194,17 @@ class WebComponent(BaseComponent):
     kind = "web"
 
 
+class LauncherComponent(BaseComponent):
+    kind = "launcher"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.initial_state = {
+            "connection_filter": None,
+        }
+        self.content.update(self.initial_state)
+
+
 class ComponentRegistry(ZooKeeperBase):
     """A component registry is organized like:
 
@@ -220,6 +231,7 @@ class ComponentRegistry(ZooKeeperBase):
         "merger": MergerComponent,
         "fingergw": FingerGatewayComponent,
         "web": WebComponent,
+        "launcher": LauncherComponent,
     }
 
     def __init__(self, client):
