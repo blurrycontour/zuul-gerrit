@@ -34,6 +34,7 @@ from kazoo.exceptions import NotEmptyError
 from opentelemetry import trace
 
 from zuul import configloader, exceptions
+from zuul.launcher.client import LauncherClient
 from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
@@ -214,6 +215,7 @@ class Scheduler(threading.Thread):
     _connection_cleanup_interval = IntervalTrigger(minutes=5, jitter=10)
     _merger_client_class = MergeClient
     _executor_client_class = ExecutorClient
+    _launcher_client_class = LauncherClient
 
     def __init__(self, config, connections, app, wait_for_init,
                  disable_pipelines=False, testonly=False):
@@ -348,6 +350,7 @@ class Scheduler(threading.Thread):
         if not testonly:
             self.executor = self._executor_client_class(self.config, self)
             self.merger = self._merger_client_class(self.config, self)
+            self.launcher = self._launcher_client_class(self.config, self)
             self.nodepool = nodepool.Nodepool(
                 self.zk_client, self.system.system_id, self.statsd,
                 scheduler=True)
