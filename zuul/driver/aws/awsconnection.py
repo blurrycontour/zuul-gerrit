@@ -41,7 +41,7 @@ class AwsConnection(BaseConnection):
             os.getenv('AWS_SECRET_ACCESS_KEY', None))
         self.profile = self.connection_config.get(
             'profile',
-            os.getenv('AWS_PROFILE', 'default'))
+            os.getenv('AWS_PROFILE', None))
 
         if (not self.access_key_id) and self.shared_credentials_file:
             path = os.path.expanduser(self.shared_credentials_file)

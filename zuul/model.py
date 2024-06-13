@@ -1459,6 +1459,14 @@ class Image(ConfigObject):
         self.type = image_type
         self.description = description
 
+    @property
+    def canonical_name(self):
+        return '/'.join([
+            urllib.parse.quote_plus(
+                self.source_context.project_canonical_name),
+            urllib.parse.quote_plus(self.name),
+        ])
+
     def __repr__(self):
         return '<Image %s>' % (self.name,)
 
@@ -1495,6 +1503,14 @@ class Flavor(ConfigObject):
         self.name = name
         self.description = description
 
+    @property
+    def canonical_name(self):
+        return '/'.join([
+            urllib.parse.quote_plus(
+                self.source_context.project_canonical_name),
+            urllib.parse.quote_plus(self.name),
+        ])
+
     def __repr__(self):
         return '<Flavor %s>' % (self.name,)
 
@@ -1530,6 +1546,14 @@ class Label(ConfigObject):
         self.image = image
         self.flavor = flavor
         self.description = description
+
+    @property
+    def canonical_name(self):
+        return '/'.join([
+            urllib.parse.quote_plus(
+                self.source_context.project_canonical_name),
+            urllib.parse.quote_plus(self.name),
+        ])
 
     def __repr__(self):
         return '<Label %s>' % (self.name,)
@@ -1588,6 +1612,14 @@ class Section(ConfigObject):
         # and only fully realized when creating a provider.
         self.config = {}
 
+    @property
+    def canonical_name(self):
+        return '/'.join([
+            urllib.parse.quote_plus(
+                self.source_context.project_canonical_name),
+            urllib.parse.quote_plus(self.name),
+        ])
+
     def __repr__(self):
         return '<Section %s>' % (self.name,)
 
@@ -1623,6 +1655,14 @@ class ProviderConfig(ConfigObject):
         # parsed and only fully realized when creating a final
         # provider.
         self.config = {}
+
+    @property
+    def canonical_name(self):
+        return '/'.join([
+            urllib.parse.quote_plus(
+                self.source_context.project_canonical_name),
+            urllib.parse.quote_plus(self.name),
+        ])
 
     def __repr__(self):
         return '<ProviderConfig %s>' % (self.name,)
