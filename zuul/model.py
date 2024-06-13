@@ -4727,9 +4727,14 @@ class BuildSet(zkobject.ZKObject):
                 self.configured = True
 
     def _toChangeDict(self, item, change):
+        if COMPONENT_REGISTRY.model_api < 29:
+            change_dict = change.toDict()
+        else:
+            change_dict = dict(
+                ref=change.cache_key,
+            )
         # Inject bundle_id to dict if available, this can be used to decide
         # if changes belongs to the same bunbdle
-        change_dict = change.toDict()
         if len(item.changes) > 1:
             change_dict['bundle_id'] = item.uuid
         return change_dict
