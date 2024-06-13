@@ -127,6 +127,18 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         search scope.
         """
 
+    def useDependenciesByTopic(self):
+        """Return whether the source uses topic dependencies
+
+        If a source treats changes in a topic as a dependency cycle,
+        this will return True.
+
+        This is only implemented by the Gerrit driver, however if
+        other systems have a similar "topic" functionality, it could
+        be added to other drivers.
+        """
+        return False
+
     def getChangesByTopic(self, topic):
         """Return changes in the same topic.
 

@@ -44,6 +44,12 @@ configuration is to configure both SSH and HTTP access.
 The section below describes commond configuration settings.  Specific
 settings for different connection methods follow.
 
+.. note::
+
+   If Gerrit is upgraded, or the value of ``change.submitWholeTopic``
+   is changed while Zuul is running, all running Zuul schedulers
+   should be restarted in order to see the change.
+
 Connection Configuration
 ------------------------
 
