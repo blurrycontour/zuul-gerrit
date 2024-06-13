@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d220227_9983b1e6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-06-13T14:10:45Z",
+      "side": 1,
+      "message": "recheck\nNo reason for test_finger_gateway to fail.",
+      "revId": "4183015e91a4fdeb8fb748b89bac7b28b368fab0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
