@@ -248,14 +248,16 @@ class TestWeb(BaseTestWeb):
         data = resp.json()
 
         # The list should contain one of each kind: executor, scheduler, web
-        self.assertEqual(len(data), 3)
+        self.assertEqual(len(data), 4)
         self.assertEqual(len(data["executor"]), 1)
+        self.assertEqual(len(data["launcher"]), 1)
         self.assertEqual(len(data["scheduler"]), self.scheduler_count)
         self.assertEqual(len(data["web"]), 1)
 
         # Each component should contain hostname and state information
         for key in ["hostname", "state", "version"]:
             self.assertIn(key, data["executor"][0])
+            self.assertIn(key, data["launcher"][0])
             self.assertIn(key, data["scheduler"][0])
             self.assertIn(key, data["web"][0])
 
