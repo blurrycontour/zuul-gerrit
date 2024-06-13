@@ -134,3 +134,7 @@ class TestComponentRegistry(ZuulTestCase):
         )
 
         self.assertComponentState("web", BaseComponent.RUNNING)
+
+    def test_launcher_component(self):
+        self.assertComponentState("launcher", BaseComponent.RUNNING)
+
