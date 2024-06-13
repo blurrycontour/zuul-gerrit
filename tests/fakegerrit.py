@@ -728,6 +728,7 @@ class GerritWebServer(object):
             def do_POST(self):
                 path = self.path
                 self.log.debug("Got POST %s", path)
+                fake_gerrit.api_calls.append(('POST', path))
 
                 data = self.rfile.read(int(self.headers['Content-Length']))
                 data = json.loads(data.decode('utf-8'))
@@ -749,6 +750,7 @@ class GerritWebServer(object):
             def do_GET(self):
                 path = self.path
                 self.log.debug("Got GET %s", path)
+                fake_gerrit.api_calls.append(('GET', path))
 
                 m = self.change_re.match(path)
                 if m:
@@ -1015,6 +1017,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self.change_number = 0
         self.changes = changes_db
         self.queries = []
+        self.api_calls = []
         self.upstream_root = upstream_root
         self.fake_checkers = []
         self._poller_event = poller_event
@@ -1136,6 +1139,8 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         for dep in change.data.get('dependsOn', []):
             dep_change = self.changes.get(int(dep['number']))
             r = dep_change.queryHTTP(internal=True)
+            if r['status'] == 'MERGED':
+                continue
             if r not in results:
                 results.append(r)
         if len(results) == 1:
