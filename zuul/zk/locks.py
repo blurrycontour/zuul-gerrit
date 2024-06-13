@@ -16,6 +16,7 @@ import logging
 from contextlib import contextmanager
 from urllib.parse import quote_plus
 
+from kazoo.exceptions import NoNodeError
 from kazoo.protocol.states import KazooState
 from kazoo.recipe.lock import Lock, ReadLock, WriteLock
 
@@ -31,6 +32,9 @@ class SessionAwareMixin:
         self._zuul_ephemeral = None
         self._zuul_session_expired = False
         self._zuul_watching_session = False
+        self._zuul_seen_contenders = set()
+        self._zuul_seen_contender_names = set()
+        self._zuul_contender_watch = None
         super().__init__(client, path, identifier, extra_lock_patterns)
 
     def acquire(self, blocking=True, timeout=None, ephemeral=True):
@@ -59,6 +63,36 @@ class SessionAwareMixin:
         if not self._zuul_ephemeral:
             return True
         return not self._zuul_session_expired
+
+    def watch_for_contenders(self):
+        if not self.is_acquired:
+            raise Exception("Unable to set contender watch without lock")
+        self._zuul_contender_watch = self.client.ChildrenWatch(
+            self.path,
+            self._zuul_event_watch, send_event=True)
+
+    def _zuul_event_watch(self, children, event=None):
+        if not self.is_acquired:
+            # Stop watching
+            return False
+        if children:
+            for child in children:
+                if child in self._zuul_seen_contenders:
+                    continue
+                self._zuul_seen_contenders.add(child)
+                try:
+                    data, stat = self.client.get(self.path + "/" + child)
+                    if data is not None:
+                        data = data.decode("utf-8")
+                        self._zuul_seen_contender_names.add(data)
+                except NoNodeError:
+                    pass
+        return True
+
+    def contender_present(self, name):
+        if self._zuul_contender_watch is None:
+            raise Exception("Watch not started")
+        return name in self._zuul_seen_contender_names
 
 
 class SessionAwareLock(SessionAwareMixin, Lock):
