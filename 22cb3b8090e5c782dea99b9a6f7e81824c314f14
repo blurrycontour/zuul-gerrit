@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da943079_297781fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2024-06-13T13:16:16Z",
+      "side": 1,
+      "message": "I did a test on live deployment connected to gitlab and was able to use zuul-client autohold ... --change \u003cnumber\u003e to hold a node.",
+      "revId": "22cb3b8090e5c782dea99b9a6f7e81824c314f14",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
