@@ -23,6 +23,7 @@ from tests.base import (
     AnsibleZuulTestCase,
     BaseTestCase,
     simple_layout,
+    gerrit_config,
     skipIfMultiScheduler,
     ZuulTestCase,
 )
@@ -879,12 +880,11 @@ class TestGerritFake(ZuulTestCase):
         ret = self.fake_gerrit._getSubmittedTogether(C1, None)
         self.assertEqual(ret, [])
 
+    @gerrit_config(submit_whole_topic=True)
     def test_submitted_together_whole_topic(self):
         # Test that the fake submitted together endpoint returns
         # expected data
-
         # This test verifies behavior with submitWholeTopic=True
-        self.fake_gerrit._fake_submit_whole_topic = True
 
         # A single change
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')

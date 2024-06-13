@@ -194,6 +194,20 @@ def never_capture():
     return decorator
 
 
+def gerrit_config(submit_whole_topic=False):
+    """Configure the fake gerrit
+
+    This allows us to configure the fake gerrit at startup.
+    """
+
+    def decorator(test):
+        test.__gerrit_config__ = dict(
+            submit_whole_topic=submit_whole_topic,
+        )
+        return test
+    return decorator
+
+
 def registerProjects(source_name, client, config):
     path = config.get('scheduler', 'tenant_config')
     with open(os.path.join(FIXTURE_DIR, path)) as f:
@@ -243,11 +257,12 @@ class StatException(Exception):
 
 
 class GerritDriverMock(GerritDriver):
-    def __init__(self, registry, changes, upstream_root,
+    def __init__(self, registry, test_config, upstream_root,
                  additional_event_queues, poller_events, add_cleanup):
         super(GerritDriverMock, self).__init__()
         self.registry = registry
-        self.changes = changes
+        self.test_config = test_config
+        self.changes = test_config.changes
         self.upstream_root = upstream_root
         self.additional_event_queues = additional_event_queues
         self.poller_events = poller_events
@@ -259,12 +274,15 @@ class GerritDriverMock(GerritDriver):
         poll_event = self.poller_events.setdefault(name, threading.Event())
         ref_event = self.poller_events.setdefault(name + '-ref',
                                                   threading.Event())
+        submit_whole_topic = self.test_config.gerrit_config.get(
+            'submit_whole_topic', False)
         connection = tests.fakegerrit.FakeGerritConnection(
             self, name, config,
             changes_db=db,
             upstream_root=self.upstream_root,
             poller_event=poll_event,
-            ref_watcher_event=ref_event)
+            ref_watcher_event=ref_event,
+            submit_whole_topic=submit_whole_topic)
         if connection.web_server:
             self.add_cleanup(connection.web_server.stop)
 
@@ -273,11 +291,11 @@ class GerritDriverMock(GerritDriver):
 
 
 class GithubDriverMock(GithubDriver):
-    def __init__(self, registry, changes, config, upstream_root,
+    def __init__(self, registry, test_config, config, upstream_root,
                  additional_event_queues, git_url_with_auth):
         super(GithubDriverMock, self).__init__()
         self.registry = registry
-        self.changes = changes
+        self.changes = test_config.changes
         self.config = config
         self.upstream_root = upstream_root
         self.additional_event_queues = additional_event_queues
@@ -298,11 +316,11 @@ class GithubDriverMock(GithubDriver):
 
 
 class PagureDriverMock(PagureDriver):
-    def __init__(self, registry, changes, upstream_root,
+    def __init__(self, registry, test_config, upstream_root,
                  additional_event_queues):
         super(PagureDriverMock, self).__init__()
         self.registry = registry
-        self.changes = changes
+        self.changes = test_config.changes
         self.upstream_root = upstream_root
         self.additional_event_queues = additional_event_queues
 
@@ -318,11 +336,11 @@ class PagureDriverMock(PagureDriver):
 
 
 class GitlabDriverMock(GitlabDriver):
-    def __init__(self, registry, changes, config, upstream_root,
+    def __init__(self, registry, test_config, config, upstream_root,
                  additional_event_queues):
         super(GitlabDriverMock, self).__init__()
         self.registry = registry
-        self.changes = changes
+        self.changes = test_config.changes
         self.config = config
         self.upstream_root = upstream_root
         self.additional_event_queues = additional_event_queues
@@ -341,19 +359,19 @@ class GitlabDriverMock(GitlabDriver):
 
 
 class TestConnectionRegistry(ConnectionRegistry):
-    def __init__(self, changes, config, additional_event_queues,
-                 upstream_root, poller_events, git_url_with_auth,
-                 add_cleanup):
+    def __init__(self, config, test_config,
+                 additional_event_queues, upstream_root,
+                 poller_events, git_url_with_auth, add_cleanup):
         self.connections = OrderedDict()
         self.drivers = {}
 
         self.registerDriver(ZuulDriver())
         self.registerDriver(GerritDriverMock(
-            self, changes, upstream_root, additional_event_queues,
+            self, test_config, upstream_root, additional_event_queues,
             poller_events, add_cleanup))
         self.registerDriver(GitDriver())
         self.registerDriver(GithubDriverMock(
-            self, changes, config, upstream_root, additional_event_queues,
+            self, test_config, config, upstream_root, additional_event_queues,
             git_url_with_auth))
         self.registerDriver(SMTPDriver())
         self.registerDriver(TimerDriver())
@@ -362,9 +380,9 @@ class TestConnectionRegistry(ConnectionRegistry):
         self.registerDriver(NullwrapDriver())
         self.registerDriver(MQTTDriver())
         self.registerDriver(PagureDriverMock(
-            self, changes, upstream_root, additional_event_queues))
+            self, test_config, upstream_root, additional_event_queues))
         self.registerDriver(GitlabDriverMock(
-            self, changes, config, upstream_root, additional_event_queues))
+            self, test_config, config, upstream_root, additional_event_queues))
         self.registerDriver(ElasticsearchDriver())
 
 
@@ -1458,13 +1476,15 @@ class WebProxyFixture(fixtures.Fixture):
 
 
 class ZuulWebFixture(fixtures.Fixture):
-    def __init__(self, changes, config, additional_event_queues,
-                 upstream_root, poller_events, git_url_with_auth,
-                 add_cleanup, test_root, info=None):
+    def __init__(self, config, test_config,
+                 additional_event_queues, upstream_root,
+                 poller_events, git_url_with_auth, add_cleanup,
+                 test_root, info=None):
         super(ZuulWebFixture, self).__init__()
         self.config = config
         self.connections = TestConnectionRegistry(
-            changes, config, additional_event_queues, upstream_root,
+            config, test_config,
+            additional_event_queues, upstream_root,
             poller_events, git_url_with_auth, add_cleanup)
         self.connections.configure(config)
 
@@ -1689,15 +1709,11 @@ class BaseTestCase(testtools.TestCase):
             False)
         self.addDetail('logging', content)
 
-    def shouldNeverCapture(self):
-        test_name = self.id().split('.')[-1]
-        test = getattr(self, test_name)
-        if hasattr(test, '__never_capture__'):
-            return getattr(test, '__never_capture__')
-        return False
-
     def setUp(self):
         super(BaseTestCase, self).setUp()
+
+        self.test_config = TestConfig(self)
+
         self.useFixture(PrometheusFixture())
         self.useFixture(GlobalRegistryFixture())
         test_timeout = os.environ.get('OS_TEST_TIMEOUT', 0)
@@ -1712,7 +1728,7 @@ class BaseTestCase(testtools.TestCase):
             self.useFixture(fixtures.Timeout(test_timeout, gentle=True))
             self.useFixture(fixtures.Timeout(test_timeout + 20, gentle=False))
 
-        if not self.shouldNeverCapture():
+        if not self.test_config.never_capture:
             if (os.environ.get('OS_STDOUT_CAPTURE') == 'True' or
                 os.environ.get('OS_STDOUT_CAPTURE') == '1'):
                 stdout = self.useFixture(
@@ -1847,21 +1863,22 @@ class SymLink(object):
 
 
 class SchedulerTestApp:
-    def __init__(self, log, config, changes, additional_event_queues,
+    def __init__(self, log, config, test_config,
+                 additional_event_queues,
                  upstream_root, poller_events,
                  git_url_with_auth, add_cleanup, validate_tenants,
                  wait_for_init, disable_pipelines, instance_id):
         self.log = log
         self.config = config
-        self.changes = changes
+        self.test_config = test_config
         self.validate_tenants = validate_tenants
         self.wait_for_init = wait_for_init
         self.disable_pipelines = disable_pipelines
 
         # Register connections from the config using fakes
         self.connections = TestConnectionRegistry(
-            self.changes,
             self.config,
+            self.test_config,
             additional_event_queues,
             upstream_root,
             poller_events,
@@ -1940,7 +1957,7 @@ class SchedulerTestManager:
     def __init__(self, validate_tenants, wait_for_init, disable_pipelines):
         self.instances = []
 
-    def create(self, log, config, changes, additional_event_queues,
+    def create(self, log, config, test_config, additional_event_queues,
                upstream_root, poller_events, git_url_with_auth,
                add_cleanup, validate_tenants, wait_for_init,
                disable_pipelines):
@@ -1960,7 +1977,7 @@ class SchedulerTestManager:
         )
         scheduler_config.set("scheduler", "command_socket", command_socket)
 
-        app = SchedulerTestApp(log, scheduler_config, changes,
+        app = SchedulerTestApp(log, scheduler_config, test_config,
                                additional_event_queues, upstream_root,
                                poller_events, git_url_with_auth,
                                add_cleanup, validate_tenants,
@@ -2004,6 +2021,22 @@ class SchedulerTestManager:
     def execute(self, function, matcher=None):
         for instance in self.filter(matcher):
             function(instance)
+
+
+class TestConfig:
+    def __init__(self, testobj):
+        test_name = testobj.id().split('.')[-1]
+        test = getattr(testobj, test_name)
+        self.simple_layout = None
+        self.gerrit_config = {}
+        self.never_capture = None
+        if hasattr(test, '__simple_layout__'):
+            self.simple_layout = getattr(test, '__simple_layout__')
+        if hasattr(test, '__gerrit_config__'):
+            self.gerrit_config = getattr(test, '__gerrit_config__')
+        if hasattr(test, '__never_capture__'):
+            self.gerrit_config = getattr(test, '__never_capture__')
+        self.changes = FakeChangeDB()
 
 
 class ZuulTestCase(BaseTestCase):
@@ -2198,7 +2231,6 @@ class ZuulTestCase(BaseTestCase):
         gerritsource.GerritSource.replication_retry_interval = 0.5
         gerritconnection.GerritEventConnector.delay = 0.0
 
-        self.changes = FakeChangeDB()
         if self.load_change_db:
             self.loadChangeDB()
 
@@ -2223,7 +2255,8 @@ class ZuulTestCase(BaseTestCase):
         self._configureElasticsearch()
 
         executor_connections = TestConnectionRegistry(
-            self.changes, self.config, self.additional_event_queues,
+            self.config, self.test_config,
+            self.additional_event_queues,
             self.upstream_root, self.poller_events,
             self.git_url_with_auth, self.addCleanup)
         executor_connections.configure(self.config,
@@ -2260,7 +2293,7 @@ class ZuulTestCase(BaseTestCase):
 
     def createScheduler(self):
         return self.scheds.create(
-            self.log, self.config, self.changes,
+            self.log, self.config, self.test_config,
             self.additional_event_queues, self.upstream_root,
             self.poller_events, self.git_url_with_auth,
             self.addCleanup, self.validate_tenants, self.wait_for_init,
@@ -2396,18 +2429,15 @@ class ZuulTestCase(BaseTestCase):
 
         return config
 
-    def setupSimpleLayout(self, config: ConfigParser):
+    def setupSimpleLayout(self, config):
         # If the test method has been decorated with a simple_layout,
         # use that instead of the class tenant_config_file.  Set up a
         # single config-project with the specified layout, and
         # initialize repos for all of the 'project' entries which
         # appear in the layout.
-        test_name = self.id().split('.')[-1]
-        test = getattr(self, test_name)
-        if hasattr(test, '__simple_layout__'):
-            path, driver = getattr(test, '__simple_layout__')
-        else:
+        if not self.test_config.simple_layout:
             return False
+        path, driver = self.test_config.simple_layout
 
         files = {}
         path = os.path.join(FIXTURE_DIR, path)
@@ -3549,11 +3579,11 @@ class ZuulTestCase(BaseTestCase):
 
     def saveChangeDB(self):
         path = os.path.join(self.test_root, "changes.data")
-        self.changes.save(path)
+        self.test_config.changes.save(path)
 
     def loadChangeDB(self):
         path = os.path.join(self.test_root, "changes.data")
-        self.changes.load(path)
+        self.test_config.changes.load(path)
 
 
 class AnsibleZuulTestCase(ZuulTestCase):

@@ -97,7 +97,7 @@ class TestSchedulerZone(ZuulTestCase):
         config.set('executor', 'command_socket',
                    os.path.join(self.test_root, 'executor2.socket'))
         executor_connections = TestConnectionRegistry(
-            self.changes, self.config, self.additional_event_queues,
+            self.config, self.test_config, self.additional_event_queues,
             self.upstream_root, self.poller_events,
             self.git_url_with_auth, self.addCleanup)
         executor_connections.configure(self.config,

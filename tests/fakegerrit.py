@@ -1000,7 +1000,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
 
     def __init__(self, driver, connection_name, connection_config,
                  changes_db=None, upstream_root=None, poller_event=None,
-                 ref_watcher_event=None):
+                 ref_watcher_event=None, submit_whole_topic=None):
 
         if connection_config.get('password'):
             self.web_server = GerritWebServer(self)
@@ -1022,7 +1022,7 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         self.fake_checkers = []
         self._poller_event = poller_event
         self._ref_watcher_event = ref_watcher_event
-        self._fake_submit_whole_topic = False
+        self._fake_submit_whole_topic = bool(submit_whole_topic)
         self._fake_submit_permission = True
         self._fake_project_default_branch = {}
         self.submit_retry_backoff = 0
