@@ -103,6 +103,8 @@ import zuul.driver.sql
 import zuul.scheduler
 import zuul.executor.server
 import zuul.executor.client
+import zuul.launcher.server
+import zuul.launcher.client
 import zuul.lib.ansible
 import zuul.lib.connections
 import zuul.lib.auth
@@ -2179,6 +2181,9 @@ class ZuulTestCase(BaseTestCase):
         self.config.set(
             'web', 'command_socket',
             os.path.join(self.test_root, 'web.socket'))
+        self.config.set(
+            'launcher', 'command_socket',
+            os.path.join(self.test_root, 'launcher.socket'))
 
         self.statsd = FakeStatsd()
         if self.config.has_section('statsd'):
@@ -2241,6 +2246,9 @@ class ZuulTestCase(BaseTestCase):
         self.executor_server.start()
         self.history = self.executor_server.build_history
         self.builds = self.executor_server.running_builds
+
+        self.launcher = zuul.launcher.server.Launcher(self.config)
+        self.launcher.start()
 
         self.scheds = SchedulerTestManager(self.validate_tenants,
                                            self.wait_for_init,
@@ -2326,8 +2334,8 @@ class ZuulTestCase(BaseTestCase):
         config.read(os.path.join(FIXTURE_DIR, config_file))
 
         sections = [
-            'zuul', 'scheduler', 'executor', 'merger', 'web', 'zookeeper',
-            'keystore', 'database',
+            'zuul', 'scheduler', 'executor', 'merger', 'web', 'launcher',
+            'zookeeper', 'keystore', 'database',
         ]
         for section in sections:
             if not config.has_section(section):
@@ -2641,6 +2649,8 @@ class ZuulTestCase(BaseTestCase):
 
         self.executor_server.stop()
         self.executor_server.join()
+        self.launcher.stop()
+        self.launcher.join()
         self.scheds.execute(lambda app: app.sched.stop())
         self.scheds.execute(lambda app: app.sched.join())
         self.statsd.stop()
