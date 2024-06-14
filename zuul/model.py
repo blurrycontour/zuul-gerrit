@@ -26,6 +26,7 @@ import textwrap
 import types
 import urllib.parse
 from collections import OrderedDict, defaultdict, namedtuple, UserDict
+from enum import StrEnum
 from functools import partial, total_ordering
 from uuid import uuid4
 
@@ -2141,6 +2142,129 @@ class NodeRequest(object):
         request.updateFromDict(data)
 
         return request
+
+
+class NodesetRequest(zkobject.LockableZKObject):
+
+    class State(StrEnum):
+        REQUESTED = "requested"
+        ACCEPTED = "accepted"
+        FULFILLED = "fulfilled"
+        FAILED = "failed"
+
+    FINAL_STATES = (
+        State.FULFILLED,
+        State.FAILED,
+    )
+
+    ROOT = "/zuul/nodeset"
+    REQUESTS_PATH = "requests"
+    LOCKS_PATH = "locks"
+
+    def __init__(self):
+        super().__init__()
+        self._set(
+            uuid=uuid4().hex,
+            state=self.State.REQUESTED,
+            tenant_name="",
+            pipeline_name="",
+            buildset_uuid="",
+            job_uuid="",
+            job_name="",
+            labels=[],
+            priority=0,
+            request_time=time.time(),
+            zuul_event_id="",
+            span_info=None,
+            provider_nodes=[],
+            # Attributes that are not serialized
+            lock=None,
+            is_locked=False,
+            # Attributes set by the launcher
+            _lscores=None,
+        )
+
+    def getPath(self):
+        return f"{self.ROOT}/{self.REQUESTS_PATH}/{self.uuid}"
+
+    def getLockPath(self):
+        return f"{self.ROOT}/{self.LOCKS_PATH}/{self.uuid}"
+
+    def serialize(self, context):
+        data = dict(
+            uuid=self.uuid,
+            state=self.state,
+            tenant_name=self.tenant_name,
+            pipeline_name=self.pipeline_name,
+            buildset_uuid=self.buildset_uuid,
+            job_uuid=self.job_uuid,
+            job_name=self.job_name,
+            labels=self.labels,
+            priority=self.priority,
+            request_time=self.request_time,
+            zuul_event_id=self.zuul_event_id,
+            span_info=self.span_info,
+            provider_nodes=self.provider_nodes,
+        )
+        return json.dumps(data, sort_keys=True).encode("utf-8")
+
+    def __repr__(self):
+        return (f"<NodesetRequest uuid={self.uuid}, state={self.state},"
+                f" labels={self.labels}, path={self.getPath()}>")
+
+
+class ProviderNode(zkobject.LockableZKObject):
+
+    class State(StrEnum):
+        REQUESTED = "requested"
+        BUILDING = "building"
+        READY = "ready"
+        FAILED = "failed"
+        USED = "used"
+        HOLD = "hold"
+
+    FINAL_STATES = (
+        State.READY,
+        State.FAILED,
+    )
+
+    ROOT = "/zuul/nodes"
+    NODES_PATH = "nodes"
+    LOCKS_PATH = "locks"
+
+    def __init__(self):
+        super().__init__()
+        self._set(
+            uuid=uuid4().hex,
+            request_id="",
+            state=self.State.REQUESTED,
+            label="",
+            connection_name="",
+            # Attributes that are not serialized
+            is_locked=False,
+            # Attributes set by the launcher
+            _lscores=None,
+        )
+
+    def __repr__(self):
+        return (f"<ProviderNode uuid={self.uuid}, state={self.state},"
+                f" path={self.getPath()}>")
+
+    def getPath(self):
+        return f"{self.ROOT}/{self.NODES_PATH}/{self.uuid}"
+
+    def getLockPath(self):
+        return f"{self.ROOT}/{self.LOCKS_PATH}/{self.uuid}"
+
+    def serialize(self, context):
+        data = dict(
+            uuid=self.uuid,
+            request_id=self.request_id,
+            state=self.state,
+            label=self.label,
+            connection_name=self.connection_name,
+        )
+        return json.dumps(data, sort_keys=True).encode("utf-8")
 
 
 class Secret(ConfigObject):
