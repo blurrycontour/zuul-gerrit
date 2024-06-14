@@ -2791,7 +2791,7 @@ class ZuulWeb(object):
                 == self.tenant_layout_state.get(tenant_name)):
             return
         self.log.debug("Reloading tenant %s", tenant_name)
-        with tenant_read_lock(self.zk_client, tenant_name):
+        with tenant_read_lock(self.zk_client, tenant_name, self.log):
             layout_state = self.tenant_layout_state.get(tenant_name)
             layout_uuid = layout_state and layout_state.uuid
 

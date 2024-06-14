@@ -767,7 +767,7 @@ class Scheduler(threading.Thread):
         for tenant in self.abide.tenants.values():
             try:
                 with tenant_read_lock(self.zk_client, tenant.name,
-                                      blocking=False):
+                                      self.log, blocking=False):
                     if not self.isTenantLayoutUpToDate(tenant.name):
                         self.log.debug(
                             "Skipping leaked pipeline cleanup for tenant %s",
@@ -1034,11 +1034,13 @@ class Scheduler(threading.Thread):
                     # There is no need to use the reconfig lock ID here as
                     # we are starting from an empty layout state and there
                     # should be no concurrent read locks.
-                    lock_ctx = tenant_write_lock(self.zk_client, tenant_name)
+                    lock_ctx = tenant_write_lock(self.zk_client,
+                                                 tenant_name, self.log)
                     timer_ctx = self.statsd_timer(
                         f'{stats_key}.reconfiguration_time')
                 else:
-                    lock_ctx = tenant_read_lock(self.zk_client, tenant_name)
+                    lock_ctx = tenant_read_lock(self.zk_client,
+                                                tenant_name, self.log)
                     timer_ctx = nullcontext()
 
                 with lock_ctx as tlock, timer_ctx:
@@ -1284,7 +1286,7 @@ class Scheduler(threading.Thread):
                             self.updateSystemConfig()
 
                         with tenant_read_lock(self.zk_client, tenant_name,
-                                              blocking=False):
+                                              log, blocking=False):
                             remote_state = self.tenant_layout_state.get(
                                 tenant_name)
                             local_state = self.local_layout_state.get(
@@ -1541,7 +1543,7 @@ class Scheduler(threading.Thread):
 
                 stats_key = f'zuul.tenant.{tenant_name}'
                 with (tenant_write_lock(
-                        self.zk_client, tenant_name,
+                        self.zk_client, tenant_name, self.log,
                         identifier=RECONFIG_LOCK_ID) as lock,
                       self.statsd_timer(f'{stats_key}.reconfiguration_time')):
                     tenant = loader.loadTenant(
@@ -1607,7 +1609,7 @@ class Scheduler(threading.Thread):
         with self.layout_lock[event.tenant_name]:
             old_tenant = self.abide.tenants.get(event.tenant_name)
             with (tenant_write_lock(
-                    self.zk_client, event.tenant_name,
+                    self.zk_client, event.tenant_name, self.log,
                     identifier=RECONFIG_LOCK_ID) as lock,
                   self.statsd_timer(f'{stats_key}.reconfiguration_time')):
                 log.debug("Loading tenant %s", event.tenant_name)
@@ -2180,7 +2182,7 @@ class Scheduler(threading.Thread):
 
             try:
                 with tenant_read_lock(
-                    self.zk_client, tenant_name, blocking=False
+                        self.zk_client, tenant_name, self.log, blocking=False
                 ) as tlock:
                     if not self.isTenantLayoutUpToDate(tenant_name):
                         continue
