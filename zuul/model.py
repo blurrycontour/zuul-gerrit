@@ -26,6 +26,7 @@ import textwrap
 import types
 import urllib.parse
 from collections import OrderedDict, defaultdict, namedtuple, UserDict
+from enum import StrEnum
 from functools import partial, total_ordering
 from uuid import uuid4
 
@@ -1829,6 +1830,182 @@ class NodeRequest(object):
         request.updateFromDict(data)
 
         return request
+
+
+class NodesetRequest:
+
+    class State(StrEnum):
+        REQUESTED = "requested"
+        ACCEPTED = "accepted"
+        FULFILLED = "fulfilled"
+        FAILED = "failed"
+
+    FINAL_STATES = (
+        State.FULFILLED,
+        State.FAILED,
+    )
+
+    _local_attrs = ("path", "stat", "lock", "_lscores",)
+
+    def __init__(self, tenant_name, pipeline_name, buildset_uuid, job_uuid,
+                 job_name, labels, priority, preferred_provider, request_time,
+                 zuul_event_id, span_info,
+                 *, uuid=None, state=State.REQUESTED, provider_nodes=None):
+        self._set(
+            uuid=uuid or uuid4().hex,
+            state=state,
+            tenant_name=tenant_name,
+            pipeline_name=pipeline_name,
+            buildset_uuid=buildset_uuid,
+            job_uuid=job_uuid,
+            job_name=job_name,
+            labels=labels,
+            priority=priority,
+            preferred_provider=preferred_provider,
+            request_time=request_time,
+            zuul_event_id=zuul_event_id,
+            span_info=span_info,
+            provider_nodes=provider_nodes or [],
+            # Attributes related to ZK (not serialized)
+            path=None,
+            stat=None,
+            lock=None,
+            is_locked=False,
+            # Attributes set by the launcher
+            _lscores=None,
+        )
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(**data)
+
+    def toDict(self):
+        return dict(
+            uuid=self.uuid,
+            state=self.state,
+            tenant_name=self.tenant_name,
+            pipeline_name=self.pipeline_name,
+            buildset_uuid=self.buildset_uuid,
+            job_uuid=self.job_uuid,
+            job_name=self.job_name,
+            labels=self.labels,
+            priority=self.priority,
+            preferred_provider=self.preferred_provider,
+            request_time=self.request_time,
+            zuul_event_id=self.zuul_event_id,
+            span_info=self.span_info,
+            provider_nodes=self.provider_nodes,
+        )
+
+    def updateFromDict(self, d):
+        self._set(
+            state=d["state"],
+            tenant_name=d["tenant_name"],
+            pipeline_name=d["pipeline_name"],
+            buildset_uuid=d["buildset_uuid"],
+            job_uuid=d["job_uuid"],
+            job_name=d["job_name"],
+            labels=d["labels"],
+            priority=d["priority"],
+            preferred_provider=d["preferred_provider"],
+            request_time=d["request_time"],
+            zuul_event_id=d["zuul_event_id"],
+            span_info=d["span_info"],
+            provider_nodes=d["provider_nodes"],
+        )
+
+    @property
+    def ltime(self):
+        return self.stat.czxid
+
+    def __repr__(self):
+        return (f"<NodesetRequest uuid={self.uuid}, state={self.state},"
+                f" labels={self.labels}, path={self.path}>")
+
+    def __setattr__(self, name, value):
+        if name in self._local_attrs:
+            super().__setattr__(name, value)
+        else:
+            raise Exception(
+                f"Unable to modify {repr(self)} attributes directly")
+
+    def _set(self, **attrs):
+        for name, value in attrs.items():
+            super().__setattr__(name, value)
+
+
+class ProviderNode:
+
+    class State(StrEnum):
+        REQUESTED = "requested"
+        BUILDING = "building"
+        READY = "ready"
+        FAILED = "failed"
+        USED = "used"
+        HOLD = "hold"
+
+    FINAL_STATES = (
+        State.READY,
+        State.FAILED,
+    )
+
+    _local_attrs = ("provider", "path", "stat", "lock", "_lscores",)
+
+    def __init__(self, *, request_id, label, uuid=None,
+                 state=State.REQUESTED):
+        self._set(
+            uuid=uuid or uuid4().hex,
+            request_id=request_id,
+            state=state,
+            label=label,
+            # Attributes related to ZK (not serialized)
+            provider=None,
+            path=None,
+            stat=None,
+            lock=None,
+            is_locked=False,
+            # Attributes set by the launcher
+            _lscores=None,
+        )
+
+    def __repr__(self):
+        return (f"<ProviderNode uuid={self.uuid}, state={self.state},"
+                f" path={self.path}>")
+
+    def __setattr__(self, name, value):
+        if name in self._local_attrs:
+            super().__setattr__(name, value)
+        else:
+            raise Exception(
+                f"Unable to modify {repr(self)} attributes directly")
+
+    def _set(self, **attrs):
+        for name, value in attrs.items():
+            super().__setattr__(name, value)
+
+    @property
+    def ltime(self):
+        return self.stat.czxid
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(**data)
+
+    def toDict(self):
+        return dict(
+            uuid=self.uuid,
+            request_id=self.request_id,
+            state=self.state,
+            label=self.label,
+        )
+
+    def updateFromDict(self, d):
+        self._set(
+            uuid=d["uuid"],
+            request_id=d["request_id"],
+            state=d["state"],
+            label=d["label"],
+        )
 
 
 class Secret(ConfigObject):
