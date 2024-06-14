@@ -16,6 +16,24 @@
       "message": "You don\u0027t actually need to run the zuul web fixture in order to verify the launcher is running.",
       "revId": "a7123df3860e1128e8afe534e4ca7e1751d141f1",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4562e19_2abbb647",
+        "filename": "tests/unit/test_component_registry.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-14T05:17:22Z",
+      "side": 1,
+      "message": "Fixed",
+      "parentUuid": "fe0aa4e6_e670fdb5",
+      "revId": "a7123df3860e1128e8afe534e4ca7e1751d141f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
