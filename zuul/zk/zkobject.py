@@ -22,11 +22,12 @@ import types
 import zlib
 import collections
 
-from kazoo.exceptions import NodeExistsError, NoNodeError
+from kazoo.exceptions import LockTimeout, NodeExistsError, NoNodeError
 from kazoo.retry import KazooRetry
 
 from zuul.zk import sharding
 from zuul.zk import ZooKeeperClient
+from zuul.zk.locks import SessionAwareLock
 
 
 class BaseZKContext:
@@ -358,7 +359,7 @@ class ZKObject:
         context.cumulative_read_bytes += len(compressed_data)
         return compressed_data, zstat
 
-    def _load(self, context, path=None, deserialize=True):
+    def _load(self, context, path=None):
         if path is None:
             path = self.getPath()
         if context.sessionIsInvalid():
@@ -371,21 +372,26 @@ class ZKObject:
             context.log.error(
                 "Exception loading ZKObject %s at %s", self, path)
             raise
-        if deserialize:
-            self._set(_zkobject_hash=None)
+        self._updateFromRaw(compressed_data, zstat, context)
+
+    @classmethod
+    def _fromRaw(cls, raw_data, zstat):
+        obj = cls()
+        obj._updateFromRaw(raw_data, zstat)
+        return obj
+
+    def _updateFromRaw(self, raw_data, zstat, context=None):
+        self._set(_zkobject_hash=None)
         try:
-            data = zlib.decompress(compressed_data)
+            data = zlib.decompress(raw_data)
         except zlib.error:
             # Fallback for old, uncompressed data
-            data = compressed_data
-        if not deserialize:
-            return data
+            data = raw_data
         self._set(**self.deserialize(data, context))
         self._set(_zstat=zstat,
                   _zkobject_hash=hash(data),
-                  _zkobject_compressed_size=len(compressed_data),
-                  _zkobject_uncompressed_size=len(data),
-                  )
+                  _zkobject_compressed_size=len(raw_data),
+                  _zkobject_uncompressed_size=len(data))
 
     @staticmethod
     def _retryableSave(context, create, path, compressed_data, version):
@@ -524,3 +530,47 @@ class ShardedZKObject(ZKObject):
             context.log.error(
                 "Exception saving ZKObject %s at %s", self, path)
             raise
+
+
+class LockableZKObject(ZKObject):
+    _lock = None
+
+    def getLockPath(self):
+        """Return the path for the lock of this object in ZK
+
+        :returns: A string representation of the Znode path
+        """
+        raise NotImplementedError()
+
+    def acquireLock(self, zk_client, blocking=True, timeout=None):
+        have_lock = False
+        lock = None
+        path = self.getLockPath()
+        try:
+            lock = SessionAwareLock(zk_client.client, path)
+            have_lock = lock.acquire(blocking, timeout)
+        except NoNodeError:
+            # Request disappeared
+            have_lock = False
+        except LockTimeout:
+            have_lock = False
+            self.log.error("Timeout trying to acquire lock: %s", path)
+
+        # If we aren't blocking, it's possible we didn't get the lock
+        # because someone else has it.
+        if not have_lock:
+            return None
+
+        self._set(_lock=lock)
+        return lock
+
+    def releaseLock(self):
+        if self._lock is None:
+            return
+        self._lock.release()
+        self._set(_lock=None)
+
+    def hasLock(self):
+        if self._lock is None:
+            return False
+        return self._lock.is_still_valid()
