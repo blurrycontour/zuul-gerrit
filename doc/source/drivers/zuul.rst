@@ -24,7 +24,9 @@ can simply be used by listing ``zuul`` as the trigger.
       .. value:: project-change-merged
 
          When Zuul merges a change to a project, it generates this
-         event for every open change in the project.
+         event for every open change in the project.  If there are a
+         large number of open changes, this may produce a large number
+         of events and result in poor performance.
 
          .. warning::
 
@@ -35,7 +37,15 @@ can simply be used by listing ``zuul`` as the trigger.
       .. value:: parent-change-enqueued
 
          When Zuul enqueues a change into any pipeline, it generates
-         this event for every child of that change.
+         this event for every child of that change.  If there are a
+         large number of open changes, this may produce a large number
+         of events and result in poor performance.
+
+         .. note:: The dependent pipeline manager automatically
+                   enqueues forward, reverse, and if configured,
+                   circular dependencies of any change that is
+                   enqueued.  It is not necessary to add this trigger
+                   to :term:`gate` pipelines.
 
    .. attr:: pipeline
 
