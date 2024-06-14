@@ -16,6 +16,23 @@
       "message": "recheck test_required_project_not_found_error which does not seem related.",
       "revId": "17ff704940aee967ab4d820cf29f4012c350fcb5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d741cd7_fdfd5564",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2024-06-14T07:45:38Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "17ff704940aee967ab4d820cf29f4012c350fcb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
