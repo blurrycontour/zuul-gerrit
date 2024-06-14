@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09c2c3a0_069fc7d2",
+        "filename": "web/src/containers/job/JobVariant.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-14T14:31:49Z",
+      "side": 1,
+      "message": "Need it here too.",
+      "revId": "2135e32b86a346370beac644b67fc236b0f6a26e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
