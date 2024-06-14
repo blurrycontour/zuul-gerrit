@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5df78321_2323fba8",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-06-14T05:41:57Z",
+      "side": 1,
+      "message": "Good idea, I think we also got this request from some of our projects. However, this would require a backend change as this data (when a reconfiguration is ongoing) is not available yet. I\u0027ll add this use case.",
+      "parentUuid": "a08c776c_22ded0c1",
+      "revId": "56a3a7a2fd72d6583e664b1d3ba78aea2f390bba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "13107100_6225caa8",
         "filename": "doc/source/developer/specs/status-page-2.0.rst",
         "patchSetId": 3
@@ -108,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ecc6c88b_47e1b840",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-06-14T05:41:57Z",
+      "side": 1,
+      "message": "I\u0027m also not sure if we should show that information in Zuul itself. Especially as this might also require some backend changes first to make the data available. Maybe when the first iteration of \"Status UI changes\" is done, we can think about further improvements and if something like this would be helpful or not?",
+      "parentUuid": "38344c5f_a9b2f2ad",
+      "revId": "56a3a7a2fd72d6583e664b1d3ba78aea2f390bba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f7dceefc_8d17f02c",
         "filename": "doc/source/developer/specs/status-page-2.0.rst",
         "patchSetId": 3
@@ -119,6 +155,24 @@
       "writtenOn": "2024-06-12T20:19:54Z",
       "side": 1,
       "message": "Another use case that would be good to capture for developers is trying to better expose why things are not yet running. Whether that is waiting for a parent job or artificat dependency or nodes haven\u0027t been allocated or we are outside of the queue window etc one of the most common things we answer questions about in OpenDev is \"why did my jobs not run\" or \"why is my job not running yet\".\n\nThis next idea is probably well beyond the scope of this spec, but it might be cool to have a \"recent events processed by zuul and reason for action taken\" page in the dashboard somewhere. Then when we don\u0027t run jobs for a change we can have an entry that says something like \"for patchset 2 created on change 123456 no jobs were queued because no jobs matched\". Probably don\u0027t need to have records for the positive case since those will show up in the normal status dashboards. Think of this as a brainstorm and not anything I expect to get done as part of this spec.",
+      "revId": "56a3a7a2fd72d6583e664b1d3ba78aea2f390bba",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22e1d631_0f0b071b",
+        "filename": "doc/source/developer/specs/status-page-2.0.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-06-14T05:41:57Z",
+      "side": 1,
+      "message": "1. I\u0027ll add this to the spec. Just for clarification (not relevant to the spec): Do you see this as fulfilled in the way it\u0027s displayed in the current status page or do you think this could need some improvement and we should show this information in a different way (e.g. to be easier accessible)?\n\n2. I think this point is indeed out of scope for this spec, so I will not add it here. This might be worth elaborating as one of the next \"UI improvements steps\" after the status page is done. It might even be worth its own spec ;-)",
+      "parentUuid": "f7dceefc_8d17f02c",
       "revId": "56a3a7a2fd72d6583e664b1d3ba78aea2f390bba",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
