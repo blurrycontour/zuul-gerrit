@@ -14,48 +14,46 @@
 # under the License.
 
 import abc
-from collections import OrderedDict, defaultdict, namedtuple, UserDict
 import copy
-import json
 import hashlib
+import itertools
+import json
 import logging
 import math
-from functools import partial, total_ordering
 import threading
-
-import re2
 import time
-from uuid import uuid4
-import urllib.parse
 import textwrap
 import types
-import itertools
+import urllib.parse
+from collections import OrderedDict, defaultdict, namedtuple, UserDict
+from functools import partial, total_ordering
+from uuid import uuid4
 
-from kazoo.exceptions import NodeExistsError, NoNodeError
+import re2
+import jsonpath_rw
 from cachetools.func import lru_cache
+from kazoo.exceptions import NodeExistsError, NoNodeError
 from opentelemetry import trace
 
-from zuul.lib import yamlutil as yaml
-from zuul.lib.varnames import check_varnames
-
-import jsonpath_rw
-
 from zuul import change_matcher
-from zuul.lib.config import get_default
-from zuul.lib.result_data import get_artifacts_from_result_data
-from zuul.lib.logutil import get_annotated_logger
-from zuul.lib.capabilities import capabilities_registry
-from zuul.lib.jsonutil import json_dumps
-from zuul.lib import tracing
-from zuul.zk import zkobject
-from zuul.zk.blob_store import BlobStore
-from zuul.zk.change_cache import ChangeKey
-from zuul.zk.components import COMPONENT_REGISTRY
 from zuul.exceptions import (
     SEVERITY_ERROR,
     SEVERITY_WARNING,
     NodesetNotFoundError,
 )
+from zuul.lib import tracing
+from zuul.lib import yamlutil as yaml
+from zuul.lib.capabilities import capabilities_registry
+from zuul.lib.config import get_default
+from zuul.lib.jsonutil import json_dumps
+from zuul.lib.logutil import get_annotated_logger
+from zuul.lib.result_data import get_artifacts_from_result_data
+from zuul.lib.varnames import check_varnames
+from zuul.zk import zkobject
+from zuul.zk.blob_store import BlobStore
+from zuul.zk.change_cache import ChangeKey
+from zuul.zk.components import COMPONENT_REGISTRY
+
 
 MERGER_MERGE = 1            # "git merge"
 MERGER_MERGE_RESOLVE = 2    # "git merge -s resolve"
