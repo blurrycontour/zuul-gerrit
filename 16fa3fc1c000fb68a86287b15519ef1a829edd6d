@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c75bb81a_89acfa40",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-14T14:57:53Z",
+      "side": 1,
+      "message": "It looks like some items were reverted back to PS1, possibly unintentionally?",
+      "revId": "16fa3fc1c000fb68a86287b15519ef1a829edd6d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
