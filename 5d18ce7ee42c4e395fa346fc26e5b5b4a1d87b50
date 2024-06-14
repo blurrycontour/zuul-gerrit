@@ -34,6 +34,24 @@
       "parentUuid": "d36d441f_94a384c2",
       "revId": "5d18ce7ee42c4e395fa346fc26e5b5b4a1d87b50",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2f1f586_b7f3bf22",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-06-14T08:03:39Z",
+      "side": 1,
+      "message": "PS2 proposes a prettier solution to visualize the file matchers. I\u0027ve tested it locally by mixing negated and non-negated file matchers, which looks like the following: https://imgur.com/a/yQSOXSj",
+      "parentUuid": "e3c29b45_e9fc23f8",
+      "revId": "5d18ce7ee42c4e395fa346fc26e5b5b4a1d87b50",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
