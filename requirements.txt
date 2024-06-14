@@ -43,3 +43,4 @@ opentelemetry-exporter-otlp-proto-http
 confluent-kafka
 boto3
 google-cloud-pubsub
+mmh3
