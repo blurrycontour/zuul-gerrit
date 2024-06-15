@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a093cd8b_41f50dc6",
+        "filename": "doc/source/developer/specs/project-subscription.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-15T15:10:46Z",
+      "side": 1,
+      "message": "I think it\u0027s important to note that the workflow with gerrit is fully supported and in use now.  For a public example, see https://gerrit.googlesource.com/zuul/jobs/+/refs/heads/master/roles/prepare-gerrit-repos/README.rst\n\nAs you note later in the spec, how to actually take advantage of submodules in a superproject is dependent on how the overall project is organized and the tooling it uses.  In the example of gerrit itself above, we move the repos into place, because that is all that is needed.  Other systems would need to rewrite .gitmodules or manifest.xml.  That can be done today at the start of the Zuul job based on the contents of zuul variables.\n\nMy quibble here is with the phrasing of this paragraph.  It is technically correct, but it does not tell the full story that with Gerrit, support for a submodule subscription workflow can be (and has been) achieved with only Zuul job changes.",
+      "revId": "aeb1d4f3ea202d5a398f18261391e36993805e7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
