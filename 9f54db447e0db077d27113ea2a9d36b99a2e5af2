@@ -188,6 +188,24 @@
       "parentUuid": "3fdd2879_24ba44ee",
       "revId": "9f54db447e0db077d27113ea2a9d36b99a2e5af2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e2deac1_72237015",
+        "filename": "doc/source/developer/specs/configure-projects.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-17T14:51:26Z",
+      "side": 1,
+      "message": "If we allow the tenant config yaml to include but ignore config-projects, that raises the question of what to do if the actual project stanza has a regex that includes a config-project.  I\u0027ve opted to say that is an error, for two reasons:\n1) It is our last opportunity to provide pre-merge feedback that the configuration may not operate as\nexpected.\n2) It\u0027s easier to automate the creation of multiple project stanzas inside the repo to work around the inability to construct a regex that matches everything but a config project.\n\nHowever, your original point still stands, just in a different place, and users won\u0027t be able to create a project stanza that matches \u0027.*\u0027 and have it implicitly only include untrusted-projects.\n\nI\u0027m open to the idea that we should relax the restriction there and have it be implicit as well, but I didn\u0027t want to go too far; this seems conservative and workable.  Thoughts?",
+      "parentUuid": "3fdd2879_24ba44ee",
+      "revId": "9f54db447e0db077d27113ea2a9d36b99a2e5af2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
