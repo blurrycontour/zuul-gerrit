@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f626175_a655ab3f",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1934,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-17T16:01:14Z",
+      "side": 1,
+      "message": "This is unused, but depending on what you anticipate using it for, perhaps a different name would be in order?  \"FAILED\" doesn\u0027t sound \"okay\" to me.  :)\n\nI actually can\u0027t guess what it\u0027ll be used for.",
+      "revId": "d62483013eb7106b96084eb08076fab1499abb91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad592b88_edee52c5",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1997,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-17T16:01:14Z",
+      "side": 1,
+      "message": "Can these two classes be ZKObjects instead of porting over the way we handled them in nodepool?\n\nNodepool was our first experiment with zk, and it was always the plan to improve the way we did things as we learned more.  I think the ZKObject pattern encompases that.\n\nIn fact, I notice that there are some bits you borrowed from zkobject.  So I think you\u0027re probably thinking along the same lines.",
+      "revId": "d62483013eb7106b96084eb08076fab1499abb91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "a17a2bcb_a2301d86",
@@ -14,6 +48,24 @@
       "writtenOn": "2024-06-17T15:00:48Z",
       "side": 1,
       "message": "I think this file wants a license header.\n\nSadly I don\u0027t think we properly updated the file it came from, but I think it should at least say\nCopyright 2023 Acme Gating, LLC\nand probably 2023-2024 bmw.",
+      "revId": "d62483013eb7106b96084eb08076fab1499abb91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8d53387_97ac4cce",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-17T16:01:14Z",
+      "side": 1,
+      "message": "(oops, unresolved)",
+      "parentUuid": "a17a2bcb_a2301d86",
       "revId": "d62483013eb7106b96084eb08076fab1499abb91",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
