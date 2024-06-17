@@ -59,6 +59,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98eee152_9d396127",
+        "filename": "doc/source/developer/specs/configure-projects.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-17T14:41:21Z",
+      "side": 1,
+      "message": "Ack.",
+      "parentUuid": "9aabad30_4d3ecb45",
+      "revId": "9f54db447e0db077d27113ea2a9d36b99a2e5af2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3fdd2879_24ba44ee",
