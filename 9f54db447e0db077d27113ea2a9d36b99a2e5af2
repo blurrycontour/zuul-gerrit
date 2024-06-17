@@ -206,6 +206,24 @@
       "parentUuid": "3fdd2879_24ba44ee",
       "revId": "9f54db447e0db077d27113ea2a9d36b99a2e5af2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30694ace_89209923",
+        "filename": "doc/source/developer/specs/configure-projects.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-17T17:24:06Z",
+      "side": 1,
+      "message": "(I think we should decide this question regardless of the following, but nevertheless, I do think we should add \"negate\" support to both of the regular expressions here (tenant config and project stanza).  I think the end state in zuul should be that all regular expressions are strings or dicts with regex and negate keys.  But I agree that it\u0027s not ideal for that to be necessary in such a simple case, at least in the tenant config.)",
+      "parentUuid": "5e2deac1_72237015",
+      "revId": "9f54db447e0db077d27113ea2a9d36b99a2e5af2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
