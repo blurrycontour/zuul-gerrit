@@ -34,6 +34,52 @@
       "parentUuid": "aff65b3b_510a11e5",
       "revId": "9f54db447e0db077d27113ea2a9d36b99a2e5af2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9aabad30_4d3ecb45",
+        "filename": "doc/source/developer/specs/configure-projects.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-17T05:52:45Z",
+      "side": 1,
+      "message": "This would also match the config-project(s) and sounds like it would not work with the behavior described further down (see my next comment).",
+      "range": {
+        "startLine": 101,
+        "startChar": 8,
+        "endLine": 103,
+        "endChar": 8
+      },
+      "revId": "9f54db447e0db077d27113ea2a9d36b99a2e5af2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fdd2879_24ba44ee",
+        "filename": "doc/source/developer/specs/configure-projects.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-17T05:52:45Z",
+      "side": 1,
+      "message": "Doesn\u0027t this complicate the regex matching? In case I want to exclude all but the config projects, this would probably require a very complicated regex instead of just `^.*$` as mentioned above.\n\nSo maybe instead of an error in case the regex also matches a config-project, we should only consider untrusted-projects by convention and ignore the rest.\n\nOtherwise we\u0027d probably need a way to negate the regex (similar to other places in the Zuul config) as RE2 doesn\u0027t allow negative lookahead.",
+      "range": {
+        "startLine": 131,
+        "startChar": 49,
+        "endLine": 132,
+        "endChar": 18
+      },
+      "revId": "9f54db447e0db077d27113ea2a9d36b99a2e5af2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
