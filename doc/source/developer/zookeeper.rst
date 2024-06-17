@@ -490,3 +490,28 @@ This is a reference for object layout in Zookeeper.
 
    Parameters for the build; these can be large so they're in their
    own znode and will be read only if needed.
+
+.. path:: zuul/nodeset/requests/<request uuid>
+   :type: NodesetRequest
+
+   A new-style (nodepool-in-zuul) node request.  This will replace
+   `nodepool/requests`.  The two may operate in parallel for a time.
+
+   Schedulers create requests and may delete them at any time
+   (regardless of lock state).
+
+.. path:: zuul/nodeset/locks/<request uuid>
+
+   A lock for the new-style node request.  Launchers will acquire a
+   lock when operating on the request.
+
+.. path:: zuul/provider/<provider name>/nodes/<node uuid>
+   :type: ProviderNode
+
+   A new-style (nodepool-in-zuul) node record.  This holds information
+   about the node (mostly supplied by the provider).
+
+.. path:: zuul/provider/<provider name>/locks/<node uuid>
+
+   A lock for the new-style node.  Launchers or executors will hold
+   this lock while operating on the node.
