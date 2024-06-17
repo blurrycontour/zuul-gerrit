@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a17a2bcb_a2301d86",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-17T15:00:48Z",
+      "side": 1,
+      "message": "I think this file wants a license header.\n\nSadly I don\u0027t think we properly updated the file it came from, but I think it should at least say\nCopyright 2023 Acme Gating, LLC\nand probably 2023-2024 bmw.",
+      "revId": "d62483013eb7106b96084eb08076fab1499abb91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
