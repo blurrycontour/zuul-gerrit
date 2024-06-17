@@ -490,3 +490,52 @@ This is a reference for object layout in Zookeeper.
 
    Parameters for the build; these can be large so they're in their
    own znode and will be read only if needed.
+
+.. path:: zuul/nodeset/requests/<request uuid>
+   :type: NodesetRequest
+
+   A new-style (nodepool-in-zuul) node request.  This will replace
+   `nodepool/requests`.  The two may operate in parallel for a time.
+
+   Schedulers create requests and may delete them at any time
+   (regardless of lock state).
+
+.. path:: zuul/nodeset/locks/<request uuid>
+
+   A lock for the new-style node request.  Launchers will acquire a
+   lock when operating on the request.
+
+.. path:: zuul/nodes/nodes/<node uuid>
+   :type: ProviderNode
+
+   A new-style (nodepool-in-zuul) node record.  This holds information
+   about the node (mostly supplied by the provider).  It also holds
+   enough information to get the endpoint responsible for the node.
+
+.. path:: zuul/nodes/locks/<node uuid>
+
+   A lock for the new-style node.  Launchers or executors will hold
+   this lock while operating on the node.
+
+.. path:: zuul/tenant/<tenant name>/provider/<provider canonical name>/config
+
+   The flattened configuration for a provider.  This holds the
+   complete information about the images, labels, and flavors the
+   provider supports.  It is the combination of the provider stanza
+   plus any inherited sections.
+
+   References to images, labels, and flavors are made using canonincal
+   names since the same short names may be different in different
+   tenants.  Since the same canonically-named provider may appear in
+   different tenants with different images, labels, and flavors, the
+   provider itself is tenant scoped.
+
+   Only updated by schedulers upon reconfiguration.  Read-only for launchers.
+
+.. path:: zuul/images/<image canonical name>/<image build uuid>
+
+   Stores information about an image built in a Zuul job.
+
+.. path:: zuul/image-uploads/<image canonical name>/<image build uuid>/endpoint/<endpoint id>
+
+   Stores information about an image upload to a particular cloud endpoint.
