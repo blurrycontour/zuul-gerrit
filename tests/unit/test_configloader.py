@@ -1348,3 +1348,23 @@ class TestNodepoolConfig(ZuulTestCase):
         provider = layout.providers['aws-us-east-1-main']
         self.assertEqual(1, len(provider.labels))
         self.assertEqual('debian-normal', provider.labels[0].name)
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_section_inheritance(self):
+        # Verify that a section may not inherit from a section in a
+        # different project.
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - section:
+                name: badsection
+                parent: aws-base
+            """)
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '-1')
+        self.assertIn('references a section', A.messages[0])
