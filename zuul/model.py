@@ -1636,6 +1636,16 @@ class Section(ConfigObject):
                 self.connection == other.connection and
                 self.config == other.config)
 
+    def validateReferences(self, layout):
+        if not self.parent:
+            return
+        parent = layout.sections.get(self.parent)
+        if (parent.source_context.project_canonical_name !=
+            self.source_context.project_canonical_name):
+            raise Exception(
+                f'The section "{self.name}" references a section '
+                'in a different project.')
+
 
 class ProviderConfig(ConfigObject):
     """A provider configuration.

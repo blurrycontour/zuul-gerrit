@@ -2846,7 +2846,11 @@ class TenantParser(object):
         for label in shadow_layout.labels.values():
             with parse_context.errorContext(stanza='label', conf=label):
                 with parse_context.accumulator.catchErrors():
-                    label.validateReferences(layout)
+                    label.validateReferences(shadow_layout)
+        for section in shadow_layout.sections.values():
+            with parse_context.errorContext(stanza='section', conf=label):
+                with parse_context.accumulator.catchErrors():
+                    section.validateReferences(shadow_layout)
         # Add providers to the shadow (or real) layout
         for provider_config in shadow_layout.provider_configs.values():
             with parse_context.errorContext(stanza='provider',
