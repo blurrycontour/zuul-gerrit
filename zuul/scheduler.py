@@ -1840,6 +1840,9 @@ class Scheduler(threading.Thread):
             uuid=tenant.layout.uuid,
             branch_cache_min_ltimes=branch_cache_min_ltimes,
         )
+        # Write the new provider configs
+        for provider in tenant.layout.providers.values():
+            provider.internalCreate(context)
         # Save the min_ltimes which are sharded before we atomically
         # update the layout state.
         self.tenant_layout_state.setMinLtimes(layout_state, min_ltimes)
