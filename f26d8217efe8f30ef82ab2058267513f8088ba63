@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6e60fec_bf9d89cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-06-18T22:08:39Z",
+      "side": 1,
+      "message": "Looks generally good. Thank you for working on this.",
+      "revId": "f26d8217efe8f30ef82ab2058267513f8088ba63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de75d4e9_f803b9de",
+        "filename": "doc/source/developer/specs/configure-projects.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-06-18T22:08:39Z",
+      "side": 1,
+      "message": "This configuration looks good. Gerrit has a similar specification, but the opposite direction, which also includes branch names. I think the simplification where specific branch allowance is not configured should be enough and can be added if needed at a later stage.",
+      "revId": "f26d8217efe8f30ef82ab2058267513f8088ba63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
