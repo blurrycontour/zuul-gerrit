@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80aed522_fc7dd577",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1934,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-18T09:53:02Z",
+      "side": 1,
+      "message": "I renamed that to `FINAL_STATES` similar to the state for the `NodesetRequest`. I think that should make more sense.",
+      "parentUuid": "2f626175_a655ab3f",
+      "revId": "d62483013eb7106b96084eb08076fab1499abb91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ad592b88_edee52c5",
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "(oops, unresolved)",
       "parentUuid": "a17a2bcb_a2301d86",
+      "revId": "d62483013eb7106b96084eb08076fab1499abb91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23638447_411a06fb",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-18T09:53:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8d53387_97ac4cce",
       "revId": "d62483013eb7106b96084eb08076fab1499abb91",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
