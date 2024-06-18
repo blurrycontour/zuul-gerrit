@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "819a9be5_e310ef83",
+        "filename": "doc/source/developer/specs/project-subscription.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-06-18T22:23:31Z",
+      "side": 1,
+      "message": "The last days I realised that we cannot use some base jobs that I intended to from the start. Given that I need other base jobs, a lot of logic might be possible to put in those jobs instead. I will look into how much of the logic can be moved into jobs during next week.",
+      "parentUuid": "a093cd8b_41f50dc6",
+      "revId": "aeb1d4f3ea202d5a398f18261391e36993805e7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "edd4dc1a_bf7123a6",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-06-15T16:19:58Z",
       "side": 1,
       "message": "I disagree with this.  It can not possibly be more work to implement a simple daemon that listens on MQTT and then does:\n* Checkout superproject\n* For each submodule:\n  * Check out the branch tip\n  * Update superproject .gitmodule to point to branch tip\n* Commit superproject change\n* Push superproject change\n\nYou don\u0027t even need to actually check out the submodules, you can do all of that with just fetching the ref list, so it would be very fast.\n\nThis is an extremely simple solution that is easy to maintain (it should require almost no ongoing maintenance) and can be easily customized to the needs of the repo.  I would support extending the MQTT reporter to wait for a reply from a system like this to make it synchronous.  I believe that would address your use cases without the significant changes to Zuul that you described.\n\nI don\u0027t think that comparing the proposal in this spec to \"forking Zuul\" is the best way to convince a community built on consensus-based decision making.",
+      "revId": "aeb1d4f3ea202d5a398f18261391e36993805e7a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13b92b6c_b3607ab7",
+        "filename": "doc/source/developer/specs/project-subscription.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-06-18T22:23:31Z",
+      "side": 1,
+      "message": "I understand your interpretation even if that was not my intention. Given that one already have an internal fork of Zuul, for some reason, introducing another tool, when the Zuul code base already have a lot setup already, gives preference for adding the code and tests within Zuul. In other situations, I agree that an MQTT receiver might be the better choice.",
+      "parentUuid": "edd4dc1a_bf7123a6",
       "revId": "aeb1d4f3ea202d5a398f18261391e36993805e7a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
