@@ -28,9 +28,13 @@ class AwsDriver(Driver, ConnectionInterface, ProviderInterface):
     def getConnection(self, name, config):
         return awsconnection.AwsConnection(self, name, config)
 
-    def getProvider(self, connection, canonical_name, provider_config):
+    def getProvider(self, connection, tenant_name, canonical_name,
+                    provider_config):
         return awsprovider.AwsProvider(
-            self, connection, canonical_name, provider_config)
+            self, connection, tenant_name, canonical_name, provider_config)
+
+    def getProviderClass(self):
+        return awsprovider.AwsProvider
 
     def getProviderSchema(self):
         return awsprovider.AwsProviderSchema().getProviderSchema()

@@ -13,8 +13,10 @@
 # under the License.
 
 import abc
+import json
 
 from zuul import model
+from zuul.zk import zkobject
 
 import voluptuous as vs
 
@@ -50,19 +52,67 @@ class BaseProviderEndpoint(metaclass=abc.ABCMeta):
         self.connection = connection
 
 
-class BaseProvider(metaclass=abc.ABCMeta):
+class BaseProvider(zkobject.PolymorphicZKObjectMixin,
+                   zkobject.ZKObject):
     """Base class for provider."""
 
-    def __init__(self, driver, connection, canonical_name, config):
-        self.driver = driver
-        self.connection = connection
+    def __init__(self, *args):
+        super().__init__()
+        if args:
+            (driver, connection, tenant_name, canonical_name, config) = args
+            config = config.copy()
+            config.pop('_source_context')
+            config.pop('_start_mark')
+            self._set(
+                driver=driver,
+                connection=connection,
+                connection_name=connection.connection_name,
+                tenant_name=tenant_name,
+                canonical_name=canonical_name,
+                config=config,
+                **self.parseConfig(config),
+            )
 
-        self.canonical_name = canonical_name
-        self.name = config['name']
-        self.section_name = config['section']
-        self.description = config.get('description')
+    @classmethod
+    def fromZK(cls, context, path, connections):
+        """Deserialize a Provider (subclass) from ZK.
 
-        self.labels = self.parseLabels(config)
+        To deserialize a Provider from ZK, pass the connection
+        registry as the "connections" argument.
+
+        The Provider subclass will automatically be deserialized and
+        the connection/driver attributes updated from the connection
+        registry.
+
+        """
+        raw_data, zstat = cls._loadData(context, path)
+        obj = cls._fromRaw(raw_data, zstat)
+        connection = connections.connections[obj.connection_name]
+        obj._set(connection=connection,
+                 driver=connection.driver)
+        return obj
+
+    def parseConfig(self, config):
+        return dict(
+            name=config['name'],
+            section_name=config['section'],
+            description=config.get('description'),
+            labels=self.parseLabels(config),
+        )
+
+    def deserialize(self, raw, context):
+        data = super().deserialize(raw, context)
+        data.update(self.parseConfig(data['config']))
+        return data
+
+    def serialize(self, context):
+        data = dict(
+            tenant_name=self.tenant_name,
+            canonical_name=self.canonical_name,
+            config=self.config,
+            connection_name=self.connection.connection_name,
+        )
+        return json.dumps(data, sort_keys=True).encode("utf8")
 
     def parseLabels(self, config):
         labels = []
@@ -83,6 +133,11 @@ class BaseProvider(metaclass=abc.ABCMeta):
     def getEndpoint(self):
         """Get an endpoint for this provider"""
         pass
+
+    def getPath(self):
+        path = (f'/zuul/tenant/{self.tenant_name}'
+                f'/provider/{self.canonical_name}/config')
+        return path
 
 
 class BaseProviderSchema(metaclass=abc.ABCMeta):
