@@ -2450,16 +2450,13 @@ class ZuulTestCase(BaseTestCase):
             layout = yaml.safe_load(data)
             files['zuul.yaml'] = data
         config_projects = []
+        types = list(zuul.configloader.ZuulSafeLoader.zuul_node_types)
+        types.remove('pragma')
         if self.test_config.enable_nodepool:
             config_projects.append({
                 'org/common-config': {
-                    'include': [
-                        'image',
-                        'flavor',
-                        'label',
-                        'section',
-                        'provider',
-                    ]}
+                    'include': types,
+                }
             })
         else:
             config_projects.append('org/common-config')
@@ -2473,13 +2470,8 @@ class ZuulTestCase(BaseTestCase):
                 if self.test_config.enable_nodepool:
                     untrusted_projects.append({
                         name: {
-                            'include': [
-                                'image',
-                                'flavor',
-                                'label',
-                                'section',
-                                'provider',
-                            ]}
+                            'include': types,
+                        }
                     })
                 else:
                     untrusted_projects.append(name)
