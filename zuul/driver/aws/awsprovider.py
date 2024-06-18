@@ -57,12 +57,13 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         return images
 
 
-class AwsProvider(BaseProvider):
+class AwsProvider(BaseProvider, subclass_id='aws'):
     log = logging.getLogger("zuul.AwsProvider")
 
-    def __init__(self, driver, connection, canonical_name, config):
-        super().__init__(driver, connection, canonical_name, config)
-        self.region = config['region']
+    def parseConfig(self, config):
+        data = super().parseConfig(config)
+        data['region'] = config['region']
+        return data
 
     def parseLabel(self, label_config):
         return AwsProviderLabel(label_config)
