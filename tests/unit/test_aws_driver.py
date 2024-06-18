@@ -40,3 +40,22 @@ class TestAwsDriver(ZuulTestCase):
         provider = layout.providers['aws-us-east-1-main']
         endpoint = provider.getEndpoint()
         self.assertTrue(len(endpoint.testListAmis()) > 1)
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_aws_launcher(self):
+        # Temporary test until replaced by launcher to show that we
+        # can deserialize a provider without a layout.
+        canonical_name = (
+            'review.example.com%2Forg%2Fcommon-config/aws-us-east-1-main'
+        )
+        path = (f'/zuul/tenant/tenant-one/connection/aws/'
+                f'provider/{canonical_name}/config')
+        # We will parse the connection name from the path
+        aws_conn = self.scheds.first.sched.connections.connections['aws']
+        aws_driver = aws_conn.driver
+        with self.createZKContext() as context:
+            provider = aws_driver.getProviderClass().fromZK(
+                context, path, driver=aws_driver, connection=aws_conn
+            )
+        endpoint = provider.getEndpoint()
+        self.assertTrue(len(endpoint.testListAmis()) > 1)
