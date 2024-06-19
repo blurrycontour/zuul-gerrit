@@ -53,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fe05138_74955b24",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1997,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-19T11:56:29Z",
+      "side": 1,
+      "message": "https://review.opendev.org/c/zuul/zuul/+/922310 would be an alternative to this change using ZKObjects",
+      "parentUuid": "ad592b88_edee52c5",
+      "revId": "d62483013eb7106b96084eb08076fab1499abb91",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "a17a2bcb_a2301d86",
