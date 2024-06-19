@@ -286,7 +286,7 @@ class JobVariant extends React.Component {
               item = value
             }
             return (
-              <ListItem key={idx}>
+              <ListItem key={idx} style={{margin:0}}>
                 {item}
               </ListItem>
             )
