@@ -22,6 +22,7 @@ import {
   DescriptionListTerm,
   DescriptionListGroup,
   DescriptionListDescription,
+  Label,
   List,
   ListItem,
   ListVariant,
@@ -53,6 +54,32 @@ import Nodeset from './Nodeset'
 import Role from './Role'
 import JobProject from './JobProject'
 import JobDescriptionCard from './JobDescriptionCard'
+
+
+function FileMatchers({ fileMatchers }) {
+  return (
+    <span>
+      <span style={{ fontFamily: 'RedHatMono' }}>
+        {fileMatchers.regex}
+      </span>
+      {
+        fileMatchers.negate
+          ? <Label
+            isCompact
+            color="grey"
+            style={{ marginLeft: 'var(--pf-global--spacer--xs)' }}
+          >
+            negated
+          </Label>
+          : ''
+      }
+    </span>
+  )
+}
+
+FileMatchers.propTypes = {
+  fileMatchers: PropTypes.object.isRequired,
+}
 
 class JobVariant extends React.Component {
   static propTypes = {
@@ -251,10 +278,10 @@ class JobVariant extends React.Component {
               }
             } else if (label === 'irrelevant_files') {
               nice_label = (<span><BanIcon /> Irrelevant files matchers</span>)
-              item = value
+              item = <FileMatchers fileMatchers={value} />
             } else if (label === 'files') {
               nice_label = (<span><ClipboardCheckIcon />Files matchers</span>)
-              item = value
+              item = <FileMatchers fileMatchers={value} />
             } else {
               item = value
             }
