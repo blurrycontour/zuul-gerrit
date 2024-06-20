@@ -238,6 +238,16 @@ def return_data(job, ref, data):
     return decorator
 
 
+def okay_tracebacks(*args):
+    """A list of substrings that, if they appear in a traceback, indicate
+    that it's okay for that traceback to appear in logs."""
+
+    def decorator(test):
+        test.__okay_tracebacks__ = args
+        return test
+    return decorator
+
+
 def registerProjects(source_name, client, config):
     path = config.get('scheduler', 'tenant_config')
     with open(os.path.join(FIXTURE_DIR, path)) as f:
@@ -1721,6 +1731,16 @@ def cpu_times(self):
     return FakeCPUTimes()
 
 
+class LogExceptionHandler(logging.Handler):
+    def __init__(self, loglist):
+        super().__init__()
+        self.__loglist = loglist
+
+    def emit(self, record):
+        if record.exc_info:
+            self.__loglist.append(record)
+
+
 class BaseTestCase(testtools.TestCase):
     log = logging.getLogger("zuul.test")
     wait_timeout = 90
@@ -1730,6 +1750,19 @@ class BaseTestCase(testtools.TestCase):
     delete_databases = True
     use_tmpdir = True
     always_attach_logs = False
+
+    def checkLogs(self, *args):
+        for record in self._exception_logs:
+            okay = False
+            for substr in self.test_config.okay_tracebacks:
+                if substr in record.exc_text:
+                    okay = True
+                    break
+            if okay:
+                continue
+            # TODO(corvus): Run this unconditionally once we are able
+            if False:
+                self.fail(f"Traceback found in logs: {record.msg}")
 
     def attachLogs(self, *args):
         def reader():
@@ -1804,6 +1837,12 @@ class BaseTestCase(testtools.TestCase):
         # Make sure we don't carry old handlers around in process state
         # which slows down test runs
         self.addCleanup(logger.removeHandler, handler)
+
+        self._exception_logs = []
+        log_exc_handler = LogExceptionHandler(self._exception_logs)
+        logger.addHandler(log_exc_handler)
+        self.addCleanup(self.checkLogs)
+        self.addCleanup(logger.removeHandler, log_exc_handler)
 
         # NOTE(notmorgan): Extract logging overrides for specific
         # libraries from the OS_LOG_DEFAULTS env and create loggers
@@ -2070,6 +2109,7 @@ class TestConfig:
         self.simple_layout = getattr(test, '__simple_layout__', None)
         self.gerrit_config = getattr(test, '__gerrit_config__', {})
         self.never_capture = getattr(test, '__never_capture__', None)
+        self.okay_tracebacks = getattr(test, '__okay_tracebacks__', [])
         self.enable_nodepool = getattr(test, '__enable_nodepool__', False)
         self.return_data = getattr(test, '__return_data__', [])
         self.changes = FakeChangeDB()
