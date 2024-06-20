@@ -23,9 +23,15 @@ import sqlalchemy as sa
 
 import zuul
 from zuul.lib import yamlutil
-from tests.base import ZuulTestCase, FIXTURE_DIR, \
-    PostgresqlSchemaFixture, MySQLSchemaFixture, \
-    BaseTestCase, AnsibleZuulTestCase
+from tests.base import (
+    AnsibleZuulTestCase,
+    BaseTestCase,
+    FIXTURE_DIR,
+    MySQLSchemaFixture,
+    PostgresqlSchemaFixture,
+    ZuulTestCase,
+    okay_tracebacks,
+)
 
 
 class TestConnections(ZuulTestCase):
@@ -675,6 +681,7 @@ class TestMQTTConnection(ZuulTestCase):
     config_file = 'zuul-mqtt-driver.conf'
     tenant_config_file = 'config/mqtt-driver/main.yaml'
 
+    @okay_tracebacks('Connection refused')
     def test_mqtt_reporter(self):
         "Test the MQTT reporter"
         # Add a success result
@@ -749,8 +756,8 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertEquals(dependent_test_job['dependencies'], ['test'])
         self.assertIn('test', dependent_test_job['job_dependencies'])
 
+    @okay_tracebacks('Connection refused')
     def test_mqtt_paused_job(self):
-
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
         # Let the job being paused via the executor
         self.executor_server.returnData("test", A, {"zuul": {"pause": True}})
@@ -780,6 +787,7 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertGreater(
             resume_event["event_time"], pause_event["event_time"])
 
+    @okay_tracebacks('Connection refused')
     def test_mqtt_retried_builds(self):
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
@@ -811,6 +819,7 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertIn("execute_time", retry_build)
         self.assertIn("log_url", retry_build)
 
+    @okay_tracebacks('Connection refused')
     def test_mqtt_invalid_topic(self):
         in_repo_conf = textwrap.dedent(
             """
@@ -833,6 +842,7 @@ class TestMQTTConnection(ZuulTestCase):
         self.assertIn("topic component 'bad' is invalid", A.messages[0],
                       "A should report a syntax error")
 
+    @okay_tracebacks('Connection refused')
     def test_topic_replace_invalid_chars(self):
         # Test that special characters in the topic are replaced
         self.create_branch('org/project', 'weird#+')
