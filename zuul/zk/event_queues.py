@@ -110,7 +110,7 @@ class EventPrefix(enum.Enum):
 
 class EventWatcher(ZooKeeperSimpleBase):
 
-    log = logging.getLogger("zuul.zk.event_queues.EventWatcher")
+    log = logging.getLogger("zuul.EventWatcher")
 
     def __init__(self, client, callback):
         super().__init__(client)
@@ -210,7 +210,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
 
     """
 
-    log = logging.getLogger("zuul.zk.event_queues.ZooKeeperEventQueue")
+    log = logging.getLogger("zuul.ZooKeeperEventQueue")
 
     def __init__(self, client, queue_root):
         super().__init__(client)
@@ -342,8 +342,8 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             data, zstat = self.kazoo_client.get(path)
             try:
                 event = json.loads(data)
-            except json.JSONDecodeError:
-                self.log.exception("Malformed event data in %s", path)
+            except json.JSONDecodeError as e:
+                self.log.error("Malformed event data in %s: %s", path, e)
                 self._remove(path)
                 continue
 
@@ -448,7 +448,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
 class EventResultFuture(ZooKeeperSimpleBase):
     """Base class for result futures for different events."""
 
-    log = logging.getLogger("zuul.zk.event_queues.EventResultFuture")
+    log = logging.getLogger("zuul.EventResultFuture")
 
     def __init__(self, client, result_path):
         super().__init__(client)
@@ -556,7 +556,7 @@ class JobResultFuture(EventResultFuture):
 class ManagementEventResultFuture(EventResultFuture):
     """Returned when a management event is put into a queue."""
 
-    log = logging.getLogger("zuul.zk.event_queues.ManagementEventResultFuture")
+    log = logging.getLogger("zuul.ManagementEventResultFuture")
 
     def __init__(self, client, result_path: str):
         super().__init__(client, result_path)
@@ -575,7 +575,7 @@ class ManagementEventQueue(ZooKeeperEventQueue):
 
     RESULTS_ROOT = "/zuul/results/management"
 
-    log = logging.getLogger("zuul.zk.event_queues.ManagementEventQueue")
+    log = logging.getLogger("zuul.ManagementEventQueue")
 
     def put(self, event, needs_result=True):
         result_path = None
@@ -690,7 +690,7 @@ class PipelineManagementEventQueue(ManagementEventQueue):
 
 
 class TenantManagementEventQueue(ManagementEventQueue):
-    log = logging.getLogger("zuul.zk.event_queues.TenantManagementEventQueue")
+    log = logging.getLogger("zuul.TenantManagementEventQueue")
 
     def __init__(self, client, tenant_name):
         queue_root = TENANT_MANAGEMENT_ROOT.format(
@@ -723,7 +723,7 @@ class TenantManagementEventQueue(ManagementEventQueue):
 class PipelineResultEventQueue(ZooKeeperEventQueue):
     """Result events via ZooKeeper"""
 
-    log = logging.getLogger("zuul.zk.event_queues.PipelineResultEventQueue")
+    log = logging.getLogger("zuul.PipelineResultEventQueue")
 
     def __init__(self, client, tenant_name, pipeline_name):
         queue_root = PIPELINE_RESULT_ROOT.format(
@@ -773,7 +773,7 @@ class PipelineResultEventQueue(ZooKeeperEventQueue):
 class TriggerEventQueue(ZooKeeperEventQueue):
     """Trigger events via ZooKeeper"""
 
-    log = logging.getLogger("zuul.zk.event_queues.TriggerEventQueue")
+    log = logging.getLogger("zuul.TriggerEventQueue")
 
     def __init__(self, client, queue_root, connections):
         self.connections = connections
@@ -819,7 +819,7 @@ class TriggerEventQueue(ZooKeeperEventQueue):
 
 
 class TenantTriggerEventQueue(TriggerEventQueue):
-    log = logging.getLogger("zuul.zk.event_queues.TenantTriggerEventQueue")
+    log = logging.getLogger("zuul.TenantTriggerEventQueue")
 
     def __init__(self, client, connections, tenant_name):
         queue_root = TENANT_TRIGGER_ROOT.format(
@@ -863,7 +863,7 @@ class TenantTriggerEventQueue(TriggerEventQueue):
 
 
 class PipelineTriggerEventQueue(TriggerEventQueue):
-    log = logging.getLogger("zuul.zk.event_queues.PipelineTriggerEventQueue")
+    log = logging.getLogger("zuul.PipelineTriggerEventQueue")
 
     def __init__(self, client, tenant_name, pipeline_name, connections):
         queue_root = PIPELINE_TRIGGER_ROOT.format(
@@ -962,7 +962,7 @@ class NodepoolEventElection(SessionAwareElection):
 class EventCheckpoint(ZooKeeperSimpleBase):
     """Store checkpoint data for drivers that need it."""
 
-    log = logging.getLogger("zuul.zk.event_queues.EventCheckpoint")
+    log = logging.getLogger("zuul.EventCheckpoint")
 
     def __init__(self, client, connection_name, receiver_name):
         super().__init__(client)
