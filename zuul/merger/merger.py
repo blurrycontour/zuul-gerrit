@@ -1489,7 +1489,7 @@ class Merger(object):
         # We don't update the repo so that it can happen outside the
         # lock.
         repo = self.getRepo(connection_name, project_name)
-        # TODO: why is reset required here?
+        # TODO: why is reset required here?  (see below?)
         repo.reset()
         # This does not fetch, update, or reset, it operates on the
         # working state.
@@ -1510,6 +1510,8 @@ class Merger(object):
         # change ref.  tosha is typically the branch name.
         repo = self.getRepo(connection_name, project_name,
                             zuul_event_id=zuul_event_id)
-        # This performs a fetch, and therefore update/reset are not
-        # required.
+        # Reset the repo to ensure that any newly created remote
+        # branches are available locally.  We might need to diff
+        # against them.
+        repo.reset()
         return repo.getFilesChanges(branch, tosha, zuul_event_id=zuul_event_id)

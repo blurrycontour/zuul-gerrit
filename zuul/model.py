@@ -4464,6 +4464,9 @@ class BuildSet(zkobject.ZKObject):
         self._files = repo_files
         self._files_path = repo_files.getPath()
 
+    def hasFiles(self):
+        return bool(self._files_path)
+
     def getFiles(self, context):
         if self._files is not None:
             return self._files

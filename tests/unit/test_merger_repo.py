@@ -1243,6 +1243,14 @@ class TestMerger(ZuulTestCase):
             if not cache:
                 break
 
+    def test_merger_get_files_changes(self):
+        self.create_branch('org/project', 'stable')
+        merger = self.executor_server.merger
+        merger.updateRepo('gerrit', 'org/project')
+        result = merger.getFilesChanges(
+            'gerrit', 'org/project', 'refs/heads/stable', 'stable')
+        self.assertIsNotNone(result)
+
 
 class TestMergerTree(BaseTestCase):
 

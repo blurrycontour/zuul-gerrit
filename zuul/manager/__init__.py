@@ -1435,8 +1435,15 @@ class PipelineManager(metaclass=ABCMeta):
             return None
         if build_set.unable_to_merge:
             return self.getFallbackLayout(item)
+        if not build_set.hasFiles():
+            log.debug("No files on buildset for: %s", item)
+            # This is probably post update on an always dynamic
+            # branch; in this case the item says it updates the
+            # config, but we don't get repo files on branches, so
+            # there's nothing to check.
+            return self.getFallbackLayout(item)
 
-        log.debug("Preparing dynamic layout for: %s" % item)
+        log.debug("Preparing dynamic layout for: %s", item)
         start = time.time()
         layout = self._loadDynamicLayout(item)
         self.reportPipelineTiming('layout_generation_time', start)
@@ -2059,11 +2066,13 @@ class PipelineManager(metaclass=ABCMeta):
         for i, change in enumerate(item.changes):
             source = self.sched.connections.getSource(
                 change.project.connection_name)
-            if event.files:
-                change_files = event.files[i]
+            if event.files is None:
+                self.log.warning(
+                    "Did not receive expected merge files content")
+                files = None
             else:
-                change_files = None
-            source.setChangeAttributes(change, files=change_files)
+                files = event.files[i]
+            source.setChangeAttributes(change, files=files)
         build_set.updateAttributes(self.current_context,
                                    files_state=build_set.COMPLETE)
         if build_set.merge_state == build_set.COMPLETE:
