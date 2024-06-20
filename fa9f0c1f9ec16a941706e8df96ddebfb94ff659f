@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "824a668c_6198f322",
+        "filename": "zuul/zk/zkobject.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-20T01:08:46Z",
+      "side": 1,
+      "message": "Is this used?",
+      "revId": "fa9f0c1f9ec16a941706e8df96ddebfb94ff659f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
