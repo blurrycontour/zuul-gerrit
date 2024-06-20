@@ -812,9 +812,15 @@ class PipelineManager(metaclass=ABCMeta):
             # Only report the item if the project is in the current
             # pipeline. Otherwise the change could be spammed by
             # reports from unrelated pipelines.
-            if self.pipeline.tenant.layout.getProjectPipelineConfig(
-                    ci, change):
-                self.sendReport(actions, ci)
+            try:
+                if self.pipeline.tenant.layout.getProjectPipelineConfig(
+                        ci, change):
+                    self.sendReport(actions, ci)
+            except model.TemplateNotFoundError:
+                # This error is not unreasonable under the
+                # circumstances; assume that a change to add a project
+                # template is in a dequeued cycle.
+                pass
         finally:
             # Ensure that the item is dequeued in any case. Otherwise we
             # might leak items caused by this temporary enqueue.
@@ -1767,8 +1773,14 @@ class PipelineManager(metaclass=ABCMeta):
                                     redact_secrets_and_keys=False)
                 self.reportPipelineTiming('job_freeze_time', start)
             except Exception as e:
-                # TODOv3(jeblair): nicify this exception as it will be reported
-                log.exception("Error freezing job graph for %s" % (item,))
+                # These errors do not warrant a traceback.
+                if not isinstance(e, (
+                        model.NoMatchingParentError,
+                        model.TemplateNotFoundError,
+                )):
+                    log.exception("Error freezing job graph for %s" % (item,))
+                else:
+                    log.info("Error freezing job graph for %s" % (item,))
                 item.setConfigError("Unable to freeze job graph: %s" %
                                     (str(e)))
                 return False
@@ -2367,8 +2379,14 @@ class PipelineManager(metaclass=ABCMeta):
 
             try:
                 for change in item.changes:
-                    project_in_pipeline = bool(
-                        layout.getProjectPipelineConfig(item, change))
+                    try:
+                        project_in_pipeline = bool(
+                            layout.getProjectPipelineConfig(item, change))
+                    except model.TemplateNotFoundError:
+                        # If one of the changes is involved in a
+                        # config error, then the item can not be in
+                        # the pipeline.
+                        project_in_pipeline = False
                     if project_in_pipeline:
                         break
             except Exception:
