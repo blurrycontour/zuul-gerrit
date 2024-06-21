@@ -1921,7 +1921,7 @@ class NodesetRequest(zkobject.LockableZKObject):
                 f" labels={self.labels}, path={self.getPath()}>")
 
 
-class ProviderNode(zkobject.LockableZKObject):
+class ProviderNode(zkobject.LockableZKObject, metaclass=abc.ABCMeta):
 
     class State(StrEnum):
         REQUESTED = "requested"
@@ -1940,6 +1940,42 @@ class ProviderNode(zkobject.LockableZKObject):
     NODES_PATH = "nodes"
     LOCKS_PATH = "locks"
 
+    # Mapping from provider ID to subclass
+    _node_subclasses = {}
+
+    # Make the ProviderNode a true abstract base class that can't be
+    # instantiated. The '_provider_id' property is automatically
+    # "implemented" through subclassing (see '__init_subclass__').
+    @abc.abstractproperty
+    def _provider_id(self):
+        pass
+
+    def __init_subclass__(cls, *, provider_id, **kwargs):
+        super().__init_subclass__(**kwargs)
+        # "Implement" the abstract '_provider_id' property
+        cls._provider_id = provider_id
+        cls._node_subclasses[provider_id] = cls
+
+    @classmethod
+    def _fromRaw(cls, raw_data, zstat):
+        uncompressed_data = cls._decompressData(raw_data)
+        data = json.loads(uncompressed_data.decode('utf-8'))
+        klass = cls._node_subclasses[data["_provider_id"]]
+        obj = klass()
+        obj._set(_zkobject_hash=None)
+        obj._set(**obj.deserialize(data, context=None))
+        obj._set(_zstat=zstat,
+                 _zkobject_hash=hash(uncompressed_data),
+                 _zkobject_compressed_size=len(raw_data),
+                 _zkobject_uncompressed_size=len(uncompressed_data))
+        return obj
+
+    def deserialize(self, data, context):
+        # Skip loading the JSON in case we already have a dict
+        if not isinstance(data, dict):
+            data = super().deserialize(data, context)
+        return data
+
     def __init__(self):
         super().__init__()
         self._set(
@@ -1956,8 +1992,8 @@ class ProviderNode(zkobject.LockableZKObject):
         )
 
     def __repr__(self):
-        return (f"<ProviderNode uuid={self.uuid}, state={self.state},"
-                f" path={self.getPath()}>")
+        return (f"<{self.__class__.__name__} uuid={self.uuid},"
+                f" state={self.state}, path={self.getPath()}>")
 
     def getPath(self):
         return f"{self.ROOT}/{self.NODES_PATH}/{self.uuid}"
@@ -1971,6 +2007,7 @@ class ProviderNode(zkobject.LockableZKObject):
             request_id=self.request_id,
             state=self.state,
             label=self.label,
+            _provider_id=self._provider_id,
         )
         return json.dumps(data, sort_keys=True).encode("utf-8")
 

@@ -2186,6 +2186,14 @@ class TestPipelineInit(ZooKeeperBaseTestCase):
         self.assertEqual(pipeline.state.layout_uuid, layout.uuid)
 
 
+class DummyAProviderNode(model.ProviderNode, provider_id="dummy-A-node"):
+    pass
+
+
+class DummyBProviderNode(model.ProviderNode, provider_id="dummy-B-node"):
+    pass
+
+
 class TestLauncherApi(ZooKeeperBaseTestCase):
 
     def setUp(self):
@@ -2239,7 +2247,9 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
 
         # Create provider nodes for the requested labels
         for i, label in enumerate(request.labels):
-            node = model.ProviderNode.new(
+            # Alternate between the two dummy provider nodes classes
+            node_class = DummyAProviderNode if i % 2 else DummyBProviderNode
+            node = node_class.new(
                 context, request_id=request.uuid, uuid=uuid.uuid4().hex,
                 label=label)
 

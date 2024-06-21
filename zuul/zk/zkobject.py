@@ -382,16 +382,20 @@ class ZKObject:
 
     def _updateFromRaw(self, raw_data, zstat, context=None):
         self._set(_zkobject_hash=None)
-        try:
-            data = zlib.decompress(raw_data)
-        except zlib.error:
-            # Fallback for old, uncompressed data
-            data = raw_data
+        data = self._decompressData(raw_data)
         self._set(**self.deserialize(data, context))
         self._set(_zstat=zstat,
                   _zkobject_hash=hash(data),
                   _zkobject_compressed_size=len(raw_data),
                   _zkobject_uncompressed_size=len(data))
+
+    @classmethod
+    def _decompressData(cls, raw_data):
+        try:
+            return zlib.decompress(raw_data)
+        except zlib.error:
+            # Fallback for old, uncompressed data
+            return raw_data
 
     @staticmethod
     def _retryableSave(context, create, path, compressed_data, version):
