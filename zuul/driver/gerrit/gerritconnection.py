@@ -1362,9 +1362,6 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         files_query = 'changes/%s/revisions/%s/files' % (
             number, data['current_revision'])
 
-        if data['revisions'][data['current_revision']]['commit']['parents']:
-            files_query += '?parent=1'
-
         files = self.get(files_query)
         return data, related, files
 
