@@ -1921,7 +1921,7 @@ class NodesetRequest(zkobject.LockableZKObject):
                 f" labels={self.labels}, path={self.getPath()}>")
 
 
-class ProviderNode(zkobject.LockableZKObject):
+class ProviderNode(zkobject.VariableZKObjectMixin, zkobject.LockableZKObject):
 
     class State(StrEnum):
         REQUESTED = "requested"
@@ -1956,8 +1956,8 @@ class ProviderNode(zkobject.LockableZKObject):
         )
 
     def __repr__(self):
-        return (f"<ProviderNode uuid={self.uuid}, state={self.state},"
-                f" path={self.getPath()}>")
+        return (f"<{self.__class__.__name__} uuid={self.uuid},"
+                f" state={self.state}, path={self.getPath()}>")
 
     def getPath(self):
         return f"{self.ROOT}/{self.NODES_PATH}/{self.uuid}"
