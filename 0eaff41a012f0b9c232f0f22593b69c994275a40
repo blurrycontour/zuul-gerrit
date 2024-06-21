@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76ee7df5_c272e050",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27900
+      },
+      "writtenOn": "2024-06-21T07:05:30Z",
+      "side": 1,
+      "message": "oh, that\u0027s a great idea to solve this finally by Zuul itself\n\nFor now I ended up deploying HashiVault near the Zuul and built a base jobs that gets a Vault session token for the trusted jobs and hands it over to the job so that the job is then able to go to vault and fetch allowed secrets. The session token is then revoked again by the base job",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
