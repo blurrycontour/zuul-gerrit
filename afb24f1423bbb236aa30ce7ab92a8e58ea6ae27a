@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c72ea22b_3ae7c4b7",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2194,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-21T14:24:42Z",
+      "side": 1,
+      "message": "I think this should probably be driver_id?  Because we want each driver to implement one subclass of this, right?  (There could be an unlimited number of aws providers, but only one aws driver).",
+      "revId": "afb24f1423bbb236aa30ce7ab92a8e58ea6ae27a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d8e8985_2d133da8",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1977,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-21T14:24:42Z",
+      "side": 1,
+      "message": "This looks so much like the other deserialization methods that I think it would be good to abstract this sufficiently to move it into the zkobject file.  This sort of thing where we actually uncompress the data seems low-level enough we should try to keep it all together.\n\nThe provider_id/driver_id doesn\u0027t make sense as a zkboject concept though.  Maybe that should just be \"subclass_id\" or something?",
+      "revId": "afb24f1423bbb236aa30ce7ab92a8e58ea6ae27a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
