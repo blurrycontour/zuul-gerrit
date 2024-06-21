@@ -7958,73 +7958,50 @@ class Layout(object):
             self.jobs[job.name] = [job]
         return True
 
-    def addNodeSet(self, nodeset):
-        # It's ok to have a duplicate nodeset definition, but only if
-        # they are in different branches of the same repo, and have
-        # the same values.
-        other = self.nodesets.get(nodeset.name)
+    def _addIdenticalObject(self, obj_type, obj_dict, new_obj):
+        """Helper method to add an object if it's new, ignore it if we
+        already have a duplicate on a different branch in the same
+        project, or raise an error if it duplicates an object in a
+        different project.
+
+        :param str obj_type: A capitalized string describing the
+            object (eg "Nodeset").
+        :param dict obj_dict: The layout dict for this object
+            type (eg self.nodesets).
+        :param object new_obj: The new object (eg a Nodeset instance).
+        """
+
+        other = obj_dict.get(new_obj.name)
         if other is not None:
-            if not nodeset.source_context.isSameProject(other.source_context):
+            if not new_obj.source_context.isSameProject(other.source_context):
                 raise Exception(
-                    "Nodeset %s already defined in project %s" %
-                    (nodeset.name, other.source_context.project_name))
-            if nodeset.source_context.branch == other.source_context.branch:
-                raise Exception("Nodeset %s already defined" % (nodeset.name,))
-            if nodeset != other:
-                raise Exception("Nodeset %s does not match existing definition"
+                    "%s %s already defined in project %s" %
+                    (obj_type, new_obj.name,
+                     other.source_context.project_name))
+            if new_obj.source_context.branch == other.source_context.branch:
+                raise Exception("%s %s already defined" % (
+                    obj_type, new_obj.name))
+            if new_obj != other:
+                raise Exception("%s %s does not match existing definition"
                                 " in branch %s" %
-                                (nodeset.name, other.source_context.branch))
+                                (obj_type, new_obj.name,
+                                 other.source_context.branch))
             # Identical data in a different branch of the same project;
             # ignore the duplicate definition
             return
-        self.nodesets[nodeset.name] = nodeset
+        obj_dict[new_obj.name] = new_obj
+
+    def addNodeSet(self, nodeset):
+        self._addIdenticalObject('Nodeset', self.nodesets, nodeset)
 
     def addSecret(self, secret):
-        # It's ok to have a duplicate secret definition, but only if
-        # they are in different branches of the same repo, and have
-        # the same values.
-        other = self.secrets.get(secret.name)
-        if other is not None:
-            if not secret.source_context.isSameProject(other.source_context):
-                raise Exception(
-                    "Secret %s already defined in project %s" %
-                    (secret.name, other.source_context.project_name))
-            if secret.source_context.branch == other.source_context.branch:
-                raise Exception("Secret %s already defined" % (secret.name,))
-            if not secret.areDataEqual(other):
-                raise Exception("Secret %s does not match existing definition"
-                                " in branch %s" %
-                                (secret.name, other.source_context.branch))
-            # Identical data in a different branch of the same project;
-            # ignore the duplicate definition
-            return
-        self.secrets[secret.name] = secret
+        self._addIdenticalObject('Secret', self.secrets, secret)
 
     def addSemaphore(self, semaphore):
-        # It's ok to have a duplicate semaphore definition, but only if
-        # they are in different branches of the same repo, and have
-        # the same values.
         if semaphore.name in self.tenant.global_semaphores:
             raise Exception("Semaphore %s shadows a global semaphore and "
                             "will be ignored" % (semaphore.name))
-        other = self.semaphores.get(semaphore.name)
-        if other is not None:
-            if not semaphore.source_context.isSameProject(
-                    other.source_context):
-                raise Exception(
-                    "Semaphore %s already defined in project %s" %
-                    (semaphore.name, other.source_context.project_name))
-            if semaphore.source_context.branch == other.source_context.branch:
-                raise Exception("Semaphore %s already defined" %
-                                (semaphore.name,))
-            if semaphore != other:
-                raise Exception("Semaphore %s does not match existing"
-                                " definition in branch %s" %
-                                (semaphore.name, other.source_context.branch))
-            # Identical data in a different branch of the same project;
-            # ignore the duplicate definition
-            return
-        self.semaphores[semaphore.name] = semaphore
+        self._addIdenticalObject('Semaphore', self.semaphores, semaphore)
 
     def getSemaphore(self, abide, semaphore_name):
         if semaphore_name in self.tenant.global_semaphores:
@@ -8040,25 +8017,7 @@ class Layout(object):
         return semaphore
 
     def addQueue(self, queue):
-        # It's ok to have a duplicate queue definition, but only if
-        # they are in different branches of the same repo, and have
-        # the same values.
-        other = self.queues.get(queue.name)
-        if other is not None:
-            if not queue.source_context.isSameProject(other.source_context):
-                raise Exception(
-                    "Queue %s already defined in project %s" %
-                    (queue.name, other.source_context.project_name))
-            if queue.source_context.branch == other.source_context.branch:
-                raise Exception("Queue %s already defined" % (queue.name,))
-            if queue != other:
-                raise Exception("Queue %s does not match existing definition"
-                                " in branch %s" %
-                                (queue.name, other.source_context.branch))
-            # Identical data in a different branch of the same project;
-            # ignore the duplicate definition
-            return
-        self.queues[queue.name] = queue
+        self._addIdenticalObject('Queue', self.queues, queue)
 
     def addPipeline(self, pipeline):
         if pipeline.tenant is not self.tenant:
