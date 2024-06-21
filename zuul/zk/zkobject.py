@@ -13,6 +13,7 @@
 # under the License.
 
 from concurrent.futures import ThreadPoolExecutor
+import abc
 import contextlib
 import json
 import logging
@@ -167,6 +168,8 @@ class ZKObject:
         :returns: A dictionary of attributes and values to be set on
         the object.
         """
+        if isinstance(data, dict):
+            return data
         return json.loads(data.decode('utf-8'))
 
     # These methods are public and shouldn't need to be overridden
@@ -333,10 +336,11 @@ class ZKObject:
 
     # Private methods below
 
-    def _retry(self, context, func, *args, max_tries=-1, **kw):
+    @classmethod
+    def _retry(cls, context, func, *args, max_tries=-1, **kw):
         kazoo_retry = KazooRetry(max_tries=max_tries,
                                  interrupt=context.sessionIsInvalid,
-                                 delay=self._retry_interval, backoff=0,
+                                 delay=cls._retry_interval, backoff=0,
                                  ignore_expire=False)
         try:
             return kazoo_retry(func, *args, **kw)
@@ -362,17 +366,22 @@ class ZKObject:
     def _load(self, context, path=None):
         if path is None:
             path = self.getPath()
+        compressed_data, zstat = self._loadData(context, path)
+        self._updateFromRaw(compressed_data, zstat, context)
+
+    @classmethod
+    def _loadData(cls, context, path):
         if context.sessionIsInvalid():
             raise Exception("ZooKeeper session or lock not valid")
         try:
-            compressed_data, zstat = self._retry(context, self._retryableLoad,
-                                                 context, path)
+            compressed_data, zstat = cls._retry(context, cls._retryableLoad,
+                                                context, path)
             context.profileEvent('get', path)
         except Exception:
             context.log.error(
-                "Exception loading ZKObject %s at %s", self, path)
+                "Exception loading ZKObject at %s", path)
             raise
-        self._updateFromRaw(compressed_data, zstat, context)
+        return compressed_data, zstat
 
     @classmethod
     def _fromRaw(cls, raw_data, zstat):
@@ -382,16 +391,24 @@ class ZKObject:
 
     def _updateFromRaw(self, raw_data, zstat, context=None):
         self._set(_zkobject_hash=None)
-        try:
-            data = zlib.decompress(raw_data)
-        except zlib.error:
-            # Fallback for old, uncompressed data
-            data = raw_data
+        data = self._decompressData(raw_data)
         self._set(**self.deserialize(data, context))
         self._set(_zstat=zstat,
                   _zkobject_hash=hash(data),
                   _zkobject_compressed_size=len(raw_data),
                   _zkobject_uncompressed_size=len(data))
+
+    @classmethod
+    def _compressData(cls, data):
+        return zlib.compress(data)
+
+    @classmethod
+    def _decompressData(cls, raw_data):
+        try:
+            return zlib.decompress(raw_data)
+        except zlib.error:
+            # Fallback for old, uncompressed data
+            return raw_data
 
     @staticmethod
     def _retryableSave(context, create, path, compressed_data, version):
@@ -415,7 +432,7 @@ class ZKObject:
         path = self.getPath()
         if context.sessionIsInvalid():
             raise Exception("ZooKeeper session or lock not valid")
-        compressed_data = zlib.compress(data)
+        compressed_data = self._compressData(data)
 
         try:
             if hasattr(self, '_zstat'):
@@ -574,3 +591,68 @@ class LockableZKObject(ZKObject):
         if self._lock is None:
             return False
         return self._lock.is_still_valid()
+
+
+class PolymorphicZKObjectMixin(abc.ABC):
+
+    # Make this mixin a true abstract base class that can't be
+    # instantiated. The '_subclass_id' property is automatically
+    # "implemented" through subclassing (see '__init_subclass__').
+    @property
+    @abc.abstractmethod
+    def _subclass_id(self):
+        pass
+
+    # Mapping of subclass id to subclass for a particular abstract
+    # parent class. Creating an instance without a subclass id
+    # starts a new hierarchy. This is only supported when none
+    # of the parent classes is alread a variable ZKObject class.
+    @property
+    @abc.abstractmethod
+    def _subclasses(self):
+        pass
+
+    def __init_subclass__(cls, *, subclass_id=None, **kwargs):
+        super().__init_subclass__(**kwargs)
+        if subclass_id is None:
+            if isinstance(cls._subclasses, dict):
+                raise TypeError(
+                    "Can't create new hierarchy below existing variable base")
+            # This is a new "base" class
+            cls._subclasses = {}
+        else:
+            if not isinstance(cls._subclasses, dict):
+                raise TypeError(
+                    "Can't create a subclass without variable base class")
+            # "Implement" the abstract '_subclass_id' property
+            sid = subclass_id.encode("utf8")
+            if sid in cls._subclasses:
+                raise ValueError(
+                    f"Subclass with id {subclass_id} already exists")
+            cls._subclass_id = sid
+            cls._subclasses[sid] = cls
+
+    @classmethod
+    def fromZK(cls, context, path, **kwargs):
+        raw_data, zstat = cls._loadData(context, path)
+        return cls._fromRaw(raw_data, zstat)
+
+    @classmethod
+    def _compressData(cls, data):
+        compressed_data = super()._compressData(data)
+        return b"\0".join((cls._subclass_id, compressed_data))
+
+    @classmethod
+    def _decompressData(cls, raw_data):
+        subclass_id, _, compressed_data = raw_data.partition(b"\0")
+        return super()._decompressData(compressed_data)
+
+    @classmethod
+    def _fromRaw(cls, raw_data, zstat):
+        subclass_id, _, _ = raw_data.partition(b"\0")
+        try:
+            klass = cls._subclasses[subclass_id]
+        except KeyError:
+            raise RuntimeError(f"Unknown subclass id: {subclass_id}")
+        return super(
+            PolymorphicZKObjectMixin, klass)._fromRaw(raw_data, zstat)
