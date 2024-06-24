@@ -168,6 +168,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "94b6406e_abc06682",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-24T21:46:25Z",
+      "side": 1,
+      "message": "Good question!\n\nUp on lines 306-318 here on the new side (but in the original spec) it talks about assigning nodes to clouds more intentionally.  So basically, in the new world, some random launcher (with no affiliation with a cloud) will look at a request and say \"this request for 2 ubuntu nodes shall be handled by rax-dfw\" presumably because it saw that rax-dfw can handle ubuntu nodes, and also has sufficient capacity to launch them, or whatever other criteria we decide to use.  I imagine we will probably want to throw some randomization in there to avoid undesirable concentration.\n\nIn other words, the good news is that the process of cloud assignment of node requests is completely decoupled from any particular python process that\u0027s running.  The bad news is that this spec (either version) doesn\u0027t go into detail about how to implement all that.  But honestly, all we need to do is start with random.choice() to get going, then start improving from there.  This spec gives us the framework for that.",
+      "parentUuid": "34b8bbc3_4ebc1b32",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1a278602_bd175c40",
         "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
         "patchSetId": 1
@@ -220,6 +238,24 @@
       "writtenOn": "2024-06-24T21:16:07Z",
       "side": 1,
       "message": "I think my main concern here is that we can effectively serialize requests for each build depending on the number of launchers that are available. With the old setup as long as you ran more than one launcher you could start building nodes for multiple builds at once. The upside to this is that builds needing fewer resources can get started more quickly because they can bypass bottlenecks when larger nodesets are needed for other jobs.\n\nI like this behavior because it helps incentivize developers to avoid just always using all the resources all the time.",
+      "parentUuid": "e9fcfb06_63f97cfc",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a2cc2d2_bbcbfd5f",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-24T21:46:25Z",
+      "side": 1,
+      "message": "We may be missing each other on this one still.\n\nI think the thing to keep in mind is that in all three cases, all nodes (up to the limit of quota) are being built simultaneously:\n* Today a single nodepool-launcher process can drive hundreds or thousands of node building state machines in parallel (from many different requests).\n* In the original spec, a zuul-launcher would do exactly the same thing, except that they would be decoupled from the zuul-launcher that originally converted the request into building nodes.\n* In the revised spec, the same is true, but the method of deciding which launcher would drive that state machine is math instead of a zk lock race.",
       "parentUuid": "e9fcfb06_63f97cfc",
       "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
