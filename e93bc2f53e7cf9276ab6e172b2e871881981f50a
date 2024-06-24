@@ -184,6 +184,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ecfbb05_c49be334",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-24T21:53:45Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "94b6406e_abc06682",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a278602_bd175c40",
@@ -257,6 +275,24 @@
       "side": 1,
       "message": "We may be missing each other on this one still.\n\nI think the thing to keep in mind is that in all three cases, all nodes (up to the limit of quota) are being built simultaneously:\n* Today a single nodepool-launcher process can drive hundreds or thousands of node building state machines in parallel (from many different requests).\n* In the original spec, a zuul-launcher would do exactly the same thing, except that they would be decoupled from the zuul-launcher that originally converted the request into building nodes.\n* In the revised spec, the same is true, but the method of deciding which launcher would drive that state machine is math instead of a zk lock race.",
       "parentUuid": "e9fcfb06_63f97cfc",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9198842_2b49c89b",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-24T21:53:45Z",
+      "side": 1,
+      "message": "Ah ok for some reason in my head I had that we were introducing something like a launch per cpu. But now rereading it I see that we are not. We\u0027re just doing our best to use more cpu time by spreading things out more generically.",
+      "parentUuid": "8a2cc2d2_bbcbfd5f",
       "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
