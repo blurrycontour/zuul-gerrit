@@ -217,6 +217,9 @@ class Scheduler(threading.Thread):
     _executor_client_class = ExecutorClient
     _launcher_client_class = LauncherClient
 
+    # Feature flag to enable usage of zuul-launcher in tests
+    _use_zuul_launcher = False
+
     def __init__(self, config, connections, app, wait_for_init,
                  disable_pipelines=False, testonly=False):
         threading.Thread.__init__(self)

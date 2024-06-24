@@ -1090,11 +1090,19 @@ class PipelineManager(metaclass=ABCMeta):
         tenant_name = build_set.item.pipeline.tenant.name
         pipeline_name = build_set.item.pipeline.name
         item = build_set.item
-        req = self.sched.nodepool.requestNodes(
-            build_set.uuid, job, tenant_name, pipeline_name, provider,
-            priority, relative_priority, event=item.event)
-        log.debug("Adding node request %s for job %s to item %s",
-                  req, job, item)
+
+        if self.sched._use_zuul_launcher:
+            req = self.sched.launcher.requestNodeset(
+                item, job, relative_priority, provider)
+            log.debug("Adding nodeset request %s for job %s to item %s",
+                      req, job, item)
+        else:
+            req = self.sched.nodepool.requestNodes(
+                build_set.uuid, job, tenant_name, pipeline_name, provider,
+                priority, relative_priority, event=item.event)
+            log.debug("Adding node request %s for job %s to item %s",
+                      req, job, item)
+
         build_set.setJobNodeRequestID(job, req.id)
         if req.fulfilled:
             nodeset = self.sched.nodepool.getNodeSet(req, job.nodeset)
