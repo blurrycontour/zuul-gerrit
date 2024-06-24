@@ -7032,6 +7032,10 @@ class TestSecrets(ZuulTestCase):
         self.assertEqual(
             [{'secret_name': self.secret}],
             self._getSecrets('project1-secret', 'playbooks'))
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertEquals(
+            len(tenant.layout.loading_errors), 0,
+            "No error should have been accumulated")
 
     def test_secret_branch_error_same_branch(self):
         # Test that we are unable to define a secret twice on the same

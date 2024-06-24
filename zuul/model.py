@@ -1876,11 +1876,7 @@ class Secret(ConfigObject):
         if not isinstance(other, Secret):
             return False
         return (self.name == other.name and
-                self.source_context == other.source_context and
                 self.secret_data == other.secret_data)
-
-    def areDataEqual(self, other):
-        return (self.secret_data == other.secret_data)
 
     def __repr__(self):
         return '<Secret %s>' % (self.name,)
