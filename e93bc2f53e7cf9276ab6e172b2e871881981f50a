@@ -1,0 +1,141 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "580adb07_0d71fe2a",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-24T20:14:47Z",
+      "side": 1,
+      "message": "Does switching to a uuid instead of a sequence imply we will have to scan all uuid\u0027s to determine which is oldest when it is time to delete the oldest image?\n\nI think this sort of change also implies some needed updates to status output as previously you can rely on sequence info to make sense of order but that will go away.",
+      "range": {
+        "startLine": 231,
+        "startChar": 41,
+        "endLine": 231,
+        "endChar": 45
+      },
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aafdeb55_b25b8b26",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-24T20:14:47Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand this new bullet. This has been the case for nodepool for many years. The only limitation was process per provider which is covered in the previous bullet.",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4134c53f_00f6d065",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-24T20:14:47Z",
+      "side": 1,
+      "message": "I think we should link to information on this hashing method as it appears to be complicated enough to warrant some more in depth info.\n\nMore specifically it appears that you can have a weighted variation of this algorithm, something that I think will be good to have here since different providers have built in weights (max-servers/capacity for nodes). But there are apparently different approaches with different drawbacks and understanding all of that is important.",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a278602_bd175c40",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-24T20:14:47Z",
+      "side": 1,
+      "message": "We would probably want to hash on request not node to simplify keeping multinode requests from consuming all the available locks. Basically ensure we\u0027re doing our best to process multiple requests in parallel rather than a single request in parallel.",
+      "range": {
+        "startLine": 336,
+        "startChar": 59,
+        "endLine": 336,
+        "endChar": 74
+      },
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e5906ba_95234e89",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-24T20:14:47Z",
+      "side": 1,
+      "message": "Should we have a new state to represent the pre building needs a provider to actually build the node state? I think for human representation of things in status output that distinction is likely to be helpful.",
+      "range": {
+        "startLine": 367,
+        "startChar": 4,
+        "endLine": 367,
+        "endChar": 14
+      },
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a433d5a_94955758",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-24T20:14:47Z",
+      "side": 1,
+      "message": "Re the above comment flip the state to building once the lock is held and just before we start to drive the state machine in the next step below.",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff03cdcd_43170634",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-06-24T20:14:47Z",
+      "side": 1,
+      "message": "In the case of OpenStack clouds I don\u0027t think there is a consistent standard for these sorts of errors/rate limits. I don\u0027t think openstack proper implements rate limits in its APIs so these errors come from proxies in front of the API services. The problem set is probably small enough to not be a huge problem, but may lead to a bunch of special casing over time.",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
