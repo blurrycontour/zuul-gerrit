@@ -26,6 +26,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5ebc39b9_4967570d",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-24T21:04:01Z",
+      "side": 1,
+      "message": "We actually already sort-of implemented this in current nodepool.  This line is mostly just catching up to the reality.\n\nCurrent nodepool has an Age column in output for identifying newest/oldest image builds.",
+      "parentUuid": "580adb07_0d71fe2a",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "aafdeb55_b25b8b26",
         "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
         "patchSetId": 1
@@ -37,6 +55,24 @@
       "writtenOn": "2024-06-24T20:14:47Z",
       "side": 1,
       "message": "I\u0027m not sure I understand this new bullet. This has been the case for nodepool for many years. The only limitation was process per provider which is covered in the previous bullet.",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b5def98_5729be6e",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-24T21:04:01Z",
+      "side": 1,
+      "message": "Yes, but the unrevised spec has some locking such that effectively only a single launcher would be issuing cloud API calls for a given provider at a time (though any provider could do so, and they could rapidly switch to handle load).  The revision will allow multiple launchers to issue API calls to a single cloud at the same time.\n\nThis is particularly important for folks that only use a single cloud (or even a single region) as the performance of a single launcher determines their max throughput.  But even in opendev which achieves high throughput through parallelization across clouds, I expect us to be able to handle bursting better.",
+      "parentUuid": "aafdeb55_b25b8b26",
       "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -60,6 +96,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "34b8bbc3_4ebc1b32",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-24T21:04:01Z",
+      "side": 1,
+      "message": "I agree about the link.\n\nThe weights don\u0027t need to come into play here because the hash will be used for the following tasks:\n* Deciding which launcher will process a request (and assign nodes to it)\n* Deciding which launcher will drive the state machine for a node\n\nNeither of those involve provider capacity, it\u0027s merely deciding which launcher does some arbitrary piece of work.\n\nKeep in mind that with nodepool-in-zuul, this whole process is much more like how Zuul processes requests than nodepool does today.  There is normally no linkage* between a launcher and a cloud provider as there is today in nodepool, much in the same way that there is no zuul-scheduler assigned to the gate pipeline and another assigned to check.  Any zuul scheduler can start processing any pipeline at any time (it just needs to lock it first).  With nodepool-in-zuul, any launcher can start processing any request or any node at any time.  What this spec revision does is it allows the launcers to decide what requests and nodes to process before locking them.  It also allows them to process nodes from the same provider at the same time.\n\n* There may be a linkage between a launcher and a cloud provider, if a deployer decides that they need to locate a particular launcher in a particular cloud region due to network constraints.  But that doesn\u0027t change the fact that the decision about what cloud should launch what node is made independently, possibly by a different launcher.",
+      "parentUuid": "4134c53f_00f6d065",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1a278602_bd175c40",
         "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
         "patchSetId": 1
@@ -77,6 +131,24 @@
         "endLine": 336,
         "endChar": 74
       },
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9fcfb06_63f97cfc",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-24T21:04:01Z",
+      "side": 1,
+      "message": "I think the \"or\" in that sentence was due to the fact that there are two queues we\u0027re hashing here:\n\n* There is a queue of nodeset requests; they will be hashed to decide which launcher should handle each.\n* There is a pile of nodes to be built; they will be hashed to decide which launcher will drive their state machines.\n\nI don\u0027t think multinode requests will have a particular advantage here.  The original request will be processed in order; then once there are multiple node records, the launchers should end up locking all of them.  If there are 5 launchers with 5 node requests, each will process 1.  If there are 5000 node requests, each should end up processing 1000.  That\u0027s fairly similar to the behavior today, except that once you exceed the capacity of the providers today, there\u0027s no more work for that nodepool-launcher to do, so you could end up with a nodepool-launcher handling 500 nodes and another handling 1500.  But a zuul-launcher will be able to evenly distribute them.",
+      "parentUuid": "1a278602_bd175c40",
       "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -134,6 +206,24 @@
       "writtenOn": "2024-06-24T20:14:47Z",
       "side": 1,
       "message": "In the case of OpenStack clouds I don\u0027t think there is a consistent standard for these sorts of errors/rate limits. I don\u0027t think openstack proper implements rate limits in its APIs so these errors come from proxies in front of the API services. The problem set is probably small enough to not be a huge problem, but may lead to a bunch of special casing over time.",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9f248f5_ff3cec94",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-24T21:04:01Z",
+      "side": 1,
+      "message": "Good point.  So we may need to design this to handle several different sources/manifestations of errors (whether it comes from headers or 4xx response text, etc).",
+      "parentUuid": "ff03cdcd_43170634",
       "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
