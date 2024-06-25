@@ -60,6 +60,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab09aeca_4b27447e",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-25T06:09:41Z",
+      "side": 1,
+      "message": "Sequence numbers can cause problems with backup and restore as with a \"fresh\" Zookeeper you can\u0027t simply import those sequence numbers. ZK will always try to start counting from 0 and there is no was to adjust the start index for the sequence numbers.\n\nPreviously we just created/deleted znodes to sync up to the required #, but that was very slow.",
+      "parentUuid": "40cda478_e605cec2",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aafdeb55_b25b8b26",
@@ -202,6 +220,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71e2ba32_84e59f17",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-25T06:09:41Z",
+      "side": 1,
+      "message": "Added a link to https://en.wikipedia.org/wiki/Rendezvous_hashing",
+      "parentUuid": "7ecfbb05_c49be334",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a278602_bd175c40",
@@ -320,6 +356,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a1655ea_da3196cd",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-25T06:09:41Z",
+      "side": 1,
+      "message": "Yep, I think that makes sense.",
+      "parentUuid": "5e5906ba_95234e89",
+      "range": {
+        "startLine": 367,
+        "startChar": 4,
+        "endLine": 367,
+        "endChar": 14
+      },
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a433d5a_94955758",
@@ -333,6 +393,24 @@
       "writtenOn": "2024-06-24T20:14:47Z",
       "side": 1,
       "message": "Re the above comment flip the state to building once the lock is held and just before we start to drive the state machine in the next step below.",
+      "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e170fa6_d7273899",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-25T06:09:41Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6a433d5a_94955758",
       "revId": "e93bc2f53e7cf9276ab6e172b2e871881981f50a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
