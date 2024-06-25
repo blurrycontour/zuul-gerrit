@@ -42,6 +42,7 @@ from tests.base import (
     iterate_timeout,
     skipIfMultiScheduler,
 )
+from tests.util import random_sha1
 
 
 class TestMultipleTenants(AnsibleZuulTestCase):
@@ -3716,6 +3717,44 @@ class TestGlobalRepoState(AnsibleZuulTestCase):
             dict(name='require-test1', result='SUCCESS', changes='1,1'),
             dict(name='require-test2', result='SUCCESS', changes='1,1'),
         ])
+
+    def test_repo_state_protected_branches(self):
+        """
+        Test that the global repo state includes all protected branches
+        when we schedule no initial merge for branch/ref events.
+        """
+        self.create_branch('org/project-branches', 'stable')
+        self.create_branch('org/project-branches', 'unprotected')
+        github = self.fake_github.getGithubClient()
+        repo = github.repo_from_project('org/project-branches')
+        repo._set_branch_protection('master', True)
+        repo._set_branch_protection('stable', True)
+        self.fake_github.emitEvent(
+            self.fake_github.getBranchProtectionRuleEvent(
+                'org/project-branches', 'created'))
+        self.waitUntilSettled()
+
+        del self.merge_job_history
+
+        A = self.fake_github.openFakePullRequest(
+            'org/project-branches', 'master', 'A')
+        A.setMerged("merging A")
+        old_sha = random_sha1()
+        new_sha = A.head_sha
+        pevent = self.fake_github.getPushEvent(project='org/project-branches',
+                                               ref='refs/heads/master',
+                                               old_rev=old_sha,
+                                               new_rev=new_sha)
+        self.fake_github.emitEvent(pevent)
+        self.waitUntilSettled()
+
+        refstate_jobs = self.merge_job_history.get(
+            zuul.model.MergeRequest.REF_STATE)
+        self.assertEqual(len(refstate_jobs), 1)
+
+        merge_request = refstate_jobs[0]
+        self.assertEqual(
+            set(merge_request.payload["branches"]), {"master", "stable"})
 
     def test_dependent_project(self):
         # Test that the repo state is restored globally for the whole buildset

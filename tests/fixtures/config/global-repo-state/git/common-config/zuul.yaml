@@ -50,6 +50,20 @@
         comment: false
     precedence: high
 
+- pipeline:
+    name: post
+    post-review: true
+    description: This pipeline runs jobs that operate after each change is merged.
+    manager: independent
+    precedence: low
+    trigger:
+      github:
+        - event: push
+          ref: ^refs/heads/.*$
+      gerrit:
+        - event: ref-updated
+          ref: ^refs/heads/.*$
+
 - job:
     name: base-calling-implicit-role
     pre-run:
