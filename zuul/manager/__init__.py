@@ -1542,12 +1542,23 @@ class PipelineManager(metaclass=ABCMeta):
 
         # Filter projects for ones that are already in repo state
         connections = self.sched.connections.connections
-        for merger_item in item.current_build_set.merger_items:
-            canonical_hostname = connections[
-                merger_item['connection']].canonical_hostname
-            canonical_project_name = (canonical_hostname + '/' +
-                                      merger_item['project'])
-            project_cnames.discard(canonical_project_name)
+
+        new_items = list()
+        build_set = item.current_build_set
+
+        # If we skipped the initial repo state (for branch/ref items),
+        # we need to include the merger items for the final repo state.
+        # MODEL_API < 28
+        if (build_set._merge_repo_state_path is None and
+            not build_set.repo_state_keys):
+            new_items.extend(build_set.merger_items)
+        else:
+            for merger_item in item.current_build_set.merger_items:
+                canonical_hostname = connections[
+                    merger_item['connection']].canonical_hostname
+                canonical_project_name = (canonical_hostname + '/' +
+                                          merger_item['project'])
+                project_cnames.discard(canonical_project_name)
 
         if not project_cnames:
             item.current_build_set.updateAttributes(
@@ -1568,15 +1579,6 @@ class PipelineManager(metaclass=ABCMeta):
 
         branches = self._branchesForRepoState(
             projects=projects, tenant=tenant, items=[item])
-
-        new_items = list()
-        build_set = item.current_build_set
-        # If we skipped the initial repo state (for branch/ref items),
-        # we need to include the merger items for the final repo state.
-        # MODEL_API < 28
-        if (build_set._merge_repo_state_path is None and
-            not build_set.repo_state_keys):
-            new_items.extend(build_set.merger_items)
 
         for project in projects:
             new_item = dict()
