@@ -24,7 +24,7 @@ import {
   getFiltersFromUrl,
   writeFiltersToUrl,
 } from '../containers/FilterToolbar'
-import { makeBuildQueryString } from '../containers/BuildQuery'
+import { makeBuildsetQueryString } from '../containers/BuildQuery'
 import BuildsetTable from '../containers/build/BuildsetTable'
 
 class BuildsetsPage extends React.Component {
@@ -67,13 +67,14 @@ class BuildsetsPage extends React.Component {
         title: 'Result',
         placeholder: 'Filter by Result...',
         type: 'select',
-        // are there more?
         options: [
           'SUCCESS',
           'FAILURE',
           'MERGE_CONFLICT',
           'MERGE_FAILURE',
           'DEQUEUED',
+          'CONFIG_ERROR',
+          'NO_JOBS',
         ]
       },
       {
@@ -115,7 +116,7 @@ class BuildsetsPage extends React.Component {
       limit: filters.limit.length > 0 ? filters.limit : [50,]
     }
     let _filters = { ...filters, ...paginationOptions }
-    const queryString = makeBuildQueryString(_filters)
+    const queryString = makeBuildsetQueryString(_filters)
     this.setState({ fetching: true })
     fetchBuildsets(this.props.tenant.apiPrefix, queryString).then(
       (response) => {

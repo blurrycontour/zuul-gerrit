@@ -158,7 +158,7 @@ class BuildsPage extends React.Component {
       limit: filters.limit.length > 0 ? filters.limit : [50,]
     }
     let _filters = { ...filters, ...paginationOptions }
-    const queryString = makeBuildQueryString(_filters, true)
+    const queryString = makeBuildQueryString(_filters)
     this.setState({ fetching: true })
     // TODO (felix): What happens in case of a broken network connection? Is the
     // fetching shows infinitely or can we catch this and show an erro state in
