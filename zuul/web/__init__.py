@@ -2004,7 +2004,7 @@ class ZuulWebAPI(object):
                   pipeline=None, change=None, branch=None,
                   patchset=None, ref=None, newrev=None, uuid=None,
                   result=None, complete=None, limit=50, skip=0,
-                  idx_min=None, idx_max=None):
+                  idx_min=None, idx_max=None, exclude_result=None):
         connection = self._get_connection()
 
         if complete:
@@ -2021,7 +2021,7 @@ class ZuulWebAPI(object):
             change=change, branch=branch, patchset=patchset, ref=ref,
             newrev=newrev, uuid=uuid, result=result, complete=complete,
             limit=limit, offset=skip, idx_min=_idx_min, idx_max=_idx_max,
-            query_timeout=self.query_timeout)
+            exclude_result=exclude_result, query_timeout=self.query_timeout)
 
         return [BuildsetConverter.toDict(b) for b in buildsets]
 
