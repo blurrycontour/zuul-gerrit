@@ -543,6 +543,12 @@ files are located in the ``zuul/doc/source/examples`` directory
 and are bind-mounted into the running containers.  You may edit them
 and restart the Zuul containers to make changes.
 
+There is some more work to do on your base job.  It should look like
+the ``base`` job in the standard library (see `zuul-base-jobs
+documentation`_ for details).
+
+.. _zuul-base-jobs documentation: https://zuul-ci.org/docs/zuul-base-jobs/jobs.html#job-base
+
 If you would like to connect your Zuul to GitHub, see
 :ref:`github_driver`.
 
