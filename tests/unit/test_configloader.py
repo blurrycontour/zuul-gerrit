@@ -1314,3 +1314,15 @@ class TestDefaultBranch(ZuulTestCase):
         md = layout.getProjectMetadata(
             'github.com/org/regex-override-project-develop')
         self.assertEqual('develop', md.default_branch)
+
+
+class TestNodepoolConfig(ZuulTestCase):
+    config_file = 'zuul-connections-gerrit-and-github.conf'
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_nodepool_config(self):
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        self.assertEqual(1, len(layout.images))
+        image = layout.images['debian']
+        self.assertEqual('debian', image.name)
+        self.assertEqual('cloud', image.type)

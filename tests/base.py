@@ -153,11 +153,12 @@ def iterate_timeout(max_seconds, purpose):
     raise Exception("Timeout waiting for %s" % purpose)
 
 
-def simple_layout(path, driver='gerrit'):
+def simple_layout(path, driver='gerrit', enable_nodepool=False):
     """Specify a layout file for use by a test method.
 
     :arg str path: The path to the layout file.
     :arg str driver: The source driver to use, defaults to gerrit.
+    :arg bool enable_nodepool: Enable additional nodepool objects.
 
     Some tests require only a very simple configuration.  For those,
     establishing a complete config directory hierachy is too much
@@ -170,10 +171,16 @@ def simple_layout(path, driver='gerrit'):
     config-project called "common-config" and each "project" instance
     referenced in the layout file will have a git repo automatically
     initialized.
+
+    The enable_nodepool argument is a temporary facility for
+    convenience during the initial stages of the nodepool-in-zuul
+    work.  It enables the additional nodepool config objects (which
+    are not otherwise enabled by default, but will be later).
     """
 
     def decorator(test):
         test.__simple_layout__ = (path, driver)
+        test.__enable_nodepool__ = enable_nodepool
         return test
     return decorator
 
@@ -2027,15 +2034,10 @@ class TestConfig:
     def __init__(self, testobj):
         test_name = testobj.id().split('.')[-1]
         test = getattr(testobj, test_name)
-        self.simple_layout = None
-        self.gerrit_config = {}
-        self.never_capture = None
-        if hasattr(test, '__simple_layout__'):
-            self.simple_layout = getattr(test, '__simple_layout__')
-        if hasattr(test, '__gerrit_config__'):
-            self.gerrit_config = getattr(test, '__gerrit_config__')
-        if hasattr(test, '__never_capture__'):
-            self.gerrit_config = getattr(test, '__never_capture__')
+        self.simple_layout = getattr(test, '__simple_layout__', None)
+        self.gerrit_config = getattr(test, '__gerrit_config__', {})
+        self.never_capture = getattr(test, '__never_capture__', None)
+        self.enable_nodepool = getattr(test, '__enable_nodepool__', False)
         self.changes = FakeChangeDB()
 
 
@@ -2445,13 +2447,32 @@ class ZuulTestCase(BaseTestCase):
             data = f.read()
             layout = yaml.safe_load(data)
             files['zuul.yaml'] = data
+        config_projects = []
+        if self.test_config.enable_nodepool:
+            config_projects.append({
+                'org/common-config': {
+                    'include': [
+                        'image',
+                    ]}
+            })
+        else:
+            config_projects.append('org/common-config')
+
         untrusted_projects = []
         for item in layout:
             if 'project' in item:
                 name = item['project']['name']
                 if name.startswith('^'):
                     continue
-                untrusted_projects.append(name)
+                if self.test_config.enable_nodepool:
+                    untrusted_projects.append({
+                        name: {
+                            'include': [
+                                'image',
+                            ]}
+                    })
+                else:
+                    untrusted_projects.append(name)
                 if self.init_repos:
                     self.init_repo(name)
                     self.addCommitToRepo(name, 'initial commit',
@@ -2476,7 +2497,7 @@ class ZuulTestCase(BaseTestCase):
                 'name': 'tenant-one',
                 'source': {
                     driver: {
-                        'config-projects': ['org/common-config'],
+                        'config-projects': config_projects,
                         'untrusted-projects': untrusted_projects}}}}]
         f.write(yaml.dump(temp_config).encode('utf8'))
         f.close()
