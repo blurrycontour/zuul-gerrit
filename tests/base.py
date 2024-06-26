@@ -2284,7 +2284,14 @@ class ZuulTestCase(BaseTestCase):
         self.history = self.executor_server.build_history
         self.builds = self.executor_server.running_builds
 
-        self.launcher = zuul.launcher.server.Launcher(self.config)
+        launcher_connections = TestConnectionRegistry(
+            self.config, self.test_config,
+            self.additional_event_queues,
+            self.upstream_root, self.poller_events,
+            self.git_url_with_auth, self.addCleanup)
+        launcher_connections.configure(self.config)
+        self.launcher = zuul.launcher.server.Launcher(
+            self.config, launcher_connections)
         self.launcher.start()
 
         self.scheds = SchedulerTestManager(self.validate_tenants,
