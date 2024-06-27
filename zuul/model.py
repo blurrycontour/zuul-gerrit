@@ -1605,6 +1605,92 @@ class Section(ConfigObject):
                 self.config == other.config)
 
 
+class ProviderConfig(ConfigObject):
+    """A provider configuration.
+
+    This represents the provider config object.  It is combined with
+    referenced sections in order to produce an instance of a
+    zuul.provider.Provider which is the actual object used for
+    managing images and nodes.
+    """
+
+    def __init__(self, name, section):
+        super().__init__()
+        self.name = name
+        self.section = section
+        self.description = None
+        # Unlike most config objects, the provider config is minimally
+        # parsed and only fully realized when creating a final
+        # provider.
+        self.config = {}
+
+    def __repr__(self):
+        return '<ProviderConfig %s>' % (self.name,)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, ProviderConfig):
+            return False
+        return (self.name == other.name and
+                self.section == other.section and
+                self.description == other.description and
+                self.config == other.config)
+
+    @staticmethod
+    def _mergeDict(a, b):
+        # Merge nested dictionaries and append lists if possible,
+        # otherwise, overwrite the value in 'a' with the value in 'b'.
+        ret = {}
+        for k, av in a.items():
+            if k not in b:
+                ret[k] = av
+        for k, bv in b.items():
+            av = a.get(k)
+            if (isinstance(av, (dict, types.MappingProxyType)) and
+                isinstance(bv, (dict, types.MappingProxyType))):
+                ret[k] = ProviderConfig._mergeDict(av, bv)
+            elif (isinstance(av, (list, tuple)) and
+                  isinstance(bv, (list, tuple))):
+                ret[k] = list(av) + list(bv)
+            else:
+                ret[k] = bv
+        return ret
+
+    @staticmethod
+    def _dropNone(d):
+        ret = {}
+        for k, v in list(d.items()):
+            if v is not None:
+                ret[k] = v
+        return ret
+
+    def flattenConfig(self, layout):
+        config = copy.deepcopy(Freezable.thaw(self.config))
+        parent_name = self.section
+        while parent_name:
+            parent_section = layout.sections[parent_name]
+            parent_config = copy.deepcopy(Freezable.thaw(
+                parent_section.config))
+            config = ProviderConfig._mergeDict(parent_config, config)
+            parent_name = parent_section.parent
+        # Provide defaults from the images/flavors/labels objects
+        for image in config.get('images', []):
+            layout_image = self._dropNone(
+                layout.images[image['name']].toDict())
+            image.update(ProviderConfig._mergeDict(layout_image, image))
+        for flavor in config.get('flavors', []):
+            layout_flavor = self._dropNone(
+                layout.flavors[flavor['name']].toDict())
+            flavor.update(ProviderConfig._mergeDict(layout_flavor, flavor))
+        for label in config.get('labels', []):
+            layout_label = self._dropNone(
+                layout.labels[label['name']].toDict())
+            label.update(ProviderConfig._mergeDict(layout_label, label))
+        return config
+
+
 class Node(ConfigObject):
     """A single node for use by a job.
 
@@ -7900,6 +7986,7 @@ class UnparsedConfig(object):
         self.flavors = []
         self.labels = []
         self.sections = []
+        self.providers = []
 
         # The list of files/dirs which this represents.
         self.files_examined = set()
@@ -7914,7 +8001,8 @@ class UnparsedConfig(object):
         source_contexts = {}
         for attr in ['pragmas', 'pipelines', 'jobs', 'project_templates',
                      'projects', 'nodesets', 'secrets', 'semaphores',
-                     'queues', 'images', 'flavors', 'labels', 'sections']:
+                     'queues', 'images', 'flavors', 'labels', 'sections',
+                     'providers']:
             # Make a deep copy of each of our attributes
             old_objlist = getattr(self, attr)
             new_objlist = copy.deepcopy(old_objlist)
@@ -7955,6 +8043,7 @@ class UnparsedConfig(object):
             self.flavors.extend(conf.flavors)
             self.labels.extend(conf.labels)
             self.sections.extend(conf.sections)
+            self.providers.extend(conf.providers)
             return
 
         if not isinstance(conf, list):
@@ -7994,6 +8083,8 @@ class UnparsedConfig(object):
                 self.labels.append(value)
             elif key == 'section':
                 self.sections.append(value)
+            elif key == 'provider':
+                self.providers.append(value)
             else:
                 raise ConfigItemUnknownError(item)
 
@@ -8016,6 +8107,7 @@ class ParsedConfig(object):
         self.flavors = []
         self.labels = []
         self.sections = []
+        self.providers = []
 
     def copy(self):
         r = ParsedConfig()
@@ -8033,6 +8125,7 @@ class ParsedConfig(object):
         r.flavors = self.flavors[:]
         r.labels = self.labels[:]
         r.sections = self.sections[:]
+        r.providers = self.providers[:]
         return r
 
     def extend(self, conf):
@@ -8050,6 +8143,7 @@ class ParsedConfig(object):
             self.flavors.extend(conf.flavors)
             self.labels.extend(conf.labels)
             self.sections.extend(conf.sections)
+            self.providers.extend(conf.providers)
             for regex, projects in conf.projects_by_regex.items():
                 self.projects_by_regex.setdefault(regex, []).extend(projects)
             return
@@ -8096,6 +8190,8 @@ class Layout(object):
         self.flavors = {}
         self.labels = {}
         self.sections = {}
+        self.provider_configs = {}
+        self.providers = {}
         self.loading_errors = LoadingErrors()
 
     def getJob(self, name):
@@ -8216,6 +8312,16 @@ class Layout(object):
 
     def addSection(self, section):
         self._addIdenticalObject('Section', self.sections, section)
+
+    def addProviderConfig(self, provider_config):
+        self._addIdenticalObject('Provider', self.provider_configs,
+                                 provider_config)
+
+    def addProvider(self, provider):
+        if provider.name in self.providers:
+            raise Exception(
+                "Provider %s is already defined" % provider.name)
+        self.providers[provider.name] = provider
 
     def addPipeline(self, pipeline):
         if pipeline.tenant is not self.tenant:
