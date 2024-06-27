@@ -55,6 +55,12 @@
   until: result.status == 200 and result.json["zuul_version"] is defined
   changed_when: false
 
+# In case ZK is shutdown first, allow the locks to expire.
+- name: Delay for ZK lock expiration
+  wait_for:
+    timeout: 30
+  delegate_to: localhost
+
 - name: Verify that old builds are available
   uri:
     url: "http://localhost:9000/api/tenant/example-tenant/builds"
