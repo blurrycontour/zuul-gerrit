@@ -384,8 +384,9 @@ class ZKObject:
         return compressed_data, zstat
 
     @classmethod
-    def _fromRaw(cls, raw_data, zstat):
+    def _fromRaw(cls, raw_data, zstat, **kw):
         obj = cls()
+        obj._set(**kw)
         obj._updateFromRaw(raw_data, zstat)
         return obj
 
@@ -633,9 +634,9 @@ class PolymorphicZKObjectMixin(abc.ABC):
             cls._subclasses[sid] = cls
 
     @classmethod
-    def fromZK(cls, context, path, **kwargs):
+    def fromZK(cls, context, path, **kw):
         raw_data, zstat = cls._loadData(context, path)
-        return cls._fromRaw(raw_data, zstat)
+        return cls._fromRaw(raw_data, zstat, **kw)
 
     @classmethod
     def _compressData(cls, data):
@@ -648,11 +649,11 @@ class PolymorphicZKObjectMixin(abc.ABC):
         return super()._decompressData(compressed_data)
 
     @classmethod
-    def _fromRaw(cls, raw_data, zstat):
+    def _fromRaw(cls, raw_data, zstat, **kw):
         subclass_id, _, _ = raw_data.partition(b"\0")
         try:
             klass = cls._subclasses[subclass_id]
         except KeyError:
             raise RuntimeError(f"Unknown subclass id: {subclass_id}")
         return super(
-            PolymorphicZKObjectMixin, klass)._fromRaw(raw_data, zstat)
+            PolymorphicZKObjectMixin, klass)._fromRaw(raw_data, zstat, **kw)
