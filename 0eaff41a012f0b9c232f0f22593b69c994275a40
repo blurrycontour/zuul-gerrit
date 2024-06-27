@@ -20,6 +20,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ec6b739f_adfa26e6",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-27T14:27:55Z",
+      "side": 1,
+      "message": "(note) I believe that much like drivers with webhooks, this will be a global url regardless of whether zuul is deployed in whitelabel mode.",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52f865bd_a7c2f465",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-27T14:27:55Z",
+      "side": 1,
+      "message": "(note) This will be a small set of keys for the system as a whole (not per-project); we will have multiples if/when they are rotated.",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f64346e1_0fb03b97",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-27T14:27:55Z",
+      "side": 1,
+      "message": "We currently prepare the secrets before running any playbooks (ie, we prepare all the secrets, then run all the playbooks).  Are you suggesting that for this we prepare each oidc secret before each playbook?  That would make sense because it would reduce the time delta between generation and first use.  If that\u0027s what you mean, let\u0027s change this to read:\n\n  The ID token will be generated in the executor immediately before running a playbook which requires it.\n\nIt\u0027s also the case that one secret may be used by more than one playbook.  Each of pre-run, run, and post-run (and also cleanup) can take a list of playbooks, and a job can have all of those.  So an open question for me is:\n\n  Do we use the same ID token for a given secret across all playbooks that have access to it?  Or do we generate a new ID token for each playbook?\n\nThe expiration time seems to be the main concern here.  It may need to be quite large to be used both in pre-run and post-run playbooks of a large job.",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ec14467_6e3d5dbc",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 1
@@ -31,6 +82,57 @@
       "writtenOn": "2024-06-21T11:42:40Z",
       "side": 1,
       "message": "typo: determine",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bd40794_3fdfead2",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-27T14:27:55Z",
+      "side": 1,
+      "message": "The job-name will change if inherited from (unless you mean the job-name of the job that uses the secret, not the final job that it inherits from).  That seems useful to me, in that if someone sets up a base job that uses a secret and someone inherits from it, there is some indication to the IDC which job is actually using it.  But this would be dangerous to rely on instead of sub, so we should probably put a big warning sign in the docs about this.",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df5519f4_4d9a68ec",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-27T14:27:55Z",
+      "side": 1,
+      "message": "Our keystorage schema currently has a schema for handling rotation of keys by using the following data structure at the key location:\n{ \u0027schema\u0027: 1,\n  \u0027keys\u0027: [\n    {\u0027version\u0027: 0,\n     \u0027created\u0027: timestamp,\n     \u0027private_key\u0027: blob},\n    ...\n  ]}\n\nWe might use the same for this.  Then just store that data structure at `/keystorage/oidc`.  That would increase parity with the other key systems.",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d219f70_4ea59a7c",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-27T14:27:55Z",
+      "side": 1,
+      "message": "Probably easier to just have the web server regenerate the public keys on startup or whenever the keystore is updated.  Will only take a second, and we don\u0027t have to deal with extra data storage/sync.",
       "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
