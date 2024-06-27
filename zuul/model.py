@@ -1453,10 +1453,11 @@ class Image(ConfigObject):
     Images are associated with labels and providers.
     """
 
-    def __init__(self, name, image_type):
+    def __init__(self, name, image_type, description):
         super().__init__()
         self.name = name
         self.type = image_type
+        self.description = description
 
     def __repr__(self):
         return '<Image %s>' % (self.name,)
@@ -1468,17 +1469,53 @@ class Image(ConfigObject):
         if not isinstance(other, Image):
             return False
         return (self.name == other.name and
-                self.type == other.type)
+                self.type == other.type and
+                self.description == other.description)
 
     def toDict(self):
         return {
             'name': self.name,
-            'type': self.type
+            'type': self.type,
+            'description': self.description,
         }
 
     @classmethod
     def fromDict(cls, data):
-        return cls(data["name"], data["type"])
+        return cls(data['name'], data['type'], data['description'])
+
+
+class Flavor(ConfigObject):
+    """A node flavor.
+
+    Flavors are associated with provider-specific instance types.
+    """
+
+    def __init__(self, name, description):
+        super().__init__()
+        self.name = name
+        self.description = description
+
+    def __repr__(self):
+        return '<Flavor %s>' % (self.name,)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, Flavor):
+            return False
+        return (self.name == other.name and
+                self.description == other.description)
+
+    def toDict(self):
+        return {
+            'name': self.name,
+            'description': self.description,
+        }
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data['name'], data['description'])
 
 
 class Node(ConfigObject):
@@ -7773,6 +7810,7 @@ class UnparsedConfig(object):
         self.semaphores = []
         self.queues = []
         self.images = []
+        self.flavors = []
 
         # The list of files/dirs which this represents.
         self.files_examined = set()
@@ -7787,7 +7825,7 @@ class UnparsedConfig(object):
         source_contexts = {}
         for attr in ['pragmas', 'pipelines', 'jobs', 'project_templates',
                      'projects', 'nodesets', 'secrets', 'semaphores',
-                     'queues', 'images']:
+                     'queues', 'images', 'flavors']:
             # Make a deep copy of each of our attributes
             old_objlist = getattr(self, attr)
             new_objlist = copy.deepcopy(old_objlist)
@@ -7825,6 +7863,7 @@ class UnparsedConfig(object):
             self.semaphores.extend(conf.semaphores)
             self.queues.extend(conf.queues)
             self.images.extend(conf.images)
+            self.flavors.extend(conf.flavors)
             return
 
         if not isinstance(conf, list):
@@ -7858,6 +7897,8 @@ class UnparsedConfig(object):
                 self.pragmas.append(value)
             elif key == 'image':
                 self.images.append(value)
+            elif key == 'flavor':
+                self.flavors.append(value)
             else:
                 raise ConfigItemUnknownError(item)
 
@@ -7877,6 +7918,7 @@ class ParsedConfig(object):
         self.semaphores = []
         self.queues = []
         self.images = []
+        self.flavors = []
 
     def copy(self):
         r = ParsedConfig()
@@ -7891,6 +7933,7 @@ class ParsedConfig(object):
         r.semaphores = self.semaphores[:]
         r.queues = self.queues[:]
         r.images = self.images[:]
+        r.flavors = self.flavors[:]
         return r
 
     def extend(self, conf):
@@ -7905,6 +7948,7 @@ class ParsedConfig(object):
             self.semaphores.extend(conf.semaphores)
             self.queues.extend(conf.queues)
             self.images.extend(conf.images)
+            self.flavors.extend(conf.flavors)
             for regex, projects in conf.projects_by_regex.items():
                 self.projects_by_regex.setdefault(regex, []).extend(projects)
             return
@@ -7948,6 +7992,7 @@ class Layout(object):
         self.semaphores = {}
         self.queues = {}
         self.images = {}
+        self.flavors = {}
         self.loading_errors = LoadingErrors()
 
     def getJob(self, name):
@@ -8059,6 +8104,9 @@ class Layout(object):
 
     def addImage(self, image):
         self._addIdenticalObject('Image', self.images, image)
+
+    def addFlavor(self, flavor):
+        self._addIdenticalObject('Flavor', self.flavors, flavor)
 
     def addPipeline(self, pipeline):
         if pipeline.tenant is not self.tenant:

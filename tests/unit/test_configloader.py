@@ -1326,3 +1326,5 @@ class TestNodepoolConfig(ZuulTestCase):
         image = layout.images['debian']
         self.assertEqual('debian', image.name)
         self.assertEqual('cloud', image.type)
+        flavor = layout.flavors['normal']
+        self.assertEqual('normal', flavor.name)
