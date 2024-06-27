@@ -11,6 +11,12 @@
     cmd: podman-compose -p zuul-tutorial stop
     chdir: ../../doc/source/examples
 
+# In case ZK is shutdown first, allow the locks to expire.
+- name: Delay for ZK lock expiration
+  wait_for:
+    timeout: 30
+  delegate_to: localhost
+
 # Restart with the new config
 - name: Run podman-compose up
   when: not local
