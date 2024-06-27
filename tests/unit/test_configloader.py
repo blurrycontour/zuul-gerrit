@@ -1317,7 +1317,7 @@ class TestDefaultBranch(ZuulTestCase):
 
 
 class TestNodepoolConfig(ZuulTestCase):
-    config_file = 'zuul-connections-gerrit-and-github.conf'
+    config_file = 'zuul-connections-nodepool.conf'
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_nodepool_config(self):
