@@ -95,3 +95,15 @@
     name: debian-normal
     image: debian
     flavor: normal
+
+- section:
+    name: aws-base
+    abstract: true
+    connection: aws
+    boot-timeout: 120
+    launch-timeout: 600
+
+- section:
+    name: aws-us-east-1
+    parent: aws-base
+    region: us-east-1
