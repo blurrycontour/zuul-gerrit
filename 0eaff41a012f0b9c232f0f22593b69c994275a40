@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6f534837_5039edf5",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-06-27T16:22:53Z",
+      "side": 1,
+      "message": "I agree",
+      "parentUuid": "ec6b739f_adfa26e6",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "52f865bd_a7c2f465",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 1
@@ -65,6 +83,24 @@
       "writtenOn": "2024-06-27T14:27:55Z",
       "side": 1,
       "message": "We currently prepare the secrets before running any playbooks (ie, we prepare all the secrets, then run all the playbooks).  Are you suggesting that for this we prepare each oidc secret before each playbook?  That would make sense because it would reduce the time delta between generation and first use.  If that\u0027s what you mean, let\u0027s change this to read:\n\n  The ID token will be generated in the executor immediately before running a playbook which requires it.\n\nIt\u0027s also the case that one secret may be used by more than one playbook.  Each of pre-run, run, and post-run (and also cleanup) can take a list of playbooks, and a job can have all of those.  So an open question for me is:\n\n  Do we use the same ID token for a given secret across all playbooks that have access to it?  Or do we generate a new ID token for each playbook?\n\nThe expiration time seems to be the main concern here.  It may need to be quite large to be used both in pre-run and post-run playbooks of a large job.",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4995573_68a464de",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-06-27T16:22:53Z",
+      "side": 1,
+      "message": "Yes, generating the ID token immediately before running a playbook was my intention here. I will update this. Regarding multiple playbooks using the same secret I think it makes sense to re-generate the ID token due to the TTL. So I\u0027ll make this clear as well/",
+      "parentUuid": "f64346e1_0fb03b97",
       "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -105,6 +141,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c8fa9e06_cbaa6e76",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-06-27T16:22:53Z",
+      "side": 1,
+      "message": "I think we still can discuss wether we\u0027ll need this at all as standard claims. In most cases I think the matching will be against the sub which is probably the only identifier which is really protected by zuul\u0027s secret mechanism. If we decide to put that information there by default (for informational, maybe logging purposes on the target service) I agree that we should put a warning in the docs.",
+      "parentUuid": "0bd40794_3fdfead2",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "df5519f4_4d9a68ec",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 1
@@ -122,6 +176,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d8286ca2_daca0c29",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-06-27T16:22:53Z",
+      "side": 1,
+      "message": "Good idea",
+      "parentUuid": "df5519f4_4d9a68ec",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3d219f70_4ea59a7c",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 1
@@ -133,6 +205,24 @@
       "writtenOn": "2024-06-27T14:27:55Z",
       "side": 1,
       "message": "Probably easier to just have the web server regenerate the public keys on startup or whenever the keystore is updated.  Will only take a second, and we don\u0027t have to deal with extra data storage/sync.",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d2d34e7_686287f1",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-06-27T16:22:53Z",
+      "side": 1,
+      "message": "Sounds good as well, my main thought about this was to cache the rendered response so we don\u0027t have to call into cryptography on every request.",
+      "parentUuid": "3d219f70_4ea59a7c",
       "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
