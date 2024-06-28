@@ -171,6 +171,9 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
                 f'/provider/{self.canonical_name}/config')
         return path
 
+    def hasLabel(self, label):
+        return any(lbl.name == label for lbl in self.labels)
+
 
 class BaseProviderSchema(metaclass=abc.ABCMeta):
     def getLabelSchema(self):

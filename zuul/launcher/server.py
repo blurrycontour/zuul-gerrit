@@ -14,19 +14,24 @@
 # under the License.
 
 import logging
+import random
 import socket
 import threading
+import uuid
 
+from zuul import model
 from zuul.lib import commandsocket, tracing
 from zuul.lib.config import get_default
 from zuul.zk.image_registry import ImageBuildRegistry
+from zuul.lib.logutil import get_annotated_logger
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import LauncherComponent
+from zuul.zk.components import COMPONENT_REGISTRY, LauncherComponent
 from zuul.zk.event_queues import (
     PipelineResultEventQueue,
     TenantTriggerEventQueue,
 )
+from zuul.zk.launcher import LauncherApi
 from zuul.zk.layout import (
     LayoutProvidersStore,
     LayoutStateStore,
@@ -37,6 +42,11 @@ from zuul.zk.zkobject import ZKContext
 COMMANDS = (
     commandsocket.StopCommand,
 )
+
+
+class NodesetRequestError(Exception):
+    """Errors that should lead to the request being declined."""
+    pass
 
 
 class Launcher:
@@ -59,11 +69,19 @@ class Launcher:
             self.zk_client
         )
 
+        COMPONENT_REGISTRY.create(self.zk_client)
         self.hostname = socket.getfqdn()
         self.component_info = LauncherComponent(
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
         self.wake_event = threading.Event()
+        self.stop_event = threading.Event()
+
+        self.connection_filter = get_default(
+            self.config, "launcher", "connection_filter")
+        self.api = LauncherApi(
+            self.zk_client, COMPONENT_REGISTRY.registry, self.component_info,
+            self.wake_event.set, self.connection_filter)
 
         self.command_map = {
             commandsocket.StopCommand.name: self.stop,
@@ -88,17 +106,160 @@ class Launcher:
         )
 
     def run(self):
-        while self._running:
-            self.wake_event.wait()
-            self.wake_event.clear()
+        self.component_info.state = self.component_info.RUNNING
+        self.log.debug("Launcher running")
+        while not self.stop_event.is_set():
             try:
                 self._run()
             except Exception:
                 self.log.exception("Error in main thread:")
+            self.wake_event.wait()
+            self.wake_event.clear()
 
     def _run(self):
+        self._processRequests()
+        self._processNodes()
         if self.updateTenantProviders():
             self.checkMissingImages()
+
+    def _processRequests(self):
+        for request in self.api.getMatchingRequests():
+            log = get_annotated_logger(self.log, request, request=request.uuid)
+            if not request.hasLock():
+                if request.state in request.FINAL_STATES:
+                    # Nothing to do here
+                    continue
+                log.debug("Got request %s", request)
+                if not request.acquireLock(self.zk_client, blocking=False):
+                    log.debug("Failed to lock matching request %s", request)
+                    continue
+
+            try:
+                if request.state == model.NodesetRequest.State.REQUESTED:
+                    self._acceptRequest(request, log)
+                elif request.state == model.NodesetRequest.State.ACCEPTED:
+                    self._checkRequest(request, log)
+            except NodesetRequestError:
+                state = model.NodesetRequest.State.FAILED
+                log.error("Marking request %s as %s", request, state)
+                event = model.NodesProvisionedEvent(
+                    request.uuid, request.buildset_uuid)
+                self.result_events[request.tenant_name][
+                    request.pipeline_name].put(event)
+                with self.createZKContext(request._lock, log) as ctx:
+                    request.updateAttributes(ctx, state=state)
+            except Exception:
+                log.exception("Error processing request %s", request)
+            if request.state in request.FINAL_STATES:
+                request.releaseLock()
+
+    def _acceptRequest(self, request, log):
+        log.debug("Accepting request %s", request)
+        # Create provider nodes for the requested labels
+        request_uuid = uuid.UUID(request.uuid)
+        provider_nodes = []
+        label_providers = self._selectProviders(request)
+        with self.createZKContext(request._lock, log) as ctx:
+            for i, (label, provider) in enumerate(label_providers):
+                # Create a deterministic node UUID by using
+                # the request UUID as namespace.
+                node_uuid = uuid.uuid5(
+                    request_uuid,
+                    f"{provider.canonical_name}-{i}-{label}").hex
+                # TODO: handle NodeExists errors
+                node_class = provider.driver.getProviderNodeClass()
+                node = node_class.new(
+                    ctx,
+                    uuid=node_uuid,
+                    label=label,
+                    request_id=request.uuid,
+                    connection_name=provider.connection_name,
+                    tenant_name=request.tenant_name,
+                    # TODO:
+                    # provider=...,
+                )
+                log.debug("Requested node %s", node)
+                provider_nodes.append(node.uuid)
+
+            request.updateAttributes(
+                ctx,
+                state=model.NodesetRequest.State.ACCEPTED,
+                provider_nodes=provider_nodes)
+
+    def _selectProviders(self, request):
+        providers = self.tenant_providers.get(request.tenant_name)
+        if not providers:
+            # TODO: handle differently?
+            raise NodesetRequestError(
+                f"No provider for tenant {request.tenant_name}")
+        label_providers = []
+        for label in request.labels:
+            candidate_providers = [p for p in providers if p.hasLabel(label)]
+            if not candidate_providers:
+                raise NodesetRequestError(
+                    f"No provider found for label {label}")
+            # TODO: make provider selection more sophisticated
+            label_providers.append((label, random.choice(candidate_providers)))
+        return label_providers
+
+    def _checkRequest(self, request, log):
+        log.debug("Checking request %s", request)
+        requested_nodes = [self.api.getProviderNode(p)
+                           for p in request.provider_nodes]
+        if not all(n.state in n.FINAL_STATES for n in requested_nodes):
+            return
+        log.debug("Request %s nodes ready: %s", request, requested_nodes)
+        failed = not all(n.state in model.ProviderNode.State.READY
+                         for n in requested_nodes)
+        # TODO:
+        # * gracefully handle node failures (retry with another connection)
+        # * deallocate ready nodes from the request if finally failed
+
+        state = (model.NodesetRequest.State.FAILED if failed
+                 else model.NodesetRequest.State.FULFILLED)
+        log.debug("Marking request %s as %s", request, state)
+
+        event = model.NodesProvisionedEvent(
+            request.uuid, request.buildset_uuid)
+        self.result_events[request.tenant_name][request.pipeline_name].put(
+            event)
+
+        with self.createZKContext(request._lock, log) as ctx:
+            request.updateAttributes(ctx, state=state)
+
+    def _processNodes(self):
+        for node in self.api.getMatchingProviderNodes():
+            log = get_annotated_logger(self.log, node, request=node.request_id)
+            if not node.hasLock():
+                if node.state in node.FINAL_STATES:
+                    continue
+                if not node.acquireLock(self.zk_client, blocking=False):
+                    log.debug("Failed to lock matching node %s", node)
+                    continue
+            if node.state == model.ProviderNode.State.REQUESTED:
+                self._buildNode(node, log)
+            if node.state == model.ProviderNode.State.BUILDING:
+                self._checkNode(node, log)
+            if node.state in node.FINAL_STATES:
+                node.releaseLock()
+
+    def _buildNode(self, node, log):
+        log.debug("Building node %s", node)
+        # TODO: implement node creation
+        with self.createZKContext(node._lock, self.log) as ctx:
+            node.updateAttributes(ctx, state=model.ProviderNode.State.BUILDING)
+
+    def _checkNode(self, node, log):
+        log.debug("Checking node %s", node)
+        # TODO: implement node check
+        if True:
+            state = model.ProviderNode.State.READY
+        else:
+            state = model.ProviderNode.State.FAILED
+        log.debug("Marking node %s as %s", node, state)
+        with self.createZKContext(node._lock, self.log) as ctx:
+            node.updateAttributes(ctx, state=state)
+        node.releaseLock()
 
     def start(self):
         self.log.debug("Starting command processor")
@@ -110,14 +271,11 @@ class Launcher:
         self.command_thread.start()
 
         self.log.debug("Starting launcher thread")
-        self._running = True
         self.launcher_thread.start()
-
-        self.component_info.state = self.component_info.RUNNING
 
     def stop(self):
         self.log.debug("Stopping launcher")
-        self._running = False
+        self.stop_event.set()
         self.wake_event.set()
         self.component_info.state = self.component_info.STOPPED
         self._command_running = False
@@ -128,6 +286,7 @@ class Launcher:
     def join(self):
         self.log.debug("Joining launcher")
         self.launcher_thread.join()
+        self.api.stop()
         self.zk_client.disconnect()
         self.tracing.stop()
         self.log.debug("Joined launcher")
@@ -142,7 +301,7 @@ class Launcher:
                 self.log.exception("Exception while processing command")
 
     def createZKContext(self, lock, log):
-        return ZKContext(self.zk_client, lock, None, log)
+        return ZKContext(self.zk_client, lock, self.stop_event, log)
 
     def updateTenantProviders(self):
         # We need to handle new and deleted tenants, so we need to
