@@ -357,3 +357,11 @@ class ProviderInterface(object, metaclass=abc.ABCMeta):
 
         """
         pass
+
+    @abc.abstractmethod
+    def getProviderNodeClass(self):
+        """Return the provider node class.
+
+        This method is required by the interface.
+        """
+        pass
