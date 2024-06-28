@@ -33,6 +33,24 @@
       "message": "I\u0027d like to get rid of the watermark idea.\n\nIn nodepool because the idea was that nodepool would wake up periodically and see if it needed to add or remove nodes from the pool to maintain the same level of ready nodes.\n\nI think mostly what we\u0027re going to want in the zuul launcher is a behavior like most of the zuul components where we wake whenever there\u0027s a new request.\n\nI\u0027m not sure how we should handle min-ready and missing image builds yet, but if we can\u0027t handle them via event triggers, then we can probably just set up some apscheduler crons for them.\n\nSo at this point, we can probably just call wake_event.wait() without a delay, right?",
       "revId": "e2513fdfe66a82ebfbcd169f09031b0ffb507546",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37eeb1f4_e37d08df",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-06-28T06:14:04Z",
+      "side": 1,
+      "message": "Yep, that makes sense. I don\u0027t see why we would need that.",
+      "parentUuid": "997daf43_e24cd0b9",
+      "revId": "e2513fdfe66a82ebfbcd169f09031b0ffb507546",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
