@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e73e2063_9470fd95",
+        "filename": "zuul/driver/bubblewrap/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-06-28T22:04:21Z",
+      "side": 1,
+      "message": "This was the expected way to find out what\u0027s going wrong.  Did this make it to the output you saw?",
+      "revId": "bef46434b0ff9d3f707cbe27d52e9c39379b10d0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
