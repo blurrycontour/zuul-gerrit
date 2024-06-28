@@ -30,17 +30,21 @@
         ssh_agent: "{{ ssh_agent_new }}"
   when: ssh_public_key is not defined or ssh_public_key == ''
 
-- name: Run podman-compose up
+- name: Run docker compose up
   when: not local
   shell:
-    cmd: podman-compose -p zuul-tutorial up -d
+    cmd: docker compose -p zuul-tutorial up -d
     chdir: src/opendev.org/zuul/zuul/doc/source/examples
+  environment:
+    DOCKER_HOST: unix:///run/podman/podman.sock
 
-- name: Run podman-compose up
+- name: Run docker compose up
   when: local
   shell:
-    cmd: podman-compose -p zuul-tutorial up -d
+    cmd: docker compose -p zuul-tutorial up -d
     chdir: ../../doc/source/examples
+  environment:
+    DOCKER_HOST: unix:///run/podman/podman.sock
 
 - name: Print list of images
   command: podman image ls --all --digests --no-trunc

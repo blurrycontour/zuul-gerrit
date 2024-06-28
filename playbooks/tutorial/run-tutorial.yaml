@@ -3,7 +3,8 @@
       package:
         name:
           - git-review
-          - podman-compose
+          # This should only be needed with the podman backend
+          - catatonit
         state: present
       become: true
   when: not local

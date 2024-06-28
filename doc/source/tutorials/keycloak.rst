@@ -46,16 +46,16 @@ that we can update Zuul's configuration to add authentication.
 .. code-block:: shell
 
    cd zuul/doc/source/examples
-   podman-compose -p zuul-tutorial stop
+   docker compose -p zuul-tutorial stop
 
 Restart the containers with a new Zuul configuration.
 
 .. code-block:: shell
 
    cd zuul/doc/source/examples
-   ZUUL_TUTORIAL_CONFIG="./keycloak/etc_zuul/" podman-compose -p zuul-tutorial up -d
+   ZUUL_TUTORIAL_CONFIG="./keycloak/etc_zuul/" docker compose -p zuul-tutorial up -d
 
-This tells podman-compose to use these Zuul `config files
+This tells docker compose to use these Zuul `config files
 <https://opendev.org/zuul/zuul/src/branch/master/doc/source/examples/keycloak>`_.
 
 Start Keycloak
@@ -67,7 +67,7 @@ with this command:
 .. code-block:: shell
 
    cd zuul/doc/source/examples/keycloak
-   podman-compose -p zuul-tutorial-keycloak up -d
+   docker compose -p zuul-tutorial-keycloak up -d
 
 Once Keycloak is running, you can visit the web interface at
 http://localhost:8082/

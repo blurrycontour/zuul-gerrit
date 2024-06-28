@@ -31,26 +31,18 @@ Before you start, ensure that some needed packages are installed.
 
 .. code-block:: shell
 
-   # Red Hat / CentOS:
-
-   sudo yum install podman git python3
-   sudo python3 -m pip install git-review podman-compose
-
    # Fedora:
 
-   sudo dnf install podman git python3
-   sudo python3 -m pip install git-review podman-compose
+   sudo dnf install git git-review docker-compose
 
    # OpenSuse:
 
-   sudo zypper install podman git python3
-   sudo python3 -m pip install git-review podman-compose
+   sudo zypper install git git-review docker-compose
 
    # Ubuntu (Noble or later) / Debian:
 
-   sudo apt-get update
-   sudo apt-get install podman git python3-pip
-   sudo python3 -m pip install git-review podman-compose
+   sudo apt update
+   sudo apt install git git-review docker-compose-v2
 
 
 Clone the Zuul repository:
@@ -60,22 +52,22 @@ Clone the Zuul repository:
    git clone https://opendev.org/zuul/zuul
 
 Then cd into the directory containing this document, and run
-podman-compose in order to start Zuul, Nodepool and Gerrit.
+docker compose in order to start Zuul, Nodepool and Gerrit.
 
 .. code-block:: shell
 
    cd zuul/doc/source/examples
-   podman-compose -p zuul-tutorial up
+   docker compose -p zuul-tutorial up
 
 For reference, the files in that directory are also `browsable on the web
 <https://opendev.org/zuul/zuul/src/branch/master/doc/source/examples>`_.
 
 All of the services will be started with debug-level logging sent to
-the standard output of the terminal where podman-compose is running.
+the standard output of the terminal where docker compose is running.
 You will see a considerable amount of information scroll by, including
 some errors.  Zuul will immediately attempt to connect to Gerrit and
 begin processing, even before Gerrit has fully initialized.  The
-podman composition includes scripts to configure Gerrit and create an
+docker composition includes scripts to configure Gerrit and create an
 account for Zuul.  Once this has all completed, the system should
 automatically connect, stabilize and become idle.  When this is
 complete, you will have the following services running:
