@@ -1,7 +1,22 @@
 - block:
     - name: Install git-review
-      command: python3 -m pip install git-review podman-compose
+      package:
+        name:
+          - git-review
+          - catatonit
+        state: present
       become: true
+    # Is this bug fixed now?
+    # - name: Start buildx builder
+    #   # https://github.com/docker/buildx/issues/344
+    #   # https://bugs.launchpad.net/ubuntu/+source/libpod/+bug/2040483
+    #   shell: |
+    #     echo "[containers]" >> /etc/containers/containers.conf
+    #     echo apparmor_profile = \"unconfined\" >> /etc/containers/containers.conf
+    #     echo "FROM scratch" | docker buildx build - || true
+    #   environment:
+    #     DOCKER_HOST: unix:///run/podman/podman.sock
+    #   become: true
   when: not local
 
 - name: Setup Tutorial Execution
