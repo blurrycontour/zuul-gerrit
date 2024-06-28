@@ -325,6 +325,7 @@ class BubblewrapDriver(Driver, WrapperInterface):
                      '/etc/resolv.conf',
                      '/etc/hosts',
                      '/etc/localtime',
+                     '/nix/store',
                      ]:
             if os.path.exists(path):
                 bwrap_command.extend(['--ro-bind', path, path])
