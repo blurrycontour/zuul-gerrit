@@ -216,6 +216,10 @@ class ConnectionRegistry(object):
                 sources.append(connection.driver.getSource(connection))
         return sources
 
+    def getProviderConnections(self):
+        return [c for c in self.connections.values()
+                if isinstance(c.driver, ProviderInterface)]
+
     def getReporter(self, connection_name, pipeline, config=None):
         connection = self.connections[connection_name]
         return connection.driver.getReporter(connection, pipeline, config)
