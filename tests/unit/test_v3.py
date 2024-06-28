@@ -6316,7 +6316,7 @@ class TestEarlyFailure(AnsibleZuulTestCase):
             of.write("continue")
 
         # From here out, allow any pre-failure job to
-        # continue until it has run three times
+        # continue until it has run two times
 
         self.log.debug("Wait for all jobs to finish")
         for _ in iterate_timeout(30, 'all jobs finished'):
@@ -6364,6 +6364,110 @@ class TestEarlyFailure(AnsibleZuulTestCase):
             dict(name='wait', result='ABORTED', changes='1,1 2,1'),
             dict(name='wait', result='SUCCESS', changes='2,1'),
         ], ordered=True)
+
+    def test_pre_run_post_run_failure_retry(self):
+        # Test that we don't set pre_fail when a pre-run playbook fails and
+        # the post-run playbook fails. This test is basically identical to
+        # the one above except that we check the behavior remains if post run
+        # playbooks also fail using a different job.
+        # (so we honor the retry logic and restart the job).
+        file_dict = {'pre-failure.txt': ''}
+        A = self.fake_gerrit.addFakeChange('org/project5', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+
+        self.log.debug("Wait for the first change to start its job")
+        for _ in iterate_timeout(30, 'job A started'):
+            if len(self.builds) == 1:
+                break
+        A_build = self.builds[0]
+        start = os.path.join(self.jobdir_root, A_build.uuid +
+                             '.failure_start.flag')
+        for _ in iterate_timeout(30, 'job A running'):
+            if os.path.exists(start):
+                break
+
+        self.log.debug("Add a second change which will test with the first")
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+
+        self.log.debug("Wait for the second change to start its job")
+        for _ in iterate_timeout(30, 'job B started'):
+            if len(self.builds) == 2:
+                break
+        B_build = self.builds[1]
+        start = os.path.join(self.jobdir_root, B_build.uuid +
+                             '.wait_start.flag')
+        for _ in iterate_timeout(30, 'job B running'):
+            if os.path.exists(start):
+                break
+
+        self.log.debug("Continue the first job which will fail early")
+        flag_path = os.path.join(self.jobdir_root, A_build.uuid,
+                                 'failure_continue_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        # From here out, allow any pre-post-failure job to
+        # continue until it has run two times
+
+        self.log.debug("Wait for all jobs to finish")
+        for _ in iterate_timeout(30, 'all jobs finished'):
+            if len(self.builds) == 1 and len(self.history) == 3:
+                break
+            for b in self.builds[:]:
+                if b.name == 'pre-post-failure':
+                    try:
+                        flag_path = os.path.join(self.jobdir_root, b.uuid,
+                                                 'failure_continue_flag')
+                        with open(flag_path, "w") as of:
+                            of.write("continue")
+                    except Exception:
+                        self.log.debug("Unable to write flag path %s",
+                                       flag_path)
+        self.log.debug("Done")
+
+        self.log.debug("Wait for the second job to be aborted "
+                       "and restarted without the first change")
+        for _ in iterate_timeout(30, 'job B restarted'):
+            if len(self.builds) == 1 and self.builds[0].name == 'wait':
+                B_build2 = self.builds[0]
+                if B_build2 != B_build:
+                    break
+
+        self.log.debug("Wait for the second change to start its job")
+        start = os.path.join(self.jobdir_root, B_build2.uuid +
+                             '.wait_start.flag')
+        for _ in iterate_timeout(30, 'job B running'):
+            if os.path.exists(start):
+                break
+
+        self.log.debug("Allow the restarted second job to finish")
+        flag_path = os.path.join(self.jobdir_root, B_build2.uuid,
+                                 'wait_continue_flag')
+        self.log.debug("Writing %s", flag_path)
+        with open(flag_path, "w") as of:
+            of.write("continue")
+
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='pre-post-failure', result=None, changes='1,1'),
+            dict(name='pre-post-failure', result=None, changes='1,1'),
+            dict(name='wait', result='ABORTED', changes='1,1 2,1'),
+            dict(name='wait', result='SUCCESS', changes='2,1'),
+        # The order of the tests in history is determined by whether or not
+        # the scheduler processes early failure results for the second
+        # pre-post-failure run aborting the first wait just before the second
+        # pre-post-failure job returns or if the second pre-post-failure job
+        # is processed before aborting the first wait job.
+        # The order actually isn't important to us in this case as long as
+        # all of the jobs have the correct reported results hence the ordered
+        # false argument here.
+        ], ordered=False)
 
     def test_early_failure_fail_fast(self):
         file_dict = {'early-failure.txt': ''}
