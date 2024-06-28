@@ -2484,6 +2484,8 @@ class ZuulTestCase(BaseTestCase):
                 name = item['project']['name']
                 if name.startswith('^'):
                     continue
+                if name == 'org/common-config':
+                    continue
                 if self.test_config.enable_nodepool:
                     untrusted_projects.append({
                         name: {

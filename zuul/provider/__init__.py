@@ -23,16 +23,21 @@ import voluptuous as vs
 
 class BaseProviderImage(metaclass=abc.ABCMeta):
     def __init__(self, config):
+        self.project_canonical_name = config['project_canonical_name']
         self.name = config['name']
+        self.branch = config['branch']
+        self.type = config['type']
 
 
 class BaseProviderFlavor(metaclass=abc.ABCMeta):
     def __init__(self, config):
+        self.project_canonical_name = config['project_canonical_name']
         self.name = config['name']
 
 
 class BaseProviderLabel(metaclass=abc.ABCMeta):
     def __init__(self, config):
+        self.project_canonical_name = config['project_canonical_name']
         self.name = config['name']
         self.min_ready = config.get('min-ready', 0)
 
@@ -97,6 +102,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
             name=config['name'],
             section_name=config['section'],
             description=config.get('description'),
+            images=self.parseImages(config),
             labels=self.parseLabels(config),
         )
 
@@ -114,6 +120,12 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         )
         return json.dumps(data, sort_keys=True).encode("utf8")
 
+    def parseImages(self, config):
+        images = []
+        for image_config in config.get('images', []):
+            images.append(self.parseImage(image_config))
+        return images
+
     def parseLabels(self, config):
         labels = []
         for label_config in config.get('labels', []):
@@ -126,6 +138,15 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
 
         :returns: a ProviderLabel subclass
         :rtype: ProviderLabel
+        """
+        pass
+
+    @abc.abstractmethod
+    def parseImage(self, image_config):
+        """Instantiate a ProviderImage subclass
+
+        :returns: a ProviderImage subclass
+        :rtype: ProviderImage
         """
         pass
 
@@ -143,6 +164,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
 class BaseProviderSchema(metaclass=abc.ABCMeta):
     def getLabelSchema(self):
         schema = vs.Schema({
+            vs.Required('project_canonical_name'): str,
             vs.Required('name'): str,
             'description': str,
             'image': str,
@@ -152,7 +174,9 @@ class BaseProviderSchema(metaclass=abc.ABCMeta):
 
     def getImageSchema(self):
         schema = vs.Schema({
+            vs.Required('project_canonical_name'): str,
             vs.Required('name'): str,
+            vs.Required('branch'): str,
             'description': str,
             'username': str,
             'connection-type': str,
@@ -165,6 +189,7 @@ class BaseProviderSchema(metaclass=abc.ABCMeta):
 
     def getFlavorSchema(self):
         schema = vs.Schema({
+            vs.Required('project_canonical_name'): str,
             vs.Required('name'): str,
             'description': str,
         })

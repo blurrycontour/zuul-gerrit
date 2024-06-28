@@ -27,6 +27,7 @@ from zuul.model import Change
 
 PARENT_CHANGE_ENQUEUED = 'parent-change-enqueued'
 PROJECT_CHANGE_MERGED = 'project-change-merged'
+IMAGE_BUILD = 'image-build'
 
 
 class ZuulDriver(Driver, TriggerInterface):
@@ -161,6 +162,22 @@ class ZuulDriver(Driver, TriggerInterface):
         event.zuul_event_id = str(uuid4().hex)
         event.timestamp = time.time()
         self.sched.addTriggerEvent(self.name, event)
+
+    def getImageBuildEvent(self, image_name, project_hostname, project_name,
+                           project_branch):
+        event = ZuulTriggerEvent()
+        event.type = IMAGE_BUILD
+        event.connection_name = "zuul"
+        event.trigger_name = self.name
+        event.image_name = image_name
+        event.project_hostname = project_hostname
+        event.project_name = project_name
+        event.branch = project_branch
+        event.ref = f'refs/heads/{project_branch}'
+        event.zuul_event_id = str(uuid4().hex)
+        event.timestamp = time.time()
+        event.arrived_at_scheduler_timestamp = event.timestamp
+        return event
 
     def getTrigger(self, connection_name, config=None):
         return zuultrigger.ZuulTrigger(self, config)

@@ -20,9 +20,14 @@ import voluptuous as vs
 from zuul.provider import (
     BaseProvider,
     BaseProviderSchema,
+    BaseProviderImage,
     BaseProviderLabel,
     BaseProviderEndpoint,
 )
+
+
+class AwsProviderImage(BaseProviderImage):
+    pass
 
 
 class AwsProviderLabel(BaseProviderLabel):
@@ -64,6 +69,9 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         data = super().parseConfig(config)
         data['region'] = config['region']
         return data
+
+    def parseImage(self, image_config):
+        return AwsProviderImage(image_config)
 
     def parseLabel(self, label_config):
         return AwsProviderLabel(label_config)
