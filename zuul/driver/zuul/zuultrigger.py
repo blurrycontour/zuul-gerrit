@@ -54,8 +54,11 @@ class ZuulTrigger(BaseTrigger):
 def getSchema():
     zuul_trigger = {
         v.Required('event'):
-        scalar_or_list(v.Any('parent-change-enqueued',
-                             'project-change-merged')),
+        scalar_or_list(v.Any(
+            'parent-change-enqueued',
+            'project-change-merged',
+            'image-build',
+        )),
         'pipeline': scalar_or_list(v.Any(ZUUL_REGEX, str)),
     }
 
