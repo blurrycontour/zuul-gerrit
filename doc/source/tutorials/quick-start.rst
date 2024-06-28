@@ -31,26 +31,18 @@ Before you start, ensure that some needed packages are installed.
 
 .. code-block:: shell
 
-   # Red Hat / CentOS:
-
-   sudo yum install podman git python3
-   sudo python3 -m pip install git-review podman-compose
-
    # Fedora:
 
-   sudo dnf install podman git python3
-   sudo python3 -m pip install git-review podman-compose
+   sudo dnf install git git-review docker-compose
 
    # OpenSuse:
 
-   sudo zypper install podman git python3
-   sudo python3 -m pip install git-review podman-compose
+   sudo zypper install git git-review docker-compose
 
    # Ubuntu (Noble or later) / Debian:
 
-   sudo apt-get update
-   sudo apt-get install podman git python3-pip
-   sudo python3 -m pip install git-review podman-compose
+   sudo apt update
+   sudo apt install git git-review docker-compose-v2
 
 
 Clone the Zuul repository:
