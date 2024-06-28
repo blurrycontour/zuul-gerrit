@@ -1480,15 +1480,14 @@ class Image(ConfigObject):
                 self.description == other.description)
 
     def toDict(self):
+        sc = self.source_context
         return {
+            'project_canonical_name': sc.project_canonical_name,
             'name': self.name,
+            'branch': sc.branch,
             'type': self.type,
             'description': self.description,
         }
-
-    @classmethod
-    def fromDict(cls, data):
-        return cls(data['name'], data['type'], data['description'])
 
 
 class Flavor(ConfigObject):
@@ -1523,14 +1522,12 @@ class Flavor(ConfigObject):
                 self.description == other.description)
 
     def toDict(self):
+        sc = self.source_context
         return {
+            'project_canonical_name': sc.project_canonical_name,
             'name': self.name,
             'description': self.description,
         }
-
-    @classmethod
-    def fromDict(cls, data):
-        return cls(data['name'], data['description'])
 
 
 class Label(ConfigObject):
@@ -1569,17 +1566,14 @@ class Label(ConfigObject):
                 self.description == other.description)
 
     def toDict(self):
+        sc = self.source_context
         return {
+            'project_canonical_name': sc.project_canonical_name,
             'name': self.name,
             'image': self.image,
             'flavor': self.flavor,
             'description': self.description,
         }
-
-    @classmethod
-    def fromDict(cls, data):
-        return cls(data['name'], data['image'], data['flavor'],
-                   data['description'])
 
     def validateReferences(self, layout):
         if not layout.images.get(self.image):
