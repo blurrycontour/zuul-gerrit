@@ -33,7 +33,7 @@ import zuul.driver.gitlab
 import zuul.driver.elasticsearch
 import zuul.driver.aws
 from zuul.connection import BaseConnection
-from zuul.driver import SourceInterface
+from zuul.driver import ProviderInterface, SourceInterface
 
 
 class DefaultConnection(BaseConnection):
@@ -205,6 +205,10 @@ class ConnectionRegistry(object):
             if hasattr(connection.driver, 'getSource'):
                 sources.append(connection.driver.getSource(connection))
         return sources
+
+    def getProviderConnections(self):
+        return [c for c in self.connections.values()
+                if isinstance(c.driver, ProviderInterface)]
 
     def getReporter(self, connection_name, pipeline, config=None):
         connection = self.connections[connection_name]
