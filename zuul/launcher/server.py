@@ -1,4 +1,5 @@
 # Copyright 2024 BMW Group
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -22,6 +23,12 @@ from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import LauncherComponent
 from zuul.zk.event_queues import PipelineResultEventQueue
+from zuul.zk.layout import (
+    LayoutProvidersStore,
+    LayoutStateStore,
+)
+from zuul.zk.locks import tenant_read_lock
+from zuul.zk.zkobject import ZKContext
 
 COMMANDS = (
     commandsocket.StopCommand,
@@ -31,9 +38,11 @@ COMMANDS = (
 class Launcher:
     log = logging.getLogger("zuul.Launcher")
 
-    def __init__(self, config):
+    def __init__(self, config, connections):
         self._running = False
         self.config = config
+        self.connections = connections
+        self.tenant_providers = {}
 
         self.tracing = tracing.Tracing(self.config)
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
@@ -47,6 +56,7 @@ class Launcher:
         self.component_info = LauncherComponent(
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
+        self.wake_event = threading.Event()
 
         self.command_map = {
             commandsocket.StopCommand.name: self.stop,
@@ -57,22 +67,30 @@ class Launcher:
         self.command_socket = commandsocket.CommandSocket(command_socket)
         self._command_running = False
 
+        self.tenant_layout_state = LayoutStateStore(
+            self.zk_client, self.wake_event.set)
+        self.layout_providers_store = LayoutProvidersStore(
+            self.zk_client, self.connections)
+        self.local_layout_state = {}
+
         self.launcher_thread = threading.Thread(
             target=self.run,
             name="Launcher",
         )
-        self.wake_event = threading.Event()
 
     def run(self):
         while self._running:
             self.wake_event.wait()
             self.wake_event.clear()
+            try:
+                self._run()
+            except Exception:
+                self.log.exception("Error in main thread:")
+
+    def _run(self):
+        self.updateTenantProviders()
 
     def start(self):
-        self.log.debug("Starting launcher thread")
-        self._running = True
-        self.launcher_thread.start()
-
         self.log.debug("Starting command processor")
         self._command_running = True
         self.command_socket.start()
@@ -80,6 +98,11 @@ class Launcher:
             target=self.runCommand, name="command")
         self.command_thread.daemon = True
         self.command_thread.start()
+
+        self.log.debug("Starting launcher thread")
+        self._running = True
+        self.launcher_thread.start()
+
         self.component_info.state = self.component_info.RUNNING
 
     def stop(self):
@@ -89,6 +112,7 @@ class Launcher:
         self.component_info.state = self.component_info.STOPPED
         self._command_running = False
         self.command_socket.stop()
+        self.connections.stop()
         self.log.debug("Stopped launcher")
 
     def join(self):
@@ -106,3 +130,38 @@ class Launcher:
                     self.command_map[command](*args)
             except Exception:
                 self.log.exception("Exception while processing command")
+
+    def createZKContext(self, lock, log):
+        return ZKContext(self.zk_client, lock, None, log)
+
+    def updateTenantProviders(self):
+        # We need to handle new and deleted tenants, so we need to
+        # process all tenants currently known and the new ones.
+        tenant_names = set(self.tenant_providers.keys())
+        tenant_names.update(self.tenant_layout_state)
+
+        for tenant_name in tenant_names:
+            # Reload the tenant if the layout changed.
+            self._updateTenantProviders(tenant_name)
+        return True
+
+    def _updateTenantProviders(self, tenant_name):
+        # Reload the tenant if the layout changed.
+        if (self.local_layout_state.get(tenant_name)
+                == self.tenant_layout_state.get(tenant_name)):
+            return
+        self.log.debug("Updating tenant %s", tenant_name)
+        with tenant_read_lock(self.zk_client, tenant_name, self.log) as tlock:
+            layout_state = self.tenant_layout_state.get(tenant_name)
+
+            if layout_state:
+                with self.createZKContext(tlock, self.log) as context:
+                    providers = list(self.layout_providers_store.get(
+                        context, tenant_name))
+                    self.tenant_providers[tenant_name] = providers
+                    for provider in providers:
+                        self.log.debug("Loaded provider %s", provider.name)
+                self.local_layout_state[tenant_name] = layout_state
+            else:
+                self.tenant_providers.pop(tenant_name, None)
+                self.local_layout_state.pop(tenant_name, None)
