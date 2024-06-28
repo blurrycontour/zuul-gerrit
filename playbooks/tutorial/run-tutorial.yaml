@@ -1,6 +1,16 @@
 - block:
     - name: Install git-review
-      command: python3 -m pip install git-review podman-compose
+      package:
+        name:
+          - git-review
+          - catatonit
+        state: present
+      become: true
+    - name: Start buildx builder
+      # https://github.com/docker/buildx/issues/344
+      shell: echo "FROM scratch" | docker buildx build -
+      environment:
+        DOCKER_HOST: unix:///run/podman/podman.sock
       become: true
   when: not local
 
