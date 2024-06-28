@@ -1,5 +1,7 @@
 - hosts: all
   roles:
     - ensure-pip
-    - ensure-podman
+    - ensure-docker
+    - role: ensure-podman
+      ensure_podman_socket: true
     - use-buildset-registry
