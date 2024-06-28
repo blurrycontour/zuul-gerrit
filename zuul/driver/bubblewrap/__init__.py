@@ -351,8 +351,6 @@ class BubblewrapDriver(Driver, WrapperInterface):
 def main(args=None):
     logging.basicConfig(level=logging.DEBUG)
 
-    driver = BubblewrapDriver(check_bwrap=True)
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--ro-paths', nargs='+')
     parser.add_argument('--rw-paths', nargs='+')
@@ -360,6 +358,8 @@ def main(args=None):
     parser.add_argument('work_dir')
     parser.add_argument('run_args', nargs='+')
     cli_args = parser.parse_args()
+
+    driver = BubblewrapDriver(check_bwrap=True)
 
     # The zuul-bwrap command is often run for debugging purposes. An SSH
     # agent may not be necessary or present in that situation.
