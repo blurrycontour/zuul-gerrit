@@ -22,7 +22,10 @@ from zuul.lib.config import get_default
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import LauncherComponent
-from zuul.zk.event_queues import PipelineResultEventQueue
+from zuul.zk.event_queues import (
+    PipelineResultEventQueue,
+    TenantTriggerEventQueue,
+)
 from zuul.zk.layout import (
     LayoutProvidersStore,
     LayoutStateStore,
@@ -48,6 +51,9 @@ class Launcher:
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
 
+        self.trigger_events = TenantTriggerEventQueue.createRegistry(
+            self.zk_client, self.connections
+        )
         self.result_events = PipelineResultEventQueue.createRegistry(
             self.zk_client
         )
@@ -88,7 +94,8 @@ class Launcher:
                 self.log.exception("Error in main thread:")
 
     def _run(self):
-        self.updateTenantProviders()
+        if self.updateTenantProviders():
+            self.checkMissingImages()
 
     def start(self):
         self.log.debug("Starting command processor")
@@ -140,16 +147,19 @@ class Launcher:
         tenant_names = set(self.tenant_providers.keys())
         tenant_names.update(self.tenant_layout_state)
 
+        updated = False
         for tenant_name in tenant_names:
             # Reload the tenant if the layout changed.
-            self._updateTenantProviders(tenant_name)
-        return True
+            if self._updateTenantProviders(tenant_name):
+                updated = True
+        return updated
 
     def _updateTenantProviders(self, tenant_name):
         # Reload the tenant if the layout changed.
+        updated = False
         if (self.local_layout_state.get(tenant_name)
                 == self.tenant_layout_state.get(tenant_name)):
-            return
+            return updated
         self.log.debug("Updating tenant %s", tenant_name)
         with tenant_read_lock(self.zk_client, tenant_name, self.log) as tlock:
             layout_state = self.tenant_layout_state.get(tenant_name)
@@ -162,6 +172,25 @@ class Launcher:
                     for provider in providers:
                         self.log.debug("Loaded provider %s", provider.name)
                 self.local_layout_state[tenant_name] = layout_state
+                updated = True
             else:
                 self.tenant_providers.pop(tenant_name, None)
                 self.local_layout_state.pop(tenant_name, None)
+        return updated
+
+    def addImageBuildEvent(self, tenant_name, image):
+        project_hostname, project_name = \
+            image.project_canonical_name.split('/', 1)
+        driver = self.connections.drivers['zuul']
+        event = driver.getImageBuildEvent(
+            image.name, project_hostname, project_name, image.branch)
+        self.log.debug("Submitting image build event for %s %s",
+                       tenant_name, image.name)
+        self.trigger_events[tenant_name].put(event.trigger_name, event)
+
+    def checkMissingImages(self):
+        for tenant_name, providers in self.tenant_providers.items():
+            for provider in providers:
+                for image in provider.images:
+                    if image.type == 'zuul':
+                        self.addImageBuildEvent(tenant_name, image)
