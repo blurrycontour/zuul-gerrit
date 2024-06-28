@@ -3375,7 +3375,9 @@ class AnsibleJob(object):
         if acquired_semaphores:
             result, code = self.runAnsible(
                 cmd, timeout, playbook, ansible_version,
-                allow_pre_fail=phase in ('run', 'post'),
+                # Don't allow pre fail to reset things if the job will be
+                # retried anyway.
+                allow_pre_fail=phase in ('run', 'post') and not will_retry,
                 cleanup=phase == 'cleanup')
         self.log.debug("Ansible complete, result %s code %s" % (
             self.RESULT_MAP[result], code))
