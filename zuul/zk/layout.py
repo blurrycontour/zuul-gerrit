@@ -1,5 +1,5 @@
 # Copyright 2020 BMW Group
-# Copyright 2022 Acme Gating, LLC
+# Copyright 2022, 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -22,7 +22,8 @@ import time
 
 from kazoo.exceptions import NoNodeError
 
-from zuul.zk import sharding, ZooKeeperBase
+from zuul.zk import sharding, ZooKeeperBase, ZooKeeperSimpleBase
+from zuul.provider import BaseProvider
 
 
 @total_ordering
@@ -216,3 +217,42 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
                 with suppress(NoNodeError):
                     self.kazoo_client.delete(path, recursive=True)
         self.log.debug("Finished layout data cleanup")
+
+
+class LayoutProvidersStore(ZooKeeperSimpleBase):
+    log = logging.getLogger("zuul.LayoutProvidersStore")
+
+    tenant_root = "/zuul/tenant"
+
+    def __init__(self, client, connections):
+        super().__init__(client)
+        self.connections = connections
+
+    def get(self, context, tenant_name):
+        path = f"{self.tenant_root}/{tenant_name}/provider"
+        try:
+            repo_names = self.kazoo_client.get_children(path)
+        except NoNodeError:
+            repo_names = []
+        for repo in repo_names:
+            path = f"{self.tenant_root}/{tenant_name}/provider/{repo}"
+            try:
+                provider_names = self.kazoo_client.get_children(path)
+            except NoNodeError:
+                provider_names = []
+            for provider_name in provider_names:
+                provider_path = (f"{path}/{provider_name}/config")
+                yield BaseProvider.fromZK(
+                    context, provider_path, self.connections
+                )
+
+    def set(self, context, tenant_name, providers):
+        self.clear(tenant_name)
+        path = f"{self.tenant_root}/{tenant_name}/provider"
+        self.kazoo_client.ensure_path(path)
+        for provider in providers:
+            provider.internalCreate(context)
+
+    def clear(self, tenant_name):
+        path = f"{self.tenant_root}/{tenant_name}/provider"
+        self.kazoo_client.delete(path, recursive=True)
