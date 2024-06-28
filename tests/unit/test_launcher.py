@@ -1,4 +1,5 @@
 # Copyright 2024 Acme Gating, LLC
+# Copyright 2024 BMW Group
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,6 +13,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import time
+import uuid
+
+from zuul import model
+from zuul.zk.event_queues import PipelineResultEventQueue
+from zuul.zk.locks import pipeline_lock
+
 from moto import mock_aws
 
 from tests.base import (
@@ -24,6 +32,7 @@ from tests.base import (
 
 class TestLauncher(ZuulTestCase):
     config_file = 'zuul-connections-nodepool.conf'
+    tenant_config_file = 'config/single-tenant/main-nodepool.yaml'
     mock_aws = mock_aws()
 
     def setUp(self):
@@ -75,3 +84,87 @@ class TestLauncher(ZuulTestCase):
         self.assertHistory([
             dict(name='build-debian-local-image', result='SUCCESS'),
         ])
+
+    def test_launcher(self):
+        result_queue = PipelineResultEventQueue(
+            self.zk_client, "tenant-one", "check")
+        labels = ["debian-normal", "debian-large"]
+
+        ctx = self.createZKContext(None)
+        # Lock the pipeline, so we can grab the result event
+        with pipeline_lock(self.zk_client, "tenant-one", "check"):
+            request = model.NodesetRequest.new(
+                ctx,
+                tenant_name="tenant-one",
+                pipeline_name="check",
+                buildset_uuid=uuid.uuid4().hex,
+                job_uuid=uuid.uuid4().hex,
+                job_name="foobar",
+                labels=labels,
+                priority=100,
+                request_time=time.time(),
+                zuul_event_id=uuid.uuid4().hex,
+                span_info=None,
+            )
+            for _ in iterate_timeout(10, "nodeset request to be fulfilled"):
+                result_events = list(result_queue)
+                if result_events:
+                    for event in result_events:
+                        # Remove event(s) from queue
+                        result_queue.ack(event)
+                    break
+
+        self.assertEqual(len(result_events), 1)
+        for event in result_queue:
+            self.assertEqual(event.request_id, request.uuid)
+            self.assertEqual(event.build_set_uuid, request.buildset_uuid)
+
+        request.refresh(ctx)
+        self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
+        self.assertEqual(len(request.provider_nodes), 2)
+
+        request.delete(ctx)
+        self.waitUntilSettled()
+
+    def test_launcher_missing_label(self):
+        def test_launcher(self):
+            result_queue = PipelineResultEventQueue(
+                self.zk_client, "tenant-one", "check")
+            labels = ["debian-normal", "debian-unavailable"]
+
+            ctx = self.createZKContext(None)
+            # Lock the pipeline, so we can grab the result event
+            with pipeline_lock(self.zk_client, "tenant-one", "check"):
+                request = model.NodesetRequest.new(
+                    ctx,
+                    tenant_name="tenant-one",
+                    pipeline_name="check",
+                    buildset_uuid=uuid.uuid4().hex,
+                    job_uuid=uuid.uuid4().hex,
+                    job_name="foobar",
+                    labels=labels,
+                    priority=100,
+                    request_time=time.time(),
+                    zuul_event_id=uuid.uuid4().hex,
+                    span_info=None,
+                )
+                for _ in iterate_timeout(
+                        10, "nodeset request to be fulfilled"):
+                    result_events = list(result_queue)
+                    if result_events:
+                        for event in result_events:
+                            # Remove event(s) from queue
+                            result_queue.ack(event)
+                        break
+
+            self.assertEqual(len(result_events), 1)
+            for event in result_queue:
+                self.assertEqual(event.request_id, request.uuid)
+                self.assertEqual(event.build_set_uuid, request.buildset_uuid)
+
+            request.refresh(ctx)
+            self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
+            self.assertEqual(len(request.provider_nodes), 0)
+
+            request.delete(ctx)
+            self.waitUntilSettled()
