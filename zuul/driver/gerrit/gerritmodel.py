@@ -228,6 +228,110 @@ class GerritTriggerEvent(TriggerEvent):
         self.removed = None  # Used by hashtags-changed event
         self.default_branch_changed = None
 
+    @classmethod
+    def fromGerritEventDict(cls, data, timestamp, connection,
+                            zuul_event_id):
+        event = cls()
+        event.timestamp = timestamp
+        event.connection_name = connection.connection_name
+        event.zuul_event_id = zuul_event_id
+
+        event.type = data.get('type')
+        event.uuid = data.get('uuid')
+
+        # This catches when a change is merged, as it could potentially
+        # have merged layout info which will need to be read in.
+        # Ideally this would be done with a refupdate event so as to catch
+        # directly pushed things as well as full changes being merged.
+        # But we do not yet get files changed data for pure refupdate events.
+        # TODO(jlk): handle refupdated events instead of just changes
+        if event.type == 'change-merged':
+            event.branch_updated = True
+        event.trigger_name = 'gerrit'
+        change = data.get('change')
+        event.project_hostname = connection.canonical_hostname
+        if change:
+            event.project_name = change.get('project')
+            event.branch = change.get('branch')
+            event.change_number = str(change.get('number'))
+            event.change_url = change.get('url')
+            patchset = data.get('patchSet')
+            if patchset:
+                event.patch_number = str(patchset.get('number'))
+                event.ref = patchset.get('ref')
+            event.approvals = data.get('approvals', [])
+            event.comment = data.get('comment')
+            patchsetcomments = data.get('patchSetComments', {}).get(
+                "/PATCHSET_LEVEL")
+            if patchsetcomments:
+                event.patchsetcomments = []
+                for patchsetcomment in patchsetcomments:
+                    event.patchsetcomments.append(
+                        patchsetcomment.get('message'))
+            event.added = data.get('added')
+            event.removed = data.get('removed')
+        refupdate = data.get('refUpdate')
+        if refupdate:
+            event.project_name = refupdate.get('project')
+            event.ref = refupdate.get('refName')
+            event.oldrev = refupdate.get('oldRev')
+            event.newrev = refupdate.get('newRev')
+        if event.project_name is None:
+            # ref-replica* events
+            event.project_name = data.get('project')
+        if event.type == 'project-created':
+            event.project_name = data.get('projectName')
+        if event.type == 'project-head-updated':
+            event.project_name = data.get('projectName')
+            event.ref = data.get('newHead')
+            event.branch = event.ref[len('refs/heads/'):]
+            event.default_branch_changed = True
+        # Map the event types to a field name holding a Gerrit
+        # account attribute. See Gerrit stream-event documentation
+        # in cmd-stream-events.html
+        accountfield_from_type = {
+            'patchset-created': 'uploader',
+            'draft-published': 'uploader',  # Gerrit 2.5/2.6
+            'change-abandoned': 'abandoner',
+            'change-restored': 'restorer',
+            'change-merged': 'submitter',
+            'merge-failed': 'submitter',  # Gerrit 2.5/2.6
+            'comment-added': 'author',
+            'ref-updated': 'submitter',
+            'reviewer-added': 'reviewer',  # Gerrit 2.5/2.6
+            'topic-changed': 'changer',
+            'hashtags-changed': 'editor',
+            'vote-deleted': 'deleter',
+            'project-created': None,  # Gerrit 2.14
+            'pending-check': None,  # Gerrit 3.0+
+            'project-head-updated': None,
+        }
+        event.account = None
+        event._accountfield_unknown = False
+        if event.type in accountfield_from_type:
+            field = accountfield_from_type[event.type]
+            if field:
+                event.account = data.get(accountfield_from_type[event.type])
+        else:
+            event._accountfield_unknown = True
+
+        # This checks whether the event created or deleted a branch so
+        # that Zuul may know to perform a reconfiguration on the
+        # project.
+        branch_refs = 'refs/heads/'
+        event._branch_ref_update = False
+        if (event.type == 'ref-updated' and
+            ((not event.ref.startswith('refs/')) or
+             event.ref.startswith(branch_refs))):
+
+            if event.ref.startswith(branch_refs):
+                event.branch = event.ref[len(branch_refs):]
+            else:
+                event.branch = event.ref
+
+            event._branch_ref_update = True
+        return event
+
     def toDict(self):
         d = super().toDict()
         d["approvals"] = self.approvals
@@ -368,18 +472,62 @@ class GerritEventFilter(EventFilter):
 
         return ret
 
+    def _checkEventType(self, event_type):
+        matches_type = False
+        for etype in self.types:
+            if etype.match(event_type):
+                matches_type = True
+        if self.types and not matches_type:
+            return FalseWithReason("Types %s do not match %s" % (
+                self.types, event_type))
+
+    def _checkEventBranch(self, event_branch):
+        # branches are ORed
+        matches_branch = False
+        for branch in self.branches:
+            if branch.match(event_branch):
+                matches_branch = True
+        if self.branches and not matches_branch:
+            return FalseWithReason("Branches %s do not match %s" % (
+                self.branches, event_branch))
+
+    def _checkEventRef(self, event_ref):
+        # refs are ORed
+        matches_ref = False
+        if event_ref is not None:
+            for ref in self.refs:
+                if ref.match(event_ref):
+                    matches_ref = True
+        if self.refs and not matches_ref:
+            return FalseWithReason(
+                "Refs %s do not match %s" % (self.refs, event_ref))
+
+    def preFilter(self, event):
+        # This is specific to the gerrit driver.
+        # Perform some quick checks to see if we can ignore this
+        # event.  If we don't know that we can ignore it, it will be
+        # enqueued and go through the normal matching process.
+        r = self._checkEventType(event.type)
+        if r is not None:
+            return r
+
+        r = self._checkEventBranch(event.branch)
+        if r is not None:
+            return r
+
+        r = self._checkEventRef(event.ref)
+        if r is not None:
+            return r
+
+        return True
+
     def matches(self, event, change):
         if not super().matches(event, change):
             return False
 
-        # event types are ORed
-        matches_type = False
-        for etype in self.types:
-            if etype.match(event.type):
-                matches_type = True
-        if self.types and not matches_type:
-            return FalseWithReason("Types %s do not match %s" % (
-                self.types, event.type))
+        r = self._checkEventType(event.type)
+        if r is not None:
+            return r
 
         if event.type == 'pending-check':
             if self.uuid and event.uuid != self.uuid:
@@ -387,24 +535,14 @@ class GerritEventFilter(EventFilter):
             if self.scheme and event.uuid.split(':')[0] != self.scheme:
                 return False
 
-        # branches are ORed
-        matches_branch = False
-        for branch in self.branches:
-            if branch.match(event.branch):
-                matches_branch = True
-        if self.branches and not matches_branch:
-            return FalseWithReason("Branches %s do not match %s" % (
-                self.branches, event.branch))
+        r = self._checkEventBranch(event.branch)
+        if r is not None:
+            return r
 
-        # refs are ORed
-        matches_ref = False
-        if event.ref is not None:
-            for ref in self.refs:
-                if ref.match(event.ref):
-                    matches_ref = True
-        if self.refs and not matches_ref:
-            return FalseWithReason(
-                "Refs %s do not match %s" % (self.refs, event.ref))
+        r = self._checkEventRef(event.ref)
+        if r is not None:
+            return r
+
         if self.ignore_deletes and event.newrev == EMPTY_GIT_REF:
             # If the updated ref has an empty git sha (all 0s),
             # then the ref is being deleted

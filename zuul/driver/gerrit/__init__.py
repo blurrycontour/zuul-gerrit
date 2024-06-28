@@ -28,6 +28,7 @@ class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
 
     def reconfigure(self, tenant):
         connection_checker_map = {}
+        connection_filter_map = {}
         for pipeline in tenant.layout.pipelines.values():
             for trigger in pipeline.triggers:
                 if isinstance(trigger, gerrittrigger.GerritTrigger):
@@ -41,8 +42,16 @@ class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
                             elif 'scheme' in trigger_item:
                                 d['scheme'] = trigger_item['scheme']
                             checkers.append(d)
+            for event_filter in pipeline.manager.event_filters:
+                trigger = event_filter.trigger
+                if isinstance(trigger, gerrittrigger.GerritTrigger):
+                    con = trigger.connection
+                    filters = connection_filter_map.setdefault(con, [])
+                    filters.append(event_filter)
         for (con, checkers) in connection_checker_map.items():
             con.setWatchedCheckers(checkers)
+        for (con, filters) in connection_filter_map.items():
+            con.setWatchedEventFilters(filters)
 
     def getConnection(self, name, config):
         return gerritconnection.GerritConnection(self, name, config)
