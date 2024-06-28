@@ -106,7 +106,11 @@ from zuul.zk.event_queues import (
     TENANT_ROOT,
 )
 from zuul.zk.exceptions import LockException
-from zuul.zk.layout import LayoutState, LayoutStateStore
+from zuul.zk.layout import (
+    LayoutProvidersStore,
+    LayoutState,
+    LayoutStateStore,
+)
 from zuul.zk.locks import (
     locked,
     tenant_read_lock,
@@ -332,6 +336,8 @@ class Scheduler(threading.Thread):
         self.tenant_layout_state = LayoutStateStore(
             self.zk_client,
             self.layout_update_event.set)
+        self.layout_providers_store = LayoutProvidersStore(
+            self.zk_client, self.connections)
         self.local_layout_state = {}
 
         command_socket = get_default(
@@ -1841,8 +1847,8 @@ class Scheduler(threading.Thread):
             branch_cache_min_ltimes=branch_cache_min_ltimes,
         )
         # Write the new provider configs
-        for provider in tenant.layout.providers.values():
-            provider.internalCreate(context)
+        self.layout_providers_store.set(context, tenant.name,
+                                        tenant.layout.providers.values())
         # Save the min_ltimes which are sharded before we atomically
         # update the layout state.
         self.tenant_layout_state.setMinLtimes(layout_state, min_ltimes)

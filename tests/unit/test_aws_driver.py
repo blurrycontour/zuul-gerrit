@@ -12,8 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from zuul.provider import BaseProvider
-
 from moto import mock_aws
 
 from tests.base import (
@@ -45,16 +43,8 @@ class TestAwsDriver(ZuulTestCase):
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_aws_launcher(self):
-        # Temporary test until replaced by launcher to show that we
-        # can deserialize a provider without a layout.
-        canonical_name = (
-            'review.example.com%2Forg%2Fcommon-config/aws-us-east-1-main'
-        )
-        path = (f'/zuul/tenant/tenant-one/'
-                f'provider/{canonical_name}/config')
-        with self.createZKContext() as context:
-            provider = BaseProvider.fromZK(
-                context, path, self.scheds.first.sched.connections
-            )
+        providers = self.launcher.tenant_providers['tenant-one']
+        self.assertEqual(1, len(providers))
+        provider = providers[0]
         endpoint = provider.getEndpoint()
         self.assertTrue(len(endpoint.testListAmis()) > 1)
