@@ -62,6 +62,12 @@
       - playbooks/wait.yaml
 
 - job:
+    name: pre-post-failure
+    parent: pre-failure
+    post-run:
+      - playbooks/post-failure.yaml
+
+- job:
     name: output-failure
     files:
       - output-failure.txt
@@ -132,3 +138,13 @@
       fail-fast: true
       jobs:
         - wait
+
+- project:
+    name: org/project5
+    queue: shared
+    check:
+      jobs:
+        - pre-post-failure
+    gate:
+      jobs:
+        - pre-post-failure
