@@ -15,7 +15,7 @@
 import urllib
 
 from zuul.driver import Driver, ConnectionInterface, ProviderInterface
-from zuul.driver.aws import awsconnection, awsprovider
+from zuul.driver.aws import awsconnection, awsmodel, awsprovider
 
 
 class AwsDriver(Driver, ConnectionInterface, ProviderInterface):
@@ -38,6 +38,9 @@ class AwsDriver(Driver, ConnectionInterface, ProviderInterface):
 
     def getProviderSchema(self):
         return awsprovider.AwsProviderSchema().getProviderSchema()
+
+    def getProviderNodeClass(self):
+        return awsmodel.AwsProviderNode
 
     def getEndpoint(self, provider):
         # An aws endpoint is a simply a region on the connection
