@@ -3017,6 +3017,19 @@ class ZuulTestCase(BaseTestCase):
                         return False
         return True
 
+    def __areAllNodesetRequestsComplete(self, matcher=None):
+        # Check ZK and the scheduler cache and make sure they are
+        # in sync.
+        sched = self.scheds.first
+        for request in self.launcher.api.getNodesetRequests():
+            if request.state in model.NodesetRequest.FINAL_STATES:
+                return False
+                if sched.pipeline_result_events[request.tenant_name][
+                    request.pipeline_name
+                ].hasEvents():
+                    return False
+        return True
+
     def __areAllMergeJobsWaiting(self):
         # Look up the queued merge jobs directly from ZooKeeper
         queued_merge_jobs = list(self.merger_api.all())
@@ -3106,6 +3119,7 @@ class ZuulTestCase(BaseTestCase):
                     self.__haveAllBuildsReported(),
                     self.__areAllBuildsWaiting(),
                     self.__areAllNodeRequestsComplete(),
+                    self.__areAllNodesetRequestsComplete(),
                     all(self.__eventQueuesEmpty(matcher))
                 )
                 raise Exception("Timeout waiting for Zuul to settle")
@@ -3126,6 +3140,7 @@ class ZuulTestCase(BaseTestCase):
                     self.__haveAllBuildsReported() and
                     self.__areAllBuildsWaiting() and
                     self.__areAllNodeRequestsComplete() and
+                    self.__areAllNodesetRequestsComplete() and
                     self.__areZooKeeperEventQueuesEmpty() and
                     all(self.__eventQueuesEmpty(matcher))):
                     # The queue empty check is placed at the end to
@@ -3169,6 +3184,7 @@ class ZuulTestCase(BaseTestCase):
     def _logQueueStatus(self, logger, matcher, all_zk_queues_empty,
                         all_merge_jobs_waiting, all_builds_reported,
                         all_builds_waiting, all_node_requests_completed,
+                        all_nodeset_requests_completed,
                         all_event_queues_empty):
         logger("Queue status:")
         for event_queue in self.__event_queues(matcher):
@@ -3179,6 +3195,8 @@ class ZuulTestCase(BaseTestCase):
         logger("All builds reported: %s", all_builds_reported)
         logger("All builds waiting: %s", all_builds_waiting)
         logger("All requests completed: %s", all_node_requests_completed)
+        logger("All nodeset requests completed: %s",
+               all_nodeset_requests_completed)
         logger("All event queues empty: %s", all_event_queues_empty)
 
     def waitForPoll(self, poller, timeout=30):

@@ -2270,6 +2270,7 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
         BUILDING = "building"
         READY = "ready"
         FAILED = "failed"
+        IN_USE = "in-use"
         USED = "used"
         HOLD = "hold"
 
@@ -2290,6 +2291,25 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             state=self.State.REQUESTED,
             label="",
             connection_name="",
+            # Node data
+            host_id=None,
+            interface_ip=None,
+            public_ipv4=None,
+            private_ipv4=None,
+            public_ipv6=None,
+            private_ipv6=None,
+            connection_port=22,
+            connection_type=None,
+            slot=None,
+            az=None,
+            cloud=None,
+            provider=None,
+            region=None,
+            username=None,
+            hold_expiration=None,
+            resources=None,
+            attributes={},
+            tenant_name=None,
             # Attributes that are not serialized
             is_locked=False,
             # Attributes set by the launcher
@@ -2301,7 +2321,11 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
                 f" state={self.state}, path={self.getPath()}>")
 
     def getPath(self):
-        return f"{self.ROOT}/{self.NODES_PATH}/{self.uuid}"
+        return self._getPath(self.uuid)
+
+    @classmethod
+    def _getPath(cls, node_id):
+        return f"{cls.ROOT}/{cls.NODES_PATH}/{node_id}"
 
     def getLockPath(self):
         return f"{self.ROOT}/{self.LOCKS_PATH}/{self.uuid}"
@@ -2315,6 +2339,28 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             connection_name=self.connection_name,
         )
         return json.dumps(data, sort_keys=True).encode("utf-8")
+
+    def getNodeData(self):
+        return dict(
+            host_id=self.host_id,
+            interface_ip=self.interface_ip,
+            public_ipv4=self.public_ipv4,
+            private_ipv4=self.private_ipv4,
+            public_ipv6=self.public_ipv6,
+            private_ipv6=self.private_ipv6,
+            connection_port=self.connection_port,
+            connection_type=self.connection_type,
+            slot=self.slot,
+            az=self.az,
+            cloud=self.cloud,
+            provider=self.provider,
+            region=self.region,
+            username=self.username,
+            hold_expiration=self.hold_expiration,
+            resources=self.resources,
+            attributes=self.attributes,
+            tenant_name=self.tenant_name,
+        )
 
 
 class Secret(ConfigObject):
