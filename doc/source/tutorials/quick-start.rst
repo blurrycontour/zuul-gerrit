@@ -49,8 +49,7 @@ Before you start, ensure that some needed packages are installed.
    # Ubuntu (Noble or later) / Debian:
 
    sudo apt-get update
-   sudo apt-get install podman git python3-pip
-   sudo python3 -m pip install git-review podman-compose
+   sudo apt-get install git git-review docker-compose-v2
 
 
 Clone the Zuul repository:

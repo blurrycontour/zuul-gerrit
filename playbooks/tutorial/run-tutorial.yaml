@@ -3,7 +3,18 @@
       package:
         name:
           - git-review
+          - catatonit
         state: present
+      become: true
+    - name: Start buildx builder
+      # https://bugs.launchpad.net/ubuntu/+source/libpod/+bug/2040483
+      #     echo "[containers]" >> /etc/containers/containers.conf
+      #     echo apparmor_profile = \"unconfined\" >> /etc/containers/containers.conf
+      # https://github.com/docker/buildx/issues/344
+      shell: |
+        echo "FROM scratch" | docker buildx build - || true
+      environment:
+        DOCKER_HOST: unix:///run/podman/podman.sock
       become: true
   when: not local
 
