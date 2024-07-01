@@ -120,11 +120,12 @@ class GerritChangeData(object):
     SSH = 1
     HTTP = 2
 
-    def __init__(self, fmt, data, related=None, files=None,
+    def __init__(self, fmt, data, related=None, files=None, commentable_files=None,
                  zuul_query_ltime=None):
         self.format = fmt
         self.data = data
         self.files = files
+        self.commentable_files = commentable_files
         self.zuul_query_ltime = zuul_query_ltime
 
         if fmt == self.SSH:
@@ -1316,11 +1317,19 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         files_query = 'changes/%s/revisions/%s/files' % (
             number, data['current_revision'])
 
+        commentable_files_query = None
         if data['revisions'][data['current_revision']]['commit']['parents']:
             files_query += '?parent=1'
+            if len(data['revisions'][data['current_revision']]['commit']['parents']) > 1:
+                commentable_files_query = 'changes/%s/revisions/%s/files' % (number, data['current_revision'])
+
+        if commentable_files_query:
+            commentable_files = self.get(commentable_files_query)
+        else:
+            commentable_files = None
 
         files = self.get(files_query)
-        return data, related, files
+        return data, related, files, commentable_files
 
     def queryChange(self, number, event=None):
         for attempt in range(3):
@@ -1329,10 +1338,10 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             zuul_query_ltime = self.sched.zk_client.getCurrentLtime()
             try:
                 if self.session:
-                    data, related, files = self.queryChangeHTTP(
+                    data, related, files, commentable_files = self.queryChangeHTTP(
                         number, event=event)
                     return GerritChangeData(GerritChangeData.HTTP,
-                                            data, related, files,
+                                            data, related, files, commentable_files,
                                             zuul_query_ltime=zuul_query_ltime)
                 else:
                     data = self.queryChangeSSH(number, event=event)

@@ -47,7 +47,7 @@ class GerritChange(Change):
         if data.format == data.SSH:
             self.updateFromSSH(data.data, connection)
         else:
-            self.updateFromHTTP(data.data, data.files, connection)
+            self.updateFromHTTP(data.data, data.files, data.commentable_files, connection)
         for k, v in extra.items():
             setattr(self, k, v)
         key = ChangeKey(connection.connection_name, None,
@@ -144,7 +144,7 @@ class GerritChange(Change):
                     elif label['status'] in ['NEED', 'REJECT']:
                         self.missing_labels.add(label['label'])
 
-    def updateFromHTTP(self, data, files, connection):
+    def updateFromHTTP(self, data, files, commentable_files, connection):
         urlparse = urllib.parse.urlparse(connection.baseurl)
         baseurl = "%s://%s%s" % (urlparse.scheme, urlparse.netloc,
                                  urlparse.path)
@@ -179,6 +179,11 @@ class GerritChange(Change):
             self.files = list(files.keys())
         else:
             self.files = []
+
+        if commentable_files:
+            self.commentable_files = list(commentable_files.keys())
+        else:
+            self.commentable_files = None
 
         self.is_merged = data['status'] == 'MERGED'
         self.approvals = []

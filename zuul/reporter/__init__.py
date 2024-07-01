@@ -136,7 +136,11 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         """
 
         for fn in list(comments.keys()):
-            if fn not in change.files:
+            if hasattr(change, 'commentable_files') and change.commentable_files:
+                if fn not in change.commentable_files:
+                    del comments[fn]
+                    item.warning("Comments left for invalid file %s" % (fn,))
+            elif fn not in change.files:
                 del comments[fn]
                 item.warning("Comments left for invalid file %s" % (fn,))
 
