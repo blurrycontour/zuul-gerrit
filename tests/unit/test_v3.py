@@ -4563,7 +4563,6 @@ class TestCleanupPlaybooks(AnsibleZuulTestCase):
         self.assertTrue(os.path.exists(post_start))
         self.assertFalse(os.path.exists(post_end))
 
-    @mock.patch("zuul.executor.server.CLEANUP_TIMEOUT", 5)
     def test_cleanup_playbook_timeout(self):
         # Test that when the cleanup runs into a timeout, the job
         # still completes.
@@ -4583,8 +4582,169 @@ class TestCleanupPlaybooks(AnsibleZuulTestCase):
         self.waitUntilSettled()
 
         self.assertHistory([
-            dict(name="python27-cleanup-timeout", result="SUCCESS",
+            dict(name="python27-cleanup-timeout", result="POST_FAILURE",
                  changes="1,1")])
+
+    def test_cleanup_playbook_inheritance(self):
+        # Test nested level aborting
+        self.executor_server.verbose = True
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - child-cleanup-failure
+            """)
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files={'.zuul.yaml': in_repo_conf})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        for _ in iterate_timeout(60, 'job started'):
+            if len(self.builds):
+                break
+        self.waitUntilSettled()
+
+        build = self.getJobFromHistory('child-cleanup-failure')
+        self.assertEqual('FAILURE', build.result)
+        cleanup_flag = os.path.join(self.jobdir_root, build.uuid +
+                                    '.cleanup.flag')
+        self.assertTrue(os.path.exists(cleanup_flag))
+        with open(cleanup_flag) as f:
+            self.assertEqual('False', f.readline())
+        self.assertEqual(2, len(build.job.pre_run))
+        self.assertEqual('playbooks/base-pre.yaml',
+                         build.job.pre_run[0]['path'])
+        self.assertEqual(0,
+                         build.job.pre_run[0]['nesting_level'])
+        self.assertEqual('playbooks/child-pre.yaml',
+                         build.job.pre_run[1]['path'])
+        self.assertEqual(2,
+                         build.job.pre_run[1]['nesting_level'])
+
+        self.assertEqual(5, len(build.job.post_run))
+
+        self.assertEqual('playbooks/child-post.yaml',
+                         build.job.post_run[0]['path'])
+        self.assertEqual(2,
+                         build.job.post_run[0]['nesting_level'])
+        self.assertEqual('playbooks/child-cleanup.yaml',
+                         build.job.post_run[1]['path'])
+        self.assertEqual(2,
+                         build.job.post_run[1]['nesting_level'])
+
+        self.assertEqual('playbooks/cleanup.yaml',
+                         build.job.post_run[2]['path'])
+        self.assertEqual(1,
+                         build.job.post_run[2]['nesting_level'])
+
+        self.assertEqual('playbooks/base-post.yaml',
+                         build.job.post_run[3]['path'])
+        self.assertEqual(0,
+                         build.job.post_run[3]['nesting_level'])
+        self.assertEqual('playbooks/base-cleanup.yaml',
+                         build.job.post_run[4]['path'])
+        self.assertEqual(0,
+                         build.job.post_run[4]['nesting_level'])
+
+    def test_cleanup_playbook_inheritance_old_syntax(self):
+        # Test nested level aborting with the old cleanup-run syntax
+        self.executor_server.verbose = True
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - child-cleanup-failure-old-syntax
+            """)
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files={'.zuul.yaml': in_repo_conf})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        for _ in iterate_timeout(60, 'job started'):
+            if len(self.builds):
+                break
+        self.waitUntilSettled()
+
+        build = self.getJobFromHistory('child-cleanup-failure-old-syntax')
+        self.assertEqual('FAILURE', build.result)
+        cleanup_flag = os.path.join(self.jobdir_root, build.uuid +
+                                    '.cleanup.flag')
+        self.assertTrue(os.path.exists(cleanup_flag))
+        with open(cleanup_flag) as f:
+            self.assertEqual('False', f.readline())
+        self.assertEqual(2, len(build.job.pre_run))
+        self.assertEqual('playbooks/base-pre.yaml',
+                         build.job.pre_run[0]['path'])
+        self.assertEqual(0,
+                         build.job.pre_run[0]['nesting_level'])
+        self.assertEqual('playbooks/child-pre.yaml',
+                         build.job.pre_run[1]['path'])
+        self.assertEqual(2,
+                         build.job.pre_run[1]['nesting_level'])
+
+        # This job has one old and one new cleanup playbook
+        self.assertEqual(4, len(build.job.post_run))
+
+        self.assertEqual('playbooks/child-post.yaml',
+                         build.job.post_run[0]['path'])
+        self.assertEqual(2,
+                         build.job.post_run[0]['nesting_level'])
+
+        self.assertEqual('playbooks/cleanup.yaml',
+                         build.job.post_run[1]['path'])
+        self.assertEqual(1,
+                         build.job.post_run[1]['nesting_level'])
+
+        self.assertEqual('playbooks/base-post.yaml',
+                         build.job.post_run[2]['path'])
+        self.assertEqual(0,
+                         build.job.post_run[2]['nesting_level'])
+        self.assertEqual('playbooks/base-cleanup.yaml',
+                         build.job.post_run[3]['path'])
+        self.assertEqual(0,
+                         build.job.post_run[3]['nesting_level'])
+
+        self.assertEqual(1, len(build.job.cleanup_run))
+
+        self.assertEqual('playbooks/child-cleanup.yaml',
+                         build.job.cleanup_run[0]['path'])
+        self.assertEqual(2,
+                         build.job.cleanup_run[0]['nesting_level'])
+
+        # Verify that we have mutated cleanup to post
+        self.assertEqual(5, len(build.jobdir.post_playbooks))
+        self.assertEqual(0, len(build.jobdir.cleanup_playbooks))
+
+        self.assertTrue(build.jobdir.post_playbooks[0].path.
+                        endswith('playbooks/child-post.yaml'))
+        self.assertEqual(2,
+                         build.jobdir.post_playbooks[0].nesting_level)
+
+        self.assertTrue(build.jobdir.post_playbooks[1].path.
+                        endswith('playbooks/cleanup.yaml'))
+        self.assertEqual(1,
+                         build.jobdir.post_playbooks[1].nesting_level)
+
+        self.assertTrue(build.jobdir.post_playbooks[2].path.
+                        endswith('playbooks/base-post.yaml'))
+        self.assertEqual(0,
+                         build.jobdir.post_playbooks[2].nesting_level)
+        self.assertTrue(build.jobdir.post_playbooks[3].path.
+                        endswith('playbooks/base-cleanup.yaml'))
+        self.assertEqual(0,
+                         build.jobdir.post_playbooks[3].nesting_level)
+
+        self.assertTrue(build.jobdir.post_playbooks[4].path.
+                        endswith('playbooks/child-cleanup.yaml'))
+        self.assertEqual(2,
+                         build.jobdir.post_playbooks[4].nesting_level)
+
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 1)
+        self.assertEqual(errors[0].severity, SEVERITY_WARNING)
+        self.assertEqual(errors[0].name, 'Cleanup Run Deprecation')
+        self.assertIn('job stanza', errors[0].error)
 
 
 class TestPlaybookSemaphore(AnsibleZuulTestCase):

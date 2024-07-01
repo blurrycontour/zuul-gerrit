@@ -15,6 +15,11 @@
 - job:
     name: base
     parent: null
+    pre-run: playbooks/base-pre.yaml
+    post-run:
+      - playbooks/base-post.yaml
+      - name: playbooks/base-cleanup.yaml
+        cleanup: true
     nodeset:
       nodes:
         - name: test_node
@@ -23,18 +28,44 @@
 - job:
     name: python27
     pre-run: playbooks/pre.yaml
-    post-run: playbooks/post.yaml
-    cleanup-run: playbooks/cleanup.yaml
+    post-run:
+      - playbooks/post.yaml
+      - name: playbooks/cleanup.yaml
+        cleanup: true
     vars:
       waitpath: '{{zuul._test.test_root}}/builds/{{zuul.build}}/test_wait'
     run: playbooks/python27.yaml
 
 - job:
     name: python27-failure
-    cleanup-run: playbooks/cleanup.yaml
+    # Intentionally a list
+    post-run:
+      - name: playbooks/cleanup.yaml
+        cleanup: true
     run: playbooks/failure.yaml
 
 - job:
     name: python27-cleanup-timeout
-    cleanup-run: playbooks/cleanup-timeout.yaml
+    # Intentionally a dict
+    post-timeout: 5
+    post-run:
+      name: playbooks/cleanup-timeout.yaml
+      cleanup: true
     run: playbooks/python27.yaml
+
+- job:
+    name: child-cleanup-failure
+    parent: python27-failure
+    pre-run: playbooks/child-pre.yaml
+    post-run:
+      - playbooks/child-post.yaml
+      - name: playbooks/child-cleanup.yaml
+        cleanup: true
+
+- job:
+    name: child-cleanup-failure-old-syntax
+    parent: python27-failure
+    pre-run: playbooks/child-pre.yaml
+    post-run: playbooks/child-post.yaml
+    # Backwards-compat syntax
+    cleanup-run: playbooks/child-cleanup.yaml

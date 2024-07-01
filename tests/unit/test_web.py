@@ -447,6 +447,7 @@ class TestWeb(BaseTestWeb):
             'secrets': [],
             'semaphores': [],
             'source_context': source_ctx,
+            'cleanup': False,
         }]
 
         self.assertEqual([
@@ -611,8 +612,9 @@ class TestWeb(BaseTestWeb):
         # can we fetch the variants for a single job
         data = self.get_url('api/tenant/tenant-one/job/complete-job').json()
 
-        def expected_pb(path):
+        def expected_pb(path, cleanup=False):
             return {
+                'cleanup': cleanup,
                 'path': path,
                 'roles': [{
                     'implicit': True,
@@ -637,7 +639,7 @@ class TestWeb(BaseTestWeb):
         ], data[0]['pre_run'])
         self.assertEqual([
             expected_pb("playbooks/post-run-01.yaml"),
-            expected_pb("playbooks/post-run-02.yaml")
+            expected_pb("playbooks/post-run-02.yaml"),
         ], data[0]['post_run'])
         self.assertEqual([
             expected_pb("playbooks/cleanup-run.yaml")
@@ -1200,6 +1202,8 @@ class TestWeb(BaseTestWeb):
             'extra_repo_state_ref': None,
             'repo_state_keys': [],
             'playbooks': [{
+                'cleanup': False,
+                'nesting_level': 1,
                 'connection': 'gerrit',
                 'project': 'common-config',
                 'branch': 'master',

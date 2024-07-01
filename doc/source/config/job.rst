@@ -61,9 +61,13 @@ be:
 * child playbook
 * child post-run playbook
 * parent post-run playbook
-* parent cleanup-run playbook
 
-Further inheritance would nest even deeper.
+Further inheritance would nest even deeper.  If a job fails or is
+aborted before the main playbook starts, Zuul will run only the
+post-run playbooks corresponding with the inheritance levels of the
+pre-run playbooks which were run.  In other words, if the child
+pre-run playbook was not run, then the child post-run playbook will
+not be run, but the parent post-run playbook will.
 
 Here is an example of two job definitions:
 
@@ -567,7 +571,19 @@ Here is an example of two job definitions:
          None of the semaphores specified for a playbook may also be
          specified in the same job.
 
+      .. attr:: cleanup
+         :default: false
+
+         A boolean value indicating whether this is a "cleanup"
+         playbook.  Normally Zuul does not run post-run playbooks when
+         it cancels a job, because the results of the job are
+         discarded.  If this value is set, then Zuul will make an
+         effort to run the playbook even if the job is canceled.
+
    .. attr:: cleanup-run
+
+      .. warning:: This attribute is deprecated.  Use
+                   :attr:`job.post-run.cleanup` instead.
 
       The name of a playbook or list of playbooks to run after job
       execution.  Values are either a string describing the full path

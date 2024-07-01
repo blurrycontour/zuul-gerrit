@@ -216,3 +216,9 @@ Version 29
 :Prior Zuul version: 10.1.0
 :Description: Store BuildSet.dependent_changes as change refs.
               Affects schedulers.
+
+Version 30
+----------
+:Prior Zuul version: 10.2.0
+:Description: Store playbook nesting_level and cleanup on frozen job.
+              Affects schedulers and executors.
