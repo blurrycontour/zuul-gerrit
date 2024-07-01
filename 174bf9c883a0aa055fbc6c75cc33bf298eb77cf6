@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2a7bc4d9_e332934b",
+        "filename": "zuul/cmd/launcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-01T14:17:11Z",
+      "side": 1,
+      "message": "Nope, I agree and I thought about that when writing this, but forgot to set the no-sql flag when it came time to actually type it out.  -1 to fix that.",
+      "revId": "174bf9c883a0aa055fbc6c75cc33bf298eb77cf6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "230d35fa_b1b40dcd",
         "filename": "zuul/launcher/server.py",
         "patchSetId": 1
@@ -31,6 +48,24 @@
       "writtenOn": "2024-07-01T12:42:47Z",
       "side": 1,
       "message": "nit: Maybe we can use a different term than \"layout\" in this and the `_updateTenantLayout` method as we are not really creating a layout here.",
+      "revId": "174bf9c883a0aa055fbc6c75cc33bf298eb77cf6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d25311b2_506da3b1",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-01T14:17:11Z",
+      "side": 1,
+      "message": "Yeah, I\u0027m walking a fine line here between showing that this is like the other components, but also a little different.\n\nI\u0027m happy to change this to updateTenantProviders.",
+      "parentUuid": "230d35fa_b1b40dcd",
       "revId": "174bf9c883a0aa055fbc6c75cc33bf298eb77cf6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
