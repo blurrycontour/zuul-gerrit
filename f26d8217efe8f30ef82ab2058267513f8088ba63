@@ -56,6 +56,24 @@
       },
       "revId": "f26d8217efe8f30ef82ab2058267513f8088ba63",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f3f6245_31cd23d8",
+        "filename": "doc/source/developer/specs/configure-projects.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-01T21:37:34Z",
+      "side": 1,
+      "message": "I think all those should be configurable.  I think doing this at all grants a high degree of trust.  Given that the point is to force another project to run a job, and we can\u0027t make any guarantees like \"it\u0027s always safe to force another project to run a job\" (in fact, the opposite is true; it\u0027s dangerous to do that, you could make the project publish a release), then I think we have to accept that anything else is unlikely to be more risky.\n\nTLDR: setting project variables is a subset of the risk we already would be accepting.",
+      "parentUuid": "c87d5a78_381fa35a",
+      "revId": "f26d8217efe8f30ef82ab2058267513f8088ba63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
