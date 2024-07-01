@@ -179,6 +179,11 @@ class GerritChange(Change):
         else:
             self.files = []
 
+        # Gerrit will not allow comments on files that are from
+        # the parent. Record the files that we are able to comment on here.
+        if data['revisions'][data['current_revision']]['files']:
+            self.commentable_files = data['revisions'][data['current_revision']]['files']
+
         self.is_merged = data['status'] == 'MERGED'
         self.approvals = []
         self.missing_labels = set()
