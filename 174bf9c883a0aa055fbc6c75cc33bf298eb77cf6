@@ -16,6 +16,23 @@
       "message": "Do we need to configure sql and source connections for the launcher? Atm. I don\u0027t see why a launcher would need anything but connections implementing the `ProviderInterface`.",
       "revId": "174bf9c883a0aa055fbc6c75cc33bf298eb77cf6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "230d35fa_b1b40dcd",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-01T12:42:47Z",
+      "side": 1,
+      "message": "nit: Maybe we can use a different term than \"layout\" in this and the `_updateTenantLayout` method as we are not really creating a layout here.",
+      "revId": "174bf9c883a0aa055fbc6c75cc33bf298eb77cf6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
