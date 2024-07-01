@@ -33,6 +33,29 @@
       "message": "This configuration looks good. Gerrit has a similar specification, but the opposite direction, which also includes branch names. I think the simplification where specific branch allowance is not configured should be enough and can be added if needed at a later stage.",
       "revId": "f26d8217efe8f30ef82ab2058267513f8088ba63",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c87d5a78_381fa35a",
+        "filename": "doc/source/developer/specs/configure-projects.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-01T21:09:06Z",
+      "side": 1,
+      "message": "Will we limit the sorts of things that can be configured for a sub project? I think the main categories are queue, jobs, and vars. Vars the are the item that I\u0027m concerned may be potentially abusable. However, I guess if you can configure queue and job lists then setting vars to influence how the jobs run is also reasonable.",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 14
+      },
+      "revId": "f26d8217efe8f30ef82ab2058267513f8088ba63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
