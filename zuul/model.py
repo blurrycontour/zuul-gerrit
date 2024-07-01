@@ -2340,7 +2340,7 @@ class PlaybookContext(ConfigObject):
     """
 
     def __init__(self, source_context, path, roles, secrets,
-                 semaphores):
+                 semaphores, cleanup=False):
         super(PlaybookContext, self).__init__()
         self.source_context = source_context
         self.path = path
@@ -2355,6 +2355,9 @@ class PlaybookContext(ConfigObject):
         self.semaphores = semaphores
         # the result of getSemaphoreInfo from semaphore handler
         self.frozen_semaphores = ()
+        self.cleanup = cleanup
+        # Set internally after inheritance
+        self.nesting_level = None
 
     def __repr__(self):
         return '<PlaybookContext %s %s>' % (self.source_context,
@@ -2370,14 +2373,16 @@ class PlaybookContext(ConfigObject):
                 self.path == other.path and
                 self.roles == other.roles and
                 self.secrets == other.secrets and
-                self.semaphores == other.semaphores)
+                self.semaphores == other.semaphores and
+                self.cleanup == other.cleanup)
 
     def copy(self):
         r = PlaybookContext(self.source_context,
                             self.path,
                             self.roles,
                             self.secrets,
-                            self.semaphores)
+                            self.semaphores,
+                            self.cleanup)
         return r
 
     def validateReferences(self, layout):
@@ -2447,7 +2452,10 @@ class PlaybookContext(ConfigObject):
             roles=[r.toDict() for r in self.roles],
             secrets=secrets,
             semaphores=self.frozen_semaphores,
-            path=self.path)
+            path=self.path,
+            cleanup=self.cleanup,
+            nesting_level=self.nesting_level,
+        )
 
     def toSchemaDict(self):
         # Render to a dict to use in REST api
@@ -2457,6 +2465,7 @@ class PlaybookContext(ConfigObject):
             'secrets': [{'name': secret.name, 'alias': secret.alias}
                         for secret in self.secrets],
             'semaphores': [{'name': sem.name} for sem in self.semaphores],
+            'cleanup': self.cleanup,
         }
         if self.source_context:
             d['source_context'] = self.source_context.toDict()
@@ -2621,6 +2630,8 @@ class FrozenJob(zkobject.ZKObject):
                   'pre_run',
                   'run',
                   'post_run',
+                  # MODEL_API < 30; all references to cleanup_run may
+                  # be removed.
                   'cleanup_run',
                   'attempts',
                   'success_message',
@@ -3373,7 +3384,6 @@ class Job(ConfigObject):
         return self.__dict__.get(name)
 
     def setBase(self, layout, semaphore_handler):
-        self.inheritance_path = self.inheritance_path + (repr(self),)
         if self._get('run') is not None:
             self.run = self.freezePlaybooks(
                 self.run, layout, semaphore_handler)
@@ -3386,6 +3396,7 @@ class Job(ConfigObject):
         if self._get('cleanup_run') is not None:
             self.cleanup_run = self.freezePlaybooks(
                 self.cleanup_run, layout, semaphore_handler)
+        self.inheritance_path = self.inheritance_path + (repr(self),)
 
     def getNodeset(self, layout):
         if isinstance(self.nodeset, str):
@@ -3573,6 +3584,7 @@ class Job(ConfigObject):
             pb.roles = self.roles
             pb.freezeSecrets(layout)
             pb.freezeSemaphores(layout, semaphore_handler)
+            pb.nesting_level = len(self.inheritance_path)
             ret.append(pb)
         return tuple(ret)
 

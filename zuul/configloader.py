@@ -44,7 +44,7 @@ from zuul.lib.varnames import check_varnames
 from zuul.zk.components import COMPONENT_REGISTRY
 from zuul.zk.semaphore import SemaphoreHandler
 from zuul.exceptions import (
-    SEVERITY_ERROR,
+    CleanupRunDeprecation,
     DuplicateGroupError,
     DuplicateNodeError,
     GlobalSemaphoreNotFoundError,
@@ -56,6 +56,7 @@ from zuul.exceptions import (
     ProjectNotFoundError,
     ProjectNotPermittedError,
     RegexDeprecation,
+    SEVERITY_ERROR,
     TemplateNotFoundError,
     UnknownConnection,
     YAMLDuplicateKeyError,
@@ -709,10 +710,19 @@ class JobParser(object):
     semaphore = {vs.Required('name'): str,
                  'resources-first': bool}
 
-    complex_playbook_def = {vs.Required('name'): str,
-                            'semaphores': to_list(str)}
+    complex_playbook_def = {
+        vs.Required('name'): str,
+        'semaphores': to_list(str),
+    }
+
+    post_run_playbook_def = {
+        vs.Required('name'): str,
+        'semaphores': to_list(str),
+        'cleanup': bool,
+    }
 
     playbook_def = to_list(vs.Any(str, complex_playbook_def))
+    post_run_playbook_def = to_list(vs.Any(str, post_run_playbook_def))
 
     # Attributes of a job that can also be used in Project and ProjectTemplate
     job_attributes = {'parent': vs.Any(str, None),
@@ -743,7 +753,7 @@ class JobParser(object):
                       'post-timeout': int,
                       'attempts': int,
                       'pre-run': playbook_def,
-                      'post-run': playbook_def,
+                      'post-run': post_run_playbook_def,
                       'run': playbook_def,
                       'cleanup-run': playbook_def,
                       'ansible-split-streams': bool,
@@ -917,55 +927,49 @@ class JobParser(object):
 
         seen_playbook_semaphores = set()
 
-        def get_playbook_attrs(playbook_defs):
-            # Helper method to extract information from a playbook
-            # defenition.
-            for pb_def in playbook_defs:
-                pb_semaphores = []
-                if isinstance(pb_def, dict):
-                    pb_name = pb_def['name']
-                    for pb_sem_name in as_list(pb_def.get('semaphores')):
-                        pb_semaphores.append(model.JobSemaphore(pb_sem_name))
-                        seen_playbook_semaphores.add(pb_sem_name)
-                else:
-                    # The playbook definition is a simple string path
-                    pb_name = pb_def
-                # Sort the list of semaphores to avoid issues with
-                # contention (where two jobs try to start at the same time
-                # and fail due to acquiring the same semaphores but in
-                # reverse order.
-                pb_semaphores = tuple(sorted(pb_semaphores,
-                                             key=lambda x: x.name))
-                yield (pb_name, pb_semaphores)
+        def sorted_semaphores(pb_dict):
+            pb_semaphore_names = as_list(pb_dict.get('semaphores', []))
+            seen_playbook_semaphores.update(pb_semaphore_names)
+            pb_semaphores = [model.JobSemaphore(x) for x in pb_semaphore_names]
+            return tuple(sorted(pb_semaphores,
+                                key=lambda x: x.name))
 
-        for pre_run_name, pre_run_semaphores in get_playbook_attrs(
-                as_list(conf.get('pre-run'))):
+        for pb_dict in [dict_with_name(x) for x in
+                        as_list(conf.get('pre-run'))]:
             pre_run = model.PlaybookContext(job.source_context,
-                                            pre_run_name, job.roles,
-                                            secrets, pre_run_semaphores)
+                                            pb_dict['name'], job.roles,
+                                            secrets,
+                                            sorted_semaphores(pb_dict))
             job.pre_run = job.pre_run + (pre_run,)
         # NOTE(pabelanger): Reverse the order of our post-run list. We prepend
         # post-runs for inherits however, we want to execute post-runs in the
         # order they are listed within the job.
-        for post_run_name, post_run_semaphores in get_playbook_attrs(
-                reversed(as_list(conf.get('post-run')))):
+        for pb_dict in [dict_with_name(x) for x in
+                        reversed(as_list(conf.get('post-run')))]:
             post_run = model.PlaybookContext(job.source_context,
-                                             post_run_name, job.roles,
-                                             secrets, post_run_semaphores)
+                                             pb_dict['name'], job.roles,
+                                             secrets,
+                                             sorted_semaphores(pb_dict),
+                                             pb_dict.get('cleanup', False))
             job.post_run = (post_run,) + job.post_run
-        for cleanup_run_name, cleanup_run_semaphores in get_playbook_attrs(
-                reversed(as_list(conf.get('cleanup-run')))):
-            cleanup_run = model.PlaybookContext(
-                job.source_context,
-                cleanup_run_name, job.roles,
-                secrets, cleanup_run_semaphores)
-            job.cleanup_run = (cleanup_run,) + job.cleanup_run
+
+        with self.pcontext.confAttr(conf, 'cleanup-run') as cleanup_run:
+            for pb_dict in [dict_with_name(x) for x in
+                            reversed(as_list(cleanup_run))]:
+                self.pcontext.accumulator.addError(CleanupRunDeprecation())
+                cleanup_run = model.PlaybookContext(job.source_context,
+                                                    pb_dict['name'], job.roles,
+                                                    secrets,
+                                                    sorted_semaphores(pb_dict))
+                job.cleanup_run = (cleanup_run,) + job.cleanup_run
 
         if 'run' in conf:
-            for run_name, run_semaphores in get_playbook_attrs(
-                    as_list(conf.get('run'))):
-                run = model.PlaybookContext(job.source_context, run_name,
-                                            job.roles, secrets, run_semaphores)
+            for pb_dict in [dict_with_name(x) for x in
+                            as_list(conf.get('run'))]:
+                run = model.PlaybookContext(job.source_context,
+                                            pb_dict['name'], job.roles,
+                                            secrets,
+                                            sorted_semaphores(pb_dict))
                 job.run = job.run + (run,)
 
         if conf.get('intermediate', False) and not conf.get('abstract', False):

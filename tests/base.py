@@ -696,15 +696,8 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
 
         self.result, error_detail = super(
             RecordingAnsibleJob, self).runPlaybooks(args)
-        if self.result is None:
-            # Record result now because cleanup won't be performed
-            self.recordResult(None)
+        self.recordResult(self.result)
         return self.result, error_detail
-
-    def runCleanupPlaybooks(self, success):
-        super(RecordingAnsibleJob, self).runCleanupPlaybooks(success)
-        if self.result is not None:
-            self.recordResult(self.result)
 
     def runAnsible(self, cmd, timeout, playbook, ansible_version,
                    allow_pre_fail, wrapped=True, cleanup=False):

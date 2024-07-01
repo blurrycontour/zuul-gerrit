@@ -345,3 +345,10 @@ Adjust the configuration to conform to RE2 syntax."""
             message = (self.zuul_error_message +
                        f"\n\nThe RE2 syntax error is: {message}")
         super().__init__(message)
+
+
+class CleanupRunDeprecation(DeprecationWarning):
+    zuul_error_name = 'Cleanup Run Deprecation'
+    zuul_error_message = """\
+The cleanup-run job attribute is deprecated.  Replace it with
+post-run playbooks with the `cleanup` attribute set."""

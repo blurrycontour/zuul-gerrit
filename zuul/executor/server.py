@@ -105,7 +105,7 @@ BLACKLISTED_VARS = dict(
     ansible_ssh_extra_args='-o PermitLocalCommand=no',
 )
 
-# TODO: make this configurable
+# MODEL_API < 30
 CLEANUP_TIMEOUT = 300
 
 
@@ -510,6 +510,9 @@ class JobDirPlaybook(object):
         self.secrets_content = None
         self.secrets_keys = set()
         self.semaphores = []
+        self.nesting_level = None
+        self.cleanup = False
+        self.ignore_result = False
 
     def addRole(self):
         count = len(self.roles)
@@ -1019,13 +1022,14 @@ class AnsibleJob(object):
         self.jobdir = None
         self.proc = None
         self.proc_lock = threading.Lock()
+        # Is the current process a cleanup playbook?
+        self.proc_cleanup = False
         self.running = False
         self.started = False  # Whether playbooks have started running
         self.time_starting_build = None
         self.paused = False
         self.aborted = False
         self.aborted_reason = None
-        self.cleanup_started = False
         self._resume_event = threading.Event()
         self.thread = None
         self.project_info = {}
@@ -1378,9 +1382,7 @@ class AnsibleJob(object):
 
         # ...as well as all playbook and role projects.
         repos = []
-        playbooks = (self.job.pre_run + self.job.run +
-                     self.job.post_run + self.job.cleanup_run)
-        for playbook in playbooks:
+        for playbook in self.job.all_playbooks:
             repos.append(playbook)
             repos += playbook['roles']
 
@@ -1591,8 +1593,6 @@ class AnsibleJob(object):
         self.executor_server.updateBuildStatus(self.build_request, data)
 
         result, error_detail = self.runPlaybooks(args)
-
-        self.runCleanupPlaybooks(result)
 
         # Stop the persistent SSH connections.
         setup_status, setup_code = self.runAnsibleCleanup(
@@ -1830,6 +1830,8 @@ class AnsibleJob(object):
     def runPlaybooks(self, args):
         result = None
         error_detail = None
+        aborted = False
+        unknown_result = False
 
         with open(self.jobdir.job_output_file, 'a') as job_output:
             job_output.write("{now} | Running Ansible setup...\n".format(
@@ -1871,6 +1873,7 @@ class AnsibleJob(object):
 
         self.loadFrozenHostvars()
         pre_failed = False
+        nesting_level_achieved = None
         should_retry = False  # We encountered a retryable failure
         will_retry = False  # The above and we have not hit retry_limit
         # Whether we will allow POST_FAILURE to override the result:
@@ -1889,6 +1892,7 @@ class AnsibleJob(object):
         # to copy logs even when the job has timed out.
         job_timeout = self.job.timeout
         for index, playbook in enumerate(self.jobdir.pre_playbooks):
+            nesting_level_achieved = playbook.nesting_level
             # TODOv3(pabelanger): Implement pre-run timeout setting.
             ansible_timeout = self.getAnsibleTimeout(time_started, job_timeout)
             pre_status, pre_code = self.runAnsiblePlaybook(
@@ -1912,6 +1916,8 @@ class AnsibleJob(object):
              self.cpu_times['children_system']))
 
         if not pre_failed:
+            # At this point, we have gone all the way down.
+            nesting_level_achieved = None
             for index, playbook in enumerate(self.jobdir.playbooks):
                 ansible_timeout = self.getAnsibleTimeout(
                     time_started, job_timeout)
@@ -1919,7 +1925,8 @@ class AnsibleJob(object):
                     playbook, ansible_timeout, self.ansible_version,
                     phase='run', index=index)
                 if job_status == self.RESULT_ABORTED:
-                    return 'ABORTED', None
+                    aborted = True
+                    break
                 elif job_status == self.RESULT_TIMED_OUT:
                     # Set the pre-failure flag so this doesn't get
                     # overridden by a post-failure.
@@ -1952,25 +1959,40 @@ class AnsibleJob(object):
                 else:
                     # The result of the job is indeterminate.  Zuul will
                     # run it again.
-                    return None, None
+                    unknown_result = True
+                    aborted = True
+                    break
 
         # check if we need to pause here
-        result_data, secret_result_data = self.getResultData()
-        pause = result_data.get('zuul', {}).get('pause')
-        if success and pause:
-            self.pause()
-        if self.aborted:
-            return 'ABORTED', None
+        if not aborted:
+            result_data, secret_result_data = self.getResultData()
+            pause = result_data.get('zuul', {}).get('pause')
+            if success and pause:
+                self.pause()
+            if self.aborted:
+                aborted = True
 
-        # Report a failure if pre-run failed and the user reported to
-        # zuul that the job should not retry.
-        if result_data.get('zuul', {}).get('retry') is False and pre_failed:
-            result = "FAILURE"
-            allow_post_result = False
-            should_retry = False
+        if not aborted:
+            # Report a failure if pre-run failed and the user reported to
+            # zuul that the job should not retry.
+            if (result_data.get('zuul', {}).get('retry') is False and
+                pre_failed):
+                result = "FAILURE"
+                allow_post_result = False
+                should_retry = False
 
         post_timeout = self.job.post_timeout
         for index, playbook in enumerate(self.jobdir.post_playbooks):
+            if aborted and not playbook.cleanup:
+                continue
+            if (nesting_level_achieved is not None and
+                playbook.nesting_level > nesting_level_achieved):
+                self.log.info("Skipping post-run playbook %s "
+                              "since nesting level %s "
+                              "is greater than achieved level of %s",
+                              playbook.path, playbook.nesting_level,
+                              nesting_level_achieved)
+                continue
             will_retry = should_retry and not self.retry_limit
             # Post timeout operates a little differently to the main job
             # timeout. We give each post playbook the full post timeout to
@@ -1981,7 +2003,7 @@ class AnsibleJob(object):
                 playbook, post_timeout, self.ansible_version, success,
                 phase='post', index=index, will_retry=will_retry)
             if post_status == self.RESULT_ABORTED:
-                return 'ABORTED', None
+                aborted = True
             if post_status == self.RESULT_UNREACHABLE:
                 # In case we encounter unreachable nodes we need to return None
                 # so the job can be retried. However in the case of post
@@ -1993,38 +2015,22 @@ class AnsibleJob(object):
                 success = False
                 # If we encountered a pre-failure, that takes
                 # precedence over the post result.
-                if allow_post_result:
+                if allow_post_result and not playbook.ignore_result:
                     result = 'POST_FAILURE'
-                if (index + 1) == len(self.jobdir.post_playbooks):
+                if (not aborted and
+                    (index + 1) == len(self.jobdir.post_playbooks)):
                     self._logFinalPlaybookError()
+
+        if unknown_result:
+            return None, None
+
+        if aborted:
+            return 'ABORTED', None
 
         if should_retry:
             return None, error_detail
 
         return result, error_detail
-
-    def runCleanupPlaybooks(self, result):
-        if not self.jobdir.cleanup_playbooks:
-            return
-
-        if not self.frozen_hostvars:
-            # Job failed before we could load the frozen hostvars.
-            # This means we can't run any cleanup playbooks.
-            return
-
-        with open(self.jobdir.job_output_file, 'a') as job_output:
-            job_output.write("{now} | Running Ansible cleanup...\n".format(
-                now=datetime.datetime.now()
-            ))
-
-        success = result == 'SUCCESS'
-        will_retry = result is None and not self.retry_limit
-        self.cleanup_started = True
-        for index, playbook in enumerate(self.jobdir.cleanup_playbooks):
-            self.runAnsiblePlaybook(
-                playbook, CLEANUP_TIMEOUT, self.ansible_version,
-                success=success, phase='cleanup', index=index,
-                will_retry=will_retry)
 
     def _logFinalPlaybookError(self):
         # Failures in the final post playbook can include failures
@@ -2175,12 +2181,28 @@ class AnsibleJob(object):
         if job_playbook is None:
             raise ExecutorError("No playbook specified")
 
-        for playbook in self.job.post_run:
-            jobdir_playbook = self.jobdir.addPostPlaybook()
-            self.preparePlaybook(jobdir_playbook, playbook, args)
+        # If there are cleanup playbooks, then mutate them into
+        # post-run playbooks.
+        post_run = self.job.post_run
+        cleanup_run = self.job.cleanup_run
+        while cleanup_run:
+            cleanup_playbook = cleanup_run.pop(0)
+            for i in range(len(post_run)):
+                post_playbook = post_run[i]
+                if (cleanup_playbook.get('nesting_level', 0) <
+                    post_playbook.get('nesting_level', 0)):
+                    post_run.insert(i, cleanup_playbook)
+                    break
+            # If we did not insert, then append:
+            else:
+                post_run.append(cleanup_playbook)
 
-        for playbook in self.job.cleanup_run:
-            jobdir_playbook = self.jobdir.addCleanupPlaybook()
+        for playbook in post_run:
+            jobdir_playbook = self.jobdir.addPostPlaybook()
+            if playbook in self.job.cleanup_run:
+                # This backwards compatible handling for MODEL_API < 30
+                jobdir_playbook.cleanup = True
+                jobdir_playbook.ignore_result = True
             self.preparePlaybook(jobdir_playbook, playbook, args)
 
     def preparePlaybook(self, jobdir_playbook, playbook, args):
@@ -2193,6 +2215,10 @@ class AnsibleJob(object):
             playbook['connection'])
         project = source.getProject(playbook['project'])
         branch = playbook['branch']
+        # MODEL_API < 30: if nesting_level not provided, use 0 so
+        # everything runs (old behavior)
+        jobdir_playbook.nesting_level = playbook.get('nesting_level', 0)
+        jobdir_playbook.cleanup = playbook.get('cleanup', False)
         jobdir_playbook.trusted = playbook['trusted']
         jobdir_playbook.branch = branch
         jobdir_playbook.project_canonical_name = project.canonical_name
@@ -2884,7 +2910,7 @@ class AnsibleJob(object):
             if not self.proc:
                 self.log.debug("Abort: no process is running")
                 return
-            elif self.cleanup_started and not timed_out:
+            elif self.proc_cleanup and not timed_out:
                 self.log.debug("Abort: cleanup is in progress")
                 return
 
@@ -2968,7 +2994,8 @@ class AnsibleJob(object):
         env_copy['HOME'] = self.jobdir.work_root
 
         with self.proc_lock:
-            if self.aborted and not cleanup:
+            self.proc_cleanup = playbook.cleanup
+            if self.aborted and not playbook.cleanup:
                 return (self.RESULT_ABORTED, None)
             self.log.debug("Ansible command: ANSIBLE_CONFIG=%s ZUUL_JOBDIR=%s "
                            "ZUUL_JOB_LOG_CONFIG=%s PYTHONPATH=%s TMP=%s %s",
@@ -3084,6 +3111,7 @@ class AnsibleJob(object):
         with self.proc_lock:
             self.proc.stdout.close()
             self.proc = None
+            self.proc_cleanup = False
 
         if timeout and watchdog.timed_out:
             return (self.RESULT_TIMED_OUT, None)
@@ -3362,7 +3390,7 @@ class AnsibleJob(object):
                 result = self.RESULT_TIMED_OUT
                 code = 0
                 break
-            if self.aborted:
+            if self.aborted and not playbook.cleanup:
                 acquired_semaphores = False
                 result = self.RESULT_ABORTED
                 code = 0
