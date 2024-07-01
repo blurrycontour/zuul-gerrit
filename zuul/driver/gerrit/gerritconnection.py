@@ -240,10 +240,11 @@ class GerritChangeData(object):
     HTTP = 2
 
     def __init__(self, fmt, data, related=None, files=None,
-                 zuul_query_ltime=None):
+                 commentable_files=None, zuul_query_ltime=None):
         self.format = fmt
         self.data = data
         self.files = files
+        self.commentable_files = commentable_files
         self.zuul_query_ltime = zuul_query_ltime
 
         if fmt == self.SSH:
@@ -1454,11 +1455,27 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         files_query = 'changes/%s/revisions/%s/files' % (
             number, data['current_revision'])
 
+        commentable_files_query = None
+        # We query with parent=1 to get the list of files compared to
+        # the merge target, unless this is the initial commit to the
+        # repository (there are no parents).
         if data['revisions'][data['current_revision']]['commit']['parents']:
             files_query += '?parent=1'
+            if len(data['revisions'][data['current_revision']][
+                    'commit']['parents']) > 1:
+                # If there is more than one parent, we also query the
+                # list of files on this specific commit so we know
+                # upon which we can leave comments.
+                commentable_files_query = 'changes/%s/revisions/%s/files' % (
+                    number, data['current_revision'])
+
+        if commentable_files_query:
+            commentable_files = self.get(commentable_files_query)
+        else:
+            commentable_files = None
 
         files = self.get(files_query)
-        return data, related, files
+        return data, related, files, commentable_files
 
     def queryChange(self, number, event=None, min_ltime=None):
         lock = self.change_network_manager.getQueryLock(number)
@@ -1474,11 +1491,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 zuul_query_ltime = self.sched.zk_client.getCurrentLtime()
                 try:
                     if self.session:
-                        data, related, files = self.queryChangeHTTP(
-                            number, event=event)
+                        data, related, files, commentable_files =\
+                            self.queryChangeHTTP(
+                                number, event=event)
                         ret = GerritChangeData(
                             GerritChangeData.HTTP,
-                            data, related, files,
+                            data, related, files, commentable_files,
                             zuul_query_ltime=zuul_query_ltime)
                     else:
                         data = self.queryChangeSSH(number, event=event)

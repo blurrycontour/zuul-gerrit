@@ -32,6 +32,7 @@ from zuul.lib import strings
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.gerrit.gerritconnection import GerritConnection
 
+import git
 import paramiko
 import testtools
 
@@ -550,6 +551,58 @@ class TestFileComments(AnsibleZuulTestCase):
         self.assertIn('expected a dictionary', A.messages[0],
                       "A should have a validation error reported")
         self.assertIn('invalid file missingfile.txt', A.messages[0],
+                      "A should have file error reported")
+
+    def test_merge_commit_file_comments(self):
+        self.create_branch('org/project', 'stable/queens')
+        self.fake_gerrit.addEvent(
+            self.fake_gerrit.getFakeBranchCreatedEvent(
+                'org/project', 'stable/queens'))
+        self.waitUntilSettled()
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'stable/queens', 'A',
+                                           files={'path/to/file.py': 'test1',
+                                                  'otherfile.txt': 'test2',
+                                                  })
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        upstream_path = os.path.join(self.upstream_root, 'org/project')
+        upstream_repo = git.Repo(upstream_path)
+        master_sha = upstream_repo.heads.master.commit.hexsha
+
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           merge_parents=[
+                                               master_sha,
+                                               A.patchsets[-1]['revision'],
+                                           ],
+                                           files={'path/to/file.py': 'test1',
+                                                  'otherfile.txt': 'test2',
+                                                  })
+
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='file-comments', result='SUCCESS', changes='2,1'),
+            dict(name='file-comments-error', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+        self.assertEqual(len(B.comments), 1)
+        comments = sorted(B.comments, key=lambda x: (x['file'], x['line']))
+        self.assertEqual(
+            comments[0],
+            {
+                'file': '/COMMIT_MSG',
+                'line': 1,
+                'message': 'commit message comment',
+                'reviewer': {
+                    'email': 'zuul@example.com',
+                    'name': 'Zuul',
+                    'username': 'jenkins'
+                },
+            },
+        )
+        self.assertIn('invalid file missingfile.txt', B.messages[0],
                       "A should have file error reported")
 
 

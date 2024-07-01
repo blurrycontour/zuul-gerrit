@@ -7177,6 +7177,8 @@ class Ref(object):
         self.oldrev = None
         self.newrev = None
         self.files = []
+        # A list of files that can be commented upon, if different than files.
+        self.commentable_files = None
         # The url for browsing the ref/tag/branch/change
         self.url = None
         # Cache info about this ref:
@@ -7198,6 +7200,7 @@ class Ref(object):
             "oldrev": self.oldrev,
             "newrev": self.newrev,
             "files": self.files,
+            "commentable_files": self.commentable_files,
             "url": self.url,
         }
 
@@ -7206,6 +7209,7 @@ class Ref(object):
         self.oldrev = data.get("oldrev")
         self.newrev = data.get("newrev")
         self.files = data.get("files", [])
+        self.commentable_files = data.get("commentable_files", None)
         self.url = data.get("url")
 
     def _id(self):

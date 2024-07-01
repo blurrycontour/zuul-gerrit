@@ -49,6 +49,7 @@ class FakeGerritChange(object):
     def __init__(self, gerrit, number, project, branch, subject,
                  status='NEW', upstream_root=None, files={},
                  parent=None, merge_parents=None, merge_files=None,
+                 merge_parent_files=None,
                  topic=None, empty=False):
         self.source_hostname = gerrit.canonical_hostname
         self.gerrit_baseurl = gerrit.baseurl
@@ -93,6 +94,7 @@ class FakeGerritChange(object):
         if topic:
             self.data['topic'] = topic
         self.upstream_root = upstream_root
+        self.merge_parent_files = merge_parent_files
         if merge_parents:
             self.addMergePatchset(parents=merge_parents,
                                   merge_files=merge_files)
@@ -560,6 +562,9 @@ class FakeGerritChange(object):
             if self.depends_on_change:
                 parent = self.depends_on_change.patchsets[
                     self.depends_on_patchset - 1]['revision']
+            parents = self.data.get('parents', [])
+            if len(parents) <= 1:
+                parents = [parent]
             revisions[rev['revision']] = {
                 "kind": "REWORK",
                 "_number": num,
@@ -570,8 +575,8 @@ class FakeGerritChange(object):
                     "subject": self.subject,
                     "message": self.data['commitMessage'],
                     "parents": [{
-                        "commit": parent,
-                    }]
+                        "commit": p,
+                    } for p in parents]
                 },
                 "files": files
             }
@@ -627,7 +632,7 @@ class FakeGerritChange(object):
             })
         return {"changes": changes}
 
-    def queryFilesHTTP(self, revision):
+    def queryFilesHTTP(self, revision, parent):
         for rev in self.patchsets:
             if rev['revision'] == revision:
                 break
@@ -635,7 +640,18 @@ class FakeGerritChange(object):
             return None
 
         files = {}
-        for f in rev['files']:
+        # We're querying the list of files different in this commit
+        # compared to the parent (ie, the list of files that we're
+        # merging into the branch, not the files in this commit).  If
+        # this is a merge commit and the test has specified such a
+        # files list, use that.
+        if (parent and len(self.data.get('parents', []))
+            and self.merge_parent_files):
+            rev_files = self.merge_parent_files or []
+        else:
+            # Otherwise, the simple case of "files in this commit"
+            rev_files = rev['files']
+        for f in rev_files:
             files[f['file']] = {"status": f['type'][0]}  # ADDED -> A
         return files
 
@@ -725,8 +741,10 @@ class GerritWebServer(object):
             list_checkers_re = re.compile('/a/plugins/checks/checkers/')
             change_re = re.compile(r'/a/changes/(.*)\?o=.*')
             related_re = re.compile(r'/a/changes/(.*)/revisions/(.*)/related')
-            files_re = re.compile(r'/a/changes/(.*)/revisions/(.*)/files'
-                                  r'\?parent=1')
+            files_parent_re = re.compile(
+                r'/a/changes/(.*)/revisions/(.*)/files'
+                r'\?parent=1')
+            files_re = re.compile(r'/a/changes/(.*)/revisions/(.*)/files')
             change_search_re = re.compile(r'/a/changes/\?n=500.*&q=(.*)')
             version_re = re.compile(r'/a/config/server/version')
             info_re = re.compile(r'/a/config/server/info')
@@ -765,6 +783,9 @@ class GerritWebServer(object):
                 m = self.related_re.match(path)
                 if m:
                     return self.get_related(m.group(1), m.group(2))
+                m = self.files_parent_re.match(path)
+                if m:
+                    return self.get_files(m.group(1), m.group(2), 1)
                 m = self.files_re.match(path)
                 if m:
                     return self.get_files(m.group(1), m.group(2))
@@ -794,6 +815,11 @@ class GerritWebServer(object):
 
             def _403(self, msg):
                 self.send_response(403)
+                self.end_headers()
+                self.wfile.write(msg.encode('utf8'))
+
+            def _400(self, msg):
+                self.send_response(400)
                 self.end_headers()
                 self.wfile.write(msg.encode('utf8'))
 
@@ -828,9 +854,12 @@ class GerritWebServer(object):
                 labels = data.get('labels', {})
                 comments = data.get('robot_comments', data.get('comments', {}))
                 tag = data.get('tag', None)
-                fake_gerrit._test_handle_review(
-                    int(change.data['number']), message, False, labels,
-                    None, True, False, comments, tag=tag)
+                try:
+                    fake_gerrit._test_handle_review(
+                        int(change.data['number']), message, False, labels,
+                        None, True, False, comments, tag=tag)
+                except Exception as e:
+                    return self._400(str(e))
                 self.send_response(200)
                 self.end_headers()
 
@@ -925,11 +954,11 @@ class GerritWebServer(object):
                 self.send_data(data)
                 self.end_headers()
 
-            def get_files(self, number, revision):
+            def get_files(self, number, revision, parent=None):
                 change = fake_gerrit.changes.get(int(number))
                 if not change:
                     return self._404()
-                data = change.queryFilesHTTP(revision)
+                data = change.queryFilesHTTP(revision, parent)
                 if data is None:
                     return self._404()
                 self.send_data(data)
@@ -1222,7 +1251,13 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                 change.messages.append(message)
 
             if file_comments:
+                ok_files = set(x['file']
+                               for x in change.patchsets[-1]['files'])
+                ok_files.add('/COMMIT_MSG')
                 for filename, commentlist in file_comments.items():
+                    if filename not in ok_files:
+                        raise Exception(
+                            f"file {filename} not found in revision")
                     for comment in commentlist:
                         change.addComment(filename, comment['line'],
                                           comment['message'], 'Zuul',
