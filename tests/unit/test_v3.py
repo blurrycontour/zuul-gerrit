@@ -10089,3 +10089,68 @@ class TestMaxDeps(ZuulTestCase):
         self.assertHistory([
             dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
+
+
+class TestPipelineLimits(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main-max-changes.yaml'
+
+    def test_pipeline_max_changes_check(self):
+        # Max-changes is 1, so this is allowed
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        # And this is not
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        B.setDependsOn(A, 1)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(B.reported, 1)
+        self.assertIn('too many changes', B.messages[0])
+
+    def test_pipeline_max_changes_gate(self):
+        # Max-changes is 1, so this is allowed
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        # And this is not
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        C.setDependsOn(B, 1)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+        B.addApproval('Approved', 1)
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.reported, 0)
+        self.assertEqual(C.reported, 1)
+        self.assertIn('too many changes', C.messages[0])

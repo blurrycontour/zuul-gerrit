@@ -722,6 +722,22 @@ class PipelineManager(metaclass=ABCMeta):
                             change_queue, change, event, warnings)
                         return False
 
+            if not self.checkPipelineWithinLimits(cycle, history):
+                log.info("Not enqueueing change %s since "
+                         "pipeline not within limits",
+                         change)
+                warnings.append(
+                    "Unable to enqueue change because there are too many "
+                    "changes in this pipeline."
+                )
+                if not history:
+                    # Only report if we are the originating change;
+                    # otherwise we're being called from
+                    # enqueueChangesAhead.
+                    self._reportNonEnqueuedItem(
+                        change_queue, change, event, warnings[-1])
+                return False
+
             warnings = []
             if not self.enqueueChangesAhead(
                     cycle, event, quiet,
@@ -932,6 +948,19 @@ class PipelineManager(metaclass=ABCMeta):
             return False
 
         return queue_config.dependencies_by_topic
+
+    def checkPipelineWithinLimits(self, cycle, history):
+        if self.pipeline.tenant.max_changes_per_pipeline is None:
+            return True
+        count = len(cycle) + len(history)
+        if count > self.pipeline.tenant.max_changes_per_pipeline:
+            return False
+
+        for item in self.pipeline.getAllItems():
+            count += len(item.changes)
+            if count > self.pipeline.tenant.max_changes_per_pipeline:
+                return False
+        return True
 
     def getNonMergeableCycleChanges(self, item):
 

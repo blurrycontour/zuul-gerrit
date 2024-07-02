@@ -360,6 +360,34 @@ configuration. Some examples of tenant definitions are:
       this option; instead it limits Zuul to zero dependencies.  This
       is distinct from :attr:`<gerrit connection>.max_dependencies`.
 
+   .. attr:: max-changes-per-pipeline
+
+      The number of changes (not queue items) allowed in any
+      individual pipeline in this tenant.  Live changes, non-live
+      changes used for dependencies, and changes that are part of a
+      dependency cycle are all counted.  If a change appears in more
+      than one queue item, it is counted multiple times.
+
+      For example, if this value was set to 100, then Zuul would allow
+      any of the following (but no more):
+
+      * 100 changes in individual queue items
+      * 1 queue item of 100 changes in a dependency cycle
+      * 1 queue item with 99 changes in a cyle plus one item depending
+        on that cycle
+
+      This counts changes across all queues in the pipeline; it is
+      therefore possible for a set of projects in one queue to affect
+      others in the same tenant.
+
+      This value is not set by default, which means there is no limit.
+      It is generally expected that the pipeline window configuration
+      should be sufficient to protect against excessive resource
+      usage.  However in some circumstances with large dependency
+      cycles, setting this value may be useful.  Note that the value
+      ``0`` does not disable this option; instead it limits Zuul to
+      zero changes.
+
    .. attr:: max-nodes-per-job
       :default: 5
 
