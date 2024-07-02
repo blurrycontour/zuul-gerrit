@@ -1097,9 +1097,10 @@ class PipelineManager(metaclass=ABCMeta):
                   req, job, item)
         build_set.setJobNodeRequestID(job, req.id)
         if req.fulfilled:
-            nodeset = self.sched.nodepool.getNodeSet(req, job.nodeset)
+            nodeset_info = self.sched.nodepool.getNodesetInfo(
+                req, job.nodeset)
             job = build_set.item.getJob(req.job_uuid)
-            build_set.jobNodeRequestComplete(job, nodeset)
+            build_set.setJobNodeSetInfo(job, nodeset_info)
         else:
             job.setWaitingStatus(f'node request: {req.id}')
 
@@ -2163,7 +2164,7 @@ class PipelineManager(metaclass=ABCMeta):
         self._makeNodepoolRequest(log, build_set, job, relative_priority)
         return True
 
-    def onNodesProvisioned(self, request, nodeset, build_set):
+    def onNodesProvisioned(self, request, nodeset_info, build_set):
         log = get_annotated_logger(self.log, request.event_id)
 
         self.reportPipelineTiming('node_request_time', request.created_time)
@@ -2175,8 +2176,7 @@ class PipelineManager(metaclass=ABCMeta):
             if self._handleNodeRequestFallback(log, build_set, job, request):
                 return
         # No more fallbacks -- tell the buildset the request is complete
-        if nodeset is not None:
-            build_set.jobNodeRequestComplete(job, nodeset)
+        build_set.setJobNodeSetInfo(job, nodeset_info)
         # Put a fake build through the cycle to clean it up.
         if not request.fulfilled:
             build_set.item.setNodeRequestFailure(
