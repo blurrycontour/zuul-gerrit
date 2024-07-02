@@ -3118,12 +3118,12 @@ class Scheduler(threading.Thread):
         if request.state == STATE_FAILED:
             self.nodepool.deleteNodeRequest(request.id,
                                             event_id=event.request_id)
-
-        nodeset = self.nodepool.getNodeSet(request, job.nodeset)
+        nodeset_info = self.nodepool.getNodesetInfo(request, job.nodeset)
 
         job = build_set.item.getJob(request.job_uuid)
         if build_set.getJobNodeSetInfo(job) is None:
-            pipeline.manager.onNodesProvisioned(request, nodeset, build_set)
+            pipeline.manager.onNodesProvisioned(
+                request, nodeset_info, build_set)
         else:
             self.log.warning("Duplicate nodes provisioned event: %s",
                              event)
