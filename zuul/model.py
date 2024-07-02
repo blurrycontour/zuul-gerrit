@@ -2138,6 +2138,25 @@ class NodeRequest(object):
         return request
 
 
+class NodesetInfo:
+
+    def __init__(self, nodes=None, provider=None, zone=None):
+        self.nodes = nodes or []
+        self.provider = provider
+        self.zone = zone
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(**data)
+
+    def toDict(self):
+        return dict(
+            nodes=self.nodes,
+            provider=self.provider,
+            zone=self.zone,
+        )
+
+
 class NodesetRequest(zkobject.LockableZKObject):
 
     class State(StrEnum):
@@ -4837,7 +4856,7 @@ class BuildSet(zkobject.ZKObject):
             debug_messages=[],
             warning_messages=[],
             merge_state=self.NEW,
-            nodeset_info={},  # job -> dict of nodeset info
+            nodeset_info={},  # job -> NodesetInfo
             node_requests={},  # job -> request id
             _files=None,  # The files object if loaded
             _files_path=None,  # The ZK path to the files object
@@ -4987,7 +5006,8 @@ class BuildSet(zkobject.ZKObject):
             "debug_messages": self.debug_messages,
             "warning_messages": self.warning_messages,
             "merge_state": self.merge_state,
-            "nodeset_info": self.nodeset_info,
+            "nodeset_info": {i: ni.toDict()
+                             for i, ni in self.nodeset_info.items()},
             "node_requests": self.node_requests,
             "files": self._files_path,
             "merge_repo_state": self._merge_repo_state_path,
@@ -5021,6 +5041,9 @@ class BuildSet(zkobject.ZKObject):
         data['_files_path'] = data.pop('files')
         data['_merge_repo_state_path'] = data.pop('merge_repo_state')
         data['_extra_repo_state_path'] = data.pop('extra_repo_state')
+
+        data['nodeset_info'] = {i: NodesetInfo.fromDict(d)
+                                for i, d in data['nodeset_info'].items()}
 
         config_errors = data.get('config_errors')
         if config_errors:
@@ -5241,17 +5264,23 @@ class BuildSet(zkobject.ZKObject):
     def getJobNodeProvider(self, job):
         info = self.getJobNodeSetInfo(job)
         if info:
-            return info.get('provider')
+            return info.provider
 
     def getJobNodeExecutorZone(self, job):
         info = self.getJobNodeSetInfo(job)
         if info:
-            return info.get('zone')
+            return info.zone
 
     def getJobNodeList(self, job):
         info = self.getJobNodeSetInfo(job)
         if info:
-            return info.get('nodes')
+            return info.nodes
+
+    def setJobNodeSetInfo(self, job, nodeset_info):
+        if job.uuid in self.nodeset_info:
+            raise Exception("Prior node request for %s", job.name)
+        with self.activeContext(self.item.pipeline.manager.current_context):
+            self.nodeset_info[job.uuid] = nodeset_info
 
     def removeJobNodeSetInfo(self, job):
         if job.uuid not in self.nodeset_info:
@@ -5277,21 +5306,6 @@ class BuildSet(zkobject.ZKObject):
             with self.activeContext(
                     self.item.pipeline.manager.current_context):
                 del self.node_requests[job.uuid]
-
-    def jobNodeRequestComplete(self, job, nodeset):
-        if job.uuid in self.nodeset_info:
-            raise Exception("Prior node request for %s" % (job.name))
-        info = {}
-        if nodeset.nodes:
-            node = nodeset.getNodes()[0]
-            if node.attributes:
-                info['zone'] = node.attributes.get('executor-zone')
-            else:
-                info['zone'] = None
-            info['provider'] = node.provider
-            info['nodes'] = [n.id for n in nodeset.getNodes()]
-        with self.activeContext(self.item.pipeline.manager.current_context):
-            self.nodeset_info[job.uuid] = info
 
     def getTries(self, job):
         return self.tries.get(job.uuid, 0)
