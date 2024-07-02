@@ -1428,6 +1428,7 @@ class PipelineParser(object):
                     'window-increase-factor': window_factor,
                     'window-decrease-type': window_type,
                     'window-decrease-factor': window_factor,
+                    'max-changes': int,
                     '_source_context': model.SourceContext,
                     '_start_mark': model.ZuulMark,
                     }
@@ -1527,6 +1528,7 @@ class PipelineParser(object):
             'window-decrease-type', 'exponential')
         pipeline.window_decrease_factor = conf.get(
             'window-decrease-factor', 2)
+        pipeline.max_changes = conf.get('max-changes', None)
 
         manager_name = conf['manager']
         if manager_name == 'dependent':

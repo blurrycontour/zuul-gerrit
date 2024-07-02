@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Pipelines may now specify the maximum number of changes that
+    should be enqueued in them in order to protect Zuul from resource
+    exhaustion.  This is not necessary in most circumstances, so the
+    default remains no limit.

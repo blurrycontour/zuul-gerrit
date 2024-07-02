@@ -574,6 +574,7 @@ class Pipeline(object):
         self.window_increase_factor = None
         self.window_decrease_type = None
         self.window_decrease_factor = None
+        self.max_changes = None
         self.state = None
         self.change_list = None
         # Only used by the unit tests for assertions
