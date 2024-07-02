@@ -28,7 +28,7 @@ from zuul.lib.tarjan import strongly_connected_components
 import zuul.lib.tracing as tracing
 from zuul.model import (
     Change, PipelineState, PipelineChangeList,
-    filter_severity, EnqueueEvent
+    filter_severity, EnqueueEvent, FalseWithReason,
 )
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.exceptions import LockException
@@ -722,6 +722,21 @@ class PipelineManager(metaclass=ABCMeta):
                             change_queue, change, event, warnings)
                         return False
 
+            if not (reason := self.checkPipelineWithinLimits(cycle, history)):
+                log.info("Not enqueueing change %s since "
+                         "pipeline not within limits: %s",
+                         change, reason)
+                warnings.append(
+                    f"Unable to enqueue change: {reason}"
+                )
+                if not history:
+                    # Only report if we are the originating change;
+                    # otherwise we're being called from
+                    # enqueueChangesAhead.
+                    self._reportNonEnqueuedItem(
+                        change_queue, change, event, warnings[-1:])
+                return False
+
             warnings = []
             if not self.enqueueChangesAhead(
                     cycle, event, quiet,
@@ -932,6 +947,26 @@ class PipelineManager(metaclass=ABCMeta):
             return False
 
         return queue_config.dependencies_by_topic
+
+    def checkPipelineWithinLimits(self, cycle, history):
+        pipeline_max = self.pipeline.tenant.max_changes_per_pipeline
+        if pipeline_max is None:
+            return True
+        additional = len(cycle) + len(history)
+        if additional > pipeline_max:
+            return FalseWithReason(
+                f"{additional} changes to enqueue greater than "
+                f"pipeline max of {pipeline_max}")
+
+        count = additional
+        for item in self.pipeline.getAllItems():
+            count += len(item.changes)
+            if count > pipeline_max:
+                return FalseWithReason(
+                    f"{additional} additional changes would exceed "
+                    f"pipeline max of {pipeline_max} under current "
+                    "conditions")
+        return True
 
     def getNonMergeableCycleChanges(self, item):
 
