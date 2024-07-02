@@ -146,4 +146,5 @@ class SharedQueuePipelineManager(PipelineManager, metaclass=ABCMeta):
             change_queue.addProject(change.project, None)
             self.pipeline.addQueue(change_queue)
             log.debug("Dynamically created queue %s", change_queue)
-            return DynamicChangeQueueContextManager(change_queue)
+            return DynamicChangeQueueContextManager(
+                change_queue, allow_delete=True)
