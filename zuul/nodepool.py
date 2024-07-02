@@ -396,15 +396,15 @@ class Nodepool(object):
             self._unlockNodes(locked_nodes)
             raise
 
-    def getNodeSet(self, request, job_nodeset):
+    def getNodesetInfo(self, request, job_nodeset):
         """
-        Get a NodeSet object with info about real nodes.
+        Get a NodesetInfo object with data about real nodes.
 
         :param NodeRequest request: The fulfilled NodeRequest
         :param NodeSet job_nodeset: The NodeSet object attached to the job
 
-        :returns: A new NodeSet object which contains information from
-            nodepool about the actual allocated nodes.
+        :returns: A new NodesetInfo object which contains information from
+            nodepool about the actual allocated nodes (if any).
         """
         # A copy of the nodeset with information about the real nodes
         nodeset = job_nodeset.copy()
@@ -412,13 +412,22 @@ class Nodepool(object):
         # If we didn't request nodes and the request is fulfilled then just
         # return. We don't have to do anything in this case.
         if not request.labels and request.fulfilled:
-            return nodeset
+            return model.NodesetInfo()
 
         # Load the node info from ZK.
         for node_id, node in zip(request.nodes, nodeset.getNodes()):
             self.zk_nodepool.updateNode(node, node_id)
 
-        return nodeset
+        info = {}
+        node = nodeset.getNodes()[0]
+        if node.attributes:
+            info['zone'] = node.attributes.get('executor-zone')
+        else:
+            info['zone'] = None
+        info['provider'] = node.provider
+        info['nodes'] = [n.id for n in nodeset.getNodes()]
+
+        return model.NodesetInfo(**info)
 
     def acceptNodes(self, request, nodeset):
         # Accept the nodes supplied by request, mutate nodeset with
