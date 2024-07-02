@@ -1770,6 +1770,7 @@ class Node(ConfigObject):
         self.slot = None
         self._keys = []
         self.az = None
+        self.cloud = None
         self.provider = None
         self.region = None
         self.username = None
@@ -2052,6 +2053,10 @@ class NodeRequest(object):
         self.canceled = False
 
     @property
+    def zuul_event_id(self):
+        return self.event_id
+
+    @property
     def fulfilled(self):
         return (self._state == STATE_FULFILLED) and not self.failed
 
@@ -2202,6 +2207,14 @@ class NodesetRequest(zkobject.LockableZKObject):
             # Attributes set by the launcher
             _lscores=None,
         )
+
+    @property
+    def fulfilled(self):
+        return self.state == self.State.FULFILLED
+
+    @property
+    def nodes(self):
+        return self.provider_nodes
 
     def getPath(self):
         return f"{self.ROOT}/{self.REQUESTS_PATH}/{self.uuid}"
@@ -4896,7 +4909,7 @@ class BuildSet(zkobject.ZKObject):
             debug_messages=[],
             warning_messages=[],
             merge_state=self.NEW,
-            nodeset_info={},  # job -> dict of nodeset info
+            nodeset_info={},  # job -> NodesetInfo
             node_requests={},  # job -> request id
             _files=None,  # The files object if loaded
             _files_path=None,  # The ZK path to the files object
