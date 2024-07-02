@@ -722,6 +722,22 @@ class PipelineManager(metaclass=ABCMeta):
                             change_queue, change, event, warnings)
                         return False
 
+            if not self.checkQueueConfigWithinLimits(cycle, history):
+                log.info("Not enqueueing change %s since "
+                         "queue not within limits",
+                         change)
+                warnings.append(
+                    "Unable to enqueue change because there are too many "
+                    "changes for this project's queue in this pipeline."
+                )
+                if not history:
+                    # Only report if we are the originating change;
+                    # otherwise we're being called from
+                    # enqueueChangesAhead.
+                    self._reportNonEnqueuedItem(
+                        change_queue, change, event, warnings[-1])
+                return False
+
             warnings = []
             if not self.enqueueChangesAhead(
                     cycle, event, quiet,
@@ -932,6 +948,32 @@ class PipelineManager(metaclass=ABCMeta):
             return False
 
         return queue_config.dependencies_by_topic
+
+    def checkQueueConfigWithinLimits(self, cycle, history):
+        project = cycle[0].project
+        queue_config = self.getQueueConfig(project)
+        if queue_config is None:
+            return True
+        if queue_config.max_changes is None:
+            return True
+        count = len(cycle) + len(history)
+        if count > queue_config.max_changes:
+            return False
+
+        queues_by_project = {}
+        for item in self.pipeline.getAllItems():
+            project = item.changes[0].project
+            if project in queues_by_project:
+                item_queue_config = queues_by_project[project]
+            else:
+                item_queue_config = queues_by_project.setdefault(
+                    project, self.getQueueConfig(project))
+            if item_queue_config is not queue_config:
+                continue
+            count += len(item.changes)
+            if count > queue_config.max_changes:
+                return False
+        return True
 
     def getNonMergeableCycleChanges(self, item):
 

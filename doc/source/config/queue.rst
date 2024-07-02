@@ -103,3 +103,33 @@ Here is an example ``queue`` configuration.
       This setting requires :attr:`queue.allow-circular-dependencies`
       to also be set.  All of the caveats noted there continue to
       apply.
+
+   .. attr:: max-changes
+      :default: no limit
+
+      The number of changes (not queue items) from this queue allowed
+      in any individual pipeline used by this queue.  Live changes,
+      non-live changes used for dependencies, and changes that are
+      part of a dependency cycle are all counted.  If a change appears
+      in more than one queue item, it is counted multiple times.  Even
+      in a pipeline with an :value:`independent
+      <pipeline.manager.independent>` pipeline manager, changes from
+      all queue items in the pipeline are counted together.
+
+      For example, if this value was set to 100, then Zuul would allow
+      any of the following (but no more):
+
+      * 100 changes in individual queue items
+      * 1 queue item of 100 changes in a dependency cycle
+      * 1 queue item with 99 changes in a cyle plus one item depending
+        on that cycle
+
+      This does not affect other queues within the pipeline.
+
+      This value is not set by default, which means there is no limit.
+      It is generally expected that the pipeline window configuration
+      should be sufficient to protect against excessive resource
+      usage.  However in some circumstances with large dependency
+      cycles, setting this value may be useful.  Note that the value
+      ``0`` does not disable this option; instead it limits Zuul to
+      zero changes.

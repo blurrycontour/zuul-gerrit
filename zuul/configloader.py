@@ -1617,6 +1617,7 @@ class QueueParser:
                  'per-branch': bool,
                  'allow-circular-dependencies': bool,
                  'dependencies-by-topic': bool,
+                 'max-changes': int,
                  '_source_context': model.SourceContext,
                  '_start_mark': model.ZuulMark,
                  }
@@ -1630,6 +1631,7 @@ class QueueParser:
             conf.get('per-branch', False),
             conf.get('allow-circular-dependencies', False),
             conf.get('dependencies-by-topic', False),
+            conf.get('max-changes', None),
         )
         if (queue.dependencies_by_topic and not
             queue.allow_circular_dependencies):

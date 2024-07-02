@@ -8789,12 +8789,14 @@ class Semaphore(ConfigObject):
 class Queue(ConfigObject):
     def __init__(self, name, per_branch=False,
                  allow_circular_dependencies=False,
-                 dependencies_by_topic=False):
+                 dependencies_by_topic=False,
+                 max_changes=None):
         super().__init__()
         self.name = name
         self.per_branch = per_branch
         self.allow_circular_dependencies = allow_circular_dependencies
         self.dependencies_by_topic = dependencies_by_topic
+        self.max_changes = max_changes
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -8808,7 +8810,8 @@ class Queue(ConfigObject):
             self.allow_circular_dependencies ==
             other.allow_circular_dependencies and
             self.dependencies_by_topic ==
-            other.dependencies_by_topic
+            other.dependencies_by_topic and
+            self.max_changes == self.max_changes
         )
 
 
