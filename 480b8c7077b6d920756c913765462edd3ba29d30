@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "05f3316d_352cdbc9",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T21:31:05Z",
+      "side": 1,
+      "message": "-1: The old status page included the user-created description of the pipeline, but this one omits it.  However, the generic description of the pipeline manager is still included here as a tooltip.\n\nIf we can find a way to have both, that\u0027s great, but if we can only have one, then I think we should have the pipeline description available on this page.  This is where users and operators are going to see short names like \"gate\" and \"release-post\" all together in close proximity.  They should be able to find out what those words mean without needing to click to go to another page for each one.",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e8f5ad69_f0234640",
         "filename": "web/src/containers/status/PipelineSummary.jsx",
         "patchSetId": 7
