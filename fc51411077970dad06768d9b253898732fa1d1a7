@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ece3b616_f2caa7a4",
+        "filename": "web/src/index.css",
+        "patchSetId": 8
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T22:09:36Z",
+      "side": 1,
+      "message": "-1: This should not be white; it should be the same as the progress bar; black-500 I think.",
+      "revId": "fc51411077970dad06768d9b253898732fa1d1a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
