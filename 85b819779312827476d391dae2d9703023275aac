@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42b90a16_25b820e5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T22:16:42Z",
+      "side": 1,
+      "message": "-1: We need the reconfiguration time as an actual timestamp somewhere.  You can make it a mouseover or otherwise make it inconspicuous if you want to keep both, but if we only have one, it should be absolute.\n\nThe reason to have it in absolute time is in order to determine whether some item currently in a pipeline was started with the current configuration or an older one.  To do that, you need the exact reconfiguration time, as well as when the item configuration was frozen (which we don\u0027t have, but we do have the build start time which is close enough).\n\nI am curious what the use case for a relative timestamp is.  I can\u0027t think of one other than a general assurance that something happened either recently or not.  That would also be served by an absolute timestamp.",
+      "revId": "85b819779312827476d391dae2d9703023275aac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
