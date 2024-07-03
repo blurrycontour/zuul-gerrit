@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7a3e5be_fc06f567",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T21:26:05Z",
+      "side": 1,
+      "message": "-1: I would say \"show all pipelines\" (it\u0027s more correct, plus the reason to show all the pipelines is because this is the only place in the web ui where you can actually learn what the piplines are; using that phrasing helps confirm that, indeeed, all the pipelines that are defined are shown).",
+      "revId": "a385d1c8109644cd1d138062373f86f6c787f809",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f49e7ab_fdd308f2",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T21:26:05Z",
+      "side": 1,
+      "message": "You can remove the todo.",
+      "revId": "a385d1c8109644cd1d138062373f86f6c787f809",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
