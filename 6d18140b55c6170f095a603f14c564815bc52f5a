@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4dba839_694ff02d",
+        "filename": "web/src/index.css",
+        "patchSetId": 13
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T21:59:14Z",
+      "side": 1,
+      "message": "-1: Want to remove this comment?",
+      "revId": "6d18140b55c6170f095a603f14c564815bc52f5a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
