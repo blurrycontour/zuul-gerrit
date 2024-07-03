@@ -154,6 +154,8 @@ class LauncherApi:
             if request.is_locked:
                 # Request is locked by someone else
                 continue
+            if request.state == NodesetRequest.State.TEST_HOLD:
+                continue
 
             score_launchers = (
                 set(request._lscores.keys()) if request._lscores else set())

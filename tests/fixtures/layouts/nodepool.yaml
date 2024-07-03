@@ -54,7 +54,7 @@
     run: playbooks/base.yaml
     nodeset:
       nodes:
-        - label: ubuntu-xenial
+        - label: debian-normal
           name: controller
 
 - job:

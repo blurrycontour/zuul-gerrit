@@ -63,6 +63,7 @@ from zuul.executor.sensors.pause import PauseSensor
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.executor.common import zuul_params_from_job
+from zuul.launcher.client import LauncherClient
 from zuul.lib import commandsocket
 from zuul.merger.server import BaseMergeServer, RepoLocks
 from zuul.model import (
@@ -1019,6 +1020,7 @@ class AnsibleJob(object):
         self.build_request = build_request
         self.nodeset = None
         self.node_request = None
+        self.nodeset_request = None
         self.jobdir = None
         self.proc = None
         self.proc_lock = threading.Lock()
@@ -1256,6 +1258,15 @@ class AnsibleJob(object):
                     node_request_id,
                 )
                 raise NodeRequestError
+        elif nodeset_request_id := self.arguments.get("nodesetrequest_id"):
+            self.nodeset_request = self.executor_server.launcher.getRequest(
+                nodeset_request_id)
+            if self.nodeset_request is None:
+                self.log.error(
+                    "Unable to retrieve NodesetReqest %s from ZooKeeper",
+                    nodeset_request_id,
+                )
+                raise NodeRequestError
 
     def lockNodes(self):
         # If the node_request is not set, this probably means that the
@@ -1271,6 +1282,14 @@ class AnsibleJob(object):
                 self.log.exception(
                     "Error locking nodeset %s", self.nodeset
                 )
+                raise NodeRequestError
+        elif self.nodeset_request:
+            self.log.debug("Locking nodeset")
+            try:
+                self.executor_server.launcher.acceptNodeset(
+                    self.nodeset_request, self.nodeset)
+            except Exception:
+                self.log.exception("Error locking nodeset %s", self.nodeset)
                 raise NodeRequestError
 
     def unlockNodes(self):
@@ -1291,6 +1310,14 @@ class AnsibleJob(object):
                 self.log.exception(
                     "Unable to return nodeset %s", self.nodeset
                 )
+        elif self.nodeset_request:
+            tenant_name = self.arguments["zuul"]["tenant"]
+            project_name = self.arguments["zuul"]["project"]["canonical_name"]
+            duration = self.end_time - self.time_starting_build
+            try:
+                self.executor_server.launcher.returnNodeset(self.nodeset)
+            except Exception:
+                self.log.exception("Unable to return nodeset %s", self.nodeset)
 
     def loadRepoState(self):
         repo_state_keys = self.arguments.get('repo_state_keys')
@@ -1565,6 +1592,9 @@ class AnsibleJob(object):
             project_name = self.arguments["zuul"]["project"]["canonical_name"]
             self.executor_server.nodepool.useNodeSet(
                 self.nodeset, tenant_name, project_name, self.zuul_event_id)
+        elif self.nodeset_request:
+            self.executor_server.launcher.useNodeset(
+                self.nodeset, self.zuul_event_id)
 
         # This prepares each playbook and the roles needed for each.
         self.preparePlaybooks(args)
@@ -3616,6 +3646,7 @@ class ExecutorServer(BaseMergeServer):
         self.system = ZuulSystem(self.zk_client)
         self.nodepool = Nodepool(self.zk_client, self.system.system_id,
                                  self.statsd)
+        self.launcher = LauncherClient(self.zk_client, None)
 
         self.result_events = PipelineResultEventQueue.createRegistry(
             self.zk_client)
