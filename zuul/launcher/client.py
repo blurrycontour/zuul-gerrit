@@ -45,11 +45,9 @@ class LauncherClient:
         span_info = tracing.getSpanInfo(request_span)
 
         with self.createZKContext(None, self.log) as ctx:
-            state = (NodesetRequest.State.REQUESTED if job.nodeset.nodes
-                     else NodesetRequest.State.FULFILLED)
             request = NodesetRequest.new(
                 ctx,
-                state=state,
+                state=self._getInitialRequestState(job),
                 tenant_name=item.pipeline.tenant.name,
                 pipeline_name=item.pipeline.name,
                 buildset_uuid=buildset.uuid,
@@ -132,3 +130,7 @@ class LauncherClient:
 
     def createZKContext(self, lock, log):
         return ZKContext(self.zk_client, lock, self.stop_event, log)
+
+    def _getInitialRequestState(self, job):
+        return (NodesetRequest.State.REQUESTED if job.nodeset.nodes
+                else NodesetRequest.State.FULFILLED)
