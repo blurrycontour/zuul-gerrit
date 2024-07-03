@@ -249,6 +249,15 @@ class Nodepool(object):
             except Exception:
                 log.exception("Unable to unlock node request %s", request)
 
+    def isNodeRequestID(self, request_id):
+        try:
+            # Node requests are of the form '100-0000000001' with the third
+            # character separating the request priority from the sequence
+            # number.
+            return request_id[3] == "-"
+        except Exception:
+            return False
+
     def holdNodeSet(self, nodeset, request, build, duration,
                     zuul_event_id=None):
         '''
