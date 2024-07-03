@@ -1079,8 +1079,21 @@ class PipelineManager(metaclass=ABCMeta):
                         item, item.getChangeForJob(job))
                 else:
                     relative_priority = 0
-                self._makeNodepoolRequest(
-                    log, build_set, job, relative_priority)
+                if self._useNodepoolFallback(log, job):
+                    self._makeNodepoolRequest(
+                        log, build_set, job, relative_priority)
+                else:
+                    self._makeLauncherRequest(
+                        log, build_set, job, relative_priority)
+        return True
+
+    def _useNodepoolFallback(self, log, job):
+        labels = {n.label for n in job.nodeset.getNodes()}
+        for provider in self.pipeline.tenant.layout.providers.values():
+            labels -= {pl.name for pl in provider.labels}
+            if not labels:
+                return False
+        log.debug("Falling back to Nodepool due to missing labels: %s", labels)
         return True
 
     def _makeNodepoolRequest(self, log, build_set, job, relative_priority,
@@ -1103,6 +1116,21 @@ class PipelineManager(metaclass=ABCMeta):
             build_set.setJobNodeSetInfo(job, nodeset_info)
         else:
             job.setWaitingStatus(f'node request: {req.id}')
+
+    def _makeLauncherRequest(self, log, build_set, job, alternative=0):
+        provider = self._getPausedParentProvider(build_set, job)
+        priority = self._calculateNodeRequestPriority(build_set, job)
+        item = build_set.item
+        req = self.sched.launcher.requestNodeset(item, job, priority, provider)
+        log.debug("Adding nodeset request %s for job %s to item %s",
+                  req, job, item)
+        build_set.setJobNodeRequestID(job, req.uuid)
+        if req.fulfilled and not req.labels:
+            # Short circuit empty node request
+            nodeset_info = model.NodesetInfo()
+            build_set.setNodesetInfo(job, nodeset_info)
+        else:
+            job.setWaitingStatus(f'nodeset request: {req.uuid}')
 
     def _getPausedParent(self, build_set, job):
         job_graph = build_set.job_graph
@@ -2165,13 +2193,13 @@ class PipelineManager(metaclass=ABCMeta):
         return True
 
     def onNodesProvisioned(self, request, nodeset_info, build_set):
-        log = get_annotated_logger(self.log, request.event_id)
+        log = get_annotated_logger(self.log, request)
 
         self.reportPipelineTiming('node_request_time', request.created_time)
         job = build_set.item.getJob(request.job_uuid)
         # First see if we need to retry the request
         if not request.fulfilled:
-            log.info("Node request %s: failure for %s",
+            log.info("Node(set) request %s: failure for %s",
                      request, job.name)
             if self._handleNodeRequestFallback(log, build_set, job, request):
                 return
@@ -2180,7 +2208,7 @@ class PipelineManager(metaclass=ABCMeta):
         # Put a fake build through the cycle to clean it up.
         if not request.fulfilled:
             build_set.item.setNodeRequestFailure(
-                job, f'Node request {request.id} failed')
+                job, f'Node(set) request {request.id} failed')
             self._resumeBuilds(build_set)
             pipeline = build_set.item.pipeline
             tenant = pipeline.tenant
@@ -2189,7 +2217,7 @@ class PipelineManager(metaclass=ABCMeta):
             tenant.semaphore_handler.release(
                 event_queue, build_set.item, job)
 
-        log.info("Completed node request %s for job %s of item %s "
+        log.info("Completed node(set) request %s for job %s of item %s "
                  "with nodes %s",
                  request, job.name, build_set.item, request.nodes)
 
