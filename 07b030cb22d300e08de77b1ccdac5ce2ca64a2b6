@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6894b4f_0760e361",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T20:08:48Z",
+      "side": 1,
+      "message": "This is used on the item panel; is there a way to navigate to the item panel in this change?  I\u0027d like to see this change in the previouw, but so far we just have the status page and there\u0027s no way to get off of that.",
+      "revId": "07b030cb22d300e08de77b1ccdac5ce2ca64a2b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1704d05_509f2cd7",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T20:08:48Z",
+      "side": 1,
+      "message": "-1: Bring over the copyright headers unless you\u0027re certain they\u0027re not needed.",
+      "revId": "07b030cb22d300e08de77b1ccdac5ce2ca64a2b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
