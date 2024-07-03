@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a9dd94f_4cdf29e5",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T19:26:36Z",
+      "side": 1,
+      "message": "-1: This appears to be at least partially a code reorganization including code from a file that has a (c) 2018 redhat line.  Unless you have done detailed analysis of the individual lines of code and their commits, I would expect at least the (c) lines from the original file to be copied over.",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8f5ad69_f0234640",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T19:26:36Z",
+      "side": 1,
+      "message": "-1: Serial pipelines also share that characteristic.  Perhaps they should be added to this list?\n\nEven better, rather than enumerating the types here which risks bitrotting, how about we combine any queues that don\u0027t have names?  That actually matches what you said in your comment (and I think that\u0027s what we really do want to accomplish here), and that\u0027s currently the best way to determine what kind of queue it is (it\u0027s a named queue if it has a name).",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37eb4f59_add07824",
+        "filename": "web/src/index.css",
+        "patchSetId": 7
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T19:26:36Z",
+      "side": 1,
+      "message": "The changing on hover makes me think clicking should be actionable; but it isn\u0027t yet.  Maybe it will be in a later change; if so, great.  If not... then I would question what we\u0027re trying to communicate with the hover color.",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33a4fb12_54c6a42d",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T19:26:36Z",
+      "side": 1,
+      "message": "That would probably eat CPU and memory without benefit, right?  If we use the same status object from the redux store, then we\u0027re saving memory.",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
