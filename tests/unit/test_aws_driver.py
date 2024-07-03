@@ -48,3 +48,16 @@ class TestAwsDriver(ZuulTestCase):
         provider = providers[0]
         endpoint = provider.getEndpoint()
         self.assertTrue(len(endpoint.testListAmis()) > 1)
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_jobs_executed(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('check-job').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(self.getJobFromHistory('check-job').node,
+                         'debian-normal')
