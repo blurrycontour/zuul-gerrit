@@ -117,40 +117,16 @@ class ExecutorClient(object):
         # TODO (swestphahl): Remove deprecated 'max_attempts' parameter
         params['max_attempts'] = job.attempts
 
-        # Store the NodeRequest ID in the job arguments, so we can look it up
-        # on the executor side to lock the nodes.
-        req_id = build.build_set.getJobNodeRequestID(job)
-        if isinstance(req_id, dict):
-            # This is a stop-gap.  It is possible for this to happen
-            # if a queue item completes all its builds and is removed
-            # while one of its builds is deduplicated in another queue
-            # item in an independent pipeline.  The bundle refactor
-            # work will remove this possibility at which point this
-            # code can be removed.  In the mean time, if we encounter
-            # this case, restart the build to try to keep things
-            # moving.
-            self.log.error(
-                "Attempt to start build with deduplicated node request ID "
-                f"{req_id}")
-            data = {"start_time": time.time()}
-            started_event = BuildStartedEvent(
-                build.uuid, build.build_set.uuid, job.uuid,
-                None, data, zuul_event_id=build.zuul_event_id)
-            self.result_events[pipeline.tenant.name][pipeline.name].put(
-                started_event
-            )
-
-            result = {"result": None, "end_time": time.time()}
-            completed_event = BuildCompletedEvent(
-                build.uuid, build.build_set.uuid, job.uuid,
-                None, result, zuul_event_id=build.zuul_event_id)
-            self.result_events[pipeline.tenant.name][pipeline.name].put(
-                completed_event
-            )
-            return
-
-        if req_id:
-            params["noderequest_id"] = req_id
+        # Store the Node(set)Request ID in the job arguments, so we can look
+        # it up on the executor side to lock the nodes.
+        if req_id := build.build_set.getJobNodeRequestID(job):
+            if self.sched.nodepool.isNodeRequestID(req_id):
+                params["noderequest_id"] = req_id
+            else:
+                # Note: We'll only create nodeset requests when all
+                # components are updated to the model API version supporting
+                # those requests, so we don't need to check for that here.
+                params["nodesetrequest_id"] = req_id
 
         zone_known = False
         if executor_zone:
