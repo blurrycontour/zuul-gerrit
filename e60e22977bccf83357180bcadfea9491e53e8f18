@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb0b078e_3800858d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-03T22:19:38Z",
+      "side": 1,
+      "message": "-1: This looks a bit awkward on a short page; it looks more like a section header than a footer.\n\nIf you want to keep this, then I think it should never be higher than the bottom of the viewport, and use smaller type.\n\nBut actually we have the components page now, and that seems better at this anyway, so maybe we should just drop it?",
+      "revId": "e60e22977bccf83357180bcadfea9491e53e8f18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
