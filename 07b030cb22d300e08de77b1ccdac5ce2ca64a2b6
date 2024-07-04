@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1b4076b2_8dc0e98f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T05:09:08Z",
+      "side": 1,
+      "message": "Good point. The ItemPanel is also used for the single change view, but apparently that is not reachable anymore in this change. It is reachable again in https://review.opendev.org/c/zuul/zuul/+/916287/9. It\u0027s not ideal, but could you check out that change? Click on a pipeline name to go to the PipelineDetailsView for that pipeline and then click on the \"Show details\" link on a QueueItem: https://imgur.com/a/3CNRu86. That will open the single change view where the item panel is used in the same way it was also used on the old status page.\n\nAFAIK I didn\u0027t change anything on the helper methods between this change and 916287, so the styling should be the same.",
+      "parentUuid": "b6894b4f_0760e361",
+      "revId": "07b030cb22d300e08de77b1ccdac5ce2ca64a2b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e1704d05_509f2cd7",
         "filename": "web/src/containers/status/Misc.jsx",
         "patchSetId": 7
