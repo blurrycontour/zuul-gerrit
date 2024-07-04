@@ -197,7 +197,7 @@ class TestGithubModelUpgrade(ZuulTestCase):
     @model_version(28)
     @simple_layout('layouts/simple.yaml')
     def test_model_28(self):
-        # This excercises the old side of the buildset
+        # This exercises the old side of the buildset
         # dependent_changes upgrade.  We don't need to perform an
         # upgrade in this test since the only behavior switch is on
         # the write side.  The read side will be tested in the new
@@ -208,8 +208,14 @@ class TestGithubModelUpgrade(ZuulTestCase):
         B.setDependsOn(A, 1)
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
+
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
         self.assertHistory([
             dict(name='check-job', result='SUCCESS'),
+            dict(name='post-job', result='SUCCESS'),
         ], ordered=False)
 
 

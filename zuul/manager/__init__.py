@@ -1134,7 +1134,7 @@ class PipelineManager(metaclass=ABCMeta):
         # dependent_changes is either fully populated (old) or a list of
         # change refs we need to convert into the change dict)
         if (build_set.dependent_changes and
-            'change_message' in build_set.dependent_changes[0]):
+            'ref' not in build_set.dependent_changes[0]):
             # MODEL_API < 29
             dependent_changes = build_set.dependent_changes
         else:
