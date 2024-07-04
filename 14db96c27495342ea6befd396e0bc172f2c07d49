@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a93249b4_ee7f5fdb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T13:23:31Z",
+      "side": 1,
+      "message": "I\u0027ve merged this change into https://review.opendev.org/c/zuul/zuul/+/916287. As this change doesn\u0027t contain any comments regarding styling, I\u0027ll simply close it and we can discuss/fix any style issues in the change posted above.",
+      "revId": "14db96c27495342ea6befd396e0bc172f2c07d49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
