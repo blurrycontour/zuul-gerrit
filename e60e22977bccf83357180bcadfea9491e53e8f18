@@ -16,6 +16,24 @@
       "message": "-1: This looks a bit awkward on a short page; it looks more like a section header than a footer.\n\nIf you want to keep this, then I think it should never be higher than the bottom of the viewport, and use smaller type.\n\nBut actually we have the components page now, and that seems better at this anyway, so maybe we should just drop it?",
       "revId": "e60e22977bccf83357180bcadfea9491e53e8f18",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6348f8c3_ced15671",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T09:28:30Z",
+      "side": 1,
+      "message": "This was meant as an equivalent to the footer on the old status page. If we decide that we don\u0027t need one, we can simply drop this change.\n\nThe design is based on the PF4 footer (which apparently has the same problem when there isn\u0027t enough content on the page). I tried to fix this but didn\u0027t find a working solution without breaking the page layout.\n\nUsing the components page for this use case works for me.",
+      "parentUuid": "bb0b078e_3800858d",
+      "revId": "e60e22977bccf83357180bcadfea9491e53e8f18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
