@@ -513,16 +513,6 @@ itself. Status name, description, and context is taken from the pipeline.
    .. TODO support role markup in :default: so we can xref
       :attr:`web.status_url` below
 
-   .. attr:: status-url
-      :default: link to the build status page
-      :type: string
-
-      URL to set in the Github status.
-
-      Defaults to a link to the build status or results page.  This
-      should probably be left blank unless there is a specific reason
-      to override it.
-
    .. attr:: check
       :type: string
 

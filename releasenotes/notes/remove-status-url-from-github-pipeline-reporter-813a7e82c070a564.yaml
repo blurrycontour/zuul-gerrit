@@ -1,0 +1,5 @@
+---
+deprecations:
+  - |
+    Remove the `status-url` parameter from the Github Pipeline reporter setting.
+    This parameter was not used.
