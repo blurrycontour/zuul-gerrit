@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4423670b_c3024683",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T05:22:16Z",
+      "side": 1,
+      "message": "\u003e I don\u0027t think we should merge this change without the toggle, and since it exists now, I think you should squash the toggle change into this one.\n\nI thought about this as well - and I think I even tried it - but I would have to reorder some of the changes in order to do so (some of the changes in between this change and the \"Add switch\" change are needed for the latter one, so I would have to integrate them as well or move them down up in the stack. Maybe I can try to include all the \"improve/align layout\" changes into their corresponding changes where the component was introduced.",
+      "revId": "4bf74f8272856ce91b9439a7007dd880ec027118",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
