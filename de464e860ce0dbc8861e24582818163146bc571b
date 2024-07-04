@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36c0a75c_71da1c0c",
+        "filename": "web/src/index.css",
+        "patchSetId": 9
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T13:33:16Z",
+      "side": 1,
+      "message": "As Jim suggested on the original change (https://review.opendev.org/c/zuul/zuul/+/917039/comment/ece3b616_f2caa7a4/), I\u0027ve changed the color from white to a black. I decided to use black-300 as I find that black-500 is hard to differentiate from the dark background. For the hover color I used black-400. Let me know if that suits you.",
+      "revId": "de464e860ce0dbc8861e24582818163146bc571b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
