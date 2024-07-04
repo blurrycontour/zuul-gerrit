@@ -103,6 +103,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bba5ea0_e5807857",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T10:03:42Z",
+      "side": 1,
+      "message": "Yep, that was exactly my intention. I wanted to have a reference, so we can clean up later. If we don\u0027t need that, I\u0027ll remove the comments.",
+      "parentUuid": "01ccacef_1cd4806e",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2cbd4bd3_07b25b0a",
@@ -116,6 +134,24 @@
       "writtenOn": "2024-07-03T21:17:05Z",
       "side": 1,
       "message": "ditto.",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f50cbbe_d3d7db0e",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T10:03:42Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2cbd4bd3_07b25b0a",
       "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
