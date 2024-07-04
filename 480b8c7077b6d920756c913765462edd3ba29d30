@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9794773_76738411",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T10:13:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a9dd94f_4cdf29e5",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "05f3316d_352cdbc9",
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "The hover effect should be part of the change that introduces the \"QueueItemPopover\". I think I already moved the effect to change the cursor to a pointer on hover, but it looks like I forgot the color effect. I will move it to the appropriate change.",
       "parentUuid": "37eb4f59_add07824",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "caaa074d_43ae297f",
+        "filename": "web/src/index.css",
+        "patchSetId": 7
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T10:13:02Z",
+      "side": 1,
+      "message": "I\u0027ve moved the hover effect to https://review.opendev.org/c/zuul/zuul/+/916286 (the change that introduces the QueueItemPopover).",
+      "parentUuid": "dd500e7c_b327856c",
       "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
