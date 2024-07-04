@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f06ca02d_0bdd7b3a",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T09:18:29Z",
+      "side": 1,
+      "message": "I think I started with that approach, but that resulted in some weird behaviour if there is a mix of named and unnamed queues. I will have another look and see if I can improve this somehow.",
+      "parentUuid": "e8f5ad69_f0234640",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "37eb4f59_add07824",
         "filename": "web/src/index.css",
         "patchSetId": 7
@@ -71,6 +89,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dd500e7c_b327856c",
+        "filename": "web/src/index.css",
+        "patchSetId": 7
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T09:18:29Z",
+      "side": 1,
+      "message": "The hover effect should be part of the change that introduces the \"QueueItemPopover\". I think I already moved the effect to change the cursor to a pointer on hover, but it looks like I forgot the color effect. I will move it to the appropriate change.",
+      "parentUuid": "37eb4f59_add07824",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "33a4fb12_54c6a42d",
         "filename": "web/src/pages/PipelineOverview.jsx",
         "patchSetId": 7
@@ -82,6 +118,24 @@
       "writtenOn": "2024-07-03T19:26:36Z",
       "side": 1,
       "message": "That would probably eat CPU and memory without benefit, right?  If we use the same status object from the redux store, then we\u0027re saving memory.",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3851997_51b154cf",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T09:18:29Z",
+      "side": 1,
+      "message": "This was mainly a TODO for me that this would be the place to implement some filtering as long as the status API returns everything - and we don\u0027t support that kind of filtering in the backend.",
+      "parentUuid": "33a4fb12_54c6a42d",
       "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
