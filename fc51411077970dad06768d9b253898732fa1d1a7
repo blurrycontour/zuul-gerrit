@@ -16,6 +16,24 @@
       "message": "-1: This should not be white; it should be the same as the progress bar; black-500 I think.",
       "revId": "fc51411077970dad06768d9b253898732fa1d1a7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "156a8e21_932e6e06",
+        "filename": "web/src/index.css",
+        "patchSetId": 8
+      },
+      "lineNbr": 789,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-04T13:03:29Z",
+      "side": 1,
+      "message": "I tried black-500, but I find that too dark. It\u0027s hard to see the squares on the dark background. Lets\u0027s go for dark-300 and see how that looks. I will integrate that directly in https://review.opendev.org/c/zuul/zuul/+/916284 when merging the relevant parts of this change into it.",
+      "parentUuid": "ece3b616_f2caa7a4",
+      "revId": "fc51411077970dad06768d9b253898732fa1d1a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
