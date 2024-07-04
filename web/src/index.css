@@ -212,8 +212,7 @@ a.refresh {
 }
 
 .zuul-item-square {
-    /* We make this clickable in a follow-up change */
-    cursor: default;
+    cursor: pointer;
     opacity: 0.7;
     padding: 0 !important;
 }
@@ -221,17 +220,37 @@ a.refresh {
 .zuul-item-square-success {
     color: var(--pf-global--success-color--100) !important;
 }
+.zuul-item-square-success svg:hover {
+    opacity: 1;
+    color: var(--pf-global--palette--green-600) !important;
+}
 .zuul-item-square-danger {
     color: var(--pf-global--danger-color--100) !important;
+}
+.zuul-item-square-danger svg:hover {
+    opacity: 1;
+    color: var(--pf-global--danger-color--200) !important;
 }
 .zuul-item-square-info {
     color: var(--pf-global--info-color--100) !important;
 }
+.zuul-item-square-info svg:hover {
+    opacity: 1;
+    color: var(--pf-global--palette--blue-500) !important;
+}
 .zuul-item-square-warning {
     color: var(--pf-global--warning-color--100) !important;
 }
+.zuul-item-square-warning svg:hover {
+    opacity: 1;
+    color: var(--pf-global--palette--orange-400) !important;
+}
 .zuul-item-square-pending {
     color: var(--pf-global--palette--black-500) !important;
+}
+.zuul-item-square-pending svg:hover {
+    opacity: 1;
+    color: var(--pf-global--palette--black-700) !important;
 }
 
 .zuul-pipeline-header h3 {
@@ -259,9 +278,14 @@ a.refresh {
     padding: 4px;
 }
 
-.zuul-change-total-result {
+/* Backwards-compatibility for progress bar on Change/Item panel */
+.zuul-status-content .zuul-change-total-result {
     height: 10px;
     width: 180px;
+}
+
+.zuul-change-total-result {
+    width: 100%;
     margin: 0;
     display: inline-block;
     vertical-align: middle;
