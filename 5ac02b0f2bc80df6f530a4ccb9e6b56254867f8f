@@ -106,6 +106,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb7d40a1_c319aab7",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-08T08:32:28Z",
+      "side": 1,
+      "message": "Resolving the comment to keep track on what is still open.",
+      "parentUuid": "2b241ba8_bcc1edc3",
+      "range": {
+        "startLine": 56,
+        "startChar": 44,
+        "endLine": 56,
+        "endChar": 46
+      },
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "24f1c40a_f4abf2cc",
@@ -153,6 +177,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc5bce28_9f8d7755",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-08T08:32:28Z",
+      "side": 1,
+      "message": "Implemented in https://review.opendev.org/c/zuul/zuul/+/921790",
+      "parentUuid": "37734c0a_32d75fad",
+      "range": {
+        "startLine": 58,
+        "startChar": 15,
+        "endLine": 58,
+        "endChar": 28
+      },
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8fb6b310_3173e390",
@@ -166,6 +214,24 @@
       "writtenOn": "2024-05-02T18:47:16Z",
       "side": 1,
       "message": "Might be safer to add a new route for the component, presently the status page does not seem usable. How about adding a new `/status/pipelines` path?",
+      "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76e0d589_71dbbae4",
+        "filename": "web/src/routes.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-08T08:32:28Z",
+      "side": 1,
+      "message": "We decided to merge this stack of changes once everything is ready and directly replace the current status page.",
+      "parentUuid": "8fb6b310_3173e390",
       "revId": "5ac02b0f2bc80df6f530a4ccb9e6b56254867f8f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
