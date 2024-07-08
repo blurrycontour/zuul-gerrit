@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3d579a74_cbd5712f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-08T13:36:34Z",
+      "side": 1,
+      "message": "I get the point that we might want to improve the layout to clearly show that a check pipeline has multiple queues, respectively that the items in check are independent of each other (running in parallel). I tried out different approaches in the beginning but none of them really worked and made the check pipeline look much weirder than it currently is 😄\n\nIn the beginning I used a similar approach for the check pipeline by adding some space in between the queues in the check pipeline. However this looked weird - especially pipelines with a lot of items. One drawback was that I couldn\u0027t manage to get some kind of grid working. So either the beginning or the end of a line didn\u0027t match the previous one and also the items looked completely unordered. Something like the following (X stands for a queue item square/box):\n\nX  XX  X  XXX  X\n X  X  XX  X  X XX\nX  X  X  XX  X  X\n\nHowever this was also based on a flex-layout. I\u0027m pretty sure I also tried using a grid-layout but can\u0027t remember which problems I had with that.\n\nAnyway, if I understood your idea correctly you suggest to divide the space into different columns and show each queue in a single cell (so basically a grid 😄). This might waste more space for many \"single change queues\", but maybe works better for aligning the spaces in between the queues and ensure that the items are arranged properly. I\u0027ll try a grid-layout again and see where this leads. Let me know in case I\u0027m on the wrong track here or totally misunderstood your comment.",
+      "parentUuid": "a3824c08_2b37482e",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57bc08d9_e2a42e20",
         "filename": "web/src/containers/status/Misc.jsx",
         "patchSetId": 9
