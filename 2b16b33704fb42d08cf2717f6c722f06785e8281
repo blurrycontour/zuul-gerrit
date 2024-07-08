@@ -33,6 +33,24 @@
       "message": "Could we add basic change information in a `title` attribute to have a quick feedback without having to click the box?",
       "revId": "2b16b33704fb42d08cf2717f6c722f06785e8281",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3eeed910_f10dd113",
+        "filename": "web/src/containers/status/QueueItemPopover.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-08T13:17:04Z",
+      "side": 1,
+      "message": "I\u0027ve implemented https://review.opendev.org/c/zuul/zuul/+/923647 as a follow-up change to open the QueueItemPopover when hovering over the boxes. I think there were also other comments about \"showing some details without the need to click\", so maybe this is the way to go.",
+      "parentUuid": "1eb85a97_23e8ffee",
+      "revId": "2b16b33704fb42d08cf2717f6c722f06785e8281",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
