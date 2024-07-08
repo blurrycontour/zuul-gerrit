@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -33,12 +33,33 @@ function QueueItemPopover({ item, triggerElement, tenant }) {
   // TODO (felix): Move the triggerElement to be used as children
   // instead. This should make the usage of the QueueItemPopover
   // a little nicer.
+
+  const [isVisible, setIsVisible] = useState(false)
   const times = calculateQueueItemTimes(item)
 
   return (
     <Popover
       className="zuul-queue-item-popover"
       aria-label="QueueItem Popover"
+      position="top"
+      isVisible={isVisible}
+      // Set minimal distance to target element, so we are able to move
+      // the cursor to the popover without closing it (this is only
+      // needed when the popover was opened via hover and not via a
+      // click).
+      // TODO (felix): The Popover is larger in light mode than in dark
+      // mode, which makes it overlapping with the trigger/target element.
+      distance={1}
+      // Custom open/close handlers to allow opening the popover via
+      // a mouse hover over the triggerElement. The "click listeners"
+      // (shouldOpen, shouldClose) are still used to allow closing the
+      // popover with a click when it was opened via a hover. This is
+      // useful if you want to switch to another QueueItemSqwuare
+      // (triggerElelemt) that is overlapped by the active popover.
+      shouldOpen={() => setIsVisible(true)}
+      shouldClose={() => setIsVisible(false)}
+      onMouseEnter={() => setIsVisible(true)}
+      onMouseLeave={() => setIsVisible(false)}
       headerContent={
         getRefs(item).map((change, idx) => (
           <div key={idx}>
@@ -54,7 +75,12 @@ function QueueItemPopover({ item, triggerElement, tenant }) {
       }
     >
       {/* The triggerElement must be placed within the Popover to open it */}
-      {triggerElement}
+      <span
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+      >
+        {triggerElement}
+      </span>
     </Popover>
   )
 }
