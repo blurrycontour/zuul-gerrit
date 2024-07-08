@@ -1642,33 +1642,11 @@ class Scheduler(threading.Thread):
         if item.live:
             return None
 
-        # If this is a non-live item we may be looking at a
-        # "foreign" project, ie, one which is not defined in the
-        # config but is constructed ad-hoc to satisfy a
-        # cross-repo-dependency.  Find the corresponding live item
-        # and use its source.
-        child = item
-        while child and not child.live:
-            # This assumes that the queue does not branch behind this
-            # item, which is currently true for non-live items; if
-            # that changes, this traversal will need to be more
-            # complex.
-            if child.items_behind:
-                child = child.items_behind[0]
-            else:
-                child = None
-        if child is item:
-            return None
-        if child and child.live:
-            for child_change in child.changes:
-                (child_trusted, child_project) = tenant.getProject(
-                    child_change.project.canonical_name)
-                if child_project:
-                    source = child_project.source
-                    new_project = source.getProject(project.name)
-                    return new_project
-
-        return None
+        # If this is a non-live item we may be looking at a "foreign"
+        # project, i.e. one which is not defined in the config but
+        # accessible by one of the configured connections. In this case
+        # we just keep using the existing project.
+        return change.project
 
     def _reenqueuePipeline(self, tenant, new_pipeline, context):
         self.log.debug("Re-enqueueing changes for pipeline %s",
