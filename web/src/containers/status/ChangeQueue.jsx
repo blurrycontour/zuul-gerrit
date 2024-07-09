@@ -163,7 +163,7 @@ Branch.propTypes = {
   newBranch: PropTypes.bool,
 }
 
-function ChangeQueue({ queue, pipeline }) {
+function ChangeQueue({ queue, pipeline, showTitle=true }) {
   // TODO (felix): Use useMemo hook to cache the rendered tree across re-renders
   const trees = []
   queue.heads.forEach(head => (
@@ -172,7 +172,7 @@ function ChangeQueue({ queue, pipeline }) {
   return (
     <>
       <Card isPlain className="zuul-change-queue">
-        {queue.name ?
+        {showTitle && queue.name ?
           <CardTitle>
             <Title headingLevel="h3" style={{ padding: 0, margin: 0 }}>
               {queue.name}
