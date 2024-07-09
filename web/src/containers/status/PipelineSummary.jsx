@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
@@ -26,11 +26,16 @@ import {
   FlexItem,
   Tooltip,
 } from '@patternfly/react-core'
-import { SquareIcon } from '@patternfly/react-icons'
+import {
+  SquareIcon,
+  AngleRightIcon,
+  AngleDownIcon,
+} from '@patternfly/react-icons'
 
 import QueueItemPopover from './QueueItemPopover'
 import { PipelineIcon, getQueueItemIconConfig } from './Misc'
 import { makeQueryString } from '../FilterToolbar'
+import ChangeQueue from './ChangeQueue'
 
 function QueueItemSquareWithPopover({ item }) {
   return (
@@ -61,8 +66,58 @@ QueueItemSquare.propTypes = {
   item: PropTypes.object,
 }
 
+function QueueCard({pipeline, queue, allQueuesExpanded}) {
+  const [isQueueExpanded, setIsQueueExpanded] = useState(undefined)
+  const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(undefined)
 
-function QueueSummary({ pipeline, pipelineType, showAllQueues }) {
+  // If the pipeline toggle is changed, update the queue toggles to match.
+  if (allQueuesExpanded !== areAllQueuesExpanded) {
+    setAreAllQueuesExpanded(allQueuesExpanded)
+    setIsQueueExpanded(allQueuesExpanded)
+  }
+
+  const onQueueToggle = () => {
+    setIsQueueExpanded(!isQueueExpanded)
+  }
+
+  return (
+    <Flex>
+      <FlexItem>
+        <Card isPlain className="zuul-compact-card">
+          <CardTitle>
+            {queue.name}
+            {queue.branch ? ` (${queue.branch})` : ''}
+            {isQueueExpanded ?
+              <AngleDownIcon style={{marginLeft: 8}} onClick={onQueueToggle}/>
+              :
+              <AngleRightIcon style={{marginLeft: 8}} onClick={onQueueToggle}/>
+            }
+          </CardTitle>
+          {isQueueExpanded ? null :
+            <CardBody style={{ paddingBottom: '0' }}>
+              {queue.heads.map((head) => (
+                head.map((item) => <QueueItemSquareWithPopover item={item} key={item.id} />)
+              ))}
+            </CardBody>
+          }
+          {isQueueExpanded ?
+            <div>
+              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false}/>
+            </div> : null
+          }
+        </Card>
+      </FlexItem>
+    </Flex>
+  )
+}
+
+QueueCard.propTypes = {
+  pipeline: PropTypes.object,
+  queue: PropTypes.object,
+  allQueuesExpanded: PropTypes.bool,
+}
+
+function QueueSummary({ pipeline, pipelineType, showAllQueues, allQueuesExpanded }) {
   let changeQueues = pipeline.change_queues
   // Dependent pipelines usually come with named queues, so we will
   // visualize each queue individually. For other pipeline types, we
@@ -75,21 +130,10 @@ function QueueSummary({ pipeline, pipelineType, showAllQueues }) {
     }
     return (
       changeQueues.map((queue) => (
-        <Flex key={`${queue.name}${queue.branch}`}>
-          <FlexItem>
-            <Card isPlain className="zuul-compact-card">
-              <CardTitle>
-                {queue.name}
-                {queue.branch ? ` (${queue.branch})` : ''}
-              </CardTitle>
-              <CardBody style={{ paddingBottom: '0' }}>
-                {queue.heads.map((head) => (
-                  head.map((item) => <QueueItemSquareWithPopover item={item} key={item.id} />)
-                ))}
-              </CardBody>
-            </Card>
-          </FlexItem>
-        </Flex>
+        <QueueCard key={`${queue.name}${queue.branch}`}
+                   pipeline={pipeline}
+                   queue={queue}
+                   allQueuesExpanded={allQueuesExpanded}/>
       ))
     )
   } else {
@@ -98,7 +142,14 @@ function QueueSummary({ pipeline, pipelineType, showAllQueues }) {
         display={{ default: 'inlineFlex' }}
         spaceItems={{ default: 'spaceItemsNone' }}
       >
-        {changeQueues.map((queue) => (
+        {allQueuesExpanded ?
+          changeQueues.map((queue, idx) => (
+            <div key={idx}>
+              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false}/>
+            </div>
+          ))
+          :
+          changeQueues.map((queue) => (
           queue.heads.map((head) => (
             head.map((item) => (
               <FlexItem key={item.id}>
@@ -106,7 +157,8 @@ function QueueSummary({ pipeline, pipelineType, showAllQueues }) {
               </FlexItem>
             ))
           ))
-        ))}
+        ))
+        }
       </Flex>
     )
   }
@@ -116,12 +168,17 @@ QueueSummary.propTypes = {
   pipeline: PropTypes.object,
   pipelineType: PropTypes.string,
   showAllQueues: PropTypes.bool,
+  allQueuesExpanded: PropTypes.bool,
 }
 
 function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
 
   const pipelineType = pipeline.manager || 'unknown'
   const itemCount = pipeline._count
+  const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(undefined)
+  const onQueueToggle = () => {
+    setAreAllQueuesExpanded(!areAllQueuesExpanded)
+  }
 
   return (
     <Card className="zuul-pipeline-summary zuul-compact-card">
@@ -152,9 +209,14 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
             {itemCount}
           </Badge>
         </Tooltip>
+        {areAllQueuesExpanded ?
+          <AngleDownIcon style={{marginLeft: 8, float:'right'}} onClick={onQueueToggle}/>
+          :
+          <AngleRightIcon style={{marginLeft: 8, float:'right'}} onClick={onQueueToggle}/>
+        }
       </CardTitle>
       <CardBody>
-        <QueueSummary pipeline={pipeline} pipelineType={pipelineType} showAllQueues={showAllQueues} />
+        <QueueSummary pipeline={pipeline} pipelineType={pipelineType} showAllQueues={showAllQueues} allQueuesExpanded={areAllQueuesExpanded}/>
       </CardBody>
 
     </Card>
