@@ -16,6 +16,24 @@
       "message": "Comment from Tristan on the original change (https://review.opendev.org/c/zuul/zuul/+/916974):\n\u003e I think this needs some padding, after clicking on the button, the border overlap with the label. Perhaps the border should be removed?",
       "revId": "ddeccef31a5fbb3d2798f6b361e0b13bcc6322de",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82ca049a_1e626a7b",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-09T12:52:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e429a252_81b47048",
+      "revId": "ddeccef31a5fbb3d2798f6b361e0b13bcc6322de",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
