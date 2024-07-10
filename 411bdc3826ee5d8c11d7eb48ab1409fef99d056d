@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff0a14ed_f02d34df",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "I\u0027m a bit late to the party, so I have a couple of general questions/remarks on the spec, mostly from an opendev pov, starting with the build process",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5bd95db_c17d5784",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "The current nodepool-builder workflow heavily relies on being able to cache certain items, in particular downloaded files and pre-cloned git repositories. How would this be possible when using a zuul job?",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ca2ae1c_9abdea35",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "Uploading artifacts likely will involve some secrets that need to be made available to the job, so such a job could only be running post-merge. Do you expect some variant of the job to be in place that does not publish build results for the check pipeline?",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35ce1f49_a29d1250",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "Currently nodepool-builder directly uploads the created images to the providers. Having to provide additional external storage space and doing at least two additional data transfers will place additional load on the systems involved, are there different options? Like zuul could hold the build node until all uploads are done, and the build node could serve the created image(s) via some http service for direct import into the providers?",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad0c8b31_12fb4de1",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "The spec should specify an option that will tell the build job which image formats are actually required. This avoids unnecessary image conversions and artifact uploads.",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4df762d4_a0fcb797",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "So logs for the uploads to the providers would still not be available as \"normal\" build results. How would debugging and error handling be happening, then?",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef4a6914_00ea919f",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "It might also be useful to specify how data about the provider is passed to the verification job in order to be able to run provider-specific verifications.",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "063c80ce_f7708141",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "Do we want to actually hardcode the \"more than two\" or make it more flexible?",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "304ca707_adc66f2b",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "Same as with uploading, how would logging and debugging of these tasks be handled?",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cc81fb6_340f8fd9",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "How could failures in this job be handled? Do you expect operator to manually check for failed jobs and re-enqueue them? Or do we need a periodic check for stale artifacts?",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfcc4285_7286baf1",
+        "filename": "doc/source/developer/specs/nodepool-in-zuul.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-10T07:49:25Z",
+      "side": 1,
+      "message": "I haven\u0027t seen this specified explicitly, but do you really expect untrusted repos to be able to trigger image builds? IMHO this could too easily be abused.",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
