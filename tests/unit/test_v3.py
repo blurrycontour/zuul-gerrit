@@ -4721,23 +4721,24 @@ class TestCleanupPlaybooks(AnsibleZuulTestCase):
                          build.jobdir.post_playbooks[0].nesting_level)
 
         self.assertTrue(build.jobdir.post_playbooks[1].path.
-                        endswith('playbooks/cleanup.yaml'))
-        self.assertEqual(1,
+                        endswith('playbooks/child-cleanup.yaml'))
+        self.assertEqual(2,
                          build.jobdir.post_playbooks[1].nesting_level)
 
         self.assertTrue(build.jobdir.post_playbooks[2].path.
+                        endswith('playbooks/cleanup.yaml'))
+        self.assertEqual(1,
+                         build.jobdir.post_playbooks[2].nesting_level)
+
+        self.assertTrue(build.jobdir.post_playbooks[3].path.
                         endswith('playbooks/base-post.yaml'))
         self.assertEqual(0,
-                         build.jobdir.post_playbooks[2].nesting_level)
-        self.assertTrue(build.jobdir.post_playbooks[3].path.
+                         build.jobdir.post_playbooks[3].nesting_level)
+        self.assertTrue(build.jobdir.post_playbooks[4].path.
                         endswith('playbooks/base-cleanup.yaml'))
         self.assertEqual(0,
-                         build.jobdir.post_playbooks[3].nesting_level)
-
-        self.assertTrue(build.jobdir.post_playbooks[4].path.
-                        endswith('playbooks/child-cleanup.yaml'))
-        self.assertEqual(2,
                          build.jobdir.post_playbooks[4].nesting_level)
+
 
         tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
         errors = tenant.layout.loading_errors

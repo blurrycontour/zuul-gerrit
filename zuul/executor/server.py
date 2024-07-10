@@ -2189,7 +2189,7 @@ class AnsibleJob(object):
             cleanup_playbook = cleanup_run.pop(0)
             for i in range(len(post_run)):
                 post_playbook = post_run[i]
-                if (cleanup_playbook.get('nesting_level', 0) <
+                if (cleanup_playbook.get('nesting_level', 0) >
                     post_playbook.get('nesting_level', 0)):
                     post_run.insert(i, cleanup_playbook)
                     break
