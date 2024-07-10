@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ee50269_107175c9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-10T00:09:03Z",
+      "side": 1,
+      "message": "The intent of the get project in re-enqueue is to make sure that we\u0027re using up-to-date information about a project in case something about the project or connection changed during the reconfiguration.  Since this project isn\u0027t actually in the tenant anyway, if something did change, we\u0027re not likely to care about it.\n\nHowever another purpose of all the work we do in the reconfiguration is to make sure we aren\u0027t carrying over outdated python ojects if we started creating new ones after the reconfiguration.  At the moment, we never delete a connection\u0027s projects, so this shouldn\u0027t be a problem.\n\nBut if we wanted to protect against this possibility and maintain the original intent, perhaps we could repeat the method we used to originall get the project: ask for the source by hostname and then get the project from the source.\n\nI\u0027ve made a followup that implements this.",
+      "revId": "a2f2bec2b82207730f924e20518a350ac3ca14b6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
