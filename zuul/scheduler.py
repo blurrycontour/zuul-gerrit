@@ -1644,9 +1644,15 @@ class Scheduler(threading.Thread):
 
         # If this is a non-live item we may be looking at a "foreign"
         # project, i.e. one which is not defined in the config but
-        # accessible by one of the configured connections. In this case
-        # we just keep using the existing project.
-        return change.project
+        # accessible by one of the configured connections. In this
+        # case look up the source by canonical hostname (under the
+        # assumption that hasn't changed) and get the project from
+        # that source.
+        source = self.connections.getSourceByCanonicalHostname(
+            project.canonical_hostname)
+        if not source:
+            return None
+        return source.getProject(project.name)
 
     def _reenqueuePipeline(self, tenant, new_pipeline, context):
         self.log.debug("Re-enqueueing changes for pipeline %s",
