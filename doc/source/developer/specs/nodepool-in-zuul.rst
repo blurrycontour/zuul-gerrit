@@ -112,15 +112,15 @@ case #3 by a periodic pipeline trigger.
 Since Zuul knows what images are configured and what their current
 states are, it will be able to emit trigger events when it detects
 that a new image (or image format) has been added to its
-configuration.  In these cases, the `zuul` driver in Zuul will enqueue
-an `image-build` trigger event on startup or reconfiguration for every
+configuration.  In these cases, the ``zuul`` driver in Zuul will enqueue
+an ``image-build`` trigger event on startup or reconfiguration for every
 missing image.  The event will include the image name.  Pipelines will
-be configured to trigger on `image-build` events as well as on a timer
+be configured to trigger on ``image-build`` events as well as on a timer
 trigger.
 
 Jobs will include an extra attribute to indicate they build a
 particular image.  This serves two purposes; first, in the case of an
-`image-build` trigger event, it will act as a matcher so that only
+``image-build`` trigger event, it will act as a matcher so that only
 jobs matching the image that needs building are run.  Second, it will
 allow Zuul to determine which formats are needed for that image (based
 on which providers are configured to use it) and include that
@@ -130,7 +130,7 @@ The job will be responsible for building the image and uploading the
 result to some storage system.  The URLs for each image format built
 should be returned to Zuul as artifacts.
 
-Finally, the `zuul` driver reporter will accept parameters which will
+Finally, the ``zuul`` driver reporter will accept parameters which will
 tell it to search the result data for these artifact URLs and update
 the internal image state accordingly.
 
@@ -189,7 +189,7 @@ To handle image validation, a flag will be stored for each image
 upload indicating whether it has been validated.  The example above
 specifies ``image-validated: true`` and therefore Zuul will put the
 image into service as soon as all image uploads are complete.
-However, if it were false, then Zuul would emit an `image-validate`
+However, if it were false, then Zuul would emit an ``image-validate``
 event after each upload is complete.  A second pipeline can be
 configured to perform image validation.  It can run any number of
 jobs, and since Zuul has complete knowledge of image states, it will
@@ -228,33 +228,34 @@ A more specific process definition follows:
 
 After a buildset reports with ``image-built: true``, Zuul will scan
 result data and for each artifact it finds, it will create an entry in
-ZooKeeper at `/zuul/images/<image_name>/<uuid>`.  Zuul will know
-not to emit any more `image-build` events for that image at this
+ZooKeeper at ``/zuul/images/<image_name>/<uuid>``.  Zuul will know
+not to emit any more ``image-build`` events for that image at this
 point.
 
 For every provider using that image, Zuul will create an entry in
 ZooKeeper at
-`/zuul/image-uploads/<image_name>/<image_number>/provider/<provider_name>`.
-It will set the remote image ID to null and the `image-validated` flag
+``/zuul/image-uploads/<image_name>/<image_number>/provider/<provider_name>``.
+It will set the remote image ID to null and the ``image-validated`` flag
 to whatever was specified in the reporter.
 
-Whenever zuul-launcher observes a new `image-upload` record without an
+Whenever zuul-launcher observes a new ``image-upload`` record without an
 ID, it will:
 
 * Lock the whole image
 * Lock each upload it can handle
 * Unlocks the image while retaining the upload locks
 * Downloads artifact (if needed) and uploads images to provider
-* If upload requires validation, it enqueues an `image-validate` zuul driver trigger event
+* If upload requires validation, it enqueues an ``image-validate`` zuul
+  driver trigger event
 * Unlocks upload
 
 The locking sequence is so that a single launcher can perform multiple
 uploads from a single artifact download if it has the opportunity.
 
 Once more than two builds of an image are in service, the oldest is
-deleted.  The image ZooKeeper record set to the `deleting` state.
-Zuul-launcher will delete the uploads from the providers.  The `zuul`
-driver emits an `image-delete` event with item data for the image
+deleted.  The image ZooKeeper record set to the ``deleting`` state.
+Zuul-launcher will delete the uploads from the providers.  The ``zuul``
+driver emits an ``image-delete`` event with item data for the image
 artifact.  This will trigger an image-delete job that can delete the
 artifact from the cloud storage.
 
@@ -324,7 +325,7 @@ zuul-launcher will take an optional command-line argument to indicate
 on which connections it should operate.
 
 Each zuul-launcher process will execute a number of processing loops
-in series; first a global request processing loop, and then a
+in a series; first a global request processing loop, and then a
 processing loop for each configured provider.
 
 Requests and nodes will be considered by a launcher based on a calculated
@@ -333,10 +334,10 @@ score. For that we will use `Rendezvous/HRW (highest random weight) hashing
 candidate launchers. The launcher with the highest score will lock and process
 a request or node.
 
-The the hash will consist of the unique launcher indentifiers (e.g. the
+The hash will consist of the unique launcher identifiers (e.g. the
 hostnames from the component registry) and the UUID of the request or node. The
-choosen hash function here needs to  be fast and doesn't have to be a
-cryptographic hash function (e.g MurmurHash).
+chosen hash function here needs to be fast and doesn't have to be a
+cryptographic hash function (e.g. MurmurHash).
 
 With this approach nodes/requests are essentially sharded between the available
 launchers, making explicit coordination mostly unnecessary. By that we can also
@@ -345,10 +346,10 @@ today.
 
 The following edge cases need to be considered with this approach:
 
-* When a new launcher starts up it won't process any locked nodes/requests,
+* When a new launcher starts up, it won't process any locked nodes/requests,
   even though it might have a higher score than existing launchers.
 
-* When a launcher is shut down the node/request is unlocked and the remaining
+* When a launcher is shut down, the node/request is unlocked and the remaining
   launchers must decide based on the score who should continue with the
   node/request.
 
@@ -365,10 +366,10 @@ launchers can resume state machine processing.
 The individual provider loop will:
 
 * Iterate over every matching node (highest score) assigned to that provider in
-  `requested` state
+  ``requested`` state
 
   * If the node is locked by another launcher, continue with the next one
-  * Lock the node (if not already locked) and set state to `building`
+  * Lock the node (if not already locked) and set state to ``building``
   * Drive the state machine
   * If success, update request
   * If failure, determine if it's a temporary or permanent failure
@@ -414,7 +415,7 @@ instances (more requests are processed in parallel).
 This means that we have to relax the provider quota guarantees that we have in
 Nodepool today. As a counter-measure we can calculate needed quota when
 assigning a request to a provider as well as on the provider level before
-actually acquiring resources. Additionally we can handled quota errors
+actually acquiring resources. Additionally we can handle quota errors
 gracefully by re-assigning the node to a different provider.
 
 Rate limiting in Nodepool today works based on a rate-limiter with the
@@ -444,8 +445,8 @@ connections by name.
 Because providers and images reference global (i.e., outside tenant
 scope) concepts, ZooKeeper paths for data related to those should
 include the canonical name of the repo where these objects are
-defined.  For example, a `debian-unstable` image in the
-`opendev/images` repo should be stored at
+defined.  For example, a ``debian-unstable`` image in the
+``opendev/images`` repo should be stored at
 ``/zuul/zuul-images/opendev.org%2fopendev%2fimages/``.  This avoids
 collisions if different tenants contain different image objects with
 the same name.
@@ -453,7 +454,7 @@ the same name.
 The actual Zuul config objects will be tenant scoped.  Image
 definitions which should be available to a tenant should be included
 in that tenant's config.  Again using the OpenDev example, the
-hypothetical `opendev/images` repository should be included in every
+hypothetical ``opendev/images`` repository should be included in every
 OpenDev tenant so all of those images are available.
 
 Within a tenant, image names must be unique (otherwise it is a tenant
