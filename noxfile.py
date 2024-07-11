@@ -143,3 +143,12 @@ def zuul_client(session):
     session.run(
         'stestr', 'run', '--concurrency=1',
         '--test-path', './tests/zuul_client')
+
+
+@nox.session(python='3')
+def bandit(session):
+    set_standard_env_vars(session)
+    session.install('-r', 'requirements.txt',
+                    '-r', 'test-requirements.txt')
+    session.install('-e', '.')
+    session.run('bandit', '-r', '.')
