@@ -178,7 +178,8 @@ class DatabaseSession(object):
             self.connection.buildModel.id).\
             join(self.connection.buildSetModel).\
             join(self.connection.refModel).\
-            group_by(self.connection.buildModel.id)
+            group_by(self.connection.buildModel.id).\
+            prefix_with('STRAIGHT_JOIN', dialect='mysql')
 
         # If the query planner isn't able to reduce either the number
         # of rows returned by the buildset or build tables, then it
@@ -338,7 +339,8 @@ class DatabaseSession(object):
             self.connection.buildModel.end_time).\
             join(self.connection.buildSetModel).\
             join(self.connection.refModel).\
-            group_by(self.connection.buildModel.id)
+            group_by(self.connection.buildModel.id).\
+            prefix_with('STRAIGHT_JOIN', dialect='mysql')
 
         # See note above about the hint.
         if not (project):
@@ -440,7 +442,8 @@ class DatabaseSession(object):
             self.connection.buildSetModel.id).\
             join(self.connection.buildSetRefModel).\
             join(self.connection.refModel).\
-            group_by(self.connection.buildSetModel.id)
+            group_by(self.connection.buildSetModel.id).\
+            prefix_with('STRAIGHT_JOIN', dialect='mysql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilterFuzzy(q, buildset_table.c.pipeline, pipeline)
