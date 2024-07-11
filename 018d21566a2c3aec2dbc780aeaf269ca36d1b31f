@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd5e327e_9adb3079",
+        "filename": "zuul/ansible/base/callback/zuul_stream.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-11T17:17:43Z",
+      "side": 1,
+      "message": "Best I can tell we start a streamer for each applicable task and only one streamer for that task. That means we won\u0027t restart the streaming thread later for some reason which means when we hit the end of this method we are indeed stopped.",
+      "revId": "018d21566a2c3aec2dbc780aeaf269ca36d1b31f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
