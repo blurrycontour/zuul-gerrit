@@ -90,7 +90,8 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('scheduler', 'log_config')
         self.log = logging.getLogger("zuul.Scheduler")
 
-        self.configure_connections(require_sql=True)
+        self.configure_connections(database=True, sources=True, triggers=True,
+                                   reporters=True, providers=True)
         self.sched = zuul.scheduler.Scheduler(self.config,
                                               self.connections, self,
                                               self.args.wait_for_init,

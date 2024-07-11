@@ -37,7 +37,7 @@ class Merger(zuul.cmd.ZuulDaemonApp):
     def run(self):
         self.handleCommands()
 
-        self.configure_connections(source_only=True)
+        self.configure_connections(sources=True)
 
         self.setup_logging('merger', 'log_config')
 

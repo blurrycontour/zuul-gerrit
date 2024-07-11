@@ -1490,7 +1490,8 @@ class ZuulWebFixture(fixtures.Fixture):
             config, test_config,
             additional_event_queues, upstream_root,
             poller_events, git_url_with_auth, add_cleanup)
-        self.connections.configure(config)
+        self.connections.configure(config, database=True, sources=True,
+                                   triggers=True, reporters=True)
 
         self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
         self.authenticators.configure(config)
@@ -1889,7 +1890,9 @@ class SchedulerTestApp:
             git_url_with_auth,
             add_cleanup,
         )
-        self.connections.configure(self.config)
+        self.connections.configure(self.config, database=True,
+                                   sources=True, triggers=True,
+                                   reporters=True, providers=True)
 
         self.sched = TestScheduler(self.config, self.connections, self,
                                    wait_for_init, disable_pipelines)
@@ -2261,8 +2264,7 @@ class ZuulTestCase(BaseTestCase):
             self.additional_event_queues,
             self.upstream_root, self.poller_events,
             self.git_url_with_auth, self.addCleanup)
-        executor_connections.configure(self.config,
-                                       source_only=True)
+        executor_connections.configure(self.config, sources=True)
         self.executor_api = TestingExecutorApi(self.zk_client)
         self.merger_api = TestingMergerApi(self.zk_client)
         self.executor_server = RecordingExecutorServer(
