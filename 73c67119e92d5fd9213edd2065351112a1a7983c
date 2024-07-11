@@ -33,6 +33,24 @@
       "message": "It isn\u0027t super clear to me why the waitUntilSettled below is insufficient instead. Wouldn\u0027t waitUntilSettled ensure that at least one scheduler has fully processed thing which would produce the expect log messages in our assertions later? I guess it isn\u0027t clear why both schedulers need to be in sync for the expected log messages to all appear.",
       "revId": "73c67119e92d5fd9213edd2065351112a1a7983c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc652aaf_1f438ad6",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-11T22:42:02Z",
+      "side": 1,
+      "message": "Good question and I no longer have the logs to answer it.",
+      "parentUuid": "8dfa4117_1e96a09d",
+      "revId": "73c67119e92d5fd9213edd2065351112a1a7983c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ],
   "submitRequirementResults": [
