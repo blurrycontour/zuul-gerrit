@@ -3522,20 +3522,29 @@ class TestGerritCircularDependencies(ZuulTestCase):
         # Test that if many changes are uploaded with the same topic,
         # we handle queries efficiently.
 
+        def waitForEvents():
+            for x in iterate_timeout(60, 'empty event queue'):
+                if not len(self.fake_gerrit.event_queue):
+                    return
+            self.log.debug("Empty event queue")
+
         # This mimics the changes being uploaded in rapid succession.
         self.waitUntilSettled()
         with self.scheds.first.sched.run_handler_lock:
             A = self.fake_gerrit.addFakeChange('org/project', "master", "A",
                                                topic='test-topic')
             self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+            waitForEvents()
 
             B = self.fake_gerrit.addFakeChange('org/project1', "master", "B",
                                                topic='test-topic')
             self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+            waitForEvents()
 
             C = self.fake_gerrit.addFakeChange('org/project2', "master", "C",
                                                topic='test-topic')
             self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+            waitForEvents()
         self.waitUntilSettled()
 
         # Output all the queries seen for debugging
