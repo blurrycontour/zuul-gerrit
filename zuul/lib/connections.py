@@ -33,7 +33,12 @@ import zuul.driver.gitlab
 import zuul.driver.elasticsearch
 import zuul.driver.aws
 from zuul.connection import BaseConnection
-from zuul.driver import SourceInterface
+from zuul.driver import (
+    ProviderInterface,
+    ReporterInterface,
+    SourceInterface,
+    TriggerInterface,
+)
 
 
 class DefaultConnection(BaseConnection):
@@ -91,11 +96,12 @@ class ConnectionRegistry(object):
         for driver in self.drivers.values():
             driver.stop()
 
-    def configure(self, config, source_only=False, require_sql=False):
+    def configure(self, config, database=False, sources=False,
+                  triggers=False, reporters=False, providers=False):
         # Register connections from the config
         connections = OrderedDict()
 
-        if 'database' in config.sections() and not source_only:
+        if database and 'database' in config.sections():
             driver = self.drivers['sql']
             con_config = dict(config.items('database'))
 
@@ -121,14 +127,14 @@ class ConnectionRegistry(object):
 
             driver = self.drivers[con_driver]
 
-            # The merger and the reporter only needs source driver.
-            # This makes sure Reporter like the SQLDriver are only created by
-            # the scheduler process
-            if source_only and not isinstance(driver, SourceInterface):
-                continue
-
-            connection = driver.getConnection(con_name, con_config)
-            connections[con_name] = connection
+            if (database and driver.name == 'sql' or
+                sources and isinstance(driver, SourceInterface) or
+                triggers and isinstance(driver, TriggerInterface) or
+                reporters and isinstance(driver, ReporterInterface) or
+                providers and isinstance(driver, ProviderInterface)):
+                # Only create connections for the requested drivers
+                connection = driver.getConnection(con_name, con_config)
+                connections[con_name] = connection
 
         # If the [gerrit] or [smtp] sections still exist, load them in as a
         # connection named 'gerrit' or 'smtp' respectfully
@@ -157,13 +163,17 @@ class ConnectionRegistry(object):
 
         # Create default connections for drivers which need no
         # connection information (e.g., 'timer' or 'zuul').
-        if not source_only:
-            for driver in self.drivers.values():
-                if not hasattr(driver, 'getConnection'):
+        for driver in self.drivers.values():
+            if not hasattr(driver, 'getConnection'):
+                if (database and driver.name == 'sql' or
+                    sources and isinstance(driver, SourceInterface) or
+                    triggers and isinstance(driver, TriggerInterface) or
+                    reporters and isinstance(driver, ReporterInterface) or
+                    providers and isinstance(driver, ProviderInterface)):
                     connections[driver.name] = DefaultConnection(
                         driver, driver.name, {})
 
-        if require_sql:
+        if database:
             if 'database' not in connections:
                 raise Exception("Database configuration is required")
 
