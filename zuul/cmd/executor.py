@@ -85,7 +85,7 @@ class Executor(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('executor', 'log_config')
         self.log = logging.getLogger("zuul.Executor")
 
-        self.configure_connections(source_only=True, check_bwrap=True)
+        self.configure_connections(sources=True, check_bwrap=True)
 
         if self.config.has_option('executor', 'job_dir'):
             self.job_dir = os.path.expanduser(
