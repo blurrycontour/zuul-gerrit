@@ -159,7 +159,8 @@ class Streamer:
                     "localhost",
                     "Timeout exception waiting for the logger. "
                     "Please check connectivity to [%s:%s]"
-                    % (self.ip, self.port))
+                    % (self.ip, self.port),
+                    stopped=True)
                 return None
             except Exception:
                 if logger_retries % 10 == 0:
@@ -247,7 +248,8 @@ class Streamer:
                     self.callback._log_streamline(
                         self.host,
                         "[Zuul] Lost log stream connection to [%s:%s]"
-                        % (self.ip, self.port))
+                        % (self.ip, self.port),
+                        stopped=True)
                     raise
                 if not more:
                     buffering = False
@@ -255,7 +257,8 @@ class Streamer:
                     buff += more
         if buff:
             self.callback._log_streamline(
-                self.host, buff.decode("utf-8", "backslashreplace"))
+                self.host, buff.decode("utf-8", "backslashreplace"),
+                stopped=True)
 
 
 class CallbackModule(default.CallbackModule):
