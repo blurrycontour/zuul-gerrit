@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff8ab864_51bc8e96",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-11T22:34:06Z",
+      "side": 1,
+      "message": "Unrelated to this fix the comment above is a bit confusing since it refers to two different caches and the assertions below without really distinguishing which cache maps to the NotIn checks and which relates to the In checks.\n\nI suspect that the In check on line 212 is logging that it is going to the files cache in zk and not the unparsing config cache.",
+      "revId": "73c67119e92d5fd9213edd2065351112a1a7983c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8dfa4117_1e96a09d",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-11T22:34:06Z",
+      "side": 1,
+      "message": "It isn\u0027t super clear to me why the waitUntilSettled below is insufficient instead. Wouldn\u0027t waitUntilSettled ensure that at least one scheduler has fully processed thing which would produce the expect log messages in our assertions later? I guess it isn\u0027t clear why both schedulers need to be in sync for the expected log messages to all appear.",
+      "revId": "73c67119e92d5fd9213edd2065351112a1a7983c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
