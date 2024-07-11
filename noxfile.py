@@ -20,7 +20,7 @@ import nox
 
 nox.options.error_on_external_run = True
 nox.options.reuse_existing_virtualenvs = True
-nox.options.sessions = ["tests-3", "linters"]
+nox.options.sessions = ["tests-3", "linters", "bandit"]
 
 
 def set_env(session, var, default):
@@ -143,3 +143,12 @@ def zuul_client(session):
     session.run(
         'stestr', 'run', '--concurrency=1',
         '--test-path', './tests/zuul_client')
+
+
+@nox.session(python='3')
+def bandit(session):
+    set_standard_env_vars(session)
+    session.install('-r', 'requirements.txt',
+                    '-r', 'test-requirements.txt')
+    session.install('-e', '.')
+    session.run('bandit', '-r', '.')
