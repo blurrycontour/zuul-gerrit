@@ -133,6 +133,17 @@
       nox_session: zuul_client
 
 - job:
+    name: zuul-nox-bandit
+    parent: zuul-nox
+    description: |
+      Test which scans for security vulnerabilities in Python code.
+    required-projects:
+      - zuul/zuul
+    vars:
+      zuul_work_dir: "{{ zuul.projects['opendev.org/zuul/zuul'].src_dir }}"
+      nox_session: bandit
+
+- job:
     name: zuul-nox-py311
     parent: zuul-nox
     timeout: 7200  # 120 minutes
