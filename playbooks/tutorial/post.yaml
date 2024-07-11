@@ -18,6 +18,7 @@
         podman logs zuul-tutorial_node_1 > {{ ansible_user_dir }}/logs/node.log 2>&1
         podman logs zuul-tutorial_launcher_1 > {{ ansible_user_dir }}/logs/launcher.log 2>&1
         podman logs zuul-tutorial_logs_1 > {{ ansible_user_dir }}/logs/logs.log 2>&1
+        podman logs zuul-tutorial-tracing_jaeger_1 > {{ ansible_user_dir }}/logs/jaeger.log 2>&1
         exit 0
     - name: Copy podman log files to executor
       synchronize:
