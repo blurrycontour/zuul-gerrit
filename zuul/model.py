@@ -1446,6 +1446,42 @@ class ApiRoot(ConfigObject):
         return f'<ApiRoot realm={self.default_auth_realm}>'
 
 
+class ImageBuildArtifact(zkobject.LockableZKObject):
+    ROOT = "/zuul/images"
+    IMAGES_PATH = "artifacts"
+    LOCKS_PATH = "locks"
+
+    def __init__(self):
+        super().__init__()
+        self._set(
+            uuid=None,  # A random UUID for the image build artifact
+            canonical_name=None,
+            build_uuid=None,  # The UUID of the build job
+            format=None,
+            url=None,
+            timestamp=None,
+            validated=None,
+        )
+
+    def getPath(self):
+        return f"{self.ROOT}/{self.IMAGES_PATH}/{self.uuid}"
+
+    def getLockPath(self):
+        return f"{self.ROOT}/{self.LOCKS_PATH}/{self.uuid}"
+
+    def serialize(self, context):
+        data = dict(
+            uuid=self.uuid,
+            canonical_name=self.canonical_name,
+            build_uuid=self.build_uuid,
+            format=self.format,
+            url=self.url,
+            timestamp=self.timestamp,
+            validated=self.validated,
+        )
+        return json.dumps(data, sort_keys=True).encode("utf-8")
+
+
 class Image(ConfigObject):
     """A zuul or cloud image.
 
