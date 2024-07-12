@@ -532,9 +532,12 @@ This is a reference for object layout in Zookeeper.
 
    Only updated by schedulers upon reconfiguration.  Read-only for launchers.
 
-.. path:: zuul/images/<image canonical name>/<image build uuid>
+.. path:: zuul/images/artifacts/<uuid>
 
-   Stores information about an image built in a Zuul job.
+   Stores information about an image build artifact.  Each build job
+   may produce any number of artifacts (each corresponding to an
+   image+format).  Information about each is stored here under a
+   random uuid.
 
 .. path:: zuul/image-uploads/<image canonical name>/<image build uuid>/endpoint/<endpoint id>
 
