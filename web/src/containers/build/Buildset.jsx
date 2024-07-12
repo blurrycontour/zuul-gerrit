@@ -241,6 +241,31 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
     )
   }
 
+  function renderEvents() {
+    return (
+      <>
+        {buildset.events.map((bs_event, idx) => (
+          <IconProperty
+            WrapElement={ListItem}
+            icon={<OutlinedClockIcon />}
+            key={idx}
+            value={
+              <span>
+                {bs_event.description} <br />
+                <i>
+                  {moment_tz
+                   .utc(bs_event.event_time)
+                   .tz(timezone)
+                   .format('YYYY-MM-DD HH:mm:ss')}
+                </i>
+              </span>
+            }
+          />
+        ))}
+      </>
+    )
+  }
+
   return (
     <>
       <Title headingLevel="h2">
@@ -297,24 +322,7 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
         <Flex flex={{ default: 'flex_1' }}>
           <FlexItem>
             <List style={{ listStyle: 'none' }}>
-              {buildset.events.map((bs_event, idx) => (
-                <IconProperty
-                  WrapElement={ListItem}
-                  icon={<OutlinedClockIcon />}
-                  key={idx}
-                  value={
-                    <span>
-                      {bs_event.description} <br />
-                      <i>
-                        {moment_tz
-                         .utc(bs_event.event_time)
-                         .tz(timezone)
-                         .format('YYYY-MM-DD HH:mm:ss')}
-                      </i>
-                    </span>
-                  }
-                />
-              ))}
+              {buildset.events && renderEvents()}
               <IconProperty
                 WrapElement={ListItem}
                 icon={<OutlinedCommentDotsIcon />}
@@ -328,12 +336,13 @@ function Buildset({ buildset, timezone, tenant, user, preferences }) {
                 }
               />
               {(user.isAdmin && user.scope.indexOf(tenant.name) !== -1) &&
-                <>
-                  {renderEnqueueButton()}
-                </>}
+               <>
+                 {renderEnqueueButton()}
+               </>}
             </List>
           </FlexItem>
-        </Flex>
+      </Flex>
+
       </Flex>
       <ChartModal
         chart={<BuildsetGanttChart builds={buildset.builds} />}
