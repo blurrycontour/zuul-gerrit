@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25537871_48efeb4e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2024-07-12T15:58:04Z",
+      "side": 1,
+      "message": "Need to write some tests for this. This issue should be reproducible simply by making a change to an environment variable in a job config file, then gating and seeing what the post build job outputs:\n\n- job:\n    name: testjob\n    description: Test build\n    vars:\n      my_message: \"This is fun 1\" \u003c- update from 1 to 2",
+      "revId": "1074c019379cde61d7510b2f4b210997382064f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
