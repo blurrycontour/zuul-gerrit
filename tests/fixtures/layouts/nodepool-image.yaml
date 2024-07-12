@@ -17,6 +17,10 @@
     trigger:
       zuul:
         - event: image-build
+    success:
+      zuul:
+        image-built: true
+        image-validated: true
 
 - pipeline:
     name: gate
