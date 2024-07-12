@@ -218,6 +218,26 @@ def gerrit_config(submit_whole_topic=False):
     return decorator
 
 
+def return_data(job, ref, data):
+    """Add return data for a job
+
+    This allows configuring job return data for jobs that start
+    immediately.
+
+    """
+
+    def decorator(test):
+        if not hasattr(test, '__return_data'):
+            test.__return_data__ = []
+        test.__return_data__.append(dict(
+            job=job,
+            ref=ref,
+            data=data,
+        ))
+        return test
+    return decorator
+
+
 def registerProjects(source_name, client, config):
     path = config.get('scheduler', 'tenant_config')
     with open(os.path.join(FIXTURE_DIR, path)) as f:
@@ -2040,6 +2060,7 @@ class TestConfig:
         self.gerrit_config = getattr(test, '__gerrit_config__', {})
         self.never_capture = getattr(test, '__never_capture__', None)
         self.enable_nodepool = getattr(test, '__enable_nodepool__', False)
+        self.return_data = getattr(test, '__return_data__', [])
         self.changes = FakeChangeDB()
 
 
@@ -2277,6 +2298,12 @@ class ZuulTestCase(BaseTestCase):
             _test_root=self.test_root,
             keep_jobdir=KEEP_TEMPDIRS,
             log_console_port=self.log_console_port)
+        for return_data in self.test_config.return_data:
+            self.executor_server.returnData(
+                return_data['job'],
+                return_data['ref'],
+                return_data['data'],
+            )
         self.executor_server.start()
         self.history = self.executor_server.build_history
         self.builds = self.executor_server.running_builds

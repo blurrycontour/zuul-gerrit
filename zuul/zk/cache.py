@@ -278,6 +278,7 @@ class ZuulTreeCache(abc.ABC):
         if key is None:
             return
 
+        obj = None
         if data:
             # Perform an in-place update of the cached object if possible
             old_obj = self._cached_objects.get(key)
@@ -294,11 +295,12 @@ class ZuulTreeCache(abc.ABC):
                 self._cached_objects[key] = obj
         else:
             try:
+                obj = self._cached_objects[key]
                 del self._cached_objects[key]
             except KeyError:
                 # If it's already gone, don't care
                 pass
-        self.postCacheHook(event, data, stat)
+        self.postCacheHook(event, data, stat, key, obj)
 
     def ensureReady(self):
         self._ready.wait()
@@ -323,7 +325,7 @@ class ZuulTreeCache(abc.ABC):
         """
         return None
 
-    def postCacheHook(self, event, data, stat):
+    def postCacheHook(self, event, data, stat, key, obj):
         """Called after the cache has been updated"""
         return None
 

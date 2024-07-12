@@ -19,6 +19,7 @@ import threading
 
 from zuul.lib import commandsocket, tracing
 from zuul.lib.config import get_default
+from zuul.zk.image_registry import ImageBuildRegistry
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import LauncherComponent
@@ -78,6 +79,8 @@ class Launcher:
         self.layout_providers_store = LayoutProvidersStore(
             self.zk_client, self.connections)
         self.local_layout_state = {}
+
+        self.image_build_registry = ImageBuildRegistry(self.zk_client)
 
         self.launcher_thread = threading.Thread(
             target=self.run,
@@ -184,8 +187,8 @@ class Launcher:
         driver = self.connections.drivers['zuul']
         event = driver.getImageBuildEvent(
             image.name, project_hostname, project_name, image.branch)
-        self.log.debug("Submitting image build event for %s %s",
-                       tenant_name, image.name)
+        self.log.info("Submitting image build event for %s %s",
+                      tenant_name, image.name)
         self.trigger_events[tenant_name].put(event.trigger_name, event)
 
     def checkMissingImages(self):
@@ -193,4 +196,20 @@ class Launcher:
             for provider in providers:
                 for image in provider.images:
                     if image.type == 'zuul':
-                        self.addImageBuildEvent(tenant_name, image)
+                        self.checkMissingImage(tenant_name, image)
+
+    def checkMissingImage(self, tenant_name, image):
+        # If there is already a successful build for
+        # this image, skip.
+        # get the registry for the image name
+
+        seen_formats = set()
+        for build in self.image_build_registry.getArtifactsForImage(
+                image.canonical_name):
+            seen_formats.add(build.format)
+
+        if seen_formats >= image.formats:
+            # We have at least one build with the required
+            # formats
+            return
+        self.addImageBuildEvent(tenant_name, image)
