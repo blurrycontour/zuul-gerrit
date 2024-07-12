@@ -14,6 +14,7 @@
 
 import abc
 import json
+import urllib.parse
 
 from zuul import model
 from zuul.zk import zkobject
@@ -27,6 +28,16 @@ class BaseProviderImage(metaclass=abc.ABCMeta):
         self.name = config['name']
         self.branch = config['branch']
         self.type = config['type']
+        # TODO: get formats from configuration
+        self.formats = set(['raw'])
+
+    @property
+    def canonical_name(self):
+        return '/'.join([
+            urllib.parse.quote_plus(
+                self.project_canonical_name),
+            urllib.parse.quote_plus(self.name),
+        ])
 
 
 class BaseProviderFlavor(metaclass=abc.ABCMeta):
