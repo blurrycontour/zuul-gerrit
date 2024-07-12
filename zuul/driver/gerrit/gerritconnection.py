@@ -249,7 +249,23 @@ class GerritEventConnector(threading.Thread):
             if qlen:
                 self.log.debug("Connection event queue length for %s: %s",
                                self.connection.connection_name, qlen)
+            merged_events_newrevs = []
             for event in self.event_queue:
+                data = event["payload"]
+                if data.get('type') == 'change-merged':
+                    merged_events_newrevs.append(data.get('newRev'))
+
+            for event in self.event_queue:
+                data = event["payload"]
+                if data.get('type') == 'ref-updated':
+                    refupdate = data.get('refUpdate')
+                    newrev = refupdate.get('newRev')
+                    # Cause ref update events to run after matching merged
+                    # changed events to prevent ref updated events from
+                    # running on old configuration
+                    if newrev in merged_events_newrevs:
+                        continue
+
                 event_span = tracing.restoreSpanContext(
                     event.get("span_context"))
                 attributes = {"rel": "GerritEvent"}
