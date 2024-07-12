@@ -19,6 +19,7 @@ import threading
 
 from zuul.lib import commandsocket, tracing
 from zuul.lib.config import get_default
+from zuul.model import ImageBuildRegistry
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import LauncherComponent
@@ -193,4 +194,30 @@ class Launcher:
             for provider in providers:
                 for image in provider.images:
                     if image.type == 'zuul':
-                        self.addImageBuildEvent(tenant_name, image)
+                        self.checkMissingImage(tenant_name, image)
+
+    def checkMissingImage(self, tenant_name, image):
+        # If there is already a successful build for
+        # this image, skip.
+        # get the registry for the image name
+        with self.createZKContext(None, self.log) as context:
+            registry = ImageBuildRegistry.getOrCreate(
+                context,
+                image.canonical_name
+            )
+
+        lock = registry.acquireLock(self.zk_client)
+        if not lock:
+            return
+        try:
+            with self.createZKContext(lock, self.log) as context:
+                registry.refresh(context)
+                for build in registry.builds:
+                    if set(build.formats) >= image.formats:
+                        # We have at least one build with the required
+                        # formats
+                        return
+        finally:
+            registry.releaseLock()
+
+        self.addImageBuildEvent(tenant_name, image)

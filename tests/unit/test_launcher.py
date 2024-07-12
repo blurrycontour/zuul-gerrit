@@ -16,6 +16,7 @@ from moto import mock_aws
 
 from tests.base import (
     ZuulTestCase,
+    iterate_timeout,
     simple_layout,
 )
 
@@ -33,7 +34,21 @@ class TestLauncher(ZuulTestCase):
         super().tearDown()
 
     @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
-    def test_launcher_image_build(self):
+    def test_launcher_missing_image_build(self):
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+        ])
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+
+        for _ in iterate_timeout(
+                30, "scheduler and launcher to have the same layout"):
+            if (self.scheds.first.sched.local_layout_state.get("tenant-one") ==
+                self.launcher.local_layout_state.get("tenant-one")):
+                break
+
+        # The build should not run again because the image is no
+        # longer missing
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='build-debian-local-image', result='SUCCESS'),

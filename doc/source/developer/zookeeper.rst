@@ -532,9 +532,9 @@ This is a reference for object layout in Zookeeper.
 
    Only updated by schedulers upon reconfiguration.  Read-only for launchers.
 
-.. path:: zuul/images/<image canonical name>/<image build uuid>
+.. path:: zuul/images/<image canonical name>
 
-   Stores information about an image built in a Zuul job.
+   Stores information about all relevant builds for this image.
 
 .. path:: zuul/image-uploads/<image canonical name>/<image build uuid>/endpoint/<endpoint id>
 

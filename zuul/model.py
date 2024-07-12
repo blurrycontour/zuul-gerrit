@@ -2262,6 +2262,51 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
         return json.dumps(data, sort_keys=True).encode("utf-8")
 
 
+class ImageBuildRegistry(zkobject.LockableZKObject):
+    ROOT = "/zuul/images"
+    IMAGES_PATH = "images"
+    LOCKS_PATH = "locks"
+
+    def __init__(self):
+        super().__init__()
+        self._set(
+            canonical_name=None,
+            builds=[],
+        )
+
+    def getPath(self):
+        return f"{self.ROOT}/{self.IMAGES_PATH}/{self.canonical_name}"
+
+    def getLockPath(self):
+        return f"{self.ROOT}/{self.LOCKS_PATH}/{self.canonical_name}"
+
+    @classmethod
+    def getOrCreate(cls, context, canonical_name):
+        obj = cls()
+        obj._set(canonical_name=canonical_name)
+        if obj.exists(context):
+            return obj
+        obj.internalCreate(context)
+        return obj
+
+    def serialize(self, context):
+        data = dict(
+            canonical_name=self.canonical_name,
+            builds=self.builds,
+        )
+        return json.dumps(data, sort_keys=True).encode("utf-8")
+
+    def addBuild(self, build_uuid, build_formats, build_timestamp):
+        self.builds.append(dict(
+            uuid=build_uuid,
+            formats=build_formats,
+            timestamp=build_timestamp,
+        ))
+
+    def removeBuild(self, build_uuid):
+        self.builds = self.builds.filter(lambda x: x['uuid'] != build_uuid)
+
+
 class Secret(ConfigObject):
     """A collection of private data.
 
