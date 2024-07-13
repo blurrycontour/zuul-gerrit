@@ -88,6 +88,8 @@ class Launcher:
                 self.log.exception("Error in main thread:")
 
     def _run(self):
+        if not self._running:
+            return
         self.updateTenantProviders()
 
     def start(self):
