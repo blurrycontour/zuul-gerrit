@@ -432,6 +432,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.watched_checkers = []
         self.project_checker_map = {}
         self.watched_event_filters = []
+        self.watched_event_filters_by_tenant = {}
+        self.watched_event_filters_lock = threading.Lock()
         self.version = (0, 0, 0)
         self.submit_whole_topic = None
         self.ssh_timeout = SSH_TIMEOUT
@@ -477,6 +479,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             self.auth = authclass(self.user, self.password)
 
     def setWatchedCheckers(self, checkers_to_watch):
+        # TODO: This is not safe for multiple tenants
+        # TODO: This does not remove checkers when tenants are deleted
         self.log.debug("Setting watched checkers to %s", checkers_to_watch)
         self.watched_checkers = set()
         self.project_checker_map = {}
@@ -512,9 +516,20 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         for x in uuids_to_watch:
             self.watched_checkers.add(x)
 
-    def setWatchedEventFilters(self, filters):
-        self.log.debug("Setting watched event filters to %s", filters)
-        self.watched_event_filters = filters
+    def setWatchedEventFilters(self, tenant_name, filters):
+        # TODO: This does not remove filters when tenants are deleted
+        self.log.debug("Setting watched event filters for %s to %s",
+                       tenant_name, filters)
+        with self.watched_event_filters_lock:
+            self.watched_event_filters_by_tenant[tenant_name] = filters
+            new_filters = set()
+            # Build a set of unique filters across all tenants
+            for tenant_filters in \
+                self.watched_event_filters_by_tenant.values():
+                new_filters.update(tenant_filters)
+            self.log.debug("Setting watched event filters to %s",
+                           new_filters)
+            self.watched_event_filters = new_filters
 
     def toDict(self):
         d = super().toDict()
