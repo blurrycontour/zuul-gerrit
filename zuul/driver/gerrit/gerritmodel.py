@@ -17,6 +17,7 @@ import copy
 import time
 import urllib.parse
 import dateutil.parser
+import json
 
 from zuul.model import EventFilter, RefFilter
 from zuul.model import Change, TriggerEvent, FalseWithReason
@@ -432,6 +433,58 @@ class GerritEventFilter(EventFilter):
         self.scheme = scheme
         self.ignore_deletes = ignore_deletes
 
+        self._hash = hash(json.dumps(self.toDict(), sort_keys=True))
+
+    def __hash__(self):
+        return self._hash
+
+    def toDict(self):
+        if self.require_filter:
+            require_filter = self.require_filter.toDict()
+        else:
+            require_filter = None
+        if self.reject_filter:
+            reject_filter = self.reject_filter.toDict()
+        else:
+            reject_filter = None
+        return dict(
+            require_filter=require_filter,
+            reject_filter=reject_filter,
+            types=self._types,
+            branches=self._branches,
+            refs=self._refs,
+            comments=self._comments,
+            emails=self._emails,
+            usernames=self._usernames,
+            added=self._added,
+            removed=self._removed,
+            event_approvals=self.event_approvals,
+            event_approval_changes=self.event_approval_changes,
+            uuid=self.uuid,
+            scheme=self.scheme,
+            ignore_deletes=self.ignore_deletes,
+        )
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, GerritEventFilter) and
+            self.require_filter == other.require_filter and
+            self.reject_filter == other.reject_filter and
+            self.types == other.types and
+            self.branches == other.branches and
+            self.refs == other.refs and
+            self.comments == other.comments and
+            self.emails == other.emails and
+            self.usernames == other.usernames and
+            self.added == other.added and
+            self.removed == other.removed and
+            self.event_approvals == other.event_approvals and
+            self.event_approval_changes == other.event_approval_changes and
+            self.uuid == other.uuid and
+            self.scheme == other.scheme and
+            self.ignore_deletes == other.ignore_deletes
+        )
+
     def __repr__(self):
         ret = '<GerritEventFilter'
         ret += ' connection: %s' % self.connection_name
@@ -687,6 +740,33 @@ class GerritRefFilter(RefFilter):
             self.current_patchset = not reject_current_patchset
         else:
             self.current_patchset = current_patchset
+
+    def toDict(self):
+        return dict(
+            required_approvals=self._required_approvals,
+            reject_approvals=self._reject_approvals,
+            statuses=self.statuses,
+            reject_statuses=self.reject_statuses,
+            required_hashtags=self.required_hashtags,
+            reject_hashtags=self.reject_hashtags,
+            open=self.open,
+            wip=self.wip,
+            current_patchset=self.current_patchset,
+        )
+
+    def __eq__(self, other):
+        return (
+            isinstance(other, GerritRefFilter) and
+            self.required_approvals == other.required_approvals and
+            self.reject_approvals == other.reject_approvals and
+            self.statuses == other.statuses and
+            self.reject_statuses == other.reject_statuses and
+            self.required_hashtags == other.required_hashtags and
+            self.reject_hashtags == other.reject_hashtags and
+            self.open == other.open and
+            self.wip == other.wip and
+            self.current_patchset == other.current_patchset
+        )
 
     @classmethod
     def requiresFromConfig(cls, connection_name, config, parse_context):
