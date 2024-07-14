@@ -178,8 +178,7 @@ class DatabaseSession(object):
             self.connection.buildModel.id).\
             join(self.connection.buildSetModel).\
             join(self.connection.refModel).\
-            group_by(self.connection.buildModel.id).\
-            prefix_with('STRAIGHT_JOIN', dialect='mysql')
+            group_by(self.connection.buildModel.id)
 
         # If the query planner isn't able to reduce either the number
         # of rows returned by the buildset or build tables, then it
@@ -201,6 +200,8 @@ class DatabaseSession(object):
         # the query.
         if provides:
             q = q.outerjoin(self.connection.providesModel)
+        else:
+            q = q.prefix_with('STRAIGHT_JOIN', dialect='mysql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilterFuzzy(q, buildset_table.c.pipeline, pipeline)
