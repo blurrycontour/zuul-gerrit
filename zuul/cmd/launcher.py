@@ -43,7 +43,8 @@ class LauncherApp(zuul.cmd.ZuulDaemonApp):
         self.setup_logging('launcher', 'log_config')
         self.log = logging.getLogger('zuul.launcher')
 
-        self.launcher = Launcher(self.config)
+        self.configure_connections(providers=True)
+        self.launcher = Launcher(self.config, self.connections)
         self.launcher.start()
 
         if self.args.nodaemon:

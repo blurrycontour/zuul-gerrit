@@ -31,9 +31,10 @@ COMMANDS = (
 class Launcher:
     log = logging.getLogger("zuul.Launcher")
 
-    def __init__(self, config):
+    def __init__(self, config, connections):
         self._running = False
         self.config = config
+        self.connections = connections
 
         self.tracing = tracing.Tracing(self.config)
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
@@ -89,6 +90,7 @@ class Launcher:
         self.component_info.state = self.component_info.STOPPED
         self._command_running = False
         self.command_socket.stop()
+        self.connections.stop()
         self.log.debug("Stopped launcher")
 
     def join(self):
