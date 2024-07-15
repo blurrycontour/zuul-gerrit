@@ -4457,9 +4457,7 @@ class TestScheduler(ZuulTestCase):
         sched = self.scheds.first.sched
         # Hold the management queue so that we don't process any
         # reconfiguration events yet.
-        with management_queue_lock(
-                self.zk_client, 'tenant-one', blocking=False
-        ):
+        with management_queue_lock(self.zk_client, 'tenant-one'):
             with sched.run_handler_lock:
                 A.setMerged()
                 # Submit two events while no processing is happening:
