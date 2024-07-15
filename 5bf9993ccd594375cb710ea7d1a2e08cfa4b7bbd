@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "294ec7a8_74ed6024",
+        "filename": ".zuul.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-07-15T15:50:31Z",
+      "side": 1,
+      "message": "Note that we normally disable voting via a variant in the pipeline rather than directly in the job definition.",
+      "revId": "5bf9993ccd594375cb710ea7d1a2e08cfa4b7bbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0f4c051_a2b75821",
+        "filename": ".zuul.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 422,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-07-15T15:50:31Z",
+      "side": 1,
+      "message": "You can set non-voting here instead if needed.",
+      "revId": "5bf9993ccd594375cb710ea7d1a2e08cfa4b7bbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f88455b6_9c34708a",
+        "filename": ".zuul.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 456,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-07-15T15:50:31Z",
+      "side": 1,
+      "message": "We typically avoid putting non-voting jobs in the gate pipeline.",
+      "revId": "5bf9993ccd594375cb710ea7d1a2e08cfa4b7bbd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
