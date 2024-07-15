@@ -42,6 +42,7 @@ class Launcher:
         self._running = False
         self.config = config
         self.connections = connections
+        self.tenant_providers = {}
 
         self.tracing = tracing.Tracing(self.config)
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
