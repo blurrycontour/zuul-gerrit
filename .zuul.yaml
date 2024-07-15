@@ -303,6 +303,14 @@
           tags: *imagetag
         - context: .
           registry: quay.io
+          repository: quay.io/zuul-ci/zuul-launcher
+          namespace: zuul-ci
+          repo_shortname: zuul-launcher
+          repo_description: Zuul launcher image
+          target: zuul-launcher
+          tags: *imagetag
+        - context: .
+          registry: quay.io
           repository: quay.io/zuul-ci/zuul-merger
           namespace: zuul-ci
           repo_shortname: zuul-merger
