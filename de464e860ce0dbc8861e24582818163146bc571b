@@ -16,6 +16,24 @@
       "message": "As Jim suggested on the original change (https://review.opendev.org/c/zuul/zuul/+/917039/comment/ece3b616_f2caa7a4/), I\u0027ve changed the color from white to a black. I decided to use black-300 as I find that black-500 is hard to differentiate from the dark background. For the hover color I used black-400. Let me know if that suits you.",
       "revId": "de464e860ce0dbc8861e24582818163146bc571b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c51a3431_ceb762f5",
+        "filename": "web/src/index.css",
+        "patchSetId": 9
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-15T16:48:47Z",
+      "side": 1,
+      "message": "This is better, thanks.  My main objective in suggesting 500 was that it should match the progress bar color since it\u0027s indicating something similar.  I do agree that 300 looks very dark, and it looks darker than the progress bar which is weird.  I measured the pixel values and they are in fact different, so I assume there may be some transparency setting having an influence or something.  I didn\u0027t track it down completely.\n\n300 is still a little light, I think, and that makes it slightly harder to read the squares as being \"incomplete\".  You might try 400 and see how that looks (I like it).  This is not a -1; I think we could go with either.",
+      "parentUuid": "36c0a75c_71da1c0c",
+      "revId": "de464e860ce0dbc8861e24582818163146bc571b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
