@@ -340,8 +340,7 @@ class DatabaseSession(object):
             self.connection.buildModel.end_time).\
             join(self.connection.buildSetModel).\
             join(self.connection.refModel).\
-            group_by(self.connection.buildModel.id).\
-            prefix_with('STRAIGHT_JOIN', dialect='mysql')
+            group_by(self.connection.buildModel.id)
 
         # See note above about the hint.
         if not (project):
