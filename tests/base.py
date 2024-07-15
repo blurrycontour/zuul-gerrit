@@ -1791,7 +1791,6 @@ class BaseTestCase(testtools.TestCase):
                     name, level_str = default.split('=', 1)
                     level = getattr(logging, level_str, logging.DEBUG)
                     logger = logging.getLogger(name)
-                    print('JEB' ,name, level)
                     logger.setLevel(level)
                     logger.addHandler(handler)
                     self.addCleanup(logger.removeHandler, handler)

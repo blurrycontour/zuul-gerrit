@@ -22,7 +22,7 @@ import time
 
 from kazoo.exceptions import NoNodeError
 
-from zuul.zk import sharding, ZooKeeperBase
+from zuul.zk import sharding, ZooKeeperBase, ZooKeeperSimpleBase
 from zuul.provider import BaseProvider
 
 
@@ -219,7 +219,7 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
         self.log.debug("Finished layout data cleanup")
 
 
-class LayoutProvidersStore(ZooKeeperBase):
+class LayoutProvidersStore(ZooKeeperSimpleBase):
     log = logging.getLogger("zuul.LayoutProvidersStore")
 
     tenant_root = "/zuul/tenant"
