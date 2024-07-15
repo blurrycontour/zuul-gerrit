@@ -1781,7 +1781,9 @@ class BaseTestCase(testtools.TestCase):
         log_defaults_from_env = os.environ.get(
             'OS_LOG_DEFAULTS',
             'git.cmd=INFO,'
-            'kazoo.client=WARNING,kazoo.recipe=WARNING')
+            'kazoo.client=WARNING,kazoo.recipe=WARNING,'
+            'botocore=WARNING'
+        )
 
         if log_defaults_from_env:
             for default in log_defaults_from_env.split(','):
@@ -1789,6 +1791,7 @@ class BaseTestCase(testtools.TestCase):
                     name, level_str = default.split('=', 1)
                     level = getattr(logging, level_str, logging.DEBUG)
                     logger = logging.getLogger(name)
+                    print('JEB' ,name, level)
                     logger.setLevel(level)
                     logger.addHandler(handler)
                     self.addCleanup(logger.removeHandler, handler)
