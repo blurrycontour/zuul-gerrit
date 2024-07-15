@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84566157_0cc632bb",
+        "filename": "zuul/lib/connections.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-15T19:57:50Z",
+      "side": 1,
+      "message": "Unused currently.",
+      "revId": "0e030edd213a042204b7f71e12fe8fc7f94b232b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
