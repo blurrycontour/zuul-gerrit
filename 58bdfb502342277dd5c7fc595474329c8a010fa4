@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bc5c0d9_728885de",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-15T20:16:37Z",
+      "side": 1,
+      "message": "I don\u0027t thisk this is quite right.  This looks like it\u0027s assigning a random connection to each label in the request.  Consulting the spec, the algo is:\n\n* If all providers have failed the request, clear all temp failures\n* If all providers have permanently failed the request, return error\n* Identify providers capable of fulfilling the request\n* Assign nodes to any provider with sufficient quota\n* If no providers with sufficient quota, assign it to first (highest priority) provider that can fulfill it later and pause that provider\n\nSo first, we should be dealing with providers, and probably not connections at this point.\n\nIt looks like you\u0027re choosing to ignore the first two steps for now; that\u0027s fine and makes things simpler.  So the first interesting step is \"Identify providers capable of fulfilling the request\".  I think that\u0027s what we should be doing here, and disregarding connections (they\u0027re just an implementation detail for how providers actually get work done).\n\nAlso, since this is the global request handling loop, theoretically this should be able to operate on a launcher with zero connections configured.  That too implies that we shouldn\u0027t be consulting the connection registry here.\n\nAnyway, I think if you want to have this be \"assign a random thing\" that\u0027s fine -- but the thing should probably be a provider not a connection.",
+      "revId": "58bdfb502342277dd5c7fc595474329c8a010fa4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
