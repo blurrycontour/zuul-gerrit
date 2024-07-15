@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "14a048ea_334eba40",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-15T17:06:53Z",
+      "side": 1,
+      "message": "I\u0027m not entirely sure we do understand each other.  To over-simplify what I said:\n\nCurrently it looks like this: https://imgur.com/7CXcDjQ.png\n\nAnd it\u0027s not intuitive to know that 923759 is ordered after 909513 (for purposes of resource allocation, etc).\n\nThe only solution I can suggest to that is to use a single column, which can be simulated now by shrinking the window width; it looks like this: https://imgur.com/UZl1ves.png\n\nIt sounds like you are saying I was suggesting a grid which looks like https://imgur.com/7CXcDjQ.png but that\u0027s what is in the change now.\n\nYour diagram with the X\u0027s looks like the pipeline overview with the little squares, but that\u0027s not what I was talking about.  Maybe that\u0027s the source of the confusion?  I\u0027m talking about the pipeline details view where we actually see the subway-map view of changes in the pipeline.  That\u0027s the main subject of this change I think.  \n\n(However, completely separate from all of that, I do like the idea of visually separating the queues in the pipeline overview; I had been thinking along those lines too, but I don\u0027t think it\u0027s important to address right now.)",
+      "parentUuid": "3d579a74_cbd5712f",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57bc08d9_e2a42e20",
         "filename": "web/src/containers/status/Misc.jsx",
         "patchSetId": 9
