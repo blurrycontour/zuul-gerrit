@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73ebe7b1_33ad708d",
+        "filename": "zuul/model.py",
+        "patchSetId": 8
+      },
+      "lineNbr": 2177,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-15T20:01:50Z",
+      "side": 1,
+      "message": "I wonder if we should call this ProvisionedNodeset or similar.",
+      "revId": "7cf8c9cebe07d988e4bf23f93e3756ec44f27f1d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
