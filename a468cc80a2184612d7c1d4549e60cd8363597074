@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "a468cc80a2184612d7c1d4549e60cd8363597074",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4acc669_404ff507",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2119,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-15T22:17:26Z",
+      "side": 1,
+      "message": "Super nits:\n* I try to avoid contractions in log messages to make grepping easier.  So I\u0027d go with \"is not\" here.\n* Could be other than protected (locked, excluded, etc), so s/(protected)/zuul-monitored/  (or maybe \"included\") might be more technically correct.",
+      "revId": "a468cc80a2184612d7c1d4549e60cd8363597074",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
