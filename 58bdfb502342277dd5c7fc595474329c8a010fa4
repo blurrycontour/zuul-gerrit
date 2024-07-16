@@ -34,6 +34,24 @@
       "parentUuid": "5bc5c0d9_728885de",
       "revId": "58bdfb502342277dd5c7fc595474329c8a010fa4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8fcdac60_c093705f",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-16T12:37:46Z",
+      "side": 1,
+      "message": "Ack, I\u0027ll change that. This was written at a time when we did not have the providers on the launcher yet.\n\nTo your point:\n\u003e Also, since this is the global request handling loop, theoretically this should be able to operate on a launcher with zero connections configured.\n\nI think that\u0027s not possible as a provider needs to have an associated connection.\nhttps://review.opendev.org/c/zuul/zuul/+/922258/6/zuul/provider/__init__.py#90",
+      "parentUuid": "63e0214e_31d098ff",
+      "revId": "58bdfb502342277dd5c7fc595474329c8a010fa4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
