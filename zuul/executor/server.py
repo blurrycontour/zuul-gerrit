@@ -2012,9 +2012,10 @@ class AnsibleJob(object):
                 should_retry = True
                 error_detail = "Host unreachable"
             if post_status != self.RESULT_NORMAL or post_code != 0:
-                success = False
                 # If we encountered a pre-failure, that takes
                 # precedence over the post result.
+                if not playbook.ignore_result:
+                    success = False
                 if allow_post_result and not playbook.ignore_result:
                     result = 'POST_FAILURE'
                 if (not aborted and
@@ -2184,7 +2185,7 @@ class AnsibleJob(object):
         # If there are cleanup playbooks, then mutate them into
         # post-run playbooks.
         post_run = self.job.post_run
-        cleanup_run = self.job.cleanup_run
+        cleanup_run = self.job.cleanup_run.copy()
         while cleanup_run:
             cleanup_playbook = cleanup_run.pop(0)
             for i in range(len(post_run)):
@@ -2199,11 +2200,11 @@ class AnsibleJob(object):
 
         for playbook in post_run:
             jobdir_playbook = self.jobdir.addPostPlaybook()
+            self.preparePlaybook(jobdir_playbook, playbook, args)
             if playbook in self.job.cleanup_run:
                 # This backwards compatible handling for MODEL_API < 30
                 jobdir_playbook.cleanup = True
                 jobdir_playbook.ignore_result = True
-            self.preparePlaybook(jobdir_playbook, playbook, args)
 
     def preparePlaybook(self, jobdir_playbook, playbook, args):
         # Check out the playbook repo if needed and set the path to
@@ -2774,6 +2775,10 @@ class AnsibleJob(object):
                 self.unreachable_nodes.add(node)
         except Exception:
             self.log.error("Error updating unreachable hosts:")
+        try:
+            os.unlink(self.jobdir.job_unreachable_file)
+        except Exception:
+            self.log.error("Error unlinking unreachable host file")
 
     def writeDebugInventory(self):
         # This file is unused by Zuul, but the base jobs copy it to logs

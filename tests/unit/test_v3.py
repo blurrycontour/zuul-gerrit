@@ -4741,10 +4741,67 @@ class TestCleanupPlaybooks(AnsibleZuulTestCase):
 
         tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
         errors = tenant.layout.loading_errors
-        self.assertEqual(len(errors), 1)
+        self.assertEqual(len(errors), 2)
         self.assertEqual(errors[0].severity, SEVERITY_WARNING)
         self.assertEqual(errors[0].name, 'Cleanup Run Deprecation')
         self.assertIn('job stanza', errors[0].error)
+
+    def test_cleanup_playbook_unreachable(self):
+        # Test that an unreachable cleanup-run playbook produces a
+        # POST_FAILURE
+        self.executor_server.verbose = True
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - child-cleanup-failure-unreachable
+            """)
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files={'.zuul.yaml': in_repo_conf})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        for _ in iterate_timeout(60, 'job started'):
+            if len(self.builds):
+                break
+        self.waitUntilSettled()
+
+        build = self.getJobFromHistory('child-cleanup-failure-unreachable')
+        self.assertEqual('POST_FAILURE', build.result)
+        cleanup_flag = os.path.join(self.jobdir_root, build.uuid +
+                                    '.cleanup.flag')
+        self.assertTrue(os.path.exists(cleanup_flag))
+        with open(cleanup_flag) as f:
+            self.assertEqual('False', f.readline())
+
+    def test_cleanup_playbook_unreachable_old_syntax(self):
+        # Test that an unreachable cleanup-run playbook produces a
+        # does not override the normal FAILURE using the old syntax
+        self.executor_server.verbose = True
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                check:
+                  jobs:
+                    - child-cleanup-failure-unreachable-old-syntax
+            """)
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files={'.zuul.yaml': in_repo_conf})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        for _ in iterate_timeout(60, 'job started'):
+            if len(self.builds):
+                break
+        self.waitUntilSettled()
+
+        build = self.getJobFromHistory(
+            'child-cleanup-failure-unreachable-old-syntax')
+        self.assertEqual('FAILURE', build.result)
+        cleanup_flag = os.path.join(self.jobdir_root, build.uuid +
+                                    '.cleanup.flag')
+        self.assertTrue(os.path.exists(cleanup_flag))
+        with open(cleanup_flag) as f:
+            self.assertEqual('False', f.readline())
 
 
 class TestPlaybookSemaphore(AnsibleZuulTestCase):
@@ -8487,9 +8544,6 @@ class TestUnreachable(AnsibleZuulTestCase):
             dict(name='post-unreachable', result=None, changes='1,1'),
             dict(name='post-unreachable', result=None, changes='1,1'),
         ], ordered=False)
-        unreachable_log = self._get_file(self.history[0],
-                                         '.ansible/nodes.unreachable')
-        self.assertEqual('fake\n', unreachable_log)
 
         retried_builds = set()
         for build in self.history:
