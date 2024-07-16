@@ -200,8 +200,6 @@ class DatabaseSession(object):
         # the query.
         if provides:
             q = q.outerjoin(self.connection.providesModel)
-        else:
-            q = q.prefix_with('STRAIGHT_JOIN', dialect='mysql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilterFuzzy(q, buildset_table.c.pipeline, pipeline)
@@ -436,14 +434,19 @@ class DatabaseSession(object):
                      query_timeout=None):
 
         buildset_table = self.connection.zuul_buildset_table
+        buildset_ref_table = self.connection.zuul_buildset_ref_table
         ref_table = self.connection.zuul_ref_table
 
         q = self.session().query(
             self.connection.buildSetModel.id).\
             join(self.connection.buildSetRefModel).\
             join(self.connection.refModel).\
-            group_by(self.connection.buildSetModel.id).\
-            prefix_with('STRAIGHT_JOIN', dialect='mysql')
+            group_by(self.connection.buildSetModel.id)
+
+        # See note above about the hint.
+        if not (project or change or uuid):
+            q = q.with_hint(buildset_table, 'USE INDEX (PRIMARY)', 'mysql')
+            q = q.with_hint(buildset_ref_table, 'USE INDEX (PRIMARY)', 'mysql')
 
         q = self.listFilter(q, buildset_table.c.tenant, tenant)
         q = self.listFilterFuzzy(q, buildset_table.c.pipeline, pipeline)
