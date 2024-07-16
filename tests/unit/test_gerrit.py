@@ -736,12 +736,12 @@ class TestPolling(ZuulTestCase):
                                            files=file_dict)
         A.setMerged()
         self.waitForPoll('gerrit')
-        self.waitUntilSettled()
+        self.waitUntilSettled('poll 1')
 
         B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
         B.setCheck('zuul:check', reset=True)
         self.waitForPoll('gerrit')
-        self.waitUntilSettled()
+        self.waitUntilSettled('poll 2')
 
         self.assertEqual(B.checks_history[0]['zuul:check']['state'],
                          'NOT_STARTED')
@@ -756,6 +756,11 @@ class TestPolling(ZuulTestCase):
             dict(name='test-job', result='SUCCESS', changes='2,1'),
             dict(name='test-job2', result='SUCCESS', changes='2,1'),
         ], ordered=False)
+
+        # There may be an extra change-merged event because we poll
+        # too often during the tests.
+        self.waitForPoll('gerrit')
+        self.waitUntilSettled('poll 3')
 
     @simple_layout('layouts/gerrit-poll-post.yaml')
     def test_post(self):
