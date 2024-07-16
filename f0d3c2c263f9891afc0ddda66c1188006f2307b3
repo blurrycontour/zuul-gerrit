@@ -16,6 +16,24 @@
       "message": "Maybe we should extend the `LayoutStateStore` with a cache so we don\u0027t hit ZK every time we check if the local layout is up-to-date.",
       "revId": "f0d3c2c263f9891afc0ddda66c1188006f2307b3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "648adc6f_5f6593fe",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-16T15:01:52Z",
+      "side": 1,
+      "message": "Good point -- or, since it has a callback, we can probably use that to set an event and only check it if it\u0027s been called.  I\u0027ll do one or the other in a followup.",
+      "parentUuid": "842b7f70_063ac7f9",
+      "revId": "f0d3c2c263f9891afc0ddda66c1188006f2307b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
