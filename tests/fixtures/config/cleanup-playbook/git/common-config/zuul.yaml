@@ -55,6 +55,8 @@
 
 - job:
     name: child-cleanup-failure
+    description: |
+      A job that fails during the run playbook
     parent: python27-failure
     pre-run: playbooks/child-pre.yaml
     post-run:
@@ -63,9 +65,34 @@
         cleanup: true
 
 - job:
+    name: child-cleanup-failure-unreachable
+    description: |
+      A job that fails during the run playbook but then also has an
+      unreachable cleanup playbook
+    parent: python27-failure
+    pre-run: playbooks/child-pre.yaml
+    post-run:
+      - playbooks/child-post.yaml
+      - name: playbooks/child-cleanup-unreachable.yaml
+        cleanup: true
+
+- job:
     name: child-cleanup-failure-old-syntax
+    description: |
+      A job that fails during the run playbook
     parent: python27-failure
     pre-run: playbooks/child-pre.yaml
     post-run: playbooks/child-post.yaml
     # Backwards-compat syntax
     cleanup-run: playbooks/child-cleanup.yaml
+
+- job:
+    name: child-cleanup-failure-unreachable-old-syntax
+    description: |
+      A job that fails during the run playbook but then also has an
+      unreachable cleanup playbook
+    parent: python27-failure
+    pre-run: playbooks/child-pre.yaml
+    post-run: playbooks/child-post.yaml
+    # Backwards-compat syntax
+    cleanup-run: playbooks/child-cleanup-unreachable.yaml

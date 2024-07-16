@@ -1,2 +1,2 @@
-- hosts: all
+- hosts: "!zuul_unreachable"
   tasks: []

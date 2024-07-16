@@ -1,4 +1,4 @@
-- hosts: all
+- hosts: "!zuul_unreachable"
   tasks:
     - copy:
         content: "{{ zuul_success }}"
