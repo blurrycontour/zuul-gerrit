@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6354999e_e372fc01",
+        "filename": "tests/fixtures/config/cleanup-playbook/git/common-config/playbooks/child-cleanup-unreachable.yaml",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-07-16T16:15:12Z",
+      "side": 1,
+      "message": "I think using `nonexistent.invalid` is the recommended dns according to https://www.rfc-editor.org/rfc/rfc6761 6.4",
+      "revId": "db3cf365cc32ac99cd0d532107d6db22fa04ca6f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
