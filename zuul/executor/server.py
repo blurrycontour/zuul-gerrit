@@ -2004,7 +2004,7 @@ class AnsibleJob(object):
                 phase='post', index=index, will_retry=will_retry)
             if post_status == self.RESULT_ABORTED:
                 aborted = True
-            if post_status == self.RESULT_UNREACHABLE:
+            if post_status == self.RESULT_UNREACHABLE and not playbook.cleanup:
                 # In case we encounter unreachable nodes we need to return None
                 # so the job can be retried. However in the case of post
                 # playbooks we should still try to run all playbooks to get a
