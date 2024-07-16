@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9c83a1c_3dd708f5",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-16T12:33:42Z",
+      "side": 1,
+      "message": "nit: maybe we should make `obj` optional to indicate that it can be None",
+      "range": {
+        "startLine": 328,
+        "startChar": 52,
+        "endLine": 328,
+        "endChar": 55
+      },
+      "revId": "a4751ef619e3e711fa6e878225e69c1b53622dda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d467a273_69e65fb9",
+        "filename": "zuul/zk/image_registry.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-16T12:33:42Z",
+      "side": 1,
+      "message": "Should we move the `LockableZKObjectCache` to `zuul/zk/cache.py`?",
+      "range": {
+        "startLine": 17,
+        "startChar": 29,
+        "endLine": 17,
+        "endChar": 50
+      },
+      "revId": "a4751ef619e3e711fa6e878225e69c1b53622dda",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
