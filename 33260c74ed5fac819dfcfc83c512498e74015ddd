@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cabe2e1f_9997af3b",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-16T18:19:10Z",
+      "side": 1,
+      "message": "See the note below on line 197 first.\n\nProvider.canonical_name may not be as unique as it sounds, since it\u0027s really the location of the provider definition which can be reused in different tenants, each of which ends up with a unique provider depending on the contents of other objects like labels, flavors, and images.\n\nI don\u0027t think any of that matters here though, since we\u0027re also scoping this to the request_uuid which is itself scoped to a tenant.  So uuid+provider.canonical_name *is* unique.  But so is uuid+provider.name (for the same reasons discussed on line 197).\n\nI\u0027m wondering if we should switch this to provider.name here, and, if we don\u0027t ever end up using provider.canonical_name, perhaps remove that entirely, just to avoid any mental traps where we think it\u0027s more unique than it really is.",
+      "revId": "33260c74ed5fac819dfcfc83c512498e74015ddd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eabc92d7_235a9114",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-16T18:19:10Z",
+      "side": 1,
+      "message": "Originally I imagined that the label in the request would be a canonical name to avoid issues related to labels having different names in different tenants.  But I think this construction is equivalent, where it\u0027s okay to use the short name because we\u0027re scoping to the providers in each tenant, where, even if they are for the same provider defitition, if they have different labels, each tenant-specific serialized manifestation of the provider will have different values for them.\n\nSo in short, I think this is okay (but double check me on that).  Also, I think that means that in general, the canonical name of some of these objects may not be important.  Here we\u0027re using tenant+label instead of label.canonical_name.  Likewise, we\u0027re also implicitly using tenant+provider here and not provider.canonical_name.  I suspect that image.canonical_name will end up being important though.",
+      "revId": "33260c74ed5fac819dfcfc83c512498e74015ddd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
