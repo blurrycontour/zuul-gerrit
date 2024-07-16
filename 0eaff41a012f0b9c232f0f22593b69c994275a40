@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e994760_f4667260",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2024-07-16T11:39:09Z",
+      "side": 1,
+      "message": "Nice! We we\u0027re discussing something like this as well for authentication to trace which jobs were using certain artifacts (instead of allowing anonymous reads).\n\nI understand that this is supposed to generate a JWT for jobs in post-review, but I wonder if it could also generate tokens in pre-review except with a smaller scope (like read only, or only allow uploads to temporary paths). Maybe that could work with a claim for `zuul.post-review`.",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec6b739f_adfa26e6",
