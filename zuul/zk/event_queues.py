@@ -19,6 +19,7 @@ import logging
 import threading
 import time
 import uuid
+import zlib
 from collections import namedtuple
 from collections.abc import Iterable
 from contextlib import suppress
@@ -302,7 +303,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
 
             with sharding.BufferedShardWriter(
                     self.kazoo_client, data_root) as stream:
-                stream.write(side_channel_data)
+                stream.write(zlib.compress(side_channel_data))
 
         if updater is None:
             return self.kazoo_client.create(
@@ -353,7 +354,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
                 try:
                     with sharding.BufferedShardReader(
                             self.kazoo_client, side_channel_path) as stream:
-                        side_channel_data = stream.read()
+                        side_channel_data = zlib.decompress(stream.read())
                 except NoNodeError:
                     self.log.exception("Side channel data for %s "
                                        "not found at %s",
@@ -522,7 +523,7 @@ class JobResultFuture(EventResultFuture):
         self._result_data_path = result['result_data_path']
         with sharding.BufferedShardReader(
                 self.kazoo_client, self._result_data_path) as stream:
-            return stream.read()
+            return zlib.decompress(stream.read())
 
     def _delete(self):
         super()._delete()

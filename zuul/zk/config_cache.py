@@ -15,6 +15,7 @@
 import contextlib
 import json
 import logging
+import zlib
 
 from collections.abc import MutableMapping
 from urllib.parse import quote_plus, unquote_plus
@@ -104,7 +105,7 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
             with sharding.BufferedShardReader(
                 self.kazoo_client, self._key_path(key)
             ) as stream:
-                return stream.read().decode("utf8")
+                return zlib.decompress(stream.read()).decode("utf8")
         except NoNodeError:
             raise KeyError(key)
 
@@ -112,7 +113,7 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
         path = self._key_path(key)
         with sharding.BufferedShardWriter(self.kazoo_client, path) as stream:
             stream.truncate(0)
-            stream.write(value.encode("utf8"))
+            stream.write(zlib.compress(value.encode("utf8")))
 
     def __delitem__(self, key):
         try:
@@ -217,7 +218,7 @@ class SystemConfigCache(ZooKeeperSimpleBase):
                 with sharding.BufferedShardReader(
                     self.kazoo_client, self.conf_path
                 ) as stream:
-                    data = json.loads(stream.read())
+                    data = json.loads(zlib.decompress(stream.read()))
             except Exception:
                 raise RuntimeError("No valid system config")
             zstat = self.kazoo_client.exists(self.conf_path)
@@ -236,6 +237,7 @@ class SystemConfigCache(ZooKeeperSimpleBase):
                 self.kazoo_client, self.conf_path
             ) as stream:
                 stream.truncate(0)
-                stream.write(json.dumps(data, sort_keys=True).encode("utf8"))
+                stream.write(zlib.compress(
+                    json.dumps(data, sort_keys=True).encode("utf8")))
             zstat = self.kazoo_client.exists(self.conf_path)
             unparsed_abide.ltime = zstat.last_modified_transaction_id

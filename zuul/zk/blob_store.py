@@ -14,6 +14,7 @@
 # under the License.
 
 import hashlib
+import zlib
 
 from kazoo.exceptions import NoNodeError
 from kazoo.retry import KazooRetry
@@ -57,13 +58,12 @@ class BlobStore:
         if not context.client.exists(flag):
             raise KeyError(key)
         with sharding.BufferedShardReader(context.client, path) as stream:
-            data = stream.read()
-            compressed_size = stream.compressed_bytes_read
+            data = zlib.decompress(stream.read())
             context.cumulative_read_time += stream.cumulative_read_time
             context.cumulative_read_objects += 1
             context.cumulative_read_znodes += stream.znodes_read
-            context.cumulative_read_bytes += compressed_size
-        return data, compressed_size
+            context.cumulative_read_bytes += stream.bytes_read
+        return data, stream.bytes_read
 
     def get(self, key):
         path = self._getPath(key)
@@ -97,15 +97,14 @@ class BlobStore:
     def _retryableSave(context, path, flag, data):
         with sharding.BufferedShardWriter(context.client, path) as stream:
             stream.truncate(0)
-            stream.write(data)
+            stream.write(zlib.compress(data))
             stream.flush()
             context.client.ensure_path(flag)
-            compressed_size = stream.compressed_bytes_written
             context.cumulative_write_time += stream.cumulative_write_time
             context.cumulative_write_objects += 1
             context.cumulative_write_znodes += stream.znodes_written
-            context.cumulative_write_bytes += compressed_size
-        return compressed_size
+            context.cumulative_write_bytes += stream.bytes_written
+        return stream.bytes_written
 
     def put(self, data):
         if isinstance(self.context, LocalZKContext):
