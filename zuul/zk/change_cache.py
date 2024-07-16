@@ -20,6 +20,7 @@ import threading
 import time
 import uuid
 import hashlib
+import zlib
 from collections import defaultdict
 from collections.abc import Iterable
 
@@ -331,8 +332,8 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             with sharding.BufferedShardReader(
                 self.kazoo_client, self._dataPath(data_uuid)
             ) as stream:
-                raw_data = stream.read()
-                compressed_size = stream.compressed_bytes_read
+                raw_data = zlib.decompress(stream.read())
+                compressed_size = stream.bytes_read
                 uncompressed_size = len(raw_data)
         except NoNodeError:
             cache_path = self._cachePath(key._hash)
@@ -380,9 +381,9 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         data_uuid = uuid.uuid4().hex
         with sharding.BufferedShardWriter(
                 self.kazoo_client, self._dataPath(data_uuid)) as stream:
-            stream.write(raw_data)
+            stream.write(zlib.compress(raw_data))
             stream.flush()
-            compressed_size = stream.compressed_bytes_written
+            compressed_size = stream.bytes_written
             uncompressed_size = len(raw_data)
 
         # Add the change_key info here mostly for debugging since the
