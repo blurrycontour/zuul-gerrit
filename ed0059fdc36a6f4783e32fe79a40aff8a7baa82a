@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7b5667f_60f6de69",
+        "filename": "zuul/provider/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-16T12:16:40Z",
+      "side": 1,
+      "message": "Just wondering if this can be a simple ZKObject or if we need to use a sharded instance? If this needs to be sharded we\u0027d need to check if that works with `PolymorphicZKObjectMixin`.",
+      "revId": "ed0059fdc36a6f4783e32fe79a40aff8a7baa82a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
