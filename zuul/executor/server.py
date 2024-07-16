@@ -3017,7 +3017,7 @@ class AnsibleJob(object):
                 env=env_copy,
             )
 
-        syntax_buffer = []
+        syntax_buffer = collections.deque(maxlen=BUFFER_LINES_FOR_SYNTAX)
         ret = None
         if timeout:
             watchdog = Watchdog(timeout, self._ansibleTimeout,
@@ -3028,9 +3028,6 @@ class AnsibleJob(object):
                 logging.getLogger("zuul.AnsibleJob.output"),
                 self.zuul_event_id, build=self.build_request.uuid)
 
-            # Use manual idx instead of enumerate so that RESULT lines
-            # don't count towards BUFFER_LINES_FOR_SYNTAX
-            idx = 0
             first = True
             for line in iter(
                     partial(self.proc.stdout.readline, OUTPUT_MAX_LINE_BYTES),
@@ -3069,10 +3066,7 @@ class AnsibleJob(object):
                             self.build_request, {'pre_fail': True})
                         # No need to pre-fail again
                         allow_pre_fail = False
-                else:
-                    idx += 1
-                if idx < BUFFER_LINES_FOR_SYNTAX:
-                    syntax_buffer.append(line)
+                syntax_buffer.append(line)
 
                 if line.startswith(b'fatal'):
                     line = line[:8192].rstrip()
