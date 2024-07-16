@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e815cf4f_04cc15a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-07-16T07:27:43Z",
+      "side": 1,
+      "message": "recheck this failed on another unstable test that is going to be fixed next https://review.opendev.org/c/zuul/zuul/+/924016",
+      "revId": "04ea6a0dfa495ad02aaabfe14a7f7b4c3c27f297",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
