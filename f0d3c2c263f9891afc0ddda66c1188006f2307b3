@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "842b7f70_063ac7f9",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-16T12:21:53Z",
+      "side": 1,
+      "message": "Maybe we should extend the `LayoutStateStore` with a cache so we don\u0027t hit ZK every time we check if the local layout is up-to-date.",
+      "revId": "f0d3c2c263f9891afc0ddda66c1188006f2307b3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
