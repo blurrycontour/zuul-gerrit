@@ -52,6 +52,24 @@
       "parentUuid": "63e0214e_31d098ff",
       "revId": "58bdfb502342277dd5c7fc595474329c8a010fa4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a537c44_7cb4802d",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-16T17:54:44Z",
+      "side": 1,
+      "message": "Oh good point.  I guess that was, as they say in physics, assuming a perfectly spherical provider.  ;)\n\nI don\u0027t think that\u0027s important, I mostly mentioned that as a theoretical construct.  Perhaps if we decide that is worth doing, we could change that requirement (allow a provider to be deserialized without a connection).\n\nI don\u0027t think that\u0027s worth doing for the use case I described.  We might decide it\u0027s worth doing so that folks could have differing zuul.yaml files on different launchers.  However I don\u0027t think that\u0027s a requirement (the way to filter connections is to use the command-line arguments or env variables).\n\nMaybe just something to keep in mind as we go.",
+      "parentUuid": "63e0214e_31d098ff",
+      "revId": "58bdfb502342277dd5c7fc595474329c8a010fa4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
