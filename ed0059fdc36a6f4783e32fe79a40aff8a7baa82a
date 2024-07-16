@@ -16,6 +16,24 @@
       "message": "Just wondering if this can be a simple ZKObject or if we need to use a sharded instance? If this needs to be sharded we\u0027d need to check if that works with `PolymorphicZKObjectMixin`.",
       "revId": "ed0059fdc36a6f4783e32fe79a40aff8a7baa82a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f36b8ffa_9ab7daeb",
+        "filename": "zuul/provider/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-16T14:58:23Z",
+      "side": 1,
+      "message": "I did not originally anticipate this being very large, but since we are now serializing basically everything about the provider, including all images, it\u0027s possible people may create very large auto-generated image/label definitions and we should probably shard this.  I will make a followup change for that.",
+      "parentUuid": "d7b5667f_60f6de69",
+      "revId": "ed0059fdc36a6f4783e32fe79a40aff8a7baa82a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
