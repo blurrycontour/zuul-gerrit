@@ -69,7 +69,7 @@ class BaseProviderEndpoint(metaclass=abc.ABCMeta):
 
 
 class BaseProvider(zkobject.PolymorphicZKObjectMixin,
-                   zkobject.ZKObject):
+                   zkobject.ShardedZKObject):
     """Base class for provider."""
 
     def __init__(self, *args):
