@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "687c5be2_084a949e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2024-07-17T08:15:21Z",
+      "side": 1,
+      "message": "\u003e 1) With the spec as currently written, you could have a base-job pre-run playbook in a trusted repo (probably your \"base\" job) request a secret for this purpose and write it to disk as an Ansible cached fact. Then subsequent playbooks which needed to download artifacts could use this cached token to access them.\n\nYep that makes sense.",
+      "parentUuid": "8c45b9d7_ec22f5ba",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ec6b739f_adfa26e6",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 1
@@ -188,6 +206,24 @@
       "side": 1,
       "message": "I think we still can discuss wether we\u0027ll need this at all as standard claims. In most cases I think the matching will be against the sub which is probably the only identifier which is really protected by zuul\u0027s secret mechanism. If we decide to put that information there by default (for informational, maybe logging purposes on the target service) I agree that we should put a warning in the docs.",
       "parentUuid": "0bd40794_3fdfead2",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "577bcabe_b457e0cd",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 29671
+      },
+      "writtenOn": "2024-07-17T08:15:21Z",
+      "side": 1,
+      "message": "\u003e In most cases I think the matching will be against the sub which is probably the only identifier which is really protected by zuul\u0027s secret mechanism.\n\nAs discussed below, if we were to generate tokens from a trusted context in pre-review I believe we would mostly match against a post-review and project claim rather than subject.\n\nIf the default claims are limited to subject (secret fqdn/id), job name and playbook we may want to allow templating in the additional claims configured in the oidc secret to make it possible to add information about the context the token was generated for. Instead I\u0027m leaning towards adding more zuul data as default claims since it seems easier to build standardized tooling around that.\n\nIs there a drawback to adding too many claims?",
+      "parentUuid": "c8fa9e06_cbaa6e76",
       "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
