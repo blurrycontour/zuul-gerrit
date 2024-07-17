@@ -233,6 +233,21 @@ def gerrit_config(submit_whole_topic=False):
     return decorator
 
 
+def driver_config(driver, **kw):
+    """A generic driver config.  Use this instead of making a new
+    decorator like gerrit_config.
+    """
+
+    def decorator(test):
+        driver_dict = getattr(test, '__driver_config__', None)
+        if driver_dict is None:
+            driver_dict = {}
+            test.__driver_config__ = driver_dict
+        driver_dict[driver] == kw
+        return test
+    return decorator
+
+
 def return_data(job, ref, data):
     """Add return data for a job
 
@@ -1793,10 +1808,15 @@ class BaseTestCase(testtools.TestCase):
             False)
         self.addDetail('logging', content)
 
+    def initTestConfig(self):
+        # Some tests may need to do this before we setUp
+        if not hasattr(self, 'test_config'):
+            self.test_config = TestConfig(self)
+
     def setUp(self):
         super(BaseTestCase, self).setUp()
 
-        self.test_config = TestConfig(self)
+        self.initTestConfig()
 
         self.useFixture(PrometheusFixture())
         self.useFixture(GlobalRegistryFixture())
@@ -2128,6 +2148,16 @@ class SchedulerTestManager:
             function(instance)
 
 
+class DriverTestConfig:
+    def __init__(self, test_config):
+        self.test_config = test_config
+
+    def __getattr__(self, name):
+        if name in self.test_config.driver_config:
+            return self.test_config.driver_config[name]
+        return {}
+
+
 class TestConfig:
     def __init__(self, testobj):
         test_name = testobj.id().split('.')[-1]
@@ -2145,6 +2175,8 @@ class TestConfig:
                                        default_okay_tracebacks)
         self.enable_nodepool = getattr(test, '__enable_nodepool__', False)
         self.return_data = getattr(test, '__return_data__', [])
+        self.driver_config = getattr(test, '__driver_config__', {})
+        self.driver = DriverTestConfig(self)
         self.changes = FakeChangeDB()
 
 
