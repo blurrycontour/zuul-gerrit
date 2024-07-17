@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48304e63_ab2e3866",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1313,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-17T14:20:32Z",
+      "side": 1,
+      "message": "Nit: you used an elif elsewhere but an if here.  Shouldn\u0027t matter because upstream we should only have one or the other; but if we ever didn\u0027t, this would make for weird behavior.",
+      "revId": "40da3e59d31bc0b7782db914dbae44add8f23a12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9f8f127_4f58b507",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1803,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-17T14:20:32Z",
+      "side": 1,
+      "message": "Why is this added?",
+      "revId": "40da3e59d31bc0b7782db914dbae44add8f23a12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
