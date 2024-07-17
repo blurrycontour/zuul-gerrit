@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8c45b9d7_ec22f5ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-17T00:12:41Z",
+      "side": 1,
+      "message": "I like that idea.\n\nFirst a clarification: this spec leverages the \"secret\" framework in Zuul, which means that the tokens aren\u0027t restricted to jobs that run in post-review, but rather they will be provided to playbooks which request access to those secrets.  This normally does mean playbooks that are defined in a trusted project, but those can be on jobs that are parent jobs of untrusted jobs (think how log uploads use a secret but run on untrusted jobs).  Now, if an untrusted playbook requests a secret, that flips some bits in zuul and turns off speculative execution and restricts the job to post-review pipelines.  That may be what you were referring to, but I just wanted to be clear because it\u0027s important for what follows.\n\nSince you want to use one of these tokens in an untrusted playbook, and presumably you also want to retain the ability to have speculative execution in untrusted playbooks, then that presents some incompatibilities with this spec and the current state of Zuul.  We could consider relaxing the restriction around using secrets in untrusted playbooks specifically for this kind of secret, but then that makes the whole system harder to understand (for users and zuul maintainers) because most secrets behave one way except this kind of secret that behaves another way.\n\nBut I can see two ways of doing what you want without opening that can of worms:\n\n1) With the spec as currently written, you could have a base-job pre-run playbook in a trusted repo (probably your \"base\" job) request a secret for this purpose and write it to disk as an Ansible cached fact.  Then subsequent playbooks which needed to download artifacts could use this cached token to access them.\n\nor\n\n2) We could automatically create a token as an \"implied\" secret that meets this criteria and supply it to every playbook.  This would be sort of like how the project ssh key shows up for post-review playbooks.  Since this one would show up everywhere automatically, we don\u0027t have to deal with attaching different kinds of secrets to jobs.\n\nI have an ever-so-slight preference for option #1 because it\u0027s fewer moving parts and I like being able to build functionality from simple primitives.  But if we think that it\u0027s too onerous I think #2 would be fine.",
+      "parentUuid": "6e994760_f4667260",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ec6b739f_adfa26e6",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 1
