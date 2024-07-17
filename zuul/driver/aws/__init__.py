@@ -20,6 +20,7 @@ from zuul.driver.aws import awsconnection, awsmodel, awsprovider
 
 class AwsDriver(Driver, ConnectionInterface, ProviderInterface):
     name = 'aws'
+    _endpoint_class = awsprovider.AwsProviderEndpoint
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
@@ -44,8 +45,8 @@ class AwsDriver(Driver, ConnectionInterface, ProviderInterface):
 
     def getEndpoint(self, provider):
         # An aws endpoint is a simply a region on the connection
-        # (presumably there is exactyl one aws connection, but in case
-        # someone uses boto to access as aws-compatible cloud we will
+        # (presumably there is exactly one aws connection, but in case
+        # someone uses boto to access an aws-compatible cloud we will
         # also use the connection).
         endpoint_id = '/'.join([
             urllib.parse.quote_plus(provider.connection.connection_name),
@@ -55,7 +56,11 @@ class AwsDriver(Driver, ConnectionInterface, ProviderInterface):
             return self.endpoints[endpoint_id]
         except KeyError:
             pass
-        endpoint = awsprovider.AwsProviderEndpoint(
+        endpoint = self._endpoint_class(
             self, provider.connection, provider.region)
         self.endpoints[endpoint_id] = endpoint
         return endpoint
+
+    def stop(self):
+        for endpoint in self.endpoints.values():
+            endpoint.stop()
