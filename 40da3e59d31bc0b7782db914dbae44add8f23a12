@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "32c522d2_cee19e27",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1313,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-17T17:35:18Z",
+      "side": 1,
+      "message": "Ack, I\u0027ve changed all to if/elif",
+      "parentUuid": "48304e63_ab2e3866",
+      "revId": "40da3e59d31bc0b7782db914dbae44add8f23a12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9f8f127_4f58b507",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-17T14:20:32Z",
       "side": 1,
       "message": "Why is this added?",
+      "revId": "40da3e59d31bc0b7782db914dbae44add8f23a12",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38ae3599_3b9241ce",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1803,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-17T17:35:18Z",
+      "side": 1,
+      "message": "Because a `Node` in Nodepool has a cloud attribute. It\u0027s set when loading the data from ZK via `updateFromDict()` but we don\u0027t initialize the attribute.",
+      "parentUuid": "e9f8f127_4f58b507",
       "revId": "40da3e59d31bc0b7782db914dbae44add8f23a12",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
