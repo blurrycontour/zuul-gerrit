@@ -56,7 +56,11 @@ function QueueItemSquare({ item }) {
       variant="plain"
       className={`zuul-item-square zuul-item-square-${iconConfig.variant}`}
     >
-      <SquareIcon />
+      {
+        iconConfig.variant === 'pending'?
+        <span>|</span>:
+        <SquareIcon />
+      }
     </Button>
   )
 }

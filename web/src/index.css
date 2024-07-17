@@ -277,10 +277,12 @@ a.refresh {
 }
 .zuul-item-square-pending {
     color: var(--pf-global--palette--black-500) !important;
+    width: 2px;
 }
 .zuul-item-square-pending svg:hover {
     opacity: 1;
     color: var(--pf-global--palette--black-700) !important;
+    width: 2px;
 }
 
 .zuul-change-queue .pf-c-progress-stepper__step-main {
