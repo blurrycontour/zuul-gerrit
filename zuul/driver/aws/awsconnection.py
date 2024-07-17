@@ -42,6 +42,8 @@ class AwsConnection(BaseConnection):
         self.profile = self.connection_config.get(
             'profile',
             os.getenv('AWS_PROFILE', None))
+        # Rate limit: requests/second
+        self.rate = self.connection_config.get('rate', 2)
 
         if (not self.access_key_id) and self.shared_credentials_file:
             path = os.path.expanduser(self.shared_credentials_file)
