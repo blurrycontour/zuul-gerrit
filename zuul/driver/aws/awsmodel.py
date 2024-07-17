@@ -1,4 +1,5 @@
 # Copyright 2024 BMW Group
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -13,7 +14,53 @@
 # under the License.
 
 from zuul import model
+from zuul.provider import statemachine
+from zuul.driver.aws.util import tag_list_to_dict
 
 
 class AwsProviderNode(model.ProviderNode, subclass_id="aws"):
     pass
+
+
+class AwsInstance(statemachine.Instance):
+    def __init__(self, provider, instance, host, quota):
+        super().__init__()
+        self.external_id = dict()
+        if instance:
+            self.external_id['instance'] = instance['InstanceId']
+        if host:
+            self.external_id['host'] = host['HostId']
+        self.metadata = tag_list_to_dict(instance.get('Tags'))
+        self.private_ipv4 = instance.get('PrivateIpAddress')
+        self.private_ipv6 = None
+        self.public_ipv4 = instance.get('PublicIpAddress')
+        self.public_ipv6 = None
+        self.cloud = 'AWS'
+        self.region = provider.region_name
+        self.az = None
+        self.quota = quota
+
+        self.az = instance.get('Placement', {}).get('AvailabilityZone')
+
+        for iface in instance.get('NetworkInterfaces', [])[:1]:
+            if iface.get('Ipv6Addresses'):
+                v6addr = iface['Ipv6Addresses'][0]
+                self.public_ipv6 = v6addr.get('Ipv6Address')
+        self.interface_ip = (self.public_ipv4 or self.public_ipv6 or
+                             self.private_ipv4 or self.private_ipv6)
+
+    def getQuotaInformation(self):
+        return self.quota
+
+
+class AwsResource(statemachine.Resource):
+    TYPE_HOST = 'host'
+    TYPE_INSTANCE = 'instance'
+    TYPE_AMI = 'ami'
+    TYPE_SNAPSHOT = 'snapshot'
+    TYPE_VOLUME = 'volume'
+    TYPE_OBJECT = 'object'
+
+    def __init__(self, metadata, type, id):
+        super().__init__(metadata, type)
+        self.id = id
