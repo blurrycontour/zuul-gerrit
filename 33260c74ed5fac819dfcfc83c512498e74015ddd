@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b0348ed_2809e3ae",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-17T09:40:37Z",
+      "side": 1,
+      "message": "Yeah, I think that makes sense. Done.",
+      "parentUuid": "cabe2e1f_9997af3b",
+      "revId": "33260c74ed5fac819dfcfc83c512498e74015ddd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eabc92d7_235a9114",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-16T18:19:10Z",
       "side": 1,
       "message": "Originally I imagined that the label in the request would be a canonical name to avoid issues related to labels having different names in different tenants.  But I think this construction is equivalent, where it\u0027s okay to use the short name because we\u0027re scoping to the providers in each tenant, where, even if they are for the same provider defitition, if they have different labels, each tenant-specific serialized manifestation of the provider will have different values for them.\n\nSo in short, I think this is okay (but double check me on that).  Also, I think that means that in general, the canonical name of some of these objects may not be important.  Here we\u0027re using tenant+label instead of label.canonical_name.  Likewise, we\u0027re also implicitly using tenant+provider here and not provider.canonical_name.  I suspect that image.canonical_name will end up being important though.",
+      "revId": "33260c74ed5fac819dfcfc83c512498e74015ddd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b86ad9c0_342b0abf",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 17
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-17T09:40:37Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "eabc92d7_235a9114",
       "revId": "33260c74ed5fac819dfcfc83c512498e74015ddd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
