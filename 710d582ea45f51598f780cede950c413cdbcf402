@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8289a7a_eeaf73b8",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-17T10:38:19Z",
+      "side": 1,
+      "message": "I hope there is no fallout from changing the behavior of `read()` to let the `NoNodeError` bubble up to the caller. It seems like we are handling that exception in most cases but there might be instances where we only handle exceptions following from an empty read (e.g. a `JSONDecodeError`).",
+      "revId": "710d582ea45f51598f780cede950c413cdbcf402",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
