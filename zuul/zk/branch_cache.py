@@ -289,16 +289,6 @@ class BranchCacheZKObject(ShardedZKObject):
         data.clear()
         data['projects'] = projects
 
-    def _save(self, context, data, create=False):
-        super()._save(context, data, create)
-        zstat = context.client.exists(self.getPath())
-        self._set(_zstat=zstat)
-
-    def _load(self, context, path=None):
-        super()._load(context, path)
-        zstat = context.client.exists(self.getPath())
-        self._set(_zstat=zstat)
-
 
 class BranchCache:
     def __init__(self, zk_client, connection, component_registry):

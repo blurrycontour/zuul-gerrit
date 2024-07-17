@@ -114,6 +114,7 @@ class FilesCache(ZooKeeperSimpleBase, MutableMapping):
         with sharding.BufferedShardWriter(self.kazoo_client, path) as stream:
             stream.truncate(0)
             stream.write(zlib.compress(value.encode("utf8")))
+            stream.flush()
 
     def __delitem__(self, key):
         try:
@@ -219,9 +220,9 @@ class SystemConfigCache(ZooKeeperSimpleBase):
                     self.kazoo_client, self.conf_path
                 ) as stream:
                     data = json.loads(zlib.decompress(stream.read()))
+                    zstat = stream.zstat
             except Exception:
                 raise RuntimeError("No valid system config")
-            zstat = self.kazoo_client.exists(self.conf_path)
             return (model.UnparsedAbideConfig.fromDict(
                     data["unparsed_abide"],
                     ltime=zstat.last_modified_transaction_id
@@ -239,5 +240,6 @@ class SystemConfigCache(ZooKeeperSimpleBase):
                 stream.truncate(0)
                 stream.write(zlib.compress(
                     json.dumps(data, sort_keys=True).encode("utf8")))
-            zstat = self.kazoo_client.exists(self.conf_path)
+                stream.flush()
+                zstat = stream.zstat
             unparsed_abide.ltime = zstat.last_modified_transaction_id

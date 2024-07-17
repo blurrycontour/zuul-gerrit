@@ -82,6 +82,7 @@ class RawShardIO(RawZKIO):
             raise ValueError("Can only truncate to 0")
         with suppress(NoNodeError):
             self.client.delete(self.path, recursive=True)
+        self.zstat = None
 
     @property
     def _shards(self):
@@ -95,6 +96,7 @@ class RawShardIO(RawZKIO):
         for shard_name in sorted(self._shards):
             shard_path = "/".join((self.path, shard_name))
             read_buffer.write(self._getData(shard_path)[0])
+        self.zstat = self.client.exists(self.path)
         return read_buffer.getvalue()
 
     def write(self, data):
@@ -112,6 +114,8 @@ class RawShardIO(RawZKIO):
         self.cumulative_write_time += time.perf_counter() - start
         self.bytes_written += len(data_bytes)
         self.znodes_written += 1
+        if self.zstat is None:
+            self.zstat = self.client.exists(self.path)
         return len(data_bytes)
 
 
