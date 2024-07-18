@@ -18,6 +18,7 @@ import threading
 import textwrap
 from unittest import mock
 
+import zuul.model
 import tests.base
 from tests.base import (
     AnsibleZuulTestCase,
@@ -965,52 +966,6 @@ class TestGerritConnection(ZuulTestCase):
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
 
-    def test_ignored_events(self):
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        event_queue = self.fake_gerrit.gerrit_event_connector.event_queue
-
-        # Hold the lock so the scheduler does not pull any events from
-        # the queue
-        with self.scheds[0].sched.run_handler_lock:
-            # This is ignored unconditionally
-            self.fake_gerrit.addEvent({
-                "type": "cache-eviction",
-            })
-            self.assertEqual(0, len(event_queue._listEvents()))
-            # This is ignored for meta refs only
-            self.fake_gerrit.addEvent({
-                "type": "ref-updated",
-                "submitter": {
-                    "name": "User Name",
-                },
-                "refUpdate": {
-                    "oldRev": '0',
-                    "newRev": '0',
-                    "refName": 'refs/changes/01/1/meta',
-                    "project": 'org/project',
-                }
-            })
-            self.assertEqual(0, len(event_queue._listEvents()))
-            # This is ignored because the ref doesn't match the pre-filter
-            self.fake_gerrit.addEvent({
-                "type": "ref-updated",
-                "submitter": {
-                    "name": "User Name",
-                },
-                "refUpdate": {
-                    "oldRev": '0',
-                    "newRev": '0',
-                    "refName": 'refs/something/else',
-                    "project": 'org/project',
-                }
-            })
-            self.assertEqual(0, len(event_queue._listEvents()))
-            # This is not ignored
-            A.setMerged()
-            self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
-            self.assertEqual(1, len(event_queue._listEvents()))
-        self.waitUntilSettled()
-
     def test_submit_requirements(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
@@ -1115,6 +1070,89 @@ class TestGerritConnection(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.assertHistory([])
+
+
+class TestGerritConnectionPreFilter(ZuulTestCase):
+    config_file = 'zuul-gerrit-web.conf'
+    tenant_config_file = 'config/pre-filter/main.yaml'
+
+    def test_ignored_events(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        event_queue = self.fake_gerrit.gerrit_event_connector.event_queue
+
+        # Reconfigure the second tenant to ensure that it doesn't
+        # delete the pre-filters for the first tenant.
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-two')
+        (trusted, project1) = tenant.getProject('org/project2')
+        event = zuul.model.TriggerEvent()
+        event.zuul_event_ltime = -1
+        self.scheds.first.sched.reconfigureTenant(
+            self.scheds.first.sched.abide.tenants['tenant-two'],
+            project1, event)
+        self.waitUntilSettled()
+
+        # For efficiency, ensure that the total filter length is the
+        # number of filters in the first tenant plus 1 (there is one
+        # unique filter in the second tenant).
+        self.assertEqual(6, len(self.fake_gerrit.watched_event_filters))
+
+        # Stop the event connector so it does not pull any events from
+        # the queue
+        self.fake_gerrit.stopEventConnector()
+        # This is ignored unconditionally
+        self.fake_gerrit.addEvent({
+            "type": "cache-eviction",
+        })
+        self.assertEqual(0, len(event_queue._listEvents()))
+        # This is ignored for meta refs only
+        self.fake_gerrit.addEvent({
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+            },
+            "refUpdate": {
+                "oldRev": '0',
+                "newRev": '0',
+                "refName": 'refs/changes/01/1/meta',
+                "project": 'org/project1',
+            }
+        })
+        self.assertEqual(0, len(event_queue._listEvents()))
+        # This is ignored because the ref doesn't match the pre-filter
+        self.fake_gerrit.addEvent({
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+            },
+            "refUpdate": {
+                "oldRev": '0',
+                "newRev": '0',
+                "refName": 'refs/something/else',
+                "project": 'org/project1',
+            }
+        })
+        self.assertEqual(0, len(event_queue._listEvents()))
+        # This is not ignored
+        self.fake_gerrit.addEvent({
+            "type": "ref-updated",
+            "submitter": {
+                "name": "User Name",
+            },
+            "refUpdate": {
+                "oldRev": '0',
+                "newRev": 'abcd',
+                "refName": 'refs/tags/1234',
+                "project": 'org/project1',
+            }
+        })
+        self.assertEqual(1, len(event_queue._listEvents()))
+        # This is not ignored
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.assertEqual(2, len(event_queue._listEvents()))
+
+        self.fake_gerrit.startEventConnector()
+        self.waitUntilSettled()
 
 
 class TestGerritUnicodeRefs(ZuulTestCase):

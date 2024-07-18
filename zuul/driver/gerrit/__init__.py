@@ -49,9 +49,10 @@ class GerritDriver(Driver, ConnectionInterface, TriggerInterface,
                     filters = connection_filter_map.setdefault(con, [])
                     filters.append(event_filter)
         for (con, checkers) in connection_checker_map.items():
+            # TODO: This is not safe for multiple tenants
             con.setWatchedCheckers(checkers)
         for (con, filters) in connection_filter_map.items():
-            con.setWatchedEventFilters(filters)
+            con.setWatchedEventFilters(tenant.name, filters)
 
     def getConnection(self, name, config):
         return gerritconnection.GerritConnection(self, name, config)
