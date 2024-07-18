@@ -1137,7 +1137,7 @@ class PipelineManager(metaclass=ABCMeta):
     def _useNodepoolFallback(self, log, job):
         labels = {n.label for n in job.nodeset.getNodes()}
         for provider in self.pipeline.tenant.layout.providers.values():
-            labels -= {pl.name for pl in provider.labels}
+            labels -= set(provider.labels.keys())
             if not labels:
                 return False
         log.debug("Falling back to Nodepool due to missing labels: %s", labels)
