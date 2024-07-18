@@ -606,14 +606,6 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         self.api_executor.shutdown()
         self._running = False
 
-    def getCreateStateMachine(self, hostname, label, image_external_id,
-                              metadata, request, az, log):
-        return AwsCreateStateMachine(self, hostname, label, image_external_id,
-                                     metadata, request, log)
-
-    def getDeleteStateMachine(self, external_id, log):
-        return AwsDeleteStateMachine(self, external_id, log)
-
     def listResources(self, bucket_name):
         for host in self._listHosts():
             try:
@@ -1761,8 +1753,18 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         # that these aren't nodepool images.  If we determine that's
         # the case, we'll add their ids here so we don't waste our
         # time on that again.
-        self.not_our_images = set()
-        self.not_our_snapshots = set()
+        self._set(
+            not_our_images=set(),
+            not_our_snapshots=set(),
+        )
+
+    @property
+    def endpoint(self):
+        ep = getattr(self, '_endpoint', None)
+        if ep:
+            return ep
+        self._set(_endpoint=self.getEndpoint())
+        return self._endpoint
 
     def parseConfig(self, config):
         data = super().parseConfig(config)
@@ -1779,27 +1781,38 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
     def getEndpoint(self):
         return self.driver.getEndpoint(self)
 
+    def getCreateStateMachine(self, hostname, label, image_external_id,
+                              metadata, request, az, log):
+        return AwsCreateStateMachine(self.endpoint, hostname, label,
+                                     image_external_id, metadata,
+                                     request, log)
+
+    def getDeleteStateMachine(self, external_id, log):
+        return AwsDeleteStateMachine(self.endpoint, external_id, log)
+
+    def listInstances(self):
+        return self.endpoint.listInstances()
+
     def listResources(self):
-        ep = self.getEndpoint()
         bucket_name = self.object_storage.get('bucket-name')
 
-        ep._tagSnapshots(self.tenant_scoped_name, self.not_our_snapshots)
-        ep._tagAmis(self.tenant_scoped_name, self.not_our_images)
-        return ep.listResources(bucket_name)
+        self.endpoint._tagSnapshots(
+            self.tenant_scoped_name, self.not_our_snapshots)
+        self.endpoint._tagAmis(
+            self.tenant_scoped_name, self.not_our_images)
+        return self.endpoint.listResources(bucket_name)
 
     def deleteResource(self, resource):
-        ep = self.getEndpoint()
         bucket_name = self.object_storage.get('bucket-name')
-        ep.deleteResource(resource, bucket_name)
+        self.endpoint.deleteResource(resource, bucket_name)
 
     def getQuotaLimits(self):
-        ep = self.getEndpoint()
         # Get the instance and volume types that this provider handles
         instance_types = {}
         host_types = set()
         volume_types = set()
-        ec2_quotas = ep._listEC2Quotas()
-        ebs_quotas = ep._listEBSQuotas()
+        ec2_quotas = self.endpoint._listEC2Quotas()
+        ebs_quotas = self.endpoint._listEBSQuotas()
         for label in self.labels:
             if label.dedicated_host:
                 host_types.add(label.instance_type)
@@ -1813,8 +1826,8 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         args = dict(default=math.inf)
         for instance_type in instance_types:
             for market_type_option in instance_types[instance_type]:
-                code = ep._getQuotaCodeForInstanceType(instance_type,
-                                                       market_type_option)
+                code = self.endpoint._getQuotaCodeForInstanceType(
+                    instance_type, market_type_option)
                 if code in args:
                     continue
                 if not code:
@@ -1826,7 +1839,7 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
                     continue
                 args[code] = ec2_quotas[code]
         for host_type in host_types:
-            code = ep._getQuotaCodeForHostType(host_type)
+            code = self.endpoint._getQuotaCodeForHostType(host_type)
             if code in args:
                 continue
             if not code:
@@ -1860,14 +1873,20 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
                 args[code] = value
         return QuotaInformation(**args)
 
+    def getQuotaForLabel(self, label):
+        return self.endpoint.getQuotaForLabel(label)
+
     def uploadImage(self, provider_image, image_name,
                     filename, image_format, metadata, md5, sha256):
-        ep = self.getEndpoint()
         bucket_name = self.object_storage.get('bucket-name')
         timeout = self.image_import_timeout
-        return ep.uploadImage(provider_image, image_name,
-                              filename, image_format, metadata, md5, sha256,
-                              bucket_name, timeout)
+        return self.endpoint.uploadImage(
+            provider_image, image_name,
+            filename, image_format, metadata, md5, sha256,
+            bucket_name, timeout)
+
+    def deleteImage(self, external_id):
+        self.endpoint.deleteImage(external_id)
 
 
 class AwsProviderSchema(BaseProviderSchema):
