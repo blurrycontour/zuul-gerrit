@@ -1054,8 +1054,12 @@ The following variables related to the job are available:
 
    .. var:: child_jobs
 
-      A list of the first level dependent jobs to be run after this job
-      has finished successfully.
+      A list of dependent jobs to be run after this job has finished
+      successfully.  Only direct dependents (i.e., the dependent job
+      lists this job as a dependency) of this job will be considered,
+      but such direct dependents may also list other jobs (which may
+      themselves be direct or indirect dependents of this job) and
+      also be considered.
 
    .. var:: override_checkout
 
