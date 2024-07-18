@@ -114,6 +114,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
             section_name=config['section'],
             description=config.get('description'),
             images=self.parseImages(config),
+            flavors=self.parseFlavors(config),
             labels=self.parseLabels(config),
         )
 
@@ -136,15 +137,24 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         return f'{self.tenant_name}-{self.name}'
 
     def parseImages(self, config):
-        images = []
+        images = {}
         for image_config in config.get('images', []):
-            images.append(self.parseImage(image_config))
+            i = self.parseImage(image_config)
+            images[i.name] = i
         return images
 
+    def parseFlavors(self, config):
+        flavors = {}
+        for flavor_config in config.get('flavors', []):
+            f = self.parseLabel(flavor_config)
+            flavors[f.name] = f
+        return flavors
+
     def parseLabels(self, config):
-        labels = []
+        labels = {}
         for label_config in config.get('labels', []):
-            labels.append(self.parseLabel(label_config))
+            l = self.parseLabel(label_config)
+            labels[l.name] = l
         return labels
 
     @abc.abstractmethod
@@ -153,6 +163,15 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
 
         :returns: a ProviderLabel subclass
         :rtype: ProviderLabel
+        """
+        pass
+
+    @abc.abstractmethod
+    def parseFlavor(self, flavor_config):
+        """Instantiate a ProviderFlavor subclass
+
+        :returns: a ProviderFlavor subclass
+        :rtype: ProviderFlavor
         """
         pass
 
