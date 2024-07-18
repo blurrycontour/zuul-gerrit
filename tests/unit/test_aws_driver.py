@@ -48,7 +48,7 @@ class TestAwsDriver(ZuulTestCase):
         self.s3_client = boto3.client('s3', region_name='us-west-2')
         self.iam = boto3.resource('iam', region_name='us-west-2')
         self.s3.create_bucket(
-            Bucket='nodepool',
+            Bucket='zuul',
             CreateBucketConfiguration={'LocationConstraint': 'us-west-2'})
 
         # A list of args to method calls for validation
@@ -136,8 +136,7 @@ class TestAwsDriver(ZuulTestCase):
         providers = self.launcher.tenant_providers['tenant-one']
         self.assertEqual(1, len(providers))
         provider = providers[0]
-        endpoint = provider.getEndpoint()
-        self.assertEqual([], list(endpoint.listInstances()))
+        self.assertNotEqual([], list(provider.listResources()))
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_jobs_executed(self):

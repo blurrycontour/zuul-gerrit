@@ -618,7 +618,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
     def getDeleteStateMachine(self, external_id, log):
         return AwsDeleteStateMachine(self, external_id, log)
 
-    def listResources(self):
+    def listResources(self, bucket_name):
         self._tagSnapshots()
         self._tagAmis()
         for host in self._listHosts():
@@ -664,8 +664,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                 continue
             yield AwsResource(tag_list_to_dict(snap.get('Tags')),
                               AwsResource.TYPE_SNAPSHOT, snap['SnapshotId'])
-        if self.provider.object_storage:
-            for obj in self._listObjects():
+        if bucket_name:
+            for obj in self._listObjects(bucket_name):
                 with self.non_mutating_rate_limiter:
                     try:
                         tags = self.s3_client.get_object_tagging(
@@ -675,7 +675,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                 yield AwsResource(tag_list_to_dict(tags['TagSet']),
                                   AwsResource.TYPE_OBJECT, obj.key)
 
-    def deleteResource(self, resource):
+    def deleteResource(self, resource, bucket_name):
+        self.deleteResource(resource, bucket_name)
         self.log.info(f"Deleting leaked {resource.type}: {resource.id}")
         if resource.type == AwsResource.TYPE_HOST:
             self._releaseHost(resource.id, immediate=True)
@@ -688,7 +689,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         if resource.type == AwsResource.TYPE_SNAPSHOT:
             self._deleteSnapshot(resource.id)
         if resource.type == AwsResource.TYPE_OBJECT:
-            self._deleteObject(resource.id)
+            self._deleteObject(bucket_name, resource.id)
 
     def listInstances(self):
         volumes = {}
@@ -1449,8 +1450,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                 snapshots.extend(page['Snapshots'])
             return snapshots
 
-    def _listObjects(self):
-        bucket_name = self.provider.object_storage.get('bucket-name')
+    def _listObjects(self, bucket_name):
         if not bucket_name:
             return []
 
@@ -1822,8 +1822,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             self.ec2_client.delete_snapshot(SnapshotId=snap['SnapshotId'])
         return snap
 
-    def _deleteObject(self, external_id):
-        bucket_name = self.provider.object_storage.get('bucket-name')
+    def _deleteObject(self, bucket_name, external_id):
         with self.rate_limiter:
             self.log.debug(f"Deleting object {external_id}")
             self.s3.Object(bucket_name, external_id).delete()
@@ -1835,6 +1834,7 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
     def parseConfig(self, config):
         data = super().parseConfig(config)
         data['region'] = config['region']
+        data['object_storage'] = config.get('object-storage')
         return data
 
     def parseImage(self, image_config):
@@ -1845,6 +1845,16 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
 
     def getEndpoint(self):
         return self.driver.getEndpoint(self)
+
+    def listResources(self):
+        ep = self.getEndpoint()
+        bucket_name = self.object_storage.get('bucket-name')
+        return ep.listResources(bucket_name)
+
+    def deleteResource(self, resource):
+        ep = self.getEndpoint()
+        bucket_name = self.object_storage.get('bucket-name')
+        ep.deleteResource(resource, bucket_name)
 
 
 class AwsProviderSchema(BaseProviderSchema):
@@ -1871,8 +1881,12 @@ class AwsProviderSchema(BaseProviderSchema):
     def getProviderSchema(self):
         # TODO: validate tag values are strings
         schema = super().getProviderSchema()
+        object_storage = {
+            vs.Required('bucket-name'): str,
+        }
 
         schema = schema.extend({
             vs.Required('region'): str,
+            'object-storage': object_storage,
         })
         return schema
