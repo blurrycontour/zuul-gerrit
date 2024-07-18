@@ -225,7 +225,11 @@ class AwsProviderImage(BaseProviderImage):
 
 
 class AwsProviderLabel(BaseProviderLabel):
-    pass
+    def __init__(self, config):
+        super().__init__(config)
+        self.dedicated_host = config.get('dedicated-host', False)
+        self.instance_type = config.get('instance-type')
+        self.volume_type = config.get('volume-type')
 
 
 class AwsDeleteStateMachine(statemachine.StateMachine):
@@ -727,75 +731,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                     continue
                 quota.add(self._getQuotaForVolume(volume))
 
-            yield AwsInstance(self.provider, instance, None, quota)
-
-    def getQuotaLimits(self):
-        # Get the instance and volume types that this provider handles
-        instance_types = {}
-        host_types = set()
-        volume_types = set()
-        ec2_quotas = self._listEC2Quotas()
-        ebs_quotas = self._listEBSQuotas()
-        for pool in self.provider.pools.values():
-            for label in pool.labels.values():
-                if label.dedicated_host:
-                    host_types.add(label.instance_type)
-                else:
-                    if label.instance_type not in instance_types:
-                        instance_types[label.instance_type] = set()
-                    instance_types[label.instance_type].add(
-                        SPOT if label.use_spot else ON_DEMAND)
-                if label.volume_type:
-                    volume_types.add(label.volume_type)
-        args = dict(default=math.inf)
-        for instance_type in instance_types:
-            for market_type_option in instance_types[instance_type]:
-                code = self._getQuotaCodeForInstanceType(instance_type,
-                                                         market_type_option)
-                if code in args:
-                    continue
-                if not code:
-                    continue
-                if code not in ec2_quotas:
-                    self.log.warning(
-                        "AWS quota code %s for instance type: %s not known",
-                        code, instance_type)
-                    continue
-                args[code] = ec2_quotas[code]
-        for host_type in host_types:
-            code = self._getQuotaCodeForHostType(host_type)
-            if code in args:
-                continue
-            if not code:
-                continue
-            if code not in ec2_quotas:
-                self.log.warning(
-                    "AWS quota code %s for host type: %s not known",
-                    code, host_type)
-                continue
-            args[code] = ec2_quotas[code]
-        for volume_type in volume_types:
-            vquota_codes = VOLUME_QUOTA_CODES.get(volume_type)
-            if not vquota_codes:
-                self.log.warning(
-                    "Unknown quota code for volume type: %s",
-                    volume_type)
-                continue
-            for resource, code in vquota_codes.items():
-                if code in args:
-                    continue
-                if code not in ebs_quotas:
-                    self.log.warning(
-                        "AWS quota code %s for volume type: %s not known",
-                        code, volume_type)
-                    continue
-                value = ebs_quotas[code]
-                # Unit mismatch: storage limit is in TB, but usage
-                # is in GB.  Translate the limit to GB.
-                if resource == 'storage':
-                    value *= 1000
-                args[code] = value
-        return QuotaInformation(**args)
+            yield AwsInstance(self.region, instance, None, quota)
 
     def getQuotaForLabel(self, label):
         # For now, we are optimistically assuming that when an
@@ -1856,6 +1792,74 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         bucket_name = self.object_storage.get('bucket-name')
         ep.deleteResource(resource, bucket_name)
 
+    def getQuotaLimits(self):
+        ep = self.getEndpoint()
+        # Get the instance and volume types that this provider handles
+        instance_types = {}
+        host_types = set()
+        volume_types = set()
+        ec2_quotas = ep._listEC2Quotas()
+        ebs_quotas = ep._listEBSQuotas()
+        for label in self.labels:
+            if label.dedicated_host:
+                host_types.add(label.instance_type)
+            else:
+                if label.instance_type not in instance_types:
+                    instance_types[label.instance_type] = set()
+                instance_types[label.instance_type].add(
+                    SPOT if label.use_spot else ON_DEMAND)
+            if label.volume_type:
+                volume_types.add(label.volume_type)
+        args = dict(default=math.inf)
+        for instance_type in instance_types:
+            for market_type_option in instance_types[instance_type]:
+                code = ep._getQuotaCodeForInstanceType(instance_type,
+                                                       market_type_option)
+                if code in args:
+                    continue
+                if not code:
+                    continue
+                if code not in ec2_quotas:
+                    self.log.warning(
+                        "AWS quota code %s for instance type: %s not known",
+                        code, instance_type)
+                    continue
+                args[code] = ec2_quotas[code]
+        for host_type in host_types:
+            code = ep._getQuotaCodeForHostType(host_type)
+            if code in args:
+                continue
+            if not code:
+                continue
+            if code not in ec2_quotas:
+                self.log.warning(
+                    "AWS quota code %s for host type: %s not known",
+                    code, host_type)
+                continue
+            args[code] = ec2_quotas[code]
+        for volume_type in volume_types:
+            vquota_codes = VOLUME_QUOTA_CODES.get(volume_type)
+            if not vquota_codes:
+                self.log.warning(
+                    "Unknown quota code for volume type: %s",
+                    volume_type)
+                continue
+            for resource, code in vquota_codes.items():
+                if code in args:
+                    continue
+                if code not in ebs_quotas:
+                    self.log.warning(
+                        "AWS quota code %s for volume type: %s not known",
+                        code, volume_type)
+                    continue
+                value = ebs_quotas[code]
+                # Unit mismatch: storage limit is in TB, but usage
+                # is in GB.  Translate the limit to GB.
+                if resource == 'storage':
+                    value *= 1000
+                args[code] = value
+        return QuotaInformation(**args)
+
 
 class AwsProviderSchema(BaseProviderSchema):
     def getImageSchema(self):
@@ -1877,6 +1881,18 @@ class AwsProviderSchema(BaseProviderSchema):
             return base_schema(data)
 
         return validator
+
+    def getLabelSchema(self):
+        base_schema = super().getLabelSchema()
+
+        # TODO: move to flavor and flag some as required
+        schema = base_schema.extend({
+            'instance-type': str,
+            'volume-type': str,
+            'dedicated-host': bool,
+        })
+
+        return schema
 
     def getProviderSchema(self):
         # TODO: validate tag values are strings
