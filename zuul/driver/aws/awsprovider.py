@@ -38,6 +38,7 @@ from zuul.provider import (
     BaseProvider,
     BaseProviderSchema,
     BaseProviderImage,
+    BaseProviderFlavor,
     BaseProviderLabel,
     BaseProviderEndpoint,
     statemachine
@@ -224,12 +225,17 @@ class AwsProviderImage(BaseProviderImage):
     pass
 
 
+class AwsProviderFlavor(BaseProviderFlavor):
+    def __init__(self, config):
+        super().__init__(config)
+        self.instance_type = config['instance-type']
+        self.volume_type = config.get('volume-type')
+        self.dedicated_host = config.get('dedicated-host', False)
+
+
 class AwsProviderLabel(BaseProviderLabel):
     def __init__(self, config):
         super().__init__(config)
-        self.dedicated_host = config.get('dedicated-host', False)
-        self.instance_type = config.get('instance-type')
-        self.volume_type = config.get('volume-type')
 
 
 class AwsDeleteStateMachine(statemachine.StateMachine):
@@ -1775,6 +1781,9 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
     def parseImage(self, image_config):
         return AwsProviderImage(image_config)
 
+    def parseFlavor(self, flavor_config):
+        return AwsProviderFlavor(flavor_config)
+
     def parseLabel(self, label_config):
         return AwsProviderLabel(label_config)
 
@@ -1813,7 +1822,7 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         volume_types = set()
         ec2_quotas = self.endpoint._listEC2Quotas()
         ebs_quotas = self.endpoint._listEBSQuotas()
-        for label in self.labels:
+        for label in self.labels.values():
             if label.dedicated_host:
                 host_types.add(label.instance_type)
             else:
@@ -1910,17 +1919,20 @@ class AwsProviderSchema(BaseProviderSchema):
 
         return validator
 
-    def getLabelSchema(self):
+    def getFlavorSchema(self):
         base_schema = super().getLabelSchema()
 
-        # TODO: move to flavor and flag some as required
         schema = base_schema.extend({
-            'instance-type': str,
+            vs.Required('instance-type'): str,
             'volume-type': str,
             'dedicated-host': bool,
         })
 
         return schema
+
+    def getLabelSchema(self):
+        base_schema = super().getLabelSchema()
+        return base_schema
 
     def getProviderSchema(self):
         # TODO: validate tag values are strings

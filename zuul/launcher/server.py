@@ -381,7 +381,7 @@ class Launcher:
     def checkMissingImages(self):
         for tenant_name, providers in self.tenant_providers.items():
             for provider in providers:
-                for image in provider.images:
+                for image in provider.images.values():
                     if image.type == 'zuul':
                         self.checkMissingImage(tenant_name, image)
 
