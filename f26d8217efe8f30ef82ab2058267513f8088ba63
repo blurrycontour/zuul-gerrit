@@ -74,6 +74,24 @@
       "parentUuid": "c87d5a78_381fa35a",
       "revId": "f26d8217efe8f30ef82ab2058267513f8088ba63",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47307e13_157ab939",
+        "filename": "doc/source/developer/specs/configure-projects.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-18T22:02:12Z",
+      "side": 1,
+      "message": "This makes sense. Basically there is risk but it is on the person configuring zuul to use this feature to consider and use appropriately. Not something we need to build guard rails in from the start for.",
+      "parentUuid": "8f3f6245_31cd23d8",
+      "revId": "f26d8217efe8f30ef82ab2058267513f8088ba63",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
