@@ -44,6 +44,8 @@ class TestUpgradeOld(ZuulTestCase):
 
         self.executor_server.stop()
         self.executor_server.join()
+        self.launcher.stop()
+        self.launcher.join()
         self.statsd.stop()
         self.statsd.join()
         self.fake_nodepool.stop()
