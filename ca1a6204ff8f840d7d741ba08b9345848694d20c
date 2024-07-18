@@ -16,6 +16,24 @@
       "message": "I think we should first set the layout updated event before waking up the launcher. Otherwise we might end up with the loop already being past the layout check before we can set the event.",
       "revId": "ca1a6204ff8f840d7d741ba08b9345848694d20c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9cf6de6_362f9bad",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-18T16:04:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de33611c_70f728ed",
+      "revId": "ca1a6204ff8f840d7d741ba08b9345848694d20c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
