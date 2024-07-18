@@ -601,14 +601,6 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             SERVICE_QUOTA_CACHE_TTL, self.api_executor)(
                 self._listEBSQuotas)
 
-        # In listResources, we reconcile AMIs which appear to be
-        # imports but have no nodepool tags, however it's possible
-        # that these aren't nodepool images.  If we determine that's
-        # the case, we'll add their ids here so we don't waste our
-        # time on that again.
-        self.not_our_images = set()
-        self.not_our_snapshots = set()
-
     def stop(self):
         self.create_executor.shutdown()
         self.api_executor.shutdown()
@@ -623,8 +615,6 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         return AwsDeleteStateMachine(self, external_id, log)
 
     def listResources(self, bucket_name):
-        self._tagSnapshots()
-        self._tagAmis()
         for host in self._listHosts():
             try:
                 if host['State'].lower() in [
@@ -1020,14 +1010,14 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
 
     # Local implementation below
 
-    def _tagAmis(self):
+    def _tagAmis(self, provider_name, not_our_images):
         # There is no way to tag imported AMIs, so this routine
         # "eventually" tags them.  We look for any AMIs without tags
         # and we copy the tags from the associated snapshot or image
         # import task.
         to_examine = []
         for ami in self._listAmis():
-            if ami['ImageId'] in self.not_our_images:
+            if ami['ImageId'] in not_our_images:
                 continue
             if ami.get('Tags'):
                 continue
@@ -1040,8 +1030,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                     # This was an import image (not snapshot) so let's
                     # try to find tags from the import task.
                     tags = tag_list_to_dict(task.get('Tags'))
-                    if (tags.get('nodepool_provider_name') ==
-                        self.provider.name):
+                    if (tags.get('zuul_provider_name') == provider_name):
                         # Copy over tags
                         self.log.debug(
                             "Copying tags from import task %s to AMI",
@@ -1056,16 +1045,16 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             # any tags from the snapshot import task, otherwise, mark
             # it as an image we can ignore in future runs.
             if len(ami.get('BlockDeviceMappings', [])) < 1:
-                self.not_our_images.add(ami['ImageId'])
+                not_our_images.add(ami['ImageId'])
                 continue
             bdm = ami['BlockDeviceMappings'][0]
             ebs = bdm.get('Ebs')
             if not ebs:
-                self.not_our_images.add(ami['ImageId'])
+                not_our_images.add(ami['ImageId'])
                 continue
             snapshot_id = ebs.get('SnapshotId')
             if not snapshot_id:
-                self.not_our_images.add(ami['ImageId'])
+                not_our_images.add(ami['ImageId'])
                 continue
             to_examine.append((ami, snapshot_id))
         if not to_examine:
@@ -1085,10 +1074,10 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         for ami, snapshot_id in to_examine:
             tags = task_map.get(snapshot_id)
             if not tags:
-                self.not_our_images.add(ami['ImageId'])
+                not_our_images.add(ami['ImageId'])
                 continue
             metadata = tag_list_to_dict(tags)
-            if (metadata.get('nodepool_provider_name') == self.provider.name):
+            if (metadata.get('zuul_provider_name') == provider_name):
                 # Copy over tags
                 self.log.debug(
                     "Copying tags from import task to image %s",
@@ -1098,13 +1087,13 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                         Resources=[ami['ImageId']],
                         Tags=task['Tags'])
             else:
-                self.not_our_images.add(ami['ImageId'])
+                not_our_images.add(ami['ImageId'])
 
-    def _tagSnapshots(self):
+    def _tagSnapshots(self, provider_name, not_our_snapshots):
         # See comments for _tagAmis
         to_examine = []
         for snap in self._listSnapshots():
-            if snap['SnapshotId'] in self.not_our_snapshots:
+            if snap['SnapshotId'] in not_our_snapshots:
                 continue
             try:
                 if snap.get('Tags'):
@@ -1124,8 +1113,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                     # This was an import image (not snapshot) so let's
                     # try to find tags from the import task.
                     tags = tag_list_to_dict(task.get('Tags'))
-                    if (tags.get('nodepool_provider_name') ==
-                        self.provider.name):
+                    if (tags.get('zuul_provider_name') == provider_name):
                         # Copy over tags
                         self.log.debug(
                             f"Copying tags from import task {task_id}"
@@ -1157,10 +1145,10 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         for snap in to_examine:
             tags = task_map.get(snap['SnapshotId'])
             if not tags:
-                self.not_our_snapshots.add(snap['SnapshotId'])
+                not_our_snapshots.add(snap['SnapshotId'])
                 continue
             metadata = tag_list_to_dict(tags)
-            if (metadata.get('nodepool_provider_name') == self.provider.name):
+            if (metadata.get('zuul_provider_name') == provider_name):
                 # Copy over tags
                 self.log.debug(
                     "Copying tags from import task to snapshot %s",
@@ -1170,7 +1158,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                         Resources=[snap['SnapshotId']],
                         Tags=tags)
             else:
-                self.not_our_snapshots.add(snap['SnapshotId'])
+                not_our_snapshots.add(snap['SnapshotId'])
 
     def _getImportImageTask(self, task_id):
         paginator = self.ec2_client.get_paginator(
@@ -1766,6 +1754,19 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
 class AwsProvider(BaseProvider, subclass_id='aws'):
     log = logging.getLogger("zuul.AwsProvider")
 
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        # In listResources, we reconcile AMIs which appear to be
+        # imports but have no nodepool tags, however it's possible
+        # that these aren't nodepool images.  If we determine that's
+        # the case, we'll add their ids here so we don't waste our
+        # time on that again.  We do not need to serialize these;
+        # these are ephemeral caches.
+        self._set(
+            not_our_images=set(),
+            not_our_snapshots=set(),
+        )
+
     def parseConfig(self, config):
         data = super().parseConfig(config)
         data['region'] = config['region']
@@ -1784,6 +1785,9 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
     def listResources(self):
         ep = self.getEndpoint()
         bucket_name = self.object_storage.get('bucket-name')
+
+        ep._tagSnapshots(self.tenant_scoped_name, self.not_our_snapshots)
+        ep._tagAmis(self.tenant_scoped_name, self.not_our_images)
         return ep.listResources(bucket_name)
 
     def deleteResource(self, resource):

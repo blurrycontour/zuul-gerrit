@@ -131,6 +131,10 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         )
         return json.dumps(data, sort_keys=True).encode("utf8")
 
+    @property
+    def tenant_scoped_name(self):
+        return f'{self.tenant_name}-{self.name}'
+
     def parseImages(self, config):
         images = []
         for image_config in config.get('images', []):
