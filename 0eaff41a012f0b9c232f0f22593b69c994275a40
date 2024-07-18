@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "57c6a767_b766f42d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-07-18T19:20:13Z",
+      "side": 1,
+      "message": "I think option 2 is interesting. However I think this might come the risk to be insecure by default. The reason is that the admin of the target system must not forget to not just match for job/pipeline whatever but also for the post-review claim in case speculative use of the secret should be prohibited (which should be the default and is also how secrets in zuul work). However I also can think of various use cases where this would be really useful.\n\nIf we do this I\u0027d suggest that we don\u0027t include a secret fqdn claim into the token and mark usage of this as potentially dangerous when not matching against the post-review claim. Use cases which demand a higher level of security could then still define their own secret and match the claims against the secret fqdn.\n\nI think I\u0027m leaning slightly towards option 1 for the start. Adding option 2 later should be quite easy if option 1 is becoming too cumbersome doesn\u0027t support all use cases.",
+      "parentUuid": "687c5be2_084a949e",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ec6b739f_adfa26e6",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 1
@@ -108,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7407ad74_eb7cc230",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-07-18T19:20:13Z",
+      "side": 1,
+      "message": "I made this more clear in the zuul-web section.",
+      "parentUuid": "6f534837_5039edf5",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "52f865bd_a7c2f465",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 1
@@ -119,6 +155,24 @@
       "writtenOn": "2024-06-27T14:27:55Z",
       "side": 1,
       "message": "(note) This will be a small set of keys for the system as a whole (not per-project); we will have multiples if/when they are rotated.",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cae9edfd_dc742f02",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-07-18T19:20:13Z",
+      "side": 1,
+      "message": "Made this more clear.",
+      "parentUuid": "52f865bd_a7c2f465",
       "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -242,6 +296,24 @@
       "side": 1,
       "message": "I think for the use case you describe (which is mostly logging), you\u0027d want to include the build uuid.  I definitely think we can/should include that here.\n\nhttps://stackoverflow.com/questions/26033983/what-is-the-maximum-size-of-jwt-token\n\nI think we can put a few standard claims in there, but we may want to avoid adding too many.  As for generalized templating, that opens a potential issue with whether they can be trusted, since it isn\u0027t necessarily zuul making the claims at that point, but the user who created the secret.  So we probably want to avoid that unless we have a really good reason.",
       "parentUuid": "577bcabe_b457e0cd",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c92f41a_3ed5372b",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-07-18T19:20:13Z",
+      "side": 1,
+      "message": "I added build-uuid, pipeline and tenant as well.",
+      "parentUuid": "9e2178cd_dedfd841",
       "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
