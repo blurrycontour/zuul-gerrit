@@ -19,6 +19,7 @@ documentation instead.
    circular-dependencies
    circular-dependencies-refactor
    community-matrix
+   configure-projects
    enhanced-regional-executors
    kubernetes-operator
    nodepool-in-zuul
