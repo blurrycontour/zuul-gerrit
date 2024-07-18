@@ -239,10 +239,10 @@ class AwsDeleteStateMachine(statemachine.StateMachine):
     INSTANCE_DELETING = 'deleting instance'
     COMPLETE = 'complete'
 
-    def __init__(self, adapter, external_id, log):
+    def __init__(self, endpoint, external_id, log):
         self.log = log
         super().__init__()
-        self.adapter = adapter
+        self.endpoint = endpoint
         # Backwards compatible for old nodes where external_id is a
         # str
         if type(external_id) is str:
@@ -259,12 +259,12 @@ class AwsDeleteStateMachine(statemachine.StateMachine):
                 self.state = self.COMPLETE
 
         if self.state == self.INSTANCE_DELETING_START:
-            self.instance = self.adapter._deleteInstance(
+            self.instance = self.endpoint._deleteInstance(
                 self.external_id['instance'], self.log)
             self.state = self.INSTANCE_DELETING
 
         if self.state == self.INSTANCE_DELETING:
-            self.instance = self.adapter._refreshDelete(self.instance)
+            self.instance = self.endpoint._refreshDelete(self.instance)
             if self.instance is None:
                 if 'host' in self.external_id:
                     self.state = self.HOST_RELEASING_START
@@ -272,12 +272,12 @@ class AwsDeleteStateMachine(statemachine.StateMachine):
                     self.state = self.COMPLETE
 
         if self.state == self.HOST_RELEASING_START:
-            self.host = self.adapter._releaseHost(
+            self.host = self.endpoint._releaseHost(
                 self.external_id['host'], self.log)
             self.state = self.HOST_RELEASING
 
         if self.state == self.HOST_RELEASING:
-            self.host = self.adapter._refreshDelete(self.host)
+            self.host = self.endpoint._refreshDelete(self.host)
             if self.host is None:
                 self.state = self.COMPLETE
 
@@ -294,11 +294,11 @@ class AwsCreateStateMachine(statemachine.StateMachine):
     INSTANCE_CREATING = 'creating instance'
     COMPLETE = 'complete'
 
-    def __init__(self, adapter, hostname, label, image_external_id,
+    def __init__(self, endpoint, hostname, label, image_external_id,
                  metadata, request, log):
         self.log = log
         super().__init__()
-        self.adapter = adapter
+        self.endpoint = endpoint
         self.attempts = 0
         self.image_external_id = image_external_id
         self.metadata = metadata
@@ -328,13 +328,13 @@ class AwsCreateStateMachine(statemachine.StateMachine):
                 self.state = self.INSTANCE_CREATING_START
 
         if self.state == self.HOST_ALLOCATING_START:
-            self.host_create_future = self.adapter._submitAllocateHost(
+            self.host_create_future = self.endpoint._submitAllocateHost(
                 self.label,
                 self.tags, self.hostname, self.log)
             self.state = self.HOST_ALLOCATING_SUBMIT
 
         if self.state == self.HOST_ALLOCATING_SUBMIT:
-            host = self.adapter._completeAllocateHost(self.host_create_future)
+            host = self.endpoint._completeAllocateHost(self.host_create_future)
             if host is None:
                 return
             self.host = host
@@ -342,7 +342,7 @@ class AwsCreateStateMachine(statemachine.StateMachine):
             self.state = self.HOST_ALLOCATING
 
         if self.state == self.HOST_ALLOCATING:
-            self.host = self.adapter._refresh(self.host)
+            self.host = self.endpoint._refresh(self.host)
 
             state = self.host['State'].lower()
             if state == 'available':
@@ -357,22 +357,22 @@ class AwsCreateStateMachine(statemachine.StateMachine):
                 return
 
         if self.state == self.INSTANCE_CREATING_START:
-            self.create_future = self.adapter._submitCreateInstance(
+            self.create_future = self.endpoint._submitCreateInstance(
                 self.label, self.image_external_id,
                 self.tags, self.hostname, self.dedicated_host_id, self.log)
             self.state = self.INSTANCE_CREATING_SUBMIT
 
         if self.state == self.INSTANCE_CREATING_SUBMIT:
-            instance = self.adapter._completeCreateInstance(self.create_future)
+            instance = self.endpoint._completeCreateInstance(self.create_future)
             if instance is None:
                 return
             self.instance = instance
             self.external_id['instance'] = instance['InstanceId']
-            self.quota = self.adapter.getQuotaForLabel(self.label)
+            self.quota = self.endpoint.getQuotaForLabel(self.label)
             self.state = self.INSTANCE_CREATING
 
         if self.state == self.INSTANCE_CREATING:
-            self.instance = self.adapter._refresh(self.instance)
+            self.instance = self.endpoint._refresh(self.instance)
 
             if self.instance['State']['Name'].lower() == "running":
                 self.state = self.COMPLETE
@@ -384,7 +384,7 @@ class AwsCreateStateMachine(statemachine.StateMachine):
 
         if self.state == self.COMPLETE:
             self.complete = True
-            return AwsInstance(self.adapter.provider, self.instance,
+            return AwsInstance(self.endpoint.region, self.instance,
                                self.host, self.quota)
 
 
