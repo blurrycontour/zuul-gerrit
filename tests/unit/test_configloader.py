@@ -1341,7 +1341,7 @@ class TestNodepoolConfig(ZuulTestCase):
         self.assertEqual('aws-us-east-1', provider_config.section)
         provider = layout.providers['aws-us-east-1-main']
         self.assertEqual(2, len(provider.labels))
-        labels = sorted([x.name for x in provider.labels])
+        labels = sorted([x for x in provider.labels.keys()])
         self.assertEqual('debian-large', labels[0])
         self.assertEqual('debian-normal', labels[1])
 
