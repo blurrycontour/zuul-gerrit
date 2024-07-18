@@ -23,7 +23,7 @@ class AwsProviderNode(model.ProviderNode, subclass_id="aws"):
 
 
 class AwsInstance(statemachine.Instance):
-    def __init__(self, provider, instance, host, quota):
+    def __init__(self, region, instance, host, quota):
         super().__init__()
         self.external_id = dict()
         if instance:
@@ -36,7 +36,7 @@ class AwsInstance(statemachine.Instance):
         self.public_ipv4 = instance.get('PublicIpAddress')
         self.public_ipv6 = None
         self.cloud = 'AWS'
-        self.region = provider.region_name
+        self.region = region
         self.az = None
         self.quota = quota
 
