@@ -1341,7 +1341,7 @@ class TestNodepoolConfig(ZuulTestCase):
         self.assertEqual('aws-us-east-1', provider_config.section)
         provider = layout.providers['aws-us-east-1-main']
         self.assertEqual(1, len(provider.labels))
-        self.assertEqual('debian-normal', provider.labels[0].name)
+        self.assertTrue('debian-normal' in provider.labels)
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_section_inheritance(self):

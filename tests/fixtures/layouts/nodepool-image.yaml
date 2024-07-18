@@ -128,6 +128,7 @@
     launch-timeout: 600
     flavors:
       - name: normal
+        instance-type: t3.medium
     images:
       - name: debian
       - name: debian-local
