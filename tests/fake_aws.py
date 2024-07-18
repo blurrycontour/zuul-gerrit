@@ -19,7 +19,7 @@ import uuid
 import botocore
 import boto3
 
-from zuul.driver.aws.awsprovider import AwsProviderEndpoint
+from zuul.driver.aws.awsendpoint import AwsProviderEndpoint
 
 
 def make_import_snapshot_stage_1(task_id, user_bucket, tags):
