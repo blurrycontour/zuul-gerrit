@@ -15,12 +15,12 @@
 import urllib
 
 from zuul.driver import Driver, ConnectionInterface, ProviderInterface
-from zuul.driver.aws import awsconnection, awsmodel, awsprovider
+from zuul.driver.aws import awsconnection, awsmodel, awsprovider, awsendpoint
 
 
 class AwsDriver(Driver, ConnectionInterface, ProviderInterface):
     name = 'aws'
-    _endpoint_class = awsprovider.AwsProviderEndpoint
+    _endpoint_class = awsendpoint.AwsProviderEndpoint
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
