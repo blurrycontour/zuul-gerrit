@@ -89,6 +89,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d5c104c_45276b2e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-18T21:52:28Z",
+      "side": 1,
+      "message": "Sounds like consensus on 1, so marking this resolved.",
+      "parentUuid": "57c6a767_b766f42d",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec6b739f_adfa26e6",
@@ -142,6 +160,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb39558d_16da6fb0",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-18T21:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7407ad74_eb7cc230",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "52f865bd_a7c2f465",
@@ -173,6 +209,24 @@
       "side": 1,
       "message": "Made this more clear.",
       "parentUuid": "52f865bd_a7c2f465",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ce5db48_0f603914",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-18T21:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cae9edfd_dc742f02",
       "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -212,6 +266,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c9f8d0b_786c22de",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-18T21:52:28Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d4995573_68a464de",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ec14467_6e3d5dbc",
@@ -225,6 +297,24 @@
       "writtenOn": "2024-06-21T11:42:40Z",
       "side": 1,
       "message": "typo: determine",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32500fb0_eb58a0f9",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-18T21:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ec14467_6e3d5dbc",
       "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -318,6 +408,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2f66cc1_bbdfd711",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-18T21:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c92f41a_3ed5372b",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df5519f4_4d9a68ec",
@@ -353,6 +461,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4531b948_78ca5d7f",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-18T21:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8286ca2_daca0c29",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3d219f70_4ea59a7c",
@@ -384,6 +510,24 @@
       "side": 1,
       "message": "Sounds good as well, my main thought about this was to cache the rendered response so we don\u0027t have to call into cryptography on every request.",
       "parentUuid": "3d219f70_4ea59a7c",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af00a47a_2c038821",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-18T21:52:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d2d34e7_686287f1",
       "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
