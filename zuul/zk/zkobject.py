@@ -18,7 +18,6 @@ import contextlib
 import json
 import logging
 import sys
-import time
 import types
 import zlib
 import collections
@@ -140,6 +139,10 @@ class ZKObject:
     _retry_interval = 5
     _zkobject_compressed_size = 0
     _zkobject_uncompressed_size = 0
+    io_reader_class = sharding.RawZKIO
+    io_writer_class = sharding.RawZKIO
+    truncate_on_create = False
+    delete_on_error = False
 
     # Implementations of these two methods are required
     def getPath(self):
@@ -269,15 +272,18 @@ class ZKObject:
                 "Exception serializing ZKObject %s", self)
             raise
 
-    def delete(self, context):
-        path = self.getPath()
+    @classmethod
+    def _delete(cls, context, path):
         if context.sessionIsInvalid():
             raise Exception("ZooKeeper session or lock not valid")
+        cls._retry(context, context.client.delete,
+                   path, recursive=True)
+        context.profileEvent('delete', path)
+
+    def delete(self, context):
+        path = self.getPath()
         try:
-            self._retry(context, context.client.delete,
-                        path, recursive=True)
-            context.profileEvent('delete', path)
-            return
+            self._delete(context, path)
         except Exception:
             context.log.error(
                 "Exception deleting ZKObject %s at %s", self, path)
@@ -354,13 +360,14 @@ class ZKObject:
         self._set(_active_context=None)
 
     @staticmethod
-    def _retryableLoad(context, path):
-        start = time.perf_counter()
-        compressed_data, zstat = context.client.get(path)
-        context.cumulative_read_time += time.perf_counter() - start
+    def _retryableLoad(io_class, context, path):
+        with io_class(context.client, path) as stream:
+            compressed_data = stream.read()
+            zstat = stream.zstat
+        context.cumulative_read_time += stream.cumulative_read_time
         context.cumulative_read_objects += 1
-        context.cumulative_read_znodes += 1
-        context.cumulative_read_bytes += len(compressed_data)
+        context.cumulative_read_znodes += stream.znodes_read
+        context.cumulative_read_bytes += stream.bytes_read
         return compressed_data, zstat
 
     def _load(self, context, path=None):
@@ -375,11 +382,14 @@ class ZKObject:
             raise Exception("ZooKeeper session or lock not valid")
         try:
             compressed_data, zstat = cls._retry(context, cls._retryableLoad,
+                                                cls.io_reader_class,
                                                 context, path)
             context.profileEvent('get', path)
         except Exception:
             context.log.error(
                 "Exception loading ZKObject at %s", path)
+            if cls.delete_on_error:
+                cls._delete(context, path)
             raise
         return compressed_data, zstat
 
@@ -391,13 +401,21 @@ class ZKObject:
         return obj
 
     def _updateFromRaw(self, raw_data, zstat, context=None):
-        self._set(_zkobject_hash=None)
-        data = self._decompressData(raw_data)
-        self._set(**self.deserialize(data, context))
-        self._set(_zstat=zstat,
-                  _zkobject_hash=hash(data),
-                  _zkobject_compressed_size=len(raw_data),
-                  _zkobject_uncompressed_size=len(data))
+        try:
+            self._set(_zkobject_hash=None)
+            data = self._decompressData(raw_data)
+            self._set(**self.deserialize(data, context))
+            self._set(_zkobject_hash=hash(data),
+                      _zkobject_compressed_size=len(raw_data),
+                      _zkobject_uncompressed_size=len(data))
+            if zstat is not None:
+                # Traditionally, a sharded zkobject does not have a
+                # _zstat
+                self._set(_zstat=zstat)
+        except Exception:
+            if self.delete_on_error:
+                self.delete(context)
+            raise
 
     @classmethod
     def _compressData(cls, data):
@@ -412,19 +430,19 @@ class ZKObject:
             return raw_data
 
     @staticmethod
-    def _retryableSave(context, create, path, compressed_data, version):
-        start = time.perf_counter()
-        if create:
-            real_path, zstat = context.client.create(
-                path, compressed_data, makepath=True,
-                include_data=True)
-        else:
-            zstat = context.client.set(path, compressed_data,
-                                       version=version)
-        context.cumulative_write_time += time.perf_counter() - start
-        context.cumulative_write_objects += 1
-        context.cumulative_write_znodes += 1
-        context.cumulative_write_bytes += len(compressed_data)
+    def _retryableSave(io_class, context, create, path, data,
+                       version):
+        zstat = None
+        with io_class(context.client, path, create=create, version=version
+                      ) as stream:
+            stream.truncate(0)
+            stream.write(data)
+            stream.flush()
+            context.cumulative_write_time += stream.cumulative_write_time
+            context.cumulative_write_objects += 1
+            context.cumulative_write_znodes += stream.znodes_written
+            context.cumulative_write_bytes += stream.bytes_written
+            zstat = stream.zstat
         return zstat
 
     def _save(self, context, data, create=False):
@@ -436,23 +454,32 @@ class ZKObject:
         compressed_data = self._compressData(data)
 
         try:
-            if hasattr(self, '_zstat'):
+            if create and not self.truncate_on_create:
+                exists = self._retry(context, context.client.exists, path)
+                context.profileEvent('exists', path)
+                if exists is not None:
+                    raise NodeExistsError
+            zstat = getattr(self, '_zstat', None)
+            if zstat is not None:
                 version = self._zstat.version
             else:
                 version = -1
             zstat = self._retry(context, self._retryableSave,
-                                context, create, path, compressed_data,
-                                version)
+                                self.io_writer_class, context, create, path,
+                                compressed_data, version)
             context.profileEvent('set', path)
         except Exception:
             context.log.error(
                 "Exception saving ZKObject %s at %s", self, path)
             raise
-        self._set(_zstat=zstat,
-                  _zkobject_hash=hash(data),
+        self._set(_zkobject_hash=hash(data),
                   _zkobject_compressed_size=len(compressed_data),
                   _zkobject_uncompressed_size=len(data),
                   )
+        if zstat is not None:
+            # Traditionally, a sharded zkobject does not have a
+            # _zstat
+            self._set(_zstat=zstat)
 
     def __setattr__(self, name, value):
         if self._active_context:
@@ -474,80 +501,8 @@ class ShardedZKObject(ZKObject):
     # pipeline summary is read without a write lock, so those are
     # expected.  Don't delete them in that case.
     delete_on_error = True
-
-    @staticmethod
-    def _retryableLoad(context, path):
-        with sharding.BufferedShardReader(context.client, path) as stream:
-            data = stream.read()
-            compressed_size = stream.compressed_bytes_read
-            context.cumulative_read_time += stream.cumulative_read_time
-            context.cumulative_read_objects += 1
-            context.cumulative_read_znodes += stream.znodes_read
-            context.cumulative_read_bytes += compressed_size
-        if not data and context.client.exists(path) is None:
-            raise NoNodeError
-        return data, compressed_size
-
-    def _load(self, context, path=None):
-        if path is None:
-            path = self.getPath()
-        if context.sessionIsInvalid():
-            raise Exception("ZooKeeper session or lock not valid")
-        try:
-            self._set(_zkobject_hash=None)
-            data, compressed_size = self._retry(context, self._retryableLoad,
-                                                context, path)
-            context.profileEvent('get', path)
-            self._set(**self.deserialize(data, context))
-            self._set(_zkobject_hash=hash(data),
-                      _zkobject_compressed_size=compressed_size,
-                      _zkobject_uncompressed_size=len(data),
-                      )
-        except Exception:
-            # A higher level must handle this exception, but log
-            # ourself here so we know what object triggered it.
-            context.log.error(
-                "Exception loading ZKObject %s at %s", self, path)
-            if self.delete_on_error:
-                self.delete(context)
-            raise
-
-    @staticmethod
-    def _retryableSave(context, path, data):
-        with sharding.BufferedShardWriter(context.client, path) as stream:
-            stream.truncate(0)
-            stream.write(data)
-            stream.flush()
-            compressed_size = stream.compressed_bytes_written
-            context.cumulative_write_time += stream.cumulative_write_time
-            context.cumulative_write_objects += 1
-            context.cumulative_write_znodes += stream.znodes_written
-            context.cumulative_write_bytes += compressed_size
-        return compressed_size
-
-    def _save(self, context, data, create=False):
-        if isinstance(context, LocalZKContext):
-            return
-        path = self.getPath()
-        if context.sessionIsInvalid():
-            raise Exception("ZooKeeper session or lock not valid")
-        try:
-            if create and not self.truncate_on_create:
-                exists = self._retry(context, context.client.exists, path)
-                context.profileEvent('exists', path)
-                if exists is not None:
-                    raise NodeExistsError
-            compressed_size = self._retry(context, self._retryableSave,
-                                          context, path, data)
-            context.profileEvent('set', path)
-            self._set(_zkobject_hash=hash(data),
-                      _zkobject_compressed_size=compressed_size,
-                      _zkobject_uncompressed_size=len(data),
-                      )
-        except Exception:
-            context.log.error(
-                "Exception saving ZKObject %s at %s", self, path)
-            raise
+    io_reader_class = sharding.BufferedShardReader
+    io_writer_class = sharding.BufferedShardWriter
 
 
 class LockableZKObject(ZKObject):

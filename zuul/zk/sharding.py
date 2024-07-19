@@ -15,7 +15,6 @@
 import io
 from contextlib import suppress
 import time
-import zlib
 
 from kazoo.exceptions import NoNodeError
 
@@ -25,16 +24,19 @@ from kazoo.exceptions import NoNodeError
 NODE_BYTE_SIZE_LIMIT = 1000000
 
 
-class RawShardIO(io.RawIOBase):
-    def __init__(self, client, path):
+class RawZKIO(io.RawIOBase):
+    def __init__(self, client, path, create=False, version=-1):
         self.client = client
-        self.shard_base = path
-        self.compressed_bytes_read = 0
-        self.compressed_bytes_written = 0
+        self.path = path
+        self.bytes_read = 0
+        self.bytes_written = 0
         self.cumulative_read_time = 0.0
         self.cumulative_write_time = 0.0
         self.znodes_read = 0
         self.znodes_written = 0
+        self.create = create
+        self.version = version
+        self.zstat = None
 
     def readable(self):
         return True
@@ -43,64 +45,84 @@ class RawShardIO(io.RawIOBase):
         return True
 
     def truncate(self, size=None):
-        if size != 0:
-            raise ValueError("Can only truncate to 0")
-        with suppress(NoNodeError):
-            self.client.delete(self.shard_base, recursive=True)
-
-    @property
-    def _shards(self):
-        try:
-            start = time.perf_counter()
-            ret = self.client.get_children(self.shard_base)
-            self.cumulative_read_time += time.perf_counter() - start
-            return ret
-        except NoNodeError:
-            return []
+        # We never truncate unless we're going to write, so make this
+        # a noop for the single-znode case.
+        pass
 
     def _getData(self, path):
         start = time.perf_counter()
-        data, _ = self.client.get(path)
+        data, zstat = self.client.get(path)
         self.cumulative_read_time += time.perf_counter() - start
-        self.compressed_bytes_read += len(data)
+        self.bytes_read += len(data)
         self.znodes_read += 1
-        return zlib.decompress(data)
+        return data, zstat
+
+    def readall(self):
+        data, self.zstat = self._getData(self.path)
+        return data
+
+    def write(self, data):
+        byte_count = len(data)
+        start = time.perf_counter()
+        if self.create:
+            _, self.zstat = self.client.create(
+                self.path, data, makepath=True, include_data=True)
+        else:
+            self.zstat = self.client.set(self.path, data,
+                                         version=self.version)
+        self.cumulative_write_time += time.perf_counter() - start
+        self.bytes_written += byte_count
+        self.znodes_written += 1
+        return byte_count
+
+
+class RawShardIO(RawZKIO):
+    def truncate(self, size=None):
+        if size != 0:
+            raise ValueError("Can only truncate to 0")
+        with suppress(NoNodeError):
+            self.client.delete(self.path, recursive=True)
+
+    @property
+    def _shards(self):
+        start = time.perf_counter()
+        ret = self.client.get_children(self.path)
+        self.cumulative_read_time += time.perf_counter() - start
+        return ret
 
     def readall(self):
         read_buffer = io.BytesIO()
         for shard_name in sorted(self._shards):
-            shard_path = "/".join((self.shard_base, shard_name))
-            read_buffer.write(self._getData(shard_path))
+            shard_path = "/".join((self.path, shard_name))
+            read_buffer.write(self._getData(shard_path)[0])
         return read_buffer.getvalue()
 
-    def write(self, shard_data):
-        byte_count = len(shard_data)
+    def write(self, data):
         # Only write one key at a time and defer writing the rest to the caller
-        shard_bytes = bytes(shard_data[0:NODE_BYTE_SIZE_LIMIT])
-        shard_bytes = zlib.compress(shard_bytes)
-        if not (len(shard_bytes) < NODE_BYTE_SIZE_LIMIT):
+        data_bytes = bytes(data[0:NODE_BYTE_SIZE_LIMIT])
+        if not (len(data_bytes) <= NODE_BYTE_SIZE_LIMIT):
             raise RuntimeError("Shard too large")
         start = time.perf_counter()
         self.client.create(
-            "{}/".format(self.shard_base),
-            shard_bytes,
+            "{}/".format(self.path),
+            data_bytes,
             sequence=True,
             makepath=True,
         )
         self.cumulative_write_time += time.perf_counter() - start
-        self.compressed_bytes_written += len(shard_bytes)
+        self.bytes_written += len(data_bytes)
         self.znodes_written += 1
-        return min(byte_count, NODE_BYTE_SIZE_LIMIT)
+        return len(data_bytes)
 
 
-class BufferedShardWriter(io.BufferedWriter):
+class BufferedZKWriter(io.BufferedWriter):
     def __init__(self, client, path):
-        self.__raw = RawShardIO(client, path)
-        super().__init__(self.__raw, NODE_BYTE_SIZE_LIMIT)
+        self.__raw = RawZKIO(client, path)
+        super().__init__(self.__raw)
 
     @property
-    def compressed_bytes_written(self):
-        return self.__raw.compressed_bytes_written
+    def bytes_written(self):
+        return self.__raw.bytes_written
 
     @property
     def cumulative_write_time(self):
@@ -110,15 +132,19 @@ class BufferedShardWriter(io.BufferedWriter):
     def znodes_written(self):
         return self.__raw.znodes_written
 
+    @property
+    def zstat(self):
+        return self.__raw.zstat
 
-class BufferedShardReader(io.BufferedReader):
+
+class BufferedZKReader(io.BufferedReader):
     def __init__(self, client, path):
-        self.__raw = RawShardIO(client, path)
-        super().__init__(self.__raw, NODE_BYTE_SIZE_LIMIT)
+        self.__raw = RawZKIO(client, path)
+        super().__init__(self.__raw)
 
     @property
-    def compressed_bytes_read(self):
-        return self.__raw.compressed_bytes_read
+    def bytes_read(self):
+        return self.__raw.bytes_read
 
     @property
     def cumulative_read_time(self):
@@ -127,3 +153,51 @@ class BufferedShardReader(io.BufferedReader):
     @property
     def znodes_read(self):
         return self.__raw.znodes_read
+
+    @property
+    def zstat(self):
+        return self.__raw.zstat
+
+
+class BufferedShardWriter(io.BufferedWriter):
+    def __init__(self, client, path, create=False, version=-1):
+        self.__raw = RawShardIO(client, path, create=create, version=version)
+        super().__init__(self.__raw, NODE_BYTE_SIZE_LIMIT)
+
+    @property
+    def bytes_written(self):
+        return self.__raw.bytes_written
+
+    @property
+    def cumulative_write_time(self):
+        return self.__raw.cumulative_write_time
+
+    @property
+    def znodes_written(self):
+        return self.__raw.znodes_written
+
+    @property
+    def zstat(self):
+        return self.__raw.zstat
+
+
+class BufferedShardReader(io.BufferedReader):
+    def __init__(self, client, path):
+        self.__raw = RawShardIO(client, path)
+        super().__init__(self.__raw, NODE_BYTE_SIZE_LIMIT)
+
+    @property
+    def bytes_read(self):
+        return self.__raw.bytes_read
+
+    @property
+    def cumulative_read_time(self):
+        return self.__raw.cumulative_read_time
+
+    @property
+    def znodes_read(self):
+        return self.__raw.znodes_read
+
+    @property
+    def zstat(self):
+        return self.__raw.zstat

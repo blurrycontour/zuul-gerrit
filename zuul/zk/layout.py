@@ -19,6 +19,7 @@ from contextlib import suppress
 from functools import total_ordering
 import logging
 import time
+import zlib
 
 from kazoo.exceptions import NoNodeError
 
@@ -173,7 +174,7 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
             path = f"{self.layout_data_root}/{layout_state.uuid}"
             with sharding.BufferedShardReader(
                     self.kazoo_client, path) as stream:
-                data = stream.read()
+                data = zlib.decompress(stream.read())
         except NoNodeError:
             return None
 
@@ -189,7 +190,7 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
         path = f"{self.layout_data_root}/{layout_state.uuid}"
         with sharding.BufferedShardWriter(
                 self.kazoo_client, path) as stream:
-            stream.write(encoded_data)
+            stream.write(zlib.compress(encoded_data))
 
     def cleanup(self, delay=300):
         self.log.debug("Starting layout data cleanup")

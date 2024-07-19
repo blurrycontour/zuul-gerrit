@@ -18,6 +18,7 @@ import logging
 import time
 from contextlib import suppress
 from enum import Enum
+import zlib
 
 from kazoo.exceptions import LockTimeout, NoNodeError
 from kazoo.protocol.states import EventType, ZnodeStat
@@ -286,7 +287,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         with sharding.BufferedShardWriter(
             self.kazoo_client, params_path
         ) as stream:
-            stream.write(self._dictToBytes(params))
+            stream.write(zlib.compress(self._dictToBytes(params)))
 
         self.kazoo_client.create(path, self._dictToBytes(request.toDict()))
 
@@ -314,7 +315,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         )
         with sharding.BufferedShardWriter(
                 self.kazoo_client, result_data_path) as stream:
-            stream.write(self._dictToBytes(result))
+            stream.write(zlib.compress(self._dictToBytes(result)))
 
         # Then write the result node to signify it's ready.
         data = {'result_data_path': result_data_path}
@@ -643,8 +644,9 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         with sharding.BufferedShardReader(
             self.kazoo_client, self._getParamsPath(request.uuid)
         ) as stream:
-            data = stream.read()
-            if not data:
+            try:
+                data = zlib.decompress(stream.read())
+            except NoNodeError:
                 return None
             return self._bytesToDict(data)
 

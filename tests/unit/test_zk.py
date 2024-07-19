@@ -151,19 +151,22 @@ class TestSharding(ZooKeeperBaseTestCase):
 
     def test_reader(self):
         shard_io = RawShardIO(self.zk_client.client, "/test/shards")
-        self.assertEqual(len(shard_io._shards), 0)
+        with testtools.ExpectedException(NoNodeError):
+            len(shard_io._shards)
 
         with BufferedShardReader(
             self.zk_client.client, "/test/shards"
         ) as shard_reader:
-            self.assertEqual(shard_reader.read(), b"")
+            with testtools.ExpectedException(NoNodeError):
+                shard_reader.read()
             shard_io.write(b"foobar")
             self.assertEqual(len(shard_io._shards), 1)
             self.assertEqual(shard_io.read(), b"foobar")
 
     def test_writer(self):
         shard_io = RawShardIO(self.zk_client.client, "/test/shards")
-        self.assertEqual(len(shard_io._shards), 0)
+        with testtools.ExpectedException(NoNodeError):
+            len(shard_io._shards)
 
         with BufferedShardWriter(
             self.zk_client.client, "/test/shards"
@@ -183,7 +186,8 @@ class TestSharding(ZooKeeperBaseTestCase):
         ) as shard_writer:
             shard_writer.truncate(0)
 
-        self.assertEqual(len(shard_io._shards), 0)
+        with testtools.ExpectedException(NoNodeError):
+            len(shard_io._shards)
 
     def test_shard_bytes_limit(self):
         with BufferedShardWriter(
@@ -2190,6 +2194,93 @@ class TestPolymorphicZKObjectMixin(ZooKeeperBaseTestCase):
 
     def test_create(self):
         class Parent(PolymorphicZKObjectMixin, ZKObject):
+            def __init__(self):
+                super().__init__()
+                self._set(
+                    _path=None,
+                    uid=uuid.uuid4().hex,
+                    state="test"
+                )
+
+            def serialize(self, context):
+                return json.dumps({
+                    "uid": self.uid,
+                    "state": self.state,
+                }).encode("utf8")
+
+            def getPath(self):
+                return f"/test/{self.uid}"
+
+        class ChildA(Parent, subclass_id="child-A"):
+            pass
+
+        class ChildB(Parent, subclass_id="chid-B"):
+            pass
+
+        context = ZKContext(self.zk_client, None, None, self.log)
+        child_a = ChildA.new(context)
+
+        child_a_from_zk = Parent.fromZK(context, child_a.getPath())
+        self.assertIsInstance(child_a_from_zk, ChildA)
+
+        child_b = ChildB.new(context)
+        child_b_from_zk = Parent.fromZK(context, child_b.getPath())
+        self.assertIsInstance(child_b_from_zk, ChildB)
+        child_b_from_zk.updateAttributes(context, state="update-1")
+
+        child_b.refresh(context)
+        self.assertEqual(child_b.state, "update-1")
+
+    def test_missing_base(self):
+        with testtools.ExpectedException(TypeError):
+            class Child(PolymorphicZKObjectMixin, subclass_id="child"):
+                pass
+
+    def test_wrong_nesting(self):
+        class Parent(PolymorphicZKObjectMixin):
+            pass
+
+        with testtools.ExpectedException(TypeError):
+            class NewParent(Parent):
+                pass
+
+    def test_duplicate_subclass_id(self):
+        class Parent(PolymorphicZKObjectMixin):
+            pass
+
+        class ChildA(Parent, subclass_id="child-a"):
+            pass
+
+        with testtools.ExpectedException(ValueError):
+            class ChildAWrong(Parent, subclass_id="child-a"):
+                pass
+
+    def test_independent_hierarchies(self):
+        class ParentA(PolymorphicZKObjectMixin):
+            pass
+
+        class ChildA(ParentA, subclass_id="child-A"):
+            pass
+
+        class ParentB(PolymorphicZKObjectMixin):
+            pass
+
+        class ChildB(ParentB, subclass_id="child-B"):
+            pass
+
+        self.assertIn(ChildA._subclass_id, ParentA._subclasses)
+        self.assertIs(ParentA._subclasses[ChildA._subclass_id], ChildA)
+        self.assertNotIn(ChildB._subclass_id, ParentA._subclasses)
+
+        self.assertIn(ChildB._subclass_id, ParentB._subclasses)
+        self.assertIs(ParentB._subclasses[ChildB._subclass_id], ChildB)
+        self.assertNotIn(ChildA._subclass_id, ParentB._subclasses)
+
+
+class TestPolymorphicZKObjectMixinSharded(ZooKeeperBaseTestCase):
+
+    def test_create(self):
+        class Parent(PolymorphicZKObjectMixin, ShardedZKObject):
             def __init__(self):
                 super().__init__()
                 self._set(
