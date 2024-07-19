@@ -18,10 +18,13 @@ from uuid import uuid4
 
 from opentelemetry import trace
 
-from zuul.driver import Driver, TriggerInterface
+from zuul.driver import Driver, TriggerInterface, ReporterInterface
 from zuul.driver.zuul.zuulmodel import ZuulTriggerEvent
-from zuul.driver.zuul import zuulmodel
-from zuul.driver.zuul import zuultrigger
+from zuul.driver.zuul import (
+    zuulmodel,
+    zuultrigger,
+    zuulreporter,
+)
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import Change
 
@@ -30,7 +33,7 @@ PROJECT_CHANGE_MERGED = 'project-change-merged'
 IMAGE_BUILD = 'image-build'
 
 
-class ZuulDriver(Driver, TriggerInterface):
+class ZuulDriver(Driver, TriggerInterface, ReporterInterface):
     name = 'zuul'
     log = logging.getLogger("zuul.ZuulTrigger")
     tracer = trace.get_tracer("zuul")
@@ -179,7 +182,7 @@ class ZuulDriver(Driver, TriggerInterface):
         event.arrived_at_scheduler_timestamp = event.timestamp
         return event
 
-    def getTrigger(self, connection_name, config=None):
+    def getTrigger(self, connection, config=None):
         return zuultrigger.ZuulTrigger(self, config)
 
     def getTriggerSchema(self):
@@ -187,3 +190,9 @@ class ZuulDriver(Driver, TriggerInterface):
 
     def getTriggerEventClass(self):
         return zuulmodel.ZuulTriggerEvent
+
+    def getReporter(self, connection, pipeline, config=None):
+        return zuulreporter.ZuulReporter(self, connection, pipeline, config)
+
+    def getReporterSchema(self):
+        return zuulreporter.getSchema()
