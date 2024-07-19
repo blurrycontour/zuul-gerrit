@@ -405,13 +405,10 @@ class ZKObject:
             self._set(_zkobject_hash=None)
             data = self._decompressData(raw_data)
             self._set(**self.deserialize(data, context))
-            self._set(_zkobject_hash=hash(data),
+            self._set(_zstat=zstat,
+                      _zkobject_hash=hash(data),
                       _zkobject_compressed_size=len(raw_data),
                       _zkobject_uncompressed_size=len(data))
-            if zstat is not None:
-                # Traditionally, a sharded zkobject does not have a
-                # _zstat
-                self._set(_zstat=zstat)
         except Exception:
             if self.delete_on_error:
                 self.delete(context)
@@ -472,14 +469,11 @@ class ZKObject:
             context.log.error(
                 "Exception saving ZKObject %s at %s", self, path)
             raise
-        self._set(_zkobject_hash=hash(data),
+        self._set(_zstat=zstat,
+                  _zkobject_hash=hash(data),
                   _zkobject_compressed_size=len(compressed_data),
                   _zkobject_uncompressed_size=len(data),
                   )
-        if zstat is not None:
-            # Traditionally, a sharded zkobject does not have a
-            # _zstat
-            self._set(_zstat=zstat)
 
     def __setattr__(self, name, value):
         if self._active_context:

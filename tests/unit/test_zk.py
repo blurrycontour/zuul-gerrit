@@ -1786,6 +1786,9 @@ class TestZKObject(ZooKeeperBaseTestCase):
                     raise OperationTimeoutError()
                 return self._real_client.set(*args, **kw)
 
+            def exists(self, *args, **kw):
+                return self._real_client.exists(*args, **kw)
+
         # Fail an update
         with (tenant_write_lock(self.zk_client, tenant_name) as lock,
               ZKContext(
