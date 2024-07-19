@@ -908,7 +908,7 @@ class Client(zuul.cmd.ZuulApp):
     def validate(self):
         from zuul import scheduler
         from zuul import configloader
-        self.configure_connections(source_only=True)
+        self.configure_connections(sources=True, triggers=True, reporters=True)
 
         class SchedulerConfig(scheduler.Scheduler):
             # A custom scheduler constructor adapted for config check
@@ -1066,7 +1066,7 @@ class Client(zuul.cmd.ZuulApp):
         args = self.args
         now = datetime.datetime.now(dateutil.tz.tzutc())
         cutoff = parse_cutoff(now, args.before, args.older_than)
-        self.configure_connections(source_only=False, require_sql=True)
+        self.configure_connections(database=True)
         connection = self.connections.getSqlConnection()
         connection.deleteBuildsets(cutoff, args.batch_size)
         sys.exit(0)
