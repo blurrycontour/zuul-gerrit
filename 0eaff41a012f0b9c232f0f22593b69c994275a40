@@ -464,6 +464,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "95e0741f_6d9b1ac7",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-07-19T08:37:13Z",
+      "side": 1,
+      "message": "I think we can add the project as well. I just forgot to add this.",
+      "parentUuid": "c397bf63_0e13ec3e",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "df5519f4_4d9a68ec",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 1
