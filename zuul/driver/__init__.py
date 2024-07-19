@@ -314,16 +314,19 @@ class ProviderInterface(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def getProvider(self, connection, canonical_name, config=None):
+    def getProvider(self, connection, tenant_name, canonical_name,
+                    config=None):
         """Create and return a new Provider object.
 
         This method is required by the interface.
 
         The provider object returned should inherit from the
-        :py:class:`~zuul.provider.BaseProvider` class.
+        :py:class:`~zuul.provider.BaseProvider` class and also
+        :py:class:`~zuul.zk.zkobject.ZKObject`.
 
         :arg Connection connection: The Connection object associated
             with the provider (as previously returned by getConnection).
+        :arg str tenant_name: The name of the tenant
         :arg str canonical_name: The canonical name of the ProviderConfig
             object corresponding with this provider.
         :arg dict config: The flattened provider configuration from the
@@ -332,6 +335,14 @@ class ProviderInterface(object, metaclass=abc.ABCMeta):
         :returns: A new provider object.
         :rtype: :py:class:`~zuul.provider.BaseProvider`
 
+        """
+        pass
+
+    @abc.abstractmethod
+    def getProviderClass(self):
+        """Return the class used by getProvider().
+
+        This method is required by the interface.
         """
         pass
 
