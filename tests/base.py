@@ -1,6 +1,6 @@
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
 # Copyright 2016 Red Hat, Inc.
-# Copyright 2021-2022 Acme Gating, LLC
+# Copyright 2021-2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -1781,7 +1781,9 @@ class BaseTestCase(testtools.TestCase):
         log_defaults_from_env = os.environ.get(
             'OS_LOG_DEFAULTS',
             'git.cmd=INFO,'
-            'kazoo.client=WARNING,kazoo.recipe=WARNING')
+            'kazoo.client=WARNING,kazoo.recipe=WARNING,'
+            'botocore=WARNING'
+        )
 
         if log_defaults_from_env:
             for default in log_defaults_from_env.split(','):
@@ -2279,7 +2281,16 @@ class ZuulTestCase(BaseTestCase):
         self.history = self.executor_server.build_history
         self.builds = self.executor_server.running_builds
 
-        self.launcher = zuul.launcher.server.Launcher(self.config)
+        launcher_connections = TestConnectionRegistry(
+            self.config, self.test_config,
+            self.additional_event_queues,
+            self.upstream_root, self.poller_events,
+            self.git_url_with_auth, self.addCleanup)
+        launcher_connections.configure(self.config, providers=True)
+
+        self.launcher = zuul.launcher.server.Launcher(
+            self.config,
+            launcher_connections)
         self.launcher.start()
 
         self.scheds = SchedulerTestManager(self.validate_tenants,
