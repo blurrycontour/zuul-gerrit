@@ -74,8 +74,11 @@ class Launcher:
         self.command_socket = commandsocket.CommandSocket(command_socket)
         self._command_running = False
 
+        self.layout_updated_event = threading.Event()
+        self.layout_updated_event.set()
+
         self.tenant_layout_state = LayoutStateStore(
-            self.zk_client, self.wake_event.set)
+            self.zk_client, self._layoutUpdatedCallback)
         self.layout_providers_store = LayoutProvidersStore(
             self.zk_client, self.connections)
         self.local_layout_state = {}
@@ -87,6 +90,10 @@ class Launcher:
             name="Launcher",
         )
 
+    def _layoutUpdatedCallback(self):
+        self.layout_updated_event.set()
+        self.wake_event.set()
+
     def run(self):
         while self._running:
             self.wake_event.wait()
@@ -97,8 +104,10 @@ class Launcher:
                 self.log.exception("Error in main thread:")
 
     def _run(self):
-        if self.updateTenantProviders():
-            self.checkMissingImages()
+        if self.layout_updated_event.is_set():
+            self.layout_updated_event.clear()
+            if self.updateTenantProviders():
+                self.checkMissingImages()
 
     def start(self):
         self.log.debug("Starting command processor")
