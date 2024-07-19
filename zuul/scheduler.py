@@ -356,7 +356,8 @@ class Scheduler(threading.Thread):
         if not testonly:
             self.executor = self._executor_client_class(self.config, self)
             self.merger = self._merger_client_class(self.config, self)
-            self.launcher = self._launcher_client_class(self.config, self)
+            self.launcher = self._launcher_client_class(
+                self.zk_client, self.stop_event)
             self.nodepool = nodepool.Nodepool(
                 self.zk_client, self.system.system_id, self.statsd,
                 scheduler=True)
