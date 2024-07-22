@@ -154,9 +154,10 @@ class Launcher:
                     self._acceptRequest(request, log)
                 elif request.state == model.NodesetRequest.State.ACCEPTED:
                     self._checkRequest(request, log)
-            except NodesetRequestError:
+            except NodesetRequestError as err:
                 state = model.NodesetRequest.State.FAILED
-                log.error("Marking request %s as %s", request, state)
+                log.error("Marking request %s as %s: %s",
+                          request, state, str(err))
                 event = model.NodesProvisionedEvent(
                     request.uuid, request.buildset_uuid)
                 self.result_events[request.tenant_name][
