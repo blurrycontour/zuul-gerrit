@@ -32,7 +32,6 @@ from tests.base import (
 
 class TestLauncher(ZuulTestCase):
     config_file = 'zuul-connections-nodepool.conf'
-    tenant_config_file = 'config/single-tenant/main-nodepool.yaml'
     mock_aws = mock_aws()
 
     def setUp(self):
@@ -85,6 +84,7 @@ class TestLauncher(ZuulTestCase):
             dict(name='build-debian-local-image', result='SUCCESS'),
         ])
 
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_launcher(self):
         result_queue = PipelineResultEventQueue(
             self.zk_client, "tenant-one", "check")
@@ -126,6 +126,7 @@ class TestLauncher(ZuulTestCase):
         request.delete(ctx)
         self.waitUntilSettled()
 
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_launcher_missing_label(self):
         def test_launcher(self):
             result_queue = PipelineResultEventQueue(

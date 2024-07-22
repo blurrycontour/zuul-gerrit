@@ -91,10 +91,18 @@
 - flavor:
     name: normal
 
+- flavor:
+    name: large
+
 - label:
     name: debian-normal
     image: debian
     flavor: normal
+
+- label:
+    name: debian-large
+    image: debian
+    flavor: large
 
 - section:
     name: aws-base
@@ -106,6 +114,7 @@
       bucket-name: zuul
     flavors:
       - name: normal
+      - name: large
     images:
       - name: debian
 
@@ -119,3 +128,4 @@
     section: aws-us-east-1
     labels:
       - debian-normal
+      - debian-large
