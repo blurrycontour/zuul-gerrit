@@ -37,7 +37,10 @@ from zuul.provider import (
 
 
 class AwsProviderImage(BaseProviderImage):
-    pass
+    def __init__(self, config):
+        super().__init__(config)
+        self.image_id = config.get('image-id')
+        self.image_filters = config.get('image-filters')
 
 
 class AwsProviderFlavor(BaseProviderFlavor):
@@ -46,6 +49,9 @@ class AwsProviderFlavor(BaseProviderFlavor):
         self.instance_type = config['instance-type']
         self.volume_type = config.get('volume-type')
         self.dedicated_host = config.get('dedicated-host', False)
+        self.ebs_optimized = bool(config.get('ebs-optimized', False))
+        # TODO
+        self.use_spot = False
 
 
 class AwsProviderLabel(BaseProviderLabel):
@@ -95,11 +101,22 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
     def getEndpoint(self):
         return self.driver.getEndpoint(self)
 
-    def getCreateStateMachine(self, hostname, label, image_external_id,
-                              metadata, request, az, log):
-        return AwsCreateStateMachine(self.endpoint, hostname, label,
-                                     image_external_id, metadata,
-                                     request, log)
+    def getCreateStateMachine(self, node, image_external_id, log):
+        # TODO: decide on a method of producing a hostname
+        # that is max 15 chars.
+        hostname = f"np{node.uuid[:13]}"
+        label = self.labels[node.label]
+        flavor = self.flavors[label.flavor]
+        image = self.images[label.image]
+        return AwsCreateStateMachine(
+            self.endpoint,
+            hostname,
+            label,
+            flavor,
+            image,
+            image_external_id,
+            node.tags,
+            log)
 
     def getDeleteStateMachine(self, external_id, log):
         return AwsDeleteStateMachine(self.endpoint, external_id, log)
@@ -188,7 +205,8 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         return QuotaInformation(**args)
 
     def getQuotaForLabel(self, label):
-        return self.endpoint.getQuotaForLabel(label)
+        flavor = self.flavors[label.flavor]
+        return self.endpoint.getQuotaForLabel(label, flavor)
 
     def uploadImage(self, provider_image, image_name,
                     filename, image_format, metadata, md5, sha256):
@@ -231,6 +249,7 @@ class AwsProviderSchema(BaseProviderSchema):
             vs.Required('instance-type'): str,
             'volume-type': str,
             'dedicated-host': bool,
+            'ebs-optimized': bool,
         })
 
         return schema
