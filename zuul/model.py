@@ -2311,6 +2311,7 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             label="",
             connection_name="",
             # Node data
+            hostname=None,
             host_id=None,
             interface_ip=None,
             public_ipv4=None,
@@ -2329,8 +2330,13 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             resources=None,
             attributes={},
             tenant_name=None,
+            create_state={},
+            delete_state={},
+            tags={},
             # Attributes that are not serialized
             is_locked=False,
+            create_state_machine=None,
+            delete_state_machine=None,
             # Attributes set by the launcher
             _lscores=None,
         )
