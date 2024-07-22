@@ -37,6 +37,7 @@ from zuul.zk.layout import (
     LayoutStateStore,
 )
 from zuul.zk.locks import tenant_read_lock
+from zuul.zk.system import ZuulSystem
 from zuul.zk.zkobject import ZKContext
 
 COMMANDS = (
@@ -67,6 +68,7 @@ class Launcher:
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
 
+        self.system = ZuulSystem(self.zk_client)
         self.trigger_events = TenantTriggerEventQueue.createRegistry(
             self.zk_client, self.connections
         )
@@ -176,21 +178,26 @@ class Launcher:
         provider_nodes = []
         label_providers = self._selectProviders(request)
         with self.createZKContext(request._lock, log) as ctx:
-            for i, (label, provider) in enumerate(label_providers):
+            for i, (label_name, provider) in enumerate(label_providers):
                 # Create a deterministic node UUID by using
                 # the request UUID as namespace.
                 node_uuid = uuid.uuid5(
-                    request_uuid, f"{provider.name}-{i}-{label}").hex
+                    request_uuid, f"{provider.name}-{i}-{label_name}").hex
+                label = provider.labels[label_name]
+                tags = provider.getNodeTags(
+                    self.system.system_id, request, provider, label,
+                    node_uuid)
                 # TODO: handle NodeExists errors
                 node_class = provider.driver.getProviderNodeClass()
                 node = node_class.new(
                     ctx,
                     uuid=node_uuid,
-                    label=label,
+                    label=label_name,
                     request_id=request.uuid,
                     connection_name=provider.connection_name,
                     tenant_name=request.tenant_name,
                     provider=provider.name,
+                    tags=tags,
                 )
                 log.debug("Requested node %s", node)
                 provider_nodes.append(node.uuid)
@@ -254,9 +261,10 @@ class Launcher:
                     self._buildNode(node, log)
                 if node.state == model.ProviderNode.State.BUILDING:
                     self._checkNode(node, log)
-            except ProviderNodeError:
+            except ProviderNodeError as err:
                 state = model.ProviderNode.State.FAILED
-                log.exception("Marking node %s as %s", node, state)
+                log.exception("Marking node %s as %s: %s", node,
+                              state, err)
                 with self.createZKContext(node._lock, self.log) as ctx:
                     node.updateAttributes(ctx, state=state)
 
@@ -267,17 +275,22 @@ class Launcher:
         log.debug("Building node %s", node)
         provider = self._getProvider(node.tenant_name, node.provider)
         _ = provider.getEndpoint()
-        # TODO: launch a node
         with self.createZKContext(node._lock, self.log) as ctx:
-            node.updateAttributes(ctx, state=model.ProviderNode.State.BUILDING)
+            with node.activeContext(ctx):
+                # TODO: this may be provided by Zuul once image
+                # uploads are supported
+                image_external_id = None
+                node.create_state_machine = provider.getCreateStateMachine(
+                    node, image_external_id, log)
+                node.state = model.ProviderNode.State.BUILDING
 
     def _checkNode(self, node, log):
         log.debug("Checking node %s", node)
-        # TODO: implement node check
-        if True:
-            state = model.ProviderNode.State.READY
-        else:
-            state = model.ProviderNode.State.FAILED
+        node.create_state_machine.advance()
+        if not node.create_state_machine.complete:
+            self.wake_event.set()
+            return
+        state = model.ProviderNode.State.READY
         log.debug("Marking node %s as %s", node, state)
         with self.createZKContext(node._lock, self.log) as ctx:
             node.updateAttributes(ctx, state=state)

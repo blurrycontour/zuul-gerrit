@@ -46,13 +46,18 @@ class BaseProviderFlavor(metaclass=abc.ABCMeta):
     def __init__(self, config):
         self.project_canonical_name = config['project_canonical_name']
         self.name = config['name']
+        self.public_ipv4 = config.get('public-ipv4', False)
 
 
 class BaseProviderLabel(metaclass=abc.ABCMeta):
     def __init__(self, config):
         self.project_canonical_name = config['project_canonical_name']
         self.name = config['name']
+        self.flavor = config.get('flavor')
+        self.image = config.get('image')
         self.min_ready = config.get('min-ready', 0)
+        self.tags = config.get('tags', {})
+        self.key_name = config.get('key-name')
 
 
 class BaseProviderEndpoint(metaclass=abc.ABCMeta):
@@ -148,7 +153,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
     def parseFlavors(self, config):
         flavors = {}
         for flavor_config in config.get('flavors', []):
-            f = self.parseLabel(flavor_config)
+            f = self.parseFlavor(flavor_config)
             flavors[f.name] = f
         return flavors
 
@@ -199,24 +204,52 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
     def hasLabel(self, label):
         return label in self.labels
 
-    def getCreateStateMachine(self, hostname, label,
-                              image_external_id, metadata,
+    def getNodeTags(self, system_id, request, provider, label,
+                    node_uuid):
+        """Return the tags that should be stored with the node
+
+        :param str system_id: The Zuul system uuid
+        :param NodesetRequest request: The node request
+        :param Provider provider: The cloud provider
+        :param ProviderLabel label: The node label
+        :param str node_uuid: The node uuid
+        """
+        tags = dict()
+
+        # TODO: add other potentially useful attrs from nodepool
+        attributes = model.Attributes(
+            request_id=request.uuid,
+            tenant_name=provider.tenant_name,
+        )
+        for k, v in label.tags.items():
+            try:
+                tags[k] = v.format(**attributes)
+            except Exception:
+                self.log.exception("Error formatting metadata %s", k)
+
+        fixed = {
+            'zuul_system_id': system_id,
+            'zuul_provider_name': self.tenant_scoped_name,
+            'zuul_provider_cname': self.canonical_name,
+            'zuul_node_uuid': node_uuid,
+        }
+        tags.update(fixed)
+        return tags
+
+    def getCreateStateMachine(self, node,
+                              image_external_id,
                               log):
         """Return a state machine suitable for creating an instance
 
         This method should return a new state machine object
         initialized to create the described node.
 
-        :param str hostname: The hostname of the node.
+        :param ProviderNode node: The node object.
         :param ProviderLabel label: A config object representing the
             provider-label for the node.
         :param str image_external_id: If provided, the external id of
             a previously uploaded image; if None, then the adapter should
             look up a cloud image based on the label.
-        :param metadata dict: A dictionary of metadata that must be
-            stored on the instance in the cloud.  The same data must be
-            able to be returned later on :py:class:`Instance` objects
-            returned from `listInstances`.
         :param log Logger: A logger instance for emitting annotated
             logs related to the request.
 
@@ -385,6 +418,8 @@ class BaseProviderSchema(metaclass=abc.ABCMeta):
             'description': str,
             'image': str,
             'flavor': str,
+            'tags': dict,
+            'key-name': str,
         })
         return schema
 
@@ -408,6 +443,7 @@ class BaseProviderSchema(metaclass=abc.ABCMeta):
             vs.Required('project_canonical_name'): str,
             vs.Required('name'): str,
             'description': str,
+            'public-ipv4': bool,
         })
         return schema
 

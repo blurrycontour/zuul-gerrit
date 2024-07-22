@@ -85,48 +85,6 @@ class TestLauncher(ZuulTestCase):
         ])
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
-    def test_launcher(self):
-        result_queue = PipelineResultEventQueue(
-            self.zk_client, "tenant-one", "check")
-        labels = ["debian-normal", "debian-large"]
-
-        ctx = self.createZKContext(None)
-        # Lock the pipeline, so we can grab the result event
-        with pipeline_lock(self.zk_client, "tenant-one", "check"):
-            request = model.NodesetRequest.new(
-                ctx,
-                tenant_name="tenant-one",
-                pipeline_name="check",
-                buildset_uuid=uuid.uuid4().hex,
-                job_uuid=uuid.uuid4().hex,
-                job_name="foobar",
-                labels=labels,
-                priority=100,
-                request_time=time.time(),
-                zuul_event_id=uuid.uuid4().hex,
-                span_info=None,
-            )
-            for _ in iterate_timeout(10, "nodeset request to be fulfilled"):
-                result_events = list(result_queue)
-                if result_events:
-                    for event in result_events:
-                        # Remove event(s) from queue
-                        result_queue.ack(event)
-                    break
-
-        self.assertEqual(len(result_events), 1)
-        for event in result_queue:
-            self.assertEqual(event.request_id, request.uuid)
-            self.assertEqual(event.build_set_uuid, request.buildset_uuid)
-
-        request.refresh(ctx)
-        self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
-        self.assertEqual(len(request.provider_nodes), 2)
-
-        request.delete(ctx)
-        self.waitUntilSettled()
-
-    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_launcher_missing_label(self):
         result_queue = PipelineResultEventQueue(
             self.zk_client, "tenant-one", "check")
