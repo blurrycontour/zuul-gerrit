@@ -388,7 +388,6 @@ class GithubReporter(BaseReporter):
 def getSchema():
     github_reporter = v.Schema({
         'status': v.Any('pending', 'success', 'failure'),
-        'status-url': str,
         'comment': bool,
         'merge': bool,
         'label': scalar_or_list(str),

@@ -7992,8 +7992,9 @@ class SystemAttributes:
         self.default_hold_expiration = 0
         self.default_ansible_version = None
         self.web_root = None
-        self.web_status_url = ""
         self.websocket_url = None
+        # TODO (swest): Deprecated; remove with the next major version
+        self.web_status_url = ""
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
