@@ -327,6 +327,22 @@ configuration. Some examples of tenant definitions are:
             in-repo configuration for its own testing (which may not
             be relevant to other users of the project).
 
+         .. attr:: configure-projects
+
+            A list of project names (or :ref:`regular expressions
+            <regex>` to match project names) that this project is
+            permitted to configure.  The use of this setting will
+            allow this project to specify :attr:`project` stanzas that
+            apply to untrusted-projects specified here.  This is an
+            advanced and potentially dangerous configuration setting
+            since it would allow one project to cause another project
+            to run certain jobs.  This behavior is normally reserved
+            for :term:`config projects <config-project>`.
+
+            This should only be used in situations where there is a
+            strong trust relationship between this project and the
+            projects it is permitted to configure.
+
       .. attr:: <project-group>
 
          The items in the list are dictionaries with the following

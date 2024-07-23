@@ -1570,8 +1570,8 @@ class TestGithubUnprotectedBranches(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants\
             .get('tenant-one')
 
-        project1 = tenant.untrusted_projects[0]
-        project2 = tenant.untrusted_projects[1]
+        project1 = list(tenant.untrusted_projects)[0]
+        project2 = list(tenant.untrusted_projects)[1]
 
         tpc1 = tenant.project_configs[project1.canonical_name]
         tpc2 = tenant.project_configs[project2.canonical_name]
@@ -1972,9 +1972,9 @@ class TestGithubLockedBranches(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants\
             .get('tenant-one')
 
-        project1 = tenant.untrusted_projects[0]
-        project2 = tenant.untrusted_projects[1]
-        project3 = tenant.untrusted_projects[2]
+        project1 = list(tenant.untrusted_projects)[0]
+        project2 = list(tenant.untrusted_projects)[1]
+        project3 = list(tenant.untrusted_projects)[2]
 
         tpc1 = tenant.project_configs[project1.canonical_name]
         tpc2 = tenant.project_configs[project2.canonical_name]
