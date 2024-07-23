@@ -220,9 +220,11 @@ class ConnectionRegistry(object):
         return [c for c in self.connections.values()
                 if isinstance(c.driver, ProviderInterface)]
 
-    def getReporter(self, connection_name, pipeline, config=None):
+    def getReporter(self, connection_name, pipeline, config=None,
+                    parse_context=None):
         connection = self.connections[connection_name]
-        return connection.driver.getReporter(connection, pipeline, config)
+        return connection.driver.getReporter(
+            connection, pipeline, config, parse_context)
 
     def getTrigger(self, connection_name, config=None):
         connection = self.connections[connection_name]
