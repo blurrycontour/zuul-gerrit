@@ -2116,6 +2116,9 @@ class PipelineManager(metaclass=ABCMeta):
             change = item.changes[0]
             source = self.sched.connections.getSource(
                 change.project.connection_name)
+            if not event.item_in_branches:
+                log.warning("Tagged commit is not part of any included "
+                            "branch. No jobs will run.")
             source.setChangeAttributes(
                 change, containing_branches=event.item_in_branches)
         with build_set.activeContext(self.current_context):

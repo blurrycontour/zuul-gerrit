@@ -582,6 +582,15 @@ class TestBranchTag(ZuulTestCase):
             dict(name='test2-job', result='SUCCESS', ref='refs/tags/bar')],
             ordered=False)
 
+    def test_detached_tag(self):
+        # Test no jobs run when a tagged commit isn't part of any branch
+        event = self.fake_gerrit.addFakeTag('org/project', 'master', 'foo')
+        # Fake a commit that doesn't appear on a branch
+        event["refUpdate"]["newRev"] = 40 * "f"
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled()
+        self.assertHistory([])
+
 
 class TestBranchNegative(ZuulTestCase):
     tenant_config_file = 'config/branch-negative/main.yaml'
