@@ -27,7 +27,7 @@ An example ``zuul.conf``:
    password=MY_SECRET_PASSWORD
 
    [web]
-   status_url=https://zuul.example.com/status
+   root=https://zuul.example.com/
 
    [scheduler]
    log_config=/etc/zuul/scheduler-logging.yaml
@@ -241,13 +241,6 @@ The following sections of ``zuul.conf`` are used by the scheduler:
 
       See :attr:`tenant.web-root` for additional options for
       whitelabeled tenant configuration.
-
-   .. attr:: status_url
-
-      URL that will be posted in Zuul comments made to changes when
-      starting jobs for a change.
-
-      .. TODO: is this effectively required?
 
 .. attr:: keystore
 
