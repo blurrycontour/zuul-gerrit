@@ -77,7 +77,7 @@ from zuul.model import (
     TenantReconfigureEvent,
     UnparsedAbideConfig,
     STATE_FAILED,
-    SEVERITY_WARNING,
+    SEVERITY_ERROR,
 )
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
@@ -1451,10 +1451,8 @@ class Scheduler(threading.Thread):
         loading_errors = []
         for tenant in abide.tenants.values():
             for error in tenant.layout.loading_errors:
-                if error.severity == SEVERITY_WARNING:
-                    self.log.warning(repr(error))
-                else:
-                    loading_errors.append(repr(error))
+                if error.severity == SEVERITY_ERROR:
+                    loading_errors.append(error.error)
         if loading_errors:
             summary = '\n\n\n'.join(loading_errors)
             raise exceptions.ConfigurationSyntaxError(
