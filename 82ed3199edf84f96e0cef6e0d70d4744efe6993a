@@ -33,6 +33,24 @@
       "message": "Might want to log the limit in the log.info() message as well as the warning sent to the code review system here. That way people don\u0027t have to discover where to find the limit and it is upfront and clear.",
       "revId": "82ed3199edf84f96e0cef6e0d70d4744efe6993a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbaa8782_48a8024e",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 731,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-23T16:48:50Z",
+      "side": 1,
+      "message": "Good idea, done!",
+      "parentUuid": "8bf9b188_bf813707",
+      "revId": "82ed3199edf84f96e0cef6e0d70d4744efe6993a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
