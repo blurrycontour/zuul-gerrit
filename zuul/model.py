@@ -1800,6 +1800,7 @@ class Node(ConfigObject):
         self.slot = None
         self._keys = []
         self.az = None
+        self.cloud = None
         self.provider = None
         self.region = None
         self.username = None
@@ -2082,6 +2083,10 @@ class NodeRequest(object):
         self.canceled = False
 
     @property
+    def zuul_event_id(self):
+        return self.event_id
+
+    @property
     def fulfilled(self):
         return (self._state == STATE_FULFILLED) and not self.failed
 
@@ -2200,6 +2205,8 @@ class NodesetRequest(zkobject.LockableZKObject):
         ACCEPTED = "accepted"
         FULFILLED = "fulfilled"
         FAILED = "failed"
+        # Only used for testing
+        TEST_HOLD = "test-hold"
 
     FINAL_STATES = (
         State.FULFILLED,
@@ -2232,6 +2239,18 @@ class NodesetRequest(zkobject.LockableZKObject):
             # Attributes set by the launcher
             _lscores=None,
         )
+
+    @property
+    def fulfilled(self):
+        return self.state == self.State.FULFILLED
+
+    @property
+    def nodes(self):
+        return self.provider_nodes
+
+    @property
+    def created_time(self):
+        return self.request_time
 
     def getPath(self):
         return f"{self.ROOT}/{self.REQUESTS_PATH}/{self.uuid}"

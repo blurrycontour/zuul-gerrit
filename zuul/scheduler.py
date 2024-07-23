@@ -65,6 +65,7 @@ from zuul.model import (
     FilesChangesCompletedEvent,
     HoldRequest,
     MergeCompletedEvent,
+    NodeRequest,
     NodesProvisionedEvent,
     PipelinePostConfigEvent,
     PipelineSemaphoreReleaseEvent,
@@ -3080,21 +3081,25 @@ class Scheduler(threading.Thread):
         pipeline.manager.onFilesChangesCompleted(event, build_set)
 
     def _doNodesProvisionedEvent(self, event, pipeline):
-        request = self.nodepool.zk_nodepool.getNodeRequest(event.request_id)
+        if self.nodepool.isNodeRequestID(event.request_id):
+            request = self.nodepool.zk_nodepool.getNodeRequest(
+                event.request_id)
+        else:
+            request = self.launcher.getRequest(event.request_id)
 
         if not request:
             self.log.warning("Unable to find request %s while processing"
                              "nodes provisioned event %s", request, event)
             return
 
+        log = get_annotated_logger(self.log, request)
         # Look up the buildset to access the local node request object
         build_set = self._getBuildSetFromPipeline(event, pipeline)
         if not build_set:
-            self.log.warning("Build set not found while processing"
-                             "nodes provisioned event %s", event)
+            log.warning("Build set not found while processing"
+                        "nodes provisioned event %s", event)
             return
 
-        log = get_annotated_logger(self.log, request.event_id)
         job = build_set.item.getJob(request.job_uuid)
         if job is None:
             log.warning("Item %s does not contain job %s "
@@ -3102,12 +3107,17 @@ class Scheduler(threading.Thread):
                         build_set.item, request.job_uuid, request)
             return
 
-        # If the request failed, we must directly delete it as the nodes will
-        # never be accepted.
-        if request.state == STATE_FAILED:
-            self.nodepool.deleteNodeRequest(request.id,
-                                            event_id=event.request_id)
-        nodeset_info = self.nodepool.getNodesetInfo(request, job.nodeset)
+        if isinstance(request, NodeRequest):
+            nodeset_info = self.nodepool.getNodesetInfo(request, job.nodeset)
+            # If the request failed, we must directly delete it as the nodes
+            # will never be accepted.
+            if request.state == STATE_FAILED:
+                self.nodepool.deleteNodeRequest(request.id,
+                                                event_id=event.request_id)
+        else:
+            nodeset_info = self.launcher.getNodesetInfo(request)
+            if request.state == request.State.FAILED:
+                self.launcher.deleteRequest(request)
 
         job = build_set.item.getJob(request.job_uuid)
         if build_set.getJobNodeSetInfo(job) is None:

@@ -852,6 +852,16 @@ class HoldableExecutorApi(ExecutorApi):
         return BuildRequest.REQUESTED
 
 
+class HoldableLauncherClient(zuul.launcher.client.LauncherClient):
+
+    hold_in_queue = False
+
+    def _getInitialRequestState(self, job):
+        if self.hold_in_queue:
+            return model.NodesetRequest.State.TEST_HOLD
+        return super()._getInitialRequestState(job)
+
+
 class TestingExecutorApi(HoldableExecutorApi):
     log = logging.getLogger("zuul.test.TestingExecutorApi")
 
@@ -1056,6 +1066,7 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
 class TestScheduler(zuul.scheduler.Scheduler):
     _merger_client_class = HoldableMergeClient
     _executor_client_class = HoldableExecutorClient
+    _launcher_client_class = HoldableLauncherClient
 
 
 class FakeSMTP(object):
@@ -3022,14 +3033,15 @@ class ZuulTestCase(BaseTestCase):
     def __areAllNodesetRequestsComplete(self, matcher=None):
         # Check ZK and the scheduler cache and make sure they are
         # in sync.
-        sched = self.scheds.first
-        for request in self.launcher.api.getNodesetRequests():
-            if request.state not in model.NodesetRequest.FINAL_STATES:
-                return False
-            if sched.pipeline_result_events[request.tenant_name][
-                request.pipeline_name
-            ].hasEvents():
-                return False
+        for app in self.scheds.filter(matcher):
+            sched = app.sched
+            for request in self.launcher.api.getNodesetRequests():
+                if request.state not in model.NodesetRequest.FINAL_STATES:
+                    return False
+                if sched.pipeline_result_events[request.tenant_name][
+                    request.pipeline_name
+                ].hasEvents():
+                    return False
         return True
 
     def __areAllMergeJobsWaiting(self):

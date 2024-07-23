@@ -75,7 +75,8 @@ class Launcher:
         )
 
         COMPONENT_REGISTRY.create(self.zk_client)
-        self.hostname = socket.getfqdn()
+        self.hostname = get_default(self.config, "launcher", "hostname",
+                                    socket.getfqdn())
         self.component_info = LauncherComponent(
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
