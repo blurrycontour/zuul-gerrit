@@ -15,6 +15,11 @@
 import logging
 import math
 
+import zuul.provider.schema as provider_schema
+from zuul.lib.voluputil import (
+    Required, Optional, Nullable, discriminate, assemble, RequiredExclusive,
+)
+
 import voluptuous as vs
 
 from zuul.driver.aws.awsendpoint import (
@@ -37,30 +42,105 @@ from zuul.provider import (
 
 
 class AwsProviderImage(BaseProviderImage):
+    aws_image_filters = {
+        'name': str,
+        'values': [str],
+    }
+    aws_cloud_schema = vs.Schema({
+        vs.Exclusive(Required('image-id'), 'spec'): str,
+        vs.Exclusive(Required('image-filters'), 'spec'): [aws_image_filters],
+        Required('type'): 'cloud',
+    })
+    cloud_schema = vs.All(
+        assemble(
+            BaseProviderImage.schema,
+            aws_cloud_schema,
+        ),
+        RequiredExclusive('image_id', 'image_filters',
+                          msg=('Provide either '
+                               '"image-filters", or "image-id" keys'))
+    )
+    zuul_schema = assemble(
+        BaseProviderImage.schema,
+        vs.Schema({'type': 'zuul'}),
+    )
+
+    inheritable_schema = BaseProviderImage.inheritable_schema
+    schema = vs.Union(
+        cloud_schema, zuul_schema,
+        discriminant=discriminate(
+            lambda val, alt: val['type'] == alt['type']))
+
     def __init__(self, config):
+        self.image_id = None
+        self.image_filters = None
         super().__init__(config)
-        self.image_id = config.get('image-id')
-        self.image_filters = config.get('image-filters')
 
 
 class AwsProviderFlavor(BaseProviderFlavor):
-    def __init__(self, config):
-        super().__init__(config)
-        self.instance_type = config['instance-type']
-        self.volume_type = config.get('volume-type')
-        self.dedicated_host = config.get('dedicated-host', False)
-        self.ebs_optimized = bool(config.get('ebs-optimized', False))
-        # TODO
-        self.use_spot = False
+    aws_flavor_schema = vs.Schema({
+        Required('instance-type'): str,
+        Optional('volume-type'): Nullable(str),
+        Optional('dedicated-host', default=False): bool,
+        Optional('ebs-optimized', default=False): bool,
+        Optional('market-type', default='on-demand'): vs.Any(
+            'on-demand', 'spot'),
+    })
+
+    inheritable_schema = assemble(
+        BaseProviderFlavor.inheritable_schema,
+        provider_schema.cloud_flavor,
+    )
+    schema = assemble(
+        BaseProviderFlavor.schema,
+        provider_schema.cloud_flavor,
+        aws_flavor_schema,
+    )
 
 
 class AwsProviderLabel(BaseProviderLabel):
-    def __init__(self, config):
-        super().__init__(config)
+    inheritable_schema = assemble(
+        BaseProviderLabel.inheritable_schema,
+        provider_schema.ssh_label,
+    )
+    schema = assemble(
+        BaseProviderLabel.schema,
+        provider_schema.ssh_label,
+    )
+
+
+class AwsProviderSchema(BaseProviderSchema):
+    def getLabelSchema(self):
+        return AwsProviderLabel.schema
+
+    def getImageSchema(self):
+        return AwsProviderImage.schema
+
+    def getFlavorSchema(self):
+        return AwsProviderFlavor.schema
+
+    def getProviderSchema(self):
+        schema = super().getProviderSchema()
+        object_storage = {
+            vs.Required('bucket-name'): str,
+        }
+
+        aws_provider_schema = vs.Schema({
+            Required('region'): str,
+            Optional('object-storage'): Nullable(object_storage),
+        })
+        return assemble(
+            schema,
+            aws_provider_schema,
+            AwsProviderImage.inheritable_schema,
+            AwsProviderFlavor.inheritable_schema,
+            AwsProviderLabel.inheritable_schema,
+        )
 
 
 class AwsProvider(BaseProvider, subclass_id='aws'):
     log = logging.getLogger("zuul.AwsProvider")
+    schema = AwsProviderSchema().getProviderSchema()
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
@@ -82,12 +162,6 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
             return ep
         self._set(_endpoint=self.getEndpoint())
         return self._endpoint
-
-    def parseConfig(self, config):
-        data = super().parseConfig(config)
-        data['region'] = config['region']
-        data['object_storage'] = config.get('object-storage')
-        return data
 
     def parseImage(self, image_config):
         return AwsProviderImage(image_config)
@@ -219,54 +293,3 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
 
     def deleteImage(self, external_id):
         self.endpoint.deleteImage(external_id)
-
-
-class AwsProviderSchema(BaseProviderSchema):
-    def getImageSchema(self):
-        base_schema = super().getImageSchema()
-
-        # This is AWS syntax, so we allow upper or lower case
-        image_filters = {
-            vs.Any('Name', 'name'): str,
-            vs.Any('Values', 'values'): [str]
-        }
-        cloud_schema = base_schema.extend({
-            'image-id': str,
-            'image-filters': [image_filters],
-        })
-
-        def validator(data):
-            if data.get('type') == 'cloud':
-                return cloud_schema(data)
-            return base_schema(data)
-
-        return validator
-
-    def getFlavorSchema(self):
-        base_schema = super().getLabelSchema()
-
-        schema = base_schema.extend({
-            vs.Required('instance-type'): str,
-            'volume-type': str,
-            'dedicated-host': bool,
-            'ebs-optimized': bool,
-        })
-
-        return schema
-
-    def getLabelSchema(self):
-        base_schema = super().getLabelSchema()
-        return base_schema
-
-    def getProviderSchema(self):
-        # TODO: validate tag values are strings
-        schema = super().getProviderSchema()
-        object_storage = {
-            vs.Required('bucket-name'): str,
-        }
-
-        schema = schema.extend({
-            vs.Required('region'): str,
-            'object-storage': object_storage,
-        })
-        return schema
