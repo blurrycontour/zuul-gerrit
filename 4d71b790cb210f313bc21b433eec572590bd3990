@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d214f5c0_3e349011",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-23T16:31:37Z",
+      "side": 1,
+      "message": "It is also useful for common development tasks. Many of our (OpenDev) users use the existing change filter on the status page to track their changes as they move from pipeline to pipeline or enqueue to multiple pipelines.\n\nFor example we have a check arm64 pipeline that runs concurrently with check. You may be interested in results from both at the same time. Similarly you may be interested in experimental pipeline results concurrently to check/gate. Then as corvus mentions there are post merge actions that may diverge into different pipelines as well.\n\nAll that to say I think being able to see changes and projects across multiple pipelines at the same time is a very useful thing and it has a number of applications.",
+      "revId": "4d71b790cb210f313bc21b433eec572590bd3990",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
