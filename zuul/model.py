@@ -7992,6 +7992,8 @@ class SystemAttributes:
         self.default_hold_expiration = 0
         self.default_ansible_version = None
         self.web_root = None
+        # TODO (swest): Deprecated - only keep for backward compat;
+        # remove with the next major version
         self.web_status_url = ""
         self.websocket_url = None
 
