@@ -37,9 +37,10 @@ class PagureDriver(Driver, ConnectionInterface, TriggerInterface,
     def getSource(self, connection):
         return paguresource.PagureSource(self, connection)
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(self, connection, pipeline, config=None,
+                    parse_context=None):
         return pagurereporter.PagureReporter(
-            self, connection, pipeline, config)
+            self, connection, pipeline, config, parse_context)
 
     def getTriggerSchema(self):
         return paguretrigger.getSchema()

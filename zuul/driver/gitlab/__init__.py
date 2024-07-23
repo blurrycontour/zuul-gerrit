@@ -37,7 +37,8 @@ class GitlabDriver(Driver, ConnectionInterface, TriggerInterface,
     def getSource(self, connection):
         return gitlabsource.GitlabSource(self, connection)
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(self, connection, pipeline, config=None,
+                    parse_context=None):
         return gitlabreporter.GitlabReporter(
             self, connection, pipeline, config)
 

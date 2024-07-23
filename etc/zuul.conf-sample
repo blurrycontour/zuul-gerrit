@@ -33,7 +33,7 @@ prometheus_port=9093
 listen_address=127.0.0.1
 port=9000
 static_cache_expiry=0
-status_url=https://zuul.example.com/status
+root=https://zuul.example.com/
 prometheus_port=9094
 
 [webclient]
