@@ -10481,3 +10481,170 @@ class TestBlobStorePipelineProcessing(ZuulTestCase):
                 break
 
         self.waitUntilSettled()
+
+
+class TestConfigProjectBranchMatcher(ZuulTestCase):
+    tenant_config_file = 'config/config-project-branch-matcher/main.yaml'
+
+    def test_config_project_branch_matcher(self):
+        for project in ['org/project1', 'org/project2',
+                        'org/reproject3', 'org/reproject4']:
+            for branch in ['stable/implied', 'stable/explicit']:
+                self.create_branch(project, branch)
+                self.fake_gerrit.addEvent(
+                    self.fake_gerrit.getFakeBranchCreatedEvent(
+                        project, branch))
+        self.waitUntilSettled("initial reconfig")
+
+        # Test project1: implied only
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/project1', 'stable/implied', 'A'
+        ).getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/project1', 'stable/explicit', 'B'
+        ).getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Test project2: explicit only
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/project2', 'stable/implied', 'C'
+        ).getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/project2', 'stable/explicit', 'D'
+        ).getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Test reproject3: implied only
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/reproject3', 'stable/implied', 'E'
+        ).getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/reproject3', 'stable/explicit', 'F'
+        ).getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Test reproject4: explicit only
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/reproject4', 'stable/implied', 'G'
+        ).getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/reproject4', 'stable/explicit', 'H'
+        ).getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='testjob', result='SUCCESS', changes='1,1'),  # A
+            dict(name='testjob', result='SUCCESS', changes='4,1'),  # D
+            dict(name='testjob', result='SUCCESS', changes='5,1'),  # E
+            dict(name='testjob', result='SUCCESS', changes='8,1'),  # H
+        ], ordered=False)
+
+
+class TestUntrustedProjectBranchMatcher(ZuulTestCase):
+    tenant_config_file = 'config/untrusted-project-branch-matcher/main.yaml'
+
+    def test_untrusted_project_branch_matcher(self):
+        for project in ['org/project1', 'org/project2',
+                        'org/reproject3', 'org/reproject4', 'superproject']:
+            for branch in ['stable/implied', 'stable/explicit']:
+                self.create_branch(project, branch)
+                self.fake_gerrit.addEvent(
+                    self.fake_gerrit.getFakeBranchCreatedEvent(
+                        project, branch))
+        self.waitUntilSettled("initial reconfig")
+
+        # Test project1: implied only
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/project1', 'stable/implied', 'A'
+        ).getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/project1', 'stable/explicit', 'B'
+        ).getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Test project2: explicit only
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/project2', 'stable/implied', 'C'
+        ).getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/project2', 'stable/explicit', 'D'
+        ).getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Test reproject3: implied only
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/reproject3', 'stable/implied', 'E'
+        ).getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/reproject3', 'stable/explicit', 'F'
+        ).getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Test reproject4: explicit only
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/reproject4', 'stable/implied', 'G'
+        ).getPatchsetCreatedEvent(1))
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'org/reproject4', 'stable/explicit', 'H'
+        ).getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Test superproject: master (the implied branch matcher is
+        # forced to the same branch for the same project).
+        self.fake_gerrit.addEvent(self.fake_gerrit.addFakeChange(
+            'superproject', 'master', 'I'
+        ).getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='testjob', result='SUCCESS', changes='1,1'),  # A
+            dict(name='testjob', result='SUCCESS', changes='4,1'),  # D
+            dict(name='testjob', result='SUCCESS', changes='5,1'),  # E
+            dict(name='testjob', result='SUCCESS', changes='8,1'),  # H
+            dict(name='testjob', result='SUCCESS', changes='9,1'),  # I
+        ], ordered=False)
+
+
+class TestSuperproject(ZuulTestCase):
+    tenant_config_file = 'config/superproject/main.yaml'
+
+    def test_project_configs(self):
+        A = self.fake_gerrit.addFakeChange('superproject', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        B = self.fake_gerrit.addFakeChange('submodule1', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        C = self.fake_gerrit.addFakeChange('othermodule', 'master', 'C')
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        D = self.fake_gerrit.addFakeChange('submodules/foo', 'master', 'D')
+        self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='integration-job', result='SUCCESS', changes='1,1'),
+            dict(name='superproject-job', result='SUCCESS', changes='1,1'),
+            dict(name='integration-job', result='SUCCESS', changes='2,1'),
+            dict(name='integration-job', result='SUCCESS', changes='3,1'),
+            dict(name='integration-job', result='SUCCESS', changes='4,1'),
+        ], ordered=False)
+
+    def test_configure_unrelated_project(self):
+        # Ensure we can't configure an unpermitted project
+        in_repo_conf = textwrap.dedent(
+            """
+            - project:
+                name: unrelated-project
+                check:
+                  jobs:
+                    - integration-job
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('superproject', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertIn('the only project definition permitted is',
+                      A.messages[0])
+        self.assertHistory([])
