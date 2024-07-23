@@ -7992,7 +7992,6 @@ class SystemAttributes:
         self.default_hold_expiration = 0
         self.default_ansible_version = None
         self.web_root = None
-        self.web_status_url = ""
         self.websocket_url = None
 
     def __eq__(self, other):
@@ -8004,7 +8003,6 @@ class SystemAttributes:
             and self.default_hold_expiration == other.default_hold_expiration
             and self.default_ansible_version == other.default_ansible_version
             and self.web_root == other.web_root
-            and self.web_status_url == other.web_status_url
             and self.websocket_url == other.websocket_url)
 
     @classmethod
@@ -8042,7 +8040,6 @@ class SystemAttributes:
             web_root = urllib.parse.urljoin(web_root, 't/{tenant.name}/')
         self.web_root = web_root
 
-        self.web_status_url = get_default(config, 'web', 'status_url', '')
         self.websocket_url = get_default(config, 'web', 'websocket_url', None)
 
     def toDict(self):
@@ -8052,7 +8049,9 @@ class SystemAttributes:
             "default_hold_expiration": self.default_hold_expiration,
             "default_ansible_version": self.default_ansible_version,
             "web_root": self.web_root,
-            "web_status_url": self.web_status_url,
+            # TODO (swest): Deprecated - only keep for backward compat;
+            # remove with the next major version
+            "web_status_url": "",
             "websocket_url": self.websocket_url,
         }
 
@@ -8064,7 +8063,6 @@ class SystemAttributes:
         sys_attrs.default_hold_expiration = data["default_hold_expiration"]
         sys_attrs.default_ansible_version = data["default_ansible_version"]
         sys_attrs.web_root = data["web_root"]
-        sys_attrs.web_status_url = data["web_status_url"]
         sys_attrs.websocket_url = data["websocket_url"]
         return sys_attrs
 

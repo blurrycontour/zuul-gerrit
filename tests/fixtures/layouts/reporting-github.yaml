@@ -29,7 +29,6 @@
       github:
         comment: false
         status: success
-        status-url: http://logs.example.com/{tenant.name}/{pipeline.name}/{change.project}/{change.number}/{buildset.uuid}/
     failure:
       github:
         comment: false
@@ -50,7 +49,6 @@
       github:
         comment: false
         status: success
-        status-url: http://logs.example.com/{tenant.name}/{pipeline.name}/{change.project}/{change.number}/{buildset.uuid}/
     failure:
       github:
         comment: false
