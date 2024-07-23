@@ -191,7 +191,8 @@ class ZuulDriver(Driver, TriggerInterface, ReporterInterface):
     def getTriggerEventClass(self):
         return zuulmodel.ZuulTriggerEvent
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(self, connection, pipeline, config=None,
+                    parse_context=None):
         return zuulreporter.ZuulReporter(self, connection, pipeline, config)
 
     def getReporterSchema(self):
