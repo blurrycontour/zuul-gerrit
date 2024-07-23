@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "422348a8_3f7463cc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-23T16:18:52Z",
+      "side": 1,
+      "message": "Seems like there is some value in knowing where Zuul\u0027s limits are both for the Zuul project as a whole and for individual installations. Unfortunately, by setting conservative limits we may never discover what those limits are. That said I guess you have to weigh things going sideways under load against the cost of recovering from that. My initial impression of this change was that queue windows should be sufficient, but I guess having a more global limiter isn\u0027t a huge burden.",
+      "revId": "82ed3199edf84f96e0cef6e0d70d4744efe6993a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bf9b188_bf813707",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 731,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-23T16:18:52Z",
+      "side": 1,
+      "message": "Might want to log the limit in the log.info() message as well as the warning sent to the code review system here. That way people don\u0027t have to discover where to find the limit and it is upfront and clear.",
+      "revId": "82ed3199edf84f96e0cef6e0d70d4744efe6993a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
