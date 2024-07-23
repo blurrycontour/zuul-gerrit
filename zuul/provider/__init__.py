@@ -17,6 +17,7 @@ import json
 import math
 import urllib.parse
 
+from zuul.lib.voluputil import Required, Optional, Nullable
 from zuul import model
 from zuul.driver.util import QuotaInformation
 from zuul.zk import zkobject
@@ -51,13 +52,22 @@ class BaseProviderFlavor(metaclass=abc.ABCMeta):
 
 class BaseProviderLabel(metaclass=abc.ABCMeta):
     def __init__(self, config):
-        self.project_canonical_name = config['project_canonical_name']
-        self.name = config['name']
-        self.flavor = config.get('flavor')
-        self.image = config.get('image')
-        self.min_ready = config.get('min-ready', 0)
-        self.tags = config.get('tags', {})
-        self.key_name = config.get('key-name')
+        schema = self.getSchema()
+        out = schema(config)
+        self.__dict__.update(out)
+
+    @classmethod
+    def getSchema(cls):
+        schema = vs.Schema({
+            Required('project_canonical_name'): str,
+            Required('name'): str,
+            Optional('description'): Nullable(str),
+            Optional('image'): Nullable(str),
+            Optional('flavor'): Nullable(str),
+            Optional('tags', default=dict): dict,
+            Optional('key-name'): Nullable(str),
+        })
+        return schema
 
 
 class BaseProviderEndpoint(metaclass=abc.ABCMeta):
@@ -412,16 +422,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
 
 class BaseProviderSchema(metaclass=abc.ABCMeta):
     def getLabelSchema(self):
-        schema = vs.Schema({
-            vs.Required('project_canonical_name'): str,
-            vs.Required('name'): str,
-            'description': str,
-            'image': str,
-            'flavor': str,
-            'tags': dict,
-            'key-name': str,
-        })
-        return schema
+        return BaseProviderLabel.getSchema()
 
     def getImageSchema(self):
         schema = vs.Schema({
