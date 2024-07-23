@@ -15,6 +15,8 @@
 
 import time
 import logging
+import urllib
+
 import voluptuous as v
 
 from zuul.reporter import BaseReporter
@@ -100,10 +102,8 @@ class PagureReporter(BaseReporter):
         state = self._commit_status
         change_number = change.number
 
-        url_pattern = self.config.get('status-url')
-        sched_config = self.connection.sched.config
-        if sched_config.has_option('web', 'status_url'):
-            url_pattern = sched_config.get('web', 'status_url')
+        url_pattern = urllib.parse.urljoin(
+            item.pipeline.tenant.web_root, 'status')
         url = item.formatUrlPattern(url_pattern) \
             if url_pattern else 'https://sftests.com'
 
@@ -145,7 +145,6 @@ class PagureReporter(BaseReporter):
 def getSchema():
     pagure_reporter = v.Schema({
         'status': v.Any('pending', 'success', 'failure'),
-        'status-url': str,
         'comment': bool,
         'merge': bool,
     })

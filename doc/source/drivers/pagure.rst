@@ -212,12 +212,6 @@ is taken from the pipeline.
       String value (``pending``, ``success``, ``failure``) that the
       reporter should set as the commit status on Pagure.
 
-   .. attr:: status-url
-      :default: web.status_url or the empty string
-
-      String value for a link url to set in the Pagure status. Defaults to the
-      zuul server status_url, or the empty string if that is unset.
-
    .. attr:: comment
       :default: true
 
