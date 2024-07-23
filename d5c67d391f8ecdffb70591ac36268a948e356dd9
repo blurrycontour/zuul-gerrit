@@ -16,6 +16,24 @@
       "message": "nit: no need to re-implement that",
       "revId": "d5c67d391f8ecdffb70591ac36268a948e356dd9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f7e54d6_35a3f06d",
+        "filename": "zuul/driver/aws/awsprovider.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1937,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-23T15:21:38Z",
+      "side": 1,
+      "message": "Yeah, sorry; I was doing something with it while writing the change, but it ended up empty.  We\u0027ll probably use it eventually, or we can clean it up at the end.",
+      "parentUuid": "2e3c1e31_cef1a6fc",
+      "revId": "d5c67d391f8ecdffb70591ac36268a948e356dd9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
