@@ -552,7 +552,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         else:
             quota = self._getQuotaForInstanceType(
                 flavor.instance_type,
-                SPOT if flavor.use_spot else ON_DEMAND)
+                SPOT if flavor.market_type == 'spot' else ON_DEMAND)
         # TODO
         # if label.volume_type:
         #     quota.add(self._getQuotaForVolumeType(
@@ -1403,7 +1403,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         #         args['BlockDeviceMappings'] = [mapping]
 
         # TODO
-        # if label.use_spot:
+        # if flavor.market_type == 'spot':
         #     args['InstanceMarketOptions'] = {
         #         'MarketType': 'spot',
         #         'SpotOptions': {

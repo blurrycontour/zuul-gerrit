@@ -17,20 +17,27 @@ import json
 import math
 import urllib.parse
 
+from zuul.lib.voluputil import assemble
 from zuul import model
 from zuul.driver.util import QuotaInformation
 from zuul.zk import zkobject
+import zuul.provider.schema as provider_schema
 
 import voluptuous as vs
 
 
 class BaseProviderImage(metaclass=abc.ABCMeta):
+    inheritable_schema = assemble(
+        provider_schema.common_image,
+    )
+    schema = assemble(
+        provider_schema.common_image,
+        provider_schema.base_image,
+    )
+
     def __init__(self, config):
-        self.project_canonical_name = config['project_canonical_name']
-        self.name = config['name']
-        self.branch = config['branch']
-        self.type = config['type']
-        # TODO: get formats from configuration
+        self.__dict__.update(self.schema(config))
+        # TODO: generate this automatically from config
         self.formats = set(['raw'])
 
     @property
@@ -43,21 +50,23 @@ class BaseProviderImage(metaclass=abc.ABCMeta):
 
 
 class BaseProviderFlavor(metaclass=abc.ABCMeta):
+    inheritable_schema = assemble()
+    schema = assemble(
+        provider_schema.base_flavor,
+    )
+
     def __init__(self, config):
-        self.project_canonical_name = config['project_canonical_name']
-        self.name = config['name']
-        self.public_ipv4 = config.get('public-ipv4', False)
+        self.__dict__.update(self.schema(config))
 
 
 class BaseProviderLabel(metaclass=abc.ABCMeta):
+    inheritable_schema = assemble()
+    schema = assemble(
+        provider_schema.base_label,
+    )
+
     def __init__(self, config):
-        self.project_canonical_name = config['project_canonical_name']
-        self.name = config['name']
-        self.flavor = config.get('flavor')
-        self.image = config.get('image')
-        self.min_ready = config.get('min-ready', 0)
-        self.tags = config.get('tags', {})
-        self.key_name = config.get('key-name')
+        self.__dict__.update(self.schema(config))
 
 
 class BaseProviderEndpoint(metaclass=abc.ABCMeta):
@@ -412,40 +421,13 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
 
 class BaseProviderSchema(metaclass=abc.ABCMeta):
     def getLabelSchema(self):
-        schema = vs.Schema({
-            vs.Required('project_canonical_name'): str,
-            vs.Required('name'): str,
-            'description': str,
-            'image': str,
-            'flavor': str,
-            'tags': dict,
-            'key-name': str,
-        })
-        return schema
+        return BaseProviderLabel.schema
 
     def getImageSchema(self):
-        schema = vs.Schema({
-            vs.Required('project_canonical_name'): str,
-            vs.Required('name'): str,
-            vs.Required('branch'): str,
-            'description': str,
-            'username': str,
-            'connection-type': str,
-            'connection-port': int,
-            'python-path': str,
-            'shell-type': str,
-            'type': str,
-        })
-        return schema
+        return BaseProviderImage.schema
 
     def getFlavorSchema(self):
-        schema = vs.Schema({
-            vs.Required('project_canonical_name'): str,
-            vs.Required('name'): str,
-            'description': str,
-            'public-ipv4': bool,
-        })
-        return schema
+        return BaseProviderFlavor.schema
 
     def getProviderSchema(self):
         schema = vs.Schema({
