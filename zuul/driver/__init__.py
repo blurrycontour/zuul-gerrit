@@ -224,7 +224,8 @@ class ReporterInterface(object, metaclass=abc.ABCMeta):
     """
 
     @abc.abstractmethod
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(self, connection, pipeline, config=None,
+                    parse_context=None):
         """Create and return a new Reporter object.
 
         This method is required by the interface.
@@ -236,6 +237,8 @@ class ReporterInterface(object, metaclass=abc.ABCMeta):
             reporter.
         :arg dict config: The configuration information supplied along
             with the reporter in the layout.
+        :arg ParseContext parse_context: The parse context during config
+            loading.
 
         :returns: A new Reporter object.
         :rtype: Reporter

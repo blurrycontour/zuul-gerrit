@@ -31,7 +31,8 @@ class SQLDriver(Driver, ConnectionInterface, ReporterInterface):
     def getConnection(self, name, config):
         return sqlconnection.SQLConnection(self, name, config)
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(self, connection, pipeline, config=None,
+                    parse_context=None):
         return sqlreporter.SQLReporter(self, connection, config)
 
     def getReporterSchema(self):

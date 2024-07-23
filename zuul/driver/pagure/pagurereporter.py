@@ -15,11 +15,18 @@
 
 import time
 import logging
+
 import voluptuous as v
 
 from zuul.reporter import BaseReporter
-from zuul.exceptions import MergeFailure
+from zuul.exceptions import DeprecationWarning, MergeFailure
 from zuul.driver.pagure.paguresource import PagureSource
+
+
+class PagureStatusUrlDeprecation(DeprecationWarning):
+    zuul_error_name = 'Pagure status-url Deprecation'
+    zuul_error_message = """The 'status-url' reporter attribute
+is deprecated."""
 
 
 class PagureReporter(BaseReporter):
@@ -28,12 +35,17 @@ class PagureReporter(BaseReporter):
     name = 'pagure'
     log = logging.getLogger("zuul.PagureReporter")
 
-    def __init__(self, driver, connection, pipeline, config=None):
-        super(PagureReporter, self).__init__(driver, connection, config)
+    def __init__(self, driver, connection, pipeline, config=None,
+                 parse_context=None):
+        super(PagureReporter, self).__init__(driver, connection, config,
+                                             parse_context)
         self._commit_status = self.config.get('status', None)
         self._create_comment = self.config.get('comment', True)
         self._merge = self.config.get('merge', False)
         self.context = "{}/{}".format(pipeline.tenant.name, pipeline.name)
+
+        if 'status-url' in self.config and parse_context:
+            parse_context.accumulator.addError(PagureStatusUrlDeprecation)
 
     def report(self, item, phase1=True, phase2=True):
         """Report on an event."""
@@ -100,13 +112,7 @@ class PagureReporter(BaseReporter):
         state = self._commit_status
         change_number = change.number
 
-        url_pattern = self.config.get('status-url')
-        sched_config = self.connection.sched.config
-        if sched_config.has_option('web', 'status_url'):
-            url_pattern = sched_config.get('web', 'status_url')
-        url = item.formatUrlPattern(url_pattern) \
-            if url_pattern else 'https://sftests.com'
-
+        url = item.formatItemUrl()
         description = '%s status: %s (%s)' % (
             item.pipeline.name, self._commit_status, sha)
 
@@ -145,6 +151,7 @@ class PagureReporter(BaseReporter):
 def getSchema():
     pagure_reporter = v.Schema({
         'status': v.Any('pending', 'success', 'failure'),
+        # MODEL_API < 31
         'status-url': str,
         'comment': bool,
         'merge': bool,
