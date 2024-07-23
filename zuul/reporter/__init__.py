@@ -15,7 +15,7 @@
 
 import abc
 import logging
-from zuul.lib.config import get_default
+import urllib
 
 
 class BaseReporter(object, metaclass=abc.ABCMeta):
@@ -172,8 +172,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         return ret
 
     def _formatItemReportEnqueue(self, item, with_jobs=True):
-        status_url = self.connection.sched.globals.web_status_url
-        if status_url:
+        if status_url := item.pipeline.tenant.web_root:
+            status_url = urllib.parse.urljoin(status_url, 'status')
             status_url = item.formatUrlPattern(status_url)
 
         # change, changes, and status_url are deprecated
@@ -185,8 +185,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             status_url=status_url)
 
     def _formatItemReportStart(self, item, with_jobs=True):
-        status_url = self.connection.sched.globals.web_status_url
-        if status_url:
+        if status_url := item.pipeline.tenant.web_root:
+            status_url = urllib.parse.urljoin(status_url, 'status')
             status_url = item.formatUrlPattern(status_url)
 
         # change, changes, and status_url are deprecated
@@ -252,9 +252,8 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         return msg
 
     def _formatItemReportNoJobs(self, item, with_jobs=True):
-        status_url = get_default(self.connection.sched.config,
-                                 'web', 'status_url', '')
-        if status_url:
+        if status_url := item.pipeline.tenant.web_root:
+            status_url = urllib.parse.urljoin(status_url, 'status')
             status_url = item.formatUrlPattern(status_url)
 
         # change, changes, and status_url are deprecated

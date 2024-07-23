@@ -1371,7 +1371,6 @@ class TestSystemConfigCache(ZooKeeperBaseTestCase):
             "default_hold_expiration": 3600,
             "default_ansible_version": "X",
             "web_root": "/web/root",
-            "web_status_url": "/web/status",
             "websocket_url": "/web/socket",
         })
         self.config_cache.set(uac, attrs)
