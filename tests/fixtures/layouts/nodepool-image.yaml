@@ -131,6 +131,7 @@
         instance-type: t3.medium
     images:
       - name: debian
+        image-id: ami-1e749f67
       - name: debian-local
 
 - section:

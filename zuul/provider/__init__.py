@@ -17,20 +17,27 @@ import json
 import math
 import urllib.parse
 
+from zuul.lib.voluputil import Required, Optional, Nullable, assemble
 from zuul import model
 from zuul.driver.util import QuotaInformation
 from zuul.zk import zkobject
+import zuul.provider.schema as provider_schema
 
 import voluptuous as vs
 
 
 class BaseProviderImage(metaclass=abc.ABCMeta):
+    inheritable_schema = assemble(
+        provider_schema.common_image,
+    )
+    schema = assemble(
+        provider_schema.common_image,
+        provider_schema.base_image,
+    )
+
     def __init__(self, config):
-        self.project_canonical_name = config['project_canonical_name']
-        self.name = config['name']
-        self.branch = config['branch']
-        self.type = config['type']
-        # TODO: get formats from configuration
+        self.__dict__.update(self.schema(config))
+        # TODO: generate this automatically from config
         self.formats = set(['raw'])
 
     @property
@@ -43,21 +50,23 @@ class BaseProviderImage(metaclass=abc.ABCMeta):
 
 
 class BaseProviderFlavor(metaclass=abc.ABCMeta):
+    inheritable_schema = assemble()
+    schema = assemble(
+        provider_schema.base_flavor,
+    )
+
     def __init__(self, config):
-        self.project_canonical_name = config['project_canonical_name']
-        self.name = config['name']
-        self.public_ipv4 = config.get('public-ipv4', False)
+        self.__dict__.update(self.schema(config))
 
 
 class BaseProviderLabel(metaclass=abc.ABCMeta):
+    inheritable_schema = assemble()
+    schema = assemble(
+        provider_schema.base_label,
+    )
+
     def __init__(self, config):
-        self.project_canonical_name = config['project_canonical_name']
-        self.name = config['name']
-        self.flavor = config.get('flavor')
-        self.image = config.get('image')
-        self.min_ready = config.get('min-ready', 0)
-        self.tags = config.get('tags', {})
-        self.key_name = config.get('key-name')
+        self.__dict__.update(self.schema(config))
 
 
 class BaseProviderEndpoint(metaclass=abc.ABCMeta):
@@ -75,9 +84,38 @@ class BaseProviderEndpoint(metaclass=abc.ABCMeta):
         self.connection = connection
 
 
+class BaseProviderSchema(metaclass=abc.ABCMeta):
+    def getLabelSchema(self):
+        return BaseProviderLabel.schema
+
+    def getImageSchema(self):
+        return BaseProviderImage.schema
+
+    def getFlavorSchema(self):
+        return BaseProviderFlavor.schema
+
+    def getProviderSchema(self):
+        schema = vs.Schema({
+            '_source_context': model.SourceContext,
+            '_start_mark': model.ZuulMark,
+            Required('name'): str,
+            Required('section'): str,
+            Required('labels'): [self.getLabelSchema()],
+            Required('images'): [self.getImageSchema()],
+            Required('flavors'): [self.getFlavorSchema()],
+            Required('abstract'): vs.Maybe(bool),
+            Required('parent'): vs.Maybe(str),
+            Required('connection'): str,
+            Optional('boot-timeout'): Nullable(int),
+            Optional('launch-timeout'): Nullable(int),
+        })
+        return schema
+
+
 class BaseProvider(zkobject.PolymorphicZKObjectMixin,
                    zkobject.ShardedZKObject):
     """Base class for provider."""
+    schema = BaseProviderSchema().getProviderSchema()
 
     def __init__(self, *args):
         super().__init__()
@@ -86,6 +124,8 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
             config = config.copy()
             config.pop('_source_context')
             config.pop('_start_mark')
+            parsed_config = self.parseConfig(config)
+            parsed_config.pop('connection')
             self._set(
                 driver=driver,
                 connection=connection,
@@ -93,7 +133,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
                 tenant_name=tenant_name,
                 canonical_name=canonical_name,
                 config=config,
-                **self.parseConfig(config),
+                **parsed_config,
             )
 
     @classmethod
@@ -115,15 +155,18 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
                  driver=connection.driver)
         return obj
 
+    def getProviderSchema(self):
+        return self.schema
+
     def parseConfig(self, config):
-        return dict(
-            name=config['name'],
-            section_name=config['section'],
-            description=config.get('description'),
+        schema = self.getProviderSchema()
+        ret = schema(config)
+        ret.update(dict(
             images=self.parseImages(config),
             flavors=self.parseFlavors(config),
             labels=self.parseLabels(config),
-        )
+        ))
+        return ret
 
     def deserialize(self, raw, context):
         data = super().deserialize(raw, context)
@@ -408,58 +451,3 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         :param external_id str or dict: The external id of the server
         """
         pass
-
-
-class BaseProviderSchema(metaclass=abc.ABCMeta):
-    def getLabelSchema(self):
-        schema = vs.Schema({
-            vs.Required('project_canonical_name'): str,
-            vs.Required('name'): str,
-            'description': str,
-            'image': str,
-            'flavor': str,
-            'tags': dict,
-            'key-name': str,
-        })
-        return schema
-
-    def getImageSchema(self):
-        schema = vs.Schema({
-            vs.Required('project_canonical_name'): str,
-            vs.Required('name'): str,
-            vs.Required('branch'): str,
-            'description': str,
-            'username': str,
-            'connection-type': str,
-            'connection-port': int,
-            'python-path': str,
-            'shell-type': str,
-            'type': str,
-        })
-        return schema
-
-    def getFlavorSchema(self):
-        schema = vs.Schema({
-            vs.Required('project_canonical_name'): str,
-            vs.Required('name'): str,
-            'description': str,
-            'public-ipv4': bool,
-        })
-        return schema
-
-    def getProviderSchema(self):
-        schema = vs.Schema({
-            '_source_context': model.SourceContext,
-            '_start_mark': model.ZuulMark,
-            vs.Required('name'): str,
-            vs.Required('section'): str,
-            vs.Required('labels'): [self.getLabelSchema()],
-            vs.Required('images'): [self.getImageSchema()],
-            vs.Required('flavors'): [self.getFlavorSchema()],
-            'abstract': bool,
-            'parent': str,
-            'connection': str,
-            'boot-timeout': int,
-            'launch-timeout': int,
-        })
-        return schema
