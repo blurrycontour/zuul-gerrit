@@ -1000,8 +1000,8 @@ class TestGitlabUnprotectedBranches(ZuulTestCase):
         tenant = self.scheds.first.sched.abide.tenants\
             .get('tenant-one')
 
-        project1 = tenant.untrusted_projects[0]
-        project2 = tenant.untrusted_projects[1]
+        project1 = list(tenant.untrusted_projects)[0]
+        project2 = list(tenant.untrusted_projects)[1]
 
         tpc1 = tenant.project_configs[project1.canonical_name]
         tpc2 = tenant.project_configs[project2.canonical_name]

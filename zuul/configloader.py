@@ -17,7 +17,6 @@ from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import copy
 import io
-import itertools
 import logging
 import math
 import os
@@ -1158,7 +1157,8 @@ class ProjectTemplateParser(object):
         self.schema = self.getSchema()
         self.not_pipelines = ['name', 'description', 'templates',
                               'merge-mode', 'default-branch', 'vars',
-                              'queue', '_source_context', '_start_mark']
+                              'queue', 'branches',
+                              '_source_context', '_start_mark']
 
     def getSchema(self):
         job = {str: vs.Any(str, JobParser.job_attributes)}
@@ -1167,7 +1167,7 @@ class ProjectTemplateParser(object):
         pipeline_contents = {
             'debug': bool,
             'fail-fast': bool,
-            'jobs': job_list
+            'jobs': job_list,
         }
 
         project = {
@@ -1260,6 +1260,7 @@ class ProjectParser(object):
         project = {
             'name': str,
             'description': str,
+            'branches': to_list(vs.Any(ZUUL_REGEX, str)),
             'vars': ansible_vars_dict,
             'templates': [str],
             'merge-mode': vs.Any('merge', 'merge-resolve',
@@ -1285,11 +1286,13 @@ class ProjectParser(object):
             # of the project where it is defined.
             project_name = (source_context.project_canonical_name)
 
+        source_tpc = self.pcontext.tenant.getTPC(
+            source_context.project_canonical_name)
         if project_name.startswith('^'):
-            # regex matching is designed to match other projects so disallow
-            # in untrusted contexts
-            if not source_context.trusted:
-                raise ProjectNotPermittedError()
+            for other_tpc in \
+                self.pcontext.tenant.getTPCsByRegex(project_name):
+                if not source_tpc.canConfigureProject(other_tpc):
+                    raise ProjectNotPermittedError()
 
             # Parse the project as a template since they're mostly the
             # same.
@@ -1298,14 +1301,18 @@ class ProjectParser(object):
 
             project_config.name = project_name
         else:
-            (trusted, project) = self.pcontext.tenant.getProject(project_name)
-            if project is None:
+            other_tpc = self.pcontext.tenant.getTPC(project_name)
+            if other_tpc is None:
                 raise ProjectNotFoundError(project_name)
+            project = other_tpc.project
 
-            if not source_context.trusted:
-                if project.canonical_name != \
-                        source_context.project_canonical_name:
-                    raise ProjectNotPermittedError()
+            same_project = (project.canonical_name ==
+                            source_context.project_canonical_name)
+            if not (
+                    same_project or
+                    source_tpc.canConfigureProject(other_tpc)
+            ):
+                raise ProjectNotPermittedError()
 
             # Parse the project as a template since they're mostly the
             # same.
@@ -1321,13 +1328,27 @@ class ProjectParser(object):
             # Pragmas can cause templates to end up with implied
             # branch matchers for arbitrary branches, but project
             # stanzas should not.  They should either have the current
-            # branch or no branch matcher.
-            if source_context.trusted:
-                project_config.setImpliedBranchMatchers([])
-            else:
-                project_config.setImpliedBranchMatchers(
-                    [change_matcher.ImpliedBranchMatcher(
-                        ZuulRegex(source_context.branch))])
+            # branch or no branch matcher.  But if we're configuring a
+            # different project, then we'll allow the pragma-supplied
+            # branch matchers.
+            if same_project:
+                if source_context.trusted:
+                    project_config.setImpliedBranchMatchers([])
+                else:
+                    project_config.setImpliedBranchMatchers(
+                        [change_matcher.ImpliedBranchMatcher(
+                            ZuulRegex(source_context.branch))])
+
+        branches = None
+        if 'branches' in conf:
+            with self.pcontext.confAttr(conf, 'branches') as conf_branches:
+                branches = [
+                    change_matcher.BranchMatcher(
+                        make_regex(x, self.pcontext))
+                    for x in as_list(conf_branches)
+                ]
+        if branches:
+            project_config.setImpliedBranchMatchers(branches)
 
         # Add templates
         for name in conf.get('templates', []):
@@ -1829,7 +1850,7 @@ class TenantParser(object):
                      'project-template', 'nodeset', 'secret', 'queue',
                      'image', 'flavor', 'label', 'section', 'provider')
 
-    project_dict = {str: {
+    inner_config_project_dict = {
         'include': to_list(classes),
         'exclude': to_list(classes),
         'shadow': to_list(str),
@@ -1842,21 +1863,33 @@ class TenantParser(object):
         'always-dynamic-branches': to_list(str),
         'allow-circular-dependencies': bool,
         'implied-branch-matchers': bool,
-    }}
+    }
+    config_project_dict = {str: inner_config_project_dict}
 
-    project = vs.Any(str, project_dict)
+    inner_untrusted_project_dict = inner_config_project_dict.copy()
+    inner_untrusted_project_dict['configure-projects'] = to_list(str)
+    untrusted_project_dict = {str: inner_untrusted_project_dict}
 
-    group = {
+    config_project = vs.Any(str, config_project_dict)
+    untrusted_project = vs.Any(str, untrusted_project_dict)
+
+    config_group = {
         'include': to_list(classes),
         'exclude': to_list(classes),
-        vs.Required('projects'): to_list(project),
+        vs.Required('projects'): to_list(config_project),
+    }
+    untrusted_group = {
+        'include': to_list(classes),
+        'exclude': to_list(classes),
+        vs.Required('projects'): to_list(untrusted_project),
     }
 
-    project_or_group = vs.Any(project, group)
+    config_project_or_group = vs.Any(config_project, config_group)
+    untrusted_project_or_group = vs.Any(untrusted_project, untrusted_group)
 
     tenant_source = vs.Schema({
-        'config-projects': to_list(project_or_group),
-        'untrusted-projects': to_list(project_or_group),
+        'config-projects': to_list(config_project_or_group),
+        'untrusted-projects': to_list(untrusted_project_or_group),
     })
 
     def validateTenantSources(self):
@@ -1948,17 +1981,12 @@ class TenantParser(object):
 
         tenant.unparsed_config = conf
         # tpcs is TenantProjectConfigs
-        tpc_registry = abide.getTPCRegistry(tenant.name)
-        config_tpcs = tpc_registry.getConfigTPCs()
-        for tpc in config_tpcs:
-            tenant.addConfigProject(tpc)
-        untrusted_tpcs = tpc_registry.getUntrustedTPCs()
-        for tpc in untrusted_tpcs:
-            tenant.addUntrustedProject(tpc)
+        for tpc in abide.getAllTPCs(tenant.name):
+            tenant.addTPC(tpc)
 
         # Get branches in parallel
         branch_futures = {}
-        for tpc in config_tpcs + untrusted_tpcs:
+        for tpc in abide.getAllTPCs(tenant.name):
             future = executor.submit(self._getProjectBranches,
                                      tenant, tpc, branch_cache_min_ltimes)
             branch_futures[future] = tpc
@@ -2098,6 +2126,7 @@ class TenantParser(object):
             project_always_dynamic_branches = None
             project_load_branch = None
             project_implied_branch_matchers = None
+            project_configure_projects = None
         else:
             project_name = list(conf.keys())[0]
             project = source.getProject(project_name)
@@ -2156,6 +2185,15 @@ class TenantParser(object):
                 'load-branch', None)
             project_implied_branch_matchers = conf[project_name].get(
                 'implied-branch-matchers', None)
+            configure_projects = as_list(conf[project_name].get(
+                'configure-projects', None))
+            if configure_projects is not None:
+                project_configure_projects = []
+                for p in configure_projects:
+                    rp = re.compile(p)
+                    project_configure_projects.append(rp)
+            else:
+                project_configure_projects = None
 
         tenant_project_config = model.TenantProjectConfig(project)
         tenant_project_config.load_classes = frozenset(project_include)
@@ -2173,7 +2211,8 @@ class TenantParser(object):
         tenant_project_config.load_branch = project_load_branch
         tenant_project_config.implied_branch_matchers = \
             project_implied_branch_matchers
-
+        tenant_project_config.configure_projects = \
+            project_configure_projects
         return tenant_project_config
 
     def _getProjects(self, source, conf, current_include):
@@ -2222,6 +2261,7 @@ class TenantParser(object):
                 # tpcs = TenantProjectConfigs
                 tpcs = self._getProjects(source, conf_repo, current_include)
                 for tpc in tpcs:
+                    tpc.trusted = True
                     futures.append(executor.submit(
                         self._loadProjectKeys, source_name, tpc.project))
                     config_projects.append(tpc)
@@ -2231,12 +2271,23 @@ class TenantParser(object):
                 tpcs = self._getProjects(source, conf_repo,
                                          current_include)
                 for tpc in tpcs:
+                    tpc.trusted = False
                     futures.append(executor.submit(
                         self._loadProjectKeys, source_name, tpc.project))
                     untrusted_projects.append(tpc)
 
         for f in futures:
             f.result()
+        for tpc in untrusted_projects:
+            if tpc.configure_projects:
+                for config_tpc in config_projects:
+                    if tpc.canConfigureProject(
+                            config_tpc, validation_only=True):
+                        raise Exception(
+                            f"Untrusted-project {tpc.project.name} may not "
+                            f"configure "
+                            f"config-project {config_tpc.project.name}")
+
         return config_projects, untrusted_projects
 
     def _cacheTenantYAML(self, abide, tenant, parse_context, min_ltimes,
@@ -2305,9 +2356,8 @@ class TenantParser(object):
         jobs = []
 
         futures = []
-        for project in itertools.chain(
-                tenant.config_projects, tenant.untrusted_projects):
-            tpc = tenant.project_configs[project.canonical_name]
+        for tpc in tenant.all_tpcs:
+            project = tpc.project
             # For each branch in the repo, get the zuul.yaml for that
             # branch.  Remember the branch and then implicitly add a
             # branch selector to each job there.  This makes the
