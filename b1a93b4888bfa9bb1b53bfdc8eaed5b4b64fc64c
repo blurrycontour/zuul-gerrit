@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "997fe761_424a34f5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-23T14:03:09Z",
+      "side": 1,
+      "message": "They are two different things.\n\nThe web root is exactly that, the web root.  The status url is the url that is reported to github/pagure when jobs are started.  The status-url is configured on pipeline reporters and uses a default in the zuul.conf file.\n\nThe reason it originally existed is so that people could link to the logs of a change while it\u0027s running (before we reported buildsets to the db).\n\nBut it can also be customized to link to the single-change status view.\n\nI think that it can be removed, but there are two things to consider during its removal:\n1) It\u0027s still a valid option that people may have set, so it needs to be properly deprecated.\n2) We need to decide what value we should use for it.\n\n   a) The status root\n   b) The per-change status page\n   c) The buildset page\n\nI think (b) makes the most sense while the change is in queue, and (c) makes the most sense after it is dequeued.  I\u0027m not sure that changing those is automatic (it may be the case that systems that do that today only do it because they have different values in the different reporters in their pipeline configs) and it may be necessary for us to add code to do that.",
+      "revId": "b1a93b4888bfa9bb1b53bfdc8eaed5b4b64fc64c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "363da592_c7d8ee56",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 7996,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-23T14:03:09Z",
+      "side": 1,
+      "message": "Maybe include a version number here for clarity?",
+      "revId": "b1a93b4888bfa9bb1b53bfdc8eaed5b4b64fc64c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
