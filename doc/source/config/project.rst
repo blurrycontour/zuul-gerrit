@@ -15,12 +15,9 @@ Multiple project definitions may appear for the same project (for
 example, in a central :term:`config projects <config-project>` as well
 as in a repo's own ``.zuul.yaml``).  In this case, all of the project
 definitions for the relevant branch are combined (the jobs listed in
-all of the matching definitions will be run).  If a project definition
-appears in a :term:`config-project`, it will apply to all branches of
-the project.  If it appears in a branch of an
-:term:`untrusted-project` it will only apply to changes on that
-branch.  In the case of an item which does not have a branch (for
-example, a tag), all of the project definitions will be combined.
+all of the matching definitions will be run).  In the case of an item
+which does not have a branch (for example, a tag), all of the project
+definitions will be combined.
 
 Consider the following project definition::
 
@@ -88,6 +85,38 @@ pipeline.
       jobs for a given pipeline, they will be combined, as will any
       jobs specified in project-pipeline definitions on the project
       itself.
+
+   .. attr:: branches
+
+      A list of branches to which this `project` stanza should apply.
+
+      If omitted on a `project` stanza within an :term:`untrusted project`
+      that is configuring its own project, the current branch will be
+      used (:attr:`pragma` settings are ignored).  That means that in
+      the typical case where this option is omitted on an untrusted
+      project, the stanza is always interpreted as configuring the
+      project on the branch where the definition is found.
+
+      If omitted on a `project` stanza within a :term:`config
+      project`, the stanza will be interpreted as applying to all
+      branches (but :attr:`pragma` settings are effective in this
+      case, see below).
+
+      If omitted when configuring a project other than the current
+      project, if :attr:`pragma.implied-branch-matchers` is in effect
+      then :attr:`pragma.implied-branches` will be used.  In all
+      cases, explicit configuration of branches overrides implied
+      branches.
+
+      Note that use of this attribute when configuring the jobs run on
+      the current project can produce undesirable behavior when
+      combined with common project branching paradigms.  In
+      particular, note that when a project is branched, the project
+      stanzas are effectively copied onto that branch, and therefore
+      additional explicit stanzas will be in effect.  It is
+      recommended to only use this attribute inside unbranched
+      projects and instead use the default implicit branch behavior
+      for branched projects.
 
    .. attr:: default-branch
       :default: master

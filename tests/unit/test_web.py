@@ -3840,7 +3840,7 @@ class TestWebUnprotectedBranches(BaseWithWeb):
         self.startWebServer()
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
 
-        project2 = tenant.untrusted_projects[1]
+        project2 = list(tenant.untrusted_projects)[1]
         tpc2 = tenant.project_configs[project2.canonical_name]
 
         # project2 should have no parsed branch
