@@ -10312,3 +10312,29 @@ class TestMaxDeps(ZuulTestCase):
         self.assertHistory([
             dict(name='project-merge', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
+
+
+class TestSuperproject(ZuulTestCase):
+    tenant_config_file = 'config/superproject/main.yaml'
+
+    def test_project_configs(self):
+        A = self.fake_gerrit.addFakeChange('superproject', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        B = self.fake_gerrit.addFakeChange('submodule1', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        C = self.fake_gerrit.addFakeChange('othermodule', 'master', 'C')
+        self.fake_gerrit.addEvent(C.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        D = self.fake_gerrit.addFakeChange('submodules/foo', 'master', 'D')
+        self.fake_gerrit.addEvent(D.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='integration-job', result='SUCCESS', changes='1,1'),
+            dict(name='superproject-job', result='SUCCESS', changes='1,1'),
+            dict(name='integration-job', result='SUCCESS', changes='2,1'),
+            dict(name='integration-job', result='SUCCESS', changes='3,1'),
+            dict(name='integration-job', result='SUCCESS', changes='4,1'),
+        ], ordered=True)

@@ -1355,7 +1355,7 @@ class ZuulWebAPI(object):
 
                 result.append({
                     'name': tenant_name,
-                    'projects': len(tenant.untrusted_projects),
+                    'projects': len(list(tenant.untrusted_projects)),
                     'queue': queue_size,
                 })
         return result
@@ -1656,15 +1656,11 @@ class ZuulWebAPI(object):
     @cherrypy.tools.check_tenant_auth()
     def projects(self, tenant_name, tenant, auth):
         result = []
-        for project in tenant.config_projects:
+        for tpc in tenant.all_tpcs:
+            project = tpc.project
             pobj = project.toDict()
-            pobj['type'] = "config"
+            pobj['type'] = "config" if tpc.trusted else "untrusted"
             result.append(pobj)
-        for project in tenant.untrusted_projects:
-            pobj = project.toDict()
-            pobj['type'] = "untrusted"
-            result.append(pobj)
-
         return sorted(result, key=lambda project: project["name"])
 
     @cherrypy.expose

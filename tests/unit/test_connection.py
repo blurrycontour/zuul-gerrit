@@ -987,6 +987,6 @@ class TestConnectionsBranchCache(ZuulTestCase):
         connection.addProject(newproject)
         tpc = zuul.model.TenantProjectConfig(newproject)
         tpc.exclude_unprotected_branches = True
-        tenant.addUntrustedProject(tpc)
+        tenant.addTPC(tpc)
         branches = connection.getProjectBranches(newproject, tenant)
         self.assertEqual([], branches)

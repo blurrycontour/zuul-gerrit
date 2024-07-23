@@ -74,7 +74,7 @@ class TestJob(BaseTestCase):
             self.project.canonical_name, self.project.name,
             self.project.connection_name, 'master', 'test', False)
         self.tpc = model.TenantProjectConfig(self.project)
-        self.tenant.addUntrustedProject(self.tpc)
+        self.tenant.addTPC(self.tpc)
         self.pipeline = model.Pipeline('gate', self.tenant)
         self.pipeline.source_context = self.context
         self.pipeline.manager = mock.Mock()
@@ -318,7 +318,7 @@ class TestJob(BaseTestCase):
             base_project.canonical_name, base_project.name,
             base_project.connection_name, 'master', 'test', True)
         tpc = model.TenantProjectConfig(base_project)
-        self.tenant.addUntrustedProject(tpc)
+        self.tenant.addTPC(tpc)
 
         base = self.pcontext.job_parser.fromYaml({
             '_source_context': base_context,
@@ -333,7 +333,7 @@ class TestJob(BaseTestCase):
             other_project.canonical_name, other_project.name,
             other_project.connection_name, 'master', 'test', True)
         tpc = model.TenantProjectConfig(other_project)
-        self.tenant.addUntrustedProject(tpc)
+        self.tenant.addTPC(tpc)
         base2 = self.pcontext.job_parser.fromYaml({
             '_source_context': other_context,
             '_start_mark': self.start_mark,
@@ -658,7 +658,8 @@ class TestTenant(BaseTestCase):
 
         source1_project1 = model.Project('project1', source1)
         source1_project1_tpc = model.TenantProjectConfig(source1_project1)
-        tenant.addConfigProject(source1_project1_tpc)
+        source1_project1_tpc.trusted = True
+        tenant.addTPC(source1_project1_tpc)
         d = {'project1':
              {'git1.example.com': source1_project1}}
         self.assertEqual(d, tenant.projects)
@@ -669,7 +670,7 @@ class TestTenant(BaseTestCase):
 
         source1_project2 = model.Project('project2', source1)
         tpc = model.TenantProjectConfig(source1_project2)
-        tenant.addUntrustedProject(tpc)
+        tenant.addTPC(tpc)
         d = {'project1':
              {'git1.example.com': source1_project1},
              'project2':
@@ -687,7 +688,7 @@ class TestTenant(BaseTestCase):
 
         source2_project1 = model.Project('project1', source2)
         tpc = model.TenantProjectConfig(source2_project1)
-        tenant.addUntrustedProject(tpc)
+        tenant.addTPC(tpc)
         d = {'project1':
              {'git1.example.com': source1_project1,
               'git2.example.com': source2_project1},
@@ -707,7 +708,8 @@ class TestTenant(BaseTestCase):
 
         source2_project2 = model.Project('project2', source2)
         tpc = model.TenantProjectConfig(source2_project2)
-        tenant.addConfigProject(tpc)
+        tpc.trusted = True
+        tenant.addTPC(tpc)
         d = {'project1':
              {'git1.example.com': source1_project1,
               'git2.example.com': source2_project1},
@@ -734,7 +736,8 @@ class TestTenant(BaseTestCase):
 
         source1_project2b = model.Project('subpath/project2', source1)
         tpc = model.TenantProjectConfig(source1_project2b)
-        tenant.addConfigProject(tpc)
+        tpc.trusted = True
+        tenant.addTPC(tpc)
         d = {'project1':
              {'git1.example.com': source1_project1,
               'git2.example.com': source2_project1},
@@ -756,7 +759,8 @@ class TestTenant(BaseTestCase):
 
         source2_project2b = model.Project('subpath/project2', source2)
         tpc = model.TenantProjectConfig(source2_project2b)
-        tenant.addConfigProject(tpc)
+        tpc.trusted = True
+        tenant.addTPC(tpc)
         d = {'project1':
              {'git1.example.com': source1_project1,
               'git2.example.com': source2_project1},
