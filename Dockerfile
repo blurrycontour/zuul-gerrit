@@ -115,6 +115,9 @@ CMD ["/usr/local/bin/zuul-executor", "-f"]
 FROM zuul as zuul-fingergw
 CMD ["/usr/local/bin/zuul-fingergw", "-f"]
 
+FROM zuul as zuul-launcher
+CMD ["/usr/local/bin/zuul-launcher", "-f"]
+
 FROM zuul as zuul-merger
 CMD ["/usr/local/bin/zuul-merger", "-f"]
 
