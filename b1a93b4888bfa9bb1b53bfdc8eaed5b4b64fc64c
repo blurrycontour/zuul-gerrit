@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6f8fff96_070ce9a4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-24T10:04:00Z",
+      "side": 1,
+      "message": "Ok, I think there are multiple places that we need to handle differently:\n\n1. The Github report did not use the `status-url` at all in `setCommitStatus()` so here we can simply add a deprecation warning in case that\u0027s configured\n2. For the Pagure reporter I\u0027ll replace the status URL with the per-change status page link (as it is already the case for Github) and also add a deprecation warning.\n3. The no-job, enqueue and start messages still allow the global `status_url` default from the Zuul config (unified to always use the setting from the system attributes) for backward compatibility. Since the `status_url` has already been deprecated in favor of `item_url` I don\u0027t think there is anything to do here atm.\n\nAfter we\u0027ve removed support for the `status_url` as a format attribute we can also remove the global `web.status_url` setting as it will be no longer used.",
+      "parentUuid": "997fe761_424a34f5",
+      "revId": "b1a93b4888bfa9bb1b53bfdc8eaed5b4b64fc64c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "363da592_c7d8ee56",
         "filename": "zuul/model.py",
         "patchSetId": 6
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-23T14:03:09Z",
       "side": 1,
       "message": "Maybe include a version number here for clarity?",
+      "revId": "b1a93b4888bfa9bb1b53bfdc8eaed5b4b64fc64c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f200cd8_855b007c",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 7996,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-24T10:04:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "363da592_c7d8ee56",
       "revId": "b1a93b4888bfa9bb1b53bfdc8eaed5b4b64fc64c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }

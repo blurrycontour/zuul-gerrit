@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3c6d954_fb7586de",
+        "filename": "doc/source/configuration.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-24T10:04:00Z",
+      "side": 0,
+      "message": "Added a deprecation note",
+      "parentUuid": "92c535ff_8697a5b5",
+      "revId": "5e00bea4eb381f88b3ffd449d5f759e12f6fe317",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9fb4963d_0ce77660",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fc08556_eda1ace3",
+        "filename": "tests/fixtures/layouts/reporting-github.yaml",
+        "patchSetId": 6
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-24T10:04:00Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "9fb4963d_0ce77660",
+      "revId": "5e00bea4eb381f88b3ffd449d5f759e12f6fe317",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c76d0321_014e6ae4",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-07-23T14:03:09Z",
       "side": 0,
       "message": "Since we\u0027re deprecating the usage, we should leave this in.",
+      "revId": "5e00bea4eb381f88b3ffd449d5f759e12f6fe317",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72e4edea_d1e7cff7",
+        "filename": "zuul/driver/github/githubreporter.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-24T10:04:00Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "c76d0321_014e6ae4",
       "revId": "5e00bea4eb381f88b3ffd449d5f759e12f6fe317",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
