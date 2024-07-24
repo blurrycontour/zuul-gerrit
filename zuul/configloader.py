@@ -1874,6 +1874,7 @@ class TenantParser(object):
 
     def getSchema(self):
         tenant = {vs.Required('name'): str,
+                  'max-changes-per-pipeline': int,
                   'max-dependencies': int,
                   'max-nodes-per-job': int,
                   'max-job-timeout': int,
@@ -1911,6 +1912,8 @@ class TenantParser(object):
         tenant = model.Tenant(conf['name'])
         pcontext = ParseContext(self.connections, self.scheduler,
                                 tenant, ansible_manager)
+        if conf.get('max-changes-per-pipeline') is not None:
+            tenant.max_changes_per_pipeline = conf['max-changes-per-pipeline']
         if conf.get('max-dependencies') is not None:
             tenant.max_dependencies = conf['max-dependencies']
         if conf.get('max-nodes-per-job') is not None:
