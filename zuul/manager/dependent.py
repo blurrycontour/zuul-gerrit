@@ -177,7 +177,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                 r = self.addChange(needed_change, event, quiet=quiet,
                                    ignore_requirements=ignore_requirements,
                                    change_queue=change_queue, history=history,
-                                   dependency_graph=dependency_graph)
+                                   dependency_graph=dependency_graph,
+                                   warnings=warnings)
                 if not r:
                     return False
         return True

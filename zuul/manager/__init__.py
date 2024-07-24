@@ -38,14 +38,17 @@ from opentelemetry import trace
 
 
 class DynamicChangeQueueContextManager(object):
-    def __init__(self, change_queue):
+    def __init__(self, change_queue, allow_delete=False):
         self.change_queue = change_queue
+        self.allow_delete = allow_delete
 
     def __enter__(self):
         return self.change_queue
 
     def __exit__(self, etype, value, tb):
-        if self.change_queue and not self.change_queue.queue:
+        if (self.allow_delete and
+            self.change_queue and
+            not self.change_queue.queue):
             self.change_queue.pipeline.removeQueue(self.change_queue)
 
 
@@ -636,12 +639,14 @@ class PipelineManager(metaclass=ABCMeta):
     def addChange(self, change, event, quiet=False, enqueue_time=None,
                   ignore_requirements=False, live=True,
                   change_queue=None, history=None, dependency_graph=None,
-                  skip_presence_check=False):
+                  skip_presence_check=False, warnings=None):
         log = get_annotated_logger(self.log, event)
         log.debug("Considering adding change %s" % change)
 
         history = history if history is not None else []
         log.debug("History: %s", history)
+
+        warnings = warnings if warnings is not None else []
 
         # Ensure the dependency graph is created when the first change is
         # processed to allow cycle detection with the Tarjan algorithm
@@ -707,13 +712,13 @@ class PipelineManager(metaclass=ABCMeta):
             if len(cycle) > 1:
                 for cycle_change in cycle:
                     if not self.canProcessCycle(cycle_change.project):
-                        log.info("Dequeing change %s since the project "
+                        log.info("Not enqueueing change %s since the project "
                                  "does not allow circular dependencies",
                                  cycle_change)
                         warnings = ["Dependency cycle detected and project "
                                     f"{cycle_change.project.name} "
                                     "doesn't allow circular dependencies"]
-                        self._reportNonEqueuedItem(
+                        self._reportNonEnqueuedItem(
                             change_queue, change, event, warnings)
                         return False
 
@@ -726,8 +731,8 @@ class PipelineManager(metaclass=ABCMeta):
                     warnings=warnings):
                 log.debug("Failed to enqueue changes ahead of %s" % change)
                 if warnings:
-                    self._reportNonEqueuedItem(change_queue, change,
-                                               event, warnings)
+                    self._reportNonEnqueuedItem(change_queue, change,
+                                                event, warnings)
                 return False
 
             log.debug("History after enqueuing changes ahead: %s", history)
@@ -779,7 +784,7 @@ class PipelineManager(metaclass=ABCMeta):
             self.dequeueSupercededItems(item)
             return True
 
-    def _reportNonEqueuedItem(self, change_queue, change, event, warnings):
+    def _reportNonEnqueuedItem(self, change_queue, change, event, warnings):
         # Enqueue an item which otherwise can not be enqueued in order
         # to report a message to the user.
         actions = self.pipeline.failure_actions

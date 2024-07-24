@@ -650,12 +650,6 @@ class Pipeline(object):
             self.queues.remove(queue)
             self.queues.insert(0, queue)
 
-    def getChangesInQueue(self):
-        changes = []
-        for shared_queue in self.queues:
-            changes.extend([x.change for x in shared_queue.queue])
-        return changes
-
     def getAllItems(self, include_old=False):
         items = []
         for shared_queue in self.queues:

@@ -36,8 +36,9 @@ class IndependentPipelineManager(PipelineManager):
             dynamic=True)
         change_queue.addProject(change.project, None)
         self.pipeline.addQueue(change_queue)
-        log.debug("Dynamically created queue %s", change_queue)
-        return DynamicChangeQueueContextManager(change_queue)
+        log.debug("Dynamically created queue %s", id(change_queue))
+        return DynamicChangeQueueContextManager(
+            change_queue, allow_delete=True)
 
     def enqueueChangesAhead(self, changes, event, quiet, ignore_requirements,
                             change_queue, history=None, dependency_graph=None,
@@ -74,7 +75,8 @@ class IndependentPipelineManager(PipelineManager):
                                    live=False,
                                    change_queue=change_queue,
                                    history=history,
-                                   dependency_graph=dependency_graph)
+                                   dependency_graph=dependency_graph,
+                                   warnings=warnings)
                 if not r:
                     return False
         return True

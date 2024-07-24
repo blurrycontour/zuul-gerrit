@@ -53,7 +53,8 @@ class SupercedentPipelineManager(PipelineManager):
         change_queue.addProject(change.project, None)
         self.pipeline.addQueue(change_queue)
         log.debug("Dynamically created queue %s", change_queue)
-        return DynamicChangeQueueContextManager(change_queue)
+        return DynamicChangeQueueContextManager(
+            change_queue, allow_delete=True)
 
     def _pruneQueues(self):
         # Leave the first item in the queue, as it's running, and the
