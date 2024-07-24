@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9f6f195f_3a52a612",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-24T12:44:50Z",
+      "side": 1,
+      "message": "Sry, I was indeed thinking about the PipelineOverview page and not about the PipelineDetails page - therefore thinking about squares and grids.\n\nNow the whole thing makes a little more sense to me. I wasn\u0027t aware that there is a dependency between the different queues in a check pipeline, therefore I thought it would be fine to visualize them like this - independent of each other (as the name of the pipeline suggests). I mean, there are semaphores and node requests that might be blocked, but I didn\u0027t see them as \"dependency\" in the classical sense. But if we say we treat those as dependencies between the individual queues, we might indeed want to visualize them in order, although I think this would result in a lot of wasted space.\n\nMaybe we can come up with a smarter solution, but that might require a different layout / organization of the queues. Does Zuul ensure that those changes are ordered directly after one another or could there be changes in between? If so, we might be able to wrap those \"dependent-queues\" into a box to show that they belong together and still keep the overall layout. Maybe we could even utilize the ProgressStepper for this purpose - so wrap all the items from a single queue in a single ProgressStep and use the ProgressStepper to visualize the dependencies between the different queues. We would then visualize independent pipelines in a different way than dependent pipelines, but most probably that would be the case for any approach we take.",
+      "parentUuid": "14a048ea_334eba40",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57bc08d9_e2a42e20",
         "filename": "web/src/containers/status/Misc.jsx",
         "patchSetId": 9
