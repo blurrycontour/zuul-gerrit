@@ -80,7 +80,7 @@ class TestAbstractMatcherCollection(BaseTestMatcher):
 
     def test_repr(self):
         matcher = cm.MatchAll([])
-        self.assertEqual(repr(matcher), '<MatchAll>')
+        self.assertEqual(repr(matcher), '<MatchAll []>')
 
 
 class BaseTestFilesMatcher(BaseTestMatcher):

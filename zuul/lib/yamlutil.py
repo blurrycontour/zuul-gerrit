@@ -32,6 +32,56 @@ except ImportError:
     Mark = yaml.Mark
 
 
+class OverrideValue:
+    def __init__(self, value, override):
+        self.value = value
+        self.override = override
+
+
+# Generally it only makes sense to override lists or dicts, but
+# because of the to_list construction, we might end up with strings
+# too.
+class OverrideStr(OverrideValue):
+    pass
+
+
+class OverrideList(OverrideValue):
+    pass
+
+
+class OverrideDict(OverrideValue):
+    pass
+
+
+class Override:
+    yaml_tag = u'!override'
+    override_value = True
+
+    @classmethod
+    def from_yaml(cls, loader, node):
+        if isinstance(node, yaml.MappingNode):
+            return OverrideDict(loader.construct_mapping(node),
+                                cls.override_value)
+        elif isinstance(node, yaml.SequenceNode):
+            return OverrideList(loader.construct_sequence(node),
+                                cls.override_value)
+        elif isinstance(node, yaml.ScalarNode):
+            tag = loader.resolve(yaml.ScalarNode, node.value, (True, False))
+            node = yaml.ScalarNode(tag, node.value,
+                                   node.start_mark, node.end_mark)
+            raw_value = loader.construct_object(node)
+            if isinstance(raw_value, str):
+                return OverrideStr(raw_value, cls.override_value)
+            raise Exception("Unsupported type for scalar override control: "
+                            f"{type(raw_value)}")
+        raise Exception(f"Unsupported type for override control: {type(node)}")
+
+
+class Inherit(Override):
+    yaml_tag = u'!inherit'
+    override_value = False
+
+
 class EncryptedPKCS1_OAEP:
     yaml_tag = u'!encrypted/pkcs1-oaep'
 
@@ -123,6 +173,11 @@ EncryptedDumper.add_representer(
 EncryptedDumper.add_representer(
     ZuulConfigKey,
     ZuulConfigKey.to_yaml)
+# Add support for override control
+EncryptedLoader.add_constructor(Override.yaml_tag,
+                                Override.from_yaml)
+EncryptedLoader.add_constructor(Inherit.yaml_tag,
+                                Inherit.from_yaml)
 
 
 def encrypted_dump(data, *args, **kwargs):
