@@ -76,6 +76,22 @@ def to_list(x):
     return vs.Any([x], x)
 
 
+def override_list(x):
+    def validator(v):
+        if isinstance(v, yaml.OverrideValue):
+            v = v.value
+        vs.Any([x], x)(v)
+    return validator
+
+
+def override_value(x):
+    def validator(v):
+        if isinstance(v, yaml.OverrideValue):
+            v = v.value
+        vs.Schema(x)(v)
+    return validator
+
+
 def as_list(item):
     if not item:
         return []
@@ -729,8 +745,8 @@ class JobParser(object):
                       'abstract': bool,
                       'protected': bool,
                       'intermediate': bool,
-                      'requires': to_list(str),
-                      'provides': to_list(str),
+                      'requires': override_list(str),
+                      'provides': override_list(str),
                       'failure-message': str,
                       'success-message': str,
                       # TODO: ignored, remove for v5
@@ -741,11 +757,12 @@ class JobParser(object):
                       'voting': bool,
                       'semaphore': vs.Any(semaphore, str),
                       'semaphores': to_list(vs.Any(semaphore, str)),
-                      'tags': to_list(str),
+                      'tags': override_list(str),
                       'branches': to_list(vs.Any(ZUUL_REGEX, str)),
-                      'files': to_list(vs.Any(ZUUL_REGEX, str)),
+                      'files': override_list(vs.Any(ZUUL_REGEX, str)),
                       'secrets': to_list(vs.Any(secret, str)),
-                      'irrelevant-files': to_list(vs.Any(ZUUL_REGEX, str)),
+                      'irrelevant-files': override_list(
+                          vs.Any(ZUUL_REGEX, str)),
                       # validation happens in NodeSetParser
                       'nodeset': vs.Any(dict, str),
                       'timeout': int,
@@ -760,12 +777,14 @@ class JobParser(object):
                       '_source_context': model.SourceContext,
                       '_start_mark': model.ZuulMark,
                       'roles': to_list(role),
-                      'required-projects': to_list(vs.Any(job_project, str)),
-                      'vars': ansible_vars_dict,
-                      'extra-vars': ansible_vars_dict,
-                      'host-vars': {str: ansible_vars_dict},
-                      'group-vars': {str: ansible_vars_dict},
-                      'dependencies': to_list(vs.Any(job_dependency, str)),
+                      'required-projects': override_list(
+                          vs.Any(job_project, str)),
+                      'vars': override_value(ansible_vars_dict),
+                      'extra-vars': override_value(ansible_vars_dict),
+                      'host-vars': override_value({str: ansible_vars_dict}),
+                      'group-vars': override_value({str: ansible_vars_dict}),
+                      'dependencies': override_list(
+                          vs.Any(job_dependency, str)),
                       'allowed-projects': to_list(str),
                       'override-branch': str,
                       'override-checkout': str,
@@ -775,7 +794,7 @@ class JobParser(object):
                       'match-on-config-updates': bool,
                       'workspace-scheme': vs.Any('golang', 'flat', 'unique'),
                       'deduplicate': vs.Any(bool, 'auto'),
-                      'failure-output': to_list(str),
+                      'failure-output': override_list(str),
     }
 
     job_name = {vs.Required('name'): str}
@@ -990,52 +1009,68 @@ class JobParser(object):
             job.nodeset = ns
 
         if 'required-projects' in conf:
-            new_projects = {}
-            projects = as_list(conf.get('required-projects', []))
-            unknown_projects = []
-            for project in projects:
-                if isinstance(project, dict):
-                    project_name = project['name']
-                    project_override_branch = project.get('override-branch')
-                    project_override_checkout = project.get(
-                        'override-checkout')
-                else:
-                    project_name = project
-                    project_override_branch = None
-                    project_override_checkout = None
-                (trusted, project) = self.pcontext.tenant.getProject(
-                    project_name)
-                if project is None:
-                    unknown_projects.append(project_name)
-                    continue
-                job_project = model.JobProject(project.canonical_name,
-                                               project_override_branch,
-                                               project_override_checkout)
-                new_projects[project.canonical_name] = job_project
+            with self.pcontext.confAttr(
+                    conf, 'required-projects') as conf_projects:
+                if isinstance(conf_projects, yaml.OverrideValue):
+                    job.override_control['required_projects'] =\
+                        conf_projects.override
+                    conf_projects = conf_projects.value
+                new_projects = {}
+                projects = as_list(conf_projects)
+                unknown_projects = []
+                for project in projects:
+                    if isinstance(project, dict):
+                        project_name = project['name']
+                        project_override_branch = project.get(
+                            'override-branch')
+                        project_override_checkout = project.get(
+                            'override-checkout')
+                    else:
+                        project_name = project
+                        project_override_branch = None
+                        project_override_checkout = None
+                    (trusted, project) = self.pcontext.tenant.getProject(
+                        project_name)
+                    if project is None:
+                        unknown_projects.append(project_name)
+                        continue
+                    job_project = model.JobProject(project.canonical_name,
+                                                   project_override_branch,
+                                                   project_override_checkout)
+                    new_projects[project.canonical_name] = job_project
 
-            # NOTE(mnaser): We accumulate all unknown projects and throw an
-            #               exception only once to capture all of them in the
-            #               error message.
-            if unknown_projects:
-                raise ProjectNotFoundError(unknown_projects)
+                # We accumulate all unknown projects and throw an
+                # exception only once to capture all of them in the
+                # error message.
+                if unknown_projects:
+                    raise ProjectNotFoundError(unknown_projects)
 
-            job.required_projects = new_projects
+                job.required_projects = new_projects
 
         if 'dependencies' in conf:
-            new_dependencies = []
-            dependencies = as_list(conf.get('dependencies', []))
-            for dep in dependencies:
-                if isinstance(dep, dict):
-                    dep_name = dep['name']
-                    dep_soft = dep.get('soft', False)
-                else:
-                    dep_name = dep
-                    dep_soft = False
-                job_dependency = model.JobDependency(dep_name, dep_soft)
-                new_dependencies.append(job_dependency)
-            job.dependencies = new_dependencies
+            with self.pcontext.confAttr(conf, 'dependencies') as conf_deps:
+                if isinstance(conf_deps, yaml.OverrideValue):
+                    job.override_control['dependencies'] = conf_deps.override
+                    conf_deps = conf_deps.value
+                new_dependencies = []
+                dependencies = as_list(conf_deps)
+                for dep in dependencies:
+                    if isinstance(dep, dict):
+                        dep_name = dep['name']
+                        dep_soft = dep.get('soft', False)
+                    else:
+                        dep_name = dep
+                        dep_soft = False
+                    job_dependency = model.JobDependency(dep_name, dep_soft)
+                    new_dependencies.append(job_dependency)
+                job.dependencies = frozenset(new_dependencies)
 
-        semaphores = as_list(conf.get('semaphores', conf.get('semaphore', [])))
+        with self.pcontext.confAttr(conf, 'semaphore') as conf_semaphore:
+            semaphores = as_list(conf_semaphore)
+        if 'semaphores' in conf:
+            with self.pcontext.confAttr(conf, 'semaphores') as conf_semaphores:
+                semaphores = as_list(conf_semaphores)
+        # TODO: after removing semaphore, indent this section
         job_semaphores = []
         for semaphore in semaphores:
             if isinstance(semaphore, str):
@@ -1060,28 +1095,31 @@ class JobParser(object):
                                 "be used for one")
 
         for k in ('tags', 'requires', 'provides'):
-            v = frozenset(as_list(conf.get(k)))
-            if v:
-                setattr(job, k, v)
+            with self.pcontext.confAttr(conf, k) as conf_k:
+                if isinstance(conf_k, yaml.OverrideValue):
+                    job.override_control[k] = conf_k.override
+                    conf_k = conf_k.value
+                v = frozenset(as_list(conf_k))
+                if v:
+                    setattr(job, k, v)
 
-        variables = conf.get('vars', None)
-        if variables:
-            check_varnames(variables)
-            job.variables = variables
-        extra_variables = conf.get('extra-vars', None)
-        if extra_variables:
-            check_varnames(extra_variables)
-            job.extra_variables = extra_variables
-        host_variables = conf.get('host-vars', None)
-        if host_variables:
-            for host, hvars in host_variables.items():
-                check_varnames(hvars)
-            job.host_variables = host_variables
-        group_variables = conf.get('group-vars', None)
-        if group_variables:
-            for group, gvars in group_variables.items():
-                check_varnames(gvars)
-            job.group_variables = group_variables
+        for (yaml_attr, job_attr, hostvars) in [
+                ('vars', 'variables', False),
+                ('extra-vars', 'extra_variables', False),
+                ('host-vars', 'host_variables', True),
+                ('group-vars', 'group_variables', True),
+        ]:
+            with self.pcontext.confAttr(conf, yaml_attr) as conf_vars:
+                if isinstance(conf_vars, yaml.OverrideValue):
+                    job.override_control[job_attr] = conf_vars.override
+                    conf_vars = conf_vars.value
+                if conf_vars:
+                    if hostvars:
+                        for host, hvars in conf_vars.items():
+                            check_varnames(hvars)
+                    else:
+                        check_varnames(conf_vars)
+                    setattr(job, job_attr, conf_vars)
 
         allowed_projects = conf.get('allowed-projects', None)
         # See note above at "post-review".
@@ -1108,6 +1146,9 @@ class JobParser(object):
             job.setBranchMatcher(branches)
         if 'files' in conf:
             with self.pcontext.confAttr(conf, 'files') as conf_files:
+                if isinstance(conf_files, yaml.OverrideValue):
+                    job.override_control['file_matcher'] = conf_files.override
+                    conf_files = conf_files.value
                 job.setFileMatcher([
                     make_regex(x, self.pcontext)
                     for x in as_list(conf_files)
@@ -1115,18 +1156,28 @@ class JobParser(object):
         if 'irrelevant-files' in conf:
             with self.pcontext.confAttr(conf,
                                         'irrelevant-files') as conf_ifiles:
+                if isinstance(conf_ifiles, yaml.OverrideValue):
+                    job.override_control['irrelevant_file_matcher'] =\
+                        conf_ifiles.override
+                    conf_ifiles = conf_ifiles.value
                 job.setIrrelevantFileMatcher([
                     make_regex(x, self.pcontext)
                     for x in as_list(conf_ifiles)
                 ])
         if 'failure-output' in conf:
-            failure_output = as_list(conf['failure-output'])
+            with self.pcontext.confAttr(conf,
+                                        'failure-output') as conf_output:
+                if isinstance(conf_output, yaml.OverrideValue):
+                    job.override_control['failure_output'] =\
+                        conf_output.override
+                    conf_output = conf_output.value
+            failure_output = as_list(conf_output)
             # Test compilation to detect errors, but the zuul_stream
             # callback plugin is what actually needs re objects, so we
             # let it recompile them later.
             for x in failure_output:
                 re2.compile(x)
-            job.failure_output = tuple(failure_output)
+            job.failure_output = tuple(sorted(failure_output))
 
         job.freeze()
         return job

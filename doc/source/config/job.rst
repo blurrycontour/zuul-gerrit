@@ -18,10 +18,45 @@ starting with very basic jobs which describe characteristics that all
 jobs on the system should have, progressing through stages of
 specialization before arriving at a particular job.  A job may inherit
 from any other job in any project (however, if the other job is marked
-as :attr:`job.final`, jobs may not inherit from it).  Generally,
-attributes on child jobs will override (or completely replace)
-attributes on the parent, however some attributes are combined.  See
-the documentation for individual attributes for these exceptions.
+as :attr:`job.final`, jobs may not inherit from it).
+
+Generally, if an attribute is set on a child job, it will override (or
+completely replace) attributes on the parent.  This is always true for
+attributes that only accept single values, but attributes that accept
+multiple values (lists, or mappings) are sometimes combined.
+The default behavior varies; see the documentation for individual
+attributes for details.  A special YAML tag may be used to control the
+behavior explicitly.  For example, in order to specify that the tags
+in the present job should override those in the parent:
+
+.. code-block:: yaml
+
+   - job:
+       name: child
+       tags: !override
+         - foo
+
+Or to indicate that they should be combined with those in the parent:
+
+.. code-block:: yaml
+
+   - job:
+       name: child
+       tags: !inherit
+         - foo
+
+Attributes which support this feature are indicated in this
+documentation with "Supports override control".
+
+When lists are combined, they are merged without duplication.
+
+When mappings (or dictionaries, for example, those used for job
+variables) are combined, they are deeply merged.  This means a leaf
+node (an entry whose value is not another mapping) with the same name
+will override a previous entry, but non-leaf nodes (entries whose
+values are mappings) will have their entries updated in the same
+manner, recursively.  New entries with unique names will be added to
+mappings.
 
 A job with no parent is called a *base job* and may only be defined in
 a :term:`config-project`.  Every other job must have a parent, and so
@@ -242,7 +277,8 @@ Here is an example of two job definitions:
 
       When inheriting jobs or applying variants, the list of
       semaphores is extended (semaphores specified in a job definition
-      are added to any supplied by their parents).
+      are added to any supplied by their parents).  This can not be
+      changed via override control.
 
       .. attr:: name
          :required:
@@ -269,10 +305,10 @@ Here is an example of two job definitions:
       that subsystem, and if the job's results are reported into a
       database, then the results of all jobs affecting that subsystem
       could be queried.  This attribute is specified as a list of
-      strings, and when inheriting jobs or applying variants, tags
-      accumulate in a set, so the result is always a set of all the
-      tags from all the jobs and variants used in constructing the
-      frozen job, with no duplication.
+      strings.
+
+      Supports override control.  The default is ``!inherit``: values
+      are merged without duplication.
 
    .. attr:: provides
 
@@ -280,9 +316,8 @@ Here is an example of two job definitions:
       by this job which may be used by other jobs for other changes
       using the :attr:`job.requires` attribute.
 
-      When inheriting jobs or applying variants, the list of
-      `provides` is extended (`provides` specified in a job definition
-      are added to any supplied by their parents).
+      Supports override control.  The default is ``!inherit``: values
+      are merged without duplication.
 
    .. attr:: requires
 
@@ -314,10 +349,6 @@ Here is an example of two job definitions:
       items, e.g. for branch items in `supercedent` pipeline, branch items
       in periodic `independent` pipeline, tag items in `independent` pipeline.
 
-      When inheriting jobs or applying variants, the list of
-      `requires` is extended (`requires` specified in a job definition
-      are added to any supplied by their parents).
-
       For example, a job which produces a builder container image in
       one project that is then consumed by a container image build job
       in another project might look like this:
@@ -343,6 +374,9 @@ Here is an example of two job definitions:
              check:
                jobs:
                  - build-final-image
+
+      Supports override control.  The default is ``!inherit``: values
+      are merged without duplication.
 
    .. attr:: secrets
 
@@ -821,14 +855,12 @@ Here is an example of two job definitions:
       of the time the item was enqueued will be frozen and used for
       all jobs for a given change (see :ref:`global_repo_state`).
 
-      This attribute is not overridden by inheritance; instead it is
-      the union of all applicable parents and variants (i.e., jobs can
-      expand but not reduce the set of required projects when they
-      inherit).
-
       The format for this attribute is either a list of strings or
       dictionaries.  Strings are interpreted as project names,
       dictionaries, if used, may have the following attributes:
+
+      Supports override control.  The default is ``!inherit``: values
+      are merged without duplication.
 
       .. attr:: name
          :required:
@@ -856,11 +888,7 @@ Here is an example of two job definitions:
 
    .. attr:: vars
 
-      A dictionary of variables to supply to Ansible.  When inheriting
-      from a job (or creating a variant of a job) vars are merged with
-      previous definitions.  This means a variable definition with the
-      same name will override a previously defined variable, but new
-      variable names will be added to the set of defined variables.
+      A dictionary of variables to supply to Ansible.
 
       When running a trusted playbook, the value of variables will be
       frozen at the start of the job.  Therefore if the value of the
@@ -878,12 +906,18 @@ Here is an example of two job definitions:
       it is not recommended to do so except in the most controlled of
       circumstances.  They are almost impossible to render safely.
 
+      Supports override control.  The default is ``!inherit``: values
+      are deep-merged.
+
    .. attr:: extra-vars
 
       A dictionary of variables to supply to Ansible with higher
       precedence than job, host, or group vars. Note, that despite
       the name this is not passed to Ansible using the `--extra-vars`
       flag.
+
+      Supports override control.  The default is ``!inherit``: values
+      are deep-merged.
 
    .. attr:: host-vars
 
@@ -892,12 +926,18 @@ Here is an example of two job definitions:
       :ref:`nodeset`, and the values are dictionaries of variables,
       just as in :attr:`job.vars`.
 
+      Supports override control.  The default is ``!inherit``: values
+      are deep-merged.
+
    .. attr:: group-vars
 
       A dictionary of group variables to supply to Ansible.  The keys
       of this dictionary are node groups as defined in a
       :ref:`nodeset`, and the values are dictionaries of variables,
       just as in :attr:`job.vars`.
+
+      Supports override control.  The default is ``!inherit``: values
+      are deep-merged.
 
    An example of three kinds of variables:
 
@@ -926,6 +966,7 @@ Here is an example of two job definitions:
          group-vars:
            api:
              baz: "this variable is visible on api1 and api2"
+
    .. attr:: dependencies
 
       A list of other jobs upon which this job depends.  Zuul will not
@@ -958,6 +999,9 @@ Here is an example of two job definitions:
          then Zuul will not run any jobs and report an error.  A
          *soft* dependency will simply be ignored if the dependent job
          is not run.
+
+      Supports override control.  The default is ``!override``: values
+      are overridden.
 
    .. attr:: allowed-projects
 
@@ -1099,6 +1143,9 @@ Here is an example of two job definitions:
       value is used to determine if the job should run. This is a
       :ref:`regular expression <regex>` or list of regular expressions.
 
+      Supports override control.  The default is ``!override``: values
+      are overridden.
+
       .. warning::
 
          File filters will be ignored for refs that don't have any
@@ -1115,6 +1162,9 @@ Here is an example of two job definitions:
       supplied, then this job will not run if the only files changed
       are in the docs directory.  A :ref:`regular expression <regex>`
       or list of regular expressions.
+
+      Supports override control.  The default is ``!override``: values
+      are overridden.
 
       .. warning::
 
@@ -1186,13 +1236,12 @@ Here is an example of two job definitions:
       In this case, it will be able to restart jobs for changes behind
       it in a dependent pipeline.
 
-      When inheriting or applying variants this option is combined
-      so that regular expressions from all parents and variants used
-      will be applied.
-
       Use caution when specifying this option.  If an early failure is
       triggered, the job result will be recorded as FAILURE even if
       the job playbooks ultimately succeed.
+
+      Supports override control.  The default is ``!inherit``: values
+      are merged without duplication.
 
    .. attr:: workspace-scheme
       :default: golang
