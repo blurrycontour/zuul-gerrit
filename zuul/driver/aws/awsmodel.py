@@ -18,8 +18,45 @@ from zuul.provider import statemachine
 from zuul.driver.aws.util import tag_list_to_dict
 
 
+class AwsDeleteState(statemachine.DeleteState):
+    HOST_RELEASING_START = 'start releasing host'
+    HOST_RELEASING = 'releasing host'
+    INSTANCE_DELETING_START = 'start deleting instance'
+    INSTANCE_DELETING = 'deleting instance'
+    COMPLETE = 'complete'
+
+
+class AwsCreateState(statemachine.CreateState):
+    HOST_ALLOCATING_START = 'start allocating host'
+    HOST_ALLOCATING_SUBMIT = 'submit allocating host'
+    HOST_ALLOCATING = 'allocating host'
+    INSTANCE_CREATING_START = 'start creating instance'
+    INSTANCE_CREATING_SUBMIT = 'submit creating instance'
+    INSTANCE_CREATING = 'creating instance'
+    COMPLETE = 'complete'
+
+    def __init__(self, node):
+        super().__init__(node)
+        self._set(
+            external_id=dict(),
+            public_ipv4=None,
+            public_ipv6=None,
+            nic=None,
+            instance=None,
+            dedicated_host_id=None,
+            attempts=0,
+        )
+
+
 class AwsProviderNode(model.ProviderNode, subclass_id="aws"):
-    pass
+    _create_state_class = AwsCreateState
+    _delete_state_class = AwsDeleteState
+
+    @property
+    def hostname(self):
+        # TODO: decide on a method of producing a hostname
+        # that is max 15 chars.
+        return f"np{self.uuid[:13]}"
 
 
 class AwsInstance(statemachine.Instance):

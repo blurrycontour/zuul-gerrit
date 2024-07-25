@@ -274,26 +274,42 @@ class Launcher:
     def _buildNode(self, node, log):
         log.debug("Building node %s", node)
         provider = self._getProvider(node.tenant_name, node.provider)
-        _ = provider.getEndpoint()
         with self.createZKContext(node._lock, self.log) as ctx:
             with node.activeContext(ctx):
-                # TODO: this may be provided by Zuul once image
-                # uploads are supported
-                image_external_id = None
                 node.create_state_machine = provider.getCreateStateMachine(
-                    node, image_external_id, log)
+                    node, log)
                 node.state = model.ProviderNode.State.BUILDING
 
     def _checkNode(self, node, log):
-        log.debug("Checking node %s", node)
-        node.create_state_machine.advance()
-        if not node.create_state_machine.complete:
-            self.wake_event.set()
-            return
-        state = model.ProviderNode.State.READY
-        log.debug("Marking node %s as %s", node, state)
         with self.createZKContext(node._lock, self.log) as ctx:
-            node.updateAttributes(ctx, state=state)
+            with node.activeContext(ctx):
+                if node.create_state and not node.create_state_machine:
+                    log.debug("Restoring create state machine")
+                    provider = self._getProvider(
+                        node.tenant_name, node.provider)
+                    node.create_state_machine = provider.getCreateStateMachine(
+                        node, log)
+
+                if node.delete_state and not node.delete_state_machine:
+                    log.debug("Restoring delete state machine")
+                    provider = self._getProvider(
+                        node.tenant_name, node.provider)
+                    node.delete_state_machine = provider.getDeleteStateMachine(
+                        node, log)
+
+                if node.delete_state_machine:
+                    node.delete_state_machine.advance()
+                    if node.delete_state_machine.complete:
+                        node.delete_state_machine = None
+                    else:
+                        return
+                log.debug("Checking node %s", node)
+                node.create_state_machine.advance()
+                if not node.create_state_machine.complete:
+                    self.wake_event.set()
+                    return
+                node.state = model.ProviderNode.State.READY
+                log.debug("Marking node %s as %s", node, node.state)
         node.releaseLock()
 
     def _getProvider(self, tenant_name, provider_name):
