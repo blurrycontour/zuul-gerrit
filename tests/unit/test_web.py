@@ -2102,6 +2102,30 @@ class TestBuildInfo(BaseTestWeb):
                                        "idx_min=%i" % idx_max).json()
         self.assertEqual(len(buildsets_query), 1, buildsets_query)
 
+    def test_web_list_buildsets_exclude_result(self):
+        # Test the exclude_result filter
+        # Generate some build records in the db.
+        self.executor_server.hold_jobs_in_build = False
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.executor_server.failJob('project-merge', A)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        B = self.fake_gerrit.addFakeChange('org/project1', 'master', 'B')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        buildsets = self.get_url("api/tenant/tenant-one/buildsets").json()
+        self.assertEqual(2, len(buildsets))
+        self.assertEqual("org/project1", buildsets[0]["refs"][0]["project"])
+        self.assertEqual("org/project", buildsets[1]["refs"][0]["project"])
+        buildsets = self.get_url("api/tenant/tenant-one/buildsets?"
+                                 "exclude_result=FAILURE").json()
+        self.assertEqual(1, len(buildsets))
+        self.assertEqual("org/project1", buildsets[0]["refs"][0]["project"])
+
     def test_web_substring_search_buildsets(self):
         # Generate some build records in the db.
         self.add_base_changes()

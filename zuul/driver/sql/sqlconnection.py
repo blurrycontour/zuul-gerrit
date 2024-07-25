@@ -431,7 +431,7 @@ class DatabaseSession(object):
                      newrev=None, uuid=None, result=None, complete=None,
                      updated_max=None,
                      limit=50, offset=0, idx_min=None, idx_max=None,
-                     query_timeout=None):
+                     exclude_result=None, query_timeout=None):
 
         buildset_table = self.connection.zuul_buildset_table
         buildset_ref_table = self.connection.zuul_buildset_ref_table
@@ -458,6 +458,7 @@ class DatabaseSession(object):
         q = self.listFilter(q, ref_table.c.newrev, newrev)
         q = self.listFilter(q, buildset_table.c.uuid, uuid)
         q = self.listFilter(q, buildset_table.c.result, result)
+        q = self.exListFilter(q, buildset_table.c.result, exclude_result)
         if idx_min:
             q = q.filter(buildset_table.c.id >= idx_min)
         if idx_max:
