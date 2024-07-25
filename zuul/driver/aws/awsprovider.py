@@ -175,25 +175,25 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
     def getEndpoint(self):
         return self.driver.getEndpoint(self)
 
-    def getCreateStateMachine(self, node, image_external_id, log):
-        # TODO: decide on a method of producing a hostname
-        # that is max 15 chars.
-        hostname = f"np{node.uuid[:13]}"
+    def getCreateStateMachine(self, node, log):
+        # TODO: this may be provided by Zuul once image
+        # uploads are supported
+        image_external_id = None
         label = self.labels[node.label]
         flavor = self.flavors[label.flavor]
         image = self.images[label.image]
+
         return AwsCreateStateMachine(
             self.endpoint,
-            hostname,
+            node,
             label,
             flavor,
             image,
             image_external_id,
-            node.tags,
             log)
 
-    def getDeleteStateMachine(self, external_id, log):
-        return AwsDeleteStateMachine(self.endpoint, external_id, log)
+    def getDeleteStateMachine(self, node, log):
+        return AwsDeleteStateMachine(self.endpoint, node, log)
 
     def listInstances(self):
         return self.endpoint.listInstances()
