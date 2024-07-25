@@ -2284,6 +2284,10 @@ class NodesetRequest(zkobject.LockableZKObject):
 class ProviderNode(zkobject.PolymorphicZKObjectMixin,
                    zkobject.LockableZKObject):
 
+    # To be defined by subclasses
+    _create_state_class = None
+    _delete_state_class = None
+
     class State(StrEnum):
         REQUESTED = "requested"
         BUILDING = "building"
@@ -2310,8 +2314,10 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             state=self.State.REQUESTED,
             label="",
             connection_name="",
+            tags={},
+            create_state=None,
+            delete_state=None,
             # Node data
-            hostname=None,
             host_id=None,
             interface_ip=None,
             public_ipv4=None,
@@ -2330,9 +2336,6 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             resources=None,
             attributes={},
             tenant_name=None,
-            create_state={},
-            delete_state={},
-            tags={},
             # Attributes that are not serialized
             is_locked=False,
             create_state_machine=None,
@@ -2356,15 +2359,34 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
         return f"{self.ROOT}/{self.LOCKS_PATH}/{self.uuid}"
 
     def serialize(self, context):
+        create_state = (self.create_state.serialize()
+                        if self.create_state else None)
+        delete_state = (self.delete_state.serialize()
+                        if self.delete_state else None)
         data = dict(
             uuid=self.uuid,
             request_id=self.request_id,
             state=self.state,
             label=self.label,
             connection_name=self.connection_name,
+            tags=self.tags,
+            create_state=create_state,
+            delete_state=delete_state,
             **self.getNodeData()
         )
         return json.dumps(data, sort_keys=True).encode("utf-8")
+
+    def deserialize(self, raw_data, context):
+        data = super().deserialize(raw_data, context)
+        if create_state := data.pop("create_state"):
+            if not self.create_state:
+                self._set(create_state=self._create_state_class(self))
+            self.create_state.deserialize(create_state)
+        if delete_state := data.pop("delete_state"):
+            if not self.delete_state:
+                self._set(delete_state=self._delete_state_class(self))
+            self.delete_state.deserialize(delete_state)
+        return data
 
     def getNodeData(self):
         return dict(
