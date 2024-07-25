@@ -279,9 +279,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         tags.update(fixed)
         return tags
 
-    def getCreateStateMachine(self, node,
-                              image_external_id,
-                              log):
+    def getCreateStateMachine(self, node, log):
         """Return a state machine suitable for creating an instance
 
         This method should return a new state machine object
@@ -290,9 +288,6 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         :param ProviderNode node: The node object.
         :param ProviderLabel label: A config object representing the
             provider-label for the node.
-        :param str image_external_id: If provided, the external id of
-            a previously uploaded image; if None, then the adapter should
-            look up a cloud image based on the label.
         :param log Logger: A logger instance for emitting annotated
             logs related to the request.
 
@@ -301,14 +296,13 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         """
         raise NotImplementedError()
 
-    def getDeleteStateMachine(self, external_id, log):
+    def getDeleteStateMachine(self, node, log):
         """Return a state machine suitable for deleting an instance
 
         This method should return a new state machine object
         initialized to delete the described instance.
 
-        :param str or dict external_id: The external_id of the instance, as
-            supplied by a creation StateMachine or an Instance.
+        :param ProviderNode node: The node object.
         :param log Logger: A logger instance for emitting annotated
             logs related to the request.
         """

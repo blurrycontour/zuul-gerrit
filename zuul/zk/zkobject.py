@@ -612,3 +612,34 @@ class PolymorphicZKObjectMixin(abc.ABC):
             raise RuntimeError(f"Unknown subclass id: {subclass_id}")
         return super(
             PolymorphicZKObjectMixin, klass)._fromRaw(raw_data, zstat, **kw)
+
+
+class ZKObjectMember:
+
+    def __init__(self, zkparent):
+        self._set(_zkparent=zkparent)
+
+    def __setattr__(self, name, value):
+        if self._zkparent._active_context:
+            super().__setattr__(name, value)
+        else:
+            raise Exception(f"Unable to modify ZKObjectMember {repr(self)}")
+
+    def _set(self, **kw):
+        for name, value in kw.items():
+            super().__setattr__(name, value)
+
+    def serialize(self, context):
+        """Implement this method to return the data to save in ZK.
+
+        :returns: A dictionary
+        """
+        raise NotImplementedError()
+
+    def deserialize(self, data):
+        """Implement this method to convert serialized data into object
+        attributes.
+
+        :param dict data: A dictionary to deserialize
+        """
+        self._set(**data)

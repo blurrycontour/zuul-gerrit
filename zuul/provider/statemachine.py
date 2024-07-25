@@ -14,18 +14,55 @@
 
 import time
 
+from zuul.zk.zkobject import ZKObjectMember
+
 
 class StateMachine:
-    START = 'start'
 
-    def __init__(self):
-        self.state = self.START
-        self.external_id = None
+    def __init__(self, state):
+        self.state = state
         self.complete = False
-        self.start_time = time.monotonic()
 
     def advance(self):
         pass
+
+
+class CreateState(ZKObjectMember):
+    START = 'start'
+
+    def __init__(self, node):
+        super().__init__(node)
+        self._set(
+            state=self.START,
+            start_time=time.monotonic(),
+            external_id=None,
+            image_external_id=None,
+        )
+
+    def serialize(self):
+        return dict(
+            image_external_id=self.image_external_id,
+            state=self.state,
+            start_time=self.start_time,
+            external_id=self.external_id,
+        )
+
+
+class DeleteState(ZKObjectMember):
+    START = 'start'
+
+    def __init__(self, node):
+        super().__init__(node)
+        self._set(
+            state=self.START,
+            external_id=None
+        )
+
+    def serialize(self):
+        return dict(
+            state=self.state,
+            external_id=self.external_id,
+        )
 
 
 class Instance:
