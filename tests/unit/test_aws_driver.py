@@ -12,14 +12,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from unittest import mock
+
 import fixtures
 from moto import mock_aws
 import boto3
 
 from zuul.driver.aws import AwsDriver
+from zuul.driver.aws.awsmodel import AwsCreateState
+from zuul.launcher.server import Launcher
 
 from tests.fake_aws import FakeAws, FakeAwsProviderEndpoint
 from tests.base import (
+    TestConnectionRegistry,
     ZuulTestCase,
     iterate_timeout,
     simple_layout,
@@ -143,6 +148,49 @@ class TestAwsDriver(ZuulTestCase):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('check-job').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(self.getJobFromHistory('check-job').node,
+                         'debian-normal')
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_launcher_failover(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+
+        with mock.patch(
+            'zuul.driver.aws.awsendpoint.AwsProviderEndpoint._refresh'
+        ) as refresh_mock:
+            # Patch 'endpoint._refresh()' to return the obj unchanged
+            refresh_mock.side_effect = lambda o: o
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+            for _ in iterate_timeout(10, "node is building"):
+                nodes = self.launcher.api.nodes_cache.getItems()
+                if not nodes:
+                    continue
+                if all(
+                    n.create_state and
+                    n.create_state.step == AwsCreateState.INSTANCE_CREATING
+                    for n in nodes
+                ):
+                    break
+            self.launcher.stop()
+            self.launcher.join()
+            launcher_connections = TestConnectionRegistry(
+                self.config, self.test_config,
+                self.additional_event_queues,
+                self.upstream_root, self.poller_events,
+                self.git_url_with_auth, self.addCleanup)
+            launcher_connections.configure(self.config, providers=True)
+
+            self.launcher = Launcher(
+                self.config,
+                launcher_connections)
+            self.launcher.start()
+
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('check-job').result,
                          'SUCCESS')

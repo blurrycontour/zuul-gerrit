@@ -132,6 +132,7 @@ class AwsCreateStateMachine(statemachine.StateMachine):
         self.flavor = flavor
         self.image = image
         self.host = None
+        self.quota = None
 
     def advance(self):
         if self.step == self.state.START:
