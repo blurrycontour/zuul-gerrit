@@ -41,6 +41,7 @@ import git
 from urllib.parse import urlsplit
 from opentelemetry import trace
 
+from zuul.exceptions import VariableNameError
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.result_data import get_warnings_from_result_data
 from zuul.lib import yamlutil as yaml
@@ -1599,7 +1600,11 @@ class AnsibleJob(object):
         self.preparePlaybooks(args)
         self.writeLoggingConfig()
         zuul_resources = self.prepareNodes(args)  # set self.host_list
-        self.prepareVars(args, zuul_resources)   # set self.original_hostvars
+        try:
+            # set self.original_hostvars
+            self.prepareVars(args, zuul_resources)
+        except VariableNameError as e:
+            raise ExecutorError(str(e))
         self.writeDebugInventory()
         self.writeRepoStateFile(repos)
 
@@ -1690,6 +1695,8 @@ class AnsibleJob(object):
             secret_data_copy = data.copy()
             secret_data_copy.pop('zuul', None)
             check_varnames(secret_data_copy)
+        except VariableNameError as e:
+            self.log.warning("Unable to load result data: %s", str(e))
         except Exception:
             self.log.exception("Unable to load result data:")
         return data, secret_data
