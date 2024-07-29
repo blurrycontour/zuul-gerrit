@@ -48,6 +48,10 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
     def handle(self):
         try:
             build_uuid = self.getCommand()
+        except BrokenPipeError:
+            self.log.info("Broken pipe")
+            # The stream was disconnected
+            return
         except Exception:
             self.log.exception("Failure during getCommand:")
             msg = 'Internal streaming error'
