@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d8153ac_23499477",
+        "filename": "tests/base.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 2111,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2024-07-29T21:38:55Z",
+      "side": 1,
+      "message": "In the case where they are _not_ ok to ignore, I assume one would just define okay_tracebacks and not include the string since default is overridden and not additive.",
+      "range": {
+        "startLine": 2111,
+        "startChar": 24,
+        "endLine": 2111,
+        "endChar": 33
+      },
+      "revId": "7f0280a2b03a4f7224166dbd3041218bd0fe6c3e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
