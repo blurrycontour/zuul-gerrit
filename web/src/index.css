@@ -195,6 +195,15 @@ a.refresh {
     cursor: default;
 }
 
+.zuul-expand-icon {
+    margin-left: 4px;
+    vertical-align: -0.2em;
+}
+
+.zuul-expand-icon:hover {
+    cursor: pointer;
+}
+
 .pf-c-popover.zuul-queue-item-popover .pf-c-popover__content h6 {
     margin-bottom: 0;
     margin-top: 5px;
@@ -239,6 +248,7 @@ a.refresh {
 
 .zuul-pipeline-link {
     color: #363636;
+    font-size: var(--pf-global--FontSize--xl);
 }
 
 .zuul-item-square {
@@ -283,8 +293,37 @@ a.refresh {
     color: var(--pf-global--palette--black-700) !important;
 }
 
+/* Make the cards within a zuul-change-queue even more compact */
 .zuul-change-queue .pf-c-progress-stepper__step-main {
     margin-bottom: 20px;
+    margin-top: 0;
+}
+
+.zuul-change-queue .pf-c-progress-stepper__step-icon {
+    font-size: 0.9rem;
+    --pf-c-progress-stepper__step-icon--Width: 1.5rem;
+    --pf-c-progress-stepper__step-icon--Height: 1.5rem;
+}
+
+.zuul-change-queue .pf-c-card.zuul-compact-card .pf-c-card__header {
+    padding: 8px 8px 0 8px;
+}
+
+.zuul-change-queue .pf-c-card.zuul-compact-card .pf-c-card__body {
+    padding: 0 8px 8px 8px;
+}
+
+.zuul-change-queue .pf-c-card.zuul-compact-card .pf-c-expandable-section__toggle {
+    padding-bottom: 0;
+}
+
+.zuul-change-queue .pf-c-card.zuul-compact-card .zuul-change-link {
+    padding-right: 2px;
+    padding-bottom: 0;
+}
+
+.zuul-pipeline-summary .zuul-change-queue {
+    padding-top: 4px;
 }
 
 .zuul-job-list.pf-c-data-list .pf-c-data-list__item-content {
