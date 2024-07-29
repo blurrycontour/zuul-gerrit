@@ -70,45 +70,43 @@ class AwsDeleteStateMachine(statemachine.StateMachine):
         self.log = log
         if node.delete_state is None:
             node.delete_state = AwsDeleteState(node)
-            node.delete_state.external_id = node.external_id
+            node.delete_state.external_id = node.create_state.external_id
         super().__init__(node.delete_state)
         self.endpoint = endpoint
-        self.external_id = node.delete_state.external_id
 
     def advance(self):
         if self.step == self.state.START:
-            if 'instance' in self.external_id:
+            if 'instance' in self.state.external_id:
                 self.step = self.state.INSTANCE_DELETING_START
-            elif 'host' in self.external_id:
+            elif 'host' in self.state.external_id:
                 self.step = self.state.HOST_RELEASING_START
             else:
                 self.step = self.state.COMPLETE
 
         if self.step == self.state.INSTANCE_DELETING_START:
-            self.instance = self.endpoint._deleteInstance(
-                self.external_id['instance'], self.log)
+            self.endpoint._deleteInstance(
+                self.state.external_id['instance'], self.log)
             self.step = self.state.INSTANCE_DELETING
 
         if self.step == self.state.INSTANCE_DELETING:
-            if not self.instance:
-                self.instance = dict(InstanceId=self.external_id['instance'])
-            self.instance = self.endpoint._refreshDelete(self.instance)
-            if self.instance is None:
-                if 'host' in self.external_id:
+            instance = self.endpoint._getInstanceById(
+                self.state.external_id['instance'])
+            if (instance is None
+                    or instance['State']['Name'].lower() == "terminated"):
+                if 'host' in self.state.external_id:
                     self.step = self.state.HOST_RELEASING_START
                 else:
-                    self.step = self.COMPLETE
+                    self.step = self.state.COMPLETE
 
         if self.step == self.state.HOST_RELEASING_START:
-            self.host = self.endpoint._releaseHost(
-                self.external_id['host'], self.log)
+            self.endpoint._releaseHost(
+                self.state.external_id['host'], self.log)
             self.step = self.state.HOST_RELEASING
 
         if self.step == self.state.HOST_RELEASING:
-            if not self.host:
-                self.host = dict(HostId=self.external_id['host'])
-            self.host = self.endpoint._refreshDelete(self.host)
-            if self.host is None:
+            host = self.endpoint._getHostById(self.state.external_id['host'])
+            if (host is None or host['State'].lower() in (
+                    'released', 'released-permanent-failure')):
                 self.step = self.state.COMPLETE
 
         if self.step == self.state.COMPLETE:
@@ -131,43 +129,36 @@ class AwsCreateStateMachine(statemachine.StateMachine):
         self.label = label
         self.flavor = flavor
         self.image = image
-        self.host = None
+        self.host_create_future = None
+        self.create_future = None
 
     def advance(self):
         if self.step == self.state.START:
             if self.flavor.dedicated_host:
-                self.step = self.state.HOST_ALLOCATING_START
+                self.step = self.state.HOST_ALLOCATING_SUBMIT
             else:
-                self.step = self.state.INSTANCE_CREATING_START
-
-        if self.step == self.state.HOST_ALLOCATING_START:
-            self.host_create_future = self.endpoint._submitAllocateHost(
-                self.label,
-                self.tags, self.hostname, self.log)
-            self.step = self.state.HOST_ALLOCATING_SUBMIT
+                self.step = self.state.INSTANCE_CREATING_SUBMIT
 
         if self.step == self.state.HOST_ALLOCATING_SUBMIT:
-            # TODO: check if we need to re-submit the allocate host
+            if not self.host_create_future:
+                client_token = self.state.getClientToken(
+                    self.state.HOST_ALLOCATING_SUBMIT)
+                self.host_create_future = self.endpoint._submitAllocateHost(
+                    self.label, self.flavor, self.tags, self.hostname,
+                    self.log, client_token)
             host = self.endpoint._completeAllocateHost(
                 self.host_create_future)
             if host is None:
                 return
-            self.host = host
             self.state.external_id['host'] = host['HostId']
             self.step = self.state.HOST_ALLOCATING
 
         if self.step == self.state.HOST_ALLOCATING:
-            if not hasattr(self, 'host'):
-                self.host = dict(
-                    HostId=self.state.external_id['host'],
-                    State="pending",
-                )
-            self.host = self.endpoint._refresh(self.host)
-
-            state = self.host['State'].lower()
+            host = self.endpoint._getHostById(self.state.external_id['host'])
+            state = host['State'].lower()
             if state == 'available':
-                self.state.dedicated_host_id = self.host['HostId']
-                self.step = self.state.INSTANCE_CREATING_START
+                self.state.dedicated_host_id = host['HostId']
+                self.step = self.state.INSTANCE_CREATING_SUBMIT
             elif state in [
                     'permanent-failure', 'released',
                     'released-permanent-failure']:
@@ -176,45 +167,46 @@ class AwsCreateStateMachine(statemachine.StateMachine):
             else:
                 return
 
-        if self.step == self.state.INSTANCE_CREATING_START:
-            self.create_future = self.endpoint._submitCreateInstance(
-                self.label, self.flavor, self.image, self.image_external_id,
-                self.tags, self.hostname, self.state.dedicated_host_id,
-                self.log)
-            self.step = self.state.INSTANCE_CREATING_SUBMIT
-
         if self.step == self.state.INSTANCE_CREATING_SUBMIT:
-            # TODO: check if we need to re-submit the create instance
+            if self.create_future is None:
+                client_token = self.state.getClientToken(
+                    self.state.INSTANCE_CREATING_SUBMIT)
+                self.create_future = self.endpoint._submitCreateInstance(
+                    self.label, self.flavor, self.image,
+                    self.image_external_id, self.tags, self.hostname,
+                    self.state.dedicated_host_id, self.log, client_token)
+
             instance = self.endpoint._completeCreateInstance(
                 self.create_future)
             if instance is None:
                 return
-            self.instance = instance
             self.state.external_id['instance'] = instance['InstanceId']
-            self.quota = self.endpoint.getQuotaForLabel(
-                self.label, self.flavor)
             self.step = self.state.INSTANCE_CREATING
 
         if self.step == self.state.INSTANCE_CREATING:
-            if not hasattr(self, 'instance'):
-                self.instance = dict(
-                    InstanceId=self.state.external_id['instance'],
-                    State=dict(Name="pending"),
-                )
-            self.instance = self.endpoint._refresh(self.instance)
+            instance = self.endpoint._getInstanceById(
+                self.state.external_id['instance'])
+            if instance is None:
+                return
 
-            if self.instance['State']['Name'].lower() == "running":
+            if instance['State']['Name'].lower() == "running":
                 self.step = self.state.COMPLETE
-            elif self.instance['State']['Name'].lower() == "terminated":
+            elif instance['State']['Name'].lower() == "terminated":
                 raise exceptions.LaunchStatusException(
                     "Instance in terminated state")
             else:
                 return
 
         if self.step == self.state.COMPLETE:
+            host = None
+            if host_id := self.state.external_id.get('host'):
+                host = self.endpoint._getHostById(host_id)
+            instance = self.endpoint._getInstanceById(
+                self.state.external_id['instance'])
+            quota = self.endpoint.getQuotaForLabel(self.label, self.flavor)
+
             self.complete = True
-            return AwsInstance(self.endpoint.region, self.instance,
-                               self.host, self.quota)
+            return AwsInstance(self.endpoint.region, instance, host, quota)
 
 
 class EbsSnapshotUploader(ImageUploader):
@@ -1100,15 +1092,23 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             return self.ec2_client.describe_instance_types(
                 InstanceTypes=[instance_type])
 
+    def _getInstanceById(self, instance_id):
+        for instance in self._listInstances():
+            if instance['InstanceId'] == instance_id:
+                return instance
+
+    def _getHostById(self, host_id):
+        for host in self._listHosts():
+            if host['HostId'] == host_id:
+                return host
+
     def _refresh(self, obj):
         if 'InstanceId' in obj:
-            for instance in self._listInstances():
-                if instance['InstanceId'] == obj['InstanceId']:
-                    return instance
+            if instance := self._getInstanceById(obj['InstanceId']):
+                return instance
         elif 'HostId' in obj:
-            for host in self._listHosts():
-                if host['HostId'] == obj['HostId']:
-                    return host
+            if host := self._getHostById(obj['HostId']):
+                return host
         return obj
 
     def _refreshDelete(self, obj):
@@ -1247,12 +1247,11 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             resp = self.ec2_client.describe_images(ImageIds=[image_id])
             return resp['Images'][0]
 
-    def _submitAllocateHost(self, label,
-                            tags, hostname, log):
+    def _submitAllocateHost(self, label, flavor, tags, hostname, log,
+                            client_token):
         return self.create_executor.submit(
-            self._allocateHost,
-            label,
-            tags, hostname, log)
+            self._allocateHost, label, flavor, tags, hostname, log,
+            client_token)
 
     def _completeAllocateHost(self, future):
         if not future.done():
@@ -1272,12 +1271,13 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                 raise exceptions.CapacityException(str(error))
             raise
 
-    def _allocateHost(self, label,
-                      tags, hostname, log):
+    def _allocateHost(self, label, flavor, tags, hostname, log, client_token=None):
         args = dict(
             AutoPlacement='off',
-            AvailabilityZone=label.pool.az,
-            InstanceType=label.instance_type,
+            # TODO: support AZ
+            # AvailabilityZone=label.pool.az,
+            AvailabilityZone="",
+            InstanceType=flavor.instance_type,
             Quantity=1,
             HostRecovery='off',
             HostMaintenance='off',
@@ -1286,7 +1286,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                     'ResourceType': 'dedicated-host',
                     'Tags': tag_dict_to_list(tags),
                 },
-            ]
+            ],
+            ClientToken=client_token or uuid4().hex
         )
 
         with self.rate_limiter(log.debug, "Allocated host"):
@@ -1300,11 +1301,11 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
 
     def _submitCreateInstance(self, label, flavor, image,
                               image_external_id, tags, hostname,
-                              dedicated_host_id, log):
+                              dedicated_host_id, log, client_token):
         return self.create_executor.submit(
             self._createInstance,
             label, flavor, image, image_external_id,
-            tags, hostname, dedicated_host_id, log)
+            tags, hostname, dedicated_host_id, log, client_token)
 
     def _completeCreateInstance(self, future):
         if not future.done():
@@ -1325,7 +1326,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             raise
 
     def _createInstance(self, label, flavor, image, image_external_id,
-                        tags, hostname, dedicated_host_id, log):
+                        tags, hostname, dedicated_host_id, log,
+                        client_token=None):
         if image_external_id:
             image_id = image_external_id
         else:
@@ -1350,7 +1352,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                     'ResourceType': 'volume',
                     'Tags': tag_dict_to_list(tags),
                 },
-            ]
+            ],
+            ClientToken=client_token or uuid4().hex,
         )
 
         # TODO:
