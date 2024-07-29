@@ -438,6 +438,11 @@ class JobNotDefinedError(Exception):
     pass
 
 
+class JobConfigurationError(Exception):
+    """A job has an invalid configuration."""
+    pass
+
+
 class Attributes(object):
     """A class to hold attributes for string formatting."""
 
@@ -8954,21 +8959,24 @@ class Layout(object):
                                    format(jobname=jobname), indent=2)
                     continue
             if final_job.abstract:
-                raise Exception("Job %s is abstract and may not be "
-                                "directly run" %
-                                (final_job.name,))
+                raise JobConfigurationError(
+                    "Job %s is abstract and may not be directly run" %
+                    (final_job.name,))
             if (not final_job.ignore_allowed_projects and
                 final_job.allowed_projects is not None and
                 change.project.name not in final_job.allowed_projects):
-                raise Exception("Project %s is not allowed to run job %s" %
-                                (change.project.name, final_job.name))
+                raise JobConfigurationError(
+                    "Project %s is not allowed to run job %s" %
+                    (change.project.name, final_job.name))
             if ((not pipeline.post_review) and final_job.post_review):
-                raise Exception("Pre-review pipeline %s does not allow "
-                                "post-review job %s" % (
-                                    pipeline.name, final_job.name))
+                raise JobConfigurationError(
+                    "Pre-review pipeline %s does not allow "
+                    "post-review job %s" % (
+                        pipeline.name, final_job.name))
             if not final_job.run:
-                raise Exception("Job %s does not specify a run playbook" % (
-                    final_job.name,))
+                raise JobConfigurationError(
+                    "Job %s does not specify a run playbook" % (
+                        final_job.name,))
 
             job_graph.addJob(final_job.freezeJob(
                 context, self.tenant, self, item, change,
