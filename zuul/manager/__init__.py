@@ -1777,6 +1777,7 @@ class PipelineManager(metaclass=ABCMeta):
                 if not isinstance(e, (
                         model.NoMatchingParentError,
                         model.TemplateNotFoundError,
+                        model.JobNotDefinedError,
                 )):
                     log.exception("Error freezing job graph for %s" % (item,))
                 else:

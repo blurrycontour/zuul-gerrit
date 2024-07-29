@@ -433,6 +433,11 @@ class RequirementsError(Exception):
     pass
 
 
+class JobNotDefinedError(Exception):
+    """A job was not defined."""
+    pass
+
+
 class Attributes(object):
     """A class to hold attributes for string formatting."""
 
@@ -8486,7 +8491,7 @@ class Layout(object):
     def getJob(self, name):
         if name in self.jobs:
             return self.jobs[name][0]
-        raise Exception("Job %s not defined" % (name,))
+        raise JobNotDefinedError("Job %s not defined" % (name,))
 
     def hasJob(self, name):
         return name in self.jobs
