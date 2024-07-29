@@ -24,12 +24,13 @@ import time
 from unittest import mock
 
 from tests.base import (
-    BaseTestCase,
-    ZuulTestCase,
     AnsibleZuulTestCase,
+    BaseTestCase,
     FIXTURE_DIR,
+    ZuulTestCase,
+    iterate_timeout,
+    okay_tracebacks,
     simple_layout,
-    iterate_timeout
 )
 
 from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
@@ -1258,6 +1259,7 @@ class TestExecutorFailure(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
     @mock.patch('zuul.executor.server.ExecutorServer.executeJob')
+    @okay_tracebacks('Failed to start')
     def test_executor_job_start_failure(self, execute_job_mock):
         execute_job_mock.side_effect = Exception('Failed to start')
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
@@ -1268,6 +1270,7 @@ class TestExecutorFailure(ZuulTestCase):
             '- project-merge .* ERROR',
             A.messages[-1]))
 
+    @okay_tracebacks("Transient error")
     def test_executor_transient_error(self):
         self.hold_jobs_in_queue = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')

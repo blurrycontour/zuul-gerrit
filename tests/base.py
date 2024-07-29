@@ -2106,10 +2106,16 @@ class TestConfig:
     def __init__(self, testobj):
         test_name = testobj.id().split('.')[-1]
         test = getattr(testobj, test_name)
+        default_okay_tracebacks = [
+            # We log git merge errors at debug level with tracebacks;
+            # these are typically safe to ignore
+            'ERROR: content conflict',
+        ]
         self.simple_layout = getattr(test, '__simple_layout__', None)
         self.gerrit_config = getattr(test, '__gerrit_config__', {})
         self.never_capture = getattr(test, '__never_capture__', None)
-        self.okay_tracebacks = getattr(test, '__okay_tracebacks__', [])
+        self.okay_tracebacks = getattr(test, '__okay_tracebacks__',
+                                       default_okay_tracebacks)
         self.enable_nodepool = getattr(test, '__enable_nodepool__', False)
         self.return_data = getattr(test, '__return_data__', [])
         self.changes = FakeChangeDB()

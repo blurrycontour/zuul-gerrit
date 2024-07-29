@@ -24,6 +24,7 @@ import tests.base
 from tests.base import (
     ZuulTestCase,
     iterate_timeout,
+    okay_tracebacks,
     simple_layout,
 )
 
@@ -102,6 +103,7 @@ class TestGerritEventSourceKafka(ZuulTestCase):
         super().setUp()
 
     @simple_layout('layouts/simple.yaml')
+    @okay_tracebacks('Broker disconnected before response received')
     def test_kafka(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         consumer = self.fake_gerrit.event_thread.consumer

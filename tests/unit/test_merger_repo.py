@@ -27,7 +27,12 @@ from zuul.merger.merger import MergerTree, Repo
 import zuul.model
 from zuul.model import MergeRequest
 from tests.base import (
-    BaseTestCase, ZuulTestCase, FIXTURE_DIR, simple_layout, iterate_timeout
+    BaseTestCase,
+    FIXTURE_DIR,
+    ZuulTestCase,
+    iterate_timeout,
+    okay_tracebacks,
+    simple_layout,
 )
 
 
@@ -289,6 +294,7 @@ class TestMergerRepo(ZuulTestCase):
         self.assertEqual(repo.remotes.origin.refs.missing.commit.hexsha,
                          commit_sha)
 
+    @okay_tracebacks('exit code')
     def test_clone_timeout(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         self.patch(git.Git, 'GIT_PYTHON_GIT_EXECUTABLE',
@@ -316,6 +322,7 @@ class TestMergerRepo(ZuulTestCase):
                                          r'.*exit code\(-9\)'):
             work_repo.update()
 
+    @okay_tracebacks('git_fetch_error.sh')
     def test_fetch_retry(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         self.patch(Repo, 'retry_interval', 1)
@@ -364,6 +371,7 @@ class TestMergerRepo(ZuulTestCase):
         # And now reset the repo. This should not crash
         work_repo.reset()
 
+    @okay_tracebacks('exit code')
     def test_broken_cache(self):
         parent_path = os.path.join(self.upstream_root, 'org/project1')
         work_repo = Repo(parent_path, self.workspace_root,
@@ -1339,6 +1347,7 @@ class TestMergerSchemes(ZuulTestCase):
         self._assertScheme(self.work_root, 'flat')
 
     @simple_layout('layouts/overlapping-repos.yaml')
+    @okay_tracebacks('collides with')
     def test_golang_collision(self):
         merger = self._getMerger(scheme=zuul.model.SCHEME_GOLANG)
         repo = merger.getRepo('gerrit', 'component')
@@ -1347,6 +1356,7 @@ class TestMergerSchemes(ZuulTestCase):
         self.assertIsNone(repo)
 
     @simple_layout('layouts/overlapping-repos.yaml')
+    @okay_tracebacks('collides with')
     def test_flat_collision(self):
         merger = self._getMerger(scheme=zuul.model.SCHEME_FLAT)
         repo = merger.getRepo('gerrit', 'component')

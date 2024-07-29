@@ -36,10 +36,10 @@ from zuul.zk.blob_store import BlobStore
 
 from tests.base import (
     AnsibleZuulTestCase,
-    ZuulTestCase,
     FIXTURE_DIR,
-    simple_layout,
+    ZuulTestCase,
     iterate_timeout,
+    simple_layout,
     skipIfMultiScheduler,
 )
 from tests.util import random_sha1

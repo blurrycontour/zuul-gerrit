@@ -23,6 +23,7 @@ import tests.base
 from tests.base import (
     ZuulTestCase,
     iterate_timeout,
+    okay_tracebacks,
     simple_layout,
 )
 
@@ -110,6 +111,7 @@ class TestGerritEventSourceAWSKinesis(ZuulTestCase):
         self.assertEqual(B.reported, 1, "B should be reported")
 
     @simple_layout('layouts/simple.yaml')
+    @okay_tracebacks("invalid literal for int() with base 10: 'nope'")
     def test_kinesis_bad_checkpoint(self):
         listener = self.fake_gerrit.event_thread
 

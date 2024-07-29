@@ -25,6 +25,7 @@ import tests.base
 from tests.base import (
     ZuulTestCase,
     iterate_timeout,
+    okay_tracebacks,
     simple_layout,
 )
 
@@ -120,6 +121,7 @@ class TestGerritEventSourceGcloudPubsub(ZuulTestCase):
         super().setUp()
 
     @simple_layout('layouts/simple.yaml')
+    @okay_tracebacks('Test error')
     def test_gcloud_pubsub(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         subscriber = self.fake_gerrit.event_thread.subscriber
