@@ -88,9 +88,9 @@ function QueueCard({pipeline, queue, allQueuesExpanded}) {
             {queue.name}
             {queue.branch ? ` (${queue.branch})` : ''}
             {isQueueExpanded ?
-              <AngleDownIcon style={{marginLeft: 8}} onClick={onQueueToggle}/>
+              <AngleDownIcon className="zuul-expand-icon" onClick={onQueueToggle} />
               :
-              <AngleRightIcon style={{marginLeft: 8}} onClick={onQueueToggle}/>
+              <AngleRightIcon className="zuul-expand-icon" onClick={onQueueToggle} />
             }
           </CardTitle>
           {isQueueExpanded ? null :
@@ -102,7 +102,7 @@ function QueueCard({pipeline, queue, allQueuesExpanded}) {
           }
           {isQueueExpanded ?
             <div>
-              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false}/>
+              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} />
             </div> : null
           }
         </Card>
@@ -210,9 +210,9 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
           </Badge>
         </Tooltip>
         {areAllQueuesExpanded ?
-          <AngleDownIcon style={{marginLeft: 8, float:'right'}} onClick={onQueueToggle}/>
+          <AngleDownIcon className="zuul-expand-icon" onClick={onQueueToggle} />
           :
-          <AngleRightIcon style={{marginLeft: 8, float:'right'}} onClick={onQueueToggle}/>
+          <AngleRightIcon className="zuul-expand-icon" onClick={onQueueToggle} />
         }
       </CardTitle>
       <CardBody>
