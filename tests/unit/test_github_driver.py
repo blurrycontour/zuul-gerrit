@@ -37,9 +37,15 @@ from zuul.model import MergeRequest, EnqueueEvent, DequeueEvent
 from zuul.zk.change_cache import ChangeKey
 
 from tests.util import random_sha1
-from tests.base import (AnsibleZuulTestCase, BaseTestCase,
-                        ZuulGithubAppTestCase, ZuulTestCase,
-                        simple_layout, iterate_timeout)
+from tests.base import (
+    AnsibleZuulTestCase,
+    BaseTestCase,
+    ZuulGithubAppTestCase,
+    ZuulTestCase,
+    iterate_timeout,
+    okay_tracebacks,
+    simple_layout,
+)
 from tests.base import ZuulWebFixture
 
 EMPTY_LAYOUT_STATE = LayoutState("", "", 0, None, {}, -1)
@@ -688,6 +694,8 @@ class TestGithubDriver(ZuulTestCase):
         self.assertIn(expected_warning, A.comments[1])
 
     @simple_layout('layouts/merging-github.yaml', driver='github')
+    @okay_tracebacks('Unknown merge failure',
+                     'Method not allowed')
     def test_report_pull_merge(self):
         # pipeline merges the pull request on success
         A = self.fake_github.openFakePullRequest('org/project', 'master',
@@ -1458,6 +1466,7 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual(A.merge_message, pr_description)
 
     @simple_layout('layouts/basic-github.yaml', driver='github')
+    @okay_tracebacks('AttributeError')
     def test_invalid_event(self):
         # Regression test to make sure the event forwarder thread continues
         # running in case the event from the GithubEventProcessor is None.
@@ -2774,6 +2783,7 @@ class TestGithubDriverEnterpriseCache(ZuulGithubAppTestCase):
             git.refs.Reference.create(cache, ref, obj, force=True)
 
     @simple_layout('layouts/merging-github.yaml', driver='github')
+    @okay_tracebacks('find remote ref')
     def test_github_repo_cache(self):
         # Test that we fetch and configure retries correctly when
         # using a github enterprise repo cache (the cache can be

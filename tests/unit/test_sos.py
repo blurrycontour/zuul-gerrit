@@ -19,7 +19,12 @@ from unittest import mock
 
 import zuul.model
 
-from tests.base import iterate_timeout, ZuulTestCase, simple_layout
+from tests.base import (
+    ZuulTestCase,
+    iterate_timeout,
+    okay_tracebacks,
+    simple_layout,
+)
 from zuul.zk.locks import SessionAwareWriteLock, TENANT_LOCK_ROOT
 from zuul.scheduler import PendingReconfiguration
 
@@ -456,6 +461,7 @@ class TestScaleOutScheduler(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
 
+    @okay_tracebacks('Unterminated string starting at')
     def test_pipeline_summary(self):
         # Test that we can deal with a truncated pipeline summary
         self.executor_server.hold_jobs_in_build = True

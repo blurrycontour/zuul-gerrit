@@ -2070,6 +2070,11 @@ class TestConfig:
         self.gerrit_config = {}
         self.never_capture = None
         self.okay_tracebacks = []
+        default_okay_tracebacks = [
+            # We log git merge errors at debug level with tracebacks;
+            # these are typically safe to ignore
+            'ERROR: content conflict',
+        ]
         if hasattr(test, '__simple_layout__'):
             self.simple_layout = getattr(test, '__simple_layout__')
         if hasattr(test, '__gerrit_config__'):
@@ -2078,6 +2083,8 @@ class TestConfig:
             self.gerrit_config = getattr(test, '__never_capture__')
         if hasattr(test, '__okay_tracebacks__'):
             self.okay_tracebacks = getattr(test, '__okay_tracebacks__')
+        else:
+            self.okay_tracebacks = default_okay_tracebacks
         self.changes = FakeChangeDB()
 
 

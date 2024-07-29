@@ -41,14 +41,15 @@ import zuul.merger.merger
 from zuul.lib import yamlutil as yaml
 
 from tests.base import (
+    FIXTURE_DIR,
+    RecordingExecutorServer,
     SSLZuulTestCase,
+    TestConnectionRegistry,
     ZuulTestCase,
+    iterate_timeout,
+    okay_tracebacks,
     repack_repo,
     simple_layout,
-    iterate_timeout,
-    RecordingExecutorServer,
-    TestConnectionRegistry,
-    FIXTURE_DIR,
     skipIfMultiScheduler,
 )
 from zuul.zk.change_cache import ChangeKey
@@ -4818,6 +4819,7 @@ class TestScheduler(ZuulTestCase):
 
     @simple_layout('layouts/smtp.yaml')
     @mock.patch('zuul.driver.gerrit.gerritreporter.GerritReporter.report')
+    @okay_tracebacks('Gerrit failed to report')
     def test_failed_reporter(self, report_mock):
         '''Test that one failed reporter doesn't break other reporters'''
         # Warning hacks. We sort the reports here so that the test is
@@ -6571,6 +6573,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.assertTrue('YAY' in A.messages[0])
         self.assertTrue('BOO' in A.messages[0])
 
+    @okay_tracebacks('git_fail.sh')
     def test_merge_error(self):
         # Test we don't get stuck on a merger error
         self.waitUntilSettled()
