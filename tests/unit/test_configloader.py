@@ -27,7 +27,12 @@ from zuul.configloader import (
 from zuul.model import Abide, MergeRequest, SourceContext
 from zuul.zk.locks import tenant_read_lock
 
-from tests.base import iterate_timeout, ZuulTestCase, simple_layout
+from tests.base import (
+    ZuulTestCase,
+    iterate_timeout,
+    okay_tracebacks,
+    simple_layout,
+)
 
 
 class TestConfigLoader(ZuulTestCase):
@@ -212,16 +217,23 @@ class TestTenantSimple(TenantParserTestCase):
                 r'review.example.com/org/project2 @master.*',
                 update_logs.output)
 
+    @okay_tracebacks('_cacheTenantYAMLBranch')
     def test_cache_new_branch(self):
+        # This tests scheduler startup right after a new branch is
+        # created.
         first = self.scheds.first
         lock1 = first.sched.layout_update_lock
-        lock2_ = first.sched.run_handler_lock
-        with lock1, lock2_:
+        lock2 = first.sched.run_handler_lock
+        with lock1, lock2:
             self.create_branch('org/project1', 'stable')
             self.fake_gerrit.addEvent(
                 self.fake_gerrit.getFakeBranchCreatedEvent(
                     'org/project1', 'stable'))
 
+            # Start another scheduler and prime it while the existing
+            # scheduler is paused and has not processed the new branch
+            # creation event.  The new scheduler will encounter a
+            # recoverable error with the branch min_ltimes.
             second = self.createScheduler()
             second.start()
             self.assertEqual(len(self.scheds), 2)
