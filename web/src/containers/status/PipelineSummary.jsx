@@ -69,7 +69,7 @@ QueueItemSquare.propTypes = {
   item: PropTypes.object,
 }
 
-function QueueCard({pipeline, queue, expanded}) {
+function QueueCard({ pipeline, queue, expanded }) {
   const [isQueueExpanded, setIsQueueExpanded] = useState(undefined)
   const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(undefined)
 
@@ -90,22 +90,22 @@ function QueueCard({pipeline, queue, expanded}) {
           <CardTitle>
             {queue.name}
             {queue.branch ? ` (${queue.branch})` : ''}
-            { isQueueExpanded?
-              <AngleDownIcon style={{marginLeft: 8}} onClick={onQueueToggle}/>
+            {isQueueExpanded ?
+              <AngleDownIcon style={{ marginLeft: '4px', verticalAlign: '-0.2em' }} onClick={onQueueToggle} />
               :
-              <AngleRightIcon style={{marginLeft: 8}} onClick={onQueueToggle}/>
+              <AngleRightIcon style={{ marginLeft: '4px', verticalAlign: '-0.2em' }} onClick={onQueueToggle} />
             }
           </CardTitle>
-          { isQueueExpanded ? null :
+          {isQueueExpanded ? null :
             <CardBody style={{ paddingBottom: '0' }}>
               {queue.heads.map((head) => (
                 head.map((item) => <QueueItemSquareWithPopover item={item} key={item.id} />)
               ))}
             </CardBody>
           }
-          { isQueueExpanded ?
+          {isQueueExpanded ?
             <div>
-              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false}/>
+              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} />
             </div> : null
           }
         </Card>
@@ -206,9 +206,9 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
           </Badge>
         </Tooltip>
         { isQueueExpanded?
-          <AngleDownIcon style={{marginLeft: 8, float:'right'}} onClick={onQueueToggle}/>
+          <AngleDownIcon style={{ marginLeft: '4px', verticalAlign: '-0.2em' }} onClick={onQueueToggle}/>
           :
-          <AngleRightIcon style={{marginLeft: 8, float:'right'}} onClick={onQueueToggle}/>
+          <AngleRightIcon style={{ marginLeft: '4px', verticalAlign: '-0.2em' }} onClick={onQueueToggle}/>
         }
       </CardTitle>
       <CardBody>
