@@ -4282,7 +4282,7 @@ class JobGraph(object):
                                 # Called for exception side effect:
                                 layout.getJob(parent_name)
                             continue
-                        raise Exception(
+                        raise JobConfigurationError(
                             "Job %s depends on %s which was not run." %
                             (dependent_job.name, parent_name))
                     dependencies[parent_job.uuid] = dict(soft=parent_soft)
