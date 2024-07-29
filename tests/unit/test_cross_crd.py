@@ -194,6 +194,9 @@ class TestGerritToGithubCRD(ZuulTestCase):
     def test_crd_gate_unknown(self):
         "Test unknown projects in dependent pipeline"
         self.init_repo("github/unknown", tag='init')
+        # We also need make the repo known to the fake github as a
+        # side-effect of getting the project.
+        self.fake_github.source.getProject("github/unknown")
         A = self.fake_gerrit.addFakeChange('gerrit/project1', 'master', 'A')
         B = self.fake_github.openFakePullRequest('github/unknown', 'master',
                                                  'B')
@@ -207,13 +210,14 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
-        # Unknown projects cannot share a queue with any other
-        # since they don't have common jobs with any other (they have no jobs).
-        # Changes which depend on unknown project changes
-        # should not be processed in dependent pipeline
+        # Unknown projects cannot share a queue with any other since
+        # they don't have common jobs with any other (they have no
+        # jobs).  Changes which depend on unknown project changes
+        # should only report an error.
         self.assertEqual(A.data['status'], 'NEW')
         self.assertFalse(B.is_merged)
-        self.assertEqual(A.reported, 0)
+        self.assertEqual(A.reported, 1)
+        self.assertIn("does not share a change queue", A.messages[-1])
         self.assertEqual(len(B.comments), 0)
         self.assertEqual(len(self.history), 0)
 
@@ -232,7 +236,7 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.waitUntilSettled()
 
         self.assertEqual(A.data['status'], 'MERGED')
-        self.assertEqual(A.reported, 2)
+        self.assertEqual(A.reported, 3)
         self.assertTrue(B.is_merged)
         self.assertEqual(len(B.comments), 0)
 
@@ -437,6 +441,9 @@ class TestGerritToGithubCRD(ZuulTestCase):
     def test_crd_check_unknown(self):
         "Test unknown projects in independent pipeline"
         self.init_repo("github/unknown", tag='init')
+        # We also need make the repo known to the fake github as a
+        # side-effect of getting the project.
+        self.fake_github.source.getProject("github/unknown")
         A = self.fake_gerrit.addFakeChange('gerrit/project1', 'master', 'A')
         B = self.fake_github.openFakePullRequest(
             'github/unknown', 'master', 'B')
