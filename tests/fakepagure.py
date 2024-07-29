@@ -375,7 +375,7 @@ class FakePagureConnection(pagureconnection.PagureConnection):
             self.set_my_username(client)
         return client
 
-    def get_project_webhook_token(self, project):
+    def get_project_webhook_token(self, project, force_refresh=False):
         return 'fake_webhook_token-%s' % project
 
     def emitEvent(self, event, use_zuulweb=False, project=None,
