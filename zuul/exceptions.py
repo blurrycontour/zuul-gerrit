@@ -54,6 +54,10 @@ class DependencyLimitExceededError(Exception):
     pass
 
 
+class VariableNameError(Exception):
+    pass
+
+
 # Authentication Exceptions
 
 class AuthTokenException(Exception):
