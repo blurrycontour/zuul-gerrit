@@ -15,21 +15,24 @@
 
 import { makeQueryString } from './FilterToolbar'
 
-function makeBuildQueryString(filters, excludeResults) {
+function makeBuildQueryString(filters) {
   let queryString = makeQueryString(filters)
-  let resultFilter = false
-  if (filters) {
-    Object.keys(filters).forEach((key) => {
-      if (filters[key] === 'result') {
-          resultFilter = true
-        }
-    })
-  }
-  if (excludeResults && !resultFilter) {
-      queryString += '&exclude_result=SKIPPED'
+  const resultFilter = filters && filters['result'].length > 0
+  if (!resultFilter) {
+    queryString += '&exclude_result=SKIPPED'
   }
   queryString += '&complete=true'
   return queryString
 }
 
-export { makeBuildQueryString }
+function makeBuildsetQueryString(filters) {
+  let queryString = makeQueryString(filters)
+  const resultFilter = filters && filters['result'].length > 0
+  if (!resultFilter) {
+    queryString += '&exclude_result=NO_JOBS&exclude_result=DEQUEUED'
+  }
+  queryString += '&complete=true'
+  return queryString
+}
+
+export { makeBuildQueryString, makeBuildsetQueryString }
