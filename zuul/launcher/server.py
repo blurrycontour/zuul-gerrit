@@ -59,7 +59,7 @@ class Launcher:
     log = logging.getLogger("zuul.Launcher")
 
     def __init__(self, config, connections):
-        self._running = False
+        self._running = True
         self.config = config
         self.connections = connections
         self.tenant_providers = {}
@@ -123,7 +123,7 @@ class Launcher:
     def run(self):
         self.component_info.state = self.component_info.RUNNING
         self.log.debug("Launcher running")
-        while not self.stop_event.is_set():
+        while self._running:
             try:
                 self._run()
             except Exception:
@@ -333,7 +333,7 @@ class Launcher:
 
     def stop(self):
         self.log.debug("Stopping launcher")
-        self.stop_event.set()
+        self._running = False
         self.wake_event.set()
         self.component_info.state = self.component_info.STOPPED
         self._command_running = False
@@ -344,6 +344,9 @@ class Launcher:
     def join(self):
         self.log.debug("Joining launcher")
         self.launcher_thread.join()
+        # Don't set the stop event until after the main thread is
+        # joined because doing so will terminate the ZKContext.
+        self.stop_event.set()
         self.api.stop()
         self.zk_client.disconnect()
         self.tracing.stop()
