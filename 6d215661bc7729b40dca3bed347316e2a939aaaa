@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45a68265_b1fdfb52",
+        "filename": "web/src/containers/status/EmptyStateInfoBox.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-29T15:09:27Z",
+      "side": 1,
+      "message": "License header",
+      "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
