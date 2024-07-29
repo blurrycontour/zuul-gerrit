@@ -2947,13 +2947,22 @@ class Scheduler(threading.Thread):
             )
 
             self._cleanupCompletedBuild(build)
-            # This usually happens when we have already canceled a
-            # build and reported stats for it, so don't send stats in
-            # this case.
+            # If we have not reported start for this build, we don't
+            # need to report end.  If we haven't reported start, we
+            # won't have a build record in the DB, so we would
+            # normally create one and attach it to a buildset, but we
+            # don't know the buildset, and we don't have enough
+            # information to construct a buildset record from scratch.
+            # Indicate that is acceptable in this situation, so we
+            # don't throw an exception.  In other words: if we don't
+            # have a build record in the DB here, the
+            # "missing_buildset_okay" flag will cause reportBuildEnd
+            # to do nothing.
             try:
                 self.sql.reportBuildEnd(
                     build, tenant=pipeline.tenant.name,
-                    final=True)
+                    final=True,
+                    missing_buildset_okay=True)
             except Exception:
                 log.exception("Error reporting build completion to DB:")
 

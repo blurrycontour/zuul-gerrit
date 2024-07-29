@@ -147,13 +147,18 @@ class SQLReporter(BaseReporter):
                 else:
                     self.log.exception("Unable to create build")
 
-    def reportBuildEnd(self, build, tenant, final):
+    def reportBuildEnd(self, build, tenant, final,
+                       missing_buildset_okay=False):
         for retry_count in range(self.retry_count):
             try:
                 with self.connection.getSession() as db:
                     db_build = db.getBuild(tenant=tenant, uuid=build.uuid)
                     if not db_build:
                         db_build = self._createBuild(db, build)
+                    if not db_build:
+                        if missing_buildset_okay:
+                            return
+                        raise Exception("Unable to create build in DB")
 
                     end_time = build.end_time or time.time()
                     end = datetime.datetime.fromtimestamp(
