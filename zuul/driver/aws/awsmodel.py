@@ -13,6 +13,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import uuid
+
 from zuul import model
 from zuul.provider import statemachine
 from zuul.driver.aws.util import tag_list_to_dict
@@ -27,10 +29,8 @@ class AwsDeleteState(statemachine.DeleteState):
 
 
 class AwsCreateState(statemachine.CreateState):
-    HOST_ALLOCATING_START = 'start allocating host'
     HOST_ALLOCATING_SUBMIT = 'submit allocating host'
     HOST_ALLOCATING = 'allocating host'
-    INSTANCE_CREATING_START = 'start creating instance'
     INSTANCE_CREATING_SUBMIT = 'submit creating instance'
     INSTANCE_CREATING = 'creating instance'
     COMPLETE = 'complete'
@@ -46,6 +46,10 @@ class AwsCreateState(statemachine.CreateState):
             dedicated_host_id=None,
             attempts=0,
         )
+
+    def getClientToken(self, op_id):
+        node_uuid = uuid.UUID(self._zkparent.uuid)
+        return uuid.uuid5(node_uuid, f"{self.attempts}-{op_id}").hex
 
 
 class AwsProviderNode(model.ProviderNode, subclass_id="aws"):
