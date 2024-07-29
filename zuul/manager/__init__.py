@@ -1777,6 +1777,7 @@ class PipelineManager(metaclass=ABCMeta):
                 if not isinstance(e, (
                         model.NoMatchingParentError,
                         model.TemplateNotFoundError,
+                        model.SecretNotFoundError,
                         model.JobNotDefinedError,
                         model.JobConfigurationError,
                 )):
