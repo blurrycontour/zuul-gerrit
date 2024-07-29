@@ -65,7 +65,7 @@ QueueItemSquare.propTypes = {
   item: PropTypes.object,
 }
 
-function QueueCard({pipeline, queue}) {
+function QueueCard({ pipeline, queue }) {
   const [isQueueExpanded, setIsQueueExpanded] = useState(false)
   const onQueueToggle = () => {
     setIsQueueExpanded(!isQueueExpanded)
@@ -77,22 +77,22 @@ function QueueCard({pipeline, queue}) {
           <CardTitle>
             {queue.name}
             {queue.branch ? ` (${queue.branch})` : ''}
-            { isQueueExpanded?
-              <AngleDownIcon style={{marginLeft: 8}} onClick={onQueueToggle}/>
+            {isQueueExpanded ?
+              <AngleDownIcon style={{ marginLeft: '4px', verticalAlign: '-0.2em' }} onClick={onQueueToggle} />
               :
-              <AngleRightIcon style={{marginLeft: 8}} onClick={onQueueToggle}/>
+              <AngleRightIcon style={{ marginLeft: '4px', verticalAlign: '-0.2em' }} onClick={onQueueToggle} />
             }
           </CardTitle>
-          { isQueueExpanded? null :
+          {isQueueExpanded ? null :
             <CardBody style={{ paddingBottom: '0' }}>
               {queue.heads.map((head) => (
                 head.map((item) => <QueueItemSquareWithPopover item={item} key={item.id} />)
               ))}
             </CardBody>
           }
-          { isQueueExpanded?
+          {isQueueExpanded ?
             <div>
-              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false}/>
+              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} />
             </div> : null
           }
         </Card>
@@ -114,9 +114,11 @@ function QueueSummary({ pipeline, pipelineType, showAllQueues }) {
     }
     return (
       changeQueues.map((queue) => (
-        <QueueCard key={`${queue.name}${queue.branch}`}
-                   pipeline={pipeline}
-                   queue={queue}/>
+        <QueueCard
+          key={`${queue.name}${queue.branch}`}
+          pipeline={pipeline}
+          queue={queue}
+        />
       ))
     )
   } else {
