@@ -2110,6 +2110,7 @@ class TestConfig:
             # We log git merge errors at debug level with tracebacks;
             # these are typically safe to ignore
             'ERROR: content conflict',
+            'mapLines',
         ]
         self.simple_layout = getattr(test, '__simple_layout__', None)
         self.gerrit_config = getattr(test, '__gerrit_config__', {})
