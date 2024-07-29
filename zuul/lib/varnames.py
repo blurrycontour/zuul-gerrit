@@ -13,6 +13,8 @@
 # under the License.
 import re
 
+from zuul.exceptions import VariableNameError
+
 
 VARNAME_RE = re.compile(r'^[A-Za-z0-9_]+$')
 
@@ -21,16 +23,19 @@ def check_varnames(var):
     # We block these in configloader, but block it here too to make
     # sure that a job doesn't pass variables named zuul or nodepool.
     if 'zuul' in var:
-        raise Exception("Defining variables named 'zuul' is not allowed")
+        raise VariableNameError(
+            "Defining variables named 'zuul' is not allowed")
     if 'nodepool' in var:
-        raise Exception("Defining variables named 'nodepool' is not allowed")
+        raise VariableNameError(
+            "Defining variables named 'nodepool' is not allowed")
     if 'unsafe_vars' in var:
-        raise Exception("Defining variables named 'unsafe_vars' "
-                        "is not allowed")
+        raise VariableNameError("Defining variables named 'unsafe_vars' "
+                                "is not allowed")
     for varname in var.keys():
         if not VARNAME_RE.match(varname):
-            raise Exception("Variable names may only contain letters, "
-                            "numbers, and underscores")
+            raise VariableNameError(
+                "Variable names may only contain letters, "
+                "numbers, and underscores")
     # Block some connection related variables so they cannot be
     # overridden by jobs to bypass security mechanisms.
     connection_vars = [
@@ -42,4 +47,5 @@ def check_varnames(var):
     ]
     for conn_var in connection_vars:
         if conn_var in var:
-            raise Exception(f"Variable name '{conn_var}' is not allowed.")
+            raise VariableNameError(
+                f"Variable name '{conn_var}' is not allowed.")
