@@ -1774,16 +1774,10 @@ class PipelineManager(metaclass=ABCMeta):
                 self.reportPipelineTiming('job_freeze_time', start)
             except Exception as e:
                 # These errors do not warrant a traceback.
-                if not isinstance(e, (
-                        model.NoMatchingParentError,
-                        model.TemplateNotFoundError,
-                        model.SecretNotFoundError,
-                        model.JobNotDefinedError,
-                        model.JobConfigurationError,
-                )):
-                    log.exception("Error freezing job graph for %s" % (item,))
+                if isinstance(e, model.JobConfigurationError):
+                    log.info("Error freezing job graph for %s", item)
                 else:
-                    log.info("Error freezing job graph for %s" % (item,))
+                    log.exception("Error freezing job graph for %s", item)
                 item.setConfigError("Unable to freeze job graph: %s" %
                                     (str(e)))
                 return False
