@@ -16,6 +16,24 @@
       "message": "This is actually a problem for zuul-web in case we\u0027ve missed a branch creation event. That would prevent zuul-web from starting unless we trigger a tenant reconfig. I think this might be worth checking.",
       "revId": "8afd653a7b4d87fe26a8c6464a60ec4c9298091b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "901d513d_42f223c3",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-30T20:37:28Z",
+      "side": 1,
+      "message": "I agree we should check that.  I added a new test for that in https://review.opendev.org/c/zuul/zuul/+/925299\n\nUnfortunately, that test passes, so we\u0027re still missing a factor for whatever causes zuul-web to not start.\n\nRegardless, I think this change is good: it merely acknowledges that the traceback in the test logs (the missing min_ready entry due to the new branch) is expected.  I believe we want to keep that traceback in order to help debug issues related to the branch cache.",
+      "parentUuid": "38628b64_d6bdbbe7",
+      "revId": "8afd653a7b4d87fe26a8c6464a60ec4c9298091b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
