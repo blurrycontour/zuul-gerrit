@@ -32,7 +32,12 @@ from zuul.zk.locks import tenant_write_lock
 import zuul.web
 
 from tests.base import ZuulTestCase, AnsibleZuulTestCase
-from tests.base import ZuulWebFixture, FIXTURE_DIR, iterate_timeout
+from tests.base import (
+    FIXTURE_DIR,
+    ZuulWebFixture,
+    iterate_timeout,
+    okay_tracebacks,
+)
 from tests.base import simple_layout
 
 
@@ -1863,6 +1868,26 @@ class TestBrokenConfigCache(BaseWithWeb):
             "api/tenant/tenant-one/config-errors").json()
         self.assertIn('Configuration files missing',
                       config_errors[0]['error'])
+
+    @okay_tracebacks('_cacheTenantYAMLBranch')
+    def test_web_cache_new_branch(self):
+        # This tests web startup right after a new branch is
+        # created.
+        first = self.scheds.first
+        lock1 = first.sched.layout_update_lock
+        lock2 = first.sched.run_handler_lock
+        with lock1, lock2:
+            self.create_branch('org/project1', 'stable')
+            self.fake_gerrit.addEvent(
+                self.fake_gerrit.getFakeBranchCreatedEvent(
+                    'org/project1', 'stable'))
+            self.startWebServer()
+            # startWebServer will only return after the initial layout
+            # update, so if we're here, the test has already passed.
+            # Verify we have a layout for good measure.
+            tenant = self.web.web.abide.tenants.get('tenant-one')
+            self.assertIsNotNone(tenant)
+        self.waitUntilSettled()
 
 
 class TestWebSocketInfo(TestInfo):
