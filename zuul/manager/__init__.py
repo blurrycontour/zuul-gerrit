@@ -1004,7 +1004,8 @@ class PipelineManager(metaclass=ABCMeta):
         }
         for change in item.changes:
             for k, v in change.getSafeAttributes().toDict().items():
-                span_attrs.setdefault(f'ref_{k}', []).append(v)
+                if v is not None:
+                    span_attrs.setdefault(f'ref_{k}', []).append(v)
         tracing.endSavedSpan(item.current_build_set.span_info)
         tracing.endSavedSpan(item.span_info,
                              attributes=span_attrs)
