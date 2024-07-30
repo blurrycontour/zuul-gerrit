@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e15d84c2_76797624",
+        "filename": "zuul/driver/aws/awsendpoint.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-30T21:44:00Z",
+      "side": 1,
+      "message": "It would be nice to be able to differentiate these states for logging actions local to a single launcher.  But I agree it\u0027s probably not worth a ZK update.  I only have one idea for how to improve this, and it\u0027s a super complicated idea involving having different state enumerations that serialize to the same values.  Anyway, I\u0027m okay keeping the extra state for now and accepting the minor zk update cost, or collapsing these into one value (maybe we can get the information about whether/when the actual api call is made another way).  Now that I write it, that sounds like the best.  :)",
+      "parentUuid": "f65db9e7_a579752e",
+      "revId": "354c01fdd1e1d6cc01a7850de884b73cd4fe8284",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "de61d6c8_ac776fc7",
         "filename": "zuul/driver/aws/awsendpoint.py",
         "patchSetId": 4
@@ -31,6 +49,23 @@
       "writtenOn": "2024-07-30T12:18:02Z",
       "side": 1,
       "message": "The state `INSTANCE_CREATING_START` and `INSTANCE_CREATING_SUBMIT` could be combined as there is no state that could be recovered from Zookeeper.",
+      "revId": "354c01fdd1e1d6cc01a7850de884b73cd4fe8284",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed133190_2f943bcb",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-30T21:44:00Z",
+      "side": 1,
+      "message": "One thing to consider about using activeContext here: it does mean that we\u0027re going to re-serialize every time we check the state machine, which is *a lot*.  We obviously will only write to zk if there\u0027s a delta, but we have to check if there\u0027s a delta.\n\nThis could be avoided if we use explicit updateAttribute calls in the statemachines themselves.  That\u0027s more tedious during development, but at scale, it might actually provide a noticeable improvement.\n\nWe could also go with this for now, and optimize later; it wouldn\u0027t be a huge change.",
       "revId": "354c01fdd1e1d6cc01a7850de884b73cd4fe8284",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
