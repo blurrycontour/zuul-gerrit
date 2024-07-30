@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38628b64_d6bdbbe7",
+        "filename": "tests/unit/test_configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-30T13:18:17Z",
+      "side": 1,
+      "message": "This is actually a problem for zuul-web in case we\u0027ve missed a branch creation event. That would prevent zuul-web from starting unless we trigger a tenant reconfig. I think this might be worth checking.",
+      "revId": "8afd653a7b4d87fe26a8c6464a60ec4c9298091b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
