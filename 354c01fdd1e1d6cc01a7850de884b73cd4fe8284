@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f65db9e7_a579752e",
+        "filename": "zuul/driver/aws/awsendpoint.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-30T12:18:02Z",
+      "side": 1,
+      "message": "The state `HOST_ALLOCATING_START` and `HOST_ALLOCATING_SUBMIT` could be combined as there is no state that could be recovered from Zookeeper.",
+      "revId": "354c01fdd1e1d6cc01a7850de884b73cd4fe8284",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de61d6c8_ac776fc7",
+        "filename": "zuul/driver/aws/awsendpoint.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-30T12:18:02Z",
+      "side": 1,
+      "message": "The state `INSTANCE_CREATING_START` and `INSTANCE_CREATING_SUBMIT` could be combined as there is no state that could be recovered from Zookeeper.",
+      "revId": "354c01fdd1e1d6cc01a7850de884b73cd4fe8284",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
