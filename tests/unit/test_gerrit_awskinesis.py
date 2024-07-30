@@ -50,11 +50,8 @@ class TestGerritEventSourceAWSKinesis(ZuulTestCase):
                 'StreamMode': 'ON_DEMAND'
             }
         )
+        self.addCleanup(self.mock_aws.stop)
         super().setUp()
-
-    def tearDown(self):
-        self.mock_aws.stop()
-        super().tearDown()
 
     @simple_layout('layouts/simple.yaml')
     def test_kinesis(self):
