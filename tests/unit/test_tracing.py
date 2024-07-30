@@ -45,6 +45,12 @@ class TestTracing(ZuulTestCase):
             if len(test_requests) == len(span_names):
                 return test_requests
 
+    def getSpan(self, name):
+        for req in self.otlp.requests:
+            span = req.resource_spans[0].scope_spans[0].spans[0]
+            if span.name == name:
+                return span
+
     def test_tracing_api(self):
         tracer = trace.get_tracer("zuul")
 
@@ -255,8 +261,41 @@ class TestTracing(ZuulTestCase):
         self.assertTrue(item_attrs['ref_patchset'] == ["1"])
         self.assertTrue('zuul_event_id' in item_attrs)
 
-    def getSpan(self, name):
-        for req in self.otlp.requests:
-            span = req.resource_spans[0].scope_spans[0].spans[0]
-            if span.name == name:
-                return span
+    def test_post(self):
+        "Test that post jobs run"
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='project-post', result='SUCCESS',
+                 ref='refs/heads/master'),
+        ], ordered=False)
+
+        job_names = [x.name for x in self.history]
+        self.assertEqual(len(self.history), 1)
+        self.assertIn('project-post', job_names)
+
+    def test_timer(self):
+        self.executor_server.hold_jobs_in_build = True
+        self.commitConfigUpdate('common-config', 'layouts/timer.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(30, 'Wait for a build on hold'):
+            if len(self.builds) > 0:
+                break
+        self.waitUntilSettled()
+
+        self.commitConfigUpdate('common-config',
+                                'layouts/no-timer.yaml')
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-bitrot', result='SUCCESS',
+                 ref='refs/heads/master'),
+        ], ordered=False)
