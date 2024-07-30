@@ -1983,8 +1983,8 @@ class SchedulerTestApp:
         ]
 
     def start(self, validate_tenants=None):
-        self.sched.start()
         if validate_tenants is None:
+            self.sched.start()
             self.sched.prime(self.config)
         else:
             self.sched.validateTenants(self.config, validate_tenants)
@@ -2800,8 +2800,11 @@ class ZuulTestCase(BaseTestCase):
         self.executor_server.join()
         self.launcher.stop()
         self.launcher.join()
-        self.scheds.execute(lambda app: app.sched.stop())
-        self.scheds.execute(lambda app: app.sched.join())
+        if self.validate_tenants is None:
+            self.scheds.execute(lambda app: app.sched.stop())
+            self.scheds.execute(lambda app: app.sched.join())
+        else:
+            self.scheds.execute(lambda app: app.sched.stopConnections())
         self.statsd.stop()
         self.statsd.join()
         self.fake_nodepool.stop()
