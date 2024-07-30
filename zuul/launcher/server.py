@@ -218,6 +218,9 @@ class Launcher:
         log.debug("Checking request %s", request)
         requested_nodes = [self.api.getProviderNode(p)
                            for p in request.provider_nodes]
+        if any(n is None for n in requested_nodes):
+            # Cache may not be up to date enough for the next check
+            return
         if not all(n.state in n.FINAL_STATES for n in requested_nodes):
             return
         log.debug("Request %s nodes ready: %s", request, requested_nodes)
