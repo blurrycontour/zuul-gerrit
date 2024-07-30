@@ -51,8 +51,12 @@ class OTLPFixture(fixtures.Fixture):
 
     def _setUp(self):
         self.server.start()
+        self.addCleanup(self._cleanup)
 
     def _cleanup(self):
-        self.server.stop()
+        self.server.stop(None)
         self.server.wait_for_termination()
         self.executor.shutdown()
+        # Reset global tracer provider
+        trace._TRACER_PROVIDER_SET_ONCE = trace.Once()
+        trace._TRACER_PROVIDER = None
