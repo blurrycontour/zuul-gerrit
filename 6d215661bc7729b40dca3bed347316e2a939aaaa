@@ -16,6 +16,74 @@
       "message": "License header",
       "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6ce493a_b125d24b",
+        "filename": "web/src/containers/status/EmptyStateInfoBox.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-30T09:34:47Z",
+      "side": 1,
+      "message": "I think it would make sense to put this component in the same file as the EmptyPage, which is containers/Errors.jsx.",
+      "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68ad726d_89379c6a",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-30T09:34:47Z",
+      "side": 1,
+      "message": "nit: Should we move these filter-related helper functions to a dedicated jsx file, e.g. containers/Filters.jsx? They are not necessarily bound to the status page(s), or?",
+      "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fc39975_d63cfeca",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-30T09:34:47Z",
+      "side": 1,
+      "message": "Currently, the EmptyStateInfoBox vanishes during a reload. I think we can avoid this by removing the !isLoading condition. In that case - if the filters don\u0027t apply anymore after the reload finishes, the page should still show the EmptyStateInfoBox.",
+      "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d3a9376_9a2d7296",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-30T09:34:47Z",
+      "side": 1,
+      "message": "nit: You could combine both in a single shorthand-if like so:\n\n{filterActive ? \u003cTooltip ...\u003e{allPipelinesSwitch}\u003c/Tooltip\u003e : allPipelinesSwitch }",
+      "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
