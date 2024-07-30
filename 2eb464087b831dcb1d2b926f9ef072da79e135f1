@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b6004e8_0bebf538",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2955,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-30T13:26:26Z",
+      "side": 1,
+      "message": "It seems we have the buildset UUID in the `BuildResultEvent`. Could we create a dummy buildset from that?",
+      "range": {
+        "startLine": 2954,
+        "startChar": 43,
+        "endLine": 2955,
+        "endChar": 69
+      },
+      "revId": "2eb464087b831dcb1d2b926f9ef072da79e135f1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
