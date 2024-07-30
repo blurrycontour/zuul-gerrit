@@ -79,6 +79,9 @@ class RequestHandler(streamer_utils.BaseFingerRequestHandler):
 
         try:
             self.stream_log(log_file)
+        except (ConnectionResetError, BrokenPipeError) as e:
+            self.log.error("Streaming failure for build UUID %s: %s",
+                           build_uuid, str(e))
         except Exception:
             self.log.exception("Streaming failure for build UUID %s:",
                                build_uuid)
