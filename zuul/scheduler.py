@@ -332,6 +332,10 @@ class Scheduler(threading.Thread):
         self.connection_cleanup_lock = ConnectionCleanupLock(self.zk_client)
         self.node_request_cleanup_lock = NodeRequestCleanupLock(self.zk_client)
 
+        self.keystore = KeyStorage(
+            self.zk_client,
+            password=self._get_key_store_password())
+
         self.abide = Abide()
         self.unparsed_abide = UnparsedAbideConfig()
         self.tenant_layout_state = LayoutStateStore(
@@ -365,9 +369,6 @@ class Scheduler(threading.Thread):
 
     def start(self):
         super(Scheduler, self).start()
-        self.keystore = KeyStorage(
-            self.zk_client,
-            password=self._get_key_store_password())
 
         self._command_running = True
         self.log.debug("Starting command processor")
