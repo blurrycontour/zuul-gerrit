@@ -2310,8 +2310,10 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             state=self.State.REQUESTED,
             label="",
             connection_name="",
+            tags={},
+            create_state={},
+            delete_state={},
             # Node data
-            hostname=None,
             host_id=None,
             interface_ip=None,
             public_ipv4=None,
@@ -2330,9 +2332,6 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             resources=None,
             attributes={},
             tenant_name=None,
-            create_state={},
-            delete_state={},
-            tags={},
             # Attributes that are not serialized
             is_locked=False,
             create_state_machine=None,
@@ -2356,12 +2355,19 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
         return f"{self.ROOT}/{self.LOCKS_PATH}/{self.uuid}"
 
     def serialize(self, context):
+        if self.create_state_machine:
+            self.create_state = self.create_state_machine.toDict()
+        if self.delete_state_machine:
+            self.delete_state = self.delete_state_machine.toDict()
+
         data = dict(
             uuid=self.uuid,
             request_id=self.request_id,
             state=self.state,
             label=self.label,
             connection_name=self.connection_name,
+            create_state=self.create_state,
+            delete_state=self.delete_state,
             **self.getNodeData()
         )
         return json.dumps(data, sort_keys=True).encode("utf-8")
