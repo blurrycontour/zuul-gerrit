@@ -118,6 +118,7 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
 
         if self.args.validate_tenants is not None:
             self.sched.stop()
+            self.sched.stopConnections()
             sys.exit(0)
 
         if self.args.nodaemon:

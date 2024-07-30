@@ -32,6 +32,11 @@ class TestUpgradeOld(ZuulTestCase):
 
     def shutdown(self):
         # Shutdown the scheduler now before it gets any aborted events
+        if self.validate_tenants is None:
+            self.scheds.execute(lambda app: app.sched.stop())
+            self.scheds.execute(lambda app: app.sched.join())
+        else:
+            self.scheds.execute(lambda app: app.sched.stopConnections())
         self.scheds.execute(lambda app: app.sched.stop())
         self.scheds.execute(lambda app: app.sched.join())
         # Then release the executor jobs and stop the executors
