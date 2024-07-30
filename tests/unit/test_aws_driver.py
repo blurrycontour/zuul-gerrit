@@ -12,14 +12,22 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import concurrent.futures
+import contextlib
+import time
+from unittest import mock
+
 import fixtures
 from moto import mock_aws
 import boto3
 
 from zuul.driver.aws import AwsDriver
+from zuul.driver.aws.awsmodel import AwsProviderNode
+from zuul.launcher.server import Launcher
 
 from tests.fake_aws import FakeAws, FakeAwsProviderEndpoint
 from tests.base import (
+    TestConnectionRegistry,
     ZuulTestCase,
     iterate_timeout,
     simple_layout,
@@ -150,3 +158,112 @@ class TestAwsDriver(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(self.getJobFromHistory('check-job').node,
                          'debian-normal')
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_launcher_failover(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+
+        with mock.patch(
+            'zuul.driver.aws.awsendpoint.AwsProviderEndpoint._refresh'
+        ) as refresh_mock:
+            # Patch 'endpoint._refresh()' to return w/o updating
+            refresh_mock.side_effect = lambda o: o
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+            for _ in iterate_timeout(10, "node is building"):
+                nodes = self.launcher.api.nodes_cache.getItems()
+                if not nodes:
+                    continue
+                if all(
+                    n.create_state and
+                    n.create_state[
+                        "state"] == n.create_state_machine.INSTANCE_CREATING
+                    for n in nodes
+                ):
+                    break
+            self.launcher.stop()
+            self.launcher.join()
+
+            launcher_connections = TestConnectionRegistry(
+                self.config, self.test_config,
+                self.additional_event_queues,
+                self.upstream_root, self.poller_events,
+                self.git_url_with_auth, self.addCleanup)
+            launcher_connections.configure(self.config, providers=True)
+            self.launcher = Launcher(
+                self.config,
+                launcher_connections)
+            self.launcher.start()
+
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('check-job').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(self.getJobFromHistory('check-job').node,
+                         'debian-normal')
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_state_machines_instance(self):
+        self._test_state_machines("debian-normal")
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_state_machines_dedicated_host(self):
+        self._test_state_machines("debian-dedicated")
+
+    def _test_state_machines(self, label):
+        # Stop the launcher main loop, so we can drive the state machine
+        # on our own.
+        self.launcher._running = False
+        self.waitUntilSettled()
+
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        provider = layout.providers['aws-us-east-1-main']
+
+        with self.createZKContext(None) as ctx:
+            node = AwsProviderNode.new(ctx, label=label)
+            execute_future = False
+            for _ in iterate_timeout(60, "create state machine to complete"):
+                with node.activeContext(ctx):
+                    # Re-create the SM from the state in ZK
+                    sm = provider.getCreateStateMachine(node, None, self.log)
+                    node.create_state_machine = sm
+                    with self._block_futures():
+                        sm.advance()
+                    # If there are pending futures we will try to re-create
+                    # the SM once from the state and then advance it once
+                    # more so the futures can complete.
+                    pending_futures = [
+                        f for f in (sm.host_create_future, sm.create_future)
+                        if f]
+                    if pending_futures:
+                        if execute_future:
+                            concurrent.futures.wait(pending_futures)
+                            sm.advance()
+                        # Toggle future execution flag
+                        execute_future = not execute_future
+                if sm.complete:
+                    break
+
+            for _ in iterate_timeout(60, "delete state machine to complete"):
+                with node.activeContext(ctx):
+                    # Re-create the SM from the state in ZK
+                    sm = provider.getDeleteStateMachine(
+                        node, node.create_state["external_id"], self.log)
+                    node.delete_state_machine = sm
+                    sm.advance()
+                if sm.complete:
+                    break
+                # Avoid busy-looping as we have to wait for the TTL
+                # cache to expire.
+                time.sleep(0.5)
+
+    @contextlib.contextmanager
+    def _block_futures(self):
+        with (mock.patch(
+                'zuul.driver.aws.awsendpoint.AwsProviderEndpoint.'
+                '_completeAllocateHost', return_value=None),
+              mock.patch(
+                'zuul.driver.aws.awsendpoint.AwsProviderEndpoint.'
+                '_completeCreateInstance', return_value=None)):
+            yield
