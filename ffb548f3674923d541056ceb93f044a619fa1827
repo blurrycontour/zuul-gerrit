@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e790381b_87aeb77d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-31T18:01:46Z",
+      "side": 1,
+      "message": "Here are my notes on why I believe checking for 0x789c as the header is correct:\n\nhttps://datatracker.ietf.org/doc/html/rfc1950#page-4\n\nCMF\u003d78\nCM\u003d8 (only choice)\nCINFO\u003d7 (default compression level)\nCMF will always be 78\n\nFLG\u003d9c 0b10011100\nFCHECK\u003d1c 0b11100\nFDICT\u003d0 0b0  this should never be 1 (we never have a dict)\nFLEVEL\u003d0b10  default algo, should always be 2\nFLG will always be 9c\n\nThe only possible variable in there is FDICT, and it is never set in the zlib.compress method and zlib.decompress returns an error if it finds that it needs a dict, which is further indication that it\u0027s never set.",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
