@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "a6656cc5_53f961fc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-31T18:54:15Z",
+      "side": 1,
+      "message": "You said \"less resilient\" and \"harder to debug\".  Let\u0027s take each one:\n\nLess resilient: in both the old and new system, if we are unable to decompress the entire object, we give up.  There is no partial recovery based on partial data.\n\nHarder to debug: I don\u0027t think we\u0027ve ever tried to debug by examining a single shard.  If we ever found ourselves in the position of doing that, we could likely still do so; the zlib structure is sufficiently flexible for that.  But it seems extremely unlikely that we ever will.\n\nMeanwhile, the new format uses fewer znodes, so comes with a significant performance gain.",
+      "parentUuid": "6f5a91de_84be711d",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "e790381b_87aeb77d",
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0874753c_93fd0efd",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-31T18:54:15Z",
+      "side": 1,
+      "message": "This tests writing the old format using our actual writer class, not a test fake.  The model_version below triggers the old format code.\n\nSince we manually read it using the old method, that verifies that we did, indeed, write old-format data.",
+      "parentUuid": "6d93907e_431df566",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "37de3d4b_e0c93692",
         "filename": "zuul/zk/sharding.py",
         "patchSetId": 1
@@ -65,6 +101,24 @@
       "writtenOn": "2024-07-31T18:24:20Z",
       "side": 1,
       "message": "Since this is a new iteration over self.shards won\u0027t this iterate back over shards[0] and shards[1] which we\u0027ve already written to the buffer above? I don\u0027t see where we are consuming those from the iterable unless enumerate is side effecting the shards list content?",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebfe4615_58284db4",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-31T18:54:15Z",
+      "side": 1,
+      "message": "The next line skips the first two.",
+      "parentUuid": "37de3d4b_e0c93692",
       "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -94,6 +148,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2bcaba42_89db5c4b",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-31T18:54:15Z",
+      "side": 1,
+      "message": "The old system *always* compressed sharded data, so if we\u0027re on an old model api version, we know we should always compress.\n\nThe only thing that could write uncompressed sharded data is in the zuul-launcher, and that\u0027s not in production use yet, se we can disregard it here.",
+      "parentUuid": "ce76e085_51390b65",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "28b2e7e2_cadee16c",
         "filename": "zuul/zk/sharding.py",
         "patchSetId": 1
@@ -105,6 +177,24 @@
       "writtenOn": "2024-07-31T18:24:20Z",
       "side": 1,
       "message": "We are writing not reading. Should this var be called write_len?",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc3f59a4_1fdd2ec3",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-31T18:54:15Z",
+      "side": 1,
+      "message": "We\u0027re in the middle of a stream, we read from one side and write to the other.  This is the number of bytes we have read from our input, which may be different than the number of bytes written to our output.",
+      "parentUuid": "28b2e7e2_cadee16c",
       "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
