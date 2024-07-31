@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcd76410_d10ed7ac",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2024-07-31T23:24:52Z",
+      "side": 1,
+      "message": "I\u0027m not 100% sure what\u0027s wrong - but from the tracebacks in the tests it looks like in the general case we\u0027re shutting down properly first?",
+      "revId": "c39a65bd2cd309ccd6d38e11c552b00891b56525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08efff00_a643d86d",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1985,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2024-07-31T23:24:52Z",
+      "side": 1,
+      "message": "I think there is a mismatch between this and the shutdown, based on the tracebacks. I\u0027m not sure where though.",
+      "revId": "c39a65bd2cd309ccd6d38e11c552b00891b56525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "961e21d1_a456f566",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2803,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2024-07-31T23:24:52Z",
+      "side": 1,
+      "message": "Where does this get set?",
+      "revId": "c39a65bd2cd309ccd6d38e11c552b00891b56525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
