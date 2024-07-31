@@ -13,12 +13,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import binascii
 from collections import defaultdict
 import json
 import queue
 import threading
 import time
 import uuid
+import zlib
 from unittest import mock
 
 import testtools
@@ -208,6 +210,42 @@ class TestSharding(ZooKeeperBaseTestCase):
             self.zk_client.client, "/test/shards"
         ) as shard_io:
             self.assertDictEqual(json.load(shard_io), data)
+
+    def test_write_old_read_new(self):
+        # Write shards in the old format where each shard is compressed individually
+        data = b'{"key": "value"}'
+        data_shards = [zlib.compress(data[:len(data)//2]), zlib.compress(data[len(data)//2:])]
+        for shard in data_shards:
+            self.zk_client.client.create("/test/old/", shard, sequence=True, makepath=True)
+
+        # Read shards, expecting the new format
+        with BufferedShardReader(
+            self.zk_client.client, "/test/old"
+        ) as shard_io:
+            read_data = shard_io.read()
+            decompressed_data = zlib.decompress(read_data)
+            self.log.debug(f"SWE> {binascii.hexlify(read_data)=}")
+            self.log.debug(f"SWE> {decompressed_data=}")
+            self.assertEqual(decompressed_data, data)
+
+    def test_write_new_read_old(self):
+        data = b'{"key": "value"}'
+        compressed_data = zlib.compress(data)
+        with mock.patch("zuul.zk.sharding.NODE_BYTE_SIZE_LIMIT", len(compressed_data)//2):
+            with BufferedShardWriter(
+                self.zk_client.client, "/test/new"
+            ) as shard_io:
+                self.log.debug(f"SWE> {binascii.hexlify(compressed_data)=}")
+                shard_io.write(compressed_data)
+
+        read_shards = []
+        for shard in sorted(self.zk_client.client.get_children("/test/new")):
+            self.log.debug(f"SWE> {shard=}")
+            read_data, _ = self.zk_client.client.get(f"/test/new/{shard}")
+            self.log.debug(f"SWE> {binascii.hexlify(read_data)=}")#
+            self.log.debug(f"SWE> {len(read_data)=}")
+            read_shards.append(zlib.decompress(read_data))
+        self.assertEqual(b"".join(read_shards), data)
 
 
 class TestUnparsedConfigCache(ZooKeeperBaseTestCase):
