@@ -10044,8 +10044,9 @@ class TestConnectionVars(AnsibleZuulTestCase):
                                            files=file_dict)
         self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
-        self.assertIn("Variable name 'ansible_shell_executable' "
-                      "is not allowed", A.messages[0])
+        self.assertIn(
+            "Defining variables named 'ansible_shell_executable' is not allowed"
+            A.messages[0])
         self.assertHistory([])
 
     def test_return_data(self):
