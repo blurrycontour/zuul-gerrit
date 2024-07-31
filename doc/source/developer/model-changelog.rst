@@ -222,3 +222,8 @@ Version 30
 :Prior Zuul version: 10.2.0
 :Description: Store playbook nesting_level and cleanup on frozen job.
               Affects schedulers and executors.
+
+Version 31
+----------
+:Prior Zuul version: 11.0.1
+:Description: Upgrade sharded zkobject format.

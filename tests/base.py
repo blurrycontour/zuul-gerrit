@@ -156,6 +156,21 @@ def iterate_timeout(max_seconds, purpose):
     raise Exception("Timeout waiting for %s" % purpose)
 
 
+def model_version(version):
+    """Specify a model version for a model upgrade test
+
+    This creates a dummy scheduler component with the specified model
+    API version.  The component is created before any other, so it
+    will appear to Zuul that it is joining an existing cluster with
+    data at the old version.
+    """
+
+    def decorator(test):
+        test.__model_version__ = version
+        return test
+    return decorator
+
+
 def simple_layout(path, driver='gerrit', enable_nodepool=False):
     """Specify a layout file for use by a test method.
 
@@ -1894,6 +1909,17 @@ class BaseTestCase(testtools.TestCase):
             data = compressed_data
         return data
 
+    def setupModelPin(self):
+        # Add a fake scheduler to the system that is on the old model
+        # version.
+        test_name = self.id().split('.')[-1]
+        test = getattr(self, test_name)
+        if hasattr(test, '__model_version__'):
+            version = getattr(test, '__model_version__')
+            self.model_test_component_info = SchedulerComponent(
+                self.zk_client, 'test_component')
+            self.model_test_component_info.register(version)
+
 
 class SymLink(object):
     def __init__(self, target):
@@ -2164,17 +2190,6 @@ class ZuulTestCase(BaseTestCase):
         )
         self.merge_server.start()
 
-    def _setupModelPin(self):
-        # Add a fake scheduler to the system that is on the old model
-        # version.
-        test_name = self.id().split('.')[-1]
-        test = getattr(self, test_name)
-        if hasattr(test, '__model_version__'):
-            version = getattr(test, '__model_version__')
-            self.model_test_component_info = SchedulerComponent(
-                self.zk_client, 'test_component')
-            self.model_test_component_info.register(version)
-
     def setUp(self):
         super(ZuulTestCase, self).setUp()
 
@@ -2277,7 +2292,7 @@ class ZuulTestCase(BaseTestCase):
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
         self.zk_client.connect()
 
-        self._setupModelPin()
+        self.setupModelPin()
 
         self._context_lock = SessionAwareLock(
             self.zk_client.client, f"/test/{uuid.uuid4().hex}")
