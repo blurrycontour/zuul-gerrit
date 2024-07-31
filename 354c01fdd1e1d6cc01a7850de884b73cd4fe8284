@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fa2dd7e0_de94ced9",
+        "filename": "zuul/driver/aws/awsendpoint.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-31T11:01:19Z",
+      "side": 1,
+      "message": "With the current state the API call will happen twice and essentially create two instances if the SM is moved to a different launcher.\n\nWe could try to reconcile this by checking the list of available instances and their metadata. In case we create a second instance the first one should later be cleaned up as unallocated instance.",
+      "parentUuid": "e15d84c2_76797624",
+      "revId": "354c01fdd1e1d6cc01a7850de884b73cd4fe8284",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "de61d6c8_ac776fc7",
         "filename": "zuul/driver/aws/awsendpoint.py",
         "patchSetId": 4
@@ -49,6 +67,24 @@
       "writtenOn": "2024-07-30T12:18:02Z",
       "side": 1,
       "message": "The state `INSTANCE_CREATING_START` and `INSTANCE_CREATING_SUBMIT` could be combined as there is no state that could be recovered from Zookeeper.",
+      "revId": "354c01fdd1e1d6cc01a7850de884b73cd4fe8284",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4af19030_fab17c03",
+        "filename": "zuul/driver/aws/awsendpoint.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-07-31T11:01:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de61d6c8_ac776fc7",
       "revId": "354c01fdd1e1d6cc01a7850de884b73cd4fe8284",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
