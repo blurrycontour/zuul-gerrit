@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab670588_236de3b4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-31T19:15:19Z",
+      "side": 1,
+      "message": "The reduced znode count is due to not needing to pad for the header content and also the reduction in total amount of header data required?",
+      "parentUuid": "a6656cc5_53f961fc",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "e790381b_87aeb77d",
@@ -88,6 +106,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "541d3b20_28eeed3c",
+        "filename": "tests/unit/test_zk.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-31T19:15:19Z",
+      "side": 1,
+      "message": "Oh I see this is due to the writer class taking compressed data and potentially uncompressing it then recompressing it into the old format. Then we read the data back to confirm that is what actually happened.",
+      "parentUuid": "0874753c_93fd0efd",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "37de3d4b_e0c93692",
@@ -119,6 +155,24 @@
       "side": 1,
       "message": "The next line skips the first two.",
       "parentUuid": "37de3d4b_e0c93692",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3d954dc_e200867c",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-31T19:15:19Z",
+      "side": 1,
+      "message": "Aha for some reason in my head that was there to avoid iterating when there was only one shard. Clearly the check is \u003c 2 though not \u003c 1.",
+      "parentUuid": "ebfe4615_58284db4",
       "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -164,6 +218,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3742d996_10f97e78",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-31T19:15:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2bcaba42_89db5c4b",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "28b2e7e2_cadee16c",
@@ -201,6 +273,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "22abe52b_5f119302",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-31T19:15:19Z",
+      "side": 1,
+      "message": "I guess it is confusing to me that a write() method would return the number of bytes provided to it rather than returning the number of bytes written. But this is to keep the calling code from needing to understand details around compression under the hood? I guess that is reasonable for simplifying the abstraction here.",
+      "parentUuid": "cc3f59a4_1fdd2ec3",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "891801ad_055615cd",
         "filename": "zuul/zk/sharding.py",
         "patchSetId": 1
@@ -212,6 +302,30 @@
       "writtenOn": "2024-07-31T18:24:20Z",
       "side": 1,
       "message": "See above.",
+      "range": {
+        "startLine": 156,
+        "startChar": 23,
+        "endLine": 156,
+        "endChar": 38
+      },
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "800b54dc_2c6aa94a",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-07-31T19:15:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "891801ad_055615cd",
       "range": {
         "startLine": 156,
         "startChar": 23,
