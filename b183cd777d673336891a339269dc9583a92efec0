@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7834f1cb_c3fe6995",
+        "filename": "zuul/lib/varnames.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 2
+      },
+      "writtenOn": "2024-07-31T23:12:01Z",
+      "side": 1,
+      "message": "I feel like this section could collapse into the following connection_vars section. Neither exception message are notably specific to the class of exception, although I do like the message text here better than the one in the connection_vars section.\n\n#notaminusone",
+      "range": {
+        "startLine": 25,
+        "startChar": 0,
+        "endLine": 33,
+        "endChar": 49
+      },
+      "revId": "b183cd777d673336891a339269dc9583a92efec0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
