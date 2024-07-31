@@ -92,6 +92,15 @@ class Item extends React.Component {
         .catch(error => {
           this.props.dispatch(addDequeueError(error))
         })
+    // ref-triggered items, e.g. periodic pipelines
+    } else if (refId === 'N/A') {
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, refRef)
+        .then(() => {
+          this.props.dispatch(fetchStatusIfNeeded(tenant))
+        })
+        .catch(error => {
+          this.props.dispatch(addDequeueError(error))
+        })
     } else {
       this.props.dispatch(addNotification({
         url: null,
