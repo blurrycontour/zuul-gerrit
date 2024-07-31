@@ -54,6 +54,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "384e98e9_7d3925f7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-31T19:20:58Z",
+      "side": 1,
+      "message": "It\u0027s mostly because we would chunk to 1mb of uncompressed data, then compress it, leaving potentially a lot of unused space available in the znode.",
+      "parentUuid": "a6656cc5_53f961fc",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "e790381b_87aeb77d",
@@ -284,6 +302,24 @@
       "writtenOn": "2024-07-31T19:15:19Z",
       "side": 1,
       "message": "I guess it is confusing to me that a write() method would return the number of bytes provided to it rather than returning the number of bytes written. But this is to keep the calling code from needing to understand details around compression under the hood? I guess that is reasonable for simplifying the abstraction here.",
+      "parentUuid": "cc3f59a4_1fdd2ec3",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2545e581_85209f69",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-07-31T19:20:58Z",
+      "side": 1,
+      "message": "Yeah, that\u0027s the buffered writer api.  You tell it what to write; the underlying io handler tells you how much it actually wrote; the higher level keeps writing until it\u0027s all written.\n\nLike a tcp send.",
       "parentUuid": "cc3f59a4_1fdd2ec3",
       "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
