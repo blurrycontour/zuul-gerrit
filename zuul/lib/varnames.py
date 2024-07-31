@@ -20,32 +20,26 @@ VARNAME_RE = re.compile(r'^[A-Za-z0-9_]+$')
 
 
 def check_varnames(var):
-    # We block these in configloader, but block it here too to make
-    # sure that a job doesn't pass variables named zuul or nodepool.
-    if 'zuul' in var:
-        raise VariableNameError(
-            "Defining variables named 'zuul' is not allowed")
-    if 'nodepool' in var:
-        raise VariableNameError(
-            "Defining variables named 'nodepool' is not allowed")
-    if 'unsafe_vars' in var:
-        raise VariableNameError("Defining variables named 'unsafe_vars' "
-                                "is not allowed")
     for varname in var.keys():
         if not VARNAME_RE.match(varname):
             raise VariableNameError(
                 "Variable names may only contain letters, "
                 "numbers, and underscores")
-    # Block some connection related variables so they cannot be
-    # overridden by jobs to bypass security mechanisms.
-    connection_vars = [
+    reserved_vars = [
+        # We block these in configloader, but block it here too to make
+        # sure that a job doesn't pass variables named zuul or nodepool.
+        'zuul',
+        'nodepool',
+        'unsafe_vars',
+        # Block some connection related variables so they cannot be
+        # overridden by jobs to bypass security mechanisms.
         'ansible_connection',
         'ansible_host',
         'ansible_python_interpreter',
         'ansible_shell_executable',
         'ansible_user',
     ]
-    for conn_var in connection_vars:
-        if conn_var in var:
+    for reserved_var in reserved_vars:
+        if reserved_var in var:
             raise VariableNameError(
-                f"Variable name '{conn_var}' is not allowed.")
+                f"Defining a variable named '{reserved_var}' is not allowed")
