@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2e36eab_4d09082c",
+        "filename": "web/src/containers/status/Item.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-07-31T08:18:16Z",
+      "side": 1,
+      "message": "NOTE: Alternatively, we could check for:\n\n```\n} else if (refRef) {\n```",
+      "revId": "ba02dd1306201ac1392562f1c59c9ee96bd99aaf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
