@@ -380,6 +380,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "058f90aa_c45e94ad",
+        "filename": "zuul/zk/sharding.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-08-01T07:04:10Z",
+      "side": 1,
+      "message": "I think this is mainly an issue with the tests as we patch the limit to be smaller, which makes the small overhead of the zlib framing count.",
+      "parentUuid": "b5a124a1_81361293",
+      "revId": "ffb548f3674923d541056ceb93f044a619fa1827",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "891801ad_055615cd",
         "filename": "zuul/zk/sharding.py",
         "patchSetId": 1
