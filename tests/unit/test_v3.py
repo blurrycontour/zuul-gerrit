@@ -19,11 +19,13 @@ import logging
 import os
 import sys
 import textwrap
+import threading
 import gc
 import re
 from time import sleep
 from unittest import mock, skip, skipIf
 from zuul.lib import yamlutil
+from zuul.scheduler import PendingReconfiguration
 
 import fixtures
 import git
@@ -10407,3 +10409,68 @@ class TestPipelineLimits(ZuulTestCase):
         self.assertEqual(C.reported, 1)
         self.assertIn('Unable to enqueue change: 2 changes to enqueue '
                       'greater than pipeline max of 1', C.messages[0])
+
+
+class TestBlobStorePipelineProcessing(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_blob_store_pipeline_processing(self):
+        # This verifies that the blob store cleanup does not remove
+        # entries that belong to a queue item with no job graph.
+        self.hold_merge_jobs_in_queue = True
+
+        sched = self.scheds.first.sched
+        old_handler = zuul.scheduler.Scheduler._doMergeCompletedEvent
+        old_abort = zuul.scheduler.Scheduler.abortIfPendingReconfig
+        should_latch = threading.Event()
+        should_latch.set()
+        latch = threading.Event()
+
+        def abort_on_reconfig(*args, **kw):
+            if latch.is_set():
+                raise PendingReconfiguration()
+            return old_abort(*args, **kw)
+
+        def merge_complete(*args, **kw):
+            ret = old_handler(*args, **kw)
+            if should_latch.is_set():
+                latch.set()
+            return ret
+
+        self.patch(zuul.scheduler.Scheduler,
+                   '_doMergeCompletedEvent',
+                   merge_complete)
+        self.patch(zuul.scheduler.Scheduler,
+                   'abortIfPendingReconfig',
+                   abort_on_reconfig)
+
+        # Add an item to the check pipeline
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # The merge job is waiting now.  Make sure there's nothing in
+        # the blob store.
+        with sched.createZKContext(None, sched.log) as ctx:
+            blobstore = BlobStore(ctx)
+            self.assertEqual(0, len(blobstore))
+
+        # Release the merge job
+        self.hold_merge_jobs_in_queue = False
+        self.merger_api.release()
+        self.waitUntilSettled()
+        # The merge job should have been processed and the latch set;
+        # confirm that
+        latch.wait()
+        with sched.run_handler_lock:
+            with sched.general_cleanup_lock:
+                # The scheduler should be idle; run the blob store
+                # cleanup and verify that it has an entry in it, even
+                # though there's no job graph yet.
+                sched._runBlobStoreCleanup()
+                with sched.createZKContext(None, sched.log) as ctx:
+                    blobstore = BlobStore(ctx)
+                    self.assertEqual(1, len(blobstore))
+
+        should_latch.clear()
+        latch.clear()
+        self.waitUntilSettled()
