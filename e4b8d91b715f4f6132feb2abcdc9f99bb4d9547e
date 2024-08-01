@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d599795d_41143892",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1782,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-08-01T06:28:19Z",
+      "side": 1,
+      "message": "Maybe it would make sense to derive those exceptions from a common base.",
+      "revId": "e4b8d91b715f4f6132feb2abcdc9f99bb4d9547e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
