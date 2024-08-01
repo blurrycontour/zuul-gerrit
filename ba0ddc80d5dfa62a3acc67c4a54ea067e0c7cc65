@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fee4eead_19c1576e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-08-01T12:47:06Z",
+      "side": 1,
+      "message": "There is still a bug in the PipelineDetails page when filtering for a single item (based on project or change) which belongs to a queue that has other items that don\u0027t match the filter. Then a queue item gets into an undefined state and I haven\u0027t yet found out why.\n\n```\nTypeError: Cannot read properties of undefined (reading \u0027failing_reasons\u0027)\n\ngetQueueItemIconConfig\nsrc/containers/status/Misc.jsx:173\n```",
+      "revId": "ba0ddc80d5dfa62a3acc67c4a54ea067e0c7cc65",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
