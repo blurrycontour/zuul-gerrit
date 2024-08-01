@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f04ba68_e77858c8",
+        "filename": "web/src/containers/status/EmptyStateInfoBox.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-08-01T12:42:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45a68265_b1fdfb52",
+      "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6ce493a_b125d24b",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-07-30T09:34:47Z",
       "side": 1,
       "message": "I think it would make sense to put this component in the same file as the EmptyPage, which is containers/Errors.jsx.",
+      "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e35b39a6_6fdb411c",
+        "filename": "web/src/containers/status/EmptyStateInfoBox.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-08-01T12:42:43Z",
+      "side": 1,
+      "message": "I generalized the EmptyStateBox and put it into containers/Errors.jsx as suggested.",
+      "parentUuid": "d6ce493a_b125d24b",
       "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37d2854b_81bda17b",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 480,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-08-01T12:42:43Z",
+      "side": 1,
+      "message": "I find it debatable how generic these functions are, since they are very much tailored for the pipeline filtering, however, `applyFilter` could be generic enough. So I put that into containers/FilterToolbar.jsx (instead of creating a separate file).",
+      "parentUuid": "68ad726d_89379c6a",
+      "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fc39975_d63cfeca",
@@ -69,6 +123,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1958932f_4dc65aec",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-08-01T12:42:43Z",
+      "side": 1,
+      "message": "Instead of removing the `!isLoading` condition completely, I changed to so that it hides the `EmptyBox` during the initial load (`isFetching`), but not when reloading (`isReloading`).",
+      "parentUuid": "1fc39975_d63cfeca",
+      "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d3a9376_9a2d7296",
@@ -82,6 +154,24 @@
       "writtenOn": "2024-07-30T09:34:47Z",
       "side": 1,
       "message": "nit: You could combine both in a single shorthand-if like so:\n\n{filterActive ? \u003cTooltip ...\u003e{allPipelinesSwitch}\u003c/Tooltip\u003e : allPipelinesSwitch }",
+      "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ff56d8e_2fdfaa4c",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-08-01T12:42:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d3a9376_9a2d7296",
       "revId": "6d215661bc7729b40dca3bed347316e2a939aaaa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
