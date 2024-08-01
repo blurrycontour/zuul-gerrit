@@ -6650,18 +6650,17 @@ class QueueItem(zkobject.ZKObject):
         return False
 
     def getBlobKeys(self):
+        keys = set(self.current_build_set.repo_state_keys)
         job_graph = self.current_build_set.job_graph
         if not job_graph:
-            return set()
+            return keys
         # Return a set of blob keys used by this item
         # for each job in the frozen job graph
-        keys = set()
         for job in job_graph.getJobs():
             for pb in job.all_playbooks:
                 for secret in pb['secrets'].values():
                     if isinstance(secret, dict) and 'blob' in secret:
                         keys.add(secret['blob'])
-            keys.update(self.current_build_set.repo_state_keys)
         return keys
 
     def getEventChange(self):
