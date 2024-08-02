@@ -54,6 +54,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ed42841_a8cc3ffa",
+        "filename": "zuul/driver/aws/awsendpoint.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-08-02T12:27:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa2dd7e0_de94ced9",
+      "revId": "354c01fdd1e1d6cc01a7850de884b73cd4fe8284",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de61d6c8_ac776fc7",
