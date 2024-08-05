@@ -6142,6 +6142,7 @@ For CI problems and help debugging, contact ci@example.org"""
         self.fake_nodepool.pause()
 
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.setMerged()
         self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
         self.waitUntilSettled()
 
@@ -6176,6 +6177,17 @@ For CI problems and help debugging, contact ci@example.org"""
 
         self.fake_nodepool.unpause()
         self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='2,1'),
+            dict(name='project-test1', result='SUCCESS', changes='2,1'),
+            dict(name='project-test2', result='SUCCESS', changes='2,1'),
+            dict(name='project-merge', result='SUCCESS', changes='3,1'),
+            dict(name='project-test1', result='SUCCESS', changes='3,1'),
+            dict(name='project-test2', result='SUCCESS', changes='3,1'),
+            dict(name='project1-project2-integration',
+                 result='SUCCESS', changes='2,1'),
+            dict(name='project-post', result='SUCCESS'),
+        ], ordered=False)
 
     @simple_layout('layouts/two-projects-integrated.yaml')
     def test_nodepool_relative_priority_check(self):
