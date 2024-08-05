@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad8f52f1_19af6268",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 509,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2024-08-05T09:56:20Z",
+      "side": 1,
+      "message": "Nit: since both `ExecutorServer` and `MergerServer` derive from `BaseMergeServer`, I think we can move it to `BaseMergeServer.__init__()`.",
+      "revId": "35b848dfb4150c057993f15bed9452f36bd74135",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
