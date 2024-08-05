@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c13ccbc_e90f49d5",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1985,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-05T17:35:34Z",
+      "side": 1,
+      "message": "See below.",
+      "parentUuid": "08efff00_a643d86d",
+      "revId": "c39a65bd2cd309ccd6d38e11c552b00891b56525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "961e21d1_a456f566",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-07-31T23:24:52Z",
       "side": 1,
       "message": "Where does this get set?",
+      "revId": "c39a65bd2cd309ccd6d38e11c552b00891b56525",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "078bc8e3_7143b194",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2803,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-05T17:35:34Z",
+      "side": 1,
+      "message": "It\u0027s a class variable; classes that exercise tenant validation set it; otherwise it defaults to None.  The issue is that some set it to the empty list, which means validate all tenants.  This line should be a check for None.",
+      "parentUuid": "961e21d1_a456f566",
       "revId": "c39a65bd2cd309ccd6d38e11c552b00891b56525",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
