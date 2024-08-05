@@ -417,34 +417,37 @@ class LoadingErrors(object):
         return len(self.errors)
 
 
-class NoMatchingParentError(Exception):
-    """A job referenced a parent, but that parent had no variants which
-    matched the current change."""
-    pass
-
-
-class TemplateNotFoundError(Exception):
-    """A project referenced a template that does not exist."""
-    pass
-
-
 class RequirementsError(Exception):
     """A job's requirements were not met."""
     pass
 
 
-class JobNotDefinedError(Exception):
+class JobConfigurationError(Exception):
+    """A job has an invalid configuration.
+
+    These are expected user errors when freezing a job graph.
+    """
+    pass
+
+
+class TemplateNotFoundError(JobConfigurationError):
+    """A project referenced a template that does not exist."""
+    pass
+
+
+class NoMatchingParentError(JobConfigurationError):
+    """A job referenced a parent, but that parent had no variants which
+    matched the current change."""
+    pass
+
+
+class JobNotDefinedError(JobConfigurationError):
     """A job was not defined."""
     pass
 
 
-class SecretNotFoundError(Exception):
+class SecretNotFoundError(JobConfigurationError):
     """A job referenced a semaphore that does not exist."""
-    pass
-
-
-class JobConfigurationError(Exception):
-    """A job has an invalid configuration."""
     pass
 
 
@@ -6651,10 +6654,10 @@ class QueueItem(zkobject.ZKObject):
                         _old_job_graph=results['job_graph'])
                     log.debug("Done creating job graph for "
                               "config change detection")
-                except Exception:
+                except Exception as e:
                     self.log.debug(
                         "Error freezing job graph in job update check:",
-                        exc_info=True)
+                        exc_info=not isinstance(e, JobConfigurationError))
                     # The config was broken before, we have no idea
                     # which jobs have changed, so rather than run them
                     # all, just rely on the file matchers as-is.
