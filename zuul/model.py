@@ -438,6 +438,11 @@ class JobNotDefinedError(Exception):
     pass
 
 
+class SecretNotFoundError(Exception):
+    """A job referenced a semaphore that does not exist."""
+    pass
+
+
 class JobConfigurationError(Exception):
     """A job has an invalid configuration."""
     pass
@@ -3851,19 +3856,21 @@ class Job(ConfigObject):
                 k not in set(['final', 'abstract', 'protected',
                               'intermediate'])):
                 if self.final:
-                    raise Exception("Unable to modify final job %s attribute "
-                                    "%s=%s with variant %s" % (
-                                        repr(self), k, other._get(k),
-                                        repr(other)))
+                    raise JobConfigurationError(
+                        "Unable to modify final job %s attribute "
+                        "%s=%s with variant %s" % (
+                            repr(self), k, other._get(k),
+                            repr(other)))
                 if self.protected_origin:
                     # this is a protected job, check origin of job definition
                     this_origin = self.protected_origin
                     other_origin = other.source_context.project_canonical_name
                     if this_origin != other_origin:
-                        raise Exception("Job %s which is defined in %s is "
-                                        "protected and cannot be inherited "
-                                        "from other projects."
-                                        % (repr(self), this_origin))
+                        raise JobConfigurationError(
+                            "Job %s which is defined in %s is "
+                            "protected and cannot be inherited "
+                            "from other projects."
+                            % (repr(self), this_origin))
                 if k not in set(['pre_run', 'run', 'post_run', 'cleanup_run',
                                  'roles', 'variables', 'extra_variables',
                                  'host_variables', 'group_variables',
@@ -3888,9 +3895,10 @@ class Job(ConfigObject):
         # has been enforced during config reading.  Similar to
         # abstract, it is cleared by inheriting.
         if self.intermediate and not other.abstract:
-            raise Exception("Intermediate job %s may only inherit "
-                            "to another abstract job" %
-                            (repr(self)))
+            raise JobConfigurationError(
+                "Intermediate job %s may only be inherited "
+                "by another abstract job" %
+                (repr(self)))
         if other.name != self.name:
             self.intermediate = other.intermediate
         elif other.intermediate:
@@ -3900,9 +3908,10 @@ class Job(ConfigObject):
         if other.protected is not None:
             # don't allow to reset protected flag
             if not other.protected and self.protected_origin:
-                raise Exception("Unable to reset protected attribute of job"
-                                " %s by job %s" % (
-                                    repr(self), repr(other)))
+                raise JobConfigurationError(
+                    "Unable to reset protected attribute of job"
+                    " %s by job %s" % (
+                        repr(self), repr(other)))
             if not self.protected_origin:
                 self.protected_origin = \
                     other.source_context.project_canonical_name
@@ -3921,7 +3930,8 @@ class Job(ConfigObject):
             for secret_use in secrets_for_parents:
                 secret = layout.secrets.get(secret_use.name)
                 if secret is None:
-                    raise Exception("Secret %s not found" % (secret_use.name,))
+                    raise SecretNotFoundError(
+                        "Secret %s not found" % (secret_use.name,))
                 secret_name = secret_use.alias
                 encrypted_secret_data = secret.serialize()
                 # Use the other project, not the secret's, because we
@@ -3989,9 +3999,10 @@ class Job(ConfigObject):
         common = (set([x.name for x in self.semaphores]) &
                   pb_semaphores)
         if common:
-            raise Exception(f"Semaphores {common} specified as both "
-                            "job and playbook semaphores but may only "
-                            "be used for one")
+            raise JobConfigurationError(
+                f"Semaphores {common} specified as both "
+                "job and playbook semaphores but may only "
+                "be used for one")
 
         for k in self.context_attributes:
             if (other._get(k) is not None and

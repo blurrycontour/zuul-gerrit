@@ -183,7 +183,7 @@ class TestJob(BaseTestCase):
         bad_final = model.Job('py27')
         bad_final.timeout = 600
         with testtools.ExpectedException(
-                Exception,
+                model.JobConfigurationError,
                 "Unable to modify final job"):
             job.applyVariant(bad_final, self.layout, None)
 
