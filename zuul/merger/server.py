@@ -488,7 +488,7 @@ class BaseMergeServer(metaclass=ABCMeta):
                 return fn(*args, **kw)
             except Exception:
                 log.exception("Exception retrying %s", fn)
-            if not self._running:
+            if not self._merger_running:
                 return
             time.sleep(5)
 
