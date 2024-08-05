@@ -140,7 +140,7 @@ class TimerDriver(Driver, TriggerInterface):
                         # throwaway object.
                         ZuulCronTrigger(jitter=jitter, **cron_args)
                     except ValueError:
-                        self.log.exception(
+                        self.log.error(
                             "Unable to create CronTrigger "
                             "for value '%s' defined in "
                             "pipeline %s",
