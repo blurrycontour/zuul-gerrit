@@ -36,7 +36,7 @@ from zuul.model import (
 from zuul.lib.monitoring import MonitoringServer
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
-from zuul.zk.components import MergerComponent
+from zuul.zk.components import MergerComponent, COMPONENT_REGISTRY
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.merger import MergerApi
 
@@ -506,6 +506,7 @@ class MergeServer(BaseMergeServer):
         self.component_info = MergerComponent(
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
+        COMPONENT_REGISTRY.create(self.zk_client)
 
         self.monitoring_server = MonitoringServer(self.config, 'merger',
                                                   self.component_info)
