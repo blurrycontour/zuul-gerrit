@@ -377,7 +377,7 @@ class TestJob(BaseTestCase):
         change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
         item = self.queue.enqueueChanges([change], None)
         with testtools.ExpectedException(
-                Exception,
+                model.JobConfigurationError,
                 "Pre-review pipeline gate does not allow post-review job"):
             with self.zk_context as ctx:
                 item.freezeJobGraph(self.layout, ctx,
