@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "479043b2_8e1d4279",
+        "filename": "zuul/driver/aws/awsendpoint.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-05T19:52:44Z",
+      "side": 1,
+      "message": "We should port over the fleet api stuff soon -- this is already different.  But structurally not a problem -- we\u0027ll just restore the quotainfo from the serialized resources.",
+      "revId": "1a2026cbe4448ea8b80cf20c858b9f6b0aa6a83a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1fc9058f_de0a300a",
+        "filename": "zuul/driver/aws/awsendpoint.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-05T19:52:44Z",
+      "side": 1,
+      "message": "I\u0027d like to look at removing this dictionary hack and just have the individual classes store whatever information they need in their own top-level variables.  That should probably be its own change, but I\u0027d like to do it before we consider this to be in production, while it\u0027s still easy.",
+      "revId": "1a2026cbe4448ea8b80cf20c858b9f6b0aa6a83a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "675d03b4_08d187cb",
+        "filename": "zuul/driver/aws/awsendpoint.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-05T19:52:44Z",
+      "side": 1,
+      "message": "The external_id as dict hack is already leading to confusion -- we\u0027re storing dedicated_host_id as a top_level var here (good) but it\u0027s also in external_id provided from the superclass.",
+      "revId": "1a2026cbe4448ea8b80cf20c858b9f6b0aa6a83a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
