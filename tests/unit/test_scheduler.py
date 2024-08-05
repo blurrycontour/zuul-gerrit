@@ -2782,10 +2782,6 @@ class TestScheduler(ZuulTestCase):
         # This test assumes the repo is already cloned; make sure it is
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         trusted, project = tenant.getProject('org/project')
-        url = self.fake_gerrit.getGitUrl(project)
-        self.executor_server.merger._addProject(
-            'review.example.com', 'gerrit', 'org/project', url, None, None,
-            None)
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addPatchset(large=True)
         # TODOv3(jeblair): add hostname to upstream root
