@@ -23,6 +23,7 @@ from abc import ABCMeta
 from configparser import ConfigParser
 
 from kazoo.exceptions import NoNodeError
+from kazoo.retry import KazooRetry
 
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
@@ -181,6 +182,9 @@ class BaseMergeServer(metaclass=ABCMeta):
         self._merger_paused = False
         self.merger_loop_wake_event.set()
 
+    def isComponentRunning(self):
+        return self._merger_running
+
     def runMerger(self):
         while self._merger_running:
             self.merger_loop_wake_event.wait()
@@ -218,7 +222,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         # have been successful because the request is already completed and
         # thus unlocked.
         if merge_request.state != MergeRequest.REQUESTED:
-            self._retry(merge_request.lock, log, self.merger_api.unlock,
+            self._retry(merge_request.lock, self.merger_api.unlock,
                         merge_request)
 
         try:
@@ -230,7 +234,7 @@ class BaseMergeServer(metaclass=ABCMeta):
             # to ZK yet; the only thing we need to do is to ensure
             # that we release the lock, and another merger will be
             # able to grab the request.
-            self._retry(merge_request.lock, log, self.merger_api.unlock,
+            self._retry(merge_request.lock, self.merger_api.unlock,
                         merge_request)
             return
 
@@ -406,7 +410,7 @@ class BaseMergeServer(metaclass=ABCMeta):
                 "Providing synchronous result via future for %s",
                 merge_request,
             )
-            self._retry(merge_request.lock, log,
+            self._retry(merge_request.lock,
                         self.merger_api.reportResult, merge_request, result)
 
         elif merge_request.build_set_uuid:
@@ -446,7 +450,7 @@ class BaseMergeServer(metaclass=ABCMeta):
                     log.warning("Pipeline was removed: %s",
                                 merge_request.pipeline_name)
 
-            self._retry(merge_request.lock, log,
+            self._retry(merge_request.lock,
                         put_complete_event, log, merge_request, event)
 
         # Set the merge request to completed, unlock and delete it. Although
@@ -455,42 +459,43 @@ class BaseMergeServer(metaclass=ABCMeta):
         # the merge request was already processed and we have a result in the
         # result queue.
         merge_request.state = MergeRequest.COMPLETED
-        self._retry(merge_request.lock, log,
+        self._retry(merge_request.lock,
                     self.merger_api.update, merge_request)
-        self._retry(merge_request.lock, log,
+        self._retry(merge_request.lock,
                     self.merger_api.unlock, merge_request)
         # TODO (felix): If we want to optimize ZK requests, we could only call
         # the remove() here.
         self.merger_api.remove(merge_request)
 
-    def _retry(self, lock, log, fn, *args, **kw):
+    def _retry(self, lock, func, *args, **kw):
         """Retry a method to deal with ZK connection issues
 
-        This is a helper method to retry ZK operations as long as it
-        makes sense to do so.  If we have encountered a suspended
-        connection, we can probably just retry the ZK operation until
-        it succeeds.  If we have fully lost the connection, then we
-        have lost the lock, so we may not care in that case.
+        This is a helper method to retry retryable ZK operations as
+        long as we are still running.
 
         This method exits when one of the following occurs:
 
         * The callable function completes.
         * This server stops.
         * The lock (if supplied) is invalidated due to connection loss.
+        * A non-retryable ZK exception is raised.
 
         Pass None as the lock parameter if the lock issue is not
         relevant.
+
         """
-        while True:
-            if lock and not lock.is_still_valid():
-                return
-            try:
-                return fn(*args, **kw)
-            except Exception:
-                log.exception("Exception retrying %s", fn)
-            if not self._running:
-                return
-            time.sleep(5)
+        def interrupt():
+            if ((not self.isComponentRunning()) or
+                (lock and not lock.is_still_valid())):
+                return True
+            return False
+
+        kazoo_retry = KazooRetry(max_tries=-1, interrupt=interrupt,
+                                 delay=5, backoff=0, ignore_expire=False)
+        try:
+            return kazoo_retry(func, *args, **kw)
+        except InterruptedError:
+            pass
 
 
 class MergeServer(BaseMergeServer):

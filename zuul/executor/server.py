@@ -36,7 +36,6 @@ from concurrent.futures.process import ProcessPoolExecutor, BrokenProcessPool
 from functools import partial
 
 from kazoo.exceptions import NoNodeError
-from kazoo.retry import KazooRetry
 
 import git
 from urllib.parse import urlsplit
@@ -3851,6 +3850,9 @@ class ExecutorServer(BaseMergeServer):
         except Exception:
             self.log.exception('Error while stopping')
 
+    def isComponentRunning(self):
+        return self._running
+
     def verboseOn(self):
         self.verbose = True
 
@@ -4066,7 +4068,7 @@ class ExecutorServer(BaseMergeServer):
         # have been successful because the request is already completed and
         # thus unlocked.
         if build_request.state != BuildRequest.REQUESTED:
-            self._retry(build_request.lock, log, self.executor_api.unlock,
+            self._retry(build_request.lock, self.executor_api.unlock,
                         build_request)
             return False
 
@@ -4091,7 +4093,7 @@ class ExecutorServer(BaseMergeServer):
             # to ZK yet; the only thing we need to do is to ensure
             # that we release the lock, and another executor will be
             # able to grab the build.
-            self._retry(build_request.lock, log, self.executor_api.unlock,
+            self._retry(build_request.lock, self.executor_api.unlock,
                         build_request)
             return False
 
@@ -4410,8 +4412,7 @@ class ExecutorServer(BaseMergeServer):
                 log.exception("Unable to process autohold for %s",
                               build_request)
 
-        lock_valid = self.zkRetry(log, build_request.lock.is_still_valid)
-        if not lock_valid:
+        if not build_request.lock.is_still_valid():
             # If we lost the lock at any point before updating the
             # state to COMPLETED, then the scheduler may have (or
             # will) detect it as an incomplete build and generate an
@@ -4437,7 +4438,8 @@ class ExecutorServer(BaseMergeServer):
         put_method = self.result_events[build_request.tenant_name][
             build_request.pipeline_name].put
         try:
-            self.zkRetry(log, put_method, event, updater=updater)
+            self._retry(build_request.lock,
+                        put_method, event, updater=updater)
             updated = True
         except JobRequestNotFound as e:
             log.warning("Could not find build: %s", str(e))
@@ -4451,21 +4453,8 @@ class ExecutorServer(BaseMergeServer):
             # should still update the build request just in case, in
             # order to prevent another executor from starting an
             # unecessary build.
-            self.zkRetry(log, self.executor_api.update, build_request)
+            self._retry(build_request.lock, self.executor_api.update,
+                        build_request)
 
-        self.zkRetry(log, self.executor_api.unlock, build_request)
-
-    def zkRetry(self, log, func, *args, **kw):
-        # This retries func after retryable exceptions from ZK, but
-        # only as long as we're still running.
-        # TODO: Replace MergerServer._retry with a version of this
-        # method.
-        def interrupt():
-            return not self._running
-
-        kazoo_retry = KazooRetry(max_tries=-1, interrupt=interrupt,
-                                 delay=5, backoff=0, ignore_expire=False)
-        try:
-            return kazoo_retry(func, *args, **kw)
-        except InterruptedError:
-            pass
+        self._retry(build_request.lock, self.executor_api.unlock,
+                    build_request)
