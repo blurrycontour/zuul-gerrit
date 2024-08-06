@@ -4024,7 +4024,11 @@ class ExecutorServer(BaseMergeServer):
         # to aid the test suite in avoiding races.
         if build_event == JobRequestEvent.CANCELED:
             self.stopJob(build_request)
-            self.executor_api.fulfillCancel(build_request)
+            try:
+                self.executor_api.fulfillCancel(build_request)
+            except NoNodeError:
+                self.log.warning("Unable to fulfill cancel request, "
+                                 "build request may have been removed")
         elif build_event == JobRequestEvent.RESUMED:
             self.resumeJob(build_request)
             self.executor_api.fulfillResume(build_request)
@@ -4460,8 +4464,11 @@ class ExecutorServer(BaseMergeServer):
             # should still update the build request just in case, in
             # order to prevent another executor from starting an
             # unecessary build.
-            self._retry(build_request.lock, self.executor_api.update,
-                        build_request)
+            try:
+                self._retry(build_request.lock, self.executor_api.update,
+                            build_request)
+            except JobRequestNotFound as e:
+                self.log.warning("Build was removed: %s", str(e))
 
         self._retry(build_request.lock, self.executor_api.unlock,
                     build_request)
