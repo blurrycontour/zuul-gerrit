@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "49ab95c6_8dd5a34a",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1608,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-08-06T08:33:23Z",
+      "side": 1,
+      "message": "nit: I\u0027d rather use exception chaining here to retain the original tb in case we\u0027d need that.\n\n```python\n   raise ExecutorError from e\n```",
+      "revId": "b183cd777d673336891a339269dc9583a92efec0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7834f1cb_c3fe6995",
         "filename": "zuul/lib/varnames.py",
         "patchSetId": 2
