@@ -1488,8 +1488,7 @@ class AnsibleJob(object):
                                 'project': project['name']}):
                 repo = self.workspace_merger.getRepo(
                     project['connection'],
-                    project['name'],
-                    process_worker=self.executor_server.process_worker)
+                    project['name'])
             repos[project['canonical_name']] = repo
 
         # The commit ID of the original item (before merging).  Used
