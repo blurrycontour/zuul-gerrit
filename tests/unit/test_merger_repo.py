@@ -264,7 +264,7 @@ class TestMergerRepo(ZuulTestCase):
             'refs/remotes/origin/master': new_sha,
             'refs/heads/broken': 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
         })
-        self.assertEqual(work_repo.getBranchHead('master').hexsha, new_sha)
+        self.assertEqual(work_repo.getBranchHead('master'), new_sha)
         self.assertIn('master', repo.remotes.origin.refs)
 
         # Git tags have a special packed-refs format. Check that we can
@@ -274,7 +274,7 @@ class TestMergerRepo(ZuulTestCase):
         repo.git.describe('annotated')
 
         work_repo.setRefs({'refs/heads/master': remote_sha})
-        self.assertEqual(work_repo.getBranchHead('master').hexsha, remote_sha)
+        self.assertEqual(work_repo.getBranchHead('master'), remote_sha)
         self.assertNotIn('master', repo.remotes.origin.refs)
 
     def test_set_remote_ref(self):

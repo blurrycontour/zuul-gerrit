@@ -1556,14 +1556,14 @@ class AnsibleJob(object):
                     'BuildCheckout',
                     attributes={'connection': project['connection'],
                                 'project': project['name']}):
-                commit = repo.checkout(selected_ref)
+                hexsha = repo.checkout(selected_ref)
 
             # Update the inventory variables to indicate the ref we
             # checked out
             p = args['zuul']['projects'][project['canonical_name']]
             p['checkout'] = selected_ref
             p['checkout_description'] = selected_desc
-            p['commit'] = commit.hexsha
+            p['commit'] = hexsha
             self.merge_ops.append(zuul.model.MergeOp(
                 cmd=['git', 'checkout', selected_ref],
                 path=repo.workspace_project_path))
@@ -2340,13 +2340,13 @@ class AnsibleJob(object):
                 self.executor_server.merge_root,
                 logger=self.log,
                 scheme=zuul.model.SCHEME_GOLANG)
-            commit = merger.checkoutBranch(
+            hexsha = merger.checkoutBranch(
                 project.connection_name, project.name,
                 branch,
                 repo_state=self.repo_state,
                 process_worker=self.executor_server.process_worker,
                 zuul_event_id=self.zuul_event_id)
-            pi.commit = commit.hexsha
+            pi.commit = hexsha
         else:
             self.log.debug("Using existing repo %s@%s in trusted space %s",
                            project, branch, pi.root)
@@ -2392,9 +2392,7 @@ class AnsibleJob(object):
                     # We call it a branch, but it can actually be any
                     # ref including a tag.  Get the ref object so we
                     # can duplicate the full path.
-                    ref_obj = repo.getRef(branch)
-                    ref_path = ref_obj.path
-                    ref_sha = ref_obj.commit.hexsha
+                    ref_path, ref_sha = repo.getRef(branch)
                     repo_state = {
                         p['connection']: {
                             p['name']: {
@@ -2418,12 +2416,12 @@ class AnsibleJob(object):
 
             self.log.debug("Cloning %s@%s into new untrusted space %s",
                            project, branch, pi.root)
-            commit = merger.checkoutBranch(
+            hexsha = merger.checkoutBranch(
                 project.connection_name, project.name,
                 branch, repo_state=repo_state,
                 process_worker=self.executor_server.process_worker,
                 zuul_event_id=self.zuul_event_id)
-            pi.commit = commit.hexsha
+            pi.commit = hexsha
         else:
             self.log.debug("Using existing repo %s@%s in trusted space %s",
                            project, branch, pi.root)
