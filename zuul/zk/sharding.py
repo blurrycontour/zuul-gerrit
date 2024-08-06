@@ -1,4 +1,5 @@
 # Copyright 2020 BMW Group
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -15,6 +16,9 @@
 import io
 from contextlib import suppress
 import time
+import zlib
+
+from zuul.zk.components import COMPONENT_REGISTRY
 
 from kazoo.exceptions import NoNodeError
 
@@ -77,6 +81,11 @@ class RawZKIO(io.RawIOBase):
 
 
 class RawShardIO(RawZKIO):
+    def __init__(self, *args, old_format=False, **kw):
+        # MODEL_API < 31
+        self.old_format = old_format
+        super().__init__(*args, **kw)
+
     def truncate(self, size=None):
         if size != 0:
             raise ValueError("Can only truncate to 0")
@@ -91,17 +100,62 @@ class RawShardIO(RawZKIO):
         self.cumulative_read_time += time.perf_counter() - start
         return ret
 
+    def readall_old(self, shard0, shard1):
+        # Decompress each shard individually and then recompress them
+        # as a unit.
+        read_buffer = io.BytesIO()
+        read_buffer.write(zlib.decompress(shard0))
+        read_buffer.write(zlib.decompress(shard1))
+        for shard_count, shard_name in enumerate(sorted(self._shards)):
+            if shard_count < 2:
+                continue
+            shard_path = "/".join((self.path, shard_name))
+            data = self._getData(shard_path)[0]
+            read_buffer.write(zlib.decompress(data))
+        self.zstat = self.client.exists(self.path)
+        return zlib.compress(read_buffer.getvalue())
+
     def readall(self):
         read_buffer = io.BytesIO()
-        for shard_name in sorted(self._shards):
+        for shard_count, shard_name in enumerate(sorted(self._shards)):
             shard_path = "/".join((self.path, shard_name))
+            data = self._getData(shard_path)[0]
+            if shard_count == 1 and data[:2] == b'\x78\x9c':
+                # If this is the second shard, and it starts with a
+                # zlib header, we're probably reading the old format.
+                # Double check that we can decompress it, and if so,
+                # switch to reading the old format.
+                try:
+                    zlib.decompress(data)
+                    return self.readall_old(
+                        read_buffer.getvalue(),
+                        data,
+                    )
+                except zlib.error:
+                    # Perhaps we were wrong about the header
+                    pass
             read_buffer.write(self._getData(shard_path)[0])
         self.zstat = self.client.exists(self.path)
         return read_buffer.getvalue()
 
     def write(self, data):
-        # Only write one key at a time and defer writing the rest to the caller
+        # Only write one znode at a time and defer writing the rest to
+        # the caller
         data_bytes = bytes(data[0:NODE_BYTE_SIZE_LIMIT])
+        read_len = len(data_bytes)
+        # MODEL_API < 31
+        if self.old_format:
+            # We're going to add a header and footer that is several
+            # bytes, so we definitely need to reduce the size a little
+            # bit, but the old format would end up with a considerable
+            # amount of headroom due to compressing after chunking, so
+            # lets go ahead and reserve 1k of space.
+            new_limit = NODE_BYTE_SIZE_LIMIT - 1024
+            data_bytes = data_bytes[0:new_limit]
+            # Update our return value to indicate how many bytes we
+            # actually read from input.
+            read_len = len(data_bytes)
+            data_bytes = zlib.compress(data_bytes)
         if not (len(data_bytes) <= NODE_BYTE_SIZE_LIMIT):
             raise RuntimeError("Shard too large")
         start = time.perf_counter()
@@ -116,7 +170,7 @@ class RawShardIO(RawZKIO):
         self.znodes_written += 1
         if self.zstat is None:
             self.zstat = self.client.exists(self.path)
-        return len(data_bytes)
+        return read_len
 
 
 class BufferedZKWriter(io.BufferedWriter):
@@ -165,7 +219,9 @@ class BufferedZKReader(io.BufferedReader):
 
 class BufferedShardWriter(io.BufferedWriter):
     def __init__(self, client, path, create=False, version=-1):
-        self.__raw = RawShardIO(client, path, create=create, version=version)
+        self.__old_format = COMPONENT_REGISTRY.model_api < 31
+        self.__raw = RawShardIO(client, path, create=create, version=version,
+                                old_format=self.__old_format)
         super().__init__(self.__raw, NODE_BYTE_SIZE_LIMIT)
 
     @property
@@ -183,6 +239,12 @@ class BufferedShardWriter(io.BufferedWriter):
     @property
     def zstat(self):
         return self.__raw.zstat
+
+    def write(self, data):
+        # MODEL_API < 31
+        if self.__old_format and data[:2] == b'\x78\x9c':
+            data = zlib.decompress(data)
+        return super().write(data)
 
 
 class BufferedShardReader(io.BufferedReader):

@@ -13,12 +13,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import binascii
 from collections import defaultdict
 import json
+import math
 import queue
 import threading
 import time
 import uuid
+import zlib
 from unittest import mock
 
 import testtools
@@ -57,8 +60,11 @@ from zuul.zk.components import (
     COMPONENT_REGISTRY
 )
 from tests.base import (
-    BaseTestCase, HoldableExecutorApi, HoldableMergerApi,
-    iterate_timeout
+    BaseTestCase,
+    HoldableExecutorApi,
+    HoldableMergerApi,
+    iterate_timeout,
+    model_version,
 )
 from zuul.zk.zkobject import (
     ShardedZKObject, PolymorphicZKObjectMixin, ZKObject, ZKContext
@@ -82,6 +88,7 @@ class ZooKeeperBaseTestCase(BaseTestCase):
             tls_ca=self.zk_chroot_fixture.zookeeper_ca)
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
+        self.setupModelPin()
         self.component_registry = ComponentRegistry(self.zk_client)
         # We don't have any other component to initialize the global
         # registry in these tests, so we do it ourselves.
@@ -208,6 +215,116 @@ class TestSharding(ZooKeeperBaseTestCase):
             self.zk_client.client, "/test/shards"
         ) as shard_io:
             self.assertDictEqual(json.load(shard_io), data)
+
+    def _test_write_old_read_new(self, shard_count):
+        # Write shards in the old format where each shard is
+        # compressed individually
+        data = b'{"key": "value"}'
+        data_shards = []
+        shard_len = math.ceil(len(data) / shard_count)
+        for start in range(0, len(data), shard_len):
+            data_shards.append(data[start:start + shard_len])
+        # Make sure we split them correctly
+        self.assertEqual(data, b''.join(data_shards))
+        self.assertEqual(shard_count, len(data_shards))
+        for shard in data_shards:
+            shard = zlib.compress(shard)
+            self.log.debug(f"{binascii.hexlify(shard)=}")
+            self.zk_client.client.create("/test/shards/", shard,
+                                         sequence=True, makepath=True)
+
+        # Read shards, expecting the new format
+        with BufferedShardReader(
+            self.zk_client.client, "/test/shards"
+        ) as shard_io:
+            read_data = shard_io.read()
+            decompressed_data = zlib.decompress(read_data)
+            self.log.debug(f"{binascii.hexlify(read_data)=}")
+            self.log.debug(f"{decompressed_data=}")
+            self.assertEqual(decompressed_data, data)
+
+    def test_write_old_read_new_1(self):
+        self._test_write_old_read_new(1)
+
+    def test_write_old_read_new_2(self):
+        self._test_write_old_read_new(2)
+
+    def test_write_old_read_new_3(self):
+        self._test_write_old_read_new(3)
+
+    def _test_write_new_read_new(self, shard_count):
+        # Write shards in the new format
+        data = b'{"key": "value"}'
+        compressed_data = zlib.compress(data)
+
+        data_shards = []
+        shard_len = math.ceil(len(compressed_data) / shard_count)
+        for start in range(0, len(compressed_data), shard_len):
+            data_shards.append(compressed_data[start:start + shard_len])
+        # Make sure we split them correctly
+        self.assertEqual(compressed_data, b''.join(data_shards))
+        self.assertEqual(shard_count, len(data_shards))
+        for shard in data_shards:
+            self.log.debug(f"{binascii.hexlify(shard)=}")
+            self.zk_client.client.create("/test/shards/", shard,
+                                         sequence=True, makepath=True)
+
+        # Read shards, expecting the new format
+        with BufferedShardReader(
+            self.zk_client.client, "/test/shards"
+        ) as shard_io:
+            read_data = shard_io.read()
+            decompressed_data = zlib.decompress(read_data)
+            self.log.debug(f"{binascii.hexlify(read_data)=}")
+            self.log.debug(f"{decompressed_data=}")
+            self.assertEqual(decompressed_data, data)
+
+    def test_write_new_read_new_1(self):
+        self._test_write_new_read_new(1)
+
+    def test_write_new_read_new_2(self):
+        self._test_write_new_read_new(2)
+
+    def test_write_new_read_new_3(self):
+        self._test_write_new_read_new(3)
+
+    def _test_write_old_read_old(self, shard_count):
+        # Test that the writer can write in the old format
+        data = b'{"key": "value is longer"}'
+        compressed_data = zlib.compress(data)
+
+        shard_len = math.ceil(len(compressed_data) / shard_count)
+        # We subtract 1024 from the size limit when writing the old
+        # format
+        size_limit = shard_len + 1024
+        with mock.patch("zuul.zk.sharding.NODE_BYTE_SIZE_LIMIT", size_limit):
+            with BufferedShardWriter(
+                    self.zk_client.client, "/test/shards"
+            ) as shard_writer:
+                shard_writer.write(compressed_data)
+
+        read_shards = []
+        for shard in sorted(
+                self.zk_client.client.get_children("/test/shards")):
+            self.log.debug(f"{shard=}")
+            read_data, _ = self.zk_client.client.get(f"/test/shards/{shard}")
+            self.log.debug(f"{binascii.hexlify(read_data)=}")
+            self.log.debug(f"{len(read_data)=}")
+            read_shards.append(zlib.decompress(read_data))
+        self.assertEqual(b"".join(read_shards), data)
+        self.assertEqual(shard_count, len(read_shards))
+
+    @model_version(30)
+    def test_write_old_read_old_1(self):
+        self._test_write_old_read_old(1)
+
+    @model_version(30)
+    def test_write_old_read_old_2(self):
+        self._test_write_old_read_old(2)
+
+    @model_version(30)
+    def test_write_old_read_old_3(self):
+        self._test_write_old_read_old(3)
 
 
 class TestUnparsedConfigCache(ZooKeeperBaseTestCase):

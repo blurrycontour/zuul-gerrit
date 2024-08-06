@@ -24,26 +24,12 @@ from tests.base import (
     ZuulTestCase,
     simple_layout,
     iterate_timeout,
+    model_version,
 )
 from zuul.zk import ZooKeeperClient
 from zuul.zk.branch_cache import BranchCache, BranchFlag
 from zuul.zk.zkobject import ZKContext
 from tests.unit.test_zk import DummyConnection
-
-
-def model_version(version):
-    """Specify a model version for a model upgrade test
-
-    This creates a dummy scheduler component with the specified model
-    API version.  The component is created before any other, so it
-    will appear to Zuul that it is joining an existing cluster with
-    data at the old version.
-    """
-
-    def decorator(test):
-        test.__model_version__ = version
-        return test
-    return decorator
 
 
 class TestModelUpgrade(ZuulTestCase):
