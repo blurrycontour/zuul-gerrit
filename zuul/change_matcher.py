@@ -88,7 +88,7 @@ class BranchMatcher(AbstractChangeMatcher):
                     if self._regex == branch:
                         return True
                 else:
-                    if self.regex.fullmatch(branch):
+                    if self.regex.match(branch):
                         return True
         return False
 
