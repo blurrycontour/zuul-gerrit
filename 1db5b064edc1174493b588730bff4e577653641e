@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "521faf9b_8b3396fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T08:00:41Z",
+      "side": 1,
+      "message": "Having globally injected yaml-tag handlers to handle specific fields feels like the wrong level of abstraction. I can see the use case of being able to write encrypted strings for any field in the whole configuration, but `!override` or `!inherit` is very specific.\n\nAnother downside with yaml-tags is that they cannot be expressed in Json. Json is a subset of Yaml, so a generator can output Json configurations for Zuul to pick up, unless you yaml-tags are part of the configuration.\n\nWhat about allowing tags to be specified as either strings or objects?\n\n```\n- job:\n    tags:\n      - foo\n      - { label: \"bar\", override: true }\n      - { label: \"baz\", inherit: true }\n```",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
