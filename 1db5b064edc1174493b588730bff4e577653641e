@@ -16,6 +16,24 @@
       "message": "Having globally injected yaml-tag handlers to handle specific fields feels like the wrong level of abstraction. I can see the use case of being able to write encrypted strings for any field in the whole configuration, but `!override` or `!inherit` is very specific.\n\nAnother downside with yaml-tags is that they cannot be expressed in Json. Json is a subset of Yaml, so a generator can output Json configurations for Zuul to pick up, unless you yaml-tags are part of the configuration.\n\nWhat about allowing tags to be specified as either strings or objects?\n\n```\n- job:\n    tags:\n      - foo\n      - { label: \"bar\", override: true }\n      - { label: \"baz\", inherit: true }\n```",
       "revId": "1db5b064edc1174493b588730bff4e577653641e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1e2e148_1bb97722",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T16:18:20Z",
+      "side": 1,
+      "message": "On the contrary, I think this provides an elegant and readable way of handling the issue of changing the behavior of a specific attribute.  YAML tags are a way of providing metadata about YAML nodes, and that\u0027s what we\u0027re using them for here.  This is very similar to the Ansible \"!unsafe\" YAML tag.\n\nThe example provided in the comment above does not address the inheritance at the correct level (individual tag values would not be inheritable or overridable, but rather the entire set of tags for a job).  It should be more like:\n\n```\n- job:\n    tags:\n      override: true\n      values:\n        - foo\n        - baz\n```\n\nBut some of the job attributes we need override control on are already dictionaries.  So we might end up with:\n\n```\n- job:\n    vars:\n      override: true\n      values:\n        foo: bar\n```\n\nAt the same time we support:\n\n```\n- job:\n    vars:\n      foo: bar\n```\n\nI think that is unclear (at best, we would need to reserve the word \"override\" as a variable name in order to use it as a marker to determine which format to use).  I think it\u0027s harder to read and reason about so many different formats.\n\nWe did choose YAML intentionally because of features like this that make it easy for humans and computers to read and parse.  Restricting it to JSON is and has not been a goal (and hasn\u0027t been possible in v3+ due to our use of the !encrypted tag).",
+      "parentUuid": "521faf9b_8b3396fe",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
