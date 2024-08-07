@@ -104,9 +104,9 @@ function QueueCard({ pipeline, queue, expanded }) {
             </CardBody>
           }
           {isQueueExpanded ?
-            <div>
+            <>
               <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} />
-            </div> : null
+            </> : null
           }
         </Card>
       </FlexItem>
@@ -147,9 +147,9 @@ function QueueSummary({ pipeline, pipelineType, showAllQueues, expandAllQueues }
       >
         { expandAllQueues ?
           changeQueues.map((queue, idx) => (
-            <div key={idx}>
+            <React.Fragment key={idx}>
               <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false}/>
-            </div>
+            </React.Fragment>
           ))
           :
           changeQueues.map((queue) => (
