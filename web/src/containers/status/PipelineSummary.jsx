@@ -66,7 +66,7 @@ QueueItemSquare.propTypes = {
   item: PropTypes.object,
 }
 
-function QueueCard({pipeline, queue, allQueuesExpanded}) {
+function QueueCard({ pipeline, queue, allQueuesExpanded }) {
   const [isQueueExpanded, setIsQueueExpanded] = useState(undefined)
   const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(undefined)
 
@@ -81,33 +81,28 @@ function QueueCard({pipeline, queue, allQueuesExpanded}) {
   }
 
   return (
-    <Flex>
-      <FlexItem>
-        <Card isPlain className="zuul-compact-card">
-          <CardTitle>
-            {queue.name}
-            {queue.branch ? ` (${queue.branch})` : ''}
-            {isQueueExpanded ?
-              <AngleDownIcon className="zuul-expand-icon" onClick={onQueueToggle} />
-              :
-              <AngleRightIcon className="zuul-expand-icon" onClick={onQueueToggle} />
-            }
-          </CardTitle>
-          {isQueueExpanded ? null :
-            <CardBody style={{ paddingBottom: '0' }}>
-              {queue.heads.map((head) => (
-                head.map((item) => <QueueItemSquareWithPopover item={item} key={item.id} />)
-              ))}
-            </CardBody>
-          }
-          {isQueueExpanded ?
-            <div>
-              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} />
-            </div> : null
-          }
-        </Card>
-      </FlexItem>
-    </Flex>
+    <Card isPlain className="zuul-compact-card">
+      <CardTitle>
+        {queue.name}
+        {queue.branch ? ` (${queue.branch})` : ''}
+        {isQueueExpanded ?
+          <AngleDownIcon className="zuul-expand-icon" onClick={onQueueToggle} />
+          :
+          <AngleRightIcon className="zuul-expand-icon" onClick={onQueueToggle} />
+        }
+      </CardTitle>
+      {isQueueExpanded ? null :
+        <CardBody style={{ paddingBottom: '0' }}>
+          {queue.heads.map((head) => (
+            head.map((item) => <QueueItemSquareWithPopover item={item} key={item.id} />)
+          ))}
+        </CardBody>
+      }
+      {isQueueExpanded ?
+        <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} />
+        : null
+      }
+    </Card>
   )
 }
 
@@ -130,10 +125,12 @@ function QueueSummary({ pipeline, pipelineType, showAllQueues, allQueuesExpanded
     }
     return (
       changeQueues.map((queue) => (
-        <QueueCard key={`${queue.name}${queue.branch}`}
-                   pipeline={pipeline}
-                   queue={queue}
-                   allQueuesExpanded={allQueuesExpanded}/>
+        <QueueCard
+          key={`${queue.name}${queue.branch}`}
+          pipeline={pipeline}
+          queue={queue}
+          allQueuesExpanded={allQueuesExpanded}
+        />
       ))
     )
   } else {
@@ -144,20 +141,18 @@ function QueueSummary({ pipeline, pipelineType, showAllQueues, allQueuesExpanded
       >
         {allQueuesExpanded ?
           changeQueues.map((queue, idx) => (
-            <div key={idx}>
-              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false}/>
-            </div>
+            <ChangeQueue key={idx} queue={queue} pipeline={pipeline} showTitle={false} />
           ))
           :
           changeQueues.map((queue) => (
-          queue.heads.map((head) => (
-            head.map((item) => (
-              <FlexItem key={item.id}>
-                <QueueItemSquareWithPopover item={item} />
-              </FlexItem>
+            queue.heads.map((head) => (
+              head.map((item) => (
+                <FlexItem key={item.id}>
+                  <QueueItemSquareWithPopover item={item} />
+                </FlexItem>
+              ))
             ))
           ))
-        ))
         }
       </Flex>
     )
@@ -216,7 +211,7 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
         }
       </CardTitle>
       <CardBody>
-        <QueueSummary pipeline={pipeline} pipelineType={pipelineType} showAllQueues={showAllQueues} allQueuesExpanded={areAllQueuesExpanded}/>
+        <QueueSummary pipeline={pipeline} pipelineType={pipelineType} showAllQueues={showAllQueues} allQueuesExpanded={areAllQueuesExpanded} />
       </CardBody>
 
     </Card>
