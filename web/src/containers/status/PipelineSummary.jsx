@@ -84,33 +84,28 @@ function QueueCard({pipeline, queue, allQueuesExpanded}) {
   }
 
   return (
-    <Flex>
-      <FlexItem>
-        <Card isPlain className="zuul-compact-card">
-          <CardTitle>
-            {queue.name}
-            {queue.branch ? ` (${queue.branch})` : ''}
-            {isQueueExpanded ?
-              <AngleDownIcon style={{ marginLeft: '4px', verticalAlign: '-0.2em' }} onClick={onQueueToggle} />
+    <Card isPlain className="zuul-compact-card">
+      <CardTitle>
+        {queue.name}
+        {queue.branch ? ` (${queue.branch})` : ''}
+        {isQueueExpanded ?
+         <AngleDownIcon style={{ marginLeft: '4px', verticalAlign: '-0.2em' }} onClick={onQueueToggle} />
               :
-              <AngleRightIcon style={{ marginLeft: '4px', verticalAlign: '-0.2em' }} onClick={onQueueToggle} />
+         <AngleRightIcon style={{ marginLeft: '4px', verticalAlign: '-0.2em' }} onClick={onQueueToggle} />
             }
-          </CardTitle>
-          {isQueueExpanded ? null :
-            <CardBody style={{ paddingBottom: '0' }}>
-              {queue.heads.map((head) => (
-                head.map((item) => <QueueItemSquareWithPopover item={item} key={item.id} />)
-              ))}
-            </CardBody>
-          }
-          {isQueueExpanded ?
-            <div>
-              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} />
-            </div> : null
-          }
-        </Card>
-      </FlexItem>
-    </Flex>
+      </CardTitle>
+      {isQueueExpanded ? null :
+       <CardBody style={{ paddingBottom: '0' }}>
+         {queue.heads.map((head) => (
+           head.map((item) => <QueueItemSquareWithPopover item={item} key={item.id} />)
+         ))}
+       </CardBody>
+      }
+      {isQueueExpanded ?
+       <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} />
+       : null
+      }
+    </Card>
   )
 }
 
@@ -147,9 +142,7 @@ function QueueSummary({ pipeline, pipelineType, showAllQueues, allQueuesExpanded
       >
         {allQueuesExpanded ?
           changeQueues.map((queue, idx) => (
-            <div key={idx}>
-              <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false}/>
-            </div>
+            <ChangeQueue key={idx} queue={queue} pipeline={pipeline} showTitle={false}/>
           ))
           :
           changeQueues.map((queue) => (

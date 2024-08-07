@@ -315,6 +315,7 @@ a.refresh {
 
 .zuul-pipeline-summary .zuul-change-queue {
     padding-top: 4px;
+    width: 100%;
 }
 
 .zuul-change-link {
