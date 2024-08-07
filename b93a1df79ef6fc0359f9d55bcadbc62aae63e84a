@@ -1,0 +1,322 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d37d5832_bfe9efd2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "My main concern is about branch matching with the current branch only, therefore -1. Otherwise it looks good.\n\nAlso, the review would be easier if the tpc-refactoring would have been done in a separate change.",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "496b14b4_c89c03ab",
+        "filename": "doc/source/config/project.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "If omitted when configuring a project other than the current project and `pragma.implied-branch-matchers` is not in effect, will the `job.branches` way of specifying a default value be used?",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c44fb29d_6009e07c",
+        "filename": "tests/fixtures/config/tenant-parser/config-superproject.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "Shall something in the filename suggest that this is a broken configuration, e.g. a `-bad-` prefix or suffix?",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5342f102_8f423018",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10427,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "```suggestion\n            \u0027org/project1\u0027, \u0027stable/implied\u0027, \u0027A\u0027\n```",
+      "range": {
+        "startLine": 10427,
+        "startChar": 46,
+        "endLine": 10427,
+        "endChar": 49
+      },
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2de6220b_3fb8974b",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10430,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "```suggestion\n            \u0027org/project1\u0027, \u0027stable/explicit\u0027, \u0027B\u0027\n```",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf56dfa8_25d03200",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10484,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "```suggestion\n            \u0027org/project1\u0027, \u0027stable/implied\u0027, \u0027A\u0027\n```",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8405599b_439b2f31",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10487,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "```suggestion\n            \u0027org/project1\u0027, \u0027stable/explicit\u0027, \u0027B\u0027\n```",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc8e69eb_fa78a8d2",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1351,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "Do I get it right that if you don\u0027t specify `branches` and this is a configuration for a different project, this will apply to all branches of the target project? How can I specify that my configuration should only apply to `source_context.branch`? Can a special `.` branch syntax be used to imply `source_context.branch`?",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b5a8ccb_b8714c42",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1853,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "This seems to be correct.",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28240055_e299857b",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2129,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "```suggestion\n            project_configure_projects \u003d []\n```",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "973e7185_2ca11fa1",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2189,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "```suggestion\n                \u0027configure-projects\u0027, []))\n```",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a58a47ce_d3f86fea",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2282,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "Remove this line? `tpc.canConfigureProject()` should check this anyway.",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87d12c6e_53e59970",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 7846,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "Why not initialize to an empty list?",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b5fddf2_31a7acb6",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 7851,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "Is this if statement only to cover that case that `self.configure_projects` is `None`? Can\u0027t it be initialized to `[]` instead and this if case be removed?",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "658b87e9_77e11780",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 7853,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "Please write a comment why `not validation_only` is used.",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0280053e_41dc57c7",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 7863,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "This if-statement can be removed if `self.always_dynamic_branches` is initialized to `[]` instead of `None`.",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f5c239b_3cc8bb10",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 9141,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "What is TPC? Please expand the abbreviation in the comment.",
+      "range": {
+        "startLine": 9141,
+        "startChar": 42,
+        "endLine": 9141,
+        "endChar": 46
+      },
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b058d5e2_771afd61",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 9158,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-07T09:30:44Z",
+      "side": 1,
+      "message": "What is TPC? Please expand the abbreviation in the comment.",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
