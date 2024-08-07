@@ -324,6 +324,7 @@ a.refresh {
 
 .zuul-pipeline-summary .zuul-change-queue {
     padding-top: 4px;
+    width: 100%;
 }
 
 .zuul-job-list.pf-c-data-list .pf-c-data-list__item-content {
