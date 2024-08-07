@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd452f45_4005b82a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "Thank you for mentioning your main concern so I could focus on it.\n\nIn general, if you leave a negative review, please make it very clear why you are doing so (particularly in the specific comment where you do).  And also, if you feel the need to leave minor \"nits\" make it clear that you consider them nits that do not require a revision.  But in general, we try to not leave nit-picky comments on reviews out of respect for the time of both the author and reviewer.  The purpose is to identify whether the change meets its requirements, has flaws, fits in with the overall direction, is complete, etc.  I don\u0027t think asking questions of me about general Zuul development concepts in -1 code reviews is the best use of our time.\n\nMost of these comments are \"nits\" and do not need to be addressed.  Please try to focus on more substantial issues in the future.  Your \"-1\" comment was a good example even though it does not represent an actual issue.",
+      "parentUuid": "d37d5832_bfe9efd2",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "496b14b4_c89c03ab",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8888bf3e_0d7e9f99",
+        "filename": "doc/source/config/project.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "job.branches does not provide a default value.  It sounds like you\u0027re confusing job branch matchers and project branch matchers.  They do different things.",
+      "parentUuid": "496b14b4_c89c03ab",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c44fb29d_6009e07c",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-08-07T09:30:44Z",
       "side": 1,
       "message": "Shall something in the filename suggest that this is a broken configuration, e.g. a `-bad-` prefix or suffix?",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00769ffd_05dd4706",
+        "filename": "tests/fixtures/config/tenant-parser/config-superproject.yaml",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "Not necessary.",
+      "parentUuid": "c44fb29d_6009e07c",
       "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -75,6 +129,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce9f51e2_cc6d237f",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10427,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "If this needs an update, sure, otherwise it\u0027s not important.",
+      "parentUuid": "5342f102_8f423018",
+      "range": {
+        "startLine": 10427,
+        "startChar": 46,
+        "endLine": 10427,
+        "endChar": 49
+      },
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2de6220b_3fb8974b",
@@ -88,6 +166,24 @@
       "writtenOn": "2024-08-07T09:30:44Z",
       "side": 1,
       "message": "```suggestion\n            \u0027org/project1\u0027, \u0027stable/explicit\u0027, \u0027B\u0027\n```",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a0ac9a9_8f8d4f03",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10430,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2de6220b_3fb8974b",
       "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -109,6 +205,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03a5ec08_1c7bc069",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10484,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "cf56dfa8_25d03200",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8405599b_439b2f31",
@@ -126,6 +240,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb8d58a1_ed05e600",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 10487,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8405599b_439b2f31",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc8e69eb_fa78a8d2",
@@ -139,6 +271,24 @@
       "writtenOn": "2024-08-07T09:30:44Z",
       "side": 1,
       "message": "Do I get it right that if you don\u0027t specify `branches` and this is a configuration for a different project, this will apply to all branches of the target project? How can I specify that my configuration should only apply to `source_context.branch`? Can a special `.` branch syntax be used to imply `source_context.branch`?",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5c8d9fa_17dbac62",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1351,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "If you don\u0027t specify ``branches`` and this is a configuration for a different project, then the standard project stanza behavior applies, which is:\n* If this project is unbranched, it applies to all branches\n* If this project is branched, then we get the implied branch matcher which is:\n  * The current branch unless\n  * Pragmas are used to set something else\n\nThis all happens in the project template parser.  So in the case you describe, we arrive at line 1334 already having the branch matcher you want (the current branch).  We only change that if we\u0027re configuring the same project: line 1334, or we explicitly set a value.\n\nThe spec says:\n\u003e By allowing project stanzas in untrusted-projects we will be permitting the creation of project stanzas with implied branch matchers based on the branch of the superproject where they are defined.",
+      "parentUuid": "fc8e69eb_fa78a8d2",
       "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -177,6 +327,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c0d5325_5ebbcfce",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2129,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "No, that breaks the intention that None is an unset value.\n\nMaybe next time instead of suggesting an edit with no context, explain why you think the code should be changed.",
+      "parentUuid": "28240055_e299857b",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "973e7185_2ca11fa1",
@@ -190,6 +358,24 @@
       "writtenOn": "2024-08-07T09:30:44Z",
       "side": 1,
       "message": "```suggestion\n                \u0027configure-projects\u0027, []))\n```",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "306baf0d_0fbe9fe7",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2189,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "No.",
+      "parentUuid": "973e7185_2ca11fa1",
       "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -211,6 +397,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c9485cb_9b5c0b84",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2282,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "We\u0027re saving an iteration.",
+      "parentUuid": "a58a47ce_d3f86fea",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87d12c6e_53e59970",
@@ -224,6 +428,24 @@
       "writtenOn": "2024-08-07T09:30:44Z",
       "side": 1,
       "message": "Why not initialize to an empty list?",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e67aefe6_7ccf7d1b",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 7846,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "As in common with some of your other comments, we often use None to indicate something is not configured.  It may or may not be important for this case.  But it\u0027s not worth fussing about.",
+      "parentUuid": "87d12c6e_53e59970",
       "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -245,6 +467,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25a66738_c362327e",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 7851,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "Doesn\u0027t matter.",
+      "parentUuid": "0b5fddf2_31a7acb6",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "658b87e9_77e11780",
@@ -262,6 +502,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a82880e_8e82dcbc",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 7853,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "Not a bad idea, but it should be apparent that we\u0027re disabling this check in order to determine if it\u0027s the only thing preventing an allowed project, which makes it an error in configuration.  I could add this if we need a revision.",
+      "parentUuid": "658b87e9_77e11780",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0280053e_41dc57c7",
@@ -275,6 +533,24 @@
       "writtenOn": "2024-08-07T09:30:44Z",
       "side": 1,
       "message": "This if-statement can be removed if `self.always_dynamic_branches` is initialized to `[]` instead of `None`.",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1fa39a9_6fbc4e84",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 7863,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "Out of scope.",
+      "parentUuid": "0280053e_41dc57c7",
       "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -302,6 +578,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5520f270_74787849",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 9141,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "It\u0027s a well understood concept that is documented and explained elsewhere.",
+      "parentUuid": "7f5c239b_3cc8bb10",
+      "range": {
+        "startLine": 9141,
+        "startChar": 42,
+        "endLine": 9141,
+        "endChar": 46
+      },
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b058d5e2_771afd61",
@@ -315,6 +615,24 @@
       "writtenOn": "2024-08-07T09:30:44Z",
       "side": 1,
       "message": "What is TPC? Please expand the abbreviation in the comment.",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b46ff8d4_f067d527",
+        "filename": "zuul/model.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 9158,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T18:11:39Z",
+      "side": 1,
+      "message": "Not necessary.",
+      "parentUuid": "b058d5e2_771afd61",
       "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
