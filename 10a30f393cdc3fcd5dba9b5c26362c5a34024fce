@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59c4d7f7_5f4f8482",
+        "filename": "zuul/lib/varnames.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-07T22:12:58Z",
+      "side": 1,
+      "message": "Nit: we could take the opportunity to improve the grammar with:\n  Defining a variable named...",
+      "revId": "10a30f393cdc3fcd5dba9b5c26362c5a34024fce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
