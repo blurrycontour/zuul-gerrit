@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0a10d5f_0ed69329",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-08T15:11:38Z",
+      "side": 1,
+      "message": "Thanks for the explanation. That sounds indeed unintuitive. I find the current behaviour very intuitive and I thought the default react behaviour should work the same. I also thought that the state is recreated if it\u0027s passed as a property - as the property changed and the component is re-rendered. Somehow it feels wrong if react re-renders the component with new props but keeps the old state. I\u0027ll have another look at this tomorrow.",
+      "parentUuid": "0634a855_d57cddd8",
+      "revId": "6c3e9607c77e29df33e21b9deca3f1821530af33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4e20ded_15bea1f5",
