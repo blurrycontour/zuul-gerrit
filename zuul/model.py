@@ -5406,6 +5406,8 @@ class BuildSet(zkobject.ZKObject):
         # if changes belongs to the same bunbdle
         if len(item.changes) > 1:
             change_dict['bundle_id'] = item.uuid
+        change_dict['queue_item_uuid'] = item.uuid
+        change_dict['enqueue_time'] = item.enqueue_time
         return change_dict
 
     def getStateName(self, state_num):

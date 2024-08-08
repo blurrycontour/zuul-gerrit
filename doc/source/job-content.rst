@@ -648,6 +648,18 @@ The following variables related to the queue item are available:
             The git sha of the ref.  Identical to ``newrev`` or
             ``oldrev`` if defined.
 
+      .. var:: queue_item_uuid
+
+         The identifier for the queue item which contains one or more items.
+         If the queue item is rescheduled due to failed jobs ahead in the
+         queue, a new identifier will be generated.
+
+      .. var:: enqueue_time
+
+         The epoch/Unix timestamp of when this (queue) item was added to the
+         pipeline queue. If the queue item is rescheduled due to failed jobs
+         ahead in the queue, this timestamp will be updated.
+
       .. var:: tag
 
          This field is present for the following item types:
