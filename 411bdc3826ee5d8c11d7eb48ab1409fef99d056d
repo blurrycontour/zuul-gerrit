@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9e06787_ee7b1cf6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-08-08T07:46:31Z",
+      "side": 1,
+      "message": "IMO the spec should be self-contained and not need reference to other materials, but whatever. I do not currently plan to volunteer for any implementation work.",
+      "revId": "411bdc3826ee5d8c11d7eb48ab1409fef99d056d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5bd95db_c17d5784",
