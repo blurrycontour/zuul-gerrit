@@ -648,6 +648,15 @@ The following variables related to the queue item are available:
             The git sha of the ref.  Identical to ``newrev`` or
             ``oldrev`` if defined.
 
+      .. var:: queue_item_uuid
+
+         The identifier for the queue item which contains one or more items.
+
+      .. var:: enqueue_time
+
+         The epoch/Unix timestamp of when this (queue) item was added to the
+         pipeline queue.
+
       .. var:: tag
 
          This field is present for the following item types:
