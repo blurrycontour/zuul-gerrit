@@ -34,6 +34,24 @@
       "parentUuid": "521faf9b_8b3396fe",
       "revId": "1db5b064edc1174493b588730bff4e577653641e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1ff4b07_b24e36a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-08T10:08:27Z",
+      "side": 1,
+      "message": "I obviously missed that this applies to all the fields, not just tags. Then it makes sense.",
+      "parentUuid": "d1e2e148_1bb97722",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
