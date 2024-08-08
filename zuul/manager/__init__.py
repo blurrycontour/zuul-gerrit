@@ -1222,6 +1222,8 @@ class PipelineManager(metaclass=ABCMeta):
                 change_dict = resolved_change.toDict()
                 if 'bundle_id' in orig_dict:
                     change_dict['bundle_id'] = orig_dict['bundle_id']
+                change_dict['queue_item_uuid'] = orig_dict['queue_item_uuid']
+                change_dict['enqueue_time'] = orig_dict['enqueue_time']
                 dependent_changes.append(change_dict)
 
         for job in jobs:
