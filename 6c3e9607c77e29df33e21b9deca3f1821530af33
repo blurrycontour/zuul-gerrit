@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55e20925_b8da3325",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-08T05:18:18Z",
+      "side": 1,
+      "message": "I think the `QueueCard` (visualizing a single queue) should only take care about the state for a single queue. The `areAllQueuesExpanded` state should be lifted to a higher component (`PipelineSummary` is the right one, I think) and be passed down as property to the `QueueCard`. We could then use the value provided by this property directly as default value for the `isQueueExpanded` state. This way we could also avoid the code in lines 76-80 (which tries to match the different states).\n\nSomething like this:\n\n```\nfunction QueueCard({pipeline, queue, allQueuesExpanded}) {\n  const [isQueueExpanded, setIsQueueExpanded] \u003d useState(allQueuesExpanded)\n  \n  const onQueueToggle \u003d () \u003d\u003e {\n  ...\n```",
+      "revId": "6c3e9607c77e29df33e21b9deca3f1821530af33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4e20ded_15bea1f5",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-08T05:18:18Z",
+      "side": 1,
+      "message": "In combination with my comment above, we should rename this to `areAllQueuesExpanded` to make the difference clear.",
+      "revId": "6c3e9607c77e29df33e21b9deca3f1821530af33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
