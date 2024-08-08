@@ -85,6 +85,9 @@ class GerritSSHEventListener(threading.Thread):
             transport = client.get_transport()
             transport.set_keepalive(self.keepalive)
 
+            # We don't set a timeout for this since it is never
+            # expected to complete.  We rely on ssh and tcp keepalives
+            # to detected a down connection.
             stdin, stdout, stderr = client.exec_command("gerrit stream-events")
 
             self._listen(stdout, stderr)

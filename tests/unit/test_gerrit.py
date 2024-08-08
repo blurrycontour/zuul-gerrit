@@ -32,6 +32,9 @@ from zuul.lib import strings
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.gerrit.gerritconnection import GerritConnection
 
+import paramiko
+import testtools
+
 FIXTURE_DIR = os.path.join(tests.base.FIXTURE_DIR, 'gerrit')
 
 
@@ -171,6 +174,28 @@ class TestGerrit(BaseTestCase):
         self.assertEqual(
             'ssh://gerrit@localhost:29418/org/project',
             url)
+
+    def test_ssh_exec_timeout(self):
+        with mock.patch('paramiko.SSHClient') as mock_ssh_client:
+            mock_client = mock.Mock()
+            mock_ssh_client.return_value = mock_client
+            mock_client.exec_command.side_effect =\
+                paramiko.buffered_pipe.PipeTimeout()
+
+            gerrit_config = {
+                'user': 'gerrit',
+                'server': 'localhost',
+            }
+            driver = GerritDriver()
+            gerrit = GerritConnection(driver, 'review_gerrit', gerrit_config)
+            with testtools.ExpectedException(
+                    paramiko.buffered_pipe.PipeTimeout):
+                gerrit._ssh("echo hi")
+            expected = [
+                mock.call('echo hi', timeout=30),
+                mock.call('echo hi', timeout=30),
+            ]
+            self.assertEqual(expected, mock_client.exec_command.mock_calls)
 
 
 class TestGerritWeb(ZuulTestCase):
