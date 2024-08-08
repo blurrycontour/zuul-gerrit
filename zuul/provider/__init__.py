@@ -301,14 +301,13 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         """
         raise NotImplementedError()
 
-    def getDeleteStateMachine(self, external_id, log):
+    def getDeleteStateMachine(self, node, log):
         """Return a state machine suitable for deleting an instance
 
         This method should return a new state machine object
         initialized to delete the described instance.
 
-        :param str or dict external_id: The external_id of the instance, as
-            supplied by a creation StateMachine or an Instance.
+        :param node ProviderNode: The node that should be deleted.
         :param log Logger: A logger instance for emitting annotated
             logs related to the request.
         """
@@ -436,18 +435,18 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         raise NotImplementedError()
 
     # The following methods are optional
-    def getConsoleLog(self, label, external_id):
+    def getConsoleLog(self, label, node):
         """Return the console log from the specified server
 
         :param label ConfigLabel: The label config for the node
-        :param external_id str or dict: The external id of the server
+        :param ProviderNode node: The node of the server
         """
         raise NotImplementedError()
 
-    def notifyNodescanFailure(self, label, external_id):
+    def notifyNodescanFailure(self, label, node):
         """Notify the adapter of a nodescan failure
 
         :param label ConfigLabel: The label config for the node
-        :param external_id str or dict: The external id of the server
+        :param ProviderNode node: The node of the server
         """
         pass

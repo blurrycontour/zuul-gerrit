@@ -2383,9 +2383,13 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             connection_name=self.connection_name,
             create_state=self.create_state,
             delete_state=self.delete_state,
-            **self.getNodeData()
+            **self.getNodeData(),
+            **self.getDriverData(),
         )
         return json.dumps(data, sort_keys=True).encode("utf-8")
+
+    def getDriverData(self):
+        return dict()
 
     def getNodeData(self):
         return dict(

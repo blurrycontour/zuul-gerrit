@@ -20,7 +20,6 @@ class StateMachine:
 
     def __init__(self, initial_state):
         self.state = initial_state.get("state", self.START)
-        self.external_id = initial_state.get("external_id", None)
         self.complete = False
         self.start_time = initial_state.get("start_time", time.monotonic())
 
@@ -30,7 +29,6 @@ class StateMachine:
     def toDict(self):
         return dict(
             state=self.state,
-            external_id=self.external_id,
             start_time=self.start_time,
         )
 
@@ -47,7 +45,6 @@ class Instance:
 
     * ready: bool (whether the instance is ready)
     * deleted: bool (whether the instance is in a deleted state)
-    * external_id: str or dict (the unique id of the instance)
     * interface_ip: str
     * metadata: dict
 
@@ -82,7 +79,6 @@ class Instance:
     def __init__(self):
         self.ready = False
         self.deleted = False
-        self.external_id = None
         self.public_ipv4 = None
         self.public_ipv6 = None
         self.private_ipv4 = None
@@ -94,6 +90,12 @@ class Instance:
         self.metadata = {}
         self.driver_data = None
         self.slot = None
+
+    @property
+    def external_id(self):
+        """Return a string representation of external ID(s) for this instance,
+        for use in logging"""
+        raise NotImplementedError()
 
     def __repr__(self):
         state = []

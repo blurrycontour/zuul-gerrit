@@ -19,17 +19,25 @@ from zuul.driver.aws.util import tag_list_to_dict
 
 
 class AwsProviderNode(model.ProviderNode, subclass_id="aws"):
-    pass
+    def __init__(self):
+        super().__init__()
+        self._set(
+            aws_instance_id=None,
+            aws_dedicated_host_id=None,
+        )
+
+    def getDriverData(self):
+        return dict(
+            aws_instance_id=self.aws_instance_id,
+            aws_dedicated_host_id=self.aws_dedicated_host_id,
+        )
 
 
 class AwsInstance(statemachine.Instance):
     def __init__(self, region, instance, host, quota):
         super().__init__()
-        self.external_id = dict()
-        if instance:
-            self.external_id['instance'] = instance['InstanceId']
-        if host:
-            self.external_id['host'] = host['HostId']
+        self.aws_instance_id = instance and instance['InstanceId'] or None
+        self.aws_dedicated_host_id = host and host['HostId'] or None
         self.metadata = tag_list_to_dict(instance.get('Tags'))
         self.private_ipv4 = instance.get('PrivateIpAddress')
         self.private_ipv6 = None
@@ -51,6 +59,13 @@ class AwsInstance(statemachine.Instance):
 
     def getQuotaInformation(self):
         return self.quota
+
+    @property
+    def external_id(self):
+        if self.aws_dedicated_host_id:
+            return (f'instance={self.aws_instance_id} '
+                    f'host={self.aws_dedicated_host_id}')
+        return f'instance={self.aws_instance_id}'
 
 
 class AwsResource(statemachine.Resource):
