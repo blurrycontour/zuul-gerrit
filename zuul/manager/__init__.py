@@ -1220,8 +1220,15 @@ class PipelineManager(metaclass=ABCMeta):
             for resolved_change, orig_dict in zip(resolved_changes,
                                                   build_set.dependent_changes):
                 change_dict = resolved_change.toDict()
+                # Depending on MODEL_API, all values may not have been written
+                # to orig_dict in ZooKeeper.
                 if 'bundle_id' in orig_dict:
                     change_dict['bundle_id'] = orig_dict['bundle_id']
+                if 'queue_item_uuid' in orig_dict:
+                    change_dict['queue_item_uuid'] = \
+                        orig_dict['queue_item_uuid']
+                if 'enqueue_time' in orig_dict:
+                    change_dict['enqueue_time'] = orig_dict['enqueue_time']
                 dependent_changes.append(change_dict)
 
         for job in jobs:
