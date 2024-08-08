@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de4246b6_c8e3594e",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-08T15:22:44Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "f4ed018f_3584a811",
+      "revId": "63c41dd72687e92959f67ebe683871fdaa20786f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "24a11809_db644a5b",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-08-08T05:28:11Z",
       "side": 1,
       "message": "Same question as above. We could provide the key property directly to the `ChangeQueue` to avoid the empty fragment here (unless this has impact on the styling/alignment of the items):\n\n```\n\u003cChangeQueue key\u003d{idx} queue\u003d{queue} pipeline\u003d{pipeline} showTitle\u003d{false}/\u003e\n```",
+      "revId": "63c41dd72687e92959f67ebe683871fdaa20786f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f79765b1_244a36b9",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-08T15:22:44Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "24a11809_db644a5b",
       "revId": "63c41dd72687e92959f67ebe683871fdaa20786f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
