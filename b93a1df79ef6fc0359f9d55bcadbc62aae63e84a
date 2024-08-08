@@ -36,6 +36,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3ef41eb_05103056",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-08T10:52:29Z",
+      "side": 1,
+      "message": "I missed the default initialization of the branch matchers in my previous review, so the code in the change looks good to me. The rest of my comment should have been marked with `nit: `.",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "496b14b4_c89c03ab",
@@ -67,6 +84,24 @@
       "side": 1,
       "message": "job.branches does not provide a default value.  It sounds like you\u0027re confusing job branch matchers and project branch matchers.  They do different things.",
       "parentUuid": "496b14b4_c89c03ab",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88879e67_91941395",
+        "filename": "doc/source/config/project.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-08T10:52:29Z",
+      "side": 1,
+      "message": "It is just that I cannot see, in the documentation, what is happening \"If omitted when configuring a project other than the current project\" and I have left `pragma.implied-branch-matchers` and `pragma.implied-branches` unset. I think that should be clarified but it\u0027s not a blocker for the change.",
+      "parentUuid": "8888bf3e_0d7e9f99",
       "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -289,6 +324,24 @@
       "side": 1,
       "message": "If you don\u0027t specify ``branches`` and this is a configuration for a different project, then the standard project stanza behavior applies, which is:\n* If this project is unbranched, it applies to all branches\n* If this project is branched, then we get the implied branch matcher which is:\n  * The current branch unless\n  * Pragmas are used to set something else\n\nThis all happens in the project template parser.  So in the case you describe, we arrive at line 1334 already having the branch matcher you want (the current branch).  We only change that if we\u0027re configuring the same project: line 1334, or we explicitly set a value.\n\nThe spec says:\n\u003e By allowing project stanzas in untrusted-projects we will be permitting the creation of project stanzas with implied branch matchers based on the branch of the superproject where they are defined.",
       "parentUuid": "fc8e69eb_fa78a8d2",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78258e1b_c4b5e603",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 1351,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-08-08T10:52:29Z",
+      "side": 1,
+      "message": "You are right, I missed the default initialization in the code base and thought this was the only place it was set.",
+      "parentUuid": "c5c8d9fa_17dbac62",
       "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
