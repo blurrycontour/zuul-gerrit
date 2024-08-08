@@ -106,6 +106,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1dfb5ccc_ad94e772",
+        "filename": "doc/source/config/project.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-08T16:35:15Z",
+      "side": 1,
+      "message": "Got it, thanks.  I agree that can/should be more clear.  Updated in next PS.",
+      "parentUuid": "88879e67_91941395",
+      "revId": "b93a1df79ef6fc0359f9d55bcadbc62aae63e84a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c44fb29d_6009e07c",
