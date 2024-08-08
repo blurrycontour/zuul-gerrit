@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0634a855_d57cddd8",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-08T14:43:46Z",
+      "side": 1,
+      "message": "I would have liked to do that too, but the way react useState works produces unintuitive behavior.\n\nWe don\u0027t get a new state closure when we pass in a different property value to QueueCard.  That means that the default initialization behavior only works the first time.  And that means that if you click on the outer carat to expand all the queues, the queues themselves don\u0027t update.\n\nSo this code is my closest approximation of that.  It does indeed maintain the \"canonical\" state of the outer carat in the PipelineSummary, and it then passes that into the QueueCard which uses it as a default.  The way it accomplishes that is by treating any change in value of the outer state as an instruction to copy that to its own state (and that includes initialization), but otherwise, letting its own state change independently.\n\nI chose \"expanded\" as a property name to indicate that the caller wanted to express an initial state, but I\u0027m happy to change the property name to allQueuesExpanded to make that more clear.",
+      "parentUuid": "55e20925_b8da3325",
+      "revId": "6c3e9607c77e29df33e21b9deca3f1821530af33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4e20ded_15bea1f5",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-08-08T05:18:18Z",
       "side": 1,
       "message": "In combination with my comment above, we should rename this to `areAllQueuesExpanded` to make the difference clear.",
+      "revId": "6c3e9607c77e29df33e21b9deca3f1821530af33",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abe2dda1_2fc84b78",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-08T14:43:46Z",
+      "side": 1,
+      "message": "WFM.",
+      "parentUuid": "c4e20ded_15bea1f5",
       "revId": "6c3e9607c77e29df33e21b9deca3f1821530af33",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
