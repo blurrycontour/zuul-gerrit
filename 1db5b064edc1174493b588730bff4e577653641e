@@ -194,6 +194,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16cbd9fa_3dc08826",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:25:11Z",
+      "side": 1,
+      "message": "Oh yup it is a singleton list but that should be sufficient to pass through the other side of the yaml validation.",
+      "parentUuid": "abf03d12_f475c960",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50727ad8_7d43b33b",
@@ -264,6 +282,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "509ac062_e1e9680d",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:25:11Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9299a9a4_722f4a24",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d63c676_0158799f",
@@ -330,6 +366,24 @@
       "side": 1,
       "message": "1) Locality: we\u0027re changing the attribute exactly where it\u0027s being set, and this should be intuitive to most programmers since programming languages would handle this as part of the statement, or declaration, or with a decorator.\n\n2) To avoid the confusion that having a new job attribute would introduce.  Is that attribute itself inheritable?",
       "parentUuid": "cd53ca54_a5aa85a6",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b851d19_0ef5212f",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1174,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:25:11Z",
+      "side": 1,
+      "message": "2) in particular has me convinced that this is the right approach. We\u0027re setting an job attribute attribute and if we added a new job attribute to the mix we create a recursive problem for end users.",
+      "parentUuid": "9fb9763b_181b2e26",
       "revId": "1db5b064edc1174493b588730bff4e577653641e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -416,6 +470,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "20e4da07_93933a70",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3778,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:25:11Z",
+      "side": 1,
+      "message": "I agree that it shouldn\u0027t change the outcome. The main impact would be the time it takes to reach a conclusion. I think if we find people have really slow matcher processing we can tackle this then.",
+      "parentUuid": "8abc67f9_523a4f1a",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "46549304_0cacd6bc",
@@ -447,6 +519,24 @@
       "side": 1,
       "message": "I don\u0027t think I intended that as a bugfix; I don\u0027t think any of the tests would have called that to my attention.  Instead, I think this was just making the code a little more clear and explicit about the behavior here.\n\nI think that if someone did what you suggest, Zuul would no-op on the second acquisition, so that error would go unnoticed, and this shouldn\u0027t change that.",
       "parentUuid": "46549304_0cacd6bc",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26dab15f_35a0a497",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4000,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:25:11Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c5a03ac9_bdefc990",
       "revId": "1db5b064edc1174493b588730bff4e577653641e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
