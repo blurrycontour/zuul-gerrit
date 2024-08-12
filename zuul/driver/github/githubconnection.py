@@ -2624,6 +2624,12 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
 
     def getPushedFileNames(self, event):
         files = set()
+        # The payload for the push event is now limited to 2,048
+        # commits. If there are more than 2,048 commits, the event will
+        # not contain serialized diff information for each commit.
+        # In this case we need to get the files via the merger.
+        if len(event.commits) >= 2048:
+            return None
         for c in event.commits:
             for f in c.get('added') + c.get('modified') + c.get('removed'):
                 files.add(f)
