@@ -18,6 +18,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b1d4506_ce7fc57f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:44:58Z",
+      "side": 1,
+      "message": "I\u0027m not +2\u0027ing here as I haven\u0027t been able to review the entire change (mostly the test cases). But the overall idea seems useful.",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2b4cec9_26372dc1",
@@ -84,6 +101,24 @@
       "side": 1,
       "message": "I\u0027m a little hesitant to do that because, for example, we already allow jobs to do exactly this.  I\u0027d like to keep things relatively consistent.\n\n(Which isn\u0027t to say I wouldn\u0027t be open to changing both.)",
       "parentUuid": "be944e8e_656674ae",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8946481_19738237",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1351,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:44:58Z",
+      "side": 1,
+      "message": "That is true. It is also true that debugging the branch matcher overrides for jobs is a common thing we have to explain to people. I guess we can see how this manifests (if at all) when people are able to start using the feature and improve documentation/education once if there are patterns that can be addressed. I just selfishly want to avoid needing to debug these situations where zuul is doing exactly what it was told to do but nevertheless people are confused by the behavior.",
+      "parentUuid": "3fb11377_893063e2",
       "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -195,6 +230,30 @@
       "side": 1,
       "message": "These lines are exactly the code that prevents the thing that you are concerned with.  That is to say, this is part of the code that ensures that an untrusted-project can not configure a trusted-project.\n\ncanConfigureProject normally does not allow an untrusted-project to configure a config-project.  But the validation_only argument disables that check, so that in this method, we can see if that\u0027s what the user\u0027s config was trying to do (keep in mind that regexes are involved, so the only way for us to know is to test each one).  If the check in canConfigureProjects is the only thing that prevents a config project from being configured, we raise an exception here so the user sees it and we don\u0027t load the config.\n\nIf we didn\u0027t do this, then the config would be deemed valid right up until the user tried to configure a config-project; then it would blow up.",
       "parentUuid": "d8809cce_78d7ada5",
+      "range": {
+        "startLine": 2283,
+        "startChar": 33,
+        "endLine": 2283,
+        "endChar": 49
+      },
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ee2685d_ed14f73f",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2283,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:44:58Z",
+      "side": 1,
+      "message": "I see the escape hatch for entertaining the idea is only a way to provide early errors. That seems like a reasonable escape hatch for user friendliness and I\u0027m glad that this is the desired behavior (to prevent promotion of repos essentially).",
+      "parentUuid": "579a66c6_dd20675c",
       "range": {
         "startLine": 2283,
         "startChar": 33,
