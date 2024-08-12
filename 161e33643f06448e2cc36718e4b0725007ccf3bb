@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "332b088b_f4745f6a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:18:17Z",
+      "side": 1,
+      "message": "I haven\u0027t reviewed the test cases yet but wanted to get what I had reviewed so far posted before EOD.",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2b4cec9_26372dc1",
+        "filename": "doc/source/config/project.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:18:17Z",
+      "side": 1,
+      "message": "In an unbranched project will we be able to express something like:\n\n```\n- project:\n    name: foo\n    branches: main\n    do_some: stuff\n    \n- project:\n    name: foo\n    branches: notmain\n    do_some: other_stuff\n```\n\nOr do we only get to express a single project config against a subset of branches if we use the branches attribute here?",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be944e8e_656674ae",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1351,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:18:17Z",
+      "side": 1,
+      "message": "I know there are warnings about this in the new doc updates, but I wonder if we should only allow branches to affect project configs in branched repos if we are not modifying the same project. From a debugging perspective I expect project foo branch stable/bar having a project stanza for itself that has branches: main set on it is going to be a fun one.\n\nThat said I guess this really isn\u0027t that different than having a projcet stanza for project foo2\u0027s main branch being modified by a project config in project foo branch stable/bar. The only difference is that you need to update the tenant config to do it to other projects but you can always make the updates against the current project?",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a6cbdbe_8ce78c43",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2129,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:18:17Z",
+      "side": 1,
+      "message": "In the schema above we\u0027ve limited configure-projects to unstrusted project definitions but here we seem to always include it whether it is trusted or not. I guess we can special case trusted projects to ignore this attribute entirely.",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06e96a72_1c880142",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2196,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:18:17Z",
+      "side": 1,
+      "message": "See above.",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8809cce_78d7ada5",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2283,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T23:18:17Z",
+      "side": 1,
+      "message": "config_projects appears to only include trusted tpcs in it (lines 2263-2267 above). This as well as the exception handler below implies that we would allow untrusted projects to configure trusted projects. Are there security concerns with doing this? For example running pre merge configs against trusted config projects via an update to an untrusted project?\n\nI think I would personally be more comfortable with untrusted projects only being allowed to configure other untrusted projects. Then the entire question about how to do this securely largely goes away and you\u0027re limited to doing untrusted things against other untrusted repos.",
+      "range": {
+        "startLine": 2283,
+        "startChar": 33,
+        "endLine": 2283,
+        "endChar": 49
+      },
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
