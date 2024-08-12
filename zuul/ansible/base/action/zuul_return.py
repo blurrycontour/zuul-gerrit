@@ -19,6 +19,15 @@ import tempfile
 from copy import deepcopy
 
 from ansible.plugins.action import ActionBase
+from zuul.ansible.schema import (
+    artifact_schema,
+    warning_schema,
+)
+
+
+def validate_schema(data):
+    artifact_schema(data)
+    warning_schema(data)
 
 
 def merge_dict(dict_a, dict_b):
@@ -118,6 +127,10 @@ def set_value(path, new_data, new_file, new_secret_data, new_secret_file):
         merge_data(new_data, data)
     if new_secret_data:
         merge_data(new_secret_data, secret_data)
+
+    # Validate the schema:
+    validate_schema(data)
+    validate_schema(secret_data)
 
     # Replace our results file ('path') with the updated data.
     (f, tmp_path) = tempfile.mkstemp(dir=workdir)
