@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6870b0f3_1723ba03",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T18:34:30Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6f8fff96_070ce9a4",
+      "revId": "b1a93b4888bfa9bb1b53bfdc8eaed5b4b64fc64c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "363da592_c7d8ee56",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "363da592_c7d8ee56",
+      "revId": "b1a93b4888bfa9bb1b53bfdc8eaed5b4b64fc64c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6f5de8a_a2122012",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 7996,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T18:34:30Z",
+      "side": 1,
+      "message": "FTR I meant:\n\u0027# TODO: Deprecated, remove after version 12.`\n\nNot necessarily to switch to using the model api.",
+      "parentUuid": "9f200cd8_855b007c",
       "revId": "b1a93b4888bfa9bb1b53bfdc8eaed5b4b64fc64c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
