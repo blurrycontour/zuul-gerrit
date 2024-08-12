@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f6115b24_4ec83e52",
+        "filename": "zuul/model_api.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T18:33:53Z",
+      "side": 1,
+      "message": "It looks like this is just used for documentation purposes and we don\u0027t actually need a model rev.\n\nYou could just set the model_api comments without revving it here, and then whenever model_api 31 shows up, they will be correct.\n\nOr you could use a different way of annotating the deprecation.\n\nI prefer either of those, esp the second.\n\nBut if you really do want to rev the model for this, then we need an entry in model-changelog.rst.",
+      "revId": "ac40f0fc777dd5bdbb1f39de79aaa9821fd6638b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
