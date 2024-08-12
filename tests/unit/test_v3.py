@@ -6184,6 +6184,146 @@ class TestShadow(ZuulTestCase):
         ], ordered=False)
 
 
+class TestArtifactReturnSynthetic(ZuulTestCase):
+    # Artifact data return tests that don't run Ansible
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def _get_artifacts(self):
+        connection = self.scheds.first.sched.sql.connection
+        builds = connection.getBuilds()
+        return [dict(name=a.name,
+                     url=a.url,
+                     metadata=a.meta)
+                for a in builds[0].artifacts]
+
+    def _test_artifact_return(self, artifacts):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.executor_server.returnData(
+            'check-job', A,
+            {'zuul':
+             {'artifacts': artifacts}
+             }
+        )
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+    @simple_layout('layouts/simple.yaml')
+    def test_artifact_return_ok(self):
+        # Test the normal case.
+        self._test_artifact_return(
+            [
+                {'name': 'image',
+                 'url': 'something',
+                 'metadata': {
+                     'type': 'test_data'
+                 }},
+            ])
+        self.assertEqual([{'name': 'image',
+                           'url': 'something',
+                           'metadata': '{"type": "test_data"}'}],
+                         self._get_artifacts())
+
+    @simple_layout('layouts/simple.yaml')
+    def test_artifact_return_no_url(self):
+        # Test that if we return malformed data, the scheduler doesn't
+        # break.
+        self._test_artifact_return(
+            [
+                {'name': 'image',
+                 'metadata': {
+                     'type': 'test_data'
+                 }},
+            ])
+        self.assertEqual([], self._get_artifacts())
+
+    @simple_layout('layouts/simple.yaml')
+    def test_artifact_return_no_name(self):
+        # Test that if we return malformed data, the scheduler doesn't
+        # break.
+        self._test_artifact_return(
+            [
+                {'url': 'something',
+                 'metadata': {
+                     'type': 'test_data'
+                 }},
+            ])
+        self.assertEqual([], self._get_artifacts())
+
+    @simple_layout('layouts/simple.yaml')
+    def test_artifact_return_bad_metadata(self):
+        # Test that if we return malformed data, the scheduler doesn't
+        # break.
+        self._test_artifact_return(
+            [
+                {'name': 'image',
+                 'url': 'something',
+                 'metadata': [1],
+                 },
+            ])
+        self.assertEqual([], self._get_artifacts())
+
+
+class TestArtifactReturn(AnsibleZuulTestCase):
+    tenant_config_file = 'config/artifact-return/main.yaml'
+
+    def _get_artifacts(self):
+        connection = self.scheds.first.sched.sql.connection
+        builds = connection.getBuilds()
+        return [dict(name=a.name,
+                     url=a.url,
+                     metadata=a.meta)
+                for a in builds[0].artifacts]
+
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+    def _test_artifact_return(self, job, error):
+        self.executor_server.keep_jobdir = True
+        expected_result = error and 'FAILURE' or 'SUCCESS'
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files={job: ''})
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name=job, result=expected_result, changes='1,1'),
+        ], ordered=False)
+        j = json.loads(self._get_file(self.history[0],
+                                      'work/logs/job-output.json'))
+        result = j[0]['plays'][0]['tasks'][1]['hosts']['localhost']
+        self.assertEqual('zuul_return', result['action'])
+        if error:
+            self.assertEqual([], self._get_artifacts())
+            self.assertIn(error, result['msg'])
+        else:
+            self.assertEqual([{'name': 'image',
+                               'url': 'something',
+                               'metadata': '{"type": "test_data"}'}],
+                             self._get_artifacts())
+            self.assertNotIn('msg', result)
+
+    def test_artifact_return_ok(self):
+        # Test the normal case.
+        self._test_artifact_return('ok', None)
+
+    def test_artifact_return_no_url(self):
+        # Test that bad data results in a user-visible error.
+        self._test_artifact_return('no-url', 'required key not provided')
+
+    def test_artifact_return_no_name(self):
+        # Test that bad data results in a user-visible error.
+        self._test_artifact_return('no-name', 'required key not provided')
+
+    def test_artifact_return_bad_metadata(self):
+        # Test that bad data results in a user-visible error.
+        self._test_artifact_return('bad-metadata',
+                                   'expeceted dict for dictionary value')
+
+
 class TestDataReturn(AnsibleZuulTestCase):
     tenant_config_file = 'config/data-return/main.yaml'
 
