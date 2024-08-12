@@ -106,6 +106,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a90489fa_09dc7e48",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:09:39Z",
+      "side": 1,
+      "message": "It\u0027s not a change.  The wording on the old side is a little archaic and is cargo-culted from when the inherit and variant behaviors were a bit different.  That\u0027s probably what makes it sound weird.\n\nHere I\u0027m trying to make the docs more consistent, so it\u0027s a bigger delta in wording compared to some others.",
+      "parentUuid": "9f3af4ef_5df00b5f",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9145a3c1_4f460130",
@@ -119,6 +137,24 @@
       "writtenOn": "2024-08-12T22:21:13Z",
       "side": 1,
       "message": "I think this is the main attribute (along with irrelevant-files below) that opendev users will use this for.",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41d30fad_dc8b74dd",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1147,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:09:39Z",
+      "side": 1,
+      "message": "It could also make folks more comfortable using failure detection.",
+      "parentUuid": "9145a3c1_4f460130",
       "revId": "1db5b064edc1174493b588730bff4e577653641e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -142,6 +178,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "abf03d12_f475c960",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:09:39Z",
+      "side": 1,
+      "message": "The override entry below uses a list just to get some variety in the coverage.  I think that should address this kind of issue.",
+      "parentUuid": "54c66658_01a6664d",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "50727ad8_7d43b33b",
         "filename": "tests/unit/test_model.py",
         "patchSetId": 1
@@ -153,6 +207,24 @@
       "writtenOn": "2024-08-12T22:21:13Z",
       "side": 1,
       "message": "We don\u0027t need an explicit parent set for child because we\u0027re manually applying variant above rather than using the full internal config generation?",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b75db13c_03ea7b62",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:09:39Z",
+      "side": 1,
+      "message": "Exactly; nothing would use it if we set it.",
+      "parentUuid": "50727ad8_7d43b33b",
       "revId": "1db5b064edc1174493b588730bff4e577653641e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -176,6 +248,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9299a9a4_722f4a24",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:09:39Z",
+      "side": 1,
+      "message": "Probably so; maybe if this gets another patchset?",
+      "parentUuid": "857c2c7e_15b3ba6d",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5d63c676_0158799f",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
@@ -187,6 +277,24 @@
       "writtenOn": "2024-08-12T22:21:13Z",
       "side": 1,
       "message": "vs.Any() will return the first matching scheme within the Any() arg list. Then we call that passing in v. For the case of `\u0027requires\u0027: override_list(str),` if requires has a list of entries we end up running something like `[str](\u0027one\u0027, \u0027two\u0027)`. Is voluptious doing matching to make a list a thing a callable that validates against that type?\n\nIn the singleton case we would just call `str(\u0027one\u0027)` and be fine.",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87a06d7f_afee5974",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:09:39Z",
+      "side": 1,
+      "message": "Keep in mind that vs.Any() is not a function, it\u0027s a class that\u0027s being passed arguments to its initializer.  so line 84 is creating a vs.Any instance, and then we invoke its __call__ method with the data.  That call method decides which of the two things passed to the initializer it should use based on the data given to it.",
+      "parentUuid": "5d63c676_0158799f",
       "revId": "1db5b064edc1174493b588730bff4e577653641e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -210,6 +318,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9fb9763b_181b2e26",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1174,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:09:39Z",
+      "side": 1,
+      "message": "1) Locality: we\u0027re changing the attribute exactly where it\u0027s being set, and this should be intuitive to most programmers since programming languages would handle this as part of the statement, or declaration, or with a decorator.\n\n2) To avoid the confusion that having a new job attribute would introduce.  Is that attribute itself inheritable?",
+      "parentUuid": "cd53ca54_a5aa85a6",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "00675160_7f5bec84",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -221,6 +347,30 @@
       "writtenOn": "2024-08-12T22:21:13Z",
       "side": 1,
       "message": "Nit: We seem to prefer defaulting to not overriding in most cases. Should the default be False to match? Or maybe we shouldn\u0027t allow for defaults and instead require everything to be explicitly set as it is very attribute context specific?",
+      "range": {
+        "startLine": 3389,
+        "startChar": 47,
+        "endLine": 3389,
+        "endChar": 51
+      },
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a61e635_fe4bfb9b",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3389,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:09:39Z",
+      "side": 1,
+      "message": "I\u0027m kind of ambivalent on this point.  Maybe no default.  Maybe do this if we make a new patchset?",
+      "parentUuid": "00675160_7f5bec84",
       "range": {
         "startLine": 3389,
         "startChar": 47,
@@ -250,6 +400,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8abc67f9_523a4f1a",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3778,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:09:39Z",
+      "side": 1,
+      "message": "It\u0027s because if someone sets !inherit, then we do a set union, so this produces stable output (which we should have for comparing job changes).  I don\u0027t think this would change the outcome, and, since we\u0027re going to examine shorter regexes first, this might improve performance.\n\nIf we\u0027re concerned, we could do the union manually with the config order, but I think this is okay.",
+      "parentUuid": "827858fe_b0182b52",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "46549304_0cacd6bc",
         "filename": "zuul/model.py",
         "patchSetId": 1
@@ -261,6 +429,24 @@
       "writtenOn": "2024-08-12T22:21:13Z",
       "side": 1,
       "message": "Is the use of set and union here to remove duplicates a bug fix? Could you have previously listed the same semaphore twice then deadlocked when trying to grab it again? I wonder if that is worth a separate change and release note?",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5a03ac9_bdefc990",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4000,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:09:39Z",
+      "side": 1,
+      "message": "I don\u0027t think I intended that as a bugfix; I don\u0027t think any of the tests would have called that to my attention.  Instead, I think this was just making the code a little more clear and explicit about the behavior here.\n\nI think that if someone did what you suggest, Zuul would no-op on the second acquisition, so that error would go unnoticed, and this shouldn\u0027t change that.",
+      "parentUuid": "46549304_0cacd6bc",
       "revId": "1db5b064edc1174493b588730bff4e577653641e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
