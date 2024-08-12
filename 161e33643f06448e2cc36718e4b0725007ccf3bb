@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "249d7f52_3080800f",
+        "filename": "doc/source/config/project.rst",
+        "patchSetId": 5
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:33:41Z",
+      "side": 1,
+      "message": "What you wrote will work.  (It\u0027s already the case that any number of project config stanzas are supported.)",
+      "parentUuid": "a2b4cec9_26372dc1",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "be944e8e_656674ae",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-08-12T23:18:17Z",
       "side": 1,
       "message": "I know there are warnings about this in the new doc updates, but I wonder if we should only allow branches to affect project configs in branched repos if we are not modifying the same project. From a debugging perspective I expect project foo branch stable/bar having a project stanza for itself that has branches: main set on it is going to be a fun one.\n\nThat said I guess this really isn\u0027t that different than having a projcet stanza for project foo2\u0027s main branch being modified by a project config in project foo branch stable/bar. The only difference is that you need to update the tenant config to do it to other projects but you can always make the updates against the current project?",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fb11377_893063e2",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1351,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:33:41Z",
+      "side": 1,
+      "message": "I\u0027m a little hesitant to do that because, for example, we already allow jobs to do exactly this.  I\u0027d like to keep things relatively consistent.\n\n(Which isn\u0027t to say I wouldn\u0027t be open to changing both.)",
+      "parentUuid": "be944e8e_656674ae",
       "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -69,6 +105,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0999b922_6a80d38d",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2129,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:33:41Z",
+      "side": 1,
+      "message": "The validation should prevent it from ever happening, but even if it did, I believe the logic in the code is sound, so I don\u0027t think this needs to change.",
+      "parentUuid": "1a6cbdbe_8ce78c43",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06e96a72_1c880142",
@@ -86,6 +140,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef908659_d915c3c7",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2196,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:33:41Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "06e96a72_1c880142",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8809cce_78d7ada5",
@@ -99,6 +171,30 @@
       "writtenOn": "2024-08-12T23:18:17Z",
       "side": 1,
       "message": "config_projects appears to only include trusted tpcs in it (lines 2263-2267 above). This as well as the exception handler below implies that we would allow untrusted projects to configure trusted projects. Are there security concerns with doing this? For example running pre merge configs against trusted config projects via an update to an untrusted project?\n\nI think I would personally be more comfortable with untrusted projects only being allowed to configure other untrusted projects. Then the entire question about how to do this securely largely goes away and you\u0027re limited to doing untrusted things against other untrusted repos.",
+      "range": {
+        "startLine": 2283,
+        "startChar": 33,
+        "endLine": 2283,
+        "endChar": 49
+      },
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "579a66c6_dd20675c",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 2283,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-12T23:33:41Z",
+      "side": 1,
+      "message": "These lines are exactly the code that prevents the thing that you are concerned with.  That is to say, this is part of the code that ensures that an untrusted-project can not configure a trusted-project.\n\ncanConfigureProject normally does not allow an untrusted-project to configure a config-project.  But the validation_only argument disables that check, so that in this method, we can see if that\u0027s what the user\u0027s config was trying to do (keep in mind that regexes are involved, so the only way for us to know is to test each one).  If the check in canConfigureProjects is the only thing that prevents a config project from being configured, we raise an exception here so the user sees it and we don\u0027t load the config.\n\nIf we didn\u0027t do this, then the config would be deemed valid right up until the user tried to configure a config-project; then it would blow up.",
+      "parentUuid": "d8809cce_78d7ada5",
       "range": {
         "startLine": 2283,
         "startChar": 33,
