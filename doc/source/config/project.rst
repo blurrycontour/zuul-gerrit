@@ -121,10 +121,6 @@ pipeline.
       Gerrit). The requested merge mode will also be used by the
       GitHub and GitLab drivers when performing merges.
 
-      The default is :value:`project.merge-mode.merge` for all drivers
-      except Gerrit, where the default is
-      :value:`project.merge-mode.merge-resolve`.
-
       Each project may only have one ``merge-mode`` therefore Zuul
       will use the first value that it encounters for a given project
       (regardless of in which branch the definition appears).  It may
@@ -134,15 +130,26 @@ pipeline.
 
       .. value:: merge
 
-         Uses the default git merge strategy (recursive). This maps to
-         the merge mode ``merge`` in GitHub and GitLab.
+         Uses the default git merge strategy. This maps to the merge
+         mode ``merge`` in GitHub and GitLab. This is the default
+         merge mode for all drivers except gerrit and GitHub.
 
       .. value:: merge-resolve
 
-         Uses the resolve git merge strategy.  This is a very
+         Uses the resolve git merge strategy. This is a very
          conservative merge strategy which most closely matches the
-         behavior of Gerrit. This maps to the merge mode ``merge`` in
-         GitHub and GitLab.
+         behavior of Gerrit, and is the default merge mode for Gerrit.
+         This maps to the merge mode ``merge`` in GitHub and GitLab.
+
+      .. value:: merge-recursive
+
+         Uses the ``recursive`` git merge strategy. This is the default
+         merge mode for GitHub Enterise version earlier than 3.8.
+
+      .. value:: merge-ort
+
+         Uses the ``ort`` git merge strategy. This is the default merge
+         mode for github.com and GitHub Enterise version 3.8 or newer.
 
       .. value:: cherry-pick
 
