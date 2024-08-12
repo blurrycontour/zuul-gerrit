@@ -12,35 +12,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import voluptuous as v
 import urllib.parse
 
-artifact = {
-    'name': v.Required(str),
-    'url': v.Required(str),
-    'metadata': dict,
-}
-
-artifact_data = {
-    'zuul': {
-        'log_url': str,
-        'artifacts': [artifact],
-        v.Extra: object,
-    },
-    v.Extra: object,
-}
-
-warning_data = {
-    'zuul': {
-        'log_url': str,
-        'warnings': [str],
-        v.Extra: object,
-    },
-    v.Extra: object,
-}
-
-artifact_schema = v.Schema(artifact_data)
-warning_schema = v.Schema(warning_data)
+from zuul.ansible.schema import (
+    artifact_schema,
+    warning_schema,
+)
 
 
 def validate_schema(data, schema):
