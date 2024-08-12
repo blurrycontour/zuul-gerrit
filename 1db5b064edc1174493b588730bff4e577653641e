@@ -70,6 +70,199 @@
       "parentUuid": "a1ff4b07_b24e36a2",
       "revId": "1db5b064edc1174493b588730bff4e577653641e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f46a0445_db194c67",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "I think this feature is a useful one. OpenDev will likely see use of it for overriding file matchers in particular. That said I do have some questions inline mostly to clarify some choices.",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f3af4ef_5df00b5f",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "The way the old behavior was written down this almost appears like it could be a behavior change. But I don\u0027t think that is the case. Can you confirm?",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9145a3c1_4f460130",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 1147,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "I think this is the main attribute (along with irrelevant-files below) that opendev users will use this for.",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54c66658_01a6664d",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 522,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "For tests against set (and not dict) it appears we only check singleton inputs and not lists of inputs? One of my other comments was concerned about voluptuous\u0027 handling of lists of strings in validation. Not sure if we can add a list in a straightforward way here given how this helper method is structured.",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50727ad8_7d43b33b",
+        "filename": "tests/unit/test_model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "We don\u0027t need an explicit parent set for child because we\u0027re manually applying variant above rather than using the full internal config generation?",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "857c2c7e_15b3ba6d",
+        "filename": "zuul/change_matcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "Can this be simplified to `return hash(self.regex)` since the zuul regex type has a __hash__ method?",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d63c676_0158799f",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "vs.Any() will return the first matching scheme within the Any() arg list. Then we call that passing in v. For the case of `\u0027requires\u0027: override_list(str),` if requires has a list of entries we end up running something like `[str](\u0027one\u0027, \u0027two\u0027)`. Is voluptious doing matching to make a list a thing a callable that validates against that type?\n\nIn the singleton case we would just call `str(\u0027one\u0027)` and be fine.",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd53ca54_a5aa85a6",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1174,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "All of this shuffling to check the type and then set job.override_control and then extract the internal value has me wonder if we can simply update a an override_control datastructure and not change the types of the content internally so that the values remain straightfoward to work with.\n\nPossibly we could do that with a new attribute in the yaml rather than using a new yaml datatype?. Was there a specific reason with going for the new yaml tags and type?",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00675160_7f5bec84",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3389,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "Nit: We seem to prefer defaulting to not overriding in most cases. Should the default be False to match? Or maybe we shouldn\u0027t allow for defaults and instead require everything to be explicitly set as it is very attribute context specific?",
+      "range": {
+        "startLine": 3389,
+        "startChar": 47,
+        "endLine": 3389,
+        "endChar": 51
+      },
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "827858fe_b0182b52",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 3778,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "Is the sort here to ensure a stable repr for this object? Mostly wondering if it is correct to change the order supplied by the configuration as there may be optimizations in ordering things carefully?",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46549304_0cacd6bc",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 4000,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-12T22:21:13Z",
+      "side": 1,
+      "message": "Is the use of set and union here to remove duplicates a bug fix? Could you have previously listed the same semaphore twice then deadlocked when trying to grab it again? I wonder if that is worth a separate change and release note?",
+      "revId": "1db5b064edc1174493b588730bff4e577653641e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
