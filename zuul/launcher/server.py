@@ -22,7 +22,10 @@ import uuid
 from zuul import model
 from zuul.lib import commandsocket, tracing
 from zuul.lib.config import get_default
-from zuul.zk.image_registry import ImageBuildRegistry
+from zuul.zk.image_registry import (
+    ImageBuildRegistry,
+    ImageUploadRegistry,
+)
 from zuul.lib.logutil import get_annotated_logger
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
@@ -110,6 +113,7 @@ class Launcher:
         self.local_layout_state = {}
 
         self.image_build_registry = ImageBuildRegistry(self.zk_client)
+        self.image_upload_registry = ImageUploadRegistry(self.zk_client)
 
         self.launcher_thread = threading.Thread(
             target=self.run,
@@ -396,35 +400,45 @@ class Launcher:
                 self.local_layout_state.pop(tenant_name, None)
         return updated
 
-    def addImageBuildEvent(self, tenant_name, image):
+    def addImageBuildEvent(self, tenant_name, project_canonical_name,
+                           branch, image_names):
         project_hostname, project_name = \
-            image.project_canonical_name.split('/', 1)
+            project_canonical_name.split('/', 1)
         driver = self.connections.drivers['zuul']
         event = driver.getImageBuildEvent(
-            image.name, project_hostname, project_name, image.branch)
+            list(image_names), project_hostname, project_name, branch)
         self.log.info("Submitting image build event for %s %s",
-                      tenant_name, image.name)
+                      tenant_name, image_names)
         self.trigger_events[tenant_name].put(event.trigger_name, event)
 
     def checkMissingImages(self):
         for tenant_name, providers in self.tenant_providers.items():
+            images_by_project_branch = {}
             for provider in providers:
                 for image in provider.images.values():
                     if image.type == 'zuul':
-                        self.checkMissingImage(tenant_name, image)
+                        self.checkMissingImage(tenant_name, image,
+                                               images_by_project_branch)
+            for ((project_canonical_name, branch), image_names) in \
+                images_by_project_branch.items():
+                self.addImageBuildEvent(tenant_name, project_canonical_name,
+                                        branch, image_names)
 
-    def checkMissingImage(self, tenant_name, image):
+    def checkMissingImage(self, tenant_name, image, images_by_project_branch):
         # If there is already a successful build for
         # this image, skip.
-        # get the registry for the image name
-
         seen_formats = set()
         for build in self.image_build_registry.getArtifactsForImage(
                 image.canonical_name):
             seen_formats.add(build.format)
 
-        if seen_formats >= image.formats:
+        if image.format in seen_formats:
             # We have at least one build with the required
             # formats
             return
-        self.addImageBuildEvent(tenant_name, image)
+
+        # Collect images with the same project-branch so we can build
+        # them in one buildset.
+        key = (image.project_canonical_name, image.branch)
+        images = images_by_project_branch.setdefault(key, set())
+        images.add(image.name)
