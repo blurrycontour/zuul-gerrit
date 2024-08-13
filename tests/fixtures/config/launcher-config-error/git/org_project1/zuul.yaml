@@ -1,0 +1,7 @@
+- project:
+    name: org/project1
+    image:
+      jobs:
+        - build-debian-local-image:
+            vars:
+              foo: bar

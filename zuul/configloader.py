@@ -795,6 +795,7 @@ class JobParser(object):
                       'workspace-scheme': vs.Any('golang', 'flat', 'unique'),
                       'deduplicate': vs.Any(bool, 'auto'),
                       'failure-output': override_list(str),
+                      'image-build-name': str,
     }
 
     job_name = {vs.Required('name'): str}
@@ -821,6 +822,7 @@ class JobParser(object):
         'match-on-config-updates',
         'workspace-scheme',
         'deduplicate',
+        'image-build-name',
     ]
 
     def __init__(self, pcontext):
@@ -3008,14 +3010,15 @@ class TenantParser(object):
 
     def _validateProjectPipelineConfigs(self, tenant, layout, parse_context):
         # Validate references to other config objects
-        def inner_validate_ppcs(ppc):
+        def inner_validate_ppcs(project_config, ppc):
             for jobs in ppc.job_list.jobs.values():
                 for job in jobs:
                     # validate that the job exists on its own (an
                     # additional requirement for project-pipeline
                     # jobs)
                     layout.getJob(job.name)
-                    job.validateReferences(layout)
+                    job.validateReferences(
+                        layout, project_config=project_config)
 
         for project_name in layout.project_configs:
             for project_config in layout.project_configs[project_name]:
@@ -3034,9 +3037,10 @@ class TenantParser(object):
                                     acc = parse_context.accumulator
                                     with acc.catchErrors():
                                         for ppc in p_tmpl.pipelines.values():
-                                            inner_validate_ppcs(ppc)
+                                            inner_validate_ppcs(
+                                                project_config, ppc)
                         for ppc in project_config.pipelines.values():
-                            inner_validate_ppcs(ppc)
+                            inner_validate_ppcs(project_config, ppc)
             # Set a merge mode if we don't have one for this project.
             # This can happen if there are only regex project stanzas
             # but no specific project stanzas.
