@@ -126,3 +126,18 @@ class TestLauncher(ZuulTestCase):
 
         request.delete(ctx)
         self.waitUntilSettled()
+
+
+class TestLauncherImagePermissions(ZuulTestCase):
+    config_file = 'zuul-connections-nodepool.conf'
+    tenant_config_file = 'config/launcher-config-error/main.yaml'
+    mock_aws = mock_aws()
+
+    def test_image_permissions(self):
+        self.waitUntilSettled()
+        self.assertHistory([])
+
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 1)
+        self.assertIn('The image build job', errors[0].error)
