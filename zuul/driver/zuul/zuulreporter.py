@@ -13,11 +13,9 @@
 # under the License.
 
 import logging
-from uuid import uuid4
 
 from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.reporter import BaseReporter
-from zuul.model import ImageBuildArtifact
 
 
 class ZuulReporter(BaseReporter):
@@ -34,36 +32,34 @@ class ZuulReporter(BaseReporter):
         if self.image_built:
             self.reportImageBuilt(item)
 
+    def addImageValidateEvent(self, image):
+        tenant_name = self.pipeline.tenant.name
+        sched = self.driver.sched
+        project_hostname, project_name = \
+            image.project_canonical_name.split('/', 1)
+        event = self.driver.getImageBuildEvent(
+            image.name, project_hostname, project_name, image.branch)
+        self.log.info("Submitting image validate event for %s %s",
+                      tenant_name, image.name)
+        sched.trigger_events[tenant_name].put(event.trigger_name, event)
+
     def reportImageBuilt(self, item):
         sched = self.driver.sched
 
         for build in item.current_build_set.getBuilds():
+            if not build.job.image_build_name:
+                continue
+            image_name = build.job.image_build_name
+            image = self.pipeline.tenant.layout.images[image_name]
             for artifact in get_artifacts_from_result_data(
                     build.result_data,
                     logger=self.log):
                 if metadata := artifact.get('metadata'):
                     if metadata.get('type') == 'zuul_image':
-                        image_name = metadata['image_name']
-                        fmt = metadata['format']
-                        image = self.pipeline.tenant.layout.images[
-                            image_name]
-                        uuid = uuid4().hex
-                        self.log.info(
-                            "Storing image build artifact metadata: "
-                            "uuid: %s name: %s format: %s build: %s url: %s",
-                            uuid, image.canonical_name, fmt, build.uuid,
-                            artifact['url'])
-                        with sched.createZKContext(None, self.log) as ctx:
-                            ImageBuildArtifact.new(
-                                ctx,
-                                uuid=uuid,
-                                canonical_name=image.canonical_name,
-                                build_uuid=build.uuid,
-                                format=fmt,
-                                url=artifact['url'],
-                                timestamp=build.end_time,
-                                validated=self.image_validated,
-                            )
+                        iba = sched.createImageBuildArtifact(
+                            image, build, metadata['format'], artifact['url'],
+                            self.image_validated)
+                        sched.createImageUploads(iba)
 
 
 def getSchema():

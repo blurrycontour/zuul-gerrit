@@ -70,6 +70,15 @@
 
 - job:
     name: build-debian-local-image
+    image-build-name: debian-local
+
+- job:
+    name: build-ubuntu-local-image
+    image-build-name: ubuntu-local
+
+- job:
+    name: build-fedora-local-image
+    image-build-name: fedora-local
 
 - job:
     name: check-job
@@ -87,7 +96,12 @@
     name: org/common-config
     image:
       jobs:
+        # These jobs should run
         - build-debian-local-image
+        - build-ubuntu-local-image
+        # This job should not because we don't emit a trigger event
+        # for this image.
+        - build-fedora-local-image
 
 - project:
     name: org/project
@@ -112,6 +126,14 @@
     name: debian-local
     type: zuul
 
+- image:
+    name: ubuntu-local
+    type: zuul
+
+- image:
+    name: fedora-local
+    type: zuul
+
 - flavor:
     name: normal
 
@@ -133,6 +155,9 @@
       - name: debian
         image-id: ami-1e749f67
       - name: debian-local
+      - name: ubuntu-local
+      # Don't add fedora here, so that we don't emit a trigger event
+      # for it.
 
 - section:
     name: aws-us-east-1

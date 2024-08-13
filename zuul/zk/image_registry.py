@@ -15,7 +15,7 @@
 import collections
 
 from zuul.zk.launcher import LockableZKObjectCache
-from zuul.model import ImageBuildArtifact
+from zuul.model import ImageBuildArtifact, ImageUpload
 
 
 class ImageBuildRegistry(LockableZKObjectCache):
@@ -43,5 +43,41 @@ class ImageBuildRegistry(LockableZKObjectCache):
             builds.discard(key)
 
     def getArtifactsForImage(self, image_canonical_name):
-        for key in list(self.builds_by_image_name[image_canonical_name]):
-            yield self._cached_objects[key]
+        keys = list(self.builds_by_image_name[image_canonical_name])
+        arts = [self._cached_objects[key] for key in keys]
+        # Sort in a stable order, primarily by timestamp, then format
+        # for identical timestamps.
+        arts = sorted(arts, key=lambda x: x.format)
+        arts = sorted(arts, key=lambda x: x.timestamp)
+        return arts
+
+
+class ImageUploadRegistry(LockableZKObjectCache):
+
+    def __init__(self, zk_client):
+        super().__init__(
+            zk_client,
+            None,
+            root=ImageUpload.ROOT,
+            items_path=ImageUpload.UPLOADS_PATH,
+            locks_path=ImageUpload.LOCKS_PATH,
+            zkobject_class=ImageUpload,
+        )
+        self.uploads_by_image_name = collections.defaultdict(set)
+
+    def postCacheHook(self, event, data, stat, key, obj):
+        super().postCacheHook(event, data, stat, key, obj)
+        if obj is None:
+            return
+        exists = key in self._cached_objects
+        uploads = self.uploads_by_image_name[obj.canonical_name]
+        if exists:
+            uploads.add(key)
+        else:
+            uploads.discard(key)
+
+    def getUploadsForImage(self, image_canonical_name):
+        keys = list(self.uploads_by_image_name[image_canonical_name])
+        uploads = [self._cached_objects[key] for key in keys]
+        uploads = sorted(uploads, key=lambda x: x.timestamp)
+        return uploads

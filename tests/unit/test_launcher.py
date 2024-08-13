@@ -33,6 +33,52 @@ from tests.base import (
 class TestLauncher(ZuulTestCase):
     config_file = 'zuul-connections-nodepool.conf'
     mock_aws = mock_aws()
+    debian_return_data = {
+        'zuul': {
+            'artifacts': [
+                {
+                    'name': 'raw image',
+                    'url': 'http://example.com/image.raw',
+                    'metadata': {
+                        'type': 'zuul_image',
+                        'image_name': 'debian-local',
+                        'format': 'raw',
+                    }
+                }, {
+                    'name': 'qcow2 image',
+                    'url': 'http://example.com/image.qcow2',
+                    'metadata': {
+                        'type': 'zuul_image',
+                        'image_name': 'debian-local',
+                        'format': 'qcow2',
+                    }
+                },
+            ]
+        }
+    }
+    ubuntu_return_data = {
+        'zuul': {
+            'artifacts': [
+                {
+                    'name': 'raw image',
+                    'url': 'http://example.com/image.raw',
+                    'metadata': {
+                        'type': 'zuul_image',
+                        'image_name': 'ubuntu-local',
+                        'format': 'raw',
+                    }
+                }, {
+                    'name': 'qcow2 image',
+                    'url': 'http://example.com/image.qcow2',
+                    'metadata': {
+                        'type': 'zuul_image',
+                        'image_name': 'ubuntu-local',
+                        'format': 'qcow2',
+                    }
+                },
+            ]
+        }
+    }
 
     def setUp(self):
         self.mock_aws.start()
@@ -46,25 +92,56 @@ class TestLauncher(ZuulTestCase):
     @return_data(
         'build-debian-local-image',
         'refs/heads/master',
-        {'zuul':
-         {'artifacts': [
-             {'name': 'raw image',
-              'url': 'http://example.com/image.raw',
-              'metadata': {
-                  'type': 'zuul_image',
-                  'image_name': 'debian-local',
-                  'format': 'raw',
-              }},
-             {'name': 'qcow2 image',
-              'url': 'http://example.com/image.qcow2',
-              'metadata': {
-                  'type': 'zuul_image',
-                  'image_name': 'debian-local',
-                  'format': 'qcow2',
-              }},
-         ]}}
+        debian_return_data,
+    )
+    @return_data(
+        'build-ubuntu-local-image',
+        'refs/heads/master',
+        ubuntu_return_data,
     )
     def test_launcher_missing_image_build(self):
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+
+        for _ in iterate_timeout(
+                30, "scheduler and launcher to have the same layout"):
+            if (self.scheds.first.sched.local_layout_state.get("tenant-one") ==
+                self.launcher.local_layout_state.get("tenant-one")):
+                break
+
+        # The build should not run again because the image is no
+        # longer missing
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+        for name in [
+                'review.example.com%2Forg%2Fcommon-config/debian-local',
+                'review.example.com%2Forg%2Fcommon-config/ubuntu-local',
+        ]:
+            artifacts = self.launcher.image_build_registry.\
+                getArtifactsForImage(name)
+            self.assertEqual(2, len(artifacts))
+            self.assertEqual('qcow2', artifacts[0].format)
+            self.assertEqual('raw', artifacts[1].format)
+            self.assertTrue(artifacts[0].validated)
+            self.assertTrue(artifacts[1].validated)
+
+    @simple_layout('layouts/nodepool-image-no-validate.yaml',
+                   enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        debian_return_data,
+    )
+    def test_launcher_image_no_validation(self):
+        # Test a two-stage image-build where we don't actually run the
+        # validate stage (so all artifacts should be un-validated).
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='build-debian-local-image', result='SUCCESS'),
@@ -83,6 +160,20 @@ class TestLauncher(ZuulTestCase):
         self.assertHistory([
             dict(name='build-debian-local-image', result='SUCCESS'),
         ])
+        name = 'review.example.com%2Forg%2Fcommon-config/debian-local'
+        artifacts = self.launcher.image_build_registry.getArtifactsForImage(
+            name)
+        self.assertEqual(2, len(artifacts))
+        self.assertEqual('qcow2', artifacts[0].format)
+        self.assertEqual('raw', artifacts[1].format)
+        self.assertFalse(artifacts[0].validated)
+        self.assertFalse(artifacts[1].validated)
+        uploads = self.launcher.image_upload_registry.getUploadsForImage(
+            name)
+        self.assertEqual(1, len(uploads))
+        self.assertEqual(artifacts[1].uuid, uploads[0].artifact_uuid)
+        self.assertIsNone(uploads[0].external_id)
+        self.assertFalse(uploads[0].validated)
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_launcher_missing_label(self):
