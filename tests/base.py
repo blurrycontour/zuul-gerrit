@@ -257,7 +257,7 @@ def return_data(job, ref, data):
     """
 
     def decorator(test):
-        if not hasattr(test, '__return_data'):
+        if not hasattr(test, '__return_data__'):
             test.__return_data__ = []
         test.__return_data__.append(dict(
             job=job,

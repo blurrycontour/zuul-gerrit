@@ -1494,6 +1494,42 @@ class ImageBuildArtifact(zkobject.LockableZKObject):
         return json.dumps(data, sort_keys=True).encode("utf-8")
 
 
+class ImageUpload(zkobject.LockableZKObject):
+    ROOT = "/zuul/image-uploads"
+    UPLOADS_PATH = "uploads"
+    LOCKS_PATH = "locks"
+
+    def __init__(self):
+        super().__init__()
+        self._set(
+            uuid=None,  # A random UUID for the image upload
+            canonical_name=None,
+            artifact_uuid=None,  # The UUID of the ImageBuildArtifact
+            provider_name=None,
+            external_id=None,
+            timestamp=None,
+            validated=None,
+        )
+
+    def getPath(self):
+        return f"{self.ROOT}/{self.UPLOADS_PATH}/{self.uuid}"
+
+    def getLockPath(self):
+        return f"{self.ROOT}/{self.LOCKS_PATH}/{self.uuid}"
+
+    def serialize(self, context):
+        data = dict(
+            uuid=self.uuid,
+            canonical_name=self.canonical_name,
+            artifact_uuid=self.artifact_uuid,
+            provider_name=self.provider_name,
+            external_id=self.external_id,
+            timestamp=self.timestamp,
+            validated=self.validated,
+        )
+        return json.dumps(data, sort_keys=True).encode("utf-8")
+
+
 class Image(ConfigObject):
     """A zuul or cloud image.
 
@@ -2889,6 +2925,7 @@ class FrozenJob(zkobject.ZKObject):
     attributes = ('ansible_version',
                   'ansible_split_streams',
                   'dependencies',
+                  'image_build_name',
                   'inheritance_path',
                   'name',
                   'nodeset_alternatives',
@@ -2935,8 +2972,11 @@ class FrozenJob(zkobject.ZKObject):
 
     def __init__(self):
         super().__init__()
-        self._set(ref=None,
-                  other_refs=[])
+        self._set(
+            ref=None,
+            other_refs=[],
+            image_build_name=None,
+        )
 
     def __repr__(self):
         name = getattr(self, 'name', '<UNKNOWN>')
@@ -4112,6 +4152,22 @@ class Job(ConfigObject):
             return False
 
         return True
+
+    def itemMatchesImage(self, item):
+        if not self.image_build_name:
+            return True
+
+        if not (item.event and hasattr(item.event, 'image_names')):
+            return True
+
+        image_names = item.event.image_names or []
+        if not image_names:
+            return True
+
+        if self.image_build_name in image_names:
+            return True
+
+        return False
 
 
 class JobProject(ConfigObject):
@@ -5540,6 +5596,7 @@ class EventInfo:
         self.timestamp = time.time()
         self.span_context = None
         self.ref = None
+        self.image_names = None
 
     @classmethod
     def fromEvent(cls, event, event_ref_key):
@@ -5551,6 +5608,7 @@ class EventInfo:
             tinfo.ref = event_ref_key
         else:
             tinfo.ref = None
+        tinfo.image_names = getattr(event, 'image_names', None)
         return tinfo
 
     @classmethod
@@ -5561,6 +5619,7 @@ class EventInfo:
         tinfo.span_context = d["span_context"]
         # MODEL_API <= 26
         tinfo.ref = d.get("ref")
+        tinfo.image_names = d.get("image_names")
         return tinfo
 
     def toDict(self):
@@ -5569,6 +5628,7 @@ class EventInfo:
             "timestamp": self.timestamp,
             "span_context": self.span_context,
             "ref": self.ref,
+            "image_names": self.image_names,
         }
 
 
@@ -9016,6 +9076,12 @@ class Layout(object):
                 add_debug_line(debug_messages,
                                "No matching pipeline variants for {jobname}".
                                format(jobname=jobname), indent=2)
+                continue
+            if not final_job.itemMatchesImage(item):
+                log.debug("Job %s did not match images", jobname)
+                add_debug_line(debug_messages,
+                               f"Job {jobname} did not match images",
+                               indent=2)
                 continue
             updates_job_config = False
             if not skip_file_matcher and \
