@@ -15,11 +15,13 @@
 
 import time
 import uuid
+from unittest import mock
 
 from zuul import model
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.locks import pipeline_lock
 
+import responses
 from moto import mock_aws
 
 from tests.base import (
@@ -82,6 +84,18 @@ class TestLauncher(ZuulTestCase):
 
     def setUp(self):
         self.mock_aws.start()
+
+        self.responses = responses.RequestsMock()
+        self.responses.start()
+        self.responses.add_passthru("http://localhost")
+        self.responses.add(
+            responses.GET,
+            'http://example.com/image.raw',
+            body="test raw image")
+        self.responses.add(
+            responses.GET,
+            'http://example.com/image.qcow2',
+            body="test qcow2 image")
         super().setUp()
 
     def tearDown(self):
@@ -99,7 +113,9 @@ class TestLauncher(ZuulTestCase):
         'refs/heads/master',
         ubuntu_return_data,
     )
-    def test_launcher_missing_image_build(self):
+    @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
+                return_value="test_external_id")
+    def test_launcher_missing_image_build(self, mock_uploadimage):
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='build-debian-local-image', result='SUCCESS'),
@@ -131,6 +147,12 @@ class TestLauncher(ZuulTestCase):
             self.assertEqual('raw', artifacts[1].format)
             self.assertTrue(artifacts[0].validated)
             self.assertTrue(artifacts[1].validated)
+            uploads = self.launcher.image_upload_registry.getUploadsForImage(
+                name)
+            self.assertEqual(1, len(uploads))
+            self.assertEqual(artifacts[1].uuid, uploads[0].artifact_uuid)
+            self.assertEqual("test_external_id", uploads[0].external_id)
+            self.assertTrue(uploads[0].validated)
 
     @simple_layout('layouts/nodepool-image-no-validate.yaml',
                    enable_nodepool=True)
@@ -139,7 +161,9 @@ class TestLauncher(ZuulTestCase):
         'refs/heads/master',
         debian_return_data,
     )
-    def test_launcher_image_no_validation(self):
+    @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
+                return_value="test_external_id")
+    def test_launcher_image_no_validation(self, mock_uploadimage):
         # Test a two-stage image-build where we don't actually run the
         # validate stage (so all artifacts should be un-validated).
         self.waitUntilSettled()
@@ -172,7 +196,7 @@ class TestLauncher(ZuulTestCase):
             name)
         self.assertEqual(1, len(uploads))
         self.assertEqual(artifacts[1].uuid, uploads[0].artifact_uuid)
-        self.assertIsNone(uploads[0].external_id)
+        self.assertEqual("test_external_id", uploads[0].external_id)
         self.assertFalse(uploads[0].validated)
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
