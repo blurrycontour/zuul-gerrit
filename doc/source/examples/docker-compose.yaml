@@ -92,6 +92,7 @@ services:
     depends_on:
       - scheduler
       - mysql
+      - zk
     ports:
       - "9000:9000"
     image: quay.io/zuul-ci/zuul-web
@@ -113,6 +114,8 @@ services:
       - ZUUL_MYSQL_PASSWORD=secret
     depends_on:
       - scheduler
+      - mysql
+      - zk
     image: quay.io/zuul-ci/zuul-executor
     volumes:
       - "${ZUUL_TUTORIAL_CONFIG:-./etc_zuul/}:/etc/zuul/:z"
