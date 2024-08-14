@@ -285,6 +285,8 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
 
     def uploadImage(self, provider_image, image_name,
                     filename, image_format, metadata, md5, sha256):
+        # TODO this needs to move to the section or connection config
+        # since it's used by endpoints.
         bucket_name = self.object_storage.get('bucket-name')
         timeout = self.image_import_timeout
         return self.endpoint.uploadImage(
