@@ -184,16 +184,7 @@ class TestAwsDriver(ZuulTestCase):
             self.launcher.stop()
             self.launcher.join()
 
-            launcher_connections = TestConnectionRegistry(
-                self.config, self.test_config,
-                self.additional_event_queues,
-                self.upstream_root, self.poller_events,
-                self.git_url_with_auth, self.addCleanup)
-            launcher_connections.configure(self.config, providers=True)
-            self.launcher = Launcher(
-                self.config,
-                launcher_connections)
-            self.launcher.start()
+            self.launcher = self.createLauncher()
 
         self.waitUntilSettled()
         self.assertEqual(self.getJobFromHistory('check-job').result,
