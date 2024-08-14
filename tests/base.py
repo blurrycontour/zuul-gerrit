@@ -1109,6 +1109,16 @@ class TestScheduler(zuul.scheduler.Scheduler):
     _launcher_client_class = HoldableLauncherClient
 
 
+class TestLauncher(zuul.launcher.server.Launcher):
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        self._test_lock = threading.Lock()
+
+    def _run(self):
+        with self._test_lock:
+            return super()._run()
+
+
 class FakeSMTP(object):
     log = logging.getLogger('zuul.FakeSMTP')
 
@@ -2420,7 +2430,7 @@ class ZuulTestCase(BaseTestCase):
             self.git_url_with_auth, self.addCleanup)
         launcher_connections.configure(self.config, providers=True)
 
-        self.launcher = zuul.launcher.server.Launcher(
+        self.launcher = TestLauncher(
             self.config,
             launcher_connections)
         self.launcher.start()
@@ -3213,6 +3223,10 @@ class ZuulTestCase(BaseTestCase):
                 return False
         return True
 
+    def __areAllLaunchersSynced(self):
+        return (self.scheds.first.sched.local_layout_state ==
+                self.launcher.local_layout_state)
+
     def waitUntilSettled(self, msg="", matcher=None) -> None:
         self.log.debug("Waiting until settled... (%s)", msg)
         start = time.time()
@@ -3223,6 +3237,8 @@ class ZuulTestCase(BaseTestCase):
                 self.log.error("Timeout waiting for Zuul to settle")
                 self.log.debug("All schedulers primed: %s",
                                self.__areAllSchedulersPrimed(matcher))
+                self.log.debug("All launchers primed: %s",
+                               self.__areAllLaunchersSynced())
                 self._logQueueStatus(
                     self.log.error, matcher,
                     self.__areZooKeeperEventQueuesEmpty(debug=True),
@@ -3246,29 +3262,32 @@ class ZuulTestCase(BaseTestCase):
                 for sched in map(lambda app: app.sched,
                                  self.scheds.filter(matcher)):
                     sched.run_handler_lock.acquire()
-                if (self.__areAllSchedulersPrimed(matcher) and
-                    self.__areAllMergeJobsWaiting() and
-                    self.__haveAllBuildsReported() and
-                    self.__areAllBuildsWaiting() and
-                    self.__areAllNodeRequestsComplete() and
-                    self.__areAllNodesetRequestsComplete() and
-                    self.__areZooKeeperEventQueuesEmpty() and
-                    all(self.__eventQueuesEmpty(matcher))):
-                    # The queue empty check is placed at the end to
-                    # ensure that if a component adds an event between
-                    # when locked the run handler and checked that the
-                    # components were stable, we don't erroneously
-                    # report that we are settled.
-                    for sched in map(lambda app: app.sched,
-                                     self.scheds.filter(matcher)):
-                        if len(self.scheds) > 1:
-                            self.refreshPipelines(sched)
-                        sched.run_handler_lock.release()
-                    self.executor_server.lock.release()
-                    self.log.debug("...settled after %.3f ms / %s loops (%s)",
-                                   time.time() - start, i, msg)
-                    self.logState()
-                    return
+                with self.launcher._test_lock:
+                    if (self.__areAllSchedulersPrimed(matcher) and
+                        self.__areAllLaunchersSynced() and
+                        self.__areAllMergeJobsWaiting() and
+                        self.__haveAllBuildsReported() and
+                        self.__areAllBuildsWaiting() and
+                        self.__areAllNodeRequestsComplete() and
+                        self.__areAllNodesetRequestsComplete() and
+                        self.__areZooKeeperEventQueuesEmpty() and
+                        all(self.__eventQueuesEmpty(matcher))):
+                        # The queue empty check is placed at the end to
+                        # ensure that if a component adds an event between
+                        # when locked the run handler and checked that the
+                        # components were stable, we don't erroneously
+                        # report that we are settled.
+                        for sched in map(lambda app: app.sched,
+                                         self.scheds.filter(matcher)):
+                            if len(self.scheds) > 1:
+                                self.refreshPipelines(sched)
+                            sched.run_handler_lock.release()
+                        self.executor_server.lock.release()
+                        self.log.debug("...settled after %.3f ms / "
+                                       "%s loops (%s)",
+                                       time.time() - start, i, msg)
+                        self.logState()
+                        return
                 for sched in map(lambda app: app.sched,
                                  self.scheds.filter(matcher)):
                     sched.run_handler_lock.release()

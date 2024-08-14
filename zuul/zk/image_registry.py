@@ -54,7 +54,7 @@ class ImageBuildRegistry(LockableZKObjectCache):
 
 class ImageUploadRegistry(LockableZKObjectCache):
 
-    def __init__(self, zk_client):
+    def __init__(self, zk_client, upload_added_event=None):
         super().__init__(
             zk_client,
             None,
@@ -64,6 +64,7 @@ class ImageUploadRegistry(LockableZKObjectCache):
             zkobject_class=ImageUpload,
         )
         self.uploads_by_image_name = collections.defaultdict(set)
+        self.upload_added_event = upload_added_event
 
     def postCacheHook(self, event, data, stat, key, obj):
         super().postCacheHook(event, data, stat, key, obj)
@@ -73,6 +74,8 @@ class ImageUploadRegistry(LockableZKObjectCache):
         uploads = self.uploads_by_image_name[obj.canonical_name]
         if exists:
             uploads.add(key)
+            if self.upload_added_event:
+                self.upload_added_event()
         else:
             uploads.discard(key)
 
