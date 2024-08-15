@@ -91,8 +91,8 @@ function QueueItem({ item, pipeline, tenant, user }) {
     // close the modal
     setIsDequeueModalOpen(false)
 
-    // post-merge
     if (/^[0-9a-f]{40}$/.test(refId)) {
+      // post-merge with a ref update (tag, branch push)
       dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, refRef)
         .then(() => {
           dispatch(fetchStatusIfNeeded(tenant))
@@ -100,8 +100,8 @@ function QueueItem({ item, pipeline, tenant, user }) {
         .catch(error => {
           dispatch(addDequeueError(error))
         })
-      // pre-merge, ie we have a change id
     } else if (refId !== 'N/A') {
+      // pre-merge, ie we have a change id
       dequeue(tenant.apiPrefix, projectName, pipeline.name, refId)
         .then(() => {
           dispatch(fetchStatusIfNeeded(tenant))
@@ -110,12 +110,14 @@ function QueueItem({ item, pipeline, tenant, user }) {
           dispatch(addDequeueError(error))
         })
     } else {
-      dispatch(addNotification({
-        url: null,
-        status: 'Invalid change ' + refRef + ' on project ' + projectName,
-        text: '',
-        type: 'error',
-      }))
+      // periodic with only a ref (branch head)
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, refRef)
+        .then(() => {
+          dispatch(fetchStatusIfNeeded(tenant))
+        })
+        .catch(error => {
+          dispatch(addDequeueError(error))
+        })
     }
   }
 
