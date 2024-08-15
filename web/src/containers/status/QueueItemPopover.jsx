@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -33,12 +33,22 @@ function QueueItemPopover({ item, triggerElement, tenant }) {
   // TODO (felix): Move the triggerElement to be used as children
   // instead. This should make the usage of the QueueItemPopover
   // a little nicer.
+
+  const [isVisible, setIsVisible] = useState(null)
   const times = calculateQueueItemTimes(item)
 
   return (
     <Popover
       className="zuul-queue-item-popover"
       aria-label="QueueItem Popover"
+      isVisible={isVisible}
+      // This custom close handler is only invoked if isVisible is
+      // non-null (i.e., we are scrubbing).  It is most likely
+      // happening on a release at the end of a scrub, so set the
+      // element back to uncontrolled mode and leave the last visible
+      // state.  The user can click or hit escape to close the popup
+      // if they want.
+      shouldClose={() => {setIsVisible(null)}}
       headerContent={
         getRefs(item).map((change, idx) => (
           <div key={idx}>
@@ -53,8 +63,30 @@ function QueueItemPopover({ item, triggerElement, tenant }) {
         <Link to={tenant.linkPrefix + '/status/change/' + getRefs(item)[0].id}>Show details</Link>
       }
     >
-      {/* The triggerElement must be placed within the Popover to open it */}
-      {triggerElement}
+    {
+      // The triggerElement must be placed within the Popover to open it
+
+      // The event handlers below implement a "scrubbing" behavior.
+      // As long as a button is depressed while entering or leaving
+      // the square, we will set the element to be controlled and
+      // force it to be shown (when entering) or not (when leaving).
+      // This leaves each of the squares in a controlled state, but if
+      // the user re-enters a previously controlled square in the off
+      // state without clicking, we will reset the element to be
+      // uncontrolled, and a subsequent click will toggle it on.
+    }
+      <span
+        onMouseEnter={(e) => {
+          if (e.buttons) { setIsVisible(true) }
+          else { setIsVisible(null) }
+        }}
+        onMouseLeave={(e) => {
+          if (e.buttons) { setIsVisible(false) }
+          else { setIsVisible(null) }
+        }}
+      >
+        {triggerElement}
+      </span>
     </Popover>
   )
 }
