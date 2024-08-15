@@ -16,6 +16,23 @@
       "message": "-1: I think if this is going to work, we need to get it out of the way of the cursor.  The problem is mostly on the left/right, so one approach would be to always have it appear above/below, even if there is not room to center it on the square.  In other words, if we hover over the top-left-most square, the popup should be above the square and flush with the left side of the viewport.  Maybe we should omit the little carat pointer in the popup if it\u0027s not possible to align that with the square.\n\nAside from that, being able to scrub left/right along the squares is very nice.",
       "revId": "3141aa7f45bb591c5d7a3890c4ec0f7a5f14a808",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fd7c602_c145a06c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-15T19:37:48Z",
+      "side": 1,
+      "message": "Consider https://review.opendev.org/926426 as an alternative that addresses the issues I raised but keeps the benefits of this.",
+      "revId": "3141aa7f45bb591c5d7a3890c4ec0f7a5f14a808",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
