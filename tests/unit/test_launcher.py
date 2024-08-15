@@ -115,7 +115,7 @@ class TestLauncher(ZuulTestCase):
     )
     @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
                 return_value="test_external_id")
-    def test_launcher_missing_image_build(self, mock_uploadimage):
+    def test_launcher_missing_image_build(self, mock_uploadImage):
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='build-debian-local-image', result='SUCCESS'),
@@ -198,6 +198,53 @@ class TestLauncher(ZuulTestCase):
         self.assertEqual(artifacts[1].uuid, uploads[0].artifact_uuid)
         self.assertEqual("test_external_id", uploads[0].external_id)
         self.assertFalse(uploads[0].validated)
+
+    @simple_layout('layouts/nodepool-image-validate.yaml',
+                   enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        debian_return_data,
+    )
+    @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
+                return_value="test_external_id")
+    def test_launcher_image_validation(self, mock_uploadImage):
+        # Test a two-stage image-build where we do run the validate
+        # stage.
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='validate-debian-local-image', result='SUCCESS'),
+        ])
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+
+        for _ in iterate_timeout(
+                30, "scheduler and launcher to have the same layout"):
+            if (self.scheds.first.sched.local_layout_state.get("tenant-one") ==
+                self.launcher.local_layout_state.get("tenant-one")):
+                break
+
+        # The build should not run again because the image is no
+        # longer missing
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='validate-debian-local-image', result='SUCCESS'),
+        ])
+        name = 'review.example.com%2Forg%2Fcommon-config/debian-local'
+        artifacts = self.launcher.image_build_registry.getArtifactsForImage(
+            name)
+        self.assertEqual(2, len(artifacts))
+        self.assertEqual('qcow2', artifacts[0].format)
+        self.assertEqual('raw', artifacts[1].format)
+        self.assertFalse(artifacts[0].validated)
+        self.assertFalse(artifacts[1].validated)
+        uploads = self.launcher.image_upload_registry.getUploadsForImage(
+            name)
+        self.assertEqual(1, len(uploads))
+        self.assertEqual(artifacts[1].uuid, uploads[0].artifact_uuid)
+        self.assertEqual("test_external_id", uploads[0].external_id)
+        self.assertTrue(uploads[0].validated)
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_launcher_missing_label(self):

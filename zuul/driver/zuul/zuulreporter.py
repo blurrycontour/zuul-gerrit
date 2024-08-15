@@ -31,17 +31,8 @@ class ZuulReporter(BaseReporter):
             return
         if self.image_built:
             self.reportImageBuilt(item)
-
-    def addImageValidateEvent(self, image):
-        tenant_name = self.pipeline.tenant.name
-        sched = self.driver.sched
-        project_hostname, project_name = \
-            image.project_canonical_name.split('/', 1)
-        event = self.driver.getImageBuildEvent(
-            image.name, project_hostname, project_name, image.branch)
-        self.log.info("Submitting image validate event for %s %s",
-                      tenant_name, image.name)
-        sched.trigger_events[tenant_name].put(event.trigger_name, event)
+        elif self.image_validated:
+            self.reportImageValidated(item)
 
     def reportImageBuilt(self, item):
         sched = self.driver.sched
@@ -57,9 +48,20 @@ class ZuulReporter(BaseReporter):
                 if metadata := artifact.get('metadata'):
                     if metadata.get('type') == 'zuul_image':
                         iba = sched.createImageBuildArtifact(
-                            image, build, metadata['format'], artifact['url'],
+                            self.pipeline.tenant.name, image, build,
+                            metadata['format'], artifact['url'],
                             self.image_validated)
                         sched.createImageUploads(iba)
+
+    def reportImageValidated(self, item):
+        sched = self.driver.sched
+
+        for build in item.current_build_set.getBuilds():
+            if not build.job.image_build_name:
+                continue
+            sched.validateImageUpload(
+                item.event.image_upload_uuid,
+            )
 
 
 def getSchema():
