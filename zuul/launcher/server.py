@@ -144,6 +144,7 @@ class EndpointUploadJob:
                 ctx,
                 external_id=external_id,
                 timestamp=time.time())
+        self.launcher.addImageValidateEvent(self.upload)
 
 
 class Launcher:
@@ -541,6 +542,19 @@ class Launcher:
             list(image_names), project_hostname, project_name, branch)
         self.log.info("Submitting image build event for %s %s",
                       tenant_name, image_names)
+        self.trigger_events[tenant_name].put(event.trigger_name, event)
+
+    def addImageValidateEvent(self, image_upload):
+        iba = self.image_build_registry.getItem(image_upload.artifact_uuid)
+        project_hostname, project_name = \
+            iba.project_canonical_name.split('/', 1)
+        tenant_name = iba.build_tenant_name
+        driver = self.connections.drivers['zuul']
+        event = driver.getImageValidateEvent(
+            [iba.name], project_hostname, project_name, iba.project_branch,
+            image_upload.uuid)
+        self.log.info("Submitting image validate event for %s %s",
+                      tenant_name, iba.name)
         self.trigger_events[tenant_name].put(event.trigger_name, event)
 
     def checkMissingImages(self):

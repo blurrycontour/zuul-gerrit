@@ -183,13 +183,15 @@ class ZuulDriver(Driver, TriggerInterface, ReporterInterface):
         event.arrived_at_scheduler_timestamp = event.timestamp
         return event
 
-    def getImageValidateEvent(self, image_name, project_hostname, project_name,
-                              project_branch):
+    def getImageValidateEvent(self, image_names, project_hostname,
+                              project_name, project_branch,
+                              image_upload_uuid):
         event = ZuulTriggerEvent()
         event.type = IMAGE_VALIDATE
         event.connection_name = "zuul"
         event.trigger_name = self.name
-        event.image_name = image_name
+        event.image_names = image_names
+        event.image_upload_uuid = image_upload_uuid
         event.project_hostname = project_hostname
         event.project_name = project_name
         event.branch = project_branch

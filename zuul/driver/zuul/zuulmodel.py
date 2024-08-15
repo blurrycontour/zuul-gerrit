@@ -64,14 +64,17 @@ class ZuulTriggerEvent(TriggerEvent):
         super(ZuulTriggerEvent, self).__init__()
         self.pipeline_name = None
         self.image_names = None
+        self.image_upload_uuid = None
 
     def toDict(self):
         d = super().toDict()
         d["pipeline_name"] = self.pipeline_name
         d["image_names"] = self.image_names
+        d["image_upload_uuid"] = self.image_upload_uuid
         return d
 
     def updateFromDict(self, d):
         super().updateFromDict(d)
         self.pipeline_name = d["pipeline_name"]
         self.image_names = d.get("image_names")
+        self.image_upload_uuid = d.get("image_upload_uuid")
