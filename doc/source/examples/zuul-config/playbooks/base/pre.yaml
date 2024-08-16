@@ -1,4 +1,4 @@
 - hosts: all
   roles:
     - add-build-sshkey
-    - prepare-workspace
+    - prepare-workspace-git

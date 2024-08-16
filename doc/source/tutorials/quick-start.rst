@@ -437,17 +437,20 @@ repositories that Zuul has prepared (which may have one or more
 changes being tested) to all of the nodes used in the job.
 
 Next, add a *post-run* playbook to remove the per-build SSH key.  Copy
-the following to ``playbooks/base/post-ssh.yaml``:
+the following to ``playbooks/base/cleanup.yaml``:
 
-.. literalinclude:: /examples/zuul-config/playbooks/base/post-ssh.yaml
+.. literalinclude:: /examples/zuul-config/playbooks/base/cleanup.yaml
    :language: yaml
 
 This is the complement of the `add-build-sshkey` role in the pre-run
 playbook -- it simply removes the per-build ssh key from any remote
 systems.  Zuul always tries to run all of the post-run playbooks
-regardless of whether any previous playbooks have failed.  Because we
-always want log collection to run and we want it to run last, we
-create a second post-run playbook for it.  Copy the following to
+regardless of whether any previous playbooks have failed.  Marking
+this *post-run* playbook as a cleanup playbook also ensures it will
+run if the job is aborted for some reason.
+
+Because we always want log collection to run and we want it to run last,
+we create a second post-run playbook for it.  Copy the following to
 ``playbooks/base/post-logs.yaml``:
 
 .. literalinclude:: /examples/zuul-config/playbooks/base/post-logs.yaml

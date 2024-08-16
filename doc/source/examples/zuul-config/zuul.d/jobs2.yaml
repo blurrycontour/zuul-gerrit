@@ -11,7 +11,8 @@
       It also sets a default timeout value (which may be overidden).
     pre-run: playbooks/base/pre.yaml
     post-run:
-      - playbooks/base/post-ssh.yaml
+      - name: playbooks/base/cleanup.yaml
+        cleanup: true
       - playbooks/base/post-logs.yaml
     roles:
       - zuul: zuul/zuul-jobs
