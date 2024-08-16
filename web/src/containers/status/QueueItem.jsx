@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { connect, useDispatch } from 'react-redux'
 
@@ -150,11 +150,15 @@ PromoteModal.propTypes = {
   onCancel: PropTypes.func.isRequired,
 }
 
-function QueueItem({ item, pipeline, tenant, user }) {
+function QueueItem({ item, pipeline, tenant, user, jobsExpanded}) {
   const [isAdminActionsOpen, setIsAdminActionsOpen] = useState(false)
   const [isDequeueModalOpen, setIsDequeueModalOpen] = useState(false)
   const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false)
-  const [isJobsExpanded, setIsJobsExpanded] = useState(false)
+  const [isJobsExpanded, setIsJobsExpanded] = useState(jobsExpanded)
+
+  useEffect(() => {
+    setIsJobsExpanded(jobsExpanded)
+  }, [jobsExpanded])
 
   const dispatch = useDispatch()
 
@@ -334,6 +338,7 @@ QueueItem.propTypes = {
   pipeline: PropTypes.object,
   tenant: PropTypes.object,
   user: PropTypes.object,
+  jobsExpanded: PropTypes.bool,
 }
 
 export default connect(state => ({

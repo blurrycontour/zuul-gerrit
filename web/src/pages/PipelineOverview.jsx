@@ -220,7 +220,7 @@ function PipelineOverviewPage({
 
   const allPipelinesSwitch = (
     <Switch
-      className="zuul-show-pipeline-switch"
+      className="zuul-show-all-switch"
       id="all-pipeline-switch"
       aria-label="Show all pipelines"
       label="Show all pipelines"
