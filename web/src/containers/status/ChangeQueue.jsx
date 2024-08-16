@@ -111,7 +111,7 @@ const createTree = (head) => {
   return tree
 }
 
-const Branch = ({ item, pipeline, newBranch = false }) => {
+const Branch = ({ item, pipeline, jobsExpanded, newBranch = false }) => {
   // hack: prevent null reference exceptions when filtering for items in queues
   // that have other items that don't match the filter. The cause is not clear
   // to me at the moment: createTree never returns an undefined tree, but here,
@@ -135,16 +135,16 @@ const Branch = ({ item, pipeline, newBranch = false }) => {
         style={{ marginBottom: '16px' }}
         key={`ps-${item.id}`}
       >
-        <QueueItem item={item} pipeline={pipeline} />
+        <QueueItem item={item} pipeline={pipeline} jobsExpanded={jobsExpanded} />
         {/* To visualize a new branch, we put a ProgressStepper within
             the current ProgressStep. */}
         {item._branches.map((branch, idx) => (
-          <Branch item={branch} pipeline={pipeline} newBranch={true} key={`br-${item.id}-${idx}`} />
+          <Branch item={branch} pipeline={pipeline} newBranch={true} key={`br-${item.id}-${idx}`} jobsExpanded={jobsExpanded} />
         ))}
       </ProgressStep>
       {/* Items in the same branch must come after the current
           ProgressStep. We don't want them to be nested. */}
-      {item._next !== null ? <Branch item={item._next} pipeline={pipeline} /> : ''}
+      {item._next !== null ? <Branch item={item._next} pipeline={pipeline} jobsExpanded={jobsExpanded} /> : ''}
     </>
   )
 
@@ -170,14 +170,16 @@ Branch.propTypes = {
   item: PropTypes.object.isRequired,
   pipeline: PropTypes.object.isRequired,
   newBranch: PropTypes.bool,
+  jobsExpanded: PropTypes.bool,
 }
 
-function ChangeQueue({ queue, pipeline, showTitle=true }) {
+function ChangeQueue({ queue, pipeline, jobsExpanded, showTitle=true }) {
   // TODO (felix): Use useMemo hook to cache the rendered tree across re-renders
   const trees = []
   queue.heads.forEach(head => (
     trees.push(createTree(head))
   ))
+
   return (
     <>
       <Card isPlain className="zuul-change-queue">
@@ -193,12 +195,12 @@ function ChangeQueue({ queue, pipeline, showTitle=true }) {
           <Panel>
             {trees.map(tree => (
               <ProgressStepper key={tree.id} isVertical>
-                <Branch item={tree} pipeline={pipeline} />
+                <Branch item={tree} pipeline={pipeline} jobsExpanded={jobsExpanded} />
               </ProgressStepper>
             ))}
           </Panel>
         </CardBody>
-      </Card >
+      </Card>
     </>
   )
 }
@@ -208,6 +210,7 @@ ChangeQueue.propTypes = {
   pipeline: PropTypes.object,
   tenant: PropTypes.object,
   showTitle: PropTypes.bool,
+  jobsExpanded: PropTypes.bool,
 }
 
 export default ChangeQueue
