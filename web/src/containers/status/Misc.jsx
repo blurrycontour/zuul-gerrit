@@ -367,16 +367,18 @@ function JobProgressBar({ job, elapsedTime, remainingTime }) {
   }
 
   return (
-    <Progress
-      aria-label={`${job.name}-progress`}
-      className={progressPercent === 0 ? 'zuul-progress-animated' : 'zuul-progress'}
-      variant={job.pre_fail ? ProgressVariant.danger : ''}
-      value={progressPercent}
-      measureLocation={ProgressMeasureLocation.inside}
-      label={remainingTimeStr}
-      valueText={remainingTimeStr}
-    />
-
+    <Tooltip
+       position="right"
+       content={`Estimated remaining time: ${remainingTimeStr}`}
+    >
+      <Progress
+        aria-label={`${job.name}-progress`}
+        className={progressPercent === 0 ? 'zuul-progress-animated' : 'zuul-progress'}
+        variant={job.pre_fail ? ProgressVariant.danger : ''}
+        value={progressPercent}
+        measureLocation={ProgressMeasureLocation.inside}
+      />
+    </Tooltip>
   )
 }
 
