@@ -28,6 +28,8 @@ import {
   Text,
   TextContent,
   TextVariants,
+  ToolbarItem,
+  Switch,
 } from '@patternfly/react-core'
 import { StreamIcon } from '@patternfly/react-icons'
 
@@ -131,6 +133,7 @@ function PipelineDetailsPage({
   pipeline, isFetching, tenant, darkMode, autoReload, fetchStatusIfNeeded, isEmpty
 }) {
   const [isReloading, setIsReloading] = useState(false)
+  const [isAllJobsExpanded, setIsAllJobsExpanded] = useState(false)
 
   const isDocumentVisible = useDocumentVisibility()
 
@@ -163,6 +166,10 @@ function PipelineDetailsPage({
     // Reset the interval on a manual refresh
   }, isReloading ? null : 5000)
 
+  const onShowAllJobsToggle = (isChecked) => {
+    setIsAllJobsExpanded(isChecked)
+  }
+
   if (pipeline === undefined || (!isReloading && isFetching)) {
     return <Fetching />
   }
@@ -186,7 +193,18 @@ function PipelineDetailsPage({
           onFilterChange={(newFilters) => {handleFilterChange(newFilters, location, history)}}
           filters={filters}
           filterInputValidation={filterInputValidation}
-        />
+        >
+          <ToolbarItem>
+            <Switch
+              className="zuul-show-all-switch"
+              aria-label="Show all jobs"
+              label="Show all jobs"
+              isReversed
+              onChange={onShowAllJobsToggle}
+              isChecked={isAllJobsExpanded}
+            />
+          </ToolbarItem>
+        </FilterToolbar>
         <PipelineDetails pipeline={pipeline} isReloading={isReloading} reloadCallback={() => updateData(tenant)} />
       </PageSection>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
@@ -213,7 +231,7 @@ function PipelineDetailsPage({
               queue => queue.heads.length > 0
             ).map((queue, idx) => (
               <GalleryItem key={idx}>
-                <ChangeQueue queue={queue} pipeline={pipeline} />
+                <ChangeQueue queue={queue} pipeline={pipeline} jobsExpanded={isAllJobsExpanded} />
               </GalleryItem>
             ))
           }
