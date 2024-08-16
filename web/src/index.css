@@ -399,6 +399,11 @@ a.refresh {
     animation: progress-bar-stripes 1s linear infinite;
 }
 
+/* Hide red cross icon next to a failing PF4 progress bar for pre-fail jobs */
+.pf-c-progress.zuul-progress.pf-m-danger .pf-c-progress__status {
+    display: none;
+}
+
 .pf-c-progress-stepper.zuul-queue-branch {
     margin-top: 20px;
 }
