@@ -276,6 +276,24 @@
       "message": "-1: The old status page had a way to show or hide all jobs; I think we should have that here.  The old one had a cookie which saved that as a default; I don\u0027t think we need to do that, but a \"show all\" or \"hide all\" on the page would be good.  This gets back to the idea of being able to easily identify common failing changes/jobs.",
       "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63fe1762_08e1e5d0",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-16T14:13:46Z",
+      "side": 1,
+      "message": "This may be addressed in https://review.opendev.org/c/zuul/zuul/+/926467",
+      "parentUuid": "8a14c2de_c9ff905a",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
