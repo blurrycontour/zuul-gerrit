@@ -183,7 +183,7 @@ a.refresh {
 
 /* Status page */
 
-.zuul-show-pipeline-switch {
+.zuul-show-all-switch {
     padding-left: var(--pf-global--spacer--sm);
 }
 
