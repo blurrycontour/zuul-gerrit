@@ -1,5 +1,5 @@
 # Copyright 2015 Rackspace Australia
-# Copyright 2023 Acme Gating, LLC
+# Copyright 2023-2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -58,8 +58,24 @@ class VariableNameError(Exception):
     pass
 
 
-# Authentication Exceptions
+# Provider exceptions
+class LaunchStatusException(Exception):
+    statsd_key = 'error.status'
 
+
+class LaunchNetworkException(Exception):
+    statsd_key = 'error.network'
+
+
+class LaunchKeyscanException(Exception):
+    statsd_key = 'error.keyscan'
+
+
+class CapacityException(Exception):
+    statsd_key = 'error.capacity'
+
+
+# Authentication Exceptions
 class AuthTokenException(Exception):
     defaultMsg = 'Unknown Error'
     HTTPError = 400
