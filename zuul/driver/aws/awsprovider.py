@@ -754,7 +754,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         return quota
 
     def uploadImage(self, provider_image, image_name, filename,
-                    image_format, metadata, md5, sha256):
+                    image_format, metadata, md5, sha256, bucket_name,
+                    timeout):
         self.log.debug(f"Uploading image {image_name}")
 
         # There is no IMDS support option for the import_image call
@@ -764,7 +765,6 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
 
         if provider_image.import_method != 'ebs-direct':
             # Upload image to S3
-            bucket_name = self.provider.object_storage['bucket-name']
             bucket = self.s3.Bucket(bucket_name)
             object_filename = f'{image_name}.{image_format}'
             extra_args = {'Tagging': urllib.parse.urlencode(metadata)}
@@ -778,16 +778,16 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             image_id = self._uploadImageImage(
                 provider_image, image_name, filename,
                 image_format, metadata, md5, sha256,
-                bucket_name, object_filename)
+                bucket_name, object_filename, timeout)
         elif provider_image.import_method == 'snapshot':
             image_id = self._uploadImageSnapshot(
                 provider_image, image_name, filename,
                 image_format, metadata, md5, sha256,
-                bucket_name, object_filename)
+                bucket_name, object_filename, timeout)
         elif provider_image.import_method == 'ebs-direct':
             image_id = self._uploadImageSnapshotEBS(
                 provider_image, image_name, filename,
-                image_format, metadata)
+                image_format, metadata, timeout)
         else:
             raise Exception("Unknown image import method")
         return image_id
@@ -829,13 +829,12 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             return self.ec2_client.register_image(**args)
 
     def _uploadImageSnapshotEBS(self, provider_image, image_name, filename,
-                                image_format, metadata):
+                                image_format, metadata, timeout):
         # Import snapshot
         uploader = EbsSnapshotUploader(self, self.log, filename, image_name,
                                        metadata)
         self.log.debug(f"Importing {image_name} as EBS snapshot")
-        volume_size, snapshot_id = uploader.upload(
-            self.provider.image_import_timeout)
+        volume_size, snapshot_id = uploader.upload(timeout)
 
         register_response = self._registerImage(
             provider_image, image_name, metadata, volume_size, snapshot_id,
@@ -847,12 +846,12 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
 
     def _uploadImageSnapshot(self, provider_image, image_name, filename,
                              image_format, metadata, md5, sha256,
-                             bucket_name, object_filename):
+                             bucket_name, object_filename, timeout):
         # Import snapshot
         self.log.debug(f"Importing {image_name} as snapshot")
-        timeout = time.time()
-        if self.provider.image_import_timeout:
-            timeout += self.provider.image_import_timeout
+        timeout_ts = time.time()
+        if timeout:
+            timeout_ts += timeout
         while True:
             try:
                 with self.rate_limiter:
@@ -875,7 +874,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             except botocore.exceptions.ClientError as error:
                 if (error.response['Error']['Code'] ==
                     'ResourceCountLimitExceeded'):
-                    if time.time() < timeout:
+                    if time.time() < timeout_ts:
                         self.log.warning("AWS error: '%s' will retry",
                                          str(error))
                         time.sleep(self.IMAGE_UPLOAD_SLEEP)
@@ -928,12 +927,12 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
 
     def _uploadImageImage(self, provider_image, image_name, filename,
                           image_format, metadata, md5, sha256,
-                          bucket_name, object_filename):
+                          bucket_name, object_filename, timeout):
         # Import image as AMI
         self.log.debug(f"Importing {image_name} as AMI")
-        timeout = time.time()
-        if self.provider.image_import_timeout:
-            timeout += self.provider.image_import_timeout
+        timeout_ts = time.time()
+        if timeout:
+            timeout_ts += timeout
         while True:
             try:
                 with self.rate_limiter:
@@ -957,7 +956,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             except botocore.exceptions.ClientError as error:
                 if (error.response['Error']['Code'] ==
                     'ResourceCountLimitExceeded'):
-                    if time.time() < timeout:
+                    if time.time() < timeout_ts:
                         self.log.warning("AWS error: '%s' will retry",
                                          str(error))
                         time.sleep(self.IMAGE_UPLOAD_SLEEP)
@@ -1859,6 +1858,15 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
                     value *= 1000
                 args[code] = value
         return QuotaInformation(**args)
+
+    def uploadImage(self, provider_image, image_name,
+                    filename, image_format, metadata, md5, sha256):
+        ep = self.getEndpoint()
+        bucket_name = self.object_storage.get('bucket-name')
+        timeout = self.image_import_timeout
+        return ep.uploadImage(provider_image, image_name,
+                              filename, image_format, metadata, md5, sha256,
+                              bucket_name, timeout)
 
 
 class AwsProviderSchema(BaseProviderSchema):
