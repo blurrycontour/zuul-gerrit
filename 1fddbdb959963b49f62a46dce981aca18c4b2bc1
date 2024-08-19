@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d599419f_37b86905",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-19T17:50:03Z",
+      "side": 1,
+      "message": "One small argument thing inline that is worth checking before approving.",
+      "revId": "1fddbdb959963b49f62a46dce981aca18c4b2bc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbf44578_23dc3272",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-19T17:50:03Z",
+      "side": 1,
+      "message": "This argument is no longer used. Should we remove it?",
+      "range": {
+        "startLine": 619,
+        "startChar": 30,
+        "endLine": 619,
+        "endChar": 40
+      },
+      "revId": "1fddbdb959963b49f62a46dce981aca18c4b2bc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "504e459a_e1d4aa27",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 700,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-19T17:50:03Z",
+      "side": 1,
+      "message": "For other reviewers who may also struggle with the way Gerrit diffed things: There are two main changes in each of these merge methods. The first is indenting everything a layer deeper under the context manager for the repo. The second is that we are returning the hexsha from the commit object rather than the commit object itself. Otherwise everything appears to remain the same.",
+      "revId": "1fddbdb959963b49f62a46dce981aca18c4b2bc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
