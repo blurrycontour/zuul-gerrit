@@ -43,6 +43,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "5545d657_a5c5f199",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 619,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-19T17:56:43Z",
+      "side": 1,
+      "message": "This was corrected in the followup change.",
+      "parentUuid": "cbf44578_23dc3272",
+      "range": {
+        "startLine": 619,
+        "startChar": 30,
+        "endLine": 619,
+        "endChar": 40
+      },
+      "revId": "1fddbdb959963b49f62a46dce981aca18c4b2bc1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "504e459a_e1d4aa27",
         "filename": "zuul/merger/merger.py",
         "patchSetId": 1
