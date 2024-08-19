@@ -115,56 +115,55 @@ QueueCard.propTypes = {
   allQueuesExpanded: PropTypes.bool,
 }
 
-function QueueSummary({ pipeline, pipelineType, showAllQueues, allQueuesExpanded }) {
+function QueueSummary({ pipeline, showAllQueues, allQueuesExpanded }) {
   let changeQueues = pipeline.change_queues
-  // Dependent pipelines usually come with named queues, so we will
-  // visualize each queue individually. For other pipeline types, we
-  // will consolidate all heads as a single queue to simplify the
-  // visualization (e.g. independent pipelines like check where each
-  // change/item is enqueued in it's own queue by design).
-  if (['dependent'].indexOf(pipelineType) > -1) {
-    if (!showAllQueues) {
-      changeQueues = changeQueues.filter(queue => queue.heads.length > 0)
-    }
-    return (
-      changeQueues.map((queue) => (
-        <QueueCard
-          key={`${queue.name}${queue.branch}`}
-          pipeline={pipeline}
-          queue={queue}
-          allQueuesExpanded={allQueuesExpanded}
-        />
-      ))
-    )
-  } else {
-    return (
-      <Flex
-        display={{ default: 'inlineFlex' }}
-        spaceItems={{ default: 'spaceItemsNone' }}
-      >
-        {allQueuesExpanded ?
-          changeQueues.map((queue, idx) => (
-            <ChangeQueue key={idx} queue={queue} pipeline={pipeline} showTitle={false} />
-          ))
-          :
-          changeQueues.map((queue) => (
-            queue.heads.map((head) => (
-              head.map((item) => (
-                <FlexItem key={item.id}>
-                  <QueueItemSquareWithPopover item={item} />
-                </FlexItem>
-              ))
-            ))
-          ))
-        }
-      </Flex>
-    )
+
+  if (!showAllQueues) {
+    changeQueues = changeQueues.filter(queue => queue.heads.length > 0)
   }
+
+  return (
+    changeQueues.map((queue, idx) => {
+      if (queue.name) {
+        // Visualize named queues individually
+        return (
+          <QueueCard
+            key={`${queue.name}${queue.branch}`}
+            pipeline={pipeline}
+            queue={queue}
+            allQueuesExpanded={allQueuesExpanded}
+          />
+        )
+      } else {
+        // For queues without a name, all heads will be consolidated
+        // into a single queue to simplify the visualization.
+        // This is the case for e.g. independent pipelines like check
+        // where each change is enqueued in it's own queue by design.
+        return (
+          allQueuesExpanded ?
+            <ChangeQueue key={idx} queue={queue} pipeline={pipeline} showTitle={false} />
+            :
+            <Flex
+              key={idx}
+              display={{ default: 'inlineFlex' }}
+              spaceItems={{ default: 'spaceItemsNone' }}
+            >
+              {queue.heads.map((head) => (
+                head.map((item) => (
+                  <FlexItem key={item.id}>
+                    <QueueItemSquareWithPopover item={item} />
+                  </FlexItem>
+                ))
+              ))}
+            </Flex>
+        )
+      }
+    })
+  )
 }
 
 QueueSummary.propTypes = {
   pipeline: PropTypes.object,
-  pipelineType: PropTypes.string,
   showAllQueues: PropTypes.bool,
   allQueuesExpanded: PropTypes.bool,
 }
@@ -180,9 +179,7 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
 
   return (
     <Card className="zuul-pipeline-summary zuul-compact-card">
-      <CardTitle
-        style={pipelineType !== 'dependent' ? { paddingBottom: '8px' } : {}}
-      >
+      <CardTitle style={{ paddingBottom: '8px' }} >
         <Tooltip content={pipeline.description ? pipeline.description : ''}>
           <PipelineIcon pipelineType={pipelineType} />
         </Tooltip>
@@ -216,7 +213,11 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
         }
       </CardTitle>
       <CardBody>
-        <QueueSummary pipeline={pipeline} pipelineType={pipelineType} showAllQueues={showAllQueues} allQueuesExpanded={areAllQueuesExpanded} />
+        <QueueSummary
+          pipeline={pipeline}
+          showAllQueues={showAllQueues}
+          allQueuesExpanded={areAllQueuesExpanded}
+        />
       </CardBody>
 
     </Card>
