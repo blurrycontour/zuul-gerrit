@@ -114,7 +114,9 @@
       bucket-name: zuul
     flavors:
       - name: normal
+        instance-type: t3.medium
       - name: large
+        instance-type: t3.large
     images:
       - name: debian
 
