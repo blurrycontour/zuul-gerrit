@@ -1139,7 +1139,7 @@ class Merger(object):
                                 retry_timeout=retry_timeout)
 
     def updateRepo(self, connection_name, project_name, repo_state=None,
-                   zuul_event_id=None, build=None, process_worker=None):
+                   zuul_event_id=None, build=None):
         """Fetch from origin if needed
 
         If repo_state is None, then this will always git fetch.
