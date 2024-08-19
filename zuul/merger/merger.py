@@ -616,7 +616,7 @@ class Repo(object):
                             branch)
                 Repo._setRef(f"refs/remotes/origin/{branch}", hexsha, repo)
 
-    def deleteRef(self, path, repo=None, zuul_event_id=None):
+    def deleteRef(self, path, zuul_event_id=None):
         # This is only used in tests
         ref_log = get_annotated_logger(
             logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
@@ -1139,7 +1139,7 @@ class Merger(object):
                                 retry_timeout=retry_timeout)
 
     def updateRepo(self, connection_name, project_name, repo_state=None,
-                   zuul_event_id=None, build=None, process_worker=None):
+                   zuul_event_id=None, build=None):
         """Fetch from origin if needed
 
         If repo_state is None, then this will always git fetch.
