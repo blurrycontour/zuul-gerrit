@@ -1070,7 +1070,7 @@ class Merger(object):
             f.write(self.scheme)
 
     def _addProject(self, hostname, connection_name, project_name, url, sshkey,
-                    zuul_event_id, process_worker=None, retry_timeout=None):
+                    zuul_event_id, retry_timeout=None):
         repo = None
         key = '/'.join([hostname, project_name])
         try:
@@ -1101,7 +1101,7 @@ class Merger(object):
         return repo
 
     def getRepo(self, connection_name, project_name,
-                zuul_event_id=None, process_worker=None,
+                zuul_event_id=None,
                 keep_remote_url=False):
         source = self.connections.getSource(connection_name)
         project = source.getProject(project_name)
@@ -1122,7 +1122,6 @@ class Merger(object):
                             (connection_name, project_name,))
         return self._addProject(hostname, connection_name, project_name, url,
                                 sshkey, zuul_event_id,
-                                process_worker=process_worker,
                                 retry_timeout=retry_timeout)
 
     def updateRepo(self, connection_name, project_name, repo_state=None,
@@ -1172,7 +1171,6 @@ class Merger(object):
         log.info("Checking out %s/%s branch %s",
                  connection_name, project_name, branch)
         repo = self.getRepo(connection_name, project_name,
-                            process_worker=process_worker,
                             zuul_event_id=zuul_event_id)
         # We don't need to reset because this is only called by the
         # executor after a clone.
