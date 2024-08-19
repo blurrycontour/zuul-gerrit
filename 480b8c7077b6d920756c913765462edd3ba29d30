@@ -53,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7c228fa_e6a15e16",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-19T09:40:51Z",
+      "side": 1,
+      "message": "Implemented in https://review.opendev.org/c/zuul/zuul/+/926514.",
+      "parentUuid": "05f3316d_352cdbc9",
+      "revId": "480b8c7077b6d920756c913765462edd3ba29d30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8f5ad69_f0234640",
