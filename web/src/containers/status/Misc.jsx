@@ -201,18 +201,13 @@ function PipelineIcon({ pipelineType, size = 'sm' }) {
   }
 
   return (
-    <Tooltip
-      position="bottom"
-      content={<div><strong>{iconConfig.help_title}</strong><p>{iconConfig.help}</p></div>}
-    >
-      <Icon
-        size={size}
-        style={{
-          marginRight: 'var(--pf-global--spacer--sm)',
-          verticalAlign: verticalAlign,
-        }}
-      />
-    </Tooltip>
+    <Icon
+      size={size}
+      style={{
+        marginRight: 'var(--pf-global--spacer--sm)',
+        verticalAlign: verticalAlign,
+      }}
+    />
   )
 }
 
