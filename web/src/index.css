@@ -354,6 +354,30 @@ a.refresh {
 .zuul-job-result-label.pf-c-label {
     border-radius: 3px;
     width: 100px;
+    /* Align font and padding to match the "old" label design */
+    padding: .2em .6em .3em;
+    border: none;
+}
+
+.zuul-job-result-label.pf-c-label.pf-m-green {
+    background-color: var(--pf-global--palette--green-400);
+}
+
+.zuul-job-result-label.pf-c-label.pf-m-red {
+    background-color: var(--pf-global--palette--red-100);
+}
+
+.zuul-job-result-label.pf-c-label.pf-m-orange {
+    background-color: var(--pf-global--warning-color--100);
+}
+
+.zuul-job-result-label.pf-c-label.pf-m-blue {
+    background-color: var(--pf-global--info-color--100);
+}
+
+.zuul-job-result-label.pf-c-label {
+    /* grey variant, without additional "pf-m-" class */
+    background-color: var(--pf-global--palette--black-500);
 }
 
 .zuul-job-result-label.pf-c-label .pf-c-label__content::before {
@@ -364,6 +388,8 @@ a.refresh {
     width: 100%;
     display: block;
     text-align: center;
+    /* Align font color to match the "old" label design */
+    color: #fff;
 }
 
 /* Remove grid gap for job progress bars to align them with the
