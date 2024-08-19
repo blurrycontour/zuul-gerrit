@@ -106,6 +106,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c028b49f_dfd12c0f",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-19T09:16:50Z",
+      "side": 1,
+      "message": "Should be fixed by now.",
+      "parentUuid": "55c74405_a99f5295",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b64e430_70e14d1e",
@@ -119,6 +137,24 @@
       "writtenOn": "2024-07-03T21:17:05Z",
       "side": 1,
       "message": "-1: Rendering the time to the right of the bar seems awkward as it shifts the bar around in relation to the completed results.  I think it should either be superimposed on the bar, or under it on a second line, or a mouseover as before.",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42d2c92d_a223a47e",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-19T09:16:50Z",
+      "side": 1,
+      "message": "The \"awkward\" part should already be fixed ;-). In addition, I\u0027ve added a \nfollow-up change to show the remaining time via a tooltip as other solutions (showing the time via the progress bar didn\u0027t work out): https://review.opendev.org/c/zuul/zuul/+/926472/2",
+      "parentUuid": "8b64e430_70e14d1e",
       "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -244,6 +280,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6ac4510_f9b2aed7",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-19T09:16:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5764d5ec_d547da8c",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc0612ba_c9eb0fa7",
@@ -292,6 +346,24 @@
       "side": 1,
       "message": "This may be addressed in https://review.opendev.org/c/zuul/zuul/+/926467",
       "parentUuid": "8a14c2de_c9ff905a",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53523902_e8004c72",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-19T09:16:50Z",
+      "side": 1,
+      "message": "Yes, that\u0027s the follow-up change for this comment.",
+      "parentUuid": "63fe1762_08e1e5d0",
       "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
