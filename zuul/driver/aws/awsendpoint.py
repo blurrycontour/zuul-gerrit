@@ -15,7 +15,6 @@
 
 import base64
 import cachetools.func
-import copy
 import functools
 import hashlib
 import json
@@ -122,24 +121,19 @@ class AwsCreateStateMachine(statemachine.StateMachine):
     INSTANCE_CREATING = 'creating instance'
     COMPLETE = 'complete'
 
-    def __init__(self, endpoint, hostname, label, image_external_id,
-                 metadata, request, log):
+    def __init__(self, endpoint, hostname, label, flavor, image,
+                 image_external_id, tags, log):
         self.log = log
         super().__init__()
         self.endpoint = endpoint
         self.attempts = 0
         self.image_external_id = image_external_id
-        self.metadata = metadata
-        self.tags = label.tags.copy() or {}
-        for k, v in label.dynamic_tags.items():
-            try:
-                self.tags[k] = v.format(request=request.getSafeAttributes())
-            except Exception:
-                self.log.exception("Error formatting tag %s", k)
-        self.tags.update(metadata)
+        self.tags = tags.copy()
         self.tags['Name'] = hostname
         self.hostname = hostname
         self.label = label
+        self.flavor = flavor
+        self.image = image
         self.public_ipv4 = None
         self.public_ipv6 = None
         self.nic = None
@@ -150,7 +144,7 @@ class AwsCreateStateMachine(statemachine.StateMachine):
 
     def advance(self):
         if self.state == self.START:
-            if self.label.dedicated_host:
+            if self.flavor.dedicated_host:
                 self.state = self.HOST_ALLOCATING_START
             else:
                 self.state = self.INSTANCE_CREATING_START
@@ -187,7 +181,7 @@ class AwsCreateStateMachine(statemachine.StateMachine):
 
         if self.state == self.INSTANCE_CREATING_START:
             self.create_future = self.endpoint._submitCreateInstance(
-                self.label, self.image_external_id,
+                self.label, self.flavor, self.image, self.image_external_id,
                 self.tags, self.hostname, self.dedicated_host_id, self.log)
             self.state = self.INSTANCE_CREATING_SUBMIT
 
@@ -198,7 +192,8 @@ class AwsCreateStateMachine(statemachine.StateMachine):
                 return
             self.instance = instance
             self.external_id['instance'] = instance['InstanceId']
-            self.quota = self.endpoint.getQuotaForLabel(self.label)
+            self.quota = self.endpoint.getQuotaForLabel(
+                self.label, self.flavor)
             self.state = self.INSTANCE_CREATING
 
         if self.state == self.INSTANCE_CREATING:
@@ -545,24 +540,25 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
 
             yield AwsInstance(self.region, instance, None, quota)
 
-    def getQuotaForLabel(self, label):
+    def getQuotaForLabel(self, label, flavor):
         # For now, we are optimistically assuming that when an
         # instance is launched on a dedicated host, it is not counted
         # against instance quota.  That may be overly optimistic.  If
         # it is, then we will merge the two quotas below rather than
         # switch.
-        if label.dedicated_host:
+        if flavor.dedicated_host:
             quota = self._getQuotaForHostType(
-                label.instance_type)
+                flavor.instance_type)
         else:
             quota = self._getQuotaForInstanceType(
-                label.instance_type,
-                SPOT if label.use_spot else ON_DEMAND)
-        if label.volume_type:
-            quota.add(self._getQuotaForVolumeType(
-                label.volume_type,
-                storage=label.volume_size,
-                iops=label.iops))
+                flavor.instance_type,
+                SPOT if flavor.use_spot else ON_DEMAND)
+        # TODO
+        # if label.volume_type:
+        #     quota.add(self._getQuotaForVolumeType(
+        #         label.volume_type,
+        #         storage=label.volume_size,
+        #         iops=label.iops))
         return quota
 
     def uploadImage(self, provider_image, image_name, filename,
@@ -1232,9 +1228,9 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             self.image_id_by_filter_cache[cache_key] = val
             return val
 
-    def _getImageId(self, cloud_image):
-        image_id = cloud_image.image_id
-        image_filters = cloud_image.image_filters
+    def _getImageId(self, image):
+        image_id = image.image_id
+        image_filters = image.image_filters
 
         if image_filters is not None:
             return self._getLatestImageIdByFilters(image_filters)
@@ -1298,11 +1294,12 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             return dict(HostId=host_ids[0],
                         State='pending')
 
-    def _submitCreateInstance(self, label, image_external_id,
-                              tags, hostname, dedicated_host_id, log):
+    def _submitCreateInstance(self, label, flavor, image,
+                              image_external_id, tags, hostname,
+                              dedicated_host_id, log):
         return self.create_executor.submit(
             self._createInstance,
-            label, image_external_id,
+            label, flavor, image, image_external_id,
             tags, hostname, dedicated_host_id, log)
 
     def _completeCreateInstance(self, future):
@@ -1323,22 +1320,22 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                 raise exceptions.CapacityException(str(error))
             raise
 
-    def _createInstance(self, label, image_external_id,
+    def _createInstance(self, label, flavor, image, image_external_id,
                         tags, hostname, dedicated_host_id, log):
         if image_external_id:
             image_id = image_external_id
         else:
-            image_id = self._getImageId(label.cloud_image)
+            image_id = self._getImageId(image)
 
         args = dict(
             ImageId=image_id,
             MinCount=1,
             MaxCount=1,
             KeyName=label.key_name,
-            EbsOptimized=label.ebs_optimized,
-            InstanceType=label.instance_type,
+            EbsOptimized=flavor.ebs_optimized,
+            InstanceType=flavor.instance_type,
             NetworkInterfaces=[{
-                'AssociatePublicIpAddress': label.pool.public_ipv4,
+                'AssociatePublicIpAddress': flavor.public_ipv4,
                 'DeviceIndex': 0}],
             TagSpecifications=[
                 {
@@ -1352,28 +1349,29 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             ]
         )
 
-        if label.pool.security_group_id:
-            args['NetworkInterfaces'][0]['Groups'] = [
-                label.pool.security_group_id
-            ]
-        if label.pool.subnet_id:
-            args['NetworkInterfaces'][0]['SubnetId'] = label.pool.subnet_id
+        # TODO:
+        # if label.pool.security_group_id:
+        #     args['NetworkInterfaces'][0]['Groups'] = [
+        #         label.pool.security_group_id
+        #     ]
+        # if label.pool.subnet_id:
+        #     args['NetworkInterfaces'][0]['SubnetId'] = label.pool.subnet_id
 
-        if label.pool.public_ipv6:
-            args['NetworkInterfaces'][0]['Ipv6AddressCount'] = 1
+        # if label.pool.public_ipv6:
+        #     args['NetworkInterfaces'][0]['Ipv6AddressCount'] = 1
 
-        if label.userdata:
-            args['UserData'] = label.userdata
+        # if label.userdata:
+        #     args['UserData'] = label.userdata
 
-        if label.iam_instance_profile:
-            if 'name' in label.iam_instance_profile:
-                args['IamInstanceProfile'] = {
-                    'Name': label.iam_instance_profile['name']
-                }
-            elif 'arn' in label.iam_instance_profile:
-                args['IamInstanceProfile'] = {
-                    'Arn': label.iam_instance_profile['arn']
-                }
+        # if label.iam_instance_profile:
+        #     if 'name' in label.iam_instance_profile:
+        #         args['IamInstanceProfile'] = {
+        #             'Name': label.iam_instance_profile['name']
+        #         }
+        #     elif 'arn' in label.iam_instance_profile:
+        #         args['IamInstanceProfile'] = {
+        #             'Arn': label.iam_instance_profile['arn']
+        #         }
 
         # Default block device mapping parameters are embedded in AMIs.
         # We might need to supply our own mapping before lauching the instance.
@@ -1383,45 +1381,48 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         # TODO: Flavors can also influence whether or not the VM spawns with a
         # volume -- we basically need to ensure DeleteOnTermination is true.
         # However, leaked volume detection may mitigate this.
-        if image.get('BlockDeviceMappings'):
-            bdm = image['BlockDeviceMappings']
-            mapping = copy.deepcopy(bdm[0])
-            if 'Ebs' in mapping:
-                mapping['Ebs']['DeleteOnTermination'] = True
-                if label.volume_size:
-                    mapping['Ebs']['VolumeSize'] = label.volume_size
-                if label.volume_type:
-                    mapping['Ebs']['VolumeType'] = label.volume_type
-                if label.iops:
-                    mapping['Ebs']['Iops'] = label.iops
-                if label.throughput:
-                    mapping['Ebs']['Throughput'] = label.throughput
-                # If the AMI is a snapshot, we cannot supply an "encrypted"
-                # parameter
-                if 'Encrypted' in mapping['Ebs']:
-                    del mapping['Ebs']['Encrypted']
-                args['BlockDeviceMappings'] = [mapping]
 
-        # enable EC2 Spot
-        if label.use_spot:
-            args['InstanceMarketOptions'] = {
-                'MarketType': 'spot',
-                'SpotOptions': {
-                    'SpotInstanceType': 'one-time',
-                    'InstanceInterruptionBehavior': 'terminate'
-                }
-            }
+        # TODO
+        # if image.get('BlockDeviceMappings'):
+        #     bdm = image['BlockDeviceMappings']
+        #     mapping = copy.deepcopy(bdm[0])
+        #     if 'Ebs' in mapping:
+        #         mapping['Ebs']['DeleteOnTermination'] = True
+        #         if label.volume_size:
+        #             mapping['Ebs']['VolumeSize'] = label.volume_size
+        #         if label.volume_type:
+        #             mapping['Ebs']['VolumeType'] = label.volume_type
+        #         if label.iops:
+        #             mapping['Ebs']['Iops'] = label.iops
+        #         if label.throughput:
+        #             mapping['Ebs']['Throughput'] = label.throughput
+        #         # If the AMI is a snapshot, we cannot supply an "encrypted"
+        #         # parameter
+        #         if 'Encrypted' in mapping['Ebs']:
+        #             del mapping['Ebs']['Encrypted']
+        #         args['BlockDeviceMappings'] = [mapping]
 
-        if label.imdsv2 == 'required':
-            args['MetadataOptions'] = {
-                'HttpTokens': 'required',
-                'HttpEndpoint': 'enabled',
-            }
-        elif label.imdsv2 == 'optional':
-            args['MetadataOptions'] = {
-                'HttpTokens': 'optional',
-                'HttpEndpoint': 'enabled',
-            }
+        # TODO
+        # if label.use_spot:
+        #     args['InstanceMarketOptions'] = {
+        #         'MarketType': 'spot',
+        #         'SpotOptions': {
+        #             'SpotInstanceType': 'one-time',
+        #             'InstanceInterruptionBehavior': 'terminate'
+        #         }
+        #     }
+
+        # TODO
+        # if label.imdsv2 == 'required':
+        #     args['MetadataOptions'] = {
+        #         'HttpTokens': 'required',
+        #         'HttpEndpoint': 'enabled',
+        #     }
+        # elif label.imdsv2 == 'optional':
+        #     args['MetadataOptions'] = {
+        #         'HttpTokens': 'optional',
+        #         'HttpEndpoint': 'enabled',
+        #     }
 
         if dedicated_host_id:
             placement = args.setdefault('Placement', {})
@@ -1431,9 +1432,10 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                 'Affinity': 'host',
             })
 
-        if label.pool.az:
-            placement = args.setdefault('Placement', {})
-            placement['AvailabilityZone'] = label.pool.az
+        # TODO
+        # if label.pool.az:
+        #     placement = args.setdefault('Placement', {})
+        #     placement['AvailabilityZone'] = label.pool.az
 
         with self.rate_limiter(log.debug, "Created instance"):
             log.debug("Creating VM %s", hostname)
