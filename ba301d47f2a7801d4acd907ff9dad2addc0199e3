@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "522b9f69_f16f7742",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-08-19T09:46:12Z",
+      "side": 1,
+      "message": "\u003e This seems reasonable to me, but a release note is probably a good idea since it could affect users. And we might want to have some tests for this so that we encode the behavior we\u0027re expecting.\n\nDone",
+      "revId": "ba301d47f2a7801d4acd907ff9dad2addc0199e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
