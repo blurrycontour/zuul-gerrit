@@ -156,9 +156,9 @@ const JOB_STATE_ICON_CONFIGS = {
   },
   POST_FAILURE: {
     icon: TimesIcon,
-    color: 'var(--pf-global--danger-color--100)',
-    variant: 'danger',
-    labelColor: 'red',
+    color: 'var(--pf-global--warning-color--100)',
+    variant: 'warning',
+    labelColor: 'orange',
   },
 }
 
