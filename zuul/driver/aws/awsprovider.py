@@ -401,7 +401,7 @@ class EbsSnapshotUploader(ImageUploader):
         # if we get a particular message, but that's impractical
         # to reproduce for testing.
         # https://docs.aws.amazon.com/ebs/latest/userguide/error-retries.html
-        ex = self.adapter.ebs_client.exceptions
+        ex = self.endpoint.ebs_client.exceptions
         if isinstance(exception, (
                 ex.RequestThrottledException,
                 ex.InternalServerException,
@@ -412,7 +412,7 @@ class EbsSnapshotUploader(ImageUploader):
 
     def _rateLimited(self, func):
         def rateLimitedFunc(*args, **kw):
-            with self.adapter.rate_limiter:
+            with self.endpoint.rate_limiter:
                 return func(*args, **kw)
         return rateLimitedFunc
 
@@ -431,7 +431,7 @@ class EbsSnapshotUploader(ImageUploader):
         checksum_base64 = base64.b64encode(checksum.digest()).decode('utf-8')
 
         response = self.retry(
-            self.adapter.ebs_client.put_snapshot_block,
+            self.endpoint.ebs_client.put_snapshot_block,
             SnapshotId=self.snapshot_id,
             BlockIndex=segment.index,
             BlockData=data,
@@ -450,7 +450,7 @@ class EbsSnapshotUploader(ImageUploader):
         # Volume size is in GiB
         size = math.ceil(self.size / GIB)
         response = self.retry(
-            self._rateLimited(self.adapter.ebs_client.start_snapshot),
+            self._rateLimited(self.endpoint.ebs_client.start_snapshot),
             VolumeSize=size,
             ClientToken=token,
             Tags=tag_dict_to_list(self.metadata),
@@ -460,7 +460,7 @@ class EbsSnapshotUploader(ImageUploader):
     def finishUpload(self):
         while True:
             response = self.retry(
-                self._rateLimited(self.adapter.ebs_client.complete_snapshot),
+                self._rateLimited(self.endpoint.ebs_client.complete_snapshot),
                 SnapshotId=self.snapshot_id,
                 ChangedBlocksCount=self.segment_count,
             )
@@ -476,10 +476,10 @@ class EbsSnapshotUploader(ImageUploader):
             self.finishUpload()
         except Exception:
             pass
-        with self.adapter.rate_limiter:
+        with self.endpoint.rate_limiter:
             snapshot_id = getattr(self, 'snapshot_id', None)
             if snapshot_id:
-                self.adapter.ec2_client.delete_snapshot(
+                self.endpoint.ec2_client.delete_snapshot(
                     SnapshotId=self.snapshot_id)
 
 
