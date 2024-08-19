@@ -204,6 +204,10 @@ a.refresh {
     cursor: default;
 }
 
+.zuul-pipeline-summary .zuul-compact-card:nth-child(1) .pf-c-card__title {
+    padding-top: 0;
+}
+
 .zuul-expand-icon {
     margin-left: 4px;
     vertical-align: -0.2em;
