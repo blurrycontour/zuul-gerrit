@@ -175,63 +175,67 @@ class Repo(object):
                       redact_url(clone_url), self.local_path)
             self._git_clone(clone_url, zuul_event_id, build=build)
 
-        repo = git.Repo(self.local_path)
-        repo.git.update_environment(**self.env)
-        # Create local branches corresponding to all the remote
-        # branches.  Skip this when cloning the workspace repo since
-        # we will restore the refs there.
-        if not repo_is_cloned and not self.skip_refs:
-            origin = repo.remotes.origin
-            for ref in origin.refs:
-                if ref.remote_head == 'HEAD':
-                    continue
-                repo.create_head('refs/heads/' + ref.remote_head,
-                                 ref.commit,
-                                 force=True)
-        with repo.config_writer() as config_writer:
-            if self.email:
-                config_writer.set_value('user', 'email', self.email)
-            if self.username:
-                config_writer.set_value('user', 'name', self.username)
+        with git.Repo(self.local_path) as repo:
+            repo.git.update_environment(**self.env)
+            # Create local branches corresponding to all the remote
+            # branches.  Skip this when cloning the workspace repo since
+            # we will restore the refs there.
+            if not repo_is_cloned and not self.skip_refs:
+                origin = repo.remotes.origin
+                for ref in origin.refs:
+                    if ref.remote_head == 'HEAD':
+                        continue
+                    repo.create_head('refs/heads/' + ref.remote_head,
+                                     ref.commit,
+                                     force=True)
+            with repo.config_writer() as config_writer:
+                if self.email:
+                    config_writer.set_value('user', 'email', self.email)
+                if self.username:
+                    config_writer.set_value('user', 'name', self.username)
 
-            # By default automatic garbage collection in git runs
-            # asynchronously in the background. This can lead to broken repos
-            # caused by a race in the following scenario:
-            #  1. git fetch (eventually triggers async gc)
-            #  2. zuul deletes all refs as part of reset
-            #  3. git gc looks for unreachable objects
-            #  4. zuul re-creates all refs as part of reset
-            #  5. git gc deletes unreachable objects it found
-            # Result is a repo with refs pointing to not existing objects.
-            # To prevent this race autoDetach can be disabled so git fetch
-            # returns after the gc finished.
-            config_writer.set_value('gc', 'autoDetach', 'false')
+                # By default automatic garbage collection in git runs
+                # asynchronously in the background. This can lead to
+                # broken repos caused by a race in the following
+                # scenario:
+                #  1. git fetch (eventually triggers async gc)
+                #  2. zuul deletes all refs as part of reset
+                #  3. git gc looks for unreachable objects
+                #  4. zuul re-creates all refs as part of reset
+                #  5. git gc deletes unreachable objects it found
+                # Result is a repo with refs pointing to not existing objects.
+                # To prevent this race autoDetach can be disabled so git fetch
+                # returns after the gc finished.
+                config_writer.set_value('gc', 'autoDetach', 'false')
 
-            # Lower the threshold of how many loose objects can trigger
-            # automatic garbage collection. With the default value of 6700
-            # we observed that with some repos automatic garbage collection
-            # simply refused to do its job because it refuses to prune if the
-            # number of unreachable objects it needs to prune exceeds a certain
-            # threshold. Thus lower the threshold to trigger automatic garbage
-            # collection more often.
-            config_writer.set_value('gc', 'auto', '512')
+                # Lower the threshold of how many loose objects can
+                # trigger automatic garbage collection. With the
+                # default value of 6700 we observed that with some
+                # repos automatic garbage collection simply refused to
+                # do its job because it refuses to prune if the number
+                # of unreachable objects it needs to prune exceeds a
+                # certain threshold. Thus lower the threshold to
+                # trigger automatic garbage collection more often.
+                config_writer.set_value('gc', 'auto', '512')
 
-            # By default garbage collection keeps unreachable objects for two
-            # weeks. However we don't need to carry around any unreachable
-            # objects so just prune them all when gc kicks in.
-            config_writer.set_value('gc', 'pruneExpire', 'now')
+                # By default garbage collection keeps unreachable
+                # objects for two weeks. However we don't need to
+                # carry around any unreachable objects so just prune
+                # them all when gc kicks in.
+                config_writer.set_value('gc', 'pruneExpire', 'now')
 
-            # By default git keeps a reflog of each branch for 90 days. Objects
-            # that are reachable from a reflog entry are not considered
-            # unrechable and thus won't be pruned for 90 days. This can blow up
-            # the repo significantly over time. Since the reflog is only really
-            # useful for humans working with repos we can just drop all the
-            # reflog when gc kicks in.
-            config_writer.set_value('gc', 'reflogExpire', 'now')
+                # By default git keeps a reflog of each branch for 90
+                # days. Objects that are reachable from a reflog entry
+                # are not considered unrechable and thus won't be
+                # pruned for 90 days. This can blow up the repo
+                # significantly over time. Since the reflog is only
+                # really useful for humans working with repos we can
+                # just drop all the reflog when gc kicks in.
+                config_writer.set_value('gc', 'reflogExpire', 'now')
 
-            config_writer.write()
-        if rewrite_url:
-            self._git_set_remote_url(repo, self.remote_url)
+                config_writer.write()
+            if rewrite_url:
+                self._git_set_remote_url(repo, self.remote_url)
         self._initialized = True
 
     def isInitialized(self):
@@ -260,9 +264,16 @@ class Repo(object):
                 else:
                     raise
 
-    def _git_fetch(self, repo, remote, zuul_event_id, ref=None, **kwargs):
+    def _git_fetch(self, remote, zuul_event_id, ref=None, **kwargs):
         log = get_annotated_logger(self.log, zuul_event_id)
         for attempt in range(1, self.retry_attempts + 1):
+            if self._git_fetchInner(log, attempt, remote,
+                                    zuul_event_id, ref=ref, **kwargs):
+                break
+
+    def _git_fetchInner(self, log, attempt, remote, zuul_event_id,
+                        ref=None, **kwargs):
+        with self.createRepoObject(zuul_event_id) as repo:
             try:
                 with timeout_handler(self.local_path):
                     ref_to_fetch = ref
@@ -271,7 +282,7 @@ class Repo(object):
                     repo.git.fetch(remote, ref_to_fetch,
                                    kill_after_timeout=self.git_timeout, f=True,
                                    **kwargs)
-                break
+                return True
             except Exception as e:
                 if attempt < self.retry_attempts:
                     if 'fatal: bad config' in e.stderr.lower():
@@ -378,28 +389,32 @@ class Repo(object):
 
     @staticmethod
     def _reset(local_path, env, log=None):
+        with Repo._createRepoObject(local_path, env) as repo:
+            return Repo._resetInner(repo, local_path, log)
+
+    @staticmethod
+    def _resetInner(repo, local_path, log):
         messages = []
-        repo = Repo._createRepoObject(local_path, env)
 
         origin_refs = {}
         head_refs = {}
         zuul_refs = {}
 
         # Get all of the local and remote refs in the repo at once.
-        for commit, ref in Repo._getRefs(repo):
+        for hexsha, ref in Repo._getRefs(repo):
             if ref.startswith('refs/remotes/origin/'):
-                origin_refs[ref[20:]] = commit
+                origin_refs[ref[20:]] = hexsha
             if ref.startswith('refs/heads/'):
-                head_refs[ref[11:]] = commit
+                head_refs[ref[11:]] = hexsha
             if ref.startswith('refs/zuul/'):
-                zuul_refs[ref] = commit
+                zuul_refs[ref] = hexsha
 
         # Detach HEAD so we can work with references without interfering
         # with any active branch. Any remote ref will do as long as it can
         # be dereferenced to an existing commit.
-        for ref, commit in origin_refs.items():
+        for ref, hexsha in origin_refs.items():
             try:
-                repo.head.reference = commit
+                repo.head.reference = hexsha
                 break
             except Exception:
                 if log:
@@ -448,11 +463,11 @@ class Repo(object):
             Repo._cleanup_leaked_ref_dirs(local_path, log, messages)
 
         # Update our local heads to match the remote
-        for ref, commit in origin_refs.items():
+        for ref, hexsha in origin_refs.items():
             if ref == 'HEAD':
                 continue
             repo.create_head('refs/heads/' + ref,
-                             commit,
+                             hexsha,
                              force=True)
         return messages
 
@@ -475,36 +490,29 @@ class Repo(object):
             raise
 
     def getBranchHead(self, branch, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        branch_head = repo.heads[branch]
-        return branch_head.commit
-
-    def setBranchHead(self, branch, head_ref, repo=None, zuul_event_id=None):
-        if repo is None:
-            repo = self.createRepoObject(zuul_event_id)
-        repo.create_head(branch, head_ref, force=True)
+        with self.createRepoObject(zuul_event_id) as repo:
+            branch_head = repo.heads[branch]
+            return branch_head.commit.hexsha
 
     def hasBranch(self, branch, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        origin = repo.remotes.origin
-        return branch in origin.refs
+        with self.createRepoObject(zuul_event_id) as repo:
+            origin = repo.remotes.origin
+            return branch in origin.refs
 
     def getBranches(self, zuul_event_id=None):
-        # TODO(jeblair): deprecate with override-branch; replaced by
-        # getRefs().
-        repo = self.createRepoObject(zuul_event_id)
-        return [x.name for x in repo.heads]
+        # This is only used in tests.
+        with self.createRepoObject(zuul_event_id) as repo:
+            return [x.name for x in repo.heads]
 
     def getRef(self, refname, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        if refname not in repo.refs:
-            return None
-        ref = repo.refs[refname]
-        return ref
+        # Return the path and hexsha of the ref
+        with self.createRepoObject(zuul_event_id) as repo:
+            ref = repo.refs[refname]
+            return (ref.path, ref.commit.hexsha)
 
     def getRefs(self, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        return Repo._getRefs(repo)
+        with self.createRepoObject(zuul_event_id) as repo:
+            return Repo._getRefs(repo)
 
     @staticmethod
     def _getRefs(repo):
@@ -514,17 +522,16 @@ class Repo(object):
         for ref in refs.splitlines():
             parts = ref.split(" ")
             if len(parts) == 2:
-                commit, ref = parts
-                yield commit, ref
+                hexsha, ref = parts
+                yield hexsha, ref
 
-    def setRef(self, path, hexsha, repo=None, zuul_event_id=None):
+    def setRef(self, path, hexsha, zuul_event_id=None):
         ref_log = get_annotated_logger(
             logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
         ref_log.debug("Create reference %s at %s in %s",
                       path, hexsha, self.local_path)
-        if repo is None:
-            repo = self.createRepoObject(zuul_event_id)
-        self._setRef(path, hexsha, repo)
+        with self.createRepoObject(zuul_event_id) as repo:
+            self._setRef(path, hexsha, repo)
 
     @staticmethod
     def _setRef(path, hexsha, repo):
@@ -535,16 +542,16 @@ class Repo(object):
             path, hexsha, repo.git_dir)
 
     def setRefs(self, refs, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        ref_log = get_annotated_logger(
-            logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
-        self._setRefs(repo, refs, log=ref_log)
+        with self.createRepoObject(zuul_event_id) as repo:
+            ref_log = get_annotated_logger(
+                logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
+            self._setRefs(repo, refs, log=ref_log)
 
     @staticmethod
-    def setRefsAsync(local_path, refs):
-        repo = git.Repo(local_path)
-        messages = Repo._setRefs(repo, refs)
-        return messages
+    def setRefsAsync(local_path, env, refs):
+        with Repo._createRepoObject(local_path, env) as repo:
+            messages = Repo._setRefs(repo, refs)
+            return messages
 
     @staticmethod
     def _setRefs(repo, refs, log=None):
@@ -597,23 +604,25 @@ class Repo(object):
 
         return messages
 
-    def setRemoteRef(self, branch, rev, zuul_event_id=None):
+    def setRemoteRef(self, branch, hexsha, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
-        repo = self.createRepoObject(zuul_event_id)
-        try:
-            log.debug("Updating remote reference origin/%s to %s", branch, rev)
-            repo.remotes.origin.refs[branch].commit = rev
-        except IndexError:
-            log.warning("No remote ref found for branch %s, creating", branch)
-            Repo._setRef(f"refs/remotes/origin/{branch}", str(rev), repo)
+        with self.createRepoObject(zuul_event_id) as repo:
+            try:
+                log.debug("Updating remote reference origin/%s to %s",
+                          branch, hexsha)
+                repo.remotes.origin.refs[branch].commit = hexsha
+            except IndexError:
+                log.warning("No remote ref found for branch %s, creating",
+                            branch)
+                Repo._setRef(f"refs/remotes/origin/{branch}", hexsha, repo)
 
     def deleteRef(self, path, repo=None, zuul_event_id=None):
+        # This is only used in tests
         ref_log = get_annotated_logger(
             logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
-        if repo is None:
-            repo = self.createRepoObject(zuul_event_id)
-        ref_log.debug("Delete reference %s", path)
-        Repo._deleteRef(path, repo)
+        with self.createRepoObject(zuul_event_id) as repo:
+            ref_log.debug("Delete reference %s", path)
+            Repo._deleteRef(path, repo)
 
     @staticmethod
     def _deleteRef(path, repo):
@@ -621,27 +630,29 @@ class Repo(object):
         return "Deleted reference %s" % path
 
     def checkout(self, ref, zuul_event_id=None):
+        # Return the hexsha of the checkout commit
         log = get_annotated_logger(self.log, zuul_event_id)
-        repo = self.createRepoObject(zuul_event_id)
-        # NOTE(pabelanger): We need to check for detached repo head, otherwise
-        # gitpython will raise an exception if we access the reference.
-        if not repo.head.is_detached and repo.head.reference == ref:
-            log.debug("Repo is already at %s" % ref)
-        else:
-            log.debug("Checking out %s" % ref)
-            try:
-                self._checkout(repo, ref)
-            except Exception:
-                lock_path = f"{self.local_path}/.git/index.lock"
-                if os.path.isfile(lock_path):
-                    log.warning("Deleting stale index.lock file: %s",
-                                lock_path)
-                    os.unlink(lock_path)
-                    # Retry the checkout
+        with self.createRepoObject(zuul_event_id) as repo:
+            # NOTE(pabelanger): We need to check for detached repo
+            # head, otherwise gitpython will raise an exception if we
+            # access the reference.
+            if not repo.head.is_detached and repo.head.reference == ref:
+                log.debug("Repo is already at %s" % ref)
+            else:
+                log.debug("Checking out %s" % ref)
+                try:
                     self._checkout(repo, ref)
-                else:
-                    raise
-        return repo.head.commit
+                except Exception:
+                    lock_path = f"{self.local_path}/.git/index.lock"
+                    if os.path.isfile(lock_path):
+                        log.warning("Deleting stale index.lock file: %s",
+                                    lock_path)
+                        os.unlink(lock_path)
+                        # Retry the checkout
+                        self._checkout(repo, ref)
+                    else:
+                        raise
+            return repo.head.commit.hexsha
 
     def _checkout(self, repo, ref):
         # Perform a hard reset to the correct ref before checking out so
@@ -664,140 +675,147 @@ class Repo(object):
     def merge(self, ref, strategy=None, zuul_event_id=None, timestamp=None,
               ops=None):
         log = get_annotated_logger(self.log, zuul_event_id)
-        repo = self.createRepoObject(zuul_event_id)
-        args = []
-        if strategy:
-            args += ['-s', strategy]
-        args.append('FETCH_HEAD')
-        msg = f"Merge '{ref}'"
-        self.fetch(ref, zuul_event_id=zuul_event_id)
-        if ops is not None:
-            ops.append(zuul.model.MergeOp(cmd=['git', 'fetch', 'origin', ref],
-                                          path=self.workspace_project_path))
-        log.debug("Merging %s with args %s", ref, args)
-        with repo.git.custom_environment(**self._getTimestampEnv(timestamp)):
-            # Use a custom message to avoid introducing
-            # merger/executor path details
-            repo.git.merge(message=msg, *args)
-        if ops is not None:
-            ops.append(zuul.model.MergeOp(
-                cmd=['git', 'merge', '-m', msg, *args],
-                path=self.workspace_project_path,
-                timestamp=timestamp))
-        return repo.head.commit
-
-    def squashMerge(self, item, zuul_event_id=None, timestamp=None, ops=None):
-        log = get_annotated_logger(self.log, zuul_event_id)
-        repo = self.createRepoObject(zuul_event_id)
-        args = ['--squash', 'FETCH_HEAD']
-        ref = item['ref']
-        msg = f"Merge '{ref}'"
-        self.fetch(ref, zuul_event_id=zuul_event_id)
-        if ops is not None:
-            ops.append(zuul.model.MergeOp(cmd=['git', 'fetch', 'origin', ref],
-                                          path=self.workspace_project_path))
-        log.debug("Squash-Merging %s with args %s", ref, args)
-        with repo.git.custom_environment(**self._getTimestampEnv(timestamp)):
-            repo.git.merge(*args)
-            # Use a custom message to avoid introducing
-            # merger/executor path details
-            repo.git.commit(message=msg, allow_empty=True)
-        if ops is not None:
-            ops.append(zuul.model.MergeOp(
-                cmd=['git', 'merge', *args],
-                path=self.workspace_project_path,
-                timestamp=timestamp))
-            ops.append(zuul.model.MergeOp(
-                cmd=['git', 'commit', '-m', msg],
-                path=self.workspace_project_path,
-                timestamp=timestamp))
-        return repo.head.commit
-
-    def rebaseMerge(self, item, base, zuul_event_id=None, timestamp=None,
-                    ops=None):
-        log = get_annotated_logger(self.log, zuul_event_id)
-        repo = self.createRepoObject(zuul_event_id)
-        args = [str(base)]
-        ref = item['ref']
-        self.fetch(ref, zuul_event_id=zuul_event_id)
-        if ops is not None:
-            ops.append(zuul.model.MergeOp(cmd=['git', 'fetch', 'origin', ref],
-                                          path=self.workspace_project_path))
-        log.debug("Rebasing %s with args %s", ref, args)
-        repo.git.checkout('FETCH_HEAD')
-        if ops is not None:
-            ops.append(zuul.model.MergeOp(
-                cmd=['git', 'checkout', 'FETCH_HEAD'],
-                path=self.workspace_project_path))
-        with repo.git.custom_environment(**self._getTimestampEnv(timestamp)):
-            try:
-                repo.git.rebase(*args)
-            except Exception:
-                repo.git.rebase(abort=True)
-                raise
-        if ops is not None:
-            ops.append(zuul.model.MergeOp(
-                cmd=['git', 'rebase', *args],
-                path=self.workspace_project_path,
-                timestamp=timestamp))
-        return repo.head.commit
-
-    def cherryPick(self, ref, zuul_event_id=None, timestamp=None, ops=None):
-        log = get_annotated_logger(self.log, zuul_event_id)
-        repo = self.createRepoObject(zuul_event_id)
-        self.fetch(ref, zuul_event_id=zuul_event_id)
-        fetch_head = repo.commit("FETCH_HEAD")
-        if len(fetch_head.parents) > 1:
-            args = ["-s", "resolve", "FETCH_HEAD"]
-            log.debug("Merging %s with args %s instead of cherry-picking",
-                      ref, args)
+        with self.createRepoObject(zuul_event_id) as repo:
+            args = []
+            if strategy:
+                args += ['-s', strategy]
+            args.append('FETCH_HEAD')
             msg = f"Merge '{ref}'"
+            self.fetch(ref, zuul_event_id=zuul_event_id)
+            if ops is not None:
+                ops.append(zuul.model.MergeOp(
+                    cmd=['git', 'fetch', 'origin', ref],
+                    path=self.workspace_project_path))
+            log.debug("Merging %s with args %s", ref, args)
             with repo.git.custom_environment(
                     **self._getTimestampEnv(timestamp)):
                 # Use a custom message to avoid introducing
                 # merger/executor path details
                 repo.git.merge(message=msg, *args)
-            op = zuul.model.MergeOp(
-                cmd=['git', 'merge', '-m', msg, *args],
-                path=self.workspace_project_path,
-                timestamp=timestamp)
-        else:
-            log.debug("Cherry-picking %s", ref)
-            # Git doesn't have an option to ignore commits that are already
-            # applied to the working tree when cherry-picking, so pass the
-            # --keep-redundant-commits option, which will cause it to make an
-            # empty commit
-            with repo.git.custom_environment(
-                    **self._getTimestampEnv(timestamp)):
-                repo.git.cherry_pick("FETCH_HEAD", keep_redundant_commits=True)
-            op = zuul.model.MergeOp(
-                cmd=['git', 'cherry-pick', 'FETCH_HEAD',
-                     '--keep-redundant-commits'],
-                path=self.workspace_project_path,
-                timestamp=timestamp)
+            if ops is not None:
+                ops.append(zuul.model.MergeOp(
+                    cmd=['git', 'merge', '-m', msg, *args],
+                    path=self.workspace_project_path,
+                    timestamp=timestamp))
+            return repo.head.commit.hexsha
 
-            # If the newly applied commit is empty, it means either:
-            #  1) The commit being cherry-picked was empty, in which the empty
-            #     commit should be kept
-            #  2) The commit being cherry-picked was already applied to the
-            #     tree, in which case the empty commit should be backed out
-            head = repo.commit("HEAD")
-            parent = head.parents[0]
-            if not any(head.diff(parent)) and \
-                    any(fetch_head.diff(fetch_head.parents[0])):
-                log.debug("%s was already applied. Removing it", ref)
-                self._checkout(repo, parent)
-                op = zuul.model.MergeOp(comment=f"Already applied {ref}")
-        if ops is not None:
-            if op.cmd:
+    def squashMerge(self, item, zuul_event_id=None, timestamp=None, ops=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        with self.createRepoObject(zuul_event_id) as repo:
+            args = ['--squash', 'FETCH_HEAD']
+            ref = item['ref']
+            msg = f"Merge '{ref}'"
+            self.fetch(ref, zuul_event_id=zuul_event_id)
+            if ops is not None:
                 ops.append(zuul.model.MergeOp(
                     cmd=['git', 'fetch', 'origin', ref],
                     path=self.workspace_project_path))
-            ops.append(op)
-        return repo.head.commit
+            log.debug("Squash-Merging %s with args %s", ref, args)
+            with repo.git.custom_environment(
+                    **self._getTimestampEnv(timestamp)):
+                repo.git.merge(*args)
+                # Use a custom message to avoid introducing
+                # merger/executor path details
+                repo.git.commit(message=msg, allow_empty=True)
+            if ops is not None:
+                ops.append(zuul.model.MergeOp(
+                    cmd=['git', 'merge', *args],
+                    path=self.workspace_project_path,
+                    timestamp=timestamp))
+                ops.append(zuul.model.MergeOp(
+                    cmd=['git', 'commit', '-m', msg],
+                    path=self.workspace_project_path,
+                    timestamp=timestamp))
+            return repo.head.commit.hexsha
+
+    def rebaseMerge(self, item, base, zuul_event_id=None, timestamp=None,
+                    ops=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        with self.createRepoObject(zuul_event_id) as repo:
+            args = [str(base)]
+            ref = item['ref']
+            self.fetch(ref, zuul_event_id=zuul_event_id)
+            if ops is not None:
+                ops.append(zuul.model.MergeOp(
+                    cmd=['git', 'fetch', 'origin', ref],
+                    path=self.workspace_project_path))
+            log.debug("Rebasing %s with args %s", ref, args)
+            repo.git.checkout('FETCH_HEAD')
+            if ops is not None:
+                ops.append(zuul.model.MergeOp(
+                    cmd=['git', 'checkout', 'FETCH_HEAD'],
+                    path=self.workspace_project_path))
+            with repo.git.custom_environment(
+                    **self._getTimestampEnv(timestamp)):
+                try:
+                    repo.git.rebase(*args)
+                except Exception:
+                    repo.git.rebase(abort=True)
+                    raise
+            if ops is not None:
+                ops.append(zuul.model.MergeOp(
+                    cmd=['git', 'rebase', *args],
+                    path=self.workspace_project_path,
+                    timestamp=timestamp))
+            return repo.head.commit.hexsha
+
+    def cherryPick(self, ref, zuul_event_id=None, timestamp=None, ops=None):
+        log = get_annotated_logger(self.log, zuul_event_id)
+        with self.createRepoObject(zuul_event_id) as repo:
+            self.fetch(ref, zuul_event_id=zuul_event_id)
+            fetch_head = repo.commit("FETCH_HEAD")
+            if len(fetch_head.parents) > 1:
+                args = ["-s", "resolve", "FETCH_HEAD"]
+                log.debug("Merging %s with args %s instead of cherry-picking",
+                          ref, args)
+                msg = f"Merge '{ref}'"
+                with repo.git.custom_environment(
+                        **self._getTimestampEnv(timestamp)):
+                    # Use a custom message to avoid introducing
+                    # merger/executor path details
+                    repo.git.merge(message=msg, *args)
+                op = zuul.model.MergeOp(
+                    cmd=['git', 'merge', '-m', msg, *args],
+                    path=self.workspace_project_path,
+                    timestamp=timestamp)
+            else:
+                log.debug("Cherry-picking %s", ref)
+                # Git doesn't have an option to ignore commits that
+                # are already applied to the working tree when
+                # cherry-picking, so pass the --keep-redundant-commits
+                # option, which will cause it to make an empty commit
+                with repo.git.custom_environment(
+                        **self._getTimestampEnv(timestamp)):
+                    repo.git.cherry_pick("FETCH_HEAD",
+                                         keep_redundant_commits=True)
+                op = zuul.model.MergeOp(
+                    cmd=['git', 'cherry-pick', 'FETCH_HEAD',
+                         '--keep-redundant-commits'],
+                    path=self.workspace_project_path,
+                    timestamp=timestamp)
+
+                # If the newly applied commit is empty, it means either:
+                #  1) The commit being cherry-picked was empty, in
+                #     which the empty commit should be kept
+                #  2) The commit being cherry-picked was already
+                #     applied to the tree, in which case the empty
+                #     commit should be backed out
+                head = repo.commit("HEAD")
+                parent = head.parents[0]
+                if not any(head.diff(parent)) and \
+                        any(fetch_head.diff(fetch_head.parents[0])):
+                    log.debug("%s was already applied. Removing it", ref)
+                    self._checkout(repo, parent)
+                    op = zuul.model.MergeOp(comment=f"Already applied {ref}")
+            if ops is not None:
+                if op.cmd:
+                    ops.append(zuul.model.MergeOp(
+                        cmd=['git', 'fetch', 'origin', ref],
+                        path=self.workspace_project_path))
+                ops.append(op)
+            return repo.head.commit.hexsha
 
     def fetch(self, ref, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
         # NOTE: The following is currently not applicable, but if we
         # switch back to fetch methods from GitPython, we need to
         # consider it:
@@ -805,132 +823,128 @@ class Repo(object):
         #   interpret it improperly causing an AssertionError. Because the
         #   data was fetched properly subsequent fetches don't seem to fail.
         #   So try again if an AssertionError is caught.
-        self._git_fetch(repo, 'origin', zuul_event_id, ref=ref)
+        self._git_fetch('origin', zuul_event_id, ref=ref)
 
     def revParse(self, ref, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        return repo.git.rev_parse(ref)
+        with self.createRepoObject(zuul_event_id) as repo:
+            return repo.git.rev_parse(ref)
 
     def fetchFrom(self, repository, ref, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        self._git_fetch(repo, repository, zuul_event_id, ref=ref)
-
-    def push(self, local, remote, zuul_event_id=None):
-        log = get_annotated_logger(self.log, zuul_event_id)
-        repo = self.createRepoObject(zuul_event_id)
-        log.debug("Pushing %s:%s to %s", local, remote, self.remote_url)
-        repo.remotes.origin.push('%s:%s' % (local, remote))
+        self._git_fetch(repository, zuul_event_id, ref=ref)
 
     def update(self, zuul_event_id=None, build=None):
         log = get_annotated_logger(self.log, zuul_event_id, build=build)
-        repo = self.createRepoObject(zuul_event_id, build=build)
-        log.debug("Updating repository %s" % self.local_path)
-        if repo.git.version_info[:2] < (1, 9):
-            # Before 1.9, 'git fetch --tags' did not include the
-            # behavior covered by 'git --fetch', so we run both
-            # commands in that case.  Starting with 1.9, 'git fetch
-            # --tags' is all that is necessary.  See
-            # https://github.com/git/git/blob/master/Documentation/RelNotes/1.9.0.txt#L18-L20
-            self._git_fetch(repo, 'origin', zuul_event_id)
-        self._git_fetch(repo, 'origin', zuul_event_id, tags=True,
-                        prune=True, prune_tags=True)
+        with self.createRepoObject(zuul_event_id, build=build) as repo:
+            log.debug("Updating repository %s" % self.local_path)
+            if repo.git.version_info[:2] < (1, 9):
+                # Before 1.9, 'git fetch --tags' did not include the
+                # behavior covered by 'git --fetch', so we run both
+                # commands in that case.  Starting with 1.9, 'git fetch
+                # --tags' is all that is necessary.  See
+                # https://github.com/git/git/blob/master/Documentation/RelNotes/1.9.0.txt#L18-L20
+                self._git_fetch('origin', zuul_event_id)
+            self._git_fetch('origin', zuul_event_id, tags=True,
+                            prune=True, prune_tags=True)
 
     def isUpdateNeeded(self, project_repo_state, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        refs = [x.path for x in repo.refs]
-        for ref, rev in project_repo_state.items():
-            # Check that each ref exists and that each commit exists
-            if ref not in refs:
-                return True
-            try:
-                repo.commit(rev)
-            except Exception:
-                # GitPython throws an error if a revision does not
-                # exist
-                return True
-        return False
+        with self.createRepoObject(zuul_event_id) as repo:
+            refs = [x.path for x in repo.refs]
+            for ref, rev in project_repo_state.items():
+                # Check that each ref exists and that each commit exists
+                if ref not in refs:
+                    return True
+                try:
+                    repo.commit(rev)
+                except Exception:
+                    # GitPython throws an error if a revision does not
+                    # exist
+                    return True
+            return False
 
     def getFiles(self, files, dirs=[], branch=None, commit=None,
                  zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         ret = {}
-        repo = self.createRepoObject(zuul_event_id)
-        if branch:
-            head = repo.heads[branch].commit
-        else:
-            head = repo.commit(commit)
-        log.debug("Getting files for %s at %s", self.local_path, head.hexsha)
-        tree = head.tree
-        for fn in files:
-            if fn in tree:
-                if tree[fn].type != 'blob':
-                    log.warning(
-                        "%s: object %s is not a blob", self.local_path, fn)
-                ret[fn] = tree[fn].data_stream.read().decode('utf8')
+        with self.createRepoObject(zuul_event_id) as repo:
+            if branch:
+                head = repo.heads[branch].commit
             else:
-                ret[fn] = None
-        if dirs:
-            for dn in dirs:
-                try:
-                    sub_tree = tree[dn]
-                except KeyError:
-                    continue
+                head = repo.commit(commit)
+            log.debug("Getting files for %s at %s",
+                      self.local_path, head.hexsha)
+            tree = head.tree
+            for fn in files:
+                if fn in tree:
+                    if tree[fn].type != 'blob':
+                        log.warning(
+                            "%s: object %s is not a blob", self.local_path, fn)
+                    ret[fn] = tree[fn].data_stream.read().decode('utf8')
+                else:
+                    ret[fn] = None
+            if dirs:
+                for dn in dirs:
+                    try:
+                        sub_tree = tree[dn]
+                    except KeyError:
+                        continue
 
-                if sub_tree.type != "tree":
-                    continue
+                    if sub_tree.type != "tree":
+                        continue
 
-                # Some people like to keep playbooks, etc. grouped
-                # under their zuul config dirs; record the leading
-                # directories of any .zuul.ignore files and prune them
-                # from the config read.
-                to_ignore = []
-                for blob in sub_tree.traverse():
-                    if blob.path.endswith(".zuul.ignore"):
-                        to_ignore.append(os.path.split(blob.path)[0])
+                    # Some people like to keep playbooks, etc. grouped
+                    # under their zuul config dirs; record the leading
+                    # directories of any .zuul.ignore files and prune them
+                    # from the config read.
+                    to_ignore = []
+                    for blob in sub_tree.traverse():
+                        if blob.path.endswith(".zuul.ignore"):
+                            to_ignore.append(os.path.split(blob.path)[0])
 
-                def _ignored(blob):
-                    for prefix in to_ignore:
-                        if blob.path.startswith(prefix):
-                            return True
-                    return False
+                    def _ignored(blob):
+                        for prefix in to_ignore:
+                            if blob.path.startswith(prefix):
+                                return True
+                        return False
 
-                for blob in sub_tree.traverse():
-                    if not _ignored(blob) and blob.path.endswith(".yaml"):
-                        ret[blob.path] = blob.data_stream.read().decode(
-                            'utf-8')
-        return ret
+                    for blob in sub_tree.traverse():
+                        if not _ignored(blob) and blob.path.endswith(".yaml"):
+                            ret[blob.path] = blob.data_stream.read().decode(
+                                'utf-8')
+            return ret
 
     def getFilesChanges(self, branch, tosha=None, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        self.fetch(branch, zuul_event_id=zuul_event_id)
-        head = repo.commit(
-            self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
-        files = set()
+        with self.createRepoObject(zuul_event_id) as repo:
+            self.fetch(branch, zuul_event_id=zuul_event_id)
+            head_hexsha = repo.commit(
+                self.revParse('FETCH_HEAD', zuul_event_id=zuul_event_id))
+            head_commit = repo.commit(head_hexsha)
+            files = set()
 
-        if tosha:
-            # When "tosha" is the target branch, the result of diff() correctly
-            # excluds the files whose changes are reverted between the commits.
-            # But it may also include the files that are not changed in the
-            # referenced commit(s). This can happen, e.g. if the target branch
-            # has diverged from the feature branch.
-            # The idea is to use this result to filter out the files whose
-            # changes are reverted between the commits.
-            diff_files = set()
-            head_commit = repo.commit(head.hexsha)
-            diff_index = head_commit.diff(tosha)
-            diff_files.update((item.a_path for item in diff_index))
+            if tosha:
+                # When "tosha" is the target branch, the result of
+                # diff() correctly excluds the files whose changes are
+                # reverted between the commits.  But it may also
+                # include the files that are not changed in the
+                # referenced commit(s). This can happen, e.g. if the
+                # target branch has diverged from the feature branch.
+                # The idea is to use this result to filter out the
+                # files whose changes are reverted between the
+                # commits.
+                diff_files = set()
+                diff_index = head_commit.diff(tosha)
+                diff_files.update((item.a_path for item in diff_index))
 
-            commit_diff = "{}..{}".format(tosha, head.hexsha)
-            for cmt in repo.iter_commits(commit_diff, no_merges=True):
-                files.update(f for f in cmt.stats.files.keys()
-                             if f in diff_files)
-        else:
-            files.update(head.stats.files.keys())
-        return list(files)
+                commit_diff = "{}..{}".format(tosha, head_hexsha)
+                for cmt in repo.iter_commits(commit_diff, no_merges=True):
+                    files.update(f for f in cmt.stats.files.keys()
+                                 if f in diff_files)
+            else:
+                files.update(head_commit.stats.files.keys())
+            return list(files)
 
     def deleteRemote(self, remote, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        repo.delete_remote(repo.remotes[remote])
+        with self.createRepoObject(zuul_event_id) as repo:
+            repo.delete_remote(repo.remotes[remote])
 
     def setRemoteUrl(self, url, zuul_event_id=None):
         if self.remote_url == url:
@@ -941,8 +955,8 @@ class Repo(object):
             # Update the remote URL as it is used for the clone if the
             # repo doesn't exist.
             self.remote_url = url
-            self._git_set_remote_url(
-                self.createRepoObject(zuul_event_id), self.remote_url)
+            with self.createRepoObject(zuul_event_id) as repo:
+                self._git_set_remote_url(repo, self.remote_url)
         except Exception:
             # Clear out the stored remote URL so we will always set
             # the Git URL after a failed attempt. This prevents us from
@@ -952,11 +966,11 @@ class Repo(object):
             raise
 
     def mapLine(self, commit, filename, lineno, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
         # Trace the specified line back to the specified commit and
         # return the line number in that commit.
         cur_commit = None
-        out = repo.git.log(L='%s,%s:%s' % (lineno, lineno, filename))
+        with self.createRepoObject(zuul_event_id) as repo:
+            out = repo.git.log(L='%s,%s:%s' % (lineno, lineno, filename))
         for l in out.split('\n'):
             if cur_commit is None:
                 m = self.commit_re.match(l)
@@ -970,14 +984,14 @@ class Repo(object):
         return None
 
     def contains(self, hexsha, zuul_event_id=None):
-        repo = self.createRepoObject(zuul_event_id)
-        log = get_annotated_logger(self.log, zuul_event_id)
-        try:
-            branches = repo.git.branch(contains=hexsha, color='never')
-        except git.GitCommandError as e:
-            if e.status == 129:
-                log.debug("Found commit %s in no branches", hexsha)
-                return []
+        with self.createRepoObject(zuul_event_id) as repo:
+            log = get_annotated_logger(self.log, zuul_event_id)
+            try:
+                branches = repo.git.branch(contains=hexsha, color='never')
+            except git.GitCommandError as e:
+                if e.status == 129:
+                    log.debug("Found commit %s in no branches", hexsha)
+                    return []
         branches = [x.replace('*', '').strip() for x in branches.split('\n')]
         branches = [x for x in branches if x != '(no branch)']
         log.debug("Found commit %s in branches: %s", hexsha, branches)
@@ -1185,7 +1199,7 @@ class Merger(object):
         projects = repo_state.setdefault(connection_name, {})
         project = projects.setdefault(project_name, {})
 
-        for commit, ref in repo.getRefs():
+        for hexsha, ref in repo.getRefs():
             if ref.startswith('refs/zuul/'):
                 continue
             if ref.startswith('refs/remotes/'):
@@ -1196,9 +1210,9 @@ class Merger(object):
                     continue
                 key = (connection_name, project_name, branch)
                 if key not in recent:
-                    recent[key] = commit
+                    recent[key] = hexsha
 
-            project[ref] = commit
+            project[ref] = hexsha
 
     def _alterRepoState(self, connection_name, project_name,
                         repo_state, path, hexsha):
@@ -1225,7 +1239,7 @@ class Merger(object):
             repo.setRefs(project, zuul_event_id=zuul_event_id)
         else:
             job = process_worker.submit(
-                Repo.setRefsAsync, repo.local_path, project)
+                Repo.setRefsAsync, repo.local_path, repo.env, project)
             messages = job.result()
             ref_log = get_annotated_logger(
                 logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
@@ -1249,30 +1263,30 @@ class Merger(object):
         try:
             mode = item['merge_mode']
             if mode == zuul.model.MERGER_MERGE:
-                commit = repo.merge(item['ref'], zuul_event_id=zuul_event_id,
+                hexsha = repo.merge(item['ref'], zuul_event_id=zuul_event_id,
                                     timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_MERGE_RESOLVE:
-                commit = repo.merge(item['ref'], 'resolve',
+                hexsha = repo.merge(item['ref'], 'resolve',
                                     zuul_event_id=zuul_event_id,
                                     timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_MERGE_RECURSIVE:
-                commit = repo.merge(item['ref'], 'recursive',
+                hexsha = repo.merge(item['ref'], 'recursive',
                                     zuul_event_id=zuul_event_id,
                                     timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_MERGE_ORT:
-                commit = repo.merge(item['ref'], 'ort',
+                hexsha = repo.merge(item['ref'], 'ort',
                                     zuul_event_id=zuul_event_id,
                                     timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_CHERRY_PICK:
-                commit = repo.cherryPick(item['ref'],
+                hexsha = repo.cherryPick(item['ref'],
                                          zuul_event_id=zuul_event_id,
                                          timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_SQUASH_MERGE:
-                commit = repo.squashMerge(
+                hexsha = repo.squashMerge(
                     item, zuul_event_id=zuul_event_id,
                     timestamp=timestamp, ops=ops)
             elif mode == zuul.model.MERGER_REBASE:
-                commit = repo.rebaseMerge(
+                hexsha = repo.rebaseMerge(
                     item, base, zuul_event_id=zuul_event_id,
                     timestamp=timestamp, ops=ops)
             else:
@@ -1286,8 +1300,8 @@ class Merger(object):
             log.exception("Exception while merging a change:")
             return None, None
 
-        orig_commit = repo.revParse('FETCH_HEAD')
-        return orig_commit, commit
+        orig_hexsha = repo.revParse('FETCH_HEAD')
+        return orig_hexsha, hexsha
 
     def _mergeItem(self, item, recent, repo_state, zuul_event_id,
                    ops, branches=None, process_worker=None):
@@ -1334,11 +1348,11 @@ class Merger(object):
                               zuul_event_id=zuul_event_id)
 
         # Merge the change
-        orig_commit, commit = self._mergeChange(item, base, zuul_event_id, ops)
-        if not commit:
+        orig_hexsha, hexsha = self._mergeChange(item, base, zuul_event_id, ops)
+        if not hexsha:
             return None, None
         # Store this commit as the most recent for this project-branch
-        recent[key] = commit.hexsha
+        recent[key] = hexsha
 
         # Make sure to have a local ref that points to the  most recent
         # (intermediate) speculative state of a branch, so commits are not
@@ -1348,9 +1362,9 @@ class Merger(object):
         # between merger and executor jobs, we create refs in "refs/zuul"
         # instead of updating local branch heads.
         repo.setRef(Repo.refNameToZuulRef(item["branch"]),
-                    commit.hexsha, zuul_event_id=zuul_event_id)
+                    hexsha, zuul_event_id=zuul_event_id)
 
-        return orig_commit, commit
+        return orig_hexsha, hexsha
 
     def mergeChanges(self, items, files=None, dirs=None, repo_state=None,
                      repo_locks=None, branches=None, zuul_event_id=None,
@@ -1363,10 +1377,10 @@ class Merger(object):
         log = get_annotated_logger(self.log, zuul_event_id)
         # connection+project+branch -> commit
         recent = {}
-        commit = None
+        hexsha = None
         # tuple(connection, project, branch) -> dict(config state)
         read_files = OrderedDict()
-        # connection -> project -> ref -> commit
+        # connection -> project -> ref -> hexsha
         if repo_state is None:
             repo_state = {}
         # A log of git operations
@@ -1387,7 +1401,7 @@ class Merger(object):
                 log.debug("Merging for change %s,%s" %
                           (item["number"], item["patchset"]))
                 try:
-                    orig_commit, commit = self._mergeItem(
+                    orig_hexsha, hexsha = self._mergeItem(
                         item, recent, repo_state, zuul_event_id, ops,
                         branches=branches,
                         process_worker=process_worker)
@@ -1397,13 +1411,13 @@ class Merger(object):
                     self.log.exception("Error merging item %s", item)
                     if errors is not None:
                         errors.append(err_msg)
-                if not commit:
+                if not hexsha:
                     if errors is not None:
                         errors.append(err_msg)
                     return None
                 if files or dirs:
                     repo = self.getRepo(item['connection'], item['project'])
-                    repo_files = repo.getFiles(files, dirs, commit=commit)
+                    repo_files = repo.getFiles(files, dirs, commit=hexsha)
                     key = item['connection'], item['project'], item['branch']
                     read_files[key] = dict(
                         connection=item['connection'],
@@ -1411,8 +1425,8 @@ class Merger(object):
                         branch=item['branch'],
                         files=repo_files)
         return (
-            commit.hexsha, list(read_files.values()), repo_state, recent,
-            orig_commit, ops
+            hexsha, list(read_files.values()), repo_state, recent,
+            orig_hexsha, ops
         )
 
     def setRepoState(self, connection_name, project_name, repo_state,
