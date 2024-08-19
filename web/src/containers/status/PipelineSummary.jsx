@@ -183,7 +183,9 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
       <CardTitle
         style={pipelineType !== 'dependent' ? { paddingBottom: '8px' } : {}}
       >
-        <PipelineIcon pipelineType={pipelineType} />
+        <Tooltip content={pipeline.description ? pipeline.description : ''}>
+          <PipelineIcon pipelineType={pipelineType} />
+        </Tooltip>
         <Link
           to={{
             pathname: `${tenant.linkPrefix}/status/pipeline/${pipeline.name}`,
