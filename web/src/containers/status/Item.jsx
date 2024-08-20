@@ -74,8 +74,8 @@ class Item extends React.Component {
     let refId = ref.id || 'N/A'
     let refRef = ref.ref
     this.setState(() => ({ showDequeueModal: false }))
-    // post-merge
     if (/^[0-9a-f]{40}$/.test(refId)) {
+      // post-merge with a ref update (tag, branch push)
       dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, refRef)
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
@@ -83,8 +83,8 @@ class Item extends React.Component {
         .catch(error => {
           this.props.dispatch(addDequeueError(error))
         })
-      // pre-merge, ie we have a change id
     } else if (refId !== 'N/A') {
+      // pre-merge, ie we have a change id
       dequeue(tenant.apiPrefix, projectName, pipeline.name, refId)
         .then(() => {
           this.props.dispatch(fetchStatusIfNeeded(tenant))
@@ -93,12 +93,14 @@ class Item extends React.Component {
           this.props.dispatch(addDequeueError(error))
         })
     } else {
-      this.props.dispatch(addNotification({
-        url: null,
-        status: 'Invalid change ' + refRef + ' on project ' + projectName,
-        text: '',
-        type: 'error',
-      }))
+      // periodic with only a ref (branch head)
+      dequeue_ref(tenant.apiPrefix, projectName, pipeline.name, refRef)
+        .then(() => {
+          this.props.dispatch(fetchStatusIfNeeded(tenant))
+        })
+        .catch(error => {
+          this.props.dispatch(addDequeueError(error))
+        })
     }
   }
 
