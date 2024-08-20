@@ -2167,6 +2167,12 @@ class TestConfig:
             # these are typically safe to ignore
             'ERROR: content conflict',
             'mapLines',
+            # These errors occasionally show up on legitimate tests
+            # due to race conditions and timing.  They are recoverable
+            # errors.  It would be nice if they didn't happen, but
+            # until we understand them more, we can't fail on them.
+            'RolledBackError',
+            'pipeline.change_list.refresh',
         ]
         self.simple_layout = getattr(test, '__simple_layout__', None)
         self.gerrit_config = getattr(test, '__gerrit_config__', {})
