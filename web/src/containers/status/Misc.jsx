@@ -186,6 +186,10 @@ const getQueueItemIconConfig = (item) => {
     return QUEUE_ITEM_ICON_CONFIGS['WAITING']
   }
 
+  if (item.jobs.length === 0) {
+    return QUEUE_ITEM_ICON_CONFIGS['WAITING']
+  }
+
   return QUEUE_ITEM_ICON_CONFIGS['SUCCESS']
 }
 
