@@ -122,7 +122,10 @@ TenantStats.propTypes = {
 function PipelineGallery({ pipelines, tenant, showAllPipelines, isLoading, filters, onClearFilters }) {
   // Filter out empty pipelines if necessary
   if (!showAllPipelines) {
-    pipelines = pipelines.filter(ppl => ppl._count > 0)
+    // In case we show only non-empty piplines, dont display pipelines that
+    // only contain empty items. This prevents pipelines from shortly appearing
+    // because items are enqueued that are not for this pipeline in the end.
+    pipelines = pipelines.filter(ppl => ppl._jobCount > 0)
   }
 
   return (
