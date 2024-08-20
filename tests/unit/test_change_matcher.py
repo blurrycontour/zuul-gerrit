@@ -71,6 +71,13 @@ class TestBranchMatcher(BaseTestMatcher):
         self.change.ref = 'baz'
         self.assertFalse(self.matcher.matches(self.change))
 
+    def test_containing_branch_partial_match(self):
+        self.change = model.Tag(self.project)
+        self.change.ref = 'refs/tags/1.0'
+        self.matcher = cm.BranchMatcher(ZuulRegex('^release-'))
+        self.change.containing_branches = ["release-1.0", "master"]
+        self.assertTrue(self.matcher.matches(self.change))
+
 
 class TestAbstractMatcherCollection(BaseTestMatcher):
 
