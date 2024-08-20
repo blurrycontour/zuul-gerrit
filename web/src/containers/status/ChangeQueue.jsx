@@ -201,7 +201,7 @@ function ChangeQueue({ queue, pipeline, jobsExpanded, showTitle=true }) {
                   isRead
                   style={{ marginLeft: 'var(--pf-global--spacer--sm)', verticalAlign: '0.1em' }}
                 >
-                  {queue._count} / {queue.window}
+                  {queue._itemCount} / {queue.window}
                 </Badge>
               </Tooltip>
             </Title>
