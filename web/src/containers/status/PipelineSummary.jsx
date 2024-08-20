@@ -170,7 +170,7 @@ QueueSummary.propTypes = {
 function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
 
   const pipelineType = pipeline.manager || 'unknown'
-  const itemCount = pipeline._count
+  const itemCount = pipeline._itemCount
   const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(undefined)
   const onQueueToggle = () => {
     setAreAllQueuesExpanded(!areAllQueuesExpanded)

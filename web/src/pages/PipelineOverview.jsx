@@ -121,7 +121,10 @@ TenantStats.propTypes = {
 function PipelineGallery({ pipelines, tenant, showAllPipelines, isLoading, filters, onClearFilters }) {
   // Filter out empty pipelines if necessary
   if (!showAllPipelines) {
-    pipelines = pipelines.filter(ppl => ppl._count > 0)
+    // In case we show only non-empty piplines, dont display pipelines that
+    // only contain empty items. This prevents pipelines from shortly appearing
+    // because items are enqueued that are not for this pipeline in the end.
+    pipelines = pipelines.filter(ppl => ppl._jobCount > 0)
   }
 
   return (
@@ -282,15 +285,16 @@ PipelineOverviewPage.propTypes = {
 }
 
 const countItems = (pipeline) => {
-  let count = 0
-  pipeline.change_queues.map(queue => (
-    queue.heads.map(head => (
-      head.map(() => (
-        count++
-      ))
-    ))
-  ))
-  return count
+  let itemCount = 0
+  let jobCount = 0
+  for (const queue of pipeline.change_queues) {
+    const items = queue.heads.flat(2)
+    itemCount += items.length
+    for (const item of items) {
+      jobCount += item.jobs.length
+    }
+  }
+  return [itemCount, jobCount]
 }
 
 function mapStateToProps(state, ownProps) {
@@ -305,9 +309,10 @@ function mapStateToProps(state, ownProps) {
     pipelines = filterPipelines(pipelines, filters, filterCategories, true)
 
     // TODO (felix): Make filtering optional via a switch (default: on)
-    pipelines = pipelines.map(ppl => (
-      { ...ppl, _count: countItems(ppl) }
-    ))
+    pipelines = pipelines.map(ppl => {
+      const [itemCount, jobCount] = countItems(ppl)
+      return { ...ppl, _itemCount: itemCount, _jobCount: jobCount}
+    })
     stats = {
       trigger_event_queue: state.status.status.trigger_event_queue,
       management_event_queue: state.status.status.management_event_queue,
