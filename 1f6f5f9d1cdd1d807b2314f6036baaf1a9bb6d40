@@ -176,6 +176,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f09e8f33_1d70ea18",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-20T07:07:23Z",
+      "side": 1,
+      "message": "Implemented in https://review.opendev.org/c/zuul/zuul/+/926570.",
+      "parentUuid": "90995bf3_b6b6f17b",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "01ccacef_1cd4806e",
