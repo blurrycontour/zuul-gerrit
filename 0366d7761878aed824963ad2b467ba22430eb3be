@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc223a00_a8213d06",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-20T14:05:14Z",
+      "side": 1,
+      "message": "The old status page had a memory for this toggle, so if a user preferred always seeing the jobs, they wouldn\u0027t have to click it every time.  That may be important for some smaller installations.\n\nShould we do one or more of the following?\n\n1) Set this in the redux store so it\u0027s global (that would mean we wouldn\u0027t need to plumb it through all the different layers).  That would make it persist through the session and on all the different pipeline pages.\n\n2) Store that value in persistent storage so that it is retained across sessions?\n\nMy inclination would be to do both of those, but I\u0027m open to other ideas.",
+      "revId": "0366d7761878aed824963ad2b467ba22430eb3be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
