@@ -1790,9 +1790,7 @@ class BaseTestCase(testtools.TestCase):
                     break
             if okay:
                 continue
-            # TODO(corvus): Run this unconditionally once we are able
-            if False:
-                self.fail(f"Traceback found in logs: {record.msg}")
+            self.fail(f"Traceback found in logs: {record.msg}")
 
     def attachLogs(self, *args):
         def reader():
