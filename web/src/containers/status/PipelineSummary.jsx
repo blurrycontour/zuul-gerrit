@@ -91,7 +91,7 @@ function QueueCard({ pipeline, queue, allQueuesExpanded }) {
         <Tooltip
           content={
             <div style={{ textAlign: 'left' }}>
-              Queue length: {queue._count}<br />Window size: {queue.window}
+              Queue length: {queue._itemCount}<br />Window size: {queue.window}
             </div>
           }
         >
@@ -99,7 +99,7 @@ function QueueCard({ pipeline, queue, allQueuesExpanded }) {
             isRead
             style={{ marginLeft: 'var(--pf-global--spacer--sm)', verticalAlign: '0.1em' }}
           >
-            {queue._count} / {queue.window}
+            {queue._itemCount} / {queue.window}
           </Badge>
         </Tooltip>
         {isQueueExpanded ?
@@ -185,7 +185,7 @@ QueueSummary.propTypes = {
 function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
 
   const pipelineType = pipeline.manager || 'unknown'
-  const itemCount = pipeline._count
+  const itemCount = pipeline._itemCount
   const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(undefined)
   const onQueueToggle = () => {
     setAreAllQueuesExpanded(!areAllQueuesExpanded)
