@@ -354,6 +354,25 @@ a.refresh {
     padding-bottom: 0;
 }
 
+/* Skipped jobs toggle + list */
+
+.zuul-job-list .pf-c-data-list__item-control {
+    margin-right: 0;
+}
+
+.zuul-job-list .pf-c-data-list__item.pf-m-expanded {
+    --pf-c-data-list__item--before--BackgroundColor: none;
+}
+
+.zuul-job-list .pf-c-data-list__item-control button {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.zuul-job-list .zuul-skipped-job-row {
+    margin-left: 16px;
+}
+
 /* Use a fixed width for job result labels. Otherwise the width will
    be different based on the length of the result string (e.g. SUCCESS,
    POST_FAILURE, RETRY_LIMIT) */
