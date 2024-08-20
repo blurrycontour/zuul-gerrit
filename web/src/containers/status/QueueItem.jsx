@@ -28,6 +28,7 @@ import {
   DataListItem,
   DataListItemCells,
   DataListItemRow,
+  DataListToggle,
   Dropdown,
   DropdownItem,
   ExpandableSection,
@@ -43,6 +44,7 @@ import {
 import {
   calculateQueueItemTimes,
   ChangeLink,
+  getJobStrResult,
   getRefs,
   JobLink,
   JobResultOrStatus,
@@ -60,6 +62,10 @@ function QueueItem({ item, pipeline, tenant, user, jobsExpanded }) {
   const [isDequeueModalOpen, setIsDequeueModalOpen] = useState(false)
   const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false)
   const [isJobsExpanded, setIsJobsExpanded] = useState(jobsExpanded)
+  const [isSkippedJobsExpanded, setIsSkippedJobsExpanded] = useState(false)
+
+  const skippedjobs = item.jobs.filter(j => getJobStrResult(j) === 'skipped')
+  const jobs = item.jobs.filter(j => getJobStrResult(j) !== 'skipped')
 
   useEffect(() => {
     setIsJobsExpanded(jobsExpanded)
@@ -69,6 +75,10 @@ function QueueItem({ item, pipeline, tenant, user, jobsExpanded }) {
 
   const onJobsToggle = (isExpanded) => {
     setIsJobsExpanded(isExpanded)
+  }
+
+  const onSkippedJobsToggle = () => {
+    setIsSkippedJobsExpanded(!isSkippedJobsExpanded)
   }
 
   const onSelect = () => {
@@ -232,27 +242,65 @@ function QueueItem({ item, pipeline, tenant, user, jobsExpanded }) {
     )
   }
 
-  const renderJobList = (jobs) => {
+  const renderJobRow = (job, idx, className) => {
+    return (
+      <DataListItem key={idx} className={className}>
+        <DataListItemRow>
+          <DataListItemCells
+            dataListCells={[
+              <DataListCell key={`${job.name}-name`}>
+                <JobLink job={job} tenant={tenant} />
+              </DataListCell>,
+              <DataListCell isFilled={false} alignRight key={`${job.name}-result`}>
+                {/* TODO (felix): Since the job.name is not unique anymore,
+                        this should be looked up by job.uuid */}
+                <JobResultOrStatus job={job} job_times={times.jobs[job.name]} />
+              </DataListCell>
+            ]}
+          />
+        </DataListItemRow>
+      </DataListItem>
+    )
+  }
+
+  const renderSkippedJobs = (skippedJobs) => {
+    return (
+      <>
+        <DataListItem key="skip-jobs" isExpanded={isSkippedJobsExpanded}>
+          <DataListItemRow>
+            <DataListToggle
+              onClick={() => onSkippedJobsToggle()}
+              isExpanded={isSkippedJobsExpanded}
+              id="expand-skipped-jobs"
+              aria-controls="expand-skipped-jobs"
+            />
+            <DataListItemCells
+              dataListCells={[
+                <DataListCell key="show skipped jobs">
+                  <div>{`Show ${skippedJobs.length} skipped jobs`}</div>
+                </DataListCell>
+              ]}
+            />
+          </DataListItemRow>
+        </DataListItem>
+        {isSkippedJobsExpanded ?
+          skippedJobs.map((job, idx) => (
+            renderJobRow(job, idx, 'zuul-skipped-job-row')
+          ))
+          : ''}
+      </>
+    )
+  }
+
+  const renderJobList = (jobs, skippedJobs) => {
     return (
       <DataList isCompact className="zuul-job-list">
         {jobs.map((job, idx) => (
-          <DataListItem key={idx}>
-            <DataListItemRow>
-              <DataListItemCells
-                dataListCells={[
-                  <DataListCell key={`${job.name}-name`}>
-                    <JobLink job={job} tenant={tenant} />
-                  </DataListCell>,
-                  <DataListCell isFilled={false} alignRight key={`${job.name}-result`}>
-                    {/* TODO (felix): Since the job.name is not unique anymore,
-                        this should be looked up by job.uuid */}
-                    <JobResultOrStatus job={job} job_times={times.jobs[job.name]} />
-                  </DataListCell>
-                ]}
-              />
-            </DataListItemRow>
-          </DataListItem>
+          renderJobRow(job, idx)
         ))}
+        {skippedJobs.length > 0 ?
+          renderSkippedJobs(skippedJobs)
+          : ''}
       </DataList>
     )
   }
@@ -291,7 +339,7 @@ function QueueItem({ item, pipeline, tenant, user, jobsExpanded }) {
                 onToggle={onJobsToggle}
                 isExpanded={isJobsExpanded}
               >
-                {renderJobList(item.jobs)}
+                {renderJobList(jobs, skippedjobs)}
               </ExpandableSection>
               : ''}
           </CardBody>
