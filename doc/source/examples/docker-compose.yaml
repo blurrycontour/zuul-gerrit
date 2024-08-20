@@ -62,9 +62,6 @@ services:
     networks:
       - zuul
   scheduler:
-    depends_on:
-      - zk
-      - mysql
     environment:
       - http_proxy
       - https_proxy
@@ -89,9 +86,6 @@ services:
     command: |
       sh -c '/var/playbooks/wait-to-start-certs.sh && \
              exec zuul-web -f'
-    depends_on:
-      - scheduler
-      - mysql
     ports:
       - "9000:9000"
     image: quay.io/zuul-ci/zuul-web
@@ -111,8 +105,6 @@ services:
       - https_proxy
       - no_proxy=${no_proxy},gerrit,scheduler
       - ZUUL_MYSQL_PASSWORD=secret
-    depends_on:
-      - scheduler
     image: quay.io/zuul-ci/zuul-executor
     volumes:
       - "${ZUUL_TUTORIAL_CONFIG:-./etc_zuul/}:/etc/zuul/:z"
@@ -137,8 +129,6 @@ services:
     networks:
       - zuul
   launcher:
-    depends_on:
-      - zk
     image: quay.io/zuul-ci/nodepool-launcher
     volumes:
       - "./playbooks/:/var/playbooks/:z"
