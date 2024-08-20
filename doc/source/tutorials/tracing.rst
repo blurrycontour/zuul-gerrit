@@ -26,14 +26,14 @@ that we can update Zuul's configuration to enable tracing.
 .. code-block:: shell
 
    cd zuul/doc/source/examples
-   sudo -E podman-compose -p zuul-tutorial stop
+   podman-compose -p zuul-tutorial stop
 
 Restart the containers with a new Zuul configuration.
 
 .. code-block:: shell
 
    cd zuul/doc/source/examples
-   ZUUL_TUTORIAL_CONFIG="./tracing/etc_zuul/" sudo -E podman-compose -p zuul-tutorial up -d
+   ZUUL_TUTORIAL_CONFIG="./tracing/etc_zuul/" podman-compose -p zuul-tutorial up -d
 
 This tells podman-compose to use these Zuul `config files
 <https://opendev.org/zuul/zuul/src/branch/master/doc/source/examples/tracing>`_.
@@ -59,7 +59,7 @@ with this command:
 .. code-block:: shell
 
    cd zuul/doc/source/examples/tracing
-   sudo -E podman-compose -p zuul-tutorial-tracing up -d
+   podman-compose -p zuul-tutorial-tracing up -d
 
 You can visit http://localhost:16686/search to verify it is running.
 
