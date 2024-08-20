@@ -96,7 +96,7 @@ PipelineStats.propTypes = {
 function PipelineDetails({ pipeline, isReloading, reloadCallback }) {
 
   const pipelineType = pipeline.manager || 'unknown'
-  const itemCount = pipeline._count
+  const itemCount = pipeline._itemCount
 
   return (
     <>

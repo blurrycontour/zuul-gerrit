@@ -187,6 +187,10 @@ const getQueueItemIconConfig = (item) => {
     return QUEUE_ITEM_ICON_CONFIGS['NON_LIVE']
   }
 
+  if (item.jobs.length === 0) {
+    return QUEUE_ITEM_ICON_CONFIGS['NON_LIVE']
+  }
+
   return QUEUE_ITEM_ICON_CONFIGS['SUCCESS']
 }
 
@@ -493,24 +497,30 @@ function isPipelineEmpty(pipeline) {
 }
 
 const countPipelineItems = (pipeline) => {
-  let count = 0
+  let itemCount = 0
+  let jobCount = 0
   pipeline.change_queues = pipeline.change_queues.map(queue => {
     queue = { ...countQueueItems(queue) }
-    count += queue._count
+    itemCount += queue._itemCount
+    jobCount += queue._jobCount
     return queue
   })
-  pipeline._count = count
+  pipeline._itemCount = itemCount
+  pipeline._jobCount = jobCount
   return pipeline
 }
 
 const countQueueItems = (queue) => {
-  let count = 0
-  queue.heads.map(head => (
-    head.map((item) => (
-      item.live ? count++ : ''
-    ))
-  ))
-  queue._count = count
+  const items = queue.heads.flat(2).filter(i => i.live)
+
+  let jobCount = 0
+  for (const item of items) {
+    jobCount += item.jobs.length
+  }
+
+  queue._itemCount = items.length
+  queue._jobCount = jobCount
+
   return queue
 }
 
