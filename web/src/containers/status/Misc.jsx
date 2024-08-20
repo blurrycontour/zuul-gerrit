@@ -385,21 +385,27 @@ JobProgressBar.propTypes = {
 
 function JobStatusLabel({ job, result }) {
   const iconConfig = JOB_STATE_ICON_CONFIGS[result.toUpperCase()] || DEFAULT_JOB_STATE_ICON_CONFIG
-  let title = ''
 
-  if (['waiting', 'queued'].includes(result) && job.waiting_status !== null) {
-    title = 'Waiting on ' + job.waiting_status
-  }
-
-  return (
-    <Label
-      className="zuul-job-result-label"
-      color={iconConfig.labelColor}
-      title={title}
-    >
+  const label = (
+    <Label className="zuul-job-result-label" color={iconConfig.labelColor}>
       {result}
     </Label>
   )
+
+  if (['waiting', 'queued'].includes(result) && job.waiting_status !== null) {
+    return (
+      // Wrap the result label in a Tooltip to show the waiting status
+      <Tooltip
+        position="right"
+        content={`Waiting on ${job.waiting_status}`}
+      >
+        {label}
+      </Tooltip>
+    )
+  }
+
+  // If there is no waiting status, just show the label
+  return label
 }
 
 JobStatusLabel.propTypes = {
