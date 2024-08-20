@@ -23,7 +23,8 @@ class ElasticsearchDriver(Driver, ConnectionInterface, ReporterInterface):
     def getConnection(self, name, config):
         return elconnection.ElasticsearchConnection(self, name, config)
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(self, connection, pipeline, config=None,
+                    parse_context=None):
         return elreporter.ElasticsearchReporter(self, connection, config)
 
     def getReporterSchema(self):

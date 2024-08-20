@@ -8034,6 +8034,7 @@ class SystemAttributes:
         self.default_hold_expiration = 0
         self.default_ansible_version = None
         self.web_root = None
+        # TODO: Deprecated, remove after version 12
         self.web_status_url = ""
         self.websocket_url = None
 

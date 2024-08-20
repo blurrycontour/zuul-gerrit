@@ -37,9 +37,10 @@ class GithubDriver(Driver, ConnectionInterface, TriggerInterface,
     def getSource(self, connection):
         return githubsource.GithubSource(self, connection)
 
-    def getReporter(self, connection, pipeline, config=None):
+    def getReporter(self, connection, pipeline, config=None,
+                    parse_context=None):
         return githubreporter.GithubReporter(
-            self, connection, pipeline, config)
+            self, connection, pipeline, config, parse_context)
 
     def getTriggerSchema(self):
         return githubtrigger.getSchema()

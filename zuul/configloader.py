@@ -1498,7 +1498,7 @@ class PipelineParser(object):
                        reporter_name not in allowed_reporters:
                         raise UnknownConnection(reporter_name)
                     reporter = self.pcontext.connections.getReporter(
-                        reporter_name, pipeline, params)
+                        reporter_name, pipeline, params, self.pcontext)
                     reporter.setAction(conf_key)
                     reporter_set.append(reporter)
                     seen_connections.add(reporter_name)
