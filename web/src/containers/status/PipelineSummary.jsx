@@ -88,6 +88,20 @@ function QueueCard({ pipeline, queue, allQueuesExpanded }) {
       <CardTitle>
         {queue.name}
         {queue.branch ? ` (${queue.branch})` : ''}
+        <Tooltip
+          content={
+            <div style={{ textAlign: 'left' }}>
+              Queue length: {queue._count}<br />Window size: {queue.window}
+            </div>
+          }
+        >
+          <Badge
+            isRead
+            style={{ marginLeft: 'var(--pf-global--spacer--sm)', verticalAlign: '0.1em' }}
+          >
+            {queue._count} / {queue.window}
+          </Badge>
+        </Tooltip>
         {isQueueExpanded ?
           <AngleDownIcon className="zuul-expand-icon" onClick={onQueueToggle} />
           :

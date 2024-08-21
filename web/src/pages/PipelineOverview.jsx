@@ -281,16 +281,26 @@ PipelineOverviewPage.propTypes = {
   fetchStatusIfNeeded: PropTypes.func,
 }
 
-const countItems = (pipeline) => {
+const countPipelineItems = (pipeline) => {
   let count = 0
-  pipeline.change_queues.map(queue => (
-    queue.heads.map(head => (
-      head.map(() => (
-        count++
-      ))
+  pipeline.change_queues = pipeline.change_queues.map(queue => {
+    queue = { ...countQueueItems(queue) }
+    count += queue._count
+    return queue
+  })
+  pipeline._count = count
+  return pipeline
+}
+
+const countQueueItems = (queue) => {
+  let count = 0
+  queue.heads.map(head => (
+    head.map(() => (
+      count++
     ))
   ))
-  return count
+  queue._count = count
+  return queue
 }
 
 function mapStateToProps(state, ownProps) {
@@ -306,7 +316,7 @@ function mapStateToProps(state, ownProps) {
 
     // TODO (felix): Make filtering optional via a switch (default: on)
     pipelines = pipelines.map(ppl => (
-      { ...ppl, _count: countItems(ppl) }
+      { ...countPipelineItems(ppl) }
     ))
     stats = {
       trigger_event_queue: state.status.status.trigger_event_queue,
