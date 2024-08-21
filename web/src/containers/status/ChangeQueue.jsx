@@ -16,6 +16,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import {
+  Badge,
   Card,
   CardTitle,
   CardBody,
@@ -23,6 +24,7 @@ import {
   ProgressStep,
   ProgressStepper,
   Title,
+  Tooltip,
 } from '@patternfly/react-core'
 
 import QueueItem from './QueueItem'
@@ -188,6 +190,20 @@ function ChangeQueue({ queue, pipeline, jobsExpanded, showTitle=true }) {
             <Title headingLevel="h3" style={{ padding: 0, margin: 0 }}>
               {queue.name}
               {queue.branch ? ` (${queue.branch})` : ''}
+              <Tooltip
+                content={
+                  <div style={{ textAlign: 'left' }}>
+                    Queue length: {queue._count}<br />Window size: {queue.window}
+                  </div>
+                }
+              >
+                <Badge
+                  isRead
+                  style={{ marginLeft: 'var(--pf-global--spacer--sm)', verticalAlign: '0.1em' }}
+                >
+                  {queue._count} / {queue.window}
+                </Badge>
+              </Tooltip>
             </Title>
           </CardTitle>
           : ''}
