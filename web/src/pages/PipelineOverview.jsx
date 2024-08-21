@@ -36,6 +36,7 @@ import PipelineSummary from '../containers/status/PipelineSummary'
 
 import { fetchStatusIfNeeded } from '../actions/status'
 import { Fetching, ReloadButton } from '../containers/Fetching'
+import { countPipelineItems } from '../containers/status/Misc'
 import { useDocumentVisibility, useInterval } from '../Hooks'
 
 import {
@@ -281,18 +282,6 @@ PipelineOverviewPage.propTypes = {
   fetchStatusIfNeeded: PropTypes.func,
 }
 
-const countItems = (pipeline) => {
-  let count = 0
-  pipeline.change_queues.map(queue => (
-    queue.heads.map(head => (
-      head.map(() => (
-        count++
-      ))
-    ))
-  ))
-  return count
-}
-
 function mapStateToProps(state, ownProps) {
   let pipelines = []
   let stats = {}
@@ -304,9 +293,8 @@ function mapStateToProps(state, ownProps) {
     pipelines = global.structuredClone(state.status.status.pipelines)
     pipelines = filterPipelines(pipelines, filters, filterCategories, true)
 
-    // TODO (felix): Make filtering optional via a switch (default: on)
     pipelines = pipelines.map(ppl => (
-      { ...ppl, _count: countItems(ppl) }
+      countPipelineItems(ppl)
     ))
     stats = {
       trigger_event_queue: state.status.status.trigger_event_queue,
