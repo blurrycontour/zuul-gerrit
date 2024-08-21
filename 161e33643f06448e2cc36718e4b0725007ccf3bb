@@ -35,6 +35,23 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba243ac8_e756eb86",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-21T22:16:17Z",
+      "side": 1,
+      "message": "Some super minor test things inline. Otherwise this lgtm.",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2b4cec9_26372dc1",
@@ -66,6 +83,92 @@
       "side": 1,
       "message": "What you wrote will work.  (It\u0027s already the case that any number of project config stanzas are supported.)",
       "parentUuid": "a2b4cec9_26372dc1",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ed0803a_8403072a",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 10487,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-21T22:16:17Z",
+      "side": 1,
+      "message": "Just for my own understanding this test case is testing the current status quo behavior with pragmas, implied and explicit matchers? We don\u0027t appear to set configuration from untrusted projects to another untrusted project in this config.",
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25613ce7_65e4821e",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 10501,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-21T22:16:17Z",
+      "side": 1,
+      "message": "Should this be A? And the next one below be B instead of D?",
+      "range": {
+        "startLine": 10501,
+        "startChar": 47,
+        "endLine": 10501,
+        "endChar": 48
+      },
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3f70523_0c1d1815",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 10536,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-21T22:16:17Z",
+      "side": 1,
+      "message": "See comment above.",
+      "range": {
+        "startLine": 10536,
+        "startChar": 67,
+        "endLine": 10536,
+        "endChar": 71
+      },
+      "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13d97e06_c6d75794",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 10558,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-21T22:16:17Z",
+      "side": 1,
+      "message": "See above about change commit values.",
+      "range": {
+        "startLine": 10558,
+        "startChar": 47,
+        "endLine": 10558,
+        "endChar": 49
+      },
       "revId": "161e33643f06448e2cc36718e4b0725007ccf3bb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
