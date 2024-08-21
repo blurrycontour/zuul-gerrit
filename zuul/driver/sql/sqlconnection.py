@@ -795,7 +795,7 @@ class SQLConnection(BaseConnection):
             start_time = sa.Column(sa.DateTime)
             end_time = sa.Column(sa.DateTime)
             voting = sa.Column(sa.Boolean)
-            log_url = sa.Column(sa.String(255))
+            log_url = sa.Column(sa.String(2048))
             error_detail = sa.Column(sa.TEXT())
             final = sa.Column(sa.Boolean)
             held = sa.Column(sa.Boolean)
