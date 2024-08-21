@@ -482,6 +482,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "289e7511_b43e9152",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-21T20:25:43Z",
+      "side": 1,
+      "message": "We can add the \"zuul.project\" to this, but I think it is potentially problematic to use.  In the case of circular dependencies between different projects, the zuul.project is an arbitrary value chosen from the list of zuul projects triggering the job.  It makes sense for single-job projects but may not make sense for integration jobs.\n\nDepending on the exact use you have in mind, that might be fine, or it may not.  It should still give you a scratch space designated for one of the projects involved, it just may not always be the same one.\n\nTo answer the question about whether there\u0027s a drawback in adding too many claims: I don\u0027t think we\u0027re going to run into the actual size limit (it\u0027s several kb).  But I do think the more we add, the more ammunition we give folks to shoot themselves in the foot by matching against claims that are not as definitive as the sub.\n\nSince I think no one objects to adding \"project\", I\u0027ll rev this spec with that addition, but I\u0027m going to leave this comment open for Albin to resolve based on whether what I just wrote is \"okay\" or needs further discussion.",
+      "parentUuid": "95e0741f_6d9b1ac7",
+      "revId": "0eaff41a012f0b9c232f0f22593b69c994275a40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "df5519f4_4d9a68ec",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 1
