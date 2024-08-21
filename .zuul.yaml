@@ -383,10 +383,7 @@
     check:
       jobs:
         - zuul-build-image
-        - zuul-nox-docs:
-            vars:
-              nox_force_python: "3.11"
-              python_version: "3.11"
+        - zuul-nox-docs
         - nox-linters:
             vars:
               nox_install_bindep: false
@@ -419,10 +416,7 @@
     gate:
       jobs:
         - zuul-upload-image
-        - zuul-nox-docs:
-            vars:
-              nox_force_python: "3.11"
-              python_version: "3.11"
+        - zuul-nox-docs
         - nox-linters:
             vars:
               nox_install_bindep: false
@@ -463,10 +457,7 @@
     release:
       jobs:
         - zuul-release-python
-        - zuul-publish-nox-docs:
-            vars:
-              nox_force_python: "3.11"
-              python_version: "3.11"
+        - zuul-publish-nox-docs
         - upload-container-image:
             secrets:
               name: container_registry_credentials
