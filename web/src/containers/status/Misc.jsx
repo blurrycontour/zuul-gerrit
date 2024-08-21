@@ -487,9 +487,33 @@ function isPipelineEmpty(pipeline) {
   )
 }
 
+const countPipelineItems = (pipeline) => {
+  let count = 0
+  pipeline.change_queues = pipeline.change_queues.map(queue => {
+    queue = { ...countQueueItems(queue) }
+    count += queue._count
+    return queue
+  })
+  pipeline._count = count
+  return pipeline
+}
+
+const countQueueItems = (queue) => {
+  let count = 0
+  queue.heads.map(head => (
+    head.map((item) => (
+      item.live ? count++ : ''
+    ))
+  ))
+  queue._count = count
+  return queue
+}
+
 export {
   calculateQueueItemTimes,
   ChangeLink,
+  countQueueItems,
+  countPipelineItems,
   getJobStrResult,
   getQueueItemIconConfig,
   getRefs,
