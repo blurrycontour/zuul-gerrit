@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    The log_url SQL column is updated to TEXT type to handle urls that are
+    longer than 255 characters.
