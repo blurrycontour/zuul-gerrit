@@ -93,7 +93,7 @@ except subprocess.CalledProcessError:
 
 interesting_tags = []
 for tag in output.splitlines():
-    if re.match('^\d+\.\d+\.\d+$', tag):
+    if re.match(r'^\d+\.\d+\.\d+$', tag):
         parts = tuple(map(int, tag.split('.')))
         if parts < min_version:
             continue
