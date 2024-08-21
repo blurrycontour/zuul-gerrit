@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import { withRouter, useLocation, useHistory } from 'react-router-dom'
 
 import {
+  Badge,
   Gallery,
   GalleryItem,
   Grid,
@@ -29,12 +30,13 @@ import {
   TextContent,
   TextVariants,
   ToolbarItem,
+  Tooltip,
   Switch,
 } from '@patternfly/react-core'
 import { StreamIcon } from '@patternfly/react-icons'
 
 import ChangeQueue from '../containers/status/ChangeQueue'
-import { PipelineIcon } from '../containers/status/Misc'
+import { countPipelineItems, PipelineIcon } from '../containers/status/Misc'
 import { fetchStatusIfNeeded } from '../actions/status'
 import { EmptyPage } from '../containers/Errors'
 import { Fetching, ReloadButton } from '../containers/Fetching'
@@ -94,6 +96,7 @@ PipelineStats.propTypes = {
 function PipelineDetails({ pipeline, isReloading, reloadCallback }) {
 
   const pipelineType = pipeline.manager || 'unknown'
+  const itemCount = pipeline._count
 
   return (
     <>
@@ -106,6 +109,24 @@ function PipelineDetails({ pipeline, isReloading, reloadCallback }) {
       <Title headingLevel="h1">
         <PipelineIcon pipelineType={pipelineType} />
         {pipeline.name}
+        <Tooltip
+          content={
+            itemCount === 1
+              ? <div>{itemCount} item enqueued</div>
+              : <div>{itemCount} items enqueued</div>
+          }
+        >
+          <Badge
+            isRead
+            style={{
+              marginLeft: 'var(--pf-global--spacer--sm)',
+              verticalAlign: '0.1em',
+              fontSize: 'var(--pf-global--FontSize--md)',
+            }}
+          >
+            {itemCount}
+          </Badge>
+        </Tooltip>
       </Title>
       <Grid hasGutter>
         <GridItem span={10}>
@@ -272,6 +293,7 @@ function mapStateToProps(state, ownProps) {
     // Filter the state for this specific pipeline
     pipeline = filterPipelines(pipelines, filters, filterCategories, false)
       .find((p) => p.name === ownProps.match.params.pipelineName) || null
+    pipeline = countPipelineItems(pipeline)
   }
 
   const isEmpty = pipeline && isPipelineEmpty(pipeline)
