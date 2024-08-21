@@ -295,8 +295,8 @@ const countPipelineItems = (pipeline) => {
 const countQueueItems = (queue) => {
   let count = 0
   queue.heads.map(head => (
-    head.map(() => (
-      count++
+    head.map((item) => (
+      item.live ? count++ : ''
     ))
   ))
   queue._count = count
