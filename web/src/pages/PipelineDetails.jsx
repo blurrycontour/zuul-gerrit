@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import { withRouter, useLocation, useHistory } from 'react-router-dom'
 
 import {
+  Badge,
   Flex,
   FlexItem,
   Gallery,
@@ -31,12 +32,17 @@ import {
   TextContent,
   TextVariants,
   ToolbarItem,
+  Tooltip,
   Switch,
 } from '@patternfly/react-core'
 import { StreamIcon } from '@patternfly/react-icons'
 
 import ChangeQueue from '../containers/status/ChangeQueue'
-import { isPipelineEmpty, PipelineIcon } from '../containers/status/Misc'
+import {
+  countPipelineItems,
+  isPipelineEmpty,
+  PipelineIcon,
+} from '../containers/status/Misc'
 import { fetchStatusIfNeeded } from '../actions/status'
 import { EmptyBox, EmptyPage } from '../containers/Errors'
 import { Fetching, ReloadButton } from '../containers/Fetching'
@@ -88,12 +94,31 @@ PipelineStats.propTypes = {
 function PipelineDetails({ pipeline }) {
 
   const pipelineType = pipeline.manager || 'unknown'
+  const itemCount = pipeline._count
 
   return (
     <>
       <Title headingLevel="h1">
         <PipelineIcon pipelineType={pipelineType} />
         {pipeline.name}
+        <Tooltip
+          content={
+            itemCount === 1
+              ? <div>{itemCount} item enqueued</div>
+              : <div>{itemCount} items enqueued</div>
+          }
+        >
+          <Badge
+            isRead
+            style={{
+              marginLeft: 'var(--pf-global--spacer--sm)',
+              verticalAlign: '0.1em',
+              fontSize: 'var(--pf-global--FontSize--md)',
+            }}
+          >
+            {itemCount}
+          </Badge>
+        </Tooltip>
       </Title>
       <Flex>
         <Flex flex={{ sm: 'flex_3' }}>
@@ -275,6 +300,7 @@ function mapStateToProps(state, ownProps) {
     // Filter the state for this specific pipeline
     pipeline = filterPipelines(pipelines, filters, filterCategories, false)
       .find((p) => p.name === ownProps.match.params.pipelineName) || null
+    pipeline = countPipelineItems(pipeline)
   }
 
   const isEmpty = pipeline && isPipelineEmpty(pipeline)
