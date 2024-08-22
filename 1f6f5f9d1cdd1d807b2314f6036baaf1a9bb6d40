@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "468fa3b1_c9d49999",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-22T21:38:17Z",
+      "side": 1,
+      "message": "It\u0027s not dependencies, but it is ordering.  So if we have a grid of queues like:\n\n\u003e  A B C\n\u003e  D E F\n  \nWe, as experienced Zuul users (and folks who have seen the previous status page) know that Zuul will fulfill node requests in the order ABCDEF.  But new users might think they would be fulfilled in the order ADBECF.  Or may not even consider that there is an order.",
+      "parentUuid": "9f6f195f_3a52a612",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57bc08d9_e2a42e20",
         "filename": "web/src/containers/status/Misc.jsx",
         "patchSetId": 9
@@ -155,6 +173,24 @@
       "side": 1,
       "message": "The \"awkward\" part should already be fixed ;-). In addition, I\u0027ve added a \nfollow-up change to show the remaining time via a tooltip as other solutions (showing the time via the progress bar didn\u0027t work out): https://review.opendev.org/c/zuul/zuul/+/926472/2",
       "parentUuid": "8b64e430_70e14d1e",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f3c6899_3422efbd",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-22T21:38:17Z",
+      "side": 1,
+      "message": "Thanks, this does look a lot better.  I have one quibble:\n\nSince the percentage text is set inside the active part of the progress bar, it causes the progress bar to have a minimum width.  That means that the progress bar always looks the same for an value less than something 40%.  That means it\u0027s useful 60% of the time and providing incorrect information 40% of the time.\n\nIf we want to include the percentage at all, then I think it would be good to have the percentage text always centered on the entire bar and not force the active part to the minimum width.  Because of the color contrast, we would probably need to have the text be inverted based on the background color (especially if the text overlaps the edge of the current progress, eg, when it\u0027s at 50%).  That should be technically possible with CSS, but a quick look suggests that patternfly doesn\u0027t make it easy, if it\u0027s possible at all with patternfly.\n\nIf we can\u0027t do that, and we have to choose, then I think we should drop the percentage (measureLocation\u003dnone) and have an accurate bar.",
+      "parentUuid": "42d2c92d_a223a47e",
       "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -277,6 +313,24 @@
       "writtenOn": "2024-07-03T21:17:05Z",
       "side": 1,
       "message": "-1: This is too dark for dark mode.  This should at least be using some standard colors that switch based on the theme.  If you don\u0027t want to use blue (our standard link blue might be okay actually), then I would do what the navbar at the top does.",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42c9287c_c3e31982",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-22T21:38:17Z",
+      "side": 1,
+      "message": "Not sure where it\u0027s fixed, but I\u0027m currently previewing the end of the stack and this is fixed somewhere.",
+      "parentUuid": "4ac22fa3_279a60c8",
       "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
