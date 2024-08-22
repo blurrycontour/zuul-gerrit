@@ -34,6 +34,24 @@
       "parentUuid": "42b90a16_25b820e5",
       "revId": "85b819779312827476d391dae2d9703023275aac",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3202cefe_87431a2f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-22T21:43:37Z",
+      "side": 1,
+      "message": "It\u0027s certainly worth being aware of what other websites are doing and that can inform our work.  But also, most websites are not doing what we are doing; and in the case of timestamps, the use case might be simply \"this review of the best frying pan was from 2 years ago so I should look for a newer one\".  I\u0027m never going to buy that as a use case for Zuul.\n\nSo I\u0027m really looking for someone to say \"I know all the changes that merge to the base-jobs repo and so I just need to know if the one change that merged today has taken effect or not, and a relative timestamp that says \u00275 minutes ago\u0027 versus \u0027yesterday\u0027 is helpful to me so I don\u0027t have to read so many numbers\".  No one has said that, but I can imagine it, which is why, if that\u0027s where you\u0027re coming from, I think it\u0027s okay to add.\n\nWe also know that (because I said it myself) we have the use case of \"I don\u0027t know all the changes that merge, but I do know that the one I care about merged at 17:14 UTC so I need to know if the reconfiguration time is 17:14 or later.\"\n\nAnyway, tooltip looks good, thanks.",
+      "parentUuid": "1f9fdadd_29af1931",
+      "revId": "85b819779312827476d391dae2d9703023275aac",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
