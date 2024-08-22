@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a876c3ee_844a90fd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-22T21:57:18Z",
+      "side": 1,
+      "message": "Adding a new comment here to make sure we don\u0027t forget it:\n\nThe icons in the stepper are missing the title/tooltip text that indicates why the item is failing.  That\u0027s very useful and we should make sure that gets added back in.",
+      "revId": "de464e860ce0dbc8861e24582818163146bc571b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "36c0a75c_71da1c0c",
         "filename": "web/src/index.css",
         "patchSetId": 9
