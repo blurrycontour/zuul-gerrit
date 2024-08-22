@@ -688,6 +688,8 @@ class Pipeline(object):
         j_queues = []
         j_pipeline['change_queues'] = j_queues
         for queue in self.queues:
+            if not queue.queue:
+                continue
             j_queue = dict(name=queue.name)
             j_queues.append(j_queue)
             j_queue['heads'] = []
