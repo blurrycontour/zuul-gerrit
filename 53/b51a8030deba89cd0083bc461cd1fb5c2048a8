@@ -1,0 +1,10 @@
+Code-Review+2: Jeremy Stanley <fungi@yuggoth.org>
+Code-Review+2: James E. Blair <jim@acmegating.com>
+Workflow+1: James E. Blair <jim@acmegating.com>
+Verified+2: Zuul
+Submitted-by: Zuul
+Submitted-at: Thu, 22 Aug 2024 16:09:20 +0000
+Reviewed-on: https://review.opendev.org/c/zuul/zuul/+/924807
+Comments-Total: 63
+Project: zuul/zuul
+Branch: refs/heads/master
