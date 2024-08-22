@@ -88,13 +88,13 @@ class TestTenantSimple(TenantParserTestCase):
         self.assertEqual(['org/project1', 'org/project2'],
                          [x.name for x in tenant.untrusted_projects])
 
-        project = tenant.config_projects[0]
+        project = list(tenant.config_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.CONFIG_SET, tpc.load_classes)
-        project = tenant.untrusted_projects[0]
+        project = list(tenant.untrusted_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.UNTRUSTED_SET, tpc.load_classes)
-        project = tenant.untrusted_projects[1]
+        project = list(tenant.untrusted_projects)[1]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.UNTRUSTED_SET, tpc.load_classes)
         self.assertTrue('common-config-job' in tenant.layout.jobs)
@@ -277,7 +277,7 @@ class TestTenantSimple(TenantParserTestCase):
                   <<: *docker_vars
             """)
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
-        project = tenant.config_projects[0]
+        project = list(tenant.config_projects)[0]
         source_context = SourceContext(
             project.canonical_name, project.name, project.connection_name,
             'master', 'zuul.yaml', True)
@@ -346,14 +346,14 @@ class TestTenantOverride(TenantParserTestCase):
                          [x.name for x in tenant.config_projects])
         self.assertEqual(['org/project1', 'org/project2', 'org/project4'],
                          [x.name for x in tenant.untrusted_projects])
-        project = tenant.config_projects[0]
+        project = list(tenant.config_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.CONFIG_SET, tpc.load_classes)
-        project = tenant.untrusted_projects[0]
+        project = list(tenant.untrusted_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.UNTRUSTED_SET - set(['project']),
                          tpc.load_classes)
-        project = tenant.untrusted_projects[1]
+        project = list(tenant.untrusted_projects)[1]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(set(['job']), tpc.load_classes)
         self.assertTrue('common-config-job' in tenant.layout.jobs)
@@ -382,14 +382,14 @@ class TestTenantGroups(TenantParserTestCase):
                          [x.name for x in tenant.config_projects])
         self.assertEqual(['org/project1', 'org/project2'],
                          [x.name for x in tenant.untrusted_projects])
-        project = tenant.config_projects[0]
+        project = list(tenant.config_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.CONFIG_SET, tpc.load_classes)
-        project = tenant.untrusted_projects[0]
+        project = list(tenant.untrusted_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.UNTRUSTED_SET - set(['project']),
                          tpc.load_classes)
-        project = tenant.untrusted_projects[1]
+        project = list(tenant.untrusted_projects)[1]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.UNTRUSTED_SET - set(['project']),
                          tpc.load_classes)
@@ -419,14 +419,14 @@ class TestTenantGroups2(TenantParserTestCase):
                          [x.name for x in tenant.config_projects])
         self.assertEqual(['org/project1', 'org/project2', 'org/project3'],
                          [x.name for x in tenant.untrusted_projects])
-        project = tenant.config_projects[0]
+        project = list(tenant.config_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.CONFIG_SET, tpc.load_classes)
-        project = tenant.untrusted_projects[0]
+        project = list(tenant.untrusted_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.UNTRUSTED_SET - set(['project']),
                          tpc.load_classes)
-        project = tenant.untrusted_projects[1]
+        project = list(tenant.untrusted_projects)[1]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.UNTRUSTED_SET - set(['project', 'job']),
                          tpc.load_classes)
@@ -457,13 +457,13 @@ class TestTenantGroups3(TenantParserTestCase):
                          [x.name for x in tenant.config_projects])
         self.assertEqual(['org/project1', 'org/project2'],
                          [x.name for x in tenant.untrusted_projects])
-        project = tenant.config_projects[0]
+        project = list(tenant.config_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.CONFIG_SET, tpc.load_classes)
-        project = tenant.untrusted_projects[0]
+        project = list(tenant.untrusted_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(set(['job']), tpc.load_classes)
-        project = tenant.untrusted_projects[1]
+        project = list(tenant.untrusted_projects)[1]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(set(['project', 'job']), tpc.load_classes)
         self.assertTrue('common-config-job' in tenant.layout.jobs)
@@ -492,14 +492,14 @@ class TestTenantGroups4(TenantParserTestCase):
                          [x.name for x in tenant.config_projects])
         self.assertEqual(['org/project1', 'org/project2'],
                          [x.name for x in tenant.untrusted_projects])
-        project = tenant.config_projects[0]
+        project = list(tenant.config_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.CONFIG_SET, tpc.load_classes)
-        project = tenant.untrusted_projects[0]
+        project = list(tenant.untrusted_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(set([]),
                          tpc.load_classes)
-        project = tenant.untrusted_projects[1]
+        project = list(tenant.untrusted_projects)[1]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(set([]),
                          tpc.load_classes)
@@ -529,10 +529,10 @@ class TestTenantGroups5(TenantParserTestCase):
                          [x.name for x in tenant.config_projects])
         self.assertEqual(['org/project1'],
                          [x.name for x in tenant.untrusted_projects])
-        project = tenant.config_projects[0]
+        project = list(tenant.config_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(self.CONFIG_SET, tpc.load_classes)
-        project = tenant.untrusted_projects[0]
+        project = list(tenant.untrusted_projects)[0]
         tpc = tenant.project_configs[project.canonical_name]
         self.assertEqual(set([]),
                          tpc.load_classes)
@@ -562,13 +562,13 @@ class TestTenantUnprotectedBranches(TenantParserTestCase):
                          [x.name for x in tenant.untrusted_projects])
 
         tpc = tenant.project_configs
-        project_name = tenant.config_projects[0].canonical_name
+        project_name = list(tenant.config_projects)[0].canonical_name
         self.assertEqual(False, tpc[project_name].exclude_unprotected_branches)
 
-        project_name = tenant.untrusted_projects[0].canonical_name
+        project_name = list(tenant.untrusted_projects)[0].canonical_name
         self.assertIsNone(tpc[project_name].exclude_unprotected_branches)
 
-        project_name = tenant.untrusted_projects[1].canonical_name
+        project_name = list(tenant.untrusted_projects)[1].canonical_name
         self.assertIsNone(tpc[project_name].exclude_unprotected_branches)
 
 
@@ -584,11 +584,11 @@ class TestTenantIncludeBranches(TenantParserTestCase):
                          [x.name for x in tenant.untrusted_projects])
 
         tpc = tenant.project_configs
-        project_name = tenant.config_projects[0].canonical_name
+        project_name = list(tenant.config_projects)[0].canonical_name
         self.assertEqual(['master'], tpc[project_name].branches)
 
         # No branches pass the filter at the start
-        project_name = tenant.untrusted_projects[0].canonical_name
+        project_name = list(tenant.untrusted_projects)[0].canonical_name
         self.assertEqual([], tpc[project_name].branches)
 
         # Create the foo branch
@@ -601,7 +601,7 @@ class TestTenantIncludeBranches(TenantParserTestCase):
         # It should pass the filter
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         tpc = tenant.project_configs
-        project_name = tenant.untrusted_projects[0].canonical_name
+        project_name = list(tenant.untrusted_projects)[0].canonical_name
         self.assertEqual(['foo'], tpc[project_name].branches)
 
         # Create the baz branch
@@ -614,7 +614,7 @@ class TestTenantIncludeBranches(TenantParserTestCase):
         # It should not pass the filter
         tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
         tpc = tenant.project_configs
-        project_name = tenant.untrusted_projects[0].canonical_name
+        project_name = list(tenant.untrusted_projects)[0].canonical_name
         self.assertEqual(['foo'], tpc[project_name].branches)
 
 
@@ -1241,6 +1241,56 @@ class TestTenantDuplicate(TenantParserTestCase):
             super().setUp()
 
     def test_tenant_dupe(self):
+        # The magic is in setUp
+        pass
+
+
+class TestTenantSuperprojectConfigProject(TenantParserTestCase):
+    tenant_config_file = ('config/tenant-parser/'
+                          'superproject-config-project.yaml')
+    scheduler_count = 1
+
+    def setUp(self):
+        # Test that we get an error trying to configure a
+        # config-project
+        err = ".*may not configure config-project.*"
+        with testtools.ExpectedException(Exception, err):
+            super().setUp()
+
+    def test_tenant_superproject_config_project(self):
+        # The magic is in setUp
+        pass
+
+
+class TestTenantSuperprojectConfigProjectRegex(TenantParserTestCase):
+    tenant_config_file = ('config/tenant-parser/'
+                          'superproject-config-project-regex.yaml')
+    scheduler_count = 1
+
+    def setUp(self):
+        # Test that we get an error trying to configure a
+        # config-project via regex
+        err = ".*may not configure config-project.*"
+        with testtools.ExpectedException(Exception, err):
+            super().setUp()
+
+    def test_tenant_superproject_config_project_regex(self):
+        # The magic is in setUp
+        pass
+
+
+class TestTenantConfigSuperproject(TenantParserTestCase):
+    tenant_config_file = ('config/tenant-parser/'
+                          'config-superproject.yaml')
+    scheduler_count = 1
+
+    def setUp(self):
+        # Test that we get an error trying to use configure-projects
+        # on a config-project
+        with testtools.ExpectedException(vs.MultipleInvalid):
+            super().setUp()
+
+    def test_tenant_config_superproject(self):
         # The magic is in setUp
         pass
 

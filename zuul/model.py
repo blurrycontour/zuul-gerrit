@@ -7869,6 +7869,24 @@ class TenantProjectConfig(object):
         self.load_branch = None
         self.merge_modes = None
         self.implied_branch_matchers = None
+        self.trusted = False
+        # A list of project names/regexes that this project is allowed
+        # to configure
+        self.configure_projects = None
+
+    def canConfigureProject(self, other_tpc, validation_only=False):
+        if self.trusted:
+            return True
+        if not self.configure_projects:
+            return False
+        if not validation_only and other_tpc.trusted:
+            return False
+        for r in self.configure_projects:
+            for name in (other_tpc.project.name,
+                         other_tpc.project.canonical_name):
+                if r.fullmatch(name):
+                    return True
+        return False
 
     def isAlwaysDynamicBranch(self, branch):
         if self.always_dynamic_branches is None:
@@ -7876,6 +7894,7 @@ class TenantProjectConfig(object):
         for r in self.always_dynamic_branches:
             if r.fullmatch(branch):
                 return True
+        return False
 
     def includesBranch(self, branch):
         if self.include_branches is not None:
@@ -9114,15 +9133,9 @@ class Tenant(object):
         # The unparsed configuration from the main zuul config for
         # this tenant.
         self.unparsed_config = None
-        # The list of projects from which we will read full
-        # configuration.
-        self.config_projects = []
-        # The parsed config from those projects.
+        # The parsed config from the config-projects
         self.config_projects_config = None
-        # The list of projects from which we will read untrusted
-        # in-repo configuration.
-        self.untrusted_projects = []
-        # The parsed config from those projects.
+        # The parsed config from untrusted-projects
         self.untrusted_projects_config = None
         self.semaphore_handler = None
         # Metadata about projects for this tenant
@@ -9154,6 +9167,32 @@ class Tenant(object):
         for hostname_dict in self.projects.values():
             for project in hostname_dict.values():
                 yield project
+
+    @property
+    def all_tpcs(self):
+        """
+        Return a generator for all tenant TPCS.
+        """
+        for tpc in self.project_configs.values():
+            yield tpc
+
+    @property
+    def config_projects(self):
+        """
+        Return a generator for all config projects.
+        """
+        for tpc in self.project_configs.values():
+            if tpc.trusted:
+                yield tpc.project
+
+    @property
+    def untrusted_projects(self):
+        """
+        Return a generator for all tenant TPCS.
+        """
+        for tpc in self.project_configs.values():
+            if not tpc.trusted:
+                yield tpc.project
 
     def _addProject(self, tpc):
         """Add a project to the project index
@@ -9208,20 +9247,19 @@ class Tenant(object):
                                     "with a hostname" % (name,))
         if project is None:
             return (None, None)
-        if project in self.config_projects:
-            return (True, project)
-        if project in self.untrusted_projects:
-            return (False, project)
-        # This should never happen:
-        raise Exception("Project %s is neither trusted nor untrusted" %
-                        (project,))
+        tpc = self.project_configs.get(project.canonical_name)
+        if tpc is None:
+            # This should never happen:
+            raise Exception("Project %s is neither trusted nor untrusted" %
+                            (project,))
+        return (tpc.trusted, project)
 
-    def getProjectsByRegex(self, regex):
-        """Return all projects with a full match to either project name or
+    def getTPCsByRegex(self, regex):
+        """Return all TPCs with a full match to either project name or
         canonical project name.
 
         :arg str regex: The regex to match
-        :returns: A list of tuples (trusted, project) describing the found
+        :returns: A list of TenantProjectConfigs describing the found
             projects.
         """
 
@@ -9241,14 +9279,24 @@ class Tenant(object):
                         projects.append(project)
 
         for project in projects:
-            if project in self.config_projects:
-                result.append((True, project))
-            elif project in self.untrusted_projects:
-                result.append((False, project))
-            else:
+            tpc = self.project_configs.get(project.canonical_name)
+            if tpc is None:
+                # This should never happen:
                 raise Exception("Project %s is neither trusted nor untrusted" %
                                 (project,))
+            result.append(tpc)
         return result
+
+    def getProjectsByRegex(self, regex):
+        """Return all projects with a full match to either project name or
+        canonical project name.
+
+        :arg str regex: The regex to match
+        :returns: A list of tuples (trusted, project) describing the found
+            projects.
+        """
+        return [(tpc.trusted, tpc.project)
+                for tpc in self.getTPCsByRegex(regex)]
 
     def getProjectBranches(self, project_canonical_name,
                            include_always_dynamic=False):
@@ -9283,13 +9331,14 @@ class Tenant(object):
             return project_config.exclude_locked_branches
         return self.exclude_locked_branches
 
-    def addConfigProject(self, tpc):
-        self.config_projects.append(tpc.project)
+    def addTPC(self, tpc):
         self._addProject(tpc)
 
-    def addUntrustedProject(self, tpc):
-        self.untrusted_projects.append(tpc.project)
-        self._addProject(tpc)
+    def getTPC(self, name):
+        (_, project) = self.getProject(name)
+        if project is None:
+            return None
+        return self.project_configs[project.canonical_name]
 
     def getSafeAttributes(self):
         return Attributes(name=self.name)
