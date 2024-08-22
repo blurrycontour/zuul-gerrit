@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f60e76a_04223613",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-22T21:50:07Z",
+      "side": 1,
+      "message": "Not a -1; the old status page has the same issue: \"TIMED_OUT\" doesn\u0027t have an entry and shows up as grey.  That might not be what we want.  We might want to make it yellow or orange like the build results page.",
+      "revId": "1fbe3e290ccbe2132e96198d245935a3d9cdc4f7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
