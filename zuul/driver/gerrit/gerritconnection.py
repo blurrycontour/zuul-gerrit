@@ -1488,12 +1488,17 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if not self.client:
             self._open()
 
-        try:
-            log.debug("SSH command:\n%s", command)
-            stdin, stdout, stderr = self.client.exec_command(command)
-        except Exception:
-            self._open()
-            stdin, stdout, stderr = self.client.exec_command(command)
+        max_attempts = 2
+        for x in range(max_attempts):
+            try:
+                log.debug("SSH command:\n%s", command)
+                stdin, stdout, stderr = self.client.exec_command(
+                    command, timeout=TIMEOUT)
+                break
+            except Exception:
+                self._open()
+                if x + 1 >= max_attempts:
+                    raise
 
         if stdin_data:
             stdin.write(stdin_data)
