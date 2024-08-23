@@ -3412,6 +3412,20 @@ class Job(ConfigObject):
             failure_output=(),
         )
 
+        override_control = defaultdict(lambda: True)
+        override_control['file_matcher'] = True
+        override_control['irrelevant_file_matcher'] = True
+        override_control['tags'] = False
+        override_control['provides'] = False
+        override_control['requires'] = False
+        override_control['dependencies'] = True
+        override_control['variables'] = False
+        override_control['extra_variables'] = False
+        override_control['host_variables'] = False
+        override_control['group_variables'] = False
+        override_control['required_projects'] = False
+        override_control['failure_output'] = False
+
         # These are generally internal attributes which are not
         # accessible via configuration.
         self.other_attributes = dict(
@@ -3428,6 +3442,8 @@ class Job(ConfigObject):
             secrets=(),  # secrets aren't inheritable
             queued=False,
             waiting_status=None,  # Text description of why its waiting
+            # Override settings for context attributes:
+            override_control=override_control,
         )
 
         self.attributes = {}
@@ -3774,42 +3790,56 @@ class Job(ConfigObject):
         # Set the file matcher to match any of the change files
         # Input is a list of ZuulRegex objects
         self._files = [x.toDict() for x in files]
-        matchers = []
-        for zuul_regex in files:
-            matchers.append(change_matcher.FileMatcher(zuul_regex))
-        self.file_matcher = change_matcher.MatchAnyFiles(matchers)
+        self.file_matcher = change_matcher.MatchAnyFiles(
+            [change_matcher.FileMatcher(zuul_regex)
+             for zuul_regex in sorted(files, key=lambda x: x.pattern)])
 
     def setIrrelevantFileMatcher(self, irrelevant_files):
         # Set the irrelevant file matcher to match any of the change files
         # Input is a list of ZuulRegex objects
         self._irrelevant_files = [x.toDict() for x in irrelevant_files]
-        matchers = []
-        for zuul_regex in irrelevant_files:
-            matchers.append(change_matcher.FileMatcher(zuul_regex))
-        self.irrelevant_file_matcher = change_matcher.MatchAllFiles(matchers)
+        self.irrelevant_file_matcher = change_matcher.MatchAllFiles(
+            [change_matcher.FileMatcher(zuul_regex)
+             for zuul_regex in sorted(irrelevant_files,
+                                      key=lambda x: x.pattern)])
 
-    def updateVariables(self, other_vars, other_extra_vars, other_host_vars,
-                        other_group_vars):
-        if other_vars is not None:
-            self.variables = Job._deepUpdate(self.variables, other_vars)
-        if other_extra_vars is not None:
-            self.extra_variables = Job._deepUpdate(
-                self.extra_variables, other_extra_vars)
-        if other_host_vars is not None:
-            self.host_variables = Job._deepUpdate(
-                self.host_variables, other_host_vars)
-        if other_group_vars is not None:
-            self.group_variables = Job._deepUpdate(
-                self.group_variables, other_group_vars)
+    def updateVariables(self, other):
+        if other.variables is not None:
+            if other.override_control['variables']:
+                self.variables = other.variables
+            else:
+                self.variables = Job._deepUpdate(
+                    self.variables, other.variables)
+        if other.extra_variables is not None:
+            if other.override_control['extra_variables']:
+                self.extra_variables = other.extra_variables
+            else:
+                self.extra_variables = Job._deepUpdate(
+                    self.extra_variables, other.extra_variables)
+        if other.host_variables is not None:
+            if other.override_control['host_variables']:
+                self.host_variables = other.host_variables
+            else:
+                self.host_variables = Job._deepUpdate(
+                    self.host_variables, other.host_variables)
+        if other.group_variables is not None:
+            if other.override_control['group_variables']:
+                self.group_variables = other.group_variables
+            else:
+                self.group_variables = Job._deepUpdate(
+                    self.group_variables, other.group_variables)
 
     def updateProjectVariables(self, project_vars):
         # Merge project/template variables directly into the job
         # variables.  Job variables override project variables.
         self.variables = Job._deepUpdate(project_vars, self.variables)
 
-    def updateProjects(self, other_projects):
-        required_projects = self.required_projects.copy()
-        required_projects.update(other_projects)
+    def updateProjects(self, other):
+        if other.override_control['required_projects']:
+            required_projects = {}
+        else:
+            required_projects = self.required_projects.copy()
+        required_projects.update(other.required_projects)
         self.required_projects = required_projects
 
     @staticmethod
@@ -3982,10 +4012,9 @@ class Job(ConfigObject):
             other_cleanup_run = self.freezePlaybooks(
                 other.cleanup_run, layout, semaphore_handler)
             self.cleanup_run = other_cleanup_run + self.cleanup_run
-        self.updateVariables(other.variables, other.extra_variables,
-                             other.host_variables, other.group_variables)
+        self.updateVariables(other)
         if other._get('required_projects') is not None:
-            self.updateProjects(other.required_projects)
+            self.updateProjects(other)
         if (other._get('allowed_projects') is not None and
             self._get('allowed_projects') is not None):
             self.allowed_projects = frozenset(
@@ -3998,11 +4027,16 @@ class Job(ConfigObject):
             # contention (where two jobs try to start at the same time
             # and fail due to acquiring the same semaphores but in
             # reverse order.
-            self.semaphores = tuple(
-                sorted(other.semaphores + self.semaphores,
-                       key=lambda x: x.name))
+            # Override control is explicitly not supported.
+            semaphores = set(self.semaphores).union(set(other.semaphores))
+            self.semaphores = tuple(sorted(semaphores, key=lambda x: x.name))
         if other._get('failure_output') is not None:
-            self.failure_output = self.failure_output + other.failure_output
+            if other.override_control['failure_output']:
+                failure_output = other.failure_output
+            else:
+                failure_output = set(self.failure_output).union(
+                    set(other.failure_output))
+            self.failure_output = tuple(sorted(failure_output))
 
         pb_semaphores = set()
         for pb in self.run + self.pre_run + self.post_run + self.cleanup_run:
@@ -4016,13 +4050,28 @@ class Job(ConfigObject):
                 "be used for one")
 
         for k in self.context_attributes:
-            if (other._get(k) is not None and
-                k not in set(['tags', 'requires', 'provides'])):
-                setattr(self, k, other._get(k))
-
-        for k in ('tags', 'requires', 'provides'):
-            if other._get(k) is not None:
-                setattr(self, k, getattr(self, k).union(other._get(k)))
+            if (v := other._get(k)) is None:
+                continue
+            if other.override_control[k]:
+                setattr(self, k, v)
+            else:
+                if isinstance(v, (set, frozenset)):
+                    setattr(self, k, getattr(self, k).union(v))
+                elif isinstance(v, change_matcher.AbstractMatcherCollection):
+                    ours = getattr(self, k)
+                    ours = ours and set(ours.matchers) or set()
+                    matchers = ours.union(set(v.matchers))
+                    if k == 'file_matcher':
+                        self.setFileMatcher([m.regex for m in matchers])
+                    elif k == 'irrelevant_file_matcher':
+                        self.setIrrelevantFileMatcher(
+                            [m.regex for m in matchers])
+                    else:
+                        raise NotImplementedError()
+                elif k in ('_files', '_irrelevant_files',):
+                    pass
+                else:
+                    raise NotImplementedError()
 
         self.inheritance_path = self.inheritance_path + (repr(other),)
 
@@ -4093,6 +4142,10 @@ class JobSemaphore(ConfigObject):
         self.name = semaphore_name
         self.resources_first = resources_first
 
+    def __repr__(self):
+        first = self.resources_first and ' resources first' or ''
+        return '<JobSemaphore %s%s>' % (self.name, first)
+
     def toDict(self):
         d = dict()
         d['name'] = self.name
@@ -4139,6 +4192,10 @@ class JobDependency(ConfigObject):
         super(JobDependency, self).__init__()
         self.name = name
         self.soft = soft
+
+    def __repr__(self):
+        soft = self.soft and ' soft' or ''
+        return '<JobDependency %s%s>' % (self.name, soft)
 
     def __ne__(self, other):
         return not self.__eq__(other)

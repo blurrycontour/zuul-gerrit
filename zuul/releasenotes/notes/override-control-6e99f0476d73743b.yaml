@@ -1,0 +1,24 @@
+---
+features:
+  - |
+    Several job attributes may now have their inheritance behavior
+    changed through "override control".  This introduces two new YAML
+    tags, ``!override`` and ``!inherit`` which may be used to
+    explicitly specify whether certain job attributes should inherit
+    values from parent jobs or override them.
+
+    See the general job documentation at :ref:`job` and also
+    documentation for the following individual attributes:
+
+      * :attr:`job.dependencies`
+      * :attr:`job.extra-vars`
+      * :attr:`job.failure-output`
+      * :attr:`job.files`
+      * :attr:`job.group-vars`
+      * :attr:`job.host-vars`
+      * :attr:`job.irrelevant-files`
+      * :attr:`job.provides`
+      * :attr:`job.required-projects`
+      * :attr:`job.requires`
+      * :attr:`job.tags`
+      * :attr:`job.vars`

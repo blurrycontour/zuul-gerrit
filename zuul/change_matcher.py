@@ -18,6 +18,8 @@ This module defines classes used in matching changes based on job
 configuration.
 """
 
+import json
+
 from zuul.lib.re2util import ZuulRegex
 
 COMMIT_MSG = '/COMMIT_MSG'
@@ -53,6 +55,9 @@ class AbstractChangeMatcher(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(json.dumps(self.regex.toDict(), sort_keys=True))
 
     def __str__(self):
         return '{%s:%s}' % (self.__class__.__name__, self._regex)
@@ -127,7 +132,8 @@ class AbstractMatcherCollection(AbstractChangeMatcher):
                             ','.join([str(x) for x in self.matchers]))
 
     def __repr__(self):
-        return '<%s>' % self.__class__.__name__
+        return '<%s [%s]>' % (self.__class__.__name__,
+                              ', '.join([repr(x) for x in self.matchers]))
 
     def copy(self):
         return self.__class__(self.matchers[:])

@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import re
+
 import re2
 
 
@@ -77,6 +79,9 @@ class ZuulRegex:
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
 
     def match(self, subject):
         if self.negate:
