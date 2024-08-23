@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e40e2d19_a371a281",
+        "filename": "zuul/ansible/schema.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-08-23T14:20:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8a8bfc0a_d96f18b8",
+      "revId": "bbfa649abfee8cd04410afb174f88fea4945d65d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "34a3da12_0efbb977",
@@ -49,6 +67,24 @@
       "writtenOn": "2024-08-23T13:35:23Z",
       "side": 1,
       "message": "I can probably make that more clear by adding the suggested text here:\n\n\u003e This file incorporates work covered by the following copyright and  \n\u003e permission notice:",
+      "revId": "bbfa649abfee8cd04410afb174f88fea4945d65d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94c13458_fbe5d806",
+        "filename": "zuul/ansible/schema.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-08-23T14:20:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "34a3da12_0efbb977",
       "revId": "bbfa649abfee8cd04410afb174f88fea4945d65d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
