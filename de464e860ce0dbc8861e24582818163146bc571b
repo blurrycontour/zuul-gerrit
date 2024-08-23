@@ -69,6 +69,24 @@
       "parentUuid": "36c0a75c_71da1c0c",
       "revId": "de464e860ce0dbc8861e24582818163146bc571b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec6a597b_4f76ad89",
+        "filename": "web/src/index.css",
+        "patchSetId": 9
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-23T10:24:57Z",
+      "side": 1,
+      "message": "I\u0027ve compared using 300/400 and 400/500 (normal/hover) and I get the feeling that this highly depends on the monitor that is used and also the brightness setting. On my external monitor 300/400 looks good, while 400/500 is quite hard to differentiate from the dark background. On my macbook screen 400/500 looks much better, while 300/400 is quite light in comparison -\u003e similar to what you wrote above.\n\nMy gut feeling says that 300/400 might be a better fit for most monitors as it provides a little more contrast to the background - with the drawback that it might look a little too light on some monitors. In the end I don\u0027t have a strict tendency to either one of those settings.",
+      "parentUuid": "c51a3431_ceb762f5",
+      "revId": "de464e860ce0dbc8861e24582818163146bc571b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
