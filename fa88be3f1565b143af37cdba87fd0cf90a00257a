@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36241e32_e4164f21",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-08-23T11:45:22Z",
+      "side": 1,
+      "message": "It looks like if we want to postpone the merge we also need to perform a merge when getting the global repo state.",
+      "revId": "fa88be3f1565b143af37cdba87fd0cf90a00257a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
