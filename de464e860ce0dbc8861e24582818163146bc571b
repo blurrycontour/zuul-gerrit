@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cabfbb97_d92062c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-23T08:08:19Z",
+      "side": 1,
+      "message": "Implemented in https://review.opendev.org/c/zuul/zuul/+/926989.",
+      "parentUuid": "a876c3ee_844a90fd",
+      "revId": "de464e860ce0dbc8861e24582818163146bc571b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36c0a75c_71da1c0c",
