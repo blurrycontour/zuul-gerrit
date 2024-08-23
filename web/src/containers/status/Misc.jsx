@@ -32,6 +32,7 @@ import {
   CodeBranchIcon,
   ExclamationIcon,
   FlaskIcon,
+  InfoIcon,
   InProgressIcon,
   PauseIcon,
   OutlinedClockIcon,
@@ -63,8 +64,8 @@ const QUEUE_ITEM_ICON_CONFIGS = {
     color: 'var(--pf-global--info-color--100)',
     variant: 'info',
   },
-  WAITING: {
-    icon: OutlinedClockIcon,
+  NON_LIVE: {
+    icon: InfoIcon,
     color: 'var(--pf-global--disabled-color--100)',
     variant: 'pending',
   },
@@ -183,7 +184,7 @@ const getQueueItemIconConfig = (item) => {
   }
 
   if (item.live !== true) {
-    return QUEUE_ITEM_ICON_CONFIGS['WAITING']
+    return QUEUE_ITEM_ICON_CONFIGS['NON_LIVE']
   }
 
   return QUEUE_ITEM_ICON_CONFIGS['SUCCESS']
