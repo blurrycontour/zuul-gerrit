@@ -113,6 +113,32 @@ const createTree = (head) => {
   return tree
 }
 
+function BranchIcon({ item }) {
+  const iconConfig = getQueueItemIconConfig(item)
+  const Icon = iconConfig.icon
+
+  let reason = 'Succeeding'
+
+  if (item.active !== true) {
+    reason = 'Waiting until closer to head of queue to start jobs'
+  } else if (item.live !== true) {
+    reason = 'Dependent item required for testing'
+  } else if (item.failing_reasons && item.failing_reasons.length > 0) {
+    reason = 'Failing because ' + item.failing_reasons.join(', ')
+  }
+
+  return (
+    <Tooltip content={reason} position="bottom">
+      <Icon />
+    </Tooltip>
+  )
+}
+
+BranchIcon.propTypes = {
+  item: PropTypes.object.isRequired,
+}
+
+// Recursively render QueueItems to visualize a ChangeQueue.
 const Branch = ({ item, pipeline, jobsExpanded, newBranch = false }) => {
   // hack: prevent null reference exceptions when filtering for items in queues
   // that have other items that don't match the filter. The cause is not clear
@@ -123,9 +149,7 @@ const Branch = ({ item, pipeline, jobsExpanded, newBranch = false }) => {
     return <></>
   }
 
-  // Recursively render QueueItems to visualize a ChangeQueue.
   const iconConfig = getQueueItemIconConfig(item)
-  const Icon = iconConfig.icon
 
   const step = (
     <>
@@ -133,7 +157,7 @@ const Branch = ({ item, pipeline, jobsExpanded, newBranch = false }) => {
         variant={iconConfig.variant}
         id={item.id}
         titleId={item.id}
-        icon={<Icon />}
+        icon={<BranchIcon item={item} />}
         style={{ marginBottom: '16px' }}
         key={`ps-${item.id}`}
       >
