@@ -1411,6 +1411,20 @@ class TestWebStatusDisplayBranch(BaseTestWeb):
                     # 'per-branch: true' is configured for all gate queues
                     self.assertEqual(q['branch'], 'master')
 
+    def test_web_status_no_empty_queues(self):
+        "Test that we the status JSON doesn't contain empty change queues"
+        self.executor_server.hold_jobs_in_build = False
+
+        # Run some builds so the change queues are used
+        self.add_changes()
+        self.waitUntilSettled()
+
+        resp = self.get_url("api/tenant/tenant-one/status")
+        data = resp.json()
+        for p in data['pipelines']:
+            if p['name'] == 'gate':
+                self.assertEqual([], p['change_queues'])
+
 
 class TestWebMultiTenant(BaseTestWeb):
     tenant_config_file = 'config/multi-tenant/main.yaml'
