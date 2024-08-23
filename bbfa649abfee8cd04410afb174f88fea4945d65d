@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0eeeb6c0_9f9d2788",
+        "filename": "zuul/ansible/schema.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-08-23T07:07:07Z",
+      "side": 1,
+      "message": "IANAL, but can we license the same file GPL and Apache 2.0?",
+      "revId": "bbfa649abfee8cd04410afb174f88fea4945d65d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
