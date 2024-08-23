@@ -5565,10 +5565,24 @@ class QueueItem(zkobject.ZKObject):
 
         data = obj._trySerialize(context)
         obj._save(context, data, create=True)
-        # Skip the initial merge for branch/ref items as we don't need it in
-        # order to build a job graph. The merger items will be included as
-        # part of the extra repo state if there are jobs to run.
-        should_merge = any(isinstance(o, (Change, Tag)) for o in obj.changes)
+
+        if any(isinstance(o, Change) for o in obj.changes):
+            # If the change doesn't update the config we can skip the
+            # initial merge as the item will use the fallback layout
+            # for freezing the job graph. The merger items will be
+            # included as part of the extra repo state if there are
+            # jobs to run.
+            should_merge = obj.updatesConfig()
+        elif any(isinstance(o, Tag) for o in obj.changes):
+            # We always need the containing branches in order to freeze
+            # the job graph.
+            should_merge = True
+        else:
+            # Skip the initial merge for branch/ref items as we don't
+            # need it in order to build a job graph. The merger items
+            # will be included as part of the extra repo state if there
+            # are jobs to run.
+            should_merge = False
         merge_state = (BuildSet.NEW if should_merge else BuildSet.COMPLETE)
         should_files = any(o.files is None for o in obj.changes)
         files_state = (BuildSet.NEW if should_files else BuildSet.COMPLETE)
