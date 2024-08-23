@@ -129,7 +129,7 @@ function BranchIcon({ item }) {
 
   return (
     <Tooltip content={reason} position="bottom">
-      <Icon />
+      <Icon color={iconConfig.color}/>
     </Tooltip>
   )
 }
