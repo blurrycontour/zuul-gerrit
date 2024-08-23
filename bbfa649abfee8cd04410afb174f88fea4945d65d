@@ -16,6 +16,41 @@
       "message": "IANAL, but can we license the same file GPL and Apache 2.0?",
       "revId": "bbfa649abfee8cd04410afb174f88fea4945d65d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a8bfc0a_d96f18b8",
+        "filename": "zuul/ansible/schema.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-23T13:35:23Z",
+      "side": 1,
+      "message": "Background:\nhttps://www.apache.org/licenses/GPL-compatibility.html\n\nThis situation is essentially 2.2 of https://softwarefreedom.org/resources/2007/gpl-non-gpl-collaboration.html",
+      "parentUuid": "0eeeb6c0_9f9d2788",
+      "revId": "bbfa649abfee8cd04410afb174f88fea4945d65d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34a3da12_0efbb977",
+        "filename": "zuul/ansible/schema.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-23T13:35:23Z",
+      "side": 1,
+      "message": "I can probably make that more clear by adding the suggested text here:\n\n\u003e This file incorporates work covered by the following copyright and  \n\u003e permission notice:",
+      "revId": "bbfa649abfee8cd04410afb174f88fea4945d65d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
