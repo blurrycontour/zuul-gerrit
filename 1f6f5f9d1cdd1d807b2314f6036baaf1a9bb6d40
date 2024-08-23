@@ -335,6 +335,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87fa0fac_afba6b0a",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-23T08:17:54Z",
+      "side": 1,
+      "message": "It\u0027s fixed directly in this change. Instead of directly setting a color here, I\u0027ve added a CSS class `zuul-pipeline-link`. This class gets different colors applied based on the selected theme.\n- light/default: https://review.opendev.org/c/zuul/zuul/+/916287/9..13/web/src/index.css#236\n- dark mode: https://review.opendev.org/c/zuul/zuul/+/916287/9..13/web/src/index.css#774",
+      "parentUuid": "42c9287c_c3e31982",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5764d5ec_d547da8c",
