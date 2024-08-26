@@ -87,6 +87,24 @@
       "parentUuid": "c51a3431_ceb762f5",
       "revId": "de464e860ce0dbc8861e24582818163146bc571b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f199b97_02e72f0f",
+        "filename": "web/src/index.css",
+        "patchSetId": 9
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-26T20:27:55Z",
+      "side": 1,
+      "message": "You may want to calibrate your displays if they\u0027re producing very different values.  I don\u0027t think I would assume that most monitors match your external monitor and design for that.  Based on Apple\u0027s track record, if you don\u0027t have a calibrated display, your best best is to go with your mackbook.",
+      "parentUuid": "ec6a597b_4f76ad89",
+      "revId": "de464e860ce0dbc8861e24582818163146bc571b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
