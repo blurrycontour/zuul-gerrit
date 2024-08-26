@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7825f42f_5d200020",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 6210,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-26T21:28:36Z",
+      "side": 1,
+      "message": "In the malformed cases we\u0027re still returning success because the returnData call above occurs outside of the fake build system in the test suite?",
+      "revId": "a1890f5ab2098d131f5aa78a741d257f42842cf4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "731ccabc_785ee828",
+        "filename": "zuul/lib/result_data.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-08-26T21:28:36Z",
+      "side": 1,
+      "message": "We\u0027ve licensed zuul.ansible.schema as GPLv3 while referring to the original license in this file that it was adopted from. Generally I think that is ok except possibly for the import here. The ansible stuff is GPLv3 since ansible is but that is largely isolated from zuul proper via forking new processes rather than linking. Here we import.\n\nThere is one other place we do that: zuul.ansible.logconfig but that file is licensed Apache v2 (which sort of autopromotes to GPLv3 via compatibility in licenses that direction when ansible imports it?)\n\nI won\u0027t claim to be a lawyer but continuing what we do for zuul.ansible.logconfig with zuul.ansible.schema makes sense to me. Particularly since it originated from here with that license.",
+      "revId": "a1890f5ab2098d131f5aa78a741d257f42842cf4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
