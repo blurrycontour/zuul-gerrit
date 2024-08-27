@@ -2298,8 +2298,8 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
 
     class State(StrEnum):
         REQUESTED = "requested"
-        BUILDING = "building"
         READY = "ready"
+        BUILDING = "building"
         FAILED = "failed"
         IN_USE = "in-use"
         USED = "used"
@@ -2308,6 +2308,18 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
     FINAL_STATES = (
         State.READY,
         State.FAILED,
+    )
+
+    CREATE_STATES = (
+        State.REQUESTED,
+        State.BUILDING,
+    )
+
+    LAUNCHER_STATES = (
+        State.REQUESTED,
+        State.BUILDING,
+        State.FAILED,
+        State.USED,
     )
 
     ROOT = "/zuul/nodes"
