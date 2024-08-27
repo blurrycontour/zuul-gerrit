@@ -465,15 +465,37 @@ a.refresh {
 .zuul-progress-animated div.pf-c-progress__bar {
     width: 100px;
     height: 24px;
+    background-color: var(--pf-global--palette--blue-50);
+}
+
+.zuul-progress-animated div.pf-c-progress__bar:after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
     background-image: linear-gradient(
-        -45deg,
-        rgba(3,3,3,.15) 25%, rgba(3,3,3,.15) 26%, transparent 27%, transparent 49%,
-        rgba(3,3,3,.15) 50%, rgba(3,3,3,.15) 51%,transparent 52%,transparent 74%,
-        rgba(3,3,3,.15) 75%,rgba(3,3,3,.15) 76%,transparent 77%
+      -45deg,
+      rgba(255, 255, 255, .2) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, .2) 50%,
+      rgba(255, 255, 255, .2) 75%,
+      transparent 75%,
+      transparent
     );
-    background-size: 40px 40px;
-    -webkit-animation: progress-bar-stripes 1s linear infinite;
-    animation: progress-bar-stripes 1s linear infinite;
+    z-index: 1;
+    background-size: 50px 50px;
+    animation: move 2s linear infinite;
+    overflow: hidden;
+}
+
+/* Keyframes are needed to make the progress bar animation work in Chrome */
+@keyframes move {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 50px 50px;
+    }
 }
 
 /* Hide red cross icon next to a failing PF4 progress bar for pre-fail jobs */
@@ -937,11 +959,23 @@ details.foldable[open] summary::before {
     background-color: var(--pf-global--palette--black-500);
 }
 
+.pf-theme-dark .zuul-progress-animated {
+    --pf-c-progress__bar--before--BackgroundColor: unset;
+}
+
 .pf-theme-dark .zuul-progress-animated div.pf-c-progress__bar {
+    background-color: var(--pf-global--palette--black-500);
+}
+
+.pf-theme-dark .zuul-progress-animated div.pf-c-progress__bar:after {
     background-image: linear-gradient(
-        -45deg,
-        rgba(254,254,254,.30) 25%, rgba(254,254,254,.30) 26%, transparent 27%, transparent 49%,
-        rgba(254,254,254,.30) 50%, rgba(254,254,254,.30) 51%,transparent 52%,transparent 74%,
-        rgba(254,254,254,.30) 75%,rgba(254,254,254,.30) 76%,transparent 77%
+      -45deg,
+      rgba(255, 255, 255, .07) 25%,
+      transparent 25%,
+      transparent 50%,
+      rgba(255, 255, 255, .07) 50%,
+      rgba(255, 255, 255, .07) 75%,
+      transparent 75%,
+      transparent
     );
 }
