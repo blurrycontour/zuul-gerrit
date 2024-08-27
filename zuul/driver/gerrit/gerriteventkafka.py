@@ -37,7 +37,7 @@ class GerritKafkaEventListener:
         kafka_config = {
             'bootstrap.servers': bs,
         }
-        kafka_config['client_id'] = connection_config.get(
+        kafka_config['client.id'] = connection_config.get(
             'kafka_client_id', 'zuul')
         kafka_config['group.id'] = connection_config.get(
             'kafka_group_id', 'zuul')
