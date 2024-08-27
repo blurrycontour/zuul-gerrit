@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "554bed30_03eb1c72",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-27T16:17:26Z",
+      "side": 1,
+      "message": "This should have a tooltip.\n\nDepending on what we think the purpose of the single-change status page is (it might be to share the link with someone else, or it might be to let the user focus on only their change), that may affect what we want the tooltip to say.\n\nAlso, we have an existing pattern of providing shareabel deep-links to things: the console log items have a \"permalink\".  The tooltip for that is \"permalink\" and the icon is a chain.  But in those cases, we are providing a link that, when shared, will show exactly the view the user currently sees.  So I think it may be a good thing we don\u0027t use that icon here.\n\nAll things considered, maybe we should use something like \"View individual queue item\" as the tooltip.",
+      "revId": "cd539375affbe0cd3e0b64a372dc7cce0529f9be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
