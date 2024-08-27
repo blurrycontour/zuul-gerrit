@@ -231,6 +231,25 @@ a.refresh {
     padding: 0 16px 16px 16px;
 }
 
+.pf-c-card.zuul-compact-card .pf-c-card__actions {
+    margin-right: 0;
+}
+
+.pf-c-card.zuul-compact-card .pf-c-card__actions > * + * {
+    margin-left: 0;
+}
+
+.pf-c-card.zuul-compact-card .pf-c-card__actions .zuul-share-link {
+    padding: 0;
+    width: 28px;
+    height: 36px;
+}
+
+.pf-c-card.zuul-compact-card .pf-c-card__actions .zuul-admin-dropdown {
+    margin-right: 4px;
+    width: 28px;
+}
+
 /* TODO (felix): Could we put every title within a compact header and
    remove this css rule? */
 .pf-c-card.zuul-compact-card .pf-c-card__header .pf-c-card__title {
