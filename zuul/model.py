@@ -2310,6 +2310,18 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
         State.FAILED,
     )
 
+    CREATE_STATES = (
+        State.REQUESTED,
+        State.BUILDING,
+    )
+
+    LAUNCHER_STATES = (
+        State.REQUESTED,
+        State.BUILDING,
+        State.FAILED,
+        State.USED,
+    )
+
     ROOT = "/zuul/nodes"
     NODES_PATH = "nodes"
     LOCKS_PATH = "locks"
