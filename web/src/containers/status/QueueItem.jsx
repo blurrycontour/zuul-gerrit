@@ -14,6 +14,7 @@
 
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import { useHistory, useLocation } from 'react-router-dom'
 import { connect, useDispatch } from 'react-redux'
 
 import {
@@ -31,6 +32,7 @@ import {
   DataListToggle,
   Dropdown,
   DropdownItem,
+  DropdownToggle,
   ExpandableSection,
   KebabToggle,
   Modal,
@@ -39,6 +41,7 @@ import {
 import {
   AngleDoubleUpIcon,
   BanIcon,
+  SearchPlusIcon,
 } from '@patternfly/react-icons'
 
 import {
@@ -56,6 +59,110 @@ import { dequeue, dequeue_ref, promote } from '../../api'
 import { addDequeueError, addPromoteError } from '../../actions/adminActions'
 import { addNotification } from '../../actions/notifications'
 import { fetchStatusIfNeeded } from '../../actions/status'
+
+function FilterDropdown({ item, pipeline }) {
+  const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false)
+
+  const history = useHistory()
+  const location = useLocation()
+  const ref = getRefs(item)[0]
+
+  const onFilterDropdownSelect = () => {
+    setIsFilterDropdownOpen(!isFilterDropdownOpen)
+  }
+
+  const onSelect = () => {
+    setIsFilterDropdownOpen(false)
+  }
+
+  const applyFilters = (filters) => {
+    history.push({
+      pathname: location.pathname,
+      search: filters.toString(),
+    })
+  }
+
+  const filterChange = () => {
+    const filterParams = new URLSearchParams('')
+    filterParams.append('change', ref.id || ref.ref)
+    applyFilters(filterParams)
+  }
+
+  const filterProject = () => {
+    const filterParams = new URLSearchParams('')
+    filterParams.append('project', ref.project)
+    applyFilters(filterParams)
+  }
+
+  const filterItem = () => {
+    const filterParams = new URLSearchParams('')
+    filterParams.append('change', ref.id || ref.ref)
+    filterParams.append('pipeline', pipeline.name)
+    applyFilters(filterParams)
+  }
+
+  // Using the full ref.id to display the helper text could break the
+  // layout of the Dropdown. This seems to be only an issue for Github
+  // changes, as the ref.if contains the full SHA. To prevent this,
+  // only display the PR number in this case. This is a very simplified
+  // version of the formatting we do in the ChangeLink component in
+  // containers/status/Misc.jsx.
+  let changeText = ref.id || ref.ref
+  let githubId = changeText.match(/^([0-9]+),([0-9a-f]{40})$/)
+  if (githubId) {
+    changeText = '#' + githubId[1]
+  }
+
+  const filterDropdownItems = [
+    <DropdownItem
+      key="filter-change"
+      description={`Filter change: ${changeText}`}
+      onClick={() => filterChange()}
+    >
+      Filter by change
+    </DropdownItem>,
+    <DropdownItem
+      key="filter-project"
+      description={`Filter project: ${ref.project}`}
+      onClick={() => filterProject()}
+    >
+      Filter by project
+    </DropdownItem>,
+    <DropdownItem
+      key="filter-item"
+      description={`Filter item: ${changeText} in ${pipeline.name}`}
+      onClick={() => filterItem()}
+    >
+      Filter by item
+    </DropdownItem>
+  ]
+
+  return (
+    <Dropdown
+      className="zuul-change-filter-dropdown"
+      position="right"
+      onSelect={onSelect}
+      toggle={
+        <DropdownToggle
+          toggleIndicator={null}
+          onToggle={onFilterDropdownSelect}
+          aria-label="Change filters"
+          id={`toggle-change-filters-${ref.id || ref.ref}`}
+        >
+          <SearchPlusIcon />
+        </DropdownToggle>
+      }
+      isOpen={isFilterDropdownOpen}
+      isPlain
+      dropdownItems={filterDropdownItems}
+    />
+  )
+}
+
+FilterDropdown.propTypes = {
+  item: PropTypes.object.isRequired,
+  pipeline: PropTypes.object.isRequired,
+}
 
 function JobRow({ job, idx, tenant, job_times, className }) {
   return (
@@ -365,17 +472,19 @@ function QueueItem({ item, pipeline, tenant, user, jobsExpanded }) {
     <>
       <Card isCompact className={`zuul-compact-card ${item.live === true ? 'zuul-queue-item' : ''}`}>
         <CardHeader>
-          {item.live === true && user.isAdmin && user.scope.indexOf(tenant.name) !== -1 ?
+          {item.live === true ?
             <CardActions>
-              <Dropdown
-                onSelect={onSelect}
-                toggle={<KebabToggle onToggle={setIsAdminActionsOpen} />}
-                isOpen={isAdminActionsOpen}
-                isPlain
-                dropdownItems={adminActions}
-                position={'right'}
-                style={{ width: '28px' }}
-              />
+              <FilterDropdown item={item} pipeline={pipeline} />
+              {user.isAdmin && user.scope.indexOf(tenant.name) !== -1 ?
+                <Dropdown
+                  className="zuul-admin-dropdown"
+                  onSelect={onSelect}
+                  toggle={<KebabToggle onToggle={setIsAdminActionsOpen} />}
+                  isOpen={isAdminActionsOpen}
+                  isPlain
+                  dropdownItems={adminActions}
+                  position="right"
+                /> : ''}
             </CardActions>
             : ''}
           <CardTitle>
