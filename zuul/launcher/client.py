@@ -139,6 +139,7 @@ class LauncherClient:
                 with self.createZKContext(provider_node._lock, log) as ctx:
                     provider_node.updateAttributes(
                         ctx, state=ProviderNode.State.USED)
+                log.debug("Released %s", provider_node)
             except Exception:
                 log.exception("Unable to return node %s", provider_node)
             finally:

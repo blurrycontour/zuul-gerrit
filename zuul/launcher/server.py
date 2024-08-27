@@ -377,43 +377,43 @@ class Launcher:
         for node in self.api.getMatchingProviderNodes():
             log = get_annotated_logger(self.log, node, request=node.request_id)
             if not node.hasLock():
-                if node.state in node.FINAL_STATES:
+                if node.is_locked:
                     continue
+
+                # There is an associated nodeset request and we can't advance
+                # the node state.
+                if (self.api.getNodesetRequest(node.request_id)
+                        and node.state not in node.LAUNCHER_STATES):
+                    continue
+
                 if not node.acquireLock(self.zk_client, blocking=False):
                     log.debug("Failed to lock matching node %s", node)
                     continue
-            try:
-                if node.state == model.ProviderNode.State.REQUESTED:
-                    self._buildNode(node, log)
-                if node.state == model.ProviderNode.State.BUILDING:
-                    self._checkNode(node, log)
-            except ProviderNodeError as err:
-                state = model.ProviderNode.State.FAILED
-                log.exception("Marking node %s as %s: %s", node,
-                              state, err)
-                with self.createZKContext(node._lock, self.log) as ctx:
-                    node.updateAttributes(ctx, state=state)
 
-            if node.state in node.FINAL_STATES:
-                node.releaseLock()
+            if request := self.api.getNodesetRequest(node.request_id):
+                try:
+                    if node.state in node.CREATE_STATES:
+                        self._checkNode(node, log)
+                    if node.state == model.ProviderNode.State.READY:
+                        node.releaseLock()
+                except ProviderNodeError as err:
+                    state = model.ProviderNode.State.FAILED
+                    log.exception("Marking node %s as %s: %s", node,
+                                  state, err)
+                    with self.createZKContext(node._lock, self.log) as ctx:
+                        node.updateAttributes(ctx, state=state)
 
-    def _buildNode(self, node, log):
-        log.debug("Building node %s", node)
-        provider = self._getProvider(node.tenant_name, node.provider)
-        with self.createZKContext(node._lock, self.log) as ctx:
-            with node.activeContext(ctx):
-                # TODO: this may be provided by Zuul once image
-                # uploads are supported
-                image_external_id = None
-                node.create_state_machine = provider.getCreateStateMachine(
-                    node, image_external_id, log)
-                node.state = model.ProviderNode.State.BUILDING
+            # TODO: implement node re-use
+            # * deallocate from request here
+            # * re-allocated similar to min-ready
+            if not request or node.state in node.State.FAILED:
+                self._cleanupNode(node, log)
 
     def _checkNode(self, node, log):
-        log.debug("Checking node %s", node)
         with self.createZKContext(node._lock, self.log) as ctx:
             with node.activeContext(ctx):
                 if not node.create_state_machine:
+                    log.debug("Building node %s", node)
                     provider = self._getProvider(
                         node.tenant_name, node.provider)
                     # TODO: this may be provided by Zuul once image
@@ -422,6 +422,7 @@ class Launcher:
                     node.create_state_machine = provider.getCreateStateMachine(
                         node, image_external_id, log)
 
+                log.debug("Checking node %s", node)
                 node.create_state_machine.advance()
                 if not node.create_state_machine.complete:
                     self.wake_event.set()
@@ -429,6 +430,28 @@ class Launcher:
                 node.state = model.ProviderNode.State.READY
                 log.debug("Marking node %s as %s", node, node.state)
         node.releaseLock()
+
+    def _cleanupNode(self, node, log):
+        with self.createZKContext(node._lock, self.log) as ctx:
+            with node.activeContext(ctx):
+                if not node.delete_state_machine:
+                    log.debug("Cleaning up node %s", node)
+                    provider = self._getProvider(
+                        node.tenant_name, node.provider)
+                    node.delete_state_machine = provider.getDeleteStateMachine(
+                        node, log)
+
+                log.debug("Checking node %s cleanup", node)
+                node.delete_state_machine.advance()
+
+            if not node.delete_state_machine.complete:
+                self.wake_event.set()
+                return
+
+            if not self.api.getNodesetRequest(node.request_id):
+                log.debug("Removing provider node %s", node)
+                node.delete(ctx)
+                node.releaseLock()
 
     def _getProvider(self, tenant_name, provider_name):
         for provider in self.tenant_providers[tenant_name]:
