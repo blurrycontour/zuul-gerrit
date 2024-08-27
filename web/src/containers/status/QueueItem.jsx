@@ -14,6 +14,7 @@
 
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import { Link, useLocation } from 'react-router-dom'
 import { connect, useDispatch } from 'react-redux'
 
 import {
@@ -35,10 +36,12 @@ import {
   KebabToggle,
   Modal,
   ModalVariant,
+  Tooltip,
 } from '@patternfly/react-core'
 import {
   AngleDoubleUpIcon,
   BanIcon,
+  FilterIcon,
 } from '@patternfly/react-icons'
 
 import {
@@ -63,6 +66,8 @@ function QueueItem({ item, pipeline, tenant, user, jobsExpanded }) {
   const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false)
   const [isJobsExpanded, setIsJobsExpanded] = useState(jobsExpanded)
   const [isSkippedJobsExpanded, setIsSkippedJobsExpanded] = useState(false)
+
+  const location = useLocation()
 
   const skippedjobs = item.jobs.filter(j => getJobStrResult(j) === 'skipped')
   const jobs = item.jobs.filter(j => getJobStrResult(j) !== 'skipped')
@@ -305,21 +310,36 @@ function QueueItem({ item, pipeline, tenant, user, jobsExpanded }) {
     )
   }
 
+  // TODO (felix): Also add queue to filter if the queue has a name
+
+  const ref = getRefs(item)[0]
+  const filterParams = new URLSearchParams('')
+  filterParams.append('change', ref.id || ref.ref)
+  filterParams.append('pipeline', pipeline.name)
+  filterParams.append('project', ref.project)
   return (
     <>
       <Card isCompact className={`zuul-compact-card ${item.live === true ? 'zuul-queue-item' : ''}`}>
         <CardHeader>
-          {item.live === true && user.isAdmin && user.scope.indexOf(tenant.name) !== -1 ?
+          {item.live === true ?
             <CardActions>
-              <Dropdown
-                onSelect={onSelect}
-                toggle={<KebabToggle onToggle={setIsAdminActionsOpen} />}
-                isOpen={isAdminActionsOpen}
-                isPlain
-                dropdownItems={adminActions}
-                position={'right'}
-                style={{ width: '28px' }}
-              />
+              <Tooltip content="Filter for this change">
+                <Button className="zuul-filter-link" variant="plain">
+                  <Link style={{ color: 'unset' }} to={`${location.pathname}?${filterParams.toString()}`}>
+                    <FilterIcon />
+                  </Link>
+                </Button>
+              </Tooltip>
+              {user.isAdmin && user.scope.indexOf(tenant.name) !== -1 ?
+                <Dropdown
+                  className="zuul-admin-dropdown"
+                  onSelect={onSelect}
+                  toggle={<KebabToggle onToggle={setIsAdminActionsOpen} />}
+                  isOpen={isAdminActionsOpen}
+                  isPlain
+                  dropdownItems={adminActions}
+                  position={'right'}
+                /> : ''}
             </CardActions>
             : ''}
           <CardTitle>
