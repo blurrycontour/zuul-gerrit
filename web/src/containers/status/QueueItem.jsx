@@ -14,6 +14,7 @@
 
 import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
+import { Link } from 'react-router-dom'
 import { connect, useDispatch } from 'react-redux'
 
 import {
@@ -39,6 +40,7 @@ import {
 import {
   AngleDoubleUpIcon,
   BanIcon,
+  ShareIcon,
 } from '@patternfly/react-icons'
 
 import {
@@ -309,17 +311,23 @@ function QueueItem({ item, pipeline, tenant, user, jobsExpanded }) {
     <>
       <Card isCompact className={`zuul-compact-card ${item.live === true ? 'zuul-queue-item' : ''}`}>
         <CardHeader>
-          {item.live === true && user.isAdmin && user.scope.indexOf(tenant.name) !== -1 ?
+          {item.live === true ?
             <CardActions>
-              <Dropdown
-                onSelect={onSelect}
-                toggle={<KebabToggle onToggle={setIsAdminActionsOpen} />}
-                isOpen={isAdminActionsOpen}
-                isPlain
-                dropdownItems={adminActions}
-                position={'right'}
-                style={{ width: '28px' }}
-              />
+              <Button className="zuul-share-link" variant="plain">
+                <Link style={{ color: 'unset' }} to={tenant.linkPrefix + '/status/change/' + getRefs(item)[0].id}>
+                  <ShareIcon />
+                </Link>
+              </Button>
+              {user.isAdmin && user.scope.indexOf(tenant.name) !== -1 ?
+                <Dropdown
+                  className="zuul-admin-dropdown"
+                  onSelect={onSelect}
+                  toggle={<KebabToggle onToggle={setIsAdminActionsOpen} />}
+                  isOpen={isAdminActionsOpen}
+                  isPlain
+                  dropdownItems={adminActions}
+                  position={'right'}
+                /> : ''}
             </CardActions>
             : ''}
           <CardTitle>
