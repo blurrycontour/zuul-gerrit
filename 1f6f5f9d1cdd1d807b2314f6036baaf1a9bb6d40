@@ -195,6 +195,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "63f2549c_e251e32c",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-27T14:50:33Z",
+      "side": 1,
+      "message": "I played around with that a little, but in the end removing the percentage was the most straight-forward (and robust) solution.",
+      "parentUuid": "6f3c6899_3422efbd",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90995bf3_b6b6f17b",
