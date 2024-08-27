@@ -89,6 +89,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bebbac7d_43f0f10d",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-27T09:07:02Z",
+      "side": 1,
+      "message": "See answer in https://review.opendev.org/c/zuul/zuul/+/916287/comment/bc0612ba_c9eb0fa7/",
+      "parentUuid": "e88b2740_9c9646cc",
+      "revId": "89550b742cd52fc4f14db386746da97452fd110c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3d64598_451a5c08",

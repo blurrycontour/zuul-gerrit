@@ -405,6 +405,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5c25c8c_9d71be4b",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-27T09:07:02Z",
+      "side": 1,
+      "message": "I\u0027ll remove the details link and implement a follow-up change for the share icon/link.",
+      "parentUuid": "bc0612ba_c9eb0fa7",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8a14c2de_c9ff905a",
