@@ -105,6 +105,24 @@
       "parentUuid": "ec6a597b_4f76ad89",
       "revId": "de464e860ce0dbc8861e24582818163146bc571b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4ab775f_0aba68bc",
+        "filename": "web/src/index.css",
+        "patchSetId": 9
+      },
+      "lineNbr": 633,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-08-27T07:30:10Z",
+      "side": 1,
+      "message": "Going for 400/500 then.",
+      "parentUuid": "6f199b97_02e72f0f",
+      "revId": "de464e860ce0dbc8861e24582818163146bc571b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
