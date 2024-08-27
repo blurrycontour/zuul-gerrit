@@ -3945,8 +3945,7 @@ class ExecutorServer(BaseMergeServer):
                 self.merger.updateRepo(
                     task.connection_name, task.project_name,
                     repo_state=task.repo_state,
-                    zuul_event_id=task.zuul_event_id, build=task.build,
-                    process_worker=self.process_worker)
+                    zuul_event_id=task.zuul_event_id, build=task.build)
                 source = self.connections.getSource(task.connection_name)
                 project = source.getProject(task.project_name)
                 task.canonical_name = project.canonical_name
