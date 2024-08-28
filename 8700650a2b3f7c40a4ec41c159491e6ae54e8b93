@@ -33,6 +33,23 @@
       "message": "I\u0027d prefer TEXT, never underestimate an ability of CI team to come up with loooong job names 😮",
       "revId": "8700650a2b3f7c40a4ec41c159491e6ae54e8b93",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e387b24_0857d243",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-08-28T18:11:18Z",
+      "side": 1,
+      "message": "With regards to #2, this bug is triggered by the upload-log role which returns the full zuul_log_path, including the pipeline and job name. I guess we should change that, but it seems simpler to support url that are longer than 255 char.\n\nI\u0027ve added an upgrade note and changed the type to TEXT.",
+      "revId": "8700650a2b3f7c40a4ec41c159491e6ae54e8b93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
