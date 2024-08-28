@@ -16,6 +16,24 @@
       "message": "mobile view is not optimal, with many changes in a pipeline there is no line break while horizontal scroll is also not appearing. Generally right side margin is missing.",
       "revId": "719ba5078711c1f4c20731170bc7d03c1c7db3cc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70a77120_377fe168",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-28T21:42:10Z",
+      "side": 1,
+      "message": "I\u0027m not sure if the first part of that still applies, but I think the second did as of patchset 10.\n\nhttps://imgur.com/a/gecKv4Z\n\nIt looks like it\u0027s fixed in PS 11.",
+      "parentUuid": "3cd8969b_2344b3a3",
+      "revId": "719ba5078711c1f4c20731170bc7d03c1c7db3cc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
