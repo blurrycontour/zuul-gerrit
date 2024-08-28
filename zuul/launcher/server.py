@@ -273,10 +273,11 @@ class Launcher:
                         self._checkNode(node, log)
                     if node.state == model.ProviderNode.State.READY:
                         node.releaseLock()
-                except ProviderNodeError as err:
+                # TODO: check which errors are recoverable or can be
+                # retried (state machine level).
+                except Exception:
                     state = model.ProviderNode.State.FAILED
-                    log.exception("Marking node %s as %s: %s", node,
-                                  state, err)
+                    log.exception("Marking node %s as %s", node, state)
                     with self.createZKContext(node._lock, self.log) as ctx:
                         node.updateAttributes(ctx, state=state)
 
