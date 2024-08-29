@@ -50,6 +50,24 @@
       "message": "With regards to #2, this bug is triggered by the upload-log role which returns the full zuul_log_path, including the pipeline and job name. I guess we should change that, but it seems simpler to support url that are longer than 255 char.\n\nI\u0027ve added an upgrade note and changed the type to TEXT.",
       "revId": "8700650a2b3f7c40a4ec41c159491e6ae54e8b93",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de00217c_f1eaa458",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-29T22:10:45Z",
+      "side": 1,
+      "message": "To me, that seems the easier thing to fix.  As I mentioned in my other comment, I don\u0027t think there\u0027s a compelling reason to include the job name any more.  A good modern construction for a log url would be:\n\n  https://ZUUL_UUID.example.com/TENANT/BUILD_UUID\n\nWhere ZUUL_UUID is a unique bucket for the system, then we put the tenant in there just as an extra safety in case the BUILD_UUID ends up not being unique we don\u0027t leak builds across tenants.  Then the BUILD_UUID (which should be unique unless uuid4 fails).\n\nThe 3 uuids take up 96 chars, leaving plenty for everything else.\n\nThis has the following advantages:\n\n* It simplifies the upload-log role\n* It simplifies the storage scheme which can be useful when performing maintenance on old build storage (pruning or searching)\n* It reduces the size of URLs which makes them easier to use and share\n* Most important: it avoids what will be a massive schema migration for many Zuul users (opendev included).\n\nIn an ideal world, I\u0027d say we should change the role now, put in a check to raise an error if the log url is \u003e 255 chars, then next time we have a schema migration that touches the build table, if we still want to do this on general principle (on its own merits) we do it then.\n\nBecause this is such an edge case, I feel like that would be the best overall allocation of resources.",
+      "parentUuid": "6e387b24_0857d243",
+      "revId": "8700650a2b3f7c40a4ec41c159491e6ae54e8b93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
