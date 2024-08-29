@@ -16,6 +16,24 @@
       "message": "The old status page had a memory for this toggle, so if a user preferred always seeing the jobs, they wouldn\u0027t have to click it every time.  That may be important for some smaller installations.\n\nShould we do one or more of the following?\n\n1) Set this in the redux store so it\u0027s global (that would mean we wouldn\u0027t need to plumb it through all the different layers).  That would make it persist through the session and on all the different pipeline pages.\n\n2) Store that value in persistent storage so that it is retained across sessions?\n\nMy inclination would be to do both of those, but I\u0027m open to other ideas.",
       "revId": "0366d7761878aed824963ad2b467ba22430eb3be",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5d1c6db_8151a1a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 31083
+      },
+      "writtenOn": "2024-08-29T07:51:23Z",
+      "side": 1,
+      "message": "Persisting the state in localStorage to keep it across sessions is done in PS7. What I didn\u0027t do is moving this to the redux store. I feel passing this as props and reacting to prop changes is a more natural thing than having this in a global state.\n\nI also added 927385 to the stack, which persists the \"Show all pipelines\" state of the PipelineOverview page.",
+      "parentUuid": "dc223a00_a8213d06",
+      "revId": "0366d7761878aed824963ad2b467ba22430eb3be",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
