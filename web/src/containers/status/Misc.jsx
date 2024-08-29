@@ -329,6 +329,7 @@ function QueueItemProgressbar({ item, darkMode }) {
           case 'retry_limit':
           case 'post_failure':
           case 'node_failure':
+          case 'canceled':
             className = ' progress-bar-warning'
             break
           case 'paused':
