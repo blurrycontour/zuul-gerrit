@@ -278,7 +278,7 @@ class ItemPanel extends React.Component {
             {item.live === true ? (
               <div className='row'>
                 <div className='col-xs-6'>
-                  <QueueItemProgressbar item={item} darkMode={this.props.preferences.darkMode} />
+                  <QueueItemProgressbar item={item} />
                 </div>
                 <div className='col-xs-6 text-right'>
                   {this.renderTimer(item, times)}
