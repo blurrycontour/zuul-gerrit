@@ -87,7 +87,6 @@ class BaseComponent(ZooKeeperBase):
         super().__init__(client)
 
         self.path = None
-        self._zstat = None
         self.register_lock = threading.Lock()
 
     def __getattr__(self, name):
@@ -116,10 +115,7 @@ class BaseComponent(ZooKeeperBase):
             # Update the ZooKeeper node
             content = json.dumps(self.content, sort_keys=True).encode("utf-8")
             try:
-                zstat = self.kazoo_client.set(
-                    self.path, content, version=self._zstat.version
-                )
-                self._zstat = zstat
+                self.kazoo_client.set(self.path, content)
             except NoNodeError:
                 self.log.error("Could not update %s in ZooKeeper", self)
 
@@ -128,15 +124,12 @@ class BaseComponent(ZooKeeperBase):
         with self.register_lock:
             path = "/".join([COMPONENTS_ROOT, self.kind, self.hostname])
             self.log.info("Registering component in ZooKeeper %s", path)
-            self.path, self._zstat = self.kazoo_client.create(
+            self.path = self.kazoo_client.create(
                 path,
                 json.dumps(self.content, sort_keys=True).encode("utf-8"),
                 makepath=True,
                 ephemeral=True,
                 sequence=True,
-                # Also return the zstat, which is necessary to successfully
-                # update the component.
-                include_data=True,
             )
 
     def _onReconnect(self):
