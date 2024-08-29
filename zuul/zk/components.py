@@ -17,7 +17,7 @@ import logging
 import threading
 from collections import defaultdict
 
-from kazoo.exceptions import NoNodeError
+from kazoo.exceptions import BadVersionError, NoNodeError, ZookeeperError
 from kazoo.protocol.states import EventType
 
 from zuul.zk import ZooKeeperBase
@@ -113,15 +113,26 @@ class BaseComponent(ZooKeeperBase):
                 )
                 return
 
+            if self._zstat:
+                version = self._zstat.version
+            else:
+                version = -1
+
             # Update the ZooKeeper node
             content = json.dumps(self.content, sort_keys=True).encode("utf-8")
             try:
-                zstat = self.kazoo_client.set(
-                    self.path, content, version=self._zstat.version
-                )
-                self._zstat = zstat
+                self._zstat = self.kazoo_client.set(
+                    self.path, content, version=version)
             except NoNodeError:
                 self.log.error("Could not update %s in ZooKeeper", self)
+            except BadVersionError:
+                raise
+            except ZookeeperError:
+                self.log.error("Error updating %s in ZooKeeper", self)
+                # Reset the zstat to not block future updates, as the
+                # operation could have succeeded,
+                self._zstat = None
+                raise
 
     def register(self, model_api=MODEL_API):
         self.content['model_api'] = model_api
