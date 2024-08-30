@@ -16,6 +16,24 @@
       "message": "\u003e I really like this change; I think it\u0027s a big improvement for the use case of \"watch my change as it progresses through the system\".\n\nI\u0027m glad that you like this change. Although this wasn\u0027t my original intention I thought the same playing around with it.\n\n\u003e I think there\u0027s a mismatch between what the tooltip says and what the change does. The tooltip says \"Filter for this change\" but the actual filter is \"Filter for this change and this project in this pipeline\".\n\nYep, that thought also crossed my mind afterwards. Originally, I only filtered for the change ID, but then I thought if somebody wants to filter for eg. refs/heads/master in a periodic pipeline, that might return multiple changes in different periodic pipelines. So I started to filter also for pipeline and project.\n\nThanks for comparison with the config-errors page. To be honest I wasn\u0027t aware that we do any kind of filtering on that page. With that in mind I think it makes total sense to use the search-plus icon also for the status page. Regarding the different use cases, I don\u0027t have a strong opinion on either of them. However, since my original idea was to only filter for the change id, it might make sense to stick to this. If the filter is not enough, a user could add additional ones or just click on the pipeline (as you also mentioned).\n\nAdding the popup sounds reasonable to me, so we allow for different options to be selected.\n\nA final thought on the config-error page: Instead of providing a single search-plus icon at the end of each row and showing a popup that allows each column to be selected, why don\u0027t we add one icon to each individual cell we allow filtering on. This would be similar to what Kibana does. To not spoil the table, we should only show those icons when the user hovers over the cell (which again is similar to what Kibana does). This would break the \"keeping both filtering mechanisms in sync\" idea, but it might improve the filtering on the config errors page a lot. This could also be be a mechanism we use in other tables (e.g. the buildset or builds table) as well, so users can easily filter for a specific job/result via a single click (if the value is available in the current view).",
       "revId": "836c94dd404ef6a4637986cf50b746d0231cea2e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b38e67f9_0173036e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-08-30T13:51:54Z",
+      "side": 1,
+      "message": "Good point about multiple periodic pipelines; users may want pipeline filtering in that case.\n\nRegarding the config-error page: we did in fact try adding the icon to each column in the table, and, as you expected, it looked terrible.  It was very difficult to read the table with all the icons in there.  We didn\u0027t try the hover idea you suggested though.  That may be worth trying, but we need to keep mobile use in mind.",
+      "parentUuid": "b9855342_350ad673",
+      "revId": "836c94dd404ef6a4637986cf50b746d0231cea2e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
