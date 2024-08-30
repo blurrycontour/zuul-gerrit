@@ -68,6 +68,42 @@
       "parentUuid": "6e387b24_0857d243",
       "revId": "8700650a2b3f7c40a4ec41c159491e6ae54e8b93",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c44ccacc_fd5427e7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-08-30T13:16:59Z",
+      "side": 1,
+      "message": "Thank you for the explanation, I didn\u0027t realize this would cause a massive migration. I am now convinced the scheme should be improved in zuul-jobs, here is the new fix: https://review.opendev.org/c/zuul/zuul-jobs/+/927582",
+      "parentUuid": "de00217c_f1eaa458",
+      "revId": "8700650a2b3f7c40a4ec41c159491e6ae54e8b93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1e210ca_a80cfc56",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-08-30T13:16:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9bff367f_9f6d854c",
+      "revId": "8700650a2b3f7c40a4ec41c159491e6ae54e8b93",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
