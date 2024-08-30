@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "0059a3b38d8241dac9cbdf984ed27049a07afcb7",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31a67aad_e41b40eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-08-30T16:04:13Z",
+      "side": 1,
+      "message": "I don\u0027t want to +2 since I don\u0027t know the javascript details, but I confirm the preview site for opendev is showing some nice runtime graphs",
+      "revId": "0059a3b38d8241dac9cbdf984ed27049a07afcb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40a55714_a96750d1",
+        "filename": "web/src/api.js",
+        "patchSetId": 7
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 13252
+      },
+      "writtenOn": "2024-08-30T16:04:13Z",
+      "side": 1,
+      "message": "nit: this should be between `fetchBuild` and `fetchBuilds` to keep the list properly ordered (upper case \u003c lower case in ASCII). or after `fetchBuildsets` if you do case-insensitive ordering",
+      "revId": "0059a3b38d8241dac9cbdf984ed27049a07afcb7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
