@@ -102,7 +102,8 @@ class UploadJob:
             futures = []
             for upload in acquired:
                 future = self.launcher.endpoint_upload_executor.submit(
-                    EndpointUploadJob(self.launcher, upload, path).run)
+                    EndpointUploadJob(self.launcher, self.image_build_artifact,
+                                      upload, path).run)
                 futures.append((upload, future))
             for upload, future in futures:
                 try:
@@ -125,8 +126,9 @@ class UploadJob:
 class EndpointUploadJob:
     log = logging.getLogger("zuul.Launcher")
 
-    def __init__(self, launcher, upload, path):
+    def __init__(self, launcher, artifact, upload, path):
         self.launcher = launcher
+        self.artifact = artifact
         self.upload = upload
         self.path = path
 
@@ -137,8 +139,23 @@ class EndpointUploadJob:
             self.log.exception("Error in endpoint upload job")
 
     def _run(self):
-        endpoint = self.launcher.endpoints[self.upload.endpoint_name]
-        external_id = endpoint.uploadImage(self.path)
+        # The upload has a list of providers with identical
+        # configurations.  Pick one of them as a representative.
+        provider_cname = self.upload.providers[0]
+        provider = self.launcher._getProviderByCanonicalName(provider_cname)
+        provider_image = None
+        for image in provider.images.values():
+            if image.canonical_name == self.upload.canonical_name:
+                provider_image = image
+        if provider_image is None:
+            raise Exception(
+                f"Unable to find image {self.upload.canonical_name}")
+
+        # TODO: add upload id, etc
+        metadata = {}
+        external_id = provider.uploadImage(
+            provider_image, self.path, self.artifact.format, metadata,
+            self.artifact.md5sum, self.artifact.sha256)
         with self.launcher.createZKContext(self.upload._lock, self.log) as ctx:
             self.upload.updateAttributes(
                 ctx,
@@ -415,9 +432,9 @@ class Launcher:
                     log.debug("Building node %s", node)
                     provider = self._getProvider(
                         node.tenant_name, node.provider)
-                    # TODO: this may be provided by Zuul once image
-                    # uploads are supported
-                    image_external_id = None
+                    image_external_id = self.getImageExternalId(node, provider)
+                    log.debug("Node %s external id %s",
+                              node, image_external_id)
                     node.create_state_machine = provider.getCreateStateMachine(
                         node, image_external_id, log)
 
@@ -458,6 +475,13 @@ class Launcher:
                 return provider
         raise ProviderNodeError(
             f"Unable to find {provider_name} in tenant {tenant_name}")
+
+    def _getProviderByCanonicalName(self, provider_cname):
+        for tenant_providers in self.tenant_providers.values():
+            for provider in tenant_providers:
+                if provider.canonical_name == provider_cname:
+                    return provider
+        raise Exception(f"Unable to find {provider_cname}")
 
     def start(self):
         self.log.debug("Starting command processor")
@@ -527,7 +551,7 @@ class Launcher:
                         self.connection_filter):
                         continue
                     endpoint = provider.getEndpoint()
-                    endpoints[endpoint.name] = endpoint
+                    endpoints[endpoint.canonical_name] = endpoint
             self.endpoints = endpoints
         return updated
 
@@ -633,3 +657,24 @@ class Launcher:
                 for chunk in resp.iter_content(chunk_size=1024 * 8):
                     f.write(chunk)
         return path
+
+    def getImageExternalId(self, node, provider):
+        label = provider.labels[node.label]
+        image = provider.images[label.image]
+        if image.type != 'zuul':
+            return None
+        image_cname = image.canonical_name
+        uploads = self.image_upload_registry.getUploadsForImage(image_cname)
+        # TODO: we could also check config hash here to start using an
+        # image that wasn't originally attached to this provider.
+        valid_uploads = [
+            upload for upload in uploads
+            if (provider.canonical_name in upload.providers and
+                upload.validated and
+                upload.external_id)
+        ]
+        if not valid_uploads:
+            raise Exception("No image found")
+        # Uploads are already sorted by timestamp
+        image_upload = valid_uploads[-1]
+        return image_upload.external_id
