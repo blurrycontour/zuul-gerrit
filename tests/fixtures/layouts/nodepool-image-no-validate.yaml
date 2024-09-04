@@ -49,6 +49,8 @@
     connection: aws
     boot-timeout: 120
     launch-timeout: 600
+    object-storage:
+      bucket-name: zuul
     flavors:
       - name: normal
         instance-type: t3.medium
