@@ -142,12 +142,19 @@
     image: debian
     flavor: normal
 
+- label:
+    name: debian-local-normal
+    image: debian-local
+    flavor: normal
+
 - section:
     name: aws-base
     abstract: true
     connection: aws
     boot-timeout: 120
     launch-timeout: 600
+    object-storage:
+      bucket-name: zuul
     flavors:
       - name: normal
         instance-type: t3.medium
@@ -168,4 +175,7 @@
     name: aws-us-east-1-main
     section: aws-us-east-1
     labels:
-      - debian-normal
+      - name: debian-normal
+        key-name: zuul
+      - name: debian-local-normal
+        key-name: zuul

@@ -26,6 +26,7 @@ import responses
 import testtools
 from kazoo.exceptions import NoNodeError
 from moto import mock_aws
+import boto3
 
 from tests.base import (
     ZuulTestCase,
@@ -49,6 +50,9 @@ class TestLauncher(ZuulTestCase):
                         'type': 'zuul_image',
                         'image_name': 'debian-local',
                         'format': 'raw',
+                        'sha256': ('d043e8080c82dbfeca3199a24d5f0193'
+                                   'e66755b5ba62d6b60107a248996a6795'),
+                        'md5sum': '78d2d3ff2463bc75c7cc1d38b8df6a6b',
                     }
                 }, {
                     'name': 'qcow2 image',
@@ -57,6 +61,9 @@ class TestLauncher(ZuulTestCase):
                         'type': 'zuul_image',
                         'image_name': 'debian-local',
                         'format': 'qcow2',
+                        'sha256': ('59984dd82f51edb3777b969739a92780'
+                                   'a520bb314b8d64b294d5de976bd8efb9'),
+                        'md5sum': '262278e1632567a907e4604e9edd2e83',
                     }
                 },
             ]
@@ -72,6 +79,9 @@ class TestLauncher(ZuulTestCase):
                         'type': 'zuul_image',
                         'image_name': 'ubuntu-local',
                         'format': 'raw',
+                        'sha256': ('d043e8080c82dbfeca3199a24d5f0193'
+                                   'e66755b5ba62d6b60107a248996a6795'),
+                        'md5sum': '78d2d3ff2463bc75c7cc1d38b8df6a6b',
                     }
                 }, {
                     'name': 'qcow2 image',
@@ -80,6 +90,9 @@ class TestLauncher(ZuulTestCase):
                         'type': 'zuul_image',
                         'image_name': 'ubuntu-local',
                         'format': 'qcow2',
+                        'sha256': ('59984dd82f51edb3777b969739a92780'
+                                   'a520bb314b8d64b294d5de976bd8efb9'),
+                        'md5sum': '262278e1632567a907e4604e9edd2e83',
                     }
                 },
             ]
@@ -100,6 +113,10 @@ class TestLauncher(ZuulTestCase):
             responses.GET,
             'http://example.com/image.qcow2',
             body="test qcow2 image")
+        self.s3 = boto3.resource('s3', region_name='us-west-2')
+        self.s3.create_bucket(
+            Bucket='zuul',
+            CreateBucketConfiguration={'LocationConstraint': 'us-west-2'})
         super().setUp()
 
     def tearDown(self):
@@ -390,6 +407,83 @@ class TestLauncher(ZuulTestCase):
         self.waitUntilSettled()
 
         for pnode in provider_nodes:
+            for _ in iterate_timeout(60, "node to be deleted"):
+                try:
+                    pnode.refresh(ctx)
+                except NoNodeError:
+                    break
+
+    @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        debian_return_data,
+    )
+    @return_data(
+        'build-ubuntu-local-image',
+        'refs/heads/master',
+        ubuntu_return_data,
+    )
+    # Use an existing image id since the upload methods aren't
+    # implemented in boto; the actualy upload process will be tested
+    # in test_aws_driver.
+    @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
+                return_value="ami-1e749f67")
+    def test_image_build_node_lifecycle(self, mock_uploadimage):
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+
+        for _ in iterate_timeout(60, "upload to complete"):
+            uploads = self.launcher.image_upload_registry.getUploadsForImage(
+                'review.example.com%2Forg%2Fcommon-config/debian-local')
+            self.assertEqual(1, len(uploads))
+            pending = [u for u in uploads if u.external_id is None]
+            if not pending:
+                break
+
+        nodeset = model.NodeSet()
+        nodeset.addNode(model.Node("node", "debian-local-normal"))
+
+        ctx = self.createZKContext(None)
+        request = self._requestNodes([n.label for n in nodeset.getNodes()])
+
+        client = LauncherClient(self.zk_client, None)
+        request = client.getRequest(request.uuid)
+
+        self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
+        self.assertEqual(len(request.provider_nodes), 1)
+
+        client.acceptNodeset(request, nodeset)
+        self.waitUntilSettled()
+
+        with testtools.ExpectedException(NoNodeError):
+            # Request should be gone
+            request.refresh(ctx)
+
+        for node in nodeset.getNodes():
+            pnode = node._provider_node
+            self.assertIsNotNone(pnode)
+            self.assertTrue(pnode.hasLock())
+
+        client.useNodeset(nodeset)
+        self.waitUntilSettled()
+
+        for node in nodeset.getNodes():
+            pnode = node._provider_node
+            self.assertTrue(pnode.hasLock())
+            self.assertTrue(pnode.state, pnode.State.IN_USE)
+
+        client.returnNodeset(nodeset)
+        self.waitUntilSettled()
+
+        for node in nodeset.getNodes():
+            pnode = node._provider_node
+            self.assertFalse(pnode.hasLock())
+            self.assertTrue(pnode.state, pnode.State.USED)
+
             for _ in iterate_timeout(60, "node to be deleted"):
                 try:
                     pnode.refresh(ctx)

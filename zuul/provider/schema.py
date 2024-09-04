@@ -56,6 +56,7 @@ common_image = vs.Schema({
 # section body).
 base_image = vs.Schema({
     Required('project_canonical_name'): str,
+    Required('config_hash'): str,
     Required('name'): str,
     Optional('description'): Nullable(str),
     Required('branch'): str,

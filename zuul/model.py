@@ -1476,6 +1476,8 @@ class ImageBuildArtifact(zkobject.LockableZKObject):
             build_tenant_name=None,  # For validation builds
             build_uuid=None,  # The UUID of the build job
             format=None,
+            md5sum=None,
+            sha256=None,
             url=None,
             timestamp=None,
             validated=None,
@@ -1497,6 +1499,8 @@ class ImageBuildArtifact(zkobject.LockableZKObject):
             build_tenant_name=self.build_tenant_name,
             build_uuid=self.build_uuid,
             format=self.format,
+            md5sum=self.md5sum,
+            sha256=self.sha256,
             url=self.url,
             timestamp=self.timestamp,
             validated=self.validated,
@@ -1516,6 +1520,8 @@ class ImageUpload(zkobject.LockableZKObject):
             canonical_name=None,
             artifact_uuid=None,  # The UUID of the ImageBuildArtifact
             endpoint_name=None,
+            providers=None,
+            config_hash=None,
             external_id=None,
             timestamp=None,
             validated=None,
@@ -1533,6 +1539,8 @@ class ImageUpload(zkobject.LockableZKObject):
             canonical_name=self.canonical_name,
             artifact_uuid=self.artifact_uuid,
             endpoint_name=self.endpoint_name,
+            providers=self.providers,
+            config_hash=self.config_hash,
             external_id=self.external_id,
             timestamp=self.timestamp,
             validated=self.validated,
@@ -1824,6 +1832,11 @@ class ProviderConfig(ConfigObject):
             layout_image = self._dropNone(
                 layout.images[image['name']].toDict())
             image.update(ProviderConfig._mergeDict(layout_image, image))
+            # This is used for identifying unique image configurations
+            # across multiple providers.
+            hasher = hashlib.sha256()
+            hasher.update(json.dumps(image, sort_keys=True).encode('utf8'))
+            image['config_hash'] = hasher.hexdigest()
         for flavor in config.get('flavors', []):
             layout_flavor = self._dropNone(
                 layout.flavors[flavor['name']].toDict())
