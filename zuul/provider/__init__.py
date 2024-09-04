@@ -84,6 +84,13 @@ class BaseProviderEndpoint(metaclass=abc.ABCMeta):
         self.connection = connection
         self.name = name
 
+    @property
+    def canonical_name(self):
+        return '/'.join([
+            urllib.parse.quote_plus(self.connection.connection_name),
+            urllib.parse.quote_plus(self.name),
+        ])
+
 
 class BaseProviderSchema(metaclass=abc.ABCMeta):
     def getLabelSchema(self):

@@ -74,6 +74,10 @@ class AwsProviderImage(BaseProviderImage):
     def __init__(self, config):
         self.image_id = None
         self.image_filters = None
+        # TODO: add to config
+        self.import_method = 'snapshot'
+        self.imds_support = None
+        self.architecture = 'x86_64'
         super().__init__(config)
 
 
@@ -283,14 +287,16 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         flavor = self.flavors[label.flavor]
         return self.endpoint.getQuotaForLabel(label, flavor)
 
-    def uploadImage(self, provider_image, image_name,
+    def uploadImage(self, provider_image,
                     filename, image_format, metadata, md5, sha256):
         # TODO this needs to move to the section or connection config
         # since it's used by endpoints.
         bucket_name = self.object_storage.get('bucket-name')
-        timeout = self.image_import_timeout
+        # TODO make this configurable
+        # timeout = self.image_import_timeout
+        timeout = 300
         return self.endpoint.uploadImage(
-            provider_image, image_name,
+            provider_image,
             filename, image_format, metadata, md5, sha256,
             bucket_name, timeout)
 

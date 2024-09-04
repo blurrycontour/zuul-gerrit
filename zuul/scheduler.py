@@ -3225,11 +3225,14 @@ class Scheduler(threading.Thread):
             tenant.semaphore_handler.release(event_queue, item, job)
 
     # Image related methods
-    def createImageBuildArtifact(self, image, build, image_format,
+    def createImageBuildArtifact(self, image, build, metadata,
                                  artifact_url, validated):
         log = get_annotated_logger(self.log, build.zuul_event_id,
                                    build=build.uuid)
         art_uuid = uuid.uuid4().hex
+        image_format = metadata['format']
+        image_md5sum = metadata['md5sum']
+        image_sha256 = metadata['sha256']
         log.info(
             "Storing image build artifact metadata: "
             "uuid: %s name: %s format: %s build: %s url: %s",
@@ -3242,6 +3245,8 @@ class Scheduler(threading.Thread):
                 canonical_name=image.canonical_name,
                 build_uuid=build.uuid,
                 format=image_format,
+                md5sum=image_md5sum,
+                sha256=image_sha256,
                 url=artifact_url,
                 timestamp=build.end_time,
                 validated=validated,
@@ -3251,10 +3256,11 @@ class Scheduler(threading.Thread):
         # iba is an ImageBuildArtifact
         with iba.locked(self.zk_client) as lock:
             with self.createZKContext(lock, self.log) as ctx:
-                # Uploads go to endpoints, but providers indicate what
-                # images each section has.  Loop over all the
-                # providers to find the endpoints that need this image.
-                endpoints = {}
+                # Providers may share image upload configurations, but
+                # these shared configurations may appear on distinct
+                # endpoints.  Identify the unique configurations for
+                # each endpoint and create one upload for each.
+                uploads = defaultdict(list)  # (endpoint, hash) -> [providers]
                 for tenant in self.abide.tenants.values():
                     for provider in tenant.layout.providers.values():
                         for image in provider.images.values():
@@ -3262,20 +3268,25 @@ class Scheduler(threading.Thread):
                                 image.format == iba.format):
                                 # This image is needed, add this endpoint
                                 endpoint = provider.getEndpoint()
-                                endpoints[endpoint.name] = endpoint
-                for endpoint in endpoints.values():
+                                key = (endpoint.canonical_name,
+                                       image.config_hash)
+                                uploads[key].append(provider.canonical_name)
+                for (endpoint_name, config_hash), providers in uploads.items():
                     upload_uuid = uuid.uuid4().hex
                     self.log.info(
                         "Storing image upload: "
-                        "uuid: %s name: %s artifact uuid: %s endpoint: %s",
+                        "uuid: %s name: %s artifact uuid: %s "
+                        "endpoint: %s config hash: %s",
                         upload_uuid, iba.canonical_name, iba.uuid,
-                        endpoint.name)
+                        endpoint_name, config_hash)
                     ImageUpload.new(
                         ctx,
                         uuid=upload_uuid,
                         canonical_name=iba.canonical_name,
                         artifact_uuid=iba.uuid,
-                        endpoint_name=endpoint.name,
+                        endpoint_name=endpoint_name,
+                        providers=providers,
+                        config_hash=config_hash,
                         timestamp=time.time(),
                         validated=iba.validated,
                     )
