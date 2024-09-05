@@ -51,7 +51,7 @@ function QueueItemProgress({ item, times }) {
     return <span style={{ color: color }}>{text}</span>
   }
 
-  let remainingTime = 'unknown'
+  let remainingTime = '-'
   if (times.remaining !== null) {
     remainingTime = formatTime(times.remaining)
   }
@@ -66,7 +66,12 @@ function QueueItemProgress({ item, times }) {
           <IconProperty icon={<StopwatchIcon />} value={formatEnqueueTime(item.enqueue_time)} />
         </Tooltip>
       </GridItem>
-      <GridItem span={6} style={{ textAlign: 'right' }}>
+      <GridItem
+        span={6}
+        className={
+          item.remaining_time !== null ? 'zuul-remaining-time' : 'zuul-unknown-remaining-time'
+        }
+      >
         <Tooltip content="Remaining Time" position="right">
           <IconProperty icon={<OutlinedClockIcon />} value={`${remainingTime}`} />
         </Tooltip>

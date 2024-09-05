@@ -183,6 +183,15 @@ a.refresh {
 
 /* Status page */
 
+.zuul-remaining-time {
+    text-align: right;
+}
+
+.zuul-unknown-remaining-time {
+    text-align: right;
+    padding-right: 4px;
+}
+
 /* Use the same hover effect like for selectable cards, but without
    actually selecting them */
 .zuul-pipeline-summary:hover,
