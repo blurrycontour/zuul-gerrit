@@ -58,11 +58,10 @@ const createTree = (head) => {
   let tree = null
 
   // Map for easier lookup of items by their id
+  // NOTE: If filters are applied, this map contains only the items that
+  // match the filter criteria. This can break the lookup of
+  // items_behind, so we have to be aware of this.
   const itemsById = {}
-  // Create a copy of the original queue, so we can remove the current
-  // node while iterating over the list. Once the list is empty, we
-  // know that we have seen all items in the queue.
-  //let head = JSON.parse(JSON.stringify(_head))
 
   // First iteration: Create map for "lookup by id"
   head.forEach(item => {
@@ -96,17 +95,29 @@ const createTree = (head) => {
       // The last element in the list is the item_behind on the "main"
       // branch
       const item_behind = itemsById[items_behind.pop()]
-      node._next = item_behind
+      // If filters are applied, the item_behind might have been removed
+      // from the head and we won't be able to visualize it.
+      if (item_behind) {
+        node._next = item_behind
+      }
       // All other items_behind are failing ones, so they should be
       // added to separate branches
       items_behind.forEach(item => {
         const item_behind = itemsById[item]
-        node._branches.push(item_behind)
+        // If filters are applied, the item_behind might have been
+        // removed from the head and we won't be able to visualize it.
+        if (item_behind) {
+          node._branches.push(item_behind)
+        }
       })
     } else {
       // We have only one element, so add it to the main branch
       const item_behind = itemsById[items_behind.pop()]
-      node._next = item_behind
+      // If filters are applied, the item_behind might have been removed
+      // from the head and we won't be able to visualize it.
+      if (item_behind) {
+        node._next = item_behind
+      }
     }
   })
 
@@ -140,15 +151,6 @@ BranchIcon.propTypes = {
 
 // Recursively render QueueItems to visualize a ChangeQueue.
 const Branch = ({ item, pipeline, jobsExpanded, newBranch = false }) => {
-  // hack: prevent null reference exceptions when filtering for items in queues
-  // that have other items that don't match the filter. The cause is not clear
-  // to me at the moment: createTree never returns an undefined tree, but here,
-  // for the above case, item(=tree) can be (temporarily) undefined. Mabye some
-  // React component/state caching issue?
-  if (!item) {
-    return <></>
-  }
-
   const iconConfig = getQueueItemIconConfig(item)
 
   const step = (
@@ -202,7 +204,7 @@ Branch.propTypes = {
 function ChangeQueue({ queue, pipeline, jobsExpanded, showTitle=true }) {
   // TODO (felix): Use useMemo hook to cache the rendered tree across re-renders
   const trees = []
-  queue.heads.forEach(head => (
+  queue.heads.filter(head => head.length > 0).forEach(head => (
     trees.push(createTree(head))
   ))
 
