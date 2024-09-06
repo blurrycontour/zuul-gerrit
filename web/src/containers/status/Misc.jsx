@@ -254,7 +254,7 @@ PipelineIcon.propTypes = {
   size: PropTypes.string,
 }
 
-function ChangeLink({ change }) {
+const getChangeLabel = (change) => {
   let changeId = change.id || 'NA'
   let changeTitle = changeId
   // Fall back to display the ref if there is no change id
@@ -273,9 +273,19 @@ function ChangeLink({ change }) {
   } else if (changeId.length === 40) {
     changeText = changeId.slice(0, 7)
   }
+
+  if (changeText !== '') {
+    return changeText
+  }
+  return changeTitle
+}
+
+
+function ChangeLink({ change }) {
+  const label = getChangeLabel(change)
   return (
     <ExternalLink target={change.url}>
-      {changeText !== '' ? changeText : changeTitle}
+      {label}
     </ExternalLink>
   )
 }
@@ -540,6 +550,7 @@ export {
   ChangeLink,
   countQueueItems,
   countPipelineItems,
+  getChangeLabel,
   getJobResultIconConfig,
   getJobStrResult,
   getQueueItemIconConfig,

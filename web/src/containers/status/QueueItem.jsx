@@ -47,6 +47,7 @@ import {
 import {
   calculateQueueItemTimes,
   ChangeLink,
+  getChangeLabel,
   getJobStrResult,
   getRefs,
   JobLink,
@@ -101,17 +102,7 @@ function FilterDropdown({ item, pipeline }) {
     applyFilters(filterParams)
   }
 
-  // Using the full ref.id to display the helper text could break the
-  // layout of the Dropdown. This seems to be only an issue for Github
-  // changes, as the ref.if contains the full SHA. To prevent this,
-  // only display the PR number in this case. This is a very simplified
-  // version of the formatting we do in the ChangeLink component in
-  // containers/status/Misc.jsx.
-  let changeText = ref.id || ref.ref
-  let githubId = changeText.match(/^([0-9]+),([0-9a-f]{40})$/)
-  if (githubId) {
-    changeText = '#' + githubId[1]
-  }
+  const changeText = getChangeLabel(ref)
 
   const filterDropdownItems = [
     <DropdownItem
