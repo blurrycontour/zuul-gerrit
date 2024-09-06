@@ -256,36 +256,35 @@ PipelineIcon.propTypes = {
 
 const getChangeLabel = (change) => {
   let changeId = change.id || 'NA'
-  let changeTitle = changeId
+  let text = changeId
+  let label = 'change'
   // Fall back to display the ref if there is no change id
   if (changeId === 'NA' && change.ref) {
-    changeTitle = change.ref
+    text = change.ref
+    label = 'branch'  // TODO (felix): label = 'ref' ?
   }
-  let changeText = ''
   if (change.url !== null) {
     let githubId = changeId.match(/^([0-9]+),([0-9a-f]{40})$/)
     if (githubId) {
-      changeTitle = githubId
-      changeText = '#' + githubId[1]
+      text = '#' + githubId[1]
     } else if (/^[0-9a-f]{40}$/.test(changeId)) {
-      changeText = changeId.slice(0, 7)
+      text = changeId.slice(0, 7)
+      label = 'revision'
     }
   } else if (changeId.length === 40) {
-    changeText = changeId.slice(0, 7)
+    text = changeId.slice(0, 7)
+    label = 'revision'
   }
 
-  if (changeText !== '') {
-    return changeText
-  }
-  return changeTitle
+  return { changeLabel: label, changeText: text }
 }
 
 
 function ChangeLink({ change }) {
-  const label = getChangeLabel(change)
+  const { changeText } = getChangeLabel(change)
   return (
     <ExternalLink target={change.url}>
-      {label}
+      {changeText}
     </ExternalLink>
   )
 }
