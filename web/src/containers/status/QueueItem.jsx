@@ -102,15 +102,15 @@ function FilterDropdown({ item, pipeline }) {
     applyFilters(filterParams)
   }
 
-  const changeText = getChangeLabel(ref)
+  const { changeLabel, changeText } = getChangeLabel(ref)
 
   const filterDropdownItems = [
     <DropdownItem
       key="filter-change"
-      description={`Filter change: ${changeText}`}
+      description={`Filter ${changeLabel}: ${changeText}`}
       onClick={() => filterChange()}
     >
-      Filter by change
+      {`Filter by ${changeLabel}`}
     </DropdownItem>,
     <DropdownItem
       key="filter-project"
