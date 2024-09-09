@@ -92,6 +92,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0a5a2b2a_2fa777fa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-09T22:42:29Z",
+      "side": 1,
+      "message": "While this comment is unresolved (in the sense that we don\u0027t really have an answer to the concern raised) I don\u0027t think it\u0027s a blocker -- just something that we should be aware of.",
+      "parentUuid": "468fa3b1_c9d49999",
+      "revId": "1f6f5f9d1cdd1d807b2314f6036baaf1a9bb6d40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57bc08d9_e2a42e20",
         "filename": "web/src/containers/status/Misc.jsx",
         "patchSetId": 9
