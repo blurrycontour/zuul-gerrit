@@ -36,6 +36,24 @@ from tests.base import (
 class TestAwsDriver(ZuulTestCase):
     config_file = 'zuul-connections-nodepool.conf'
     mock_aws = mock_aws()
+    debian_return_data = {
+        'zuul': {
+            'artifacts': [
+                {
+                    'name': 'raw image',
+                    'url': 'http://example.com/image.raw',
+                    'metadata': {
+                        'type': 'zuul_image',
+                        'image_name': 'debian-local',
+                        'format': 'raw',
+                        'sha256': ('59984dd82f51edb3777b969739a92780'
+                                   'a520bb314b8d64b294d5de976bd8efb9'),
+                        'md5sum': '262278e1632567a907e4604e9edd2e83',
+                    }
+                },
+            ]
+        }
+    }
 
     def setUp(self):
         self.initTestConfig()
@@ -197,25 +215,6 @@ class TestAwsDriver(ZuulTestCase):
                 '_completeCreateInstance', return_value=None)):
             yield
 
-    debian_return_data = {
-        'zuul': {
-            'artifacts': [
-                {
-                    'name': 'raw image',
-                    'url': 'http://example.com/image.raw',
-                    'metadata': {
-                        'type': 'zuul_image',
-                        'image_name': 'debian-local',
-                        'format': 'raw',
-                        'sha256': ('59984dd82f51edb3777b969739a92780'
-                                   'a520bb314b8d64b294d5de976bd8efb9'),
-                        'md5sum': '262278e1632567a907e4604e9edd2e83',
-                    }
-                },
-            ]
-        }
-    }
-
     @simple_layout('layouts/aws/nodepool-image-snapshot.yaml',
                    enable_nodepool=True)
     @return_data(
@@ -224,6 +223,32 @@ class TestAwsDriver(ZuulTestCase):
         debian_return_data,
     )
     def test_aws_diskimage_snapshot(self):
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+        ], ordered=False)
+
+        name = 'review.example.com%2Forg%2Fcommon-config/debian-local'
+        artifacts = self.launcher.image_build_registry.\
+            getArtifactsForImage(name)
+        self.assertEqual(1, len(artifacts))
+        self.assertEqual('raw', artifacts[0].format)
+        self.assertTrue(artifacts[0].validated)
+        uploads = self.launcher.image_upload_registry.getUploadsForImage(
+            name)
+        self.assertEqual(1, len(uploads))
+        self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
+        self.assertIn('ami-', uploads[0].external_id)
+        self.assertTrue(uploads[0].validated)
+
+    @simple_layout('layouts/aws/nodepool-image-image.yaml',
+                   enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        debian_return_data,
+    )
+    def test_aws_diskimage_image(self):
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='build-debian-local-image', result='SUCCESS'),
