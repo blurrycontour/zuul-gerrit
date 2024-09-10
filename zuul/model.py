@@ -2300,6 +2300,9 @@ class NodesetRequest(zkobject.LockableZKObject):
             request_time=time.time(),
             zuul_event_id="",
             span_info=None,
+            # A list of list with the attempted provider nodes. The last
+            # item in the contained lists is the current attempt. E.g.
+            # [[label-A-failed, label-A-building], [label-b-ready], ...]
             provider_nodes=[],
             # Attributes that are not serialized
             lock=None,
@@ -2314,7 +2317,7 @@ class NodesetRequest(zkobject.LockableZKObject):
 
     @property
     def nodes(self):
-        return self.provider_nodes
+        return [n[-1] for n in self.provider_nodes]
 
     @property
     def created_time(self):
