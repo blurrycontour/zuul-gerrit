@@ -215,14 +215,9 @@ class TestAwsDriver(ZuulTestCase):
                 '_completeCreateInstance', return_value=None)):
             yield
 
-    @simple_layout('layouts/aws/nodepool-image-snapshot.yaml',
-                   enable_nodepool=True)
-    @return_data(
-        'build-debian-local-image',
-        'refs/heads/master',
-        debian_return_data,
-    )
-    def test_aws_diskimage_snapshot(self):
+    # Test the 3 image import methods:
+
+    def _test_aws_diskimage_import(self):
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='build-debian-local-image', result='SUCCESS'),
@@ -240,6 +235,16 @@ class TestAwsDriver(ZuulTestCase):
         self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
         self.assertIn('ami-', uploads[0].external_id)
         self.assertTrue(uploads[0].validated)
+
+    @simple_layout('layouts/aws/nodepool-image-snapshot.yaml',
+                   enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        debian_return_data,
+    )
+    def test_aws_diskimage_snapshot(self):
+        self._test_aws_diskimage_import()
 
     @simple_layout('layouts/aws/nodepool-image-image.yaml',
                    enable_nodepool=True)
@@ -249,20 +254,14 @@ class TestAwsDriver(ZuulTestCase):
         debian_return_data,
     )
     def test_aws_diskimage_image(self):
-        self.waitUntilSettled()
-        self.assertHistory([
-            dict(name='build-debian-local-image', result='SUCCESS'),
-        ], ordered=False)
+        self._test_aws_diskimage_import()
 
-        name = 'review.example.com%2Forg%2Fcommon-config/debian-local'
-        artifacts = self.launcher.image_build_registry.\
-            getArtifactsForImage(name)
-        self.assertEqual(1, len(artifacts))
-        self.assertEqual('raw', artifacts[0].format)
-        self.assertTrue(artifacts[0].validated)
-        uploads = self.launcher.image_upload_registry.getUploadsForImage(
-            name)
-        self.assertEqual(1, len(uploads))
-        self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
-        self.assertIn('ami-', uploads[0].external_id)
-        self.assertTrue(uploads[0].validated)
+    @simple_layout('layouts/aws/nodepool-image-ebs-direct.yaml',
+                   enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        debian_return_data,
+    )
+    def test_aws_diskimage_ebs_direct(self):
+        self._test_aws_diskimage_import()
