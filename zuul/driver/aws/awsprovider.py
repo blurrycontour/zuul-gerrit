@@ -78,6 +78,11 @@ class AwsProviderImage(BaseProviderImage):
         self.import_method = 'snapshot'
         self.imds_support = None
         self.architecture = 'x86_64'
+        self.volume_size = None
+        self.volume_type = 'gp3'
+        self.iops = None
+        self.throughput = None
+        self.ena_support = True
         super().__init__(config)
 
 
