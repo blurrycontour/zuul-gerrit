@@ -306,6 +306,54 @@ class TestLauncher(ZuulTestCase):
         return request
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_jobs_executed(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('check-job').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(self.getJobFromHistory('check-job').node,
+                         'debian-normal')
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_launcher_failover(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+
+        with mock.patch(
+            'zuul.driver.aws.awsendpoint.AwsProviderEndpoint._refresh'
+        ) as refresh_mock:
+            # Patch 'endpoint._refresh()' to return w/o updating
+            refresh_mock.side_effect = lambda o: o
+            self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+            for _ in iterate_timeout(10, "node is building"):
+                nodes = self.launcher.api.nodes_cache.getItems()
+                if not nodes:
+                    continue
+                if all(
+                    n.create_state and
+                    n.create_state[
+                        "state"] == n.create_state_machine.INSTANCE_CREATING
+                    for n in nodes
+                ):
+                    break
+            self.launcher.stop()
+            self.launcher.join()
+
+            self.launcher = self.createLauncher()
+
+        self.waitUntilSettled()
+        self.assertEqual(self.getJobFromHistory('check-job').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(self.getJobFromHistory('check-job').node,
+                         'debian-normal')
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_launcher_missing_label(self):
         ctx = self.createZKContext(None)
         labels = ["debian-normal", "debian-unavailable"]
