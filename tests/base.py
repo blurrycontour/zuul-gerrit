@@ -127,7 +127,7 @@ import opentelemetry.sdk.trace.export
 
 KEEP_TEMPDIRS = bool(os.environ.get('KEEP_TEMPDIRS', False))
 SCHEDULER_COUNT = int(os.environ.get('ZUUL_SCHEDULER_COUNT', 1))
-ZOOKEEPER_SESSION_TIMEOUT = 30
+ZOOKEEPER_SESSION_TIMEOUT = 60
 
 
 def skipIfMultiScheduler(reason=None):
