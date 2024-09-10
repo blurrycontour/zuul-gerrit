@@ -239,6 +239,8 @@ class FakeAws:
 
 
 class FakeAwsProviderEndpoint(AwsProviderEndpoint):
+    IMAGE_UPLOAD_SLEEP = 1
+
     # Patch/override adapter methods to aid unit tests
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)

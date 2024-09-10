@@ -751,11 +751,11 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             raise Exception(f"Error uploading image: {task}")
 
         # Tag the snapshot
+        with self.non_mutating_rate_limiter:
+            resp = self.ec2_client.describe_snapshots(
+                SnapshotIds=[task['SnapshotTaskDetail']['SnapshotId']])
+            snap = resp['Snapshots'][0]
         try:
-            with self.non_mutating_rate_limiter:
-                resp = self.ec2_client.describe_snapshots(
-                    SnapshotIds=[task['SnapshotTaskDetail']['SnapshotId']])
-                snap = resp['Snapshots'][0]
             with self.rate_limiter:
                 self.ec2_client.create_tags(
                     Resources=[task['SnapshotTaskDetail']['SnapshotId']],
