@@ -262,7 +262,7 @@ class TestLauncher(ZuulTestCase):
         labels = ["debian-normal", "debian-unavailable"]
         request = self._requestNodes(labels)
         self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
-        self.assertEqual(len(request.provider_nodes), 0)
+        self.assertEqual(len(request.nodes), 0)
 
         request.delete(ctx)
         self.waitUntilSettled()
@@ -279,7 +279,7 @@ class TestLauncher(ZuulTestCase):
         request = client.getRequest(request.uuid)
 
         self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
-        self.assertEqual(len(request.provider_nodes), 1)
+        self.assertEqual(len(request.nodes), 1)
 
         client.acceptNodeset(request, nodeset)
         self.waitUntilSettled()
@@ -321,7 +321,7 @@ class TestLauncher(ZuulTestCase):
         request = self._requestNodes(["debian-normal"])
 
         provider_nodes = []
-        for node_id in request.provider_nodes:
+        for node_id in request.nodes:
             provider_nodes.append(model.ProviderNode.fromZK(
                 ctx, path=model.ProviderNode._getPath(node_id)))
 
@@ -347,10 +347,10 @@ class TestLauncher(ZuulTestCase):
         ctx = self.createZKContext(None)
         request = self._requestNodes(["debian-invalid"])
         self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
-        self.assertEqual(len(request.provider_nodes), 1)
+        self.assertEqual(len(request.nodes), 1)
 
         provider_nodes = []
-        for node_id in request.provider_nodes:
+        for node_id in request.nodes:
             provider_nodes.append(model.ProviderNode.fromZK(
                 ctx, path=model.ProviderNode._getPath(node_id)))
 
@@ -405,7 +405,7 @@ class TestLauncher(ZuulTestCase):
         request = client.getRequest(request.uuid)
 
         self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
-        self.assertEqual(len(request.provider_nodes), 1)
+        self.assertEqual(len(request.nodes), 1)
 
         client.acceptNodeset(request, nodeset)
         self.waitUntilSettled()
