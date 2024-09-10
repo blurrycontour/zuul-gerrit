@@ -127,6 +127,7 @@ import opentelemetry.sdk.trace.export
 
 KEEP_TEMPDIRS = bool(os.environ.get('KEEP_TEMPDIRS', False))
 SCHEDULER_COUNT = int(os.environ.get('ZUUL_SCHEDULER_COUNT', 1))
+ZOOKEEPER_SESSION_TIMEOUT = 30
 
 
 def skipIfMultiScheduler(reason=None):
@@ -1158,6 +1159,7 @@ class FakeNodepool(object):
             keyfile=zk_chroot_fixture.zookeeper_key,
             certfile=zk_chroot_fixture.zookeeper_cert,
             ca=zk_chroot_fixture.zookeeper_ca,
+            timeout=ZOOKEEPER_SESSION_TIMEOUT,
         )
         self.client.start()
         self.registerLauncher()
@@ -1478,11 +1480,12 @@ class ChrootedKazooFixture(fixtures.Fixture):
 
         # Ensure the chroot path exists and clean up any pre-existing znodes.
         _tmp_client = kazoo.client.KazooClient(
-            hosts=f'{self.zookeeper_host}:{self.zookeeper_port}', timeout=10,
+            hosts=f'{self.zookeeper_host}:{self.zookeeper_port}',
             use_ssl=True,
             keyfile=self.zookeeper_key,
             certfile=self.zookeeper_cert,
             ca=self.zookeeper_ca,
+            timeout=ZOOKEEPER_SESSION_TIMEOUT,
         )
         _tmp_client.start()
 
@@ -1503,6 +1506,7 @@ class ChrootedKazooFixture(fixtures.Fixture):
             keyfile=self.zookeeper_key,
             certfile=self.zookeeper_cert,
             ca=self.zookeeper_ca,
+            timeout=ZOOKEEPER_SESSION_TIMEOUT,
         )
         _tmp_client.start()
         _tmp_client.delete(self.zookeeper_chroot, recursive=True)
@@ -2356,7 +2360,8 @@ class ZuulTestCase(BaseTestCase):
         self.statsd.start()
 
         self.config.set('zookeeper', 'hosts', self.zk_chroot_fixture.zk_hosts)
-        self.config.set('zookeeper', 'session_timeout', '30')
+        self.config.set('zookeeper', 'session_timeout',
+                        str(ZOOKEEPER_SESSION_TIMEOUT))
         self.config.set('zookeeper', 'tls_cert',
                         self.zk_chroot_fixture.zookeeper_cert)
         self.config.set('zookeeper', 'tls_key',
