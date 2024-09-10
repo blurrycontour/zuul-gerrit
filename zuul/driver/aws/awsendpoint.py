@@ -604,7 +604,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                     image_format, metadata, md5, sha256, bucket_name,
                     timeout):
         image_name = provider_image.name
-        self.log.debug(f"Uploading image {image_name}")
+        self.log.debug(f"Uploading image {image_name} "
+                       f"via {provider_image.import_method}")
 
         # There is no IMDS support option for the import_image call
         if (provider_image.import_method == 'image' and
