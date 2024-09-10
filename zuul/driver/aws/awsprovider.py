@@ -60,12 +60,23 @@ class AwsProviderImage(BaseProviderImage):
                           msg=('Provide either '
                                '"image-filters", or "image-id" keys'))
     )
+    inheritable_aws_zuul_schema = vs.Schema({
+        Optional('import-method', default='snapshot'): vs.Any(
+            'snapshot', 'image', 'ebs-direct')
+    })
+    aws_zuul_schema = vs.Schema({
+        Required('type'): 'zuul',
+    })
     zuul_schema = assemble(
         BaseProviderImage.schema,
-        vs.Schema({'type': 'zuul'}),
+        aws_zuul_schema,
+        inheritable_aws_zuul_schema,
     )
 
-    inheritable_schema = BaseProviderImage.inheritable_schema
+    inheritable_schema = assemble(
+        BaseProviderImage.inheritable_schema,
+        inheritable_aws_zuul_schema,
+    )
     schema = vs.Union(
         cloud_schema, zuul_schema,
         discriminant=discriminate(
@@ -75,7 +86,6 @@ class AwsProviderImage(BaseProviderImage):
         self.image_id = None
         self.image_filters = None
         # TODO: add to config
-        self.import_method = 'snapshot'
         self.imds_support = None
         self.architecture = 'x86_64'
         self.volume_size = None
