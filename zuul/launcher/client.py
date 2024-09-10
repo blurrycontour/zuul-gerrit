@@ -86,7 +86,7 @@ class LauncherClient:
 
     def getNodesetInfo(self, request):
         # TODO: populated other nodeset info fields
-        return NodesetInfo(nodes=list(request.provider_nodes))
+        return NodesetInfo(nodes=list(request.nodes))
 
     def acceptNodeset(self, request, nodeset):
         log = get_annotated_logger(self.log, request)
@@ -94,7 +94,7 @@ class LauncherClient:
         try:
             with self.createZKContext(None, self.log) as ctx:
                 for node_id, node in zip(
-                    request.provider_nodes, nodeset.getNodes()
+                    request.nodes, nodeset.getNodes()
                 ):
                     provider_node = ProviderNode.fromZK(
                         ctx, path=ProviderNode._getPath(node_id))

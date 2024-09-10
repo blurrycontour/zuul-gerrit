@@ -339,7 +339,7 @@ class Launcher:
                     tags=tags,
                 )
                 log.debug("Requested node %s", node)
-                provider_nodes.append(node.uuid)
+                provider_nodes.append([node.uuid])
 
             request.updateAttributes(
                 ctx,
@@ -364,7 +364,7 @@ class Launcher:
     def _checkRequest(self, request, log):
         log.debug("Checking request %s", request)
         requested_nodes = [self.api.getProviderNode(p)
-                           for p in request.provider_nodes]
+                           for p in request.nodes]
         if any(n is None for n in requested_nodes):
             # Cache may not be up to date enough for the next check
             return
