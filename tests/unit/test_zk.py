@@ -2560,7 +2560,7 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
         request.updateAttributes(
             context,
             state=model.NodesetRequest.State.ACCEPTED,
-            provider_nodes=[n.uuid for n in provider_nodes])
+            provider_nodes=[[n.uuid] for n in provider_nodes])
 
         # "Fulfill" requested provider nodes
         for node in self.api.getMatchingProviderNodes():
@@ -2582,7 +2582,7 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
         # Wait for nodes to show up be ready and unlocked
         for _ in iterate_timeout(10, "nodes to be ready"):
             requested_nodes = [self.api.getProviderNode(ni)
-                               for ni in request.provider_nodes]
+                               for ni in request.nodes]
             if len(requested_nodes) != 2:
                 continue
             if all(n.state == model.ProviderNode.State.READY
