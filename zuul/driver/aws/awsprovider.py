@@ -62,10 +62,19 @@ class AwsProviderImage(BaseProviderImage):
     )
     inheritable_aws_zuul_schema = vs.Schema({
         Optional('import-method', default='snapshot'): vs.Any(
-            'snapshot', 'image', 'ebs-direct')
+            'snapshot', 'image', 'ebs-direct'),
+        # None is an acceptable explicit value for imds-support
+        Optional('imds-support', default=None): vs.Any('v2.0', None),
+        Optional('architecture', default='x86_64'): str,
+        Optional('ena-support', default=True): bool,
+        Optional('volume-size'): Nullable(int),
+        Optional('volume-type', default='gp3'): str,
+        Optional('iops'): Nullable(int),
+        Optional('throughput'): Nullable(int),
     })
     aws_zuul_schema = vs.Schema({
         Required('type'): 'zuul',
+        Optional('tags', default=dict): {str: str},
     })
     zuul_schema = assemble(
         BaseProviderImage.schema,
@@ -85,14 +94,6 @@ class AwsProviderImage(BaseProviderImage):
     def __init__(self, image_config, provider_config):
         self.image_id = None
         self.image_filters = None
-        # TODO: add to config
-        self.imds_support = None
-        self.architecture = 'x86_64'
-        self.volume_size = None
-        self.volume_type = 'gp3'
-        self.iops = None
-        self.throughput = None
-        self.ena_support = True
         super().__init__(image_config, provider_config)
 
 
