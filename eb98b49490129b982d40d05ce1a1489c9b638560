@@ -16,6 +16,24 @@
       "message": "I\u0027m not +2\u0027ing this change (or its parents) because I haven\u0027t been able to review the javascript code itself. Instead I have used the CI built site preview to poke around the new dashboard against OpenDev\u0027s Zuul. Overall things seem to work for me and I haven\u0027t found any deal breaker behaviors.\n\nI did have some feedback which I\u0027ve put into https://etherpad.opendev.org/p/new-zuul-dashboard-feedback as I don\u0027t think any of it needs to hold up proceeding with this stack, but may make for useful improvements in the future.",
       "revId": "eb98b49490129b982d40d05ce1a1489c9b638560",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b83c7c4a_643eb48a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-11T19:45:22Z",
+      "side": 1,
+      "message": "Sorry I missed your comment after +3\u0027ed the top of the stack, I\u0027ll remove my workflow.\n\nI\u0027ve also poked at the preview dashboard from https://review.opendev.org/928334 , and so far I only saw strict improvements. The JavaScript code looks great to me too. Though I think your feedback also makes sense, and I would be happy to hold on until it is addressed.",
+      "parentUuid": "bedab558_91c5c5cc",
+      "revId": "eb98b49490129b982d40d05ce1a1489c9b638560",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
