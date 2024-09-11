@@ -15,6 +15,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 import collections
+import itertools
 import logging
 import os
 import random
@@ -291,6 +292,10 @@ class Launcher:
                     log.debug("Failed to lock matching request %s", request)
                     continue
 
+            if not self._cachesReadyForRequest(request):
+                self.log.debug("Caches are not up-to-date for %s", request)
+                continue
+
             try:
                 if request.state == model.NodesetRequest.State.REQUESTED:
                     self._acceptRequest(request, log)
@@ -311,35 +316,22 @@ class Launcher:
             if request.state in request.FINAL_STATES:
                 request.releaseLock()
 
+    def _cachesReadyForRequest(self, request):
+        # Make sure we have all associated provider nodes in the cache
+        return all(
+            self.api.getProviderNode(n)
+            for n in itertools.chain.from_iterable(request.provider_nodes)
+        )
+
     def _acceptRequest(self, request, log):
         log.debug("Accepting request %s", request)
         # Create provider nodes for the requested labels
-        request_uuid = uuid.UUID(request.uuid)
         provider_nodes = []
-        label_providers = self._selectProviders(request)
+        label_providers = self._selectProviders(request, log)
         with self.createZKContext(request._lock, log) as ctx:
             for i, (label_name, provider) in enumerate(label_providers):
-                # Create a deterministic node UUID by using
-                # the request UUID as namespace.
-                node_uuid = uuid.uuid5(
-                    request_uuid, f"{provider.name}-{i}-{label_name}").hex
-                label = provider.labels[label_name]
-                tags = provider.getNodeTags(
-                    self.system.system_id, request, provider, label,
-                    node_uuid)
-                # TODO: handle NodeExists errors
-                node_class = provider.driver.getProviderNodeClass()
-                node = node_class.new(
-                    ctx,
-                    uuid=node_uuid,
-                    label=label_name,
-                    request_id=request.uuid,
-                    connection_name=provider.connection_name,
-                    tenant_name=request.tenant_name,
-                    provider=provider.name,
-                    tags=tags,
-                )
-                log.debug("Requested node %s", node)
+                node = self._requestNode(
+                    label_name, request, provider, log, ctx)
                 provider_nodes.append([node.uuid])
 
             request.updateAttributes(
@@ -347,28 +339,78 @@ class Launcher:
                 state=model.NodesetRequest.State.ACCEPTED,
                 provider_nodes=provider_nodes)
 
-    def _selectProviders(self, request):
+    def _selectProviders(self, request, log):
         providers = self.tenant_providers.get(request.tenant_name)
         if not providers:
             raise NodesetRequestError(
                 f"No provider for tenant {request.tenant_name}")
+
+        existing_nodes = [
+            self.api.getProviderNode(n)
+            for n in itertools.chain.from_iterable(request.provider_nodes)
+        ]
+        provider_failures = collections.Counter(
+            n.provider for n in existing_nodes
+            if n.state == n.State.FAILED)
+
         label_providers = []
-        for label in request.labels:
-            candidate_providers = [p for p in providers if p.hasLabel(label)]
+        for i, label in enumerate(request.labels):
+            candidate_providers = [
+                p for p in providers
+                if p.hasLabel(label)
+                and provider_failures[p.name] < p.launch_attempts
+            ]
             if not candidate_providers:
                 raise NodesetRequestError(
                     f"No provider found for label {label}")
+
+            log.debug("Candidate providers: %s", candidate_providers)
             # TODO: make provider selection more sophisticated
             label_providers.append((label, random.choice(candidate_providers)))
         return label_providers
+
+    def _requestNode(self, label_name, request, provider, log, ctx):
+        # Create a deterministic node UUID by using
+        # the request UUID as namespace.
+        node_uuid = uuid.uuid4().hex
+        label = provider.labels[label_name]
+        tags = provider.getNodeTags(
+            self.system.system_id, request, provider, label,
+            node_uuid)
+        node_class = provider.driver.getProviderNodeClass()
+        node = node_class.new(
+            ctx,
+            uuid=node_uuid,
+            label=label_name,
+            request_id=request.uuid,
+            connection_name=provider.connection_name,
+            tenant_name=request.tenant_name,
+            provider=provider.name,
+            tags=tags,
+        )
+        log.debug("Requested node %s", node)
+        return node
 
     def _checkRequest(self, request, log):
         log.debug("Checking request %s", request)
         requested_nodes = [self.api.getProviderNode(p)
                            for p in request.nodes]
-        if any(n is None for n in requested_nodes):
-            # Cache may not be up to date enough for the next check
-            return
+
+        requested_nodes = []
+        for i, node_id in enumerate(request.nodes):
+            node = self.api.getProviderNode(node_id)
+            if node.state == node.State.FAILED:
+                label_providers = self._selectProviders(request, log)
+                label_name, provider = label_providers[i]
+                log.info("Retrying request with provider %s", provider)
+                with self.createZKContext(request._lock, log) as ctx:
+                    node = self._requestNode(
+                        label_name, request, provider, log, ctx)
+                    with request.activeContext(ctx):
+                        request.provider_nodes[i].append(node.uuid)
+
+            requested_nodes.append(node)
+
         if not all(n.state in n.FINAL_STATES for n in requested_nodes):
             return
         log.debug("Request %s nodes ready: %s", request, requested_nodes)

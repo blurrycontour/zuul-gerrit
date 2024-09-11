@@ -444,7 +444,10 @@ class TestLauncher(ZuulTestCase):
         ctx = self.createZKContext(None)
         request = self._requestNodes(["debian-invalid"])
         self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
+        provider_nodes = request.provider_nodes[0]
+        self.assertEqual(len(provider_nodes), 2)
         self.assertEqual(len(request.nodes), 1)
+        self.assertEqual(provider_nodes[-1], request.nodes[-1])
 
         provider_nodes = []
         for node_id in request.nodes:
