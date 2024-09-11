@@ -116,6 +116,7 @@ class BaseProviderSchema(metaclass=abc.ABCMeta):
             Required('connection'): str,
             Optional('boot-timeout'): Nullable(int),
             Optional('launch-timeout'): Nullable(int),
+            Optional('launch-retries', default=3): int,
         })
         return schema
 
@@ -143,6 +144,10 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
                 config=config,
                 **parsed_config,
             )
+
+    def __repr__(self):
+        return (f"<{self.__class__.__name__} "
+                f"canonical_name={self.canonical_name}>")
 
     @classmethod
     def fromZK(cls, context, path, connections):
