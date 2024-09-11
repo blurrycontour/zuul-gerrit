@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d31c6550_7886c1f0",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-11T19:33:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "db51a049_71eb5179",
+      "revId": "7416623afdefb00ebd0faf32fabd6e1be7b2c06c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e798fd3c_ad07bfe5",
@@ -65,6 +83,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9662d83a_ebd83757",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-11T19:33:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "aacb8201_a970c76c",
+      "range": {
+        "startLine": 104,
+        "startChar": 6,
+        "endLine": 104,
+        "endChar": 10
+      },
+      "revId": "7416623afdefb00ebd0faf32fabd6e1be7b2c06c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c4feadab_203fd6bc",
@@ -102,6 +144,30 @@
       "side": 1,
       "message": "The ids are based on the uuids of the queue items. I assume that a queue item should only be listed once in the status.json, so they should also only be part of a single tree (unless there is a bug in the code). Having multiple trees should also be a rare edge case (when a queue consists of multiple heads, so multiple (failing) queue items at the beginning of the queue).",
       "parentUuid": "c4feadab_203fd6bc",
+      "range": {
+        "startLine": 185,
+        "startChar": 31,
+        "endLine": 185,
+        "endChar": 34
+      },
+      "revId": "7416623afdefb00ebd0faf32fabd6e1be7b2c06c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "066da0ed_6b830a9b",
+        "filename": "web/src/containers/status/ChangeQueue.jsx",
+        "patchSetId": 9
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-11T19:33:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c0284e58_5fc536be",
       "range": {
         "startLine": 185,
         "startChar": 31,
