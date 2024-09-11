@@ -53,7 +53,7 @@ import { getQueueItemIconConfig } from './Misc'
 // |-E
 // | |
 // F G
-const createTree = (head) => {
+function createTree(head) {
   // Root of the tree/linked list
   let tree = null
 
@@ -150,7 +150,7 @@ BranchIcon.propTypes = {
 }
 
 // Recursively render QueueItems to visualize a ChangeQueue.
-const Branch = ({ item, pipeline, jobsExpanded, newBranch = false }) => {
+function Branch({ item, pipeline, jobsExpanded, newBranch = false }) {
   const iconConfig = getQueueItemIconConfig(item)
 
   const step = (

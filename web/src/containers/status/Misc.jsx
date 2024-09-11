@@ -198,7 +198,7 @@ const DEFAULT_JOB_STATE_ICON_CONFIG = {
   labelColor: 'grey',
 }
 
-const getJobResultIconConfig = (job) => {
+function getJobResultIconConfig(job) {
   let iconConfig = DEFAULT_JOB_STATE_ICON_CONFIG
   let result = job.result ? job.result.toUpperCase() : null
   if (result !== null) {
@@ -207,7 +207,7 @@ const getJobResultIconConfig = (job) => {
   return iconConfig
 }
 
-const getQueueItemIconConfig = (item) => {
+function getQueueItemIconConfig(item) {
   if (item.failing_reasons && item.failing_reasons.length > 0) {
     let reasons = item.failing_reasons.join(', ')
     if (reasons.match(/merge conflict/)) {
@@ -254,7 +254,7 @@ PipelineIcon.propTypes = {
   size: PropTypes.string,
 }
 
-const getChangeLabel = (change) => {
+function getChangeLabel(change) {
   let changeId = change.id || 'NA'
   let changeTitle = changeId
   // Fall back to display the ref if there is no change id
@@ -294,7 +294,7 @@ ChangeLink.propTypes = {
   change: PropTypes.object,
 }
 
-const getJobStrResult = (job) => {
+function getJobStrResult(job) {
   let result = job.result ? job.result.toLowerCase() : null
   if (result === null) {
     if (job.url === null) {
@@ -312,7 +312,7 @@ const getJobStrResult = (job) => {
   return result
 }
 
-const calculateQueueItemTimes = (item) => {
+function calculateQueueItemTimes(item) {
   let maxRemaining = 0
   let jobs = {}
   const now = Date.now()
@@ -523,7 +523,7 @@ function isPipelineEmpty(pipeline) {
   )
 }
 
-const countPipelineItems = (pipeline) => {
+function countPipelineItems(pipeline) {
   let count = 0
   pipeline.change_queues = pipeline.change_queues.map(queue => {
     queue = { ...countQueueItems(queue) }
@@ -534,7 +534,7 @@ const countPipelineItems = (pipeline) => {
   return pipeline
 }
 
-const countQueueItems = (queue) => {
+function countQueueItems(queue) {
   let count = 0
   queue.heads.map(head => (
     head.map((item) => (
