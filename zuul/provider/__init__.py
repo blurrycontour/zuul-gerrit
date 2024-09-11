@@ -116,6 +116,7 @@ class BaseProviderSchema(metaclass=abc.ABCMeta):
             Required('connection'): str,
             Optional('boot-timeout'): Nullable(int),
             Optional('launch-timeout'): Nullable(int),
+            Optional('launch-retries'): Nullable(int),
         })
         return schema
 
@@ -134,15 +135,21 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
             config.pop('_start_mark')
             parsed_config = self.parseConfig(config)
             parsed_config.pop('connection')
+            launch_retries = parsed_config.pop('launch_retries', 3)
             self._set(
                 driver=driver,
                 connection=connection,
                 connection_name=connection.connection_name,
                 tenant_name=tenant_name,
                 canonical_name=canonical_name,
+                launch_retries=launch_retries,
                 config=config,
                 **parsed_config,
             )
+
+    def __repr__(self):
+        return (f"<{self.__class__.__name__} "
+                f"canonical_name={self.canonical_name}>")
 
     @classmethod
     def fromZK(cls, context, path, connections):
