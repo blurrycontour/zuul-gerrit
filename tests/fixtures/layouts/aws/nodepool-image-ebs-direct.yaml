@@ -61,12 +61,12 @@
     launch-timeout: 600
     object-storage:
       bucket-name: zuul
+    import-method: ebs-direct
     flavors:
       - name: normal
         instance-type: t3.medium
     images:
       - name: debian-local
-        import-method: ebs-direct
 
 - section:
     name: aws-us-west-2

@@ -35,8 +35,13 @@ class BaseProviderImage(metaclass=abc.ABCMeta):
         provider_schema.base_image,
     )
 
-    def __init__(self, config):
-        self.__dict__.update(self.schema(config))
+    def __init__(self, image_config, provider_config):
+        new_config = image_config.copy()
+        for k in self.inheritable_schema.schema.keys():
+            if k not in new_config and k in provider_config:
+                new_config[k] = provider_config[k]
+
+        self.__dict__.update(self.schema(new_config))
         # TODO: generate this automatically from config
         self.format = 'raw'
 
@@ -55,8 +60,13 @@ class BaseProviderFlavor(metaclass=abc.ABCMeta):
         provider_schema.base_flavor,
     )
 
-    def __init__(self, config):
-        self.__dict__.update(self.schema(config))
+    def __init__(self, flavor_config, provider_config):
+        new_config = flavor_config.copy()
+        for k in self.inheritable_schema.schema.keys():
+            if k not in new_config and k in provider_config:
+                new_config[k] = provider_config[k]
+
+        self.__dict__.update(self.schema(new_config))
 
 
 class BaseProviderLabel(metaclass=abc.ABCMeta):
@@ -65,8 +75,13 @@ class BaseProviderLabel(metaclass=abc.ABCMeta):
         provider_schema.base_label,
     )
 
-    def __init__(self, config):
-        self.__dict__.update(self.schema(config))
+    def __init__(self, label_config, provider_config):
+        new_config = label_config.copy()
+        for k in self.inheritable_schema.schema.keys():
+            if k not in new_config and k in provider_config:
+                new_config[k] = provider_config[k]
+
+        self.__dict__.update(self.schema(new_config))
 
 
 class BaseProviderEndpoint(metaclass=abc.ABCMeta):
@@ -202,26 +217,26 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
     def parseImages(self, config):
         images = {}
         for image_config in config.get('images', []):
-            i = self.parseImage(image_config)
+            i = self.parseImage(image_config, config)
             images[i.name] = i
         return images
 
     def parseFlavors(self, config):
         flavors = {}
         for flavor_config in config.get('flavors', []):
-            f = self.parseFlavor(flavor_config)
+            f = self.parseFlavor(flavor_config, config)
             flavors[f.name] = f
         return flavors
 
     def parseLabels(self, config):
         labels = {}
         for label_config in config.get('labels', []):
-            l = self.parseLabel(label_config)
+            l = self.parseLabel(label_config, config)
             labels[l.name] = l
         return labels
 
     @abc.abstractmethod
-    def parseLabel(self, label_config):
+    def parseLabel(self, label_config, provider_config):
         """Instantiate a ProviderLabel subclass
 
         :returns: a ProviderLabel subclass
@@ -230,7 +245,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         pass
 
     @abc.abstractmethod
-    def parseFlavor(self, flavor_config):
+    def parseFlavor(self, flavor_config, provider_config):
         """Instantiate a ProviderFlavor subclass
 
         :returns: a ProviderFlavor subclass
@@ -239,7 +254,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         pass
 
     @abc.abstractmethod
-    def parseImage(self, image_config):
+    def parseImage(self, image_config, provider_config):
         """Instantiate a ProviderImage subclass
 
         :returns: a ProviderImage subclass
