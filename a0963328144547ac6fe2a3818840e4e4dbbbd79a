@@ -16,6 +16,24 @@
       "message": "It took me a while to figure out that this only happen when moving the mouse with the button pressed. That\u0027s neat, but I\u0027m not sure it\u0027s very intuitive to discover that feature :) Perhaps once the popover is displayed, then it should simply follow the mouse, whatever the buttons state.",
       "revId": "a0963328144547ac6fe2a3818840e4e4dbbbd79a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d1ad2fc_c4888bdd",
+        "filename": "web/src/containers/status/QueueItemPopover.jsx",
+        "patchSetId": 11
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-11T20:01:59Z",
+      "side": 1,
+      "message": "The comment was submitted too fast. Please ignore the suggestion.",
+      "parentUuid": "1110e61c_80b7e90f",
+      "revId": "a0963328144547ac6fe2a3818840e4e4dbbbd79a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
