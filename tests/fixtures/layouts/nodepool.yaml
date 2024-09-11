@@ -126,6 +126,7 @@
     connection: aws
     boot-timeout: 120
     launch-timeout: 600
+    launch-attempts: 2
     object-storage:
       bucket-name: zuul
     # TODO
