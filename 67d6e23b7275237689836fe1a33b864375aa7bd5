@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "67d6e23b7275237689836fe1a33b864375aa7bd5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7deda8f_668df31e",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 18
+      },
+      "lineNbr": 514,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-11T20:23:20Z",
+      "side": 1,
+      "message": "It looks like these 2 counting functions are actually mutating their argument to add the count, but they also returns their input which is a bit confusing. Perhaps it would be cleaner if they didn\u0027t use a return statement? Or maybe we don\u0027t need to pre-compute the counts and we can simply count in the rendering function?",
+      "revId": "67d6e23b7275237689836fe1a33b864375aa7bd5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4852d597_e210e346",
+        "filename": "web/src/pages/PipelineDetails.jsx",
+        "patchSetId": 18
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-11T20:23:20Z",
+      "side": 1,
+      "message": "Shouldn\u0027t we check for null that could be set by the previous expression?",
+      "revId": "67d6e23b7275237689836fe1a33b864375aa7bd5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
