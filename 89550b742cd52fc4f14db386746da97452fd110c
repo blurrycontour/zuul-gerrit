@@ -54,6 +54,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6de91194_a31aff38",
+        "filename": "web/src/containers/status/QueueItem.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-11T19:32:08Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "128e2d69_c1d1c061",
+      "revId": "89550b742cd52fc4f14db386746da97452fd110c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b529bec5_2dbf7656",
@@ -144,6 +162,30 @@
       "side": 1,
       "message": "I don\u0027t have a strong opinion here, but to me it made more sense to build/generate the link where it\u0027s used and not somewhere on the outside and pass it through.",
       "parentUuid": "f3d64598_451a5c08",
+      "range": {
+        "startLine": 51,
+        "startChar": 59,
+        "endLine": 51,
+        "endChar": 65
+      },
+      "revId": "89550b742cd52fc4f14db386746da97452fd110c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f8db26b_f77eeac2",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-11T19:32:08Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "78f6efd3_a2fb352c",
       "range": {
         "startLine": 51,
         "startChar": 59,
