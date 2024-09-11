@@ -16,6 +16,29 @@
       "message": "recheck",
       "revId": "037ba1f6514e6ac40415497947002f5636aeed9e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fadacd7b_64794cc7",
+        "filename": "web/src/containers/status/Misc.jsx",
+        "patchSetId": 12
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-11T19:25:16Z",
+      "side": 1,
+      "message": "nit: we might want to use the `function` syntax to define new functions. I used to prefer having a single `const name \u003d value` for declarations, but I now recommend the function syntax for the following reasons:\n\n- easier to grep, and,\n- 2 char shorter.\n\nI made the change in https://review.opendev.org/c/zuul/zuul/+/928963",
+      "range": {
+        "startLine": 184,
+        "startChar": 0,
+        "endLine": 184,
+        "endChar": 5
+      },
+      "revId": "037ba1f6514e6ac40415497947002f5636aeed9e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
