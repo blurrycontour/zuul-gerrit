@@ -82,7 +82,7 @@ class AwsProviderImage(BaseProviderImage):
         discriminant=discriminate(
             lambda val, alt: val['type'] == alt['type']))
 
-    def __init__(self, config):
+    def __init__(self, image_config, provider_config):
         self.image_id = None
         self.image_filters = None
         # TODO: add to config
@@ -93,7 +93,7 @@ class AwsProviderImage(BaseProviderImage):
         self.iops = None
         self.throughput = None
         self.ena_support = True
-        super().__init__(config)
+        super().__init__(image_config, provider_config)
 
 
 class AwsProviderFlavor(BaseProviderFlavor):
@@ -182,14 +182,14 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         self._set(_endpoint=self.getEndpoint())
         return self._endpoint
 
-    def parseImage(self, image_config):
-        return AwsProviderImage(image_config)
+    def parseImage(self, image_config, provider_config):
+        return AwsProviderImage(image_config, provider_config)
 
-    def parseFlavor(self, flavor_config):
-        return AwsProviderFlavor(flavor_config)
+    def parseFlavor(self, flavor_config, provider_config):
+        return AwsProviderFlavor(flavor_config, provider_config)
 
-    def parseLabel(self, label_config):
-        return AwsProviderLabel(label_config)
+    def parseLabel(self, label_config, provider_config):
+        return AwsProviderLabel(label_config, provider_config)
 
     def getEndpoint(self):
         return self.driver.getEndpoint(self)
