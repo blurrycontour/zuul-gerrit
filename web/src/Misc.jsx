@@ -14,6 +14,7 @@
 
 import * as React from 'react'
 import PropTypes from 'prop-types'
+import * as moment from 'moment'
 import { ExternalLinkAltIcon } from '@patternfly/react-icons'
 
 function removeHash() {
@@ -111,11 +112,11 @@ function renderRefInfo(ref) {
     </>
   )
   const oldrev = ref.oldrev ? (
-    <><br/><strong>Old</strong> {ref.oldrev}</>
-  ) : ( <></> )
+    <><br /><strong>Old</strong> {ref.oldrev}</>
+  ) : (<></>)
   const newrev = ref.newrev ? (
-    <><br/><strong>New</strong> {ref.newrev}</>
-  ) : ( <></> )
+    <><br /><strong>New</strong> {ref.newrev}</>
+  ) : (<></>)
 
   return (
     <>
@@ -180,4 +181,25 @@ function setDarkMode(darkMode) {
   }
 }
 
-export { IconProperty, removeHash, ExternalLink, buildExternalLink, buildExternalTableLink, describeRef, renderRefInfo, ConditionalWrapper, resolveDarkMode, setDarkMode }
+function formatTime(ms) {
+  return moment.duration(ms).format({
+    template: 'h [hr] m [min]',
+    largest: 2,
+    minValue: 1,
+    usePlural: false,
+  })
+}
+
+export {
+  buildExternalLink,
+  buildExternalTableLink,
+  ConditionalWrapper,
+  describeRef,
+  ExternalLink,
+  formatTime,
+  IconProperty,
+  removeHash,
+  renderRefInfo,
+  resolveDarkMode,
+  setDarkMode,
+}

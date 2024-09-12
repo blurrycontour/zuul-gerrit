@@ -1,5 +1,6 @@
 // Copyright 2018 Red Hat, Inc
 // Copyright 2020 BMW Group
+// Copyright 2024 Acme Gating, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -28,6 +29,8 @@ import {
   StreamIcon,
   TimesIcon,
 } from '@patternfly/react-icons'
+
+import { ExternalLink } from '../../Misc'
 
 const QUEUE_ITEM_ICON_CONFIGS = {
   SUCCESS: {
@@ -148,4 +151,148 @@ PipelineIcon.propTypes = {
   size: PropTypes.string,
 }
 
-export { getQueueItemIconConfig, PipelineIcon }
+function ChangeLink({ change }) {
+  let changeId = change.id || 'NA'
+  let changeTitle = changeId
+  // Fall back to display the ref if there is no change id
+  if (changeId === 'NA' && change.ref) {
+    changeTitle = change.ref
+  }
+  let changeText = ''
+  if (change.url !== null) {
+    let githubId = changeId.match(/^([0-9]+),([0-9a-f]{40})$/)
+    if (githubId) {
+      changeTitle = githubId
+      changeText = '#' + githubId[1]
+    } else if (/^[0-9a-f]{40}$/.test(changeId)) {
+      changeText = changeId.slice(0, 7)
+    }
+  } else if (changeId.length === 40) {
+    changeText = changeId.slice(0, 7)
+  }
+  return (
+    <ExternalLink target={change.url}>
+      {changeText !== '' ? changeText : changeTitle}
+    </ExternalLink>
+  )
+}
+
+ChangeLink.propTypes = {
+  change: PropTypes.object,
+}
+
+const getJobStrResult = (job) => {
+  let result = job.result ? job.result.toLowerCase() : null
+  if (result === null) {
+    if (job.url === null) {
+      if (job.queued === false) {
+        result = 'waiting'
+      } else {
+        result = 'queued'
+      }
+    } else if (job.paused !== null && job.paused) {
+      result = 'paused'
+    } else {
+      result = 'in progress'
+    }
+  }
+  return result
+}
+
+const calculateQueueItemTimes = (item) => {
+  let maxRemaining = 0
+  let jobs = {}
+  const now = Date.now()
+
+  for (const job of item.jobs) {
+    let jobElapsed = null
+    let jobRemaining = null
+    if (job.start_time) {
+      let jobStart = parseInt(job.start_time * 1000)
+
+      if (job.end_time) {
+        let jobEnd = parseInt(job.end_time * 1000)
+        jobElapsed = jobEnd - jobStart
+      } else {
+        jobElapsed = Math.max(now - jobStart, 0)
+        if (job.estimated_time) {
+          jobRemaining = Math.max(parseInt(job.estimated_time * 1000) - jobElapsed, 0)
+        }
+      }
+    }
+    if (jobRemaining && jobRemaining > maxRemaining) {
+      maxRemaining = jobRemaining
+    }
+    jobs[job.name] = {
+      elapsed: jobElapsed,
+      remaining: jobRemaining,
+    }
+  }
+  // If not all the jobs have started, this will be null, so only
+  // use our value if it's oky to calculate it.
+  if (item.remaining_time === null) {
+    maxRemaining = null
+  }
+  return {
+    remaining: maxRemaining,
+    jobs: jobs,
+  }
+}
+
+function QueueItemProgressbar({ item, darkMode }) {
+  // TODO (felix): Use a PF4 progress bar instead
+  const interesting_jobs = item.jobs.filter(j => getJobStrResult(j) !== 'skipped')
+  let jobPercent = (100 / interesting_jobs.length).toFixed(2)
+  return (
+    <div className={`progress zuul-change-total-result${darkMode ? ' progress-dark' : ''}`}>
+      {item.jobs.map((job, idx) => {
+        let result = getJobStrResult(job)
+        if (['queued', 'waiting', 'skipped'].includes(result)) {
+          return ''
+        }
+        let className = ''
+        switch (result) {
+          case 'success':
+            className = ' progress-bar-success'
+            break
+          case 'lost':
+          case 'failure':
+            className = ' progress-bar-danger'
+            break
+          case 'unstable':
+          case 'retry_limit':
+          case 'post_failure':
+          case 'node_failure':
+            className = ' progress-bar-warning'
+            break
+          case 'paused':
+            className = ' progress-bar-info'
+            break
+          default:
+            if (job.pre_fail) {
+              className = ' progress-bar-danger'
+            }
+            break
+        }
+        return <div className={'progress-bar' + className}
+          key={idx}
+          title={job.name}
+          style={{ width: jobPercent + '%' }} />
+      })}
+    </div>
+  )
+}
+
+QueueItemProgressbar.propTypes = {
+  item: PropTypes.object,
+  darkMode: PropTypes.bool,
+}
+
+export {
+  calculateQueueItemTimes,
+  ChangeLink,
+  getJobStrResult,
+  getQueueItemIconConfig,
+  QueueItemProgressbar,
+  PipelineIcon,
+}
