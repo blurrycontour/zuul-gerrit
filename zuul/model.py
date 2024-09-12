@@ -1895,6 +1895,7 @@ class Node(ConfigObject):
         self.attributes = {}
         self.tenant_name = None
         self.requestor = None
+        self.node_properties = {}
 
     @property
     def state(self):
