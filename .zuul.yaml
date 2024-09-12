@@ -90,7 +90,7 @@
         ZUUL_ZK_CERT: /opt/zookeeper/ca/certs/client.pem
         ZUUL_ZK_KEY: /opt/zookeeper/ca/keys/clientkey.pem
         ZUUL_SSH_KEY: /home/zuul/.ssh/id_rsa
-        ZUUL_REMOTE_IPV4: "{{ nodepool.interface_ip }}"
+        ZUUL_REMOTE_IPV4: "{{ nodepool.private_ipv4 }}"
         ZUUL_REMOTE_KEEP: "true"
         CI: "1"
       nox_force_python: "3.11"
