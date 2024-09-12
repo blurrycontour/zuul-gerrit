@@ -1301,7 +1301,8 @@ class FakeNodepool(object):
                     image_id=None,
                     host_keys=host_keys,
                     executor='fake-nodepool',
-                    hold_expiration=None)
+                    hold_expiration=None,
+                    node_properties={"spot": False})
         if self.resources:
             data['resources'] = self.resources
         if self.remote_ansible:
