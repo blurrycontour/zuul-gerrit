@@ -505,8 +505,22 @@ a.refresh {
     }
 }
 
-/* Hide red cross icon next to a failing PF4 progress bar for pre-fail jobs */
-.pf-c-progress.zuul-progress.pf-m-danger .pf-c-progress__status {
+.pf-c-progress.zuul-item-progress {
+    height: 24px;
+}
+
+.pf-c-progress.zuul-item-progress .pf-c-progress__indicator {
+    height: 24px;
+}
+
+.zuul-item-progress div.pf-c-progress__bar {
+    height: 24px;
+}
+
+/* Hide PF4 status indicator (red cross, green checkmark) next to a progress
+   bar */
+.pf-c-progress.zuul-item-progress .pf-c-progress__status,
+.pf-c-progress.zuul-progress .pf-c-progress__status {
     display: none;
 }
 

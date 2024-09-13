@@ -111,8 +111,6 @@ const PIPELINE_ICON_CONFIGS = {
 const DEFAULT_PIPELINE_ICON_CONFIG = PIPELINE_ICON_CONFIGS['unknown']
 
 const JOB_STATE_ICON_CONFIGS = {
-  // TODO (felix): Add missing stats/result values like
-  // unstable, retry_limit, post_failure, node_failure
   SUCCESS: {
     icon: CheckIcon,
     color: 'var(--pf-global--success-color--100)',
@@ -120,6 +118,12 @@ const JOB_STATE_ICON_CONFIGS = {
     labelColor: 'green',
   },
   FAILURE: {
+    icon: TimesIcon,
+    color: 'var(--pf-global--danger-color--100)',
+    variant: 'danger',
+    labelColor: 'red',
+  },
+  LOST: {
     icon: TimesIcon,
     color: 'var(--pf-global--danger-color--100)',
     variant: 'danger',
@@ -137,25 +141,49 @@ const JOB_STATE_ICON_CONFIGS = {
     variant: 'pending',
     labelColor: 'grey',
   },
-  WAITING: {
-    icon: OutlinedClockIcon,
-    color: 'var(--pf-global--disabled-color--100)',
-    variant: 'pending',
-    labelColor: 'grey',
-  },
   SKIPPED: {
     icon: AngleDoubleRightIcon,
     color: 'var(--pf-global--info-color--100)',
     variant: 'info',
     labelColor: 'blue',
   },
+  WAITING: {
+    icon: OutlinedClockIcon,
+    color: 'var(--pf-global--disabled-color--100)',
+    variant: 'pending',
+    labelColor: 'grey',
+  },
   CANCELED: {
     icon: TimesIcon,
-    color: 'var(--pf-global--danger-color--100)',
-    variant: 'danger',
+    color: 'var(--pf-global--warning-color--100)',
+    variant: 'warning',
     labelColor: 'orange',
   },
   POST_FAILURE: {
+    icon: TimesIcon,
+    color: 'var(--pf-global--warning-color--100)',
+    variant: 'warning',
+    labelColor: 'orange',
+  },
+  NODE_FAILURE: {
+    icon: TimesIcon,
+    color: 'var(--pf-global--warning-color--100)',
+    variant: 'warning',
+    labelColor: 'orange',
+  },
+  TIMED_OUT: {
+    icon: TimesIcon,
+    color: 'var(--pf-global--warning-color--100)',
+    variant: 'warning',
+    labelColor: 'orange',
+  },
+  RETRY_LIMIT: {
+    icon: TimesIcon,
+    color: 'var(--pf-global--warning-color--100)',
+    variant: 'warning',
+    labelColor: 'orange',
+  },
+  UNSTABLE: {
     icon: TimesIcon,
     color: 'var(--pf-global--warning-color--100)',
     variant: 'warning',
@@ -168,6 +196,15 @@ const DEFAULT_JOB_STATE_ICON_CONFIG = {
   color: 'var(--pf-global--disabled-color--100)',
   variant: 'info',
   labelColor: 'grey',
+}
+
+const getJobResultIconConfig = (job) => {
+  let iconConfig = DEFAULT_JOB_STATE_ICON_CONFIG
+  let result = job.result ? job.result.toUpperCase() : null
+  if (result !== null) {
+    iconConfig = JOB_STATE_ICON_CONFIGS[result] || DEFAULT_JOB_STATE_ICON_CONFIG
+  }
+  return iconConfig
 }
 
 const getQueueItemIconConfig = (item) => {
@@ -305,45 +342,29 @@ const calculateQueueItemTimes = (item) => {
   }
 }
 
-function QueueItemProgressbar({ item, darkMode }) {
-  // TODO (felix): Use a PF4 progress bar instead
+function QueueItemProgressbar({ item }) {
   const interesting_jobs = item.jobs.filter(j => getJobStrResult(j) !== 'skipped')
   let jobPercent = (100 / interesting_jobs.length).toFixed(2)
+
   return (
-    <div className={`progress zuul-change-total-result${darkMode ? ' progress-dark' : ''}`}>
-      {item.jobs.map((job, idx) => {
-        let result = getJobStrResult(job)
-        if (['queued', 'waiting', 'skipped'].includes(result)) {
-          return ''
-        }
-        let className = ''
-        switch (result) {
-          case 'success':
-            className = ' progress-bar-success'
-            break
-          case 'lost':
-          case 'failure':
-            className = ' progress-bar-danger'
-            break
-          case 'unstable':
-          case 'retry_limit':
-          case 'post_failure':
-          case 'node_failure':
-            className = ' progress-bar-warning'
-            break
-          case 'paused':
-            className = ' progress-bar-info'
-            break
-          default:
-            if (job.pre_fail) {
-              className = ' progress-bar-danger'
-            }
-            break
-        }
-        return <div className={'progress-bar' + className}
-          key={idx}
-          title={job.name}
-          style={{ width: jobPercent + '%' }} />
+    <div style={{ textWrap: 'nowrap' }}>
+      {interesting_jobs.map((job, idx) => {
+        const iconConfig = getJobResultIconConfig(job)
+        return (
+          <Tooltip
+            key={`${job.name}-${job.uuid}-${idx}`}
+            content={job.name}
+          >
+            <Progress
+              aria-label={`${job.name}-progress`}
+              className="zuul-item-progress"
+              value={100}
+              measureLocation={ProgressMeasureLocation.none}
+              variant={iconConfig.variant}
+              style={{ width: jobPercent + '%', display: 'inline-block' }}
+            />
+          </Tooltip>
+        )
       })}
     </div>
   )
@@ -389,7 +410,7 @@ JobProgressBar.propTypes = {
 }
 
 function JobStatusLabel({ job, result }) {
-  const iconConfig = JOB_STATE_ICON_CONFIGS[result.toUpperCase()] || DEFAULT_JOB_STATE_ICON_CONFIG
+  const iconConfig = getJobResultIconConfig(job)
 
   const label = (
     <Label className="zuul-job-result-label" color={iconConfig.labelColor}>
@@ -519,6 +540,7 @@ export {
   ChangeLink,
   countQueueItems,
   countPipelineItems,
+  getJobResultIconConfig,
   getJobStrResult,
   getQueueItemIconConfig,
   getRefs,
