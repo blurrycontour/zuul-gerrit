@@ -164,7 +164,8 @@ PipelineGallery.propTypes = {
 function PipelineOverviewPage({
   pipelines, stats, isFetching, tenant, darkMode, autoReload, timezone, fetchStatusIfNeeded
 }) {
-  const [showAllPipelines, setShowAllPipelines] = useState(false)
+  const [showAllPipelines, setShowAllPipelines] = useState(
+    localStorage.getItem('zuul_show_all_pipelines') === 'true')
   const [isReloading, setIsReloading] = useState(false)
   const location = useLocation()
   const history = useHistory()
@@ -175,18 +176,20 @@ function PipelineOverviewPage({
 
   const onShowAllPipelinesToggle = (isChecked) => {
     setShowAllPipelines(isChecked)
+    localStorage.setItem('zuul_show_all_pipelines', isChecked.toString())
   }
 
   const onFilterChanged = (newFilters) => {
     handleFilterChange(newFilters, location, history)
     // show all pipelines when filtering, hide when not
-    setShowAllPipelines(isFilterActive(newFilters))
+    setShowAllPipelines(
+      isFilterActive(newFilters) || localStorage.getItem('zuul_show_all_pipelines') === 'true')
   }
 
   const onClearFilters = () => {
     clearFilters(location, history, filterCategories)
     // reset `showAllPipelines` when clearing filters
-    setShowAllPipelines(false)
+    setShowAllPipelines(localStorage.getItem('zuul_show_all_pipelines') === 'true')
   }
 
   const updateData = useCallback((tenant) => {
