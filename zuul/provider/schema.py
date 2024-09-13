@@ -31,6 +31,7 @@ base_label = vs.Schema({
     Optional('image'): Nullable(str),
     Optional('flavor'): Nullable(str),
     Optional('tags', default=dict): {str: str},
+    Optional('min_ready', default=0): int
 })
 
 # Label attributes that are common to any kind of ssh-based driver.
