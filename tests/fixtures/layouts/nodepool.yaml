@@ -104,6 +104,7 @@
     name: debian-normal
     image: debian
     flavor: normal
+    min-ready: 3
 
 - label:
     name: debian-large

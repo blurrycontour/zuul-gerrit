@@ -466,6 +466,7 @@ class LabelParser(object):
         vs.Required('image'): str,
         vs.Required('flavor'): str,
         'description': str,
+        'min-ready': int,
     }
     schema = vs.Schema(label)
 
@@ -478,7 +479,7 @@ class LabelParser(object):
         self.schema(conf)
 
         label = model.Label(conf['name'], conf['image'], conf['flavor'],
-                            conf.get('description'))
+                            conf.get('description'), conf.get('min-ready'))
         label.source_context = conf.get('_source_context')
         label.start_mark = conf.get('_start_mark')
         label.freeze()
