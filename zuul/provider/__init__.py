@@ -83,6 +83,11 @@ class BaseProviderLabel(metaclass=abc.ABCMeta):
 
         self.__dict__.update(self.schema(new_config))
 
+    def __repr__(self):
+        return (f"<{self.__class__.__name__} "
+                f"name={self.name} "
+                f"project_canonical_name={self.project_canonical_name}>")
+
 
 class BaseProviderEndpoint(metaclass=abc.ABCMeta):
     """Base class for provider endpoints.
@@ -275,21 +280,20 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
     def hasLabel(self, label):
         return label in self.labels
 
-    def getNodeTags(self, system_id, request, provider, label,
-                    node_uuid):
+    def getNodeTags(self, system_id, provider, label, node_uuid, request=None):
         """Return the tags that should be stored with the node
 
         :param str system_id: The Zuul system uuid
-        :param NodesetRequest request: The node request
         :param Provider provider: The cloud provider
         :param ProviderLabel label: The node label
         :param str node_uuid: The node uuid
+        :param NodesetRequest request: The node request or None
         """
         tags = dict()
 
         # TODO: add other potentially useful attrs from nodepool
         attributes = model.Attributes(
-            request_id=request.uuid,
+            request_id=request.uuid if request else None,
             tenant_name=provider.tenant_name,
         )
         for k, v in label.tags.items():
