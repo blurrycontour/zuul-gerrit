@@ -26,11 +26,13 @@ from zuul.lib.voluputil import Required, Optional, Nullable
 # a standalone label (but not in the section body).
 base_label = vs.Schema({
     Required('project_canonical_name'): str,
+    Required('config_hash'): str,
     Required('name'): str,
     Optional('description'): Nullable(str),
     Optional('image'): Nullable(str),
     Optional('flavor'): Nullable(str),
     Optional('tags', default=dict): {str: str},
+    Optional('min_ready', default=0): int
 })
 
 # Label attributes that are common to any kind of ssh-based driver.
@@ -56,7 +58,7 @@ common_image = vs.Schema({
 # section body).
 base_image = vs.Schema({
     Required('project_canonical_name'): str,
-    Required('config_hash'): int,
+    Required('config_hash'): str,
     Required('name'): str,
     Optional('description'): Nullable(str),
     Required('branch'): str,
@@ -69,6 +71,7 @@ base_image = vs.Schema({
 # a standalone flavor (but not in the section body).
 base_flavor = vs.Schema({
     Required('project_canonical_name'): str,
+    Required('config_hash'): str,
     Required('name'): str,
     Optional('description'): Nullable(str),
 })
