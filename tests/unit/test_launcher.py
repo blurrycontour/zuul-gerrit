@@ -271,6 +271,44 @@ class TestLauncher(ZuulTestCase):
         self.assertEqual(self.getJobFromHistory('check-job').node,
                          'debian-normal')
 
+    @simple_layout('layouts/nodepool-min-ready.yaml', enable_nodepool=True)
+    def test_min_ready(self):
+        for _ in iterate_timeout(60, "nodes to be ready"):
+            nodes = self.launcher.api.nodes_cache.getItems()
+            if len(nodes) != 3:
+                continue
+            if all(n.state == n.State.READY for n in nodes):
+                break
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(30, "node to be in-use"):
+            if any(n.state == n.State.IN_USE for n in nodes):
+                break
+
+        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(self.getJobFromHistory('check-job').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(self.getJobFromHistory('check-job').node,
+                         'debian-normal')
+
+        # Wait for min-ready slots to be refilled
+        for _ in iterate_timeout(60, "nodes to be ready"):
+            nodes = self.launcher.api.nodes_cache.getItems()
+            if len(nodes) != 3:
+                continue
+            if all(n.state == n.State.READY for n in nodes):
+                break
+
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_launcher_failover(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
