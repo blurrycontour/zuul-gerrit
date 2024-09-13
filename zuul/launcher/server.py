@@ -15,6 +15,7 @@
 
 from concurrent.futures import ThreadPoolExecutor
 import collections
+import contextlib
 import itertools
 import logging
 import os
@@ -164,6 +165,17 @@ class EndpointUploadJob:
                 timestamp=time.time())
 
 
+@contextlib.contextmanager
+def tick_or_reset(node, sm):
+    old_state = sm.state
+    yield
+    new_state = sm.state
+    if old_state == new_state:
+        node._backoff.tick()
+    else:
+        node._backoff.reset()
+
+
 class Launcher:
     log = logging.getLogger("zuul.Launcher")
 
@@ -195,6 +207,7 @@ class Launcher:
         self.component_info = LauncherComponent(
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
+        self._next_wake = None
         self.wake_event = threading.Event()
         self.stop_event = threading.Event()
 
@@ -249,6 +262,25 @@ class Launcher:
             thread_name_prefix="UploadWorker",
         )
 
+    @property
+    def next_wake(self):
+        return self._next_wake
+
+    @next_wake.setter
+    def next_wake(self, deadline):
+        if self._next_wake is None or deadline < self._next_wake:
+            self._next_wake = deadline
+
+    @next_wake.deleter
+    def next_wake(self):
+        self._next_wake = None
+
+    def _getWakeEventTimeout(self):
+        if self.next_wake is None:
+            return None
+        else:
+            return time.time() - self.next_wake
+
     def _layoutUpdatedCallback(self):
         self.layout_updated_event.set()
         self.wake_event.set()
@@ -261,11 +293,13 @@ class Launcher:
         self.component_info.state = self.component_info.RUNNING
         self.log.debug("Launcher running")
         while self._running:
+            # Reset the wake time
+            del self.next_wake
             try:
                 self._run()
             except Exception:
                 self.log.exception("Error in main thread:")
-            self.wake_event.wait()
+            self.wake_event.wait(self._getWakeEventTimeout())
             self.wake_event.clear()
 
     def _run(self):
@@ -291,6 +325,10 @@ class Launcher:
                     log.debug("Failed to lock matching request %s", request)
                     continue
 
+            if request._backoff.deadline > time.time():
+                log.debug("Skipping %s due to backoff", request)
+                continue
+
             if not self._cachesReadyForRequest(request):
                 self.log.debug("Caches are not up-to-date for %s", request)
                 continue
@@ -314,6 +352,8 @@ class Launcher:
                 log.exception("Error processing request %s", request)
             if request.state in request.FINAL_STATES:
                 request.releaseLock()
+
+            self.next_wake = request._backoff.deadline
 
     def _cachesReadyForRequest(self, request):
         # Make sure we have all associated provider nodes in the cache
@@ -446,6 +486,10 @@ class Launcher:
                     log.debug("Failed to lock matching node %s", node)
                     continue
 
+            if node._backoff.deadline > time.time():
+                log.debug("Skipping %s due to backoff", node)
+                continue
+
             if request := self.api.getNodesetRequest(node.request_id):
                 try:
                     if node.state in node.CREATE_STATES:
@@ -464,6 +508,8 @@ class Launcher:
             if not request or node.state in node.State.FAILED:
                 self._cleanupNode(node, log)
 
+            self.next_wake = node._backoff.deadline
+
     def _checkNode(self, node, log):
         with self.createZKContext(node._lock, self.log) as ctx:
             with node.activeContext(ctx):
@@ -478,9 +524,9 @@ class Launcher:
                         node, image_external_id, log)
 
                 log.debug("Checking node %s", node)
-                node.create_state_machine.advance()
+                with tick_or_reset(node, node.create_state_machine):
+                    node.create_state_machine.advance()
                 if not node.create_state_machine.complete:
-                    self.wake_event.set()
                     return
                 node.state = model.ProviderNode.State.READY
                 log.debug("Marking node %s as %s", node, node.state)
@@ -497,10 +543,10 @@ class Launcher:
                         node, log)
 
                 log.debug("Checking node %s cleanup", node)
-                node.delete_state_machine.advance()
+                with tick_or_reset(node, node.delete_state_machine):
+                    node.delete_state_machine.advance()
 
             if not node.delete_state_machine.complete:
-                self.wake_event.set()
                 return
 
             if not self.api.getNodesetRequest(node.request_id):
