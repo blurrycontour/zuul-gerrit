@@ -1,0 +1,27 @@
+- label:
+    name: debian-emea
+    image: debian
+    flavor: normal
+    min-ready: 1
+
+- provider:
+    name: aws-eu-central-1-main
+    section: aws-eu-central-1
+    labels:
+      - name: debian-emea
+        key-name: zuul
+
+- provider:
+    name: aws-ca-central-1-main
+    section: aws-ca-central-1
+    labels:
+      - name: debian-normal
+        key-name: zuul
+
+- project:
+    check:
+      jobs:
+        - check-job
+    gate:
+      jobs:
+        - check-job
