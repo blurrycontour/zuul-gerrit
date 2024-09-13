@@ -1638,12 +1638,13 @@ class Label(ConfigObject):
     Labels are associated with provider-specific instance types.
     """
 
-    def __init__(self, name, image, flavor, description):
+    def __init__(self, name, image, flavor, description, min_ready):
         super().__init__()
         self.name = name
         self.image = image
         self.flavor = flavor
         self.description = description
+        self.min_ready = min_ready
 
     @property
     def canonical_name(self):
@@ -1665,7 +1666,8 @@ class Label(ConfigObject):
         return (self.name == other.name and
                 self.image == other.image and
                 self.flavor == other.flavor and
-                self.description == other.description)
+                self.description == other.description and
+                self.min_ready == other.min_ready)
 
     def toDict(self):
         sc = self.source_context
@@ -1675,6 +1677,7 @@ class Label(ConfigObject):
             'image': self.image,
             'flavor': self.flavor,
             'description': self.description,
+            'min_ready': self.min_ready,
         }
 
     def validateReferences(self, layout):
@@ -2409,7 +2412,7 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
         super().__init__()
         self._set(
             uuid=uuid4().hex,
-            request_id="",
+            request_id=None,
             state=self.State.REQUESTED,
             label="",
             tags={},

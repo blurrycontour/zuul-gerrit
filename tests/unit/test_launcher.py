@@ -271,6 +271,15 @@ class TestLauncher(ZuulTestCase):
         self.assertEqual(self.getJobFromHistory('check-job').node,
                          'debian-normal')
 
+    @simple_layout('layouts/nodepool-min-ready.yaml', enable_nodepool=True)
+    def test_min_ready(self):
+        for _ in iterate_timeout(60, "nodes are ready"):
+            nodes = self.launcher.api.nodes_cache.getItems()
+            if len(nodes) != 3:
+                continue
+            if all(n.state == n.State.READY for n in nodes):
+                break
+
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_launcher_failover(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
