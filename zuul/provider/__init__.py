@@ -83,6 +83,15 @@ class BaseProviderLabel(metaclass=abc.ABCMeta):
 
         self.__dict__.update(self.schema(new_config))
 
+    def __repr__(self):
+        return (f"<{self.__class__.__name__} "
+                f"name={self.name} "
+                f"project_canonical_name={self.project_canonical_name}>")
+
+    @property
+    def canonical_name(self):
+        return f"{self.project_canonical_name}/{self.name}"
+
 
 class BaseProviderEndpoint(metaclass=abc.ABCMeta):
     """Base class for provider endpoints.
@@ -275,22 +284,22 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
     def hasLabel(self, label):
         return label in self.labels
 
-    def getNodeTags(self, system_id, request, provider, label,
-                    node_uuid):
+    def getNodeTags(self, system_id, label, node_uuid,
+                    provider=None, request=None):
         """Return the tags that should be stored with the node
 
         :param str system_id: The Zuul system uuid
-        :param NodesetRequest request: The node request
-        :param Provider provider: The cloud provider
         :param ProviderLabel label: The node label
         :param str node_uuid: The node uuid
+        :param Provider provider: The cloud provider or None
+        :param NodesetRequest request: The node request or None
         """
         tags = dict()
 
         # TODO: add other potentially useful attrs from nodepool
         attributes = model.Attributes(
-            request_id=request.uuid,
-            tenant_name=provider.tenant_name,
+            request_id=request.uuid if request else None,
+            tenant_name=provider.tenant_name if provider else None,
         )
         for k, v in label.tags.items():
             try:
@@ -300,8 +309,8 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
 
         fixed = {
             'zuul_system_id': system_id,
-            'zuul_provider_name': self.tenant_scoped_name,
-            'zuul_provider_cname': self.canonical_name,
+            # 'zuul_provider_name': self.tenant_scoped_name,
+            # 'zuul_provider_cname': self.canonical_name,
             'zuul_node_uuid': node_uuid,
         }
         tags.update(fixed)
