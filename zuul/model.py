@@ -15,6 +15,7 @@
 
 import abc
 import copy
+import dataclasses
 import hashlib
 import itertools
 import json
@@ -2266,6 +2267,24 @@ class NodesetInfo:
         )
 
 
+@dataclasses.dataclass(slots=True)
+class BackoffRecord:
+    BACKOFF_CAP = 30
+    BACKOFF_BASE = 0.5
+
+    attempts: int = 0
+    deadline: float = dataclasses.field(default_factory=time.time)
+
+    def tick(self):
+        self.deadline = time.time() + min(
+            self.BACKOFF_CAP, self.BACKOFF_BASE * 2 ** self.attempts)
+        self.attempts += 1
+
+    def reset(self):
+        self.attempts = 0
+        self.deadline = time.time()
+
+
 class NodesetRequest(zkobject.LockableZKObject):
 
     class State(StrEnum):
@@ -2309,6 +2328,7 @@ class NodesetRequest(zkobject.LockableZKObject):
             is_locked=False,
             # Attributes set by the launcher
             _lscores=None,
+            _backoff=BackoffRecord(),
         )
 
     @property
@@ -2421,6 +2441,7 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             delete_state_machine=None,
             # Attributes set by the launcher
             _lscores=None,
+            _backoff=BackoffRecord(),
         )
 
     def __repr__(self):
