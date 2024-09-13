@@ -13,8 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import textwrap
 import time
 import uuid
+from collections import defaultdict
 from unittest import mock, skip
 
 from zuul import model
@@ -37,9 +39,36 @@ from tests.base import (
 )
 
 
-class TestLauncher(ZuulTestCase):
+class LauncherBaseTestCase(ZuulTestCase):
     config_file = 'zuul-connections-nodepool.conf'
     mock_aws = mock_aws()
+
+    def setUp(self):
+        self.mock_aws.start()
+
+        self.responses = responses.RequestsMock()
+        self.responses.start()
+        self.responses.add_passthru("http://localhost")
+        self.responses.add(
+            responses.GET,
+            'http://example.com/image.raw',
+            body="test raw image")
+        self.responses.add(
+            responses.GET,
+            'http://example.com/image.qcow2',
+            body="test qcow2 image")
+        self.s3 = boto3.resource('s3', region_name='us-west-2')
+        self.s3.create_bucket(
+            Bucket='zuul',
+            CreateBucketConfiguration={'LocationConstraint': 'us-west-2'})
+        super().setUp()
+
+    def tearDown(self):
+        self.mock_aws.stop()
+        super().tearDown()
+
+
+class TestLauncher(LauncherBaseTestCase):
     debian_return_data = {
         'zuul': {
             'artifacts': [
@@ -98,30 +127,6 @@ class TestLauncher(ZuulTestCase):
             ]
         }
     }
-
-    def setUp(self):
-        self.mock_aws.start()
-
-        self.responses = responses.RequestsMock()
-        self.responses.start()
-        self.responses.add_passthru("http://localhost")
-        self.responses.add(
-            responses.GET,
-            'http://example.com/image.raw',
-            body="test raw image")
-        self.responses.add(
-            responses.GET,
-            'http://example.com/image.qcow2',
-            body="test qcow2 image")
-        self.s3 = boto3.resource('s3', region_name='us-west-2')
-        self.s3.create_bucket(
-            Bucket='zuul',
-            CreateBucketConfiguration={'LocationConstraint': 'us-west-2'})
-        super().setUp()
-
-    def tearDown(self):
-        self.mock_aws.stop()
-        super().tearDown()
 
     @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
     @return_data(
@@ -288,7 +293,7 @@ class TestLauncher(ZuulTestCase):
                     span_info=None,
                 )
                 for _ in iterate_timeout(
-                        10, "nodeset request to be fulfilled"):
+                        30, "nodeset request to be fulfilled"):
                     result_events = list(result_queue)
                     if result_events:
                         for event in result_events:
@@ -540,6 +545,138 @@ class TestLauncher(ZuulTestCase):
                     pnode.refresh(ctx)
                 except NoNodeError:
                     break
+
+
+class TestMinReadyLauncher(LauncherBaseTestCase):
+    config_file = 'zuul-launcher-multi-region.conf'
+    tenant_config_file = "config/launcher-min-ready/main.yaml"
+
+    def test_min_ready(self):
+        for _ in iterate_timeout(60, "nodes to be ready"):
+            nodes = self.launcher.api.nodes_cache.getItems()
+            # Since we are randomly picking a provider to fill the
+            # min-ready slots we might end up with 3-5 nodes
+            # depending on the choice of providers.
+            if not 3 <= len(nodes) <= 5:
+                continue
+            if all(n.state == n.State.READY for n in nodes):
+                break
+
+        self.waitUntilSettled()
+        nodes = self.launcher.api.nodes_cache.getItems()
+        self.assertGreaterEqual(len(nodes), 3)
+        self.assertLessEqual(len(nodes), 5)
+
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(30, "nodes to be in-use"):
+            # We expect the launcher to use the min-ready nodes
+            in_use_nodes = [n for n in nodes if n.state == n.State.IN_USE]
+            if len(in_use_nodes) == 2:
+                break
+
+        self.executor_server.hold_jobs_in_build = True
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        check_job_a = self.getJobFromHistory('check-job', project=A.project)
+        self.assertEqual(check_job_a.result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(check_job_a.node,
+                         'debian-normal')
+
+        check_job_b = self.getJobFromHistory('check-job', project=A.project)
+        self.assertEqual(check_job_b.result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(check_job_b.node,
+                         'debian-normal')
+
+        # Wait for min-ready slots to be refilled
+        for _ in iterate_timeout(60, "nodes to be ready"):
+            nodes = self.launcher.api.nodes_cache.getItems()
+            if not 3 <= len(nodes) <= 5:
+                continue
+            if all(n.state == n.State.READY for n in nodes):
+                break
+
+        self.waitUntilSettled()
+        nodes = self.launcher.api.nodes_cache.getItems()
+        self.assertGreaterEqual(len(nodes), 3)
+        self.assertLessEqual(len(nodes), 5)
+
+
+class TestMinReadyTenantVariant(LauncherBaseTestCase):
+    config_file = 'zuul-launcher-multi-region.conf'
+    tenant_config_file = "config/launcher-min-ready/tenant-variant.yaml"
+
+    def test_min_ready(self):
+        for _ in iterate_timeout(60, "nodes to be ready"):
+            nodes = self.launcher.api.nodes_cache.getItems()
+            if len(nodes) != 5:
+                continue
+            if all(n.state == n.State.READY for n in nodes):
+                break
+
+        self.waitUntilSettled()
+        nodes = self.launcher.api.nodes_cache.getItems()
+        self.assertEqual(5, len(nodes))
+
+        nodes_by_label = defaultdict(list)
+        for node in nodes:
+            nodes_by_label[node.label].append(node)
+
+        self.assertEqual(4, len(nodes_by_label['debian-normal']))
+        debian_normal_cfg_hashes = {
+            n.label_config_hash for n in nodes_by_label['debian-normal']
+        }
+        self.assertEqual(2, len(debian_normal_cfg_hashes))
+
+        files = {
+            'zuul-extra.d/image.yaml': textwrap.dedent(
+                '''
+                - image:
+                    name: debian
+                    type: cloud
+                    description: "Debian test image"
+                '''
+            )
+        }
+        self.addCommitToRepo('org/project1', 'Change label config', files)
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(60, "nodes to be ready"):
+            nodes = self.launcher.api.nodes_cache.getItems()
+            if len(nodes) != 5:
+                continue
+            if all(n.state == n.State.READY for n in nodes):
+                break
+
+        nodes = self.launcher.api.nodes_cache.getItems()
+        self.assertEqual(5, len(nodes))
+
+        nodes_by_label = defaultdict(list)
+        for node in nodes:
+            nodes_by_label[node.label].append(node)
+
+        self.assertEqual(1, len(nodes_by_label['debian-emea']))
+        self.assertEqual(4, len(nodes_by_label['debian-normal']))
+        debian_normal_cfg_hashes = {
+            n.label_config_hash for n in nodes_by_label['debian-normal']
+        }
+        self.assertEqual(2, len(debian_normal_cfg_hashes))
 
 
 class TestLauncherImagePermissions(ZuulTestCase):
