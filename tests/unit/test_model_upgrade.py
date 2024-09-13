@@ -25,6 +25,7 @@ from tests.base import (
     simple_layout,
     iterate_timeout,
     model_version,
+    ZOOKEEPER_SESSION_TIMEOUT,
 )
 from zuul.zk import ZooKeeperClient
 from zuul.zk.branch_cache import BranchCache, BranchFlag
@@ -215,7 +216,9 @@ class TestBranchCacheUpgrade(BaseTestCase):
             self.zk_chroot_fixture.zk_hosts,
             tls_cert=self.zk_chroot_fixture.zookeeper_cert,
             tls_key=self.zk_chroot_fixture.zookeeper_key,
-            tls_ca=self.zk_chroot_fixture.zookeeper_ca)
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca,
+            timeout=ZOOKEEPER_SESSION_TIMEOUT,
+        )
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
         self.model_test_component_info = SchedulerComponent(

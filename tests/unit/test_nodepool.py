@@ -17,7 +17,12 @@ import uuid
 from zuul import model
 import zuul.nodepool
 
-from tests.base import BaseTestCase, FakeNodepool, iterate_timeout
+from tests.base import (
+    BaseTestCase,
+    FakeNodepool,
+    iterate_timeout,
+    ZOOKEEPER_SESSION_TIMEOUT,
+)
 from zuul.zk import ZooKeeperClient
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.components import COMPONENT_REGISTRY
@@ -58,7 +63,9 @@ class TestNodepoolBase(BaseTestCase):
             self.zk_chroot_fixture.zk_hosts,
             tls_cert=self.zk_chroot_fixture.zookeeper_cert,
             tls_key=self.zk_chroot_fixture.zookeeper_key,
-            tls_ca=self.zk_chroot_fixture.zookeeper_ca)
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca,
+            timeout=ZOOKEEPER_SESSION_TIMEOUT,
+        )
         self.zk_nodepool = ZooKeeperNodepool(self.zk_client)
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
