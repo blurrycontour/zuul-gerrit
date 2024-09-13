@@ -262,6 +262,7 @@ a.refresh {
 .pf-c-card.zuul-compact-card .pf-c-card__header .pf-c-card__title {
     padding: 0;
     padding-bottom: 8px;
+    overflow-wrap: anywhere;
 }
 
 .pf-c-card.zuul-compact-card .pf-c-expandable-section__content {
