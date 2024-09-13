@@ -1652,12 +1652,13 @@ class Label(ConfigObject):
     Labels are associated with provider-specific instance types.
     """
 
-    def __init__(self, name, image, flavor, description):
+    def __init__(self, name, image, flavor, description, min_ready):
         super().__init__()
         self.name = name
         self.image = image
         self.flavor = flavor
         self.description = description
+        self.min_ready = min_ready
 
     @property
     def canonical_name(self):
@@ -1679,7 +1680,8 @@ class Label(ConfigObject):
         return (self.name == other.name and
                 self.image == other.image and
                 self.flavor == other.flavor and
-                self.description == other.description)
+                self.description == other.description and
+                self.min_ready == other.min_ready)
 
     def toDict(self):
         sc = self.source_context
@@ -1689,6 +1691,7 @@ class Label(ConfigObject):
             'image': self.image,
             'flavor': self.flavor,
             'description': self.description,
+            'min_ready': self.min_ready,
         }
 
     def validateReferences(self, layout):
@@ -1835,24 +1838,50 @@ class ProviderConfig(ConfigObject):
             config = ProviderConfig._mergeDict(parent_config, config)
             parent_name = parent_section.parent
         # Provide defaults from the images/flavors/labels objects
+        image_hashes = {}
         for image in config.get('images', []):
             layout_image = self._dropNone(
                 layout.images[image['name']].toDict())
             image.update(ProviderConfig._mergeDict(layout_image, image))
             # This is used for identifying unique image configurations
             # across multiple providers.
-            hasher = hashlib.sha256()
-            hasher.update(json.dumps(image, sort_keys=True).encode('utf8'))
-            image['config_hash'] = hasher.hexdigest()
+            image['config_hash'] = hashlib.sha256(
+                json.dumps(image, sort_keys=True).encode("utf8")).hexdigest()
+            image_hashes[image['name']] = image['config_hash']
+        flavor_hashes = {}
         for flavor in config.get('flavors', []):
             layout_flavor = self._dropNone(
                 layout.flavors[flavor['name']].toDict())
             flavor.update(ProviderConfig._mergeDict(layout_flavor, flavor))
+            flavor['config_hash'] = hashlib.sha256(
+                json.dumps(flavor, sort_keys=True).encode("utf8")).hexdigest()
+            flavor_hashes[flavor['name']] = flavor['config_hash']
         for label in config.get('labels', []):
             layout_label = self._dropNone(
                 layout.labels[label['name']].toDict())
             label.update(ProviderConfig._mergeDict(layout_label, label))
+            try:
+                label['config_hash'] = self._getLabelConfigHash(
+                    label, image_hashes, flavor_hashes)
+            except Exception:
+                # We might miss some flavor or label, but this will be
+                # caught later during config validation.
+                label['config_hash'] = None
         return config
+
+    def _getLabelConfigHash(self, label, image_hashes, flavor_hashes):
+        label_hash = hashlib.sha256(
+            json.dumps(label, sort_keys=True).encode("utf8")
+        ).hexdigest()
+        image_hash = image_hashes[label["image"]]
+        flavor_hash = flavor_hashes[label["flavor"]]
+        # XOR relevant config hashes
+        _hash = (
+            int(label_hash, 16)
+            ^ int(image_hash, 16)
+            ^ int(flavor_hash, 16)
+        )
+        return f"{_hash:x}"
 
 
 class Node(ConfigObject):
@@ -2406,9 +2435,11 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
         super().__init__()
         self._set(
             uuid=uuid4().hex,
-            request_id="",
+            request_id=None,
+            zuul_event_id=None,
             state=self.State.REQUESTED,
             label="",
+            label_config_hash=None,
             tags={},
             connection_name="",
             create_state={},
@@ -2442,7 +2473,8 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
 
     def __repr__(self):
         return (f"<{self.__class__.__name__} uuid={self.uuid},"
-                f" state={self.state}, path={self.getPath()}>")
+                f" label={self.label}, state={self.state},"
+                f" path={self.getPath()}>")
 
     def getPath(self):
         return self._getPath(self.uuid)
@@ -2456,15 +2488,17 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
 
     def serialize(self, context):
         if self.create_state_machine:
-            self.create_state = self.create_state_machine.toDict()
+            self._set(create_state=self.create_state_machine.toDict())
         if self.delete_state_machine:
-            self.delete_state = self.delete_state_machine.toDict()
+            self._set(delete_state=self.delete_state_machine.toDict())
 
         data = dict(
             uuid=self.uuid,
             request_id=self.request_id,
+            zuul_event_id=self.zuul_event_id,
             state=self.state,
             label=self.label,
+            label_config_hash=self.label_config_hash,
             tags=self.tags,
             connection_name=self.connection_name,
             create_state=self.create_state,
