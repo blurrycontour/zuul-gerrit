@@ -357,6 +357,25 @@ a.refresh {
     padding-bottom: 0;
 }
 
+/* Skipped jobs toggle + list */
+
+.zuul-job-list .pf-c-data-list__item-control {
+    margin-right: 0;
+}
+
+.zuul-job-list .pf-c-data-list__item.pf-m-expanded {
+    --pf-c-data-list__item--before--BackgroundColor: none;
+}
+
+.zuul-job-list .pf-c-data-list__item-control button {
+    padding-left: 6px;
+    padding-right: 6px;
+}
+
+.zuul-job-list .zuul-skipped-job-row {
+    margin-left: 16px;
+}
+
 @media screen and (max-width: 768px) {
     .pf-c-data-list.pf-m-compact.pf-m-grid-md.zuul-job-list {
         border-top-width: 4px;
