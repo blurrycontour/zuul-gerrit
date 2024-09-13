@@ -26,7 +26,11 @@ from zuul.zk.components import (
     ComponentRegistry, COMPONENT_REGISTRY
 )
 
-from tests.base import BaseTestCase, iterate_timeout
+from tests.base import (
+    BaseTestCase,
+    iterate_timeout,
+    ZOOKEEPER_SESSION_TIMEOUT,
+)
 
 
 class EventQueueBaseTestCase(BaseTestCase):
@@ -39,7 +43,8 @@ class EventQueueBaseTestCase(BaseTestCase):
             self.zk_chroot_fixture.zk_hosts,
             tls_cert=self.zk_chroot_fixture.zookeeper_cert,
             tls_key=self.zk_chroot_fixture.zookeeper_key,
-            tls_ca=self.zk_chroot_fixture.zookeeper_ca
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca,
+            timeout=ZOOKEEPER_SESSION_TIMEOUT,
         )
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
@@ -461,7 +466,9 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
             self.zk_chroot_fixture.zk_hosts,
             tls_cert=self.zk_chroot_fixture.zookeeper_cert,
             tls_key=self.zk_chroot_fixture.zookeeper_key,
-            tls_ca=self.zk_chroot_fixture.zookeeper_ca)
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca,
+            timeout=ZOOKEEPER_SESSION_TIMEOUT,
+        )
         self.addCleanup(external_client.disconnect)
         external_client.connect()
 
@@ -502,7 +509,9 @@ class TestManagementEventQueue(EventQueueBaseTestCase):
             self.zk_chroot_fixture.zk_hosts,
             tls_cert=self.zk_chroot_fixture.zookeeper_cert,
             tls_key=self.zk_chroot_fixture.zookeeper_key,
-            tls_ca=self.zk_chroot_fixture.zookeeper_ca)
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca,
+            timeout=ZOOKEEPER_SESSION_TIMEOUT,
+        )
         self.addCleanup(external_client.disconnect)
         external_client.connect()
 

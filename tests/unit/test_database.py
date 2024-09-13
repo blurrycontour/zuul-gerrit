@@ -20,7 +20,10 @@ import subprocess
 from zuul.driver.sql import SQLDriver
 from zuul.zk import ZooKeeperClient
 from tests.base import (
-    BaseTestCase, MySQLSchemaFixture, PostgresqlSchemaFixture
+    BaseTestCase,
+    MySQLSchemaFixture,
+    PostgresqlSchemaFixture,
+    ZOOKEEPER_SESSION_TIMEOUT,
 )
 
 import sqlalchemy
@@ -36,7 +39,8 @@ class DBBaseTestCase(BaseTestCase):
             self.zk_chroot_fixture.zk_hosts,
             tls_cert=self.zk_chroot_fixture.zookeeper_cert,
             tls_key=self.zk_chroot_fixture.zookeeper_key,
-            tls_ca=self.zk_chroot_fixture.zookeeper_ca
+            tls_ca=self.zk_chroot_fixture.zookeeper_ca,
+            timeout=ZOOKEEPER_SESSION_TIMEOUT,
         )
         self.addCleanup(self.zk_client.disconnect)
         self.zk_client.connect()
