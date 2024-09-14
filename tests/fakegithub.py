@@ -1,6 +1,5 @@
-#!/usr/bin/env python
-
 # Copyright 2018 Red Hat, Inc.
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -516,13 +515,23 @@ class FakeApp:
         self.slug = slug
 
 
-class FakeCheckRun(object):
-    def __init__(self, id, name, details_url, output, status, conclusion,
+class FakeCheckSuite:
+    _graphene_type = 'CheckSuite'
+
+    def __init__(self):
+        self.id = str(uuid.uuid4())
+        self.runs = []
+
+
+class FakeCheckRun:
+    _graphene_type = 'CheckRun'
+
+    def __init__(self, name, details_url, output, status, conclusion,
                  completed_at, external_id, actions, app):
         if actions is None:
             actions = []
 
-        self.id = id
+        self.id = str(uuid.uuid4())
         self.name = name
         self.details_url = details_url
         self.output = output
@@ -585,11 +594,14 @@ class FakeCombinedStatus(object):
         self.statuses = statuses
 
 
-class FakeCommit(object):
+class FakeCommit:
+    _graphene_type = 'Commit'
+
     def __init__(self, sha):
         self._statuses = []
         self.sha = sha
-        self._check_runs = []
+        self._check_suites = defaultdict(FakeCheckSuite)
+        self.id = str(uuid.uuid4())
 
     def set_status(self, state, url, description, context, user):
         status = FakeStatus(
@@ -598,10 +610,9 @@ class FakeCommit(object):
         # the last status provided for a commit.
         self._statuses.insert(0, status)
 
-    def set_check_run(self, id, name, details_url, output, status, conclusion,
+    def set_check_run(self, name, details_url, output, status, conclusion,
                       completed_at, external_id, actions, app):
         check_run = FakeCheckRun(
-            id,
             name,
             details_url,
             output,
@@ -614,7 +625,8 @@ class FakeCommit(object):
         )
         # Always insert a check_run to the front of the list to represent the
         # last check_run provided for a commit.
-        self._check_runs.insert(0, check_run)
+        check_suite = self._check_suites[app]
+        check_suite.runs.insert(0, check_run)
         return check_run
 
     def get_url(self, path, params=None):
@@ -622,7 +634,7 @@ class FakeCommit(object):
             statuses = [s.as_dict() for s in self._statuses]
             return FakeResponse(statuses)
         if path == "check-runs":
-            check_runs = [c.as_dict() for c in self._check_runs]
+            check_runs = [c.as_dict() for c in self.check_runs()]
             resp = {"total_count": len(check_runs), "check_runs": check_runs}
             return FakeResponse(resp)
 
@@ -630,7 +642,10 @@ class FakeCommit(object):
         return self._statuses
 
     def check_runs(self):
-        return self._check_runs
+        check_runs = []
+        for suite in self._check_suites.values():
+            check_runs.extend(suite.runs)
+        return check_runs
 
     def status(self):
         '''
@@ -653,7 +668,6 @@ class FakeRepository(object):
         self._commits = {}
         self.data = data
         self.name = name
-        self.check_run_counter = 0
 
         # Simple dictionary to store permission values per feature (e.g.
         # checks, Repository contents, Pull requests, Commit statuses, ...).
@@ -691,7 +705,6 @@ class FakeRepository(object):
             return
 
         rule = self._branch_protection_rules[branch_name]
-        rule.id = str(uuid.uuid4())
         rule.pattern = branch_name
         rule.required_contexts = contexts or []
         rule.require_reviews = require_review
@@ -749,9 +762,7 @@ class FakeRepository(object):
         if commit is None:
             commit = FakeCommit(head_sha)
             self._commits[head_sha] = commit
-        self.check_run_counter += 1
         commit.set_check_run(
-            str(self.check_run_counter),
             name,
             details_url,
             output,
@@ -1112,9 +1123,7 @@ class FakeGithubSession(object):
             if commit is None:
                 commit = FakeCommit(head_sha)
                 repo._commits[head_sha] = commit
-            repo.check_run_counter += 1
             check_run = commit.set_check_run(
-                str(repo.check_run_counter),
                 json['name'],
                 json['details_url'],
                 json['output'],
@@ -1170,7 +1179,7 @@ class FakeGithubSession(object):
             check_runs = [
                 check_run
                 for commit in repo._commits.values()
-                for check_run in commit._check_runs
+                for check_run in commit.check_runs()
                 if check_run.id == check_run_id
             ]
             check_run = check_runs[0]
@@ -1202,8 +1211,10 @@ class FakeGithubSession(object):
 
 
 class FakeBranchProtectionRule:
+    _graphene_type = 'BranchProtectionRule'
 
     def __init__(self):
+        self.id = str(uuid.uuid4())
         self.pattern = None
         self.required_contexts = []
         self.require_reviews = False

@@ -1,4 +1,5 @@
 # Copyright 2015 GoodData
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -2686,48 +2687,6 @@ class TestGithubDriverEnterprise(ZuulGithubAppTestCase):
         self.assertEqual(len(A.comments), 0)
 
 
-class TestGithubDriverEnterpriseLegacy(ZuulGithubAppTestCase):
-    config_file = 'zuul-github-driver-enterprise.conf'
-    scheduler_count = 1
-
-    def setUp(self):
-        self.old_version = FakeGithubEnterpriseClient.version
-        FakeGithubEnterpriseClient.version = '2.19.0'
-
-        super().setUp()
-
-    def tearDown(self):
-        super().tearDown()
-        FakeGithubEnterpriseClient.version = self.old_version
-
-    @simple_layout('layouts/merging-github.yaml', driver='github')
-    def test_report_pull_merge(self):
-        github = self.fake_github.getGithubClient()
-        repo = github.repo_from_project('org/project')
-        repo._set_branch_protection(
-            'master', require_review=True)
-
-        # pipeline merges the pull request on success
-        A = self.fake_github.openFakePullRequest('org/project', 'master',
-                                                 'PR title',
-                                                 body='I shouldnt be seen',
-                                                 body_text='PR body')
-
-        self.fake_github.emitEvent(A.getCommentAddedEvent('merge me'))
-        self.waitUntilSettled()
-
-        # Note: PR was not approved but old github does not support
-        # reviewDecision so this gets ignored and zuul merges nevertheless
-        self.assertTrue(A.is_merged)
-        self.assertThat(A.merge_message,
-                        MatchesRegex(r'.*PR title\n\nPR body.*', re.DOTALL))
-        self.assertThat(A.merge_message,
-                        Not(MatchesRegex(
-                            r'.*I shouldnt be seen.*',
-                            re.DOTALL)))
-        self.assertEqual(len(A.comments), 0)
-
-
 class TestGithubDriverEnterpriseCache(ZuulGithubAppTestCase):
     config_file = 'zuul-github-driver-enterprise.conf'
     scheduler_count = 1
@@ -2931,3 +2890,40 @@ class TestGithubGraphQL(ZuulTestCase):
             self.fake_github.graphql_client.fetch_branch_protection(
                 github, project))
         self.assertEqual(num_rules * (1 + num_extra_branches), len(branches))
+
+    @simple_layout('layouts/basic-github.yaml', driver='github')
+    def test_graphql_query_canmerge(self):
+        project = self.fake_github.getProject('org/project')
+        github = self.fake_github.getGithubClient(project.name)
+        repo = github.repo_from_project('org/project')
+
+        num_rules = 101
+        for branch_no in range(num_rules):
+            repo._set_branch_protection(f'branch{branch_no}',
+                                        protected=True,
+                                        locked=True)
+        repo._set_branch_protection('master',
+                                    protected=True,
+                                    locked=True)
+
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        num_apps = 102
+        num_runs = 103
+        for app_no in range(num_apps):
+            for run_no in range(num_runs):
+                repo.create_check_run(
+                    A.head_sha,
+                    f'run{run_no}',
+                    conclusion='failure',
+                    app=f'app{app_no}',
+                )
+        conn = self.scheds.first.sched.connections.connections["github"]
+        change_key = ChangeKey(conn.connection_name, "org/project",
+                               "PullRequest", str(A.number), str(A.head_sha))
+        change = conn.getChange(change_key, refresh=True)
+        result = self.fake_github.graphql_client.fetch_canmerge(
+            github, change)
+        self.assertTrue(result['protected'])
+        # We should have one run from each app; the duplicate runs are
+        # dropped by github.
+        self.assertEqual(num_apps + 1, len(result['checks'].keys()))
