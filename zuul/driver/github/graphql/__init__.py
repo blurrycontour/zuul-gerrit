@@ -38,7 +38,9 @@ class GraphQLClient:
         self.log.debug('Loading prepared graphql queries')
         query_names = [
             'canmerge',
-            'canmerge-legacy',
+            'canmerge-page-rules',
+            'canmerge-page-suites',
+            'canmerge-page-runs',
             'branch-protection',
             'branch-protection-inner',
         ]
@@ -66,43 +68,58 @@ class GraphQLClient:
                       query_name, response)
         return response
 
-    def _fetch_canmerge(self, log, github, owner, repo, pull, sha):
-        if github.version and github.version[:2] < (2, 21):
-            # Github Enterprise prior to 2.21 doesn't offer the review decision
-            # so don't request it as this will result in an error.
-            query = 'canmerge-legacy'
-        else:
-            # Since GitHub Enterprise 2.21 and on github.com we can request the
-            # review decision state of the pull request.
-            query = 'canmerge'
-        return self._run_query(log, github, query,
-                               owner=owner,
-                               repo=repo,
-                               pull=pull,
-                               head_sha=sha)
-
     def fetch_canmerge(self, github, change, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         owner, repo = change.project.name.split('/')
-
-        data = self._fetch_canmerge(log, github, owner, repo, change.number,
-                                    change.patchset)
         result = {}
+        cursor = None
+        matching_rules = []
 
-        repository = nested_get(data, 'data', 'repository')
-        # Find corresponding rule to our branch
-        rules = nested_get(repository, 'branchProtectionRules', 'nodes',
-                           default=[])
+        while True:
+            if cursor is None:
+                # First page of branchProtectionRules
+                data = self._run_query(log, github, 'canmerge',
+                                       owner=owner,
+                                       repo=repo,
+                                       pull=change.number,
+                                       head_sha=change.patchset,
+                                       ref_name=change.branch,
+                                       )
 
-        # Filter branch protection rules for the one matching the change.
-        matching_rules = [
-            rule for rule in rules
-            for ref in nested_get(rule, 'matchingRefs', 'nodes', default=[])
-            if ref.get('name') == change.branch
-        ]
+                repository = nested_get(data, 'data', 'repository')
+            else:
+                # Subsequent pages of branchProtectionRules
+                data = self._run_query(log, github, 'canmerge-page-rules',
+                                       owner=owner,
+                                       repo=repo,
+                                       cursor=cursor,
+                                       ref_name=change.branch,
+                                       )
+
+            # Find corresponding rule to our branch
+            rules = nested_get(
+                data, 'data', 'repository', 'branchProtectionRules', 'nodes',
+                default=[])
+
+            # Filter branch protection rules for the one matching the change.
+            # matchingRefs should either be empty or only contain our branch
+            matching_rules.extend([
+                rule for rule in rules
+                for ref in nested_get(
+                    rule, 'matchingRefs', 'nodes', default=[])
+                if ref.get('name') == change.branch
+            ])
+
+            rules_pageinfo = nested_get(
+                data, 'data', 'repository',
+                'branchProtectionRules', 'pageInfo')
+            if not rules_pageinfo['hasNextPage']:
+                break
+            cursor = rules_pageinfo['endCursor']
+
         if len(matching_rules) > 1:
-            log.warn('More than one branch protection rules match change %s',
-                     change)
+            log.warn('More than one branch protection rule '
+                     'matches change %s', change)
             return result
         elif len(matching_rules) == 1:
             matching_rule = matching_rules[0]
@@ -138,7 +155,7 @@ class GraphQLClient:
 
         # Add status checks
         result['status'] = {}
-        commit = nested_get(data, 'data', 'repository', 'object')
+        commit = nested_get(repository, 'object')
         # Status can be explicit None so make sure we work with a dict
         # afterwards
         status = commit.get('status') or {}
@@ -147,14 +164,43 @@ class GraphQLClient:
 
         # Add check runs
         result['checks'] = {}
-        for suite in nested_get(commit, 'checkSuites', 'nodes', default=[]):
-            for run in nested_get(suite, 'checkRuns', 'nodes', default=[]):
+        for suite in self._fetch_canmerge_suites(github, log, commit):
+            for run in self._fetch_canmerge_runs(github, log, suite):
                 result['checks'][run['name']] = {
                     **run,
                     "app": suite.get("app")
                 }
 
         return result
+
+    def _fetch_canmerge_suites(self, github, log, commit):
+        commit_id = commit['id']
+        while True:
+            for suite in nested_get(
+                    commit, 'checkSuites', 'nodes', default=[]):
+                yield suite
+            page_info = nested_get(commit, 'checkSuites', 'pageInfo')
+            if not page_info['hasNextPage']:
+                return
+            data = self._run_query(
+                log, github, 'canmerge-page-suites',
+                commit_node_id=commit_id,
+                cursor=page_info['endCursor'])
+            commit = nested_get(data, 'data', 'node')
+
+    def _fetch_canmerge_runs(self, github, log, suite):
+        suite_id = suite['id']
+        while True:
+            for run in nested_get(suite, 'checkRuns', 'nodes', default=[]):
+                yield run
+            page_info = nested_get(suite, 'checkRuns', 'pageInfo')
+            if not page_info['hasNextPage']:
+                return
+            data = self._run_query(
+                log, github, 'canmerge-page-runs',
+                suite_node_id=suite_id,
+                cursor=page_info['endCursor'])
+            suite = nested_get(data, 'data', 'node')
 
     def _fetch_branch_protection(self, log, github, project,
                                  zuul_event_id=None):

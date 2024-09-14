@@ -3,15 +3,20 @@ query canMergeData(
   $repo: String!
   $pull: Int!
   $head_sha: String!
+  $ref_name: String!
 ) {
   repository(owner: $owner, name: $repo) {
     branchProtectionRules(first: 100) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
       nodes {
         pattern
         requiredStatusCheckContexts
         requiresApprovingReviews
         requiresCodeOwnerReviews
-        matchingRefs(first: 100) {
+        matchingRefs(first: 100, query: $ref_name) {
           nodes {
             name
           }
@@ -25,13 +30,23 @@ query canMergeData(
     }
     object(expression: $head_sha) {
       ... on Commit {
+        id
         checkSuites(first: 100) {
+          pageInfo {
+            endCursor
+            hasNextPage
+          }
           nodes {
+	    id
             app {
               name
               slug
             }
             checkRuns(first: 100) {
+              pageInfo {
+                endCursor
+                hasNextPage
+              }
               nodes {
                 name
                 conclusion
