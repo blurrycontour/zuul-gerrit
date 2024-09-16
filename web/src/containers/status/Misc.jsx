@@ -459,8 +459,8 @@ function JobLink({ job, tenant }) {
     few: 'rd',
     other: 'th',
   }
-  if (job.retries > 1) {
-    job_name = job_name + '(' + job.tries + suffixes[ordinal_rules.select(job.tries)] + ' attempt)'
+  if (job.tries > 1) {
+    job_name = job_name + ' (' + job.tries + suffixes[ordinal_rules.select(job.tries)] + ' attempt)'
   }
 
   let name = ''
