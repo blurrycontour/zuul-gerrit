@@ -167,6 +167,8 @@ class EndpointUploadJob:
 
 class Launcher:
     log = logging.getLogger("zuul.Launcher")
+    # Max. time the main event loop is allowed to sleep
+    MAX_SLEEP = 1
 
     def __init__(self, config, connections):
         self._running = True
@@ -262,10 +264,13 @@ class Launcher:
         self.component_info.state = self.component_info.RUNNING
         self.log.debug("Launcher running")
         while self._running:
+            loop_start = time.monotonic()
             try:
                 self._run()
             except Exception:
                 self.log.exception("Error in main thread:")
+            loop_duration = time.monotonic() - loop_start
+            time.sleep(max(0, self.MAX_SLEEP - loop_duration))
             self.wake_event.wait()
             self.wake_event.clear()
 
