@@ -97,6 +97,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c74e9f0a_74e294bc",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-09-16T16:17:26Z",
+      "side": 1,
+      "message": "I think if we intend to support both we might want to add an attribute to the secret in order to choose the algorithm for that token. In that case we could also just define the default algorithm in zuul.conf.",
+      "parentUuid": "1b1afbc3_c12abb80",
+      "range": {
+        "startLine": 102,
+        "startChar": 6,
+        "endLine": 102,
+        "endChar": 13
+      },
+      "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e7c15dad_84a69034",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 6
