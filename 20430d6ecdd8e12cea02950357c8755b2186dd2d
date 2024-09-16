@@ -24,6 +24,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1afd8f7_8f564f8e",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-16T16:04:15Z",
+      "side": 1,
+      "message": "Agreed.  We discussed this a bit on PS1 and noted that it should probably behave like the connection webhook URLs.  There\u0027s a small note about that in the \"zuul-web\" section below.",
+      "parentUuid": "87e5992a_2ad5ecfc",
+      "range": {
+        "startLine": 88,
+        "startChar": 0,
+        "endLine": 89,
+        "endChar": 53
+      },
+      "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "12bdd0e0_712fe2c9",
@@ -49,6 +73,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1b1afbc3_c12abb80",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-16T16:04:15Z",
+      "side": 1,
+      "message": "This is based on the private key(s) we generate, right?  This spec anticipates having a single RSA key; Jeremy also suggested that folks may want other values but we could add them later.\n\nDo you think we should automatically generate a key for each algorithm we add (so RSA and ECDSA if we add that)?  Or should we allow admins to exclude some?  (It sounds like that\u0027s what you\u0027re suggesting.)  In the second case, we would need to add a zuul.conf section like:\n\n```\n[oidc]\nsupported_algos\u003dECDSA\n```\n\nWhich, if Zuul supported both RSA and ECDSA, would mean that Zuul should only generate ECDSA keys.  The default might be something like:\n\n```\n[oidc]\nsupported_algos\u003dRSA,ECDSA\n```\n\nWhich means Zuul would generate both.\n\nThat sounds fine to me, but I want to make sure that\u0027s what you\u0027re suggesting.",
+      "parentUuid": "12bdd0e0_712fe2c9",
+      "range": {
+        "startLine": 102,
+        "startChar": 6,
+        "endLine": 102,
+        "endChar": 13
+      },
+      "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e7c15dad_84a69034",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 6
@@ -60,6 +108,24 @@
       "writtenOn": "2024-09-12T13:03:37Z",
       "side": 1,
       "message": "How about adding a subcommand to the admin cli in case the keys were compromised?",
+      "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef361b27_27f4eaa4",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-16T16:04:15Z",
+      "side": 1,
+      "message": "Sounds reasonable.",
+      "parentUuid": "e7c15dad_84a69034",
       "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
