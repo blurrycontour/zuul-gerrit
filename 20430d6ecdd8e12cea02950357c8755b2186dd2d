@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1f27047_693d7d94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-16T17:08:21Z",
+      "side": 1,
+      "message": "Adding a -1 because i think the inline comment about the subject scheme should be decided now in order to future proof.",
+      "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87e5992a_2ad5ecfc",
@@ -115,6 +132,23 @@
         "endLine": 102,
         "endChar": 13
       },
+      "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50cc5cac_02ad50b2",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-16T17:08:21Z",
+      "side": 1,
+      "message": "Albin has drawn my attention to the fact that Azure (unlike AWS) does not appear to support wildcards in subject matches; nor does it allow matching on anything other than subject.  See this github issue for a bunch of folks lamenting that fact: https://github.com/Azure/azure-workload-identity/issues/373\n\nThat makes some things difficult for Azure.  For example, having a credential that just acts in the scope of the defining project means that you have to over-specify the subject.  Where an admin might want to match a subject of \"\u003czuul-tenant\u003e/\u003ccanonical-project-name\u003e/*\" they would have to specify a secret name even if that wasn\u0027t interesting to them.\n\nWe might want to make this easier in the future by supporting other schemes in the subject.  For example, we might want to support exactly the project-level scheme described above.  Or we might want to encode the triggering project (and possibly branch) as the subject.\n\nI\u0027m not sure we need to decide all the things we might want to do right now, but if we decide that we may want to explore other schemes later, then we should encode the scheme in the subject now so that we are future-proof.\n\nI suggest we update this to specify the subject as:\n\n```\nsub: \"secret:\u003czuul-tenant\u003e/\u003ccanonical-project-name\u003e/\u003csecret name\u003e\"\n```\n\nSo that our first (and so far only) subject scheme is `secret` -- meaning, the subject is the canonical name of the secret itself.  Future subject schemes might be `secret-project` (for the scheme described above) or `triggering-project` (which, as discussed in other comments, could be problematic for deduplicated jobs in circular dependencies, but could nonetheless be useful).  Or `tenant` or `queue`.",
       "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
