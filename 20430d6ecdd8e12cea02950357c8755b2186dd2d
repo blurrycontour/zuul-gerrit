@@ -155,6 +155,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f3e3695c_f8b654d6",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 16068
+      },
+      "writtenOn": "2024-09-17T06:23:20Z",
+      "side": 1,
+      "message": "I like this suggestion.",
+      "parentUuid": "50cc5cac_02ad50b2",
+      "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e7c15dad_84a69034",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 6
