@@ -1,5 +1,5 @@
 # Copyright 2014 OpenStack Foundation
-# Copyright 2021-2023 Acme Gating, LLC
+# Copyright 2021-2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -1092,9 +1092,8 @@ class AnsibleJob(object):
             max_attempts = self.arguments["max_attempts"]
         self.retry_limit = self.arguments["zuul"]["attempts"] >= max_attempts
 
-        parent_data = self.arguments["parent_data"]
-        self.normal_vars = Job._deepUpdate(parent_data.copy(),
-                                           self.job.variables)
+        # We don't set normal_vars until we load the include-vars
+        # files after preparing repos.
         self.secret_vars = self.arguments["secret_parent_data"]
 
     def run(self):
@@ -1390,42 +1389,33 @@ class AnsibleJob(object):
         tasks = []
         projects = set()
 
-        with open(self.jobdir.job_output_file, 'a') as job_output:
-            job_output.write("{now} | Updating repositories\n".format(
-                now=datetime.datetime.now()
-            ))
-        # Make sure all projects used by the job are updated...
+        # Make sure all projects used by the job are updated ...
         for project in args['projects']:
-            self.log.debug("Updating project %s" % (project,))
+            key = (project['connection'], project['name'])
+            projects.add(key)
+
+        # ... as well as all playbook and role projects ...
+        for playbook in self.job.all_playbooks:
+            key = (playbook['connection'], playbook['project'])
+            projects.add(key)
+            for role in playbook['roles']:
+                key = (role['connection'], role['project'])
+                projects.add(key)
+
+        # ... and include-vars projects.
+        for iv in self.job.include_vars:
+            key = (iv['connection'], iv['project'])
+            projects.add(key)
+
+        for (connection, project) in projects:
+            self.log.debug("Updating project %s %s", connection, project)
             tasks.append(self.executor_server.update(
-                project['connection'], project['name'],
-                repo_state=self.repo_state,
+                connection, project, repo_state=self.repo_state,
                 zuul_event_id=self.zuul_event_id,
                 build=self.build_request.uuid,
                 span_context=tracing.getSpanContext(
                     trace.get_current_span()),
             ))
-            projects.add((project['connection'], project['name']))
-
-        # ...as well as all playbook and role projects.
-        repos = []
-        for playbook in self.job.all_playbooks:
-            repos.append(playbook)
-            repos += playbook['roles']
-
-        for repo in repos:
-            key = (repo['connection'], repo['project'])
-            if key not in projects:
-                self.log.debug("Updating playbook or role %s" % (
-                               repo['project'],))
-                tasks.append(self.executor_server.update(
-                    *key, repo_state=self.repo_state,
-                    zuul_event_id=self.zuul_event_id,
-                    build=self.build_request.uuid,
-                    span_context=tracing.getSpanContext(
-                        trace.get_current_span()),
-                ))
-                projects.add(key)
 
         for task in tasks:
             task.wait()
@@ -1579,6 +1569,8 @@ class AnsibleJob(object):
         if self.aborted:
             self._send_aborted()
             return
+
+        self.loadIncludeVars()
 
         # We set the nodes to "in use" as late as possible. So in case
         # the build failed during the checkout phase, the node is
@@ -2489,6 +2481,26 @@ class AnsibleJob(object):
         # It is neither a bare role, nor a collection of roles
         raise RoleNotFoundError("Unable to find role in %s" % (path,))
 
+    def selectBranchForProject(self, project, project_default_branch):
+        # Find if the project is one of the job-specified projects.
+        # If it is, we can honor the project checkout-override options.
+        args = self.arguments
+        args_project = {}
+        for p in args['projects']:
+            if (p['canonical_name'] == project.canonical_name):
+                args_project = p
+                break
+
+        return self.resolveBranch(
+            project.canonical_name,
+            None,
+            args['branch'],
+            self.job.override_branch,
+            self.job.override_checkout,
+            args_project.get('override_branch'),
+            args_project.get('override_checkout'),
+            project_default_branch)
+
     def prepareZuulRole(self, jobdir_playbook, role, args, role_info):
         self.log.debug("Prepare zuul role for %s" % (role,))
         # Check out the role repo if needed
@@ -2509,23 +2521,8 @@ class AnsibleJob(object):
             role_info.checkout_description = 'playbook branch'
             role_info.checkout = branch
         else:
-            # Find if the project is one of the job-specified projects.
-            # If it is, we can honor the project checkout-override options.
-            args_project = {}
-            for p in args['projects']:
-                if (p['canonical_name'] == project.canonical_name):
-                    args_project = p
-                    break
-
-            branch, selected_desc = self.resolveBranch(
-                project.canonical_name,
-                None,
-                args['branch'],
-                self.job.override_branch,
-                self.job.override_checkout,
-                args_project.get('override_branch'),
-                args_project.get('override_checkout'),
-                role['project_default_branch'])
+            branch, selected_desc = self.selectBranchForProject(
+                project, role['project_default_branch'])
             self.log.debug("Role using %s %s", selected_desc, branch)
             role_info.checkout_description = selected_desc
             role_info.checkout = branch
@@ -2677,6 +2674,40 @@ class AnsibleJob(object):
                 for key in node['host_keys']:
                     known_hosts.write('%s\n' % key)
         return zuul_resources
+
+    def loadIncludeVars(self):
+        parent_data = self.arguments["parent_data"]
+
+        normal_vars = parent_data.copy()
+        for iv in self.job.include_vars:
+            source = self.executor_server.connections.getSource(
+                iv['connection'])
+            project = source.getProject(iv['project'])
+
+            branch, selected_desc = self.selectBranchForProject(
+                project, iv['project_default_branch'])
+            self.log.debug("Include-vars project %s using %s %s",
+                           project.canonical_name, selected_desc, branch)
+            if not iv['trusted']:
+                path = self.checkoutUntrustedProject(project, branch,
+                                                     self.arguments)
+            else:
+                path = self.checkoutTrustedProject(project, branch,
+                                                   self.arguments)
+            path = os.path.join(path, iv['name'])
+            try:
+                with open(path) as f:
+                    self.log.debug("Loading vars from %s", path)
+                    new_vars = yaml.safe_load(f)
+                    normal_vars = Job._deepUpdate(normal_vars, new_vars)
+            except FileNotFoundError:
+                self.log.info("Vars file %s not found", path)
+                if iv['required']:
+                    raise ExecutorError(
+                        f"Required vars file {iv['name']} not found")
+
+        self.normal_vars = Job._deepUpdate(normal_vars,
+                                           self.job.variables)
 
     def prepareVars(self, args, zuul_resources):
         normal_vars = self.normal_vars.copy()
