@@ -66,6 +66,7 @@ def construct_build_params(uuid, connections, job, item, pipeline,
         tenant=tenant.name,
         event_id=item.event.zuul_event_id if item.event else None,
         jobtags=sorted(job.tags),
+        include_vars=job.include_vars,
     ))
     if hasattr(change, 'message'):
         zuul_params['message'] = strings.b64encode(change.message)

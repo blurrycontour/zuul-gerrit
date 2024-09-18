@@ -372,6 +372,7 @@ class TestWeb(BaseTestWeb):
              'group_variables': {},
              'host_variables': {},
              'image_build_name': None,
+             'include_vars': [],
              'intermediate': False,
              'irrelevant_files': [],
              'match_on_config_updates': True,
@@ -511,6 +512,7 @@ class TestWeb(BaseTestWeb):
                 'extra_variables': {},
                 'group_variables': {},
                 'host_variables': {},
+                'include_vars': [],
                 'variant_description': '',
                 'voting': True,
                 'workspace_scheme': 'golang'
@@ -566,6 +568,7 @@ class TestWeb(BaseTestWeb):
                 'extra_variables': {},
                 'group_variables': {},
                 'host_variables': {},
+                'include_vars': [],
                 'variant_description': 'stable',
                 'voting': True,
                 'workspace_scheme': 'golang'
@@ -614,6 +617,7 @@ class TestWeb(BaseTestWeb):
                 'extra_variables': {},
                 'group_variables': {},
                 'host_variables': {},
+                'include_vars': [],
                 'variant_description': '',
                 'voting': True,
                 'workspace_scheme': 'golang'
@@ -743,6 +747,7 @@ class TestWeb(BaseTestWeb):
                   'extra_variables': {},
                   'group_variables': {},
                   'host_variables': {},
+                  'include_vars': [],
                   'variant_description': '',
                   'voting': True,
                   'workspace_scheme': 'golang'}],
@@ -786,6 +791,7 @@ class TestWeb(BaseTestWeb):
                   'extra_variables': {},
                   'group_variables': {},
                   'host_variables': {},
+                  'include_vars': [],
                   'variant_description': '',
                   'voting': True,
                   'workspace_scheme': 'golang'}],
@@ -829,6 +835,7 @@ class TestWeb(BaseTestWeb):
                   'extra_variables': {},
                   'group_variables': {},
                   'host_variables': {},
+                  'include_vars': [],
                   'variant_description': '',
                   'voting': True,
                   'workspace_scheme': 'golang'}],
@@ -872,6 +879,7 @@ class TestWeb(BaseTestWeb):
                   'extra_variables': {},
                   'group_variables': {},
                   'host_variables': {},
+                  'include_vars': [],
                   'variant_description': '',
                   'voting': True,
                   'workspace_scheme': 'golang'}]]
@@ -942,6 +950,7 @@ class TestWeb(BaseTestWeb):
                              'extra_variables': {},
                              'group_variables': {},
                              'host_variables': {},
+                             'include_vars': [],
                              'variant_description': '',
                              'voting': True,
                              'workspace_scheme': 'golang'}
@@ -1298,6 +1307,7 @@ class TestWeb(BaseTestWeb):
                 'change_url': None,
                 'child_jobs': [],
                 'event_id': None,
+                'include_vars': [],
             },
             'workspace_scheme': 'golang',
         }
@@ -1347,6 +1357,7 @@ class TestWeb(BaseTestWeb):
                 'change_url': None,
                 'child_jobs': [],
                 'event_id': None,
+                'include_vars': [],
                 'items': [],
                 'job': 'noop',
                 'jobtags': [],

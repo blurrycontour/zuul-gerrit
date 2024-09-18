@@ -730,14 +730,32 @@ class JobParser(object):
         'semaphores': to_list(str),
     }
 
+    playbook_def = to_list(vs.Any(str, complex_playbook_def))
+
     post_run_playbook_def = {
         vs.Required('name'): str,
         'semaphores': to_list(str),
         'cleanup': bool,
     }
 
-    playbook_def = to_list(vs.Any(str, complex_playbook_def))
     post_run_playbook_def = to_list(vs.Any(str, post_run_playbook_def))
+
+    complex_include_vars_project_def = {
+        vs.Required('name'): str,
+        'project': str,
+        'required': bool,
+    }
+
+    complex_include_vars_zuul_project_def = {
+        vs.Required('name'): str,
+        'zuul-project': bool,
+        'required': bool,
+    }
+
+    include_vars_def = to_list(vs.Any(str,
+                                      complex_include_vars_project_def,
+                                      complex_include_vars_zuul_project_def,
+                                      ))
 
     # Attributes of a job that can also be used in Project and ProjectTemplate
     job_attributes = {'parent': vs.Any(str, None),
@@ -783,6 +801,7 @@ class JobParser(object):
                       'extra-vars': override_value(ansible_vars_dict),
                       'host-vars': override_value({str: ansible_vars_dict}),
                       'group-vars': override_value({str: ansible_vars_dict}),
+                      'include-vars': override_value(include_vars_def),
                       'dependencies': override_list(
                           vs.Any(job_dependency, str)),
                       'allowed-projects': to_list(str),
@@ -1122,6 +1141,34 @@ class JobParser(object):
                     else:
                         check_varnames(conf_vars)
                     setattr(job, job_attr, conf_vars)
+
+        with self.pcontext.confAttr(conf, 'include-vars') as conf_include_vars:
+            if isinstance(conf_include_vars, yaml.OverrideValue):
+                job.override_control['include_vars'] =\
+                    conf_include_vars.override
+                conf_include_vars = conf_include_vars.value
+            if conf_include_vars:
+                include_vars = []
+                for iv in as_list(conf_include_vars):
+                    if isinstance(iv, str):
+                        iv = {'name': iv}
+                    project_cn = None
+                    if not iv.get('zuul-project', False):
+                        pname = iv.get(
+                            'project',
+                            conf['_source_context'].project_canonical_name)
+                        (trusted, project) = self.pcontext.tenant.getProject(
+                            pname)
+                        if project is None:
+                            raise ProjectNotFoundError(pname)
+                        project_cn = project.canonical_name
+                    job_include_vars = model.JobIncludeVars(
+                        iv['name'],
+                        project_cn,
+                        iv.get('required', True),
+                    )
+                    include_vars.append(job_include_vars)
+                job.include_vars = tuple(include_vars)
 
         allowed_projects = conf.get('allowed-projects', None)
         # See note above at "post-review".
