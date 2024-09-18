@@ -967,6 +967,71 @@ Here is an example of two job definitions:
            api:
              baz: "this variable is visible on api1 and api2"
 
+   .. attr:: vars-files
+
+      A list of files from which to read variables.
+
+      The value may be supplied as a list or a single item, and each
+      value may be a string or a dictionary described below.  If
+      supplied as a string, it is treated as the
+      :attr:`job.vars-files.name`.
+
+      Files are read in order, with later variable values overriding
+      earlier ones.  Variables specified by :attr:`job.vars` and
+      related attributes will override variables read from files.
+
+      The file should be in YAML or JSON format.
+
+      Supports override control.  The default is ``!inherit``: values
+      are appended without duplication.
+
+      .. attr:: name
+         :required:
+
+         The name (relative to the root of the repository) of the file
+         to read.
+
+      .. attr:: project
+
+         The name of the project containing the file to read.  If this
+         is left unspecified, the project containing the current job
+         definition is used.  This option is mutually exclusive with
+         :attr:`job.vars-files.zuul-project`.
+
+      .. attr:: zuul-project
+         :default: false
+
+         A boolean indicating that instead of using a specified
+         project, the project associated with the change under test
+         (which can be found in the :var:`zuul.project` variable)
+         should be used.  This permits the definition of jobs that may
+         be centrally defined and used globally to read variables
+         from files in the projects upon which they run.
+
+         This option is mutually exclusive with
+         :attr:`job.vars-files.project`.
+
+      An example using job-vars:
+
+      .. code-block:: yaml
+
+         - job:
+             name: central-job
+             description: |
+               This job reads versions.yaml from whatever project
+               it is used to test.
+             vars-files:
+               - name: versions.yaml
+                 zuul-project: true
+
+         - job:
+             name: integration-job
+             description: |
+               This job reads data/product-versions.yaml from the repo
+               that contains this very job definition, no matter which
+               project runs the job.
+             vars-files: data/product-versions.yaml
+
    .. attr:: dependencies
 
       A list of other jobs upon which this job depends.  Zuul will not

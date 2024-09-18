@@ -730,14 +730,30 @@ class JobParser(object):
         'semaphores': to_list(str),
     }
 
+    playbook_def = to_list(vs.Any(str, complex_playbook_def))
+
     post_run_playbook_def = {
         vs.Required('name'): str,
         'semaphores': to_list(str),
         'cleanup': bool,
     }
 
-    playbook_def = to_list(vs.Any(str, complex_playbook_def))
     post_run_playbook_def = to_list(vs.Any(str, post_run_playbook_def))
+
+    complex_vars_files_project_def = {
+        vs.Required('name'): str,
+        'project': str,
+    }
+
+    complex_vars_files_zuul_project_def = {
+        vs.Required('name'): str,
+        'zuul-project': bool,
+    }
+
+    vars_files_def = to_list(vs.Any(str,
+                                    complex_vars_files_project_def,
+                                    complex_vars_files_zuul_project_def,
+                                    ))
 
     # Attributes of a job that can also be used in Project and ProjectTemplate
     job_attributes = {'parent': vs.Any(str, None),
@@ -783,6 +799,7 @@ class JobParser(object):
                       'extra-vars': override_value(ansible_vars_dict),
                       'host-vars': override_value({str: ansible_vars_dict}),
                       'group-vars': override_value({str: ansible_vars_dict}),
+                      'vars-files': override_value(vars_files_def),
                       'dependencies': override_list(
                           vs.Any(job_dependency, str)),
                       'allowed-projects': to_list(str),
@@ -1120,6 +1137,32 @@ class JobParser(object):
                     else:
                         check_varnames(conf_vars)
                     setattr(job, job_attr, conf_vars)
+
+        with self.pcontext.confAttr(conf, 'vars-files') as conf_vars_files:
+            if isinstance(conf_vars_files, yaml.OverrideValue):
+                job.override_control['vars_files'] = conf_vars_files.override
+                conf_vars_files = conf_vars_files.value
+            if conf_vars_files:
+                vars_files = []
+                for vf in as_list(conf_vars_files):
+                    if isinstance(vf, str):
+                        vf = {'name': vf}
+                    project_cn = None
+                    if not vf.get('zuul-project', False):
+                        pname = vf.get(
+                            'project',
+                            conf['_source_context'].project_canonical_name)
+                        (trusted, project) = self.pcontext.tenant.getProject(
+                            pname)
+                        if project is None:
+                            raise ProjectNotFoundError(pname)
+                        project_cn = project.canonical_name
+                    job_vars_file = JobVarsFile(
+                        vf['name'],
+                        project_cn,
+                    )
+                    vars_files.append(job_vars_file)
+                job.vars_files = tuple(vars_files)
 
         allowed_projects = conf.get('allowed-projects', None)
         # See note above at "post-review".

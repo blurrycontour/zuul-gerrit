@@ -1,5 +1,5 @@
 # Copyright 2014 OpenStack Foundation
-# Copyright 2021-2023 Acme Gating, LLC
+# Copyright 2021-2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -1092,9 +1092,8 @@ class AnsibleJob(object):
             max_attempts = self.arguments["max_attempts"]
         self.retry_limit = self.arguments["zuul"]["attempts"] >= max_attempts
 
-        parent_data = self.arguments["parent_data"]
-        self.normal_vars = Job._deepUpdate(parent_data.copy(),
-                                           self.job.variables)
+        # We don't set normal_vars until we load the vars files after
+        # preparing repos.
         self.secret_vars = self.arguments["secret_parent_data"]
 
     def run(self):
@@ -1579,6 +1578,8 @@ class AnsibleJob(object):
         if self.aborted:
             self._send_aborted()
             return
+
+        self.loadVarsFiles()
 
         # We set the nodes to "in use" as late as possible. So in case
         # the build failed during the checkout phase, the node is
@@ -2139,6 +2140,7 @@ class AnsibleJob(object):
                 # var or all-var, then don't do anything here; let the
                 # user control.
                 api = 'ansible_python_interpreter'
+                #JEB we do have the repos at this point
                 if (api not in self.normal_vars and
                     not is_group_var_set(api, name, self.nodeset, self.job)):
                     python = getattr(node, 'python_path', 'auto')
@@ -2454,6 +2456,7 @@ class AnsibleJob(object):
         # anything above it in precedence.
 
         other_vars = set()
+        #JEB we do have repos
         other_vars.update(self.normal_vars.keys())
         for group_vars in self.job.group_variables.values():
             other_vars.update(group_vars.keys())
@@ -2489,6 +2492,26 @@ class AnsibleJob(object):
         # It is neither a bare role, nor a collection of roles
         raise RoleNotFoundError("Unable to find role in %s" % (path,))
 
+    def selectBranchForProject(self, project, project_default_branch):
+        # Find if the project is one of the job-specified projects.
+        # If it is, we can honor the project checkout-override options.
+        args_project = {}
+        for p in args['projects']:
+            if (p['canonical_name'] == project.canonical_name):
+                args_project = p
+                break
+
+        return self.resolveBranch(
+            project.canonical_name,
+            None,
+            args['branch'],
+            self.job.override_branch,
+            self.job.override_checkout,
+            args_project.get('override_branch'),
+            args_project.get('override_checkout'),
+            project_default_branch)
+        return branch, selected_desc
+
     def prepareZuulRole(self, jobdir_playbook, role, args, role_info):
         self.log.debug("Prepare zuul role for %s" % (role,))
         # Check out the role repo if needed
@@ -2509,23 +2532,8 @@ class AnsibleJob(object):
             role_info.checkout_description = 'playbook branch'
             role_info.checkout = branch
         else:
-            # Find if the project is one of the job-specified projects.
-            # If it is, we can honor the project checkout-override options.
-            args_project = {}
-            for p in args['projects']:
-                if (p['canonical_name'] == project.canonical_name):
-                    args_project = p
-                    break
-
-            branch, selected_desc = self.resolveBranch(
-                project.canonical_name,
-                None,
-                args['branch'],
-                self.job.override_branch,
-                self.job.override_checkout,
-                args_project.get('override_branch'),
-                args_project.get('override_checkout'),
-                role['project_default_branch'])
+            branch, selected_desc = self.selectBranchForProject(
+                project, role['project_default_branch'])
             self.log.debug("Role using %s %s", selected_desc, branch)
             role_info.checkout_description = selected_desc
             role_info.checkout = branch
@@ -2678,7 +2686,37 @@ class AnsibleJob(object):
                     known_hosts.write('%s\n' % key)
         return zuul_resources
 
+    def loadVarsFiles(self):
+        parent_data = self.arguments["parent_data"]
+
+        # vars files should use trusted checkout
+        # vars files should have low precedence
+        normal_vars = parent_data.copy()
+        for vf in self.job.vars_files:
+            source = self.executor_server.connections.getSource(
+                vf['connection'])
+            project = source.getProject(vf['project'])
+
+            branch, selected_desc = self.selectBranchForProject(
+                project, vf['project_default_branch'])
+            self.log.debug("Vars file project %s using %s %s",
+                           project.canonical_name, selected_desc, branch)
+            if not vf['trusted']:
+                path = self.checkoutUntrustedProject(project, branch,
+                                                     self.arguments)
+            else:
+                path = self.checkoutTrustedProject(project, branch,
+                                                   self.arguments)
+            path = os.path.join(path, vf['name'])
+            with open(path) as f:
+                self.log.debug("Loading vars from %s", path)
+                new_vars = yaml.safe_load(f)
+                normal_vars = Job._deepUpdate(normal_vars, new_vars)
+        self.normal_vars = Job._deepUpdate(normal_vars,
+                                           self.job.variables)
+
     def prepareVars(self, args, zuul_resources):
+        #JEB we do have repos now
         normal_vars = self.normal_vars.copy()
         check_varnames(normal_vars)
 

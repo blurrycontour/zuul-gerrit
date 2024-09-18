@@ -2910,6 +2910,7 @@ class FrozenJob(zkobject.ZKObject):
                   'config_hash',
                   'deduplicate',
                   'failure_output',
+                  'vars_files',
                   )
 
     job_data_attributes = ('artifact_data',
@@ -3079,6 +3080,7 @@ class FrozenJob(zkobject.ZKObject):
                 for (project_name, job_project)
                 in data['required_projects'].items()}
 
+        data.setdefault('vars_files', [])
         data['provides'] = frozenset(data['provides'])
         data['requires'] = frozenset(data['requires'])
         data['tags'] = frozenset(data['tags'])
@@ -3309,6 +3311,7 @@ class Job(ConfigObject):
         d['extra_variables'] = self.extra_variables
         d['host_variables'] = self.host_variables
         d['group_variables'] = self.group_variables
+        d['vars_files'] = self.vars_files
         d['final'] = self.final
         d['abstract'] = self.abstract
         d['intermediate'] = self.intermediate
@@ -3330,6 +3333,7 @@ class Job(ConfigObject):
         d['match_on_config_updates'] = self.match_on_config_updates
         d['deduplicate'] = self.deduplicate
         d['failure_output'] = self.failure_output
+        d['vars_files'] = self.vars_files
         if self.isBase():
             d['parent'] = None
         elif self.parent:
@@ -3388,6 +3392,7 @@ class Job(ConfigObject):
             extra_variables={},
             host_variables={},
             group_variables={},
+            vars_files=(),
             nodeset=Job.empty_nodeset,
             workspace=None,
             pre_run=(),
@@ -3423,6 +3428,7 @@ class Job(ConfigObject):
         override_control['extra_variables'] = False
         override_control['host_variables'] = False
         override_control['group_variables'] = False
+        override_control['vars_files'] = False
         override_control['required_projects'] = False
         override_control['failure_output'] = False
 
@@ -3463,6 +3469,11 @@ class Job(ConfigObject):
         project_canonical_names.update(self._projectsFromPlaybooks(
             itertools.chain(self.pre_run, [self.run[0]], self.post_run,
                             self.cleanup_run), with_implicit=True))
+        project_canonical_names.update({
+            vf.project_canonical_name
+            for vf in self.vars_files
+            if vf.project_canonical_name
+        })
         # Return a sorted list so the order is deterministic for
         # comparison.
         return sorted(project_canonical_names)
@@ -3495,6 +3506,24 @@ class Job(ConfigObject):
             role['connection'] = role_connection.connection_name
             role['project'] = role_project.name
         return d
+
+    def _freezeVarsFile(self, tenant, layout, change, vars_file):
+        project_cname = (vars_file.project_canonical_name or
+                         change.project.canonical_name)
+        (trusted, project) = tenant.getProject(project_cname)
+        project_metadata = layout.getProjectMetadata(project_cname)
+        if project_metadata:
+            default_branch = project_metadata.default_branch
+        else:
+            default_branch = 'master'
+        connection = role_project.source.connection
+        return dict(
+            name=vars_file.name,
+            connection=connection.connection_name,
+            project=project.name,
+            project_default_branch=default_branch,
+            trusted=trusted,
+        )
 
     def _deduplicateSecrets(self, context, frozen_playbooks):
         # At the end of this method, the values in the playbooks'
@@ -3602,6 +3631,9 @@ class Job(ConfigObject):
         kw['dependencies'] = frozenset(kw['dependencies'])
         kw['semaphores'] = list(kw['semaphores'])
         kw['failure_output'] = list(kw['failure_output'])
+        # Fill in the zuul project for any vars files that don't specify it
+        kw['vars_files'] = [ self._freezeVarsFile(
+            tenant, layout, change, vf) for vf in kw['vars_files']]
         kw['ref'] = change.cache_key
         # Don't add buildset to attributes since it's not serialized
         kw['buildset'] = buildset
@@ -3916,7 +3948,8 @@ class Job(ConfigObject):
                                  'roles', 'variables', 'extra_variables',
                                  'host_variables', 'group_variables',
                                  'required_projects', 'allowed_projects',
-                                 'semaphores', 'failure_output']):
+                                 'semaphores', 'failure_output',
+                                 'vars_files']):
                     setattr(self, k, other._get(k))
 
         # Don't set final above so that we don't trip an error halfway
@@ -4013,6 +4046,15 @@ class Job(ConfigObject):
                 other.cleanup_run, layout, semaphore_handler)
             self.cleanup_run = other_cleanup_run + self.cleanup_run
         self.updateVariables(other)
+        if other._get('vars_files') is not None:
+            if other.override_control['vars_files']:
+                vars_files = other.vars_files
+            else:
+                vars_files = list(self.vars_files)
+                for vf in other.vars_files:
+                    if vf not in vars_files:
+                        vars_files.append(vf)
+            self.vars_files = tuple(vars_files)
         if other._get('required_projects') is not None:
             self.updateProjects(other)
         if (other._get('allowed_projects') is not None and
@@ -4100,6 +4142,35 @@ class Job(ConfigObject):
             return False
 
         return True
+
+
+class JobVarsFile(ConfigObject):
+    """ A reference to a variables file from a job. """
+
+    def __init__(self, name, project_canonical_name):
+        super(self).__init__()
+        self.name = name
+        # The repo to look for the file in, or None for the zuul project
+        self.project_canonical_name = project_canonical_name
+
+    def toDict(self):
+        d = dict()
+        d['name'] = self.name
+        d['project_canonical_name'] = self.project_canonical_name
+        return d
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data['name'],
+                   data['canonical_project_name'])
+
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
+
+    def __eq__(self, other):
+        if not isinstance(other, JobVarsFile):
+            return False
+        return self.toDict() == other.toDict()
 
 
 class JobProject(ConfigObject):
