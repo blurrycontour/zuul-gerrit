@@ -2910,6 +2910,7 @@ class FrozenJob(zkobject.ZKObject):
                   'config_hash',
                   'deduplicate',
                   'failure_output',
+                  'include_vars',
                   )
 
     job_data_attributes = ('artifact_data',
@@ -3079,6 +3080,7 @@ class FrozenJob(zkobject.ZKObject):
                 for (project_name, job_project)
                 in data['required_projects'].items()}
 
+        data.setdefault('include_vars', [])
         data['provides'] = frozenset(data['provides'])
         data['requires'] = frozenset(data['requires'])
         data['tags'] = frozenset(data['tags'])
@@ -3309,6 +3311,7 @@ class Job(ConfigObject):
         d['extra_variables'] = self.extra_variables
         d['host_variables'] = self.host_variables
         d['group_variables'] = self.group_variables
+        d['include_vars'] = self.include_vars
         d['final'] = self.final
         d['abstract'] = self.abstract
         d['intermediate'] = self.intermediate
@@ -3330,6 +3333,7 @@ class Job(ConfigObject):
         d['match_on_config_updates'] = self.match_on_config_updates
         d['deduplicate'] = self.deduplicate
         d['failure_output'] = self.failure_output
+        d['include_vars'] = list(map(lambda x: x.toDict(), self.include_vars))
         if self.isBase():
             d['parent'] = None
         elif self.parent:
@@ -3388,6 +3392,7 @@ class Job(ConfigObject):
             extra_variables={},
             host_variables={},
             group_variables={},
+            include_vars=(),
             nodeset=Job.empty_nodeset,
             workspace=None,
             pre_run=(),
@@ -3423,6 +3428,7 @@ class Job(ConfigObject):
         override_control['extra_variables'] = False
         override_control['host_variables'] = False
         override_control['group_variables'] = False
+        override_control['include_vars'] = False
         override_control['required_projects'] = False
         override_control['failure_output'] = False
 
@@ -3463,6 +3469,11 @@ class Job(ConfigObject):
         project_canonical_names.update(self._projectsFromPlaybooks(
             itertools.chain(self.pre_run, [self.run[0]], self.post_run,
                             self.cleanup_run), with_implicit=True))
+        project_canonical_names.update({
+            iv.project_canonical_name
+            for iv in self.include_vars
+            if iv.project_canonical_name
+        })
         # Return a sorted list so the order is deterministic for
         # comparison.
         return sorted(project_canonical_names)
@@ -3495,6 +3506,25 @@ class Job(ConfigObject):
             role['connection'] = role_connection.connection_name
             role['project'] = role_project.name
         return d
+
+    def _freezeIncludeVars(self, tenant, layout, change, include_vars):
+        project_cname = (include_vars.project_canonical_name or
+                         change.project.canonical_name)
+        (trusted, project) = tenant.getProject(project_cname)
+        project_metadata = layout.getProjectMetadata(project_cname)
+        if project_metadata:
+            default_branch = project_metadata.default_branch
+        else:
+            default_branch = 'master'
+        connection = project.source.connection
+        return dict(
+            name=include_vars.name,
+            connection=connection.connection_name,
+            project=project.name,
+            project_default_branch=default_branch,
+            trusted=trusted,
+            required=include_vars.required,
+        )
 
     def _deduplicateSecrets(self, context, frozen_playbooks):
         # At the end of this method, the values in the playbooks'
@@ -3592,6 +3622,9 @@ class Job(ConfigObject):
             # redacted.
             kw['secrets'] = self._deduplicateSecrets(context, frozen_playbooks)
         kw['affected_projects'] = self._getAffectedProjects(tenant)
+        # Fill in the zuul project for any include-vars that don't specify it
+        kw['include_vars'] = [self._freezeIncludeVars(
+            tenant, layout, change, iv) for iv in kw['include_vars']]
         kw['config_hash'] = self.getConfigHash(tenant)
         # Ensure that the these attributes are exactly equal to what
         # would be deserialized on another scheduler.
@@ -3916,7 +3949,8 @@ class Job(ConfigObject):
                                  'roles', 'variables', 'extra_variables',
                                  'host_variables', 'group_variables',
                                  'required_projects', 'allowed_projects',
-                                 'semaphores', 'failure_output']):
+                                 'semaphores', 'failure_output',
+                                 'include_vars']):
                     setattr(self, k, other._get(k))
 
         # Don't set final above so that we don't trip an error halfway
@@ -4013,6 +4047,15 @@ class Job(ConfigObject):
                 other.cleanup_run, layout, semaphore_handler)
             self.cleanup_run = other_cleanup_run + self.cleanup_run
         self.updateVariables(other)
+        if other._get('include_vars') is not None:
+            if other.override_control['include_vars']:
+                include_vars = other.include_vars
+            else:
+                include_vars = list(self.include_vars)
+                for iv in other.include_vars:
+                    if iv not in include_vars:
+                        include_vars.append(iv)
+            self.include_vars = tuple(include_vars)
         if other._get('required_projects') is not None:
             self.updateProjects(other)
         if (other._get('allowed_projects') is not None and
@@ -4100,6 +4143,38 @@ class Job(ConfigObject):
             return False
 
         return True
+
+
+class JobIncludeVars(ConfigObject):
+    """ A reference to a variables file from a job. """
+
+    def __init__(self, name, project_canonical_name, required):
+        super().__init__()
+        self.name = name
+        # The repo to look for the file in, or None for the zuul project
+        self.project_canonical_name = project_canonical_name
+        self.required = required
+
+    def toDict(self):
+        d = dict()
+        d['name'] = self.name
+        d['project_canonical_name'] = self.project_canonical_name
+        d['required'] = self.required
+        return d
+
+    @classmethod
+    def fromDict(cls, data):
+        return cls(data['name'],
+                   data['canonical_project_name'],
+                   data['required'])
+
+    def __hash__(self):
+        return hash(json.dumps(self.toDict(), sort_keys=True))
+
+    def __eq__(self, other):
+        if not isinstance(other, JobIncludeVars):
+            return False
+        return self.toDict() == other.toDict()
 
 
 class JobProject(ConfigObject):
