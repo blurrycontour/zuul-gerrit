@@ -94,6 +94,7 @@ order of precedence is:
 #. :ref:`Secrets <user_jobs_secrets>`
 #. :ref:`Job variables <user_jobs_job_variables>`
 #. :ref:`Project variables <user_jobs_project_variables>`
+#. :ref:`File variables <user_jobs_file_variables>`
 #. :ref:`Parent job results <user_jobs_parent_results>`
 
 Meaning that a site-wide variable with the same name as any other will
@@ -200,6 +201,16 @@ a project.
           - job2:
               vars:
                 var_for_all_jobs: override
+
+.. _user_jobs_file_variables:
+
+File Variables
+~~~~~~~~~~~~~~
+
+Any variables specified in files loaded from project repositories
+(using the :attr:`project.include-vars` attribute) are available to jobs
+as Ansible host variables in the same way as :ref:`job variables
+<user_jobs_job_variables>`.
 
 .. _user_jobs_parent_results:
 
