@@ -10788,3 +10788,112 @@ class TestSuperproject(ZuulTestCase):
         self.assertIn('the only project definition permitted is',
                       A.messages[0])
         self.assertHistory([])
+
+
+class TestIncludeVars(ZuulTestCase):
+    tenant_config_file = 'config/include-vars/main.yaml'
+
+    def getBuildInventory(self, name):
+        build = self.getBuildByName(name)
+        inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
+        return inventory
+
+    def test_include_vars(self):
+        # Test including from the same project and another project
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.executor_server.returnData(
+            'parent-job', A,
+            {
+                'parent_var_precedence': 'parent-vars',
+                'parent_vars': True,
+            }
+        )
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled("waiting for parent job to be running")
+
+        self.executor_server.release('parent-job')
+        self.waitUntilSettled("waiting for remaining jobs to start")
+
+        inventory = self.getBuildInventory('same-project')
+        ivars = inventory['all']['vars']
+        # We read a variable from the expected file
+        self.assertTrue(ivars['project1'])
+        # Job and project vars have higher precedence than file
+        self.assertEqual('job-vars', ivars['job_var_precedence'])
+        self.assertEqual('project-vars', ivars['project_var_precedence'])
+        # Files have higher precedence than returned parent data
+        self.assertEqual('include-vars', ivars['parent_var_precedence'])
+        # Make sure we did get returned parent data
+        self.assertTrue(ivars['parent_vars'])
+
+        inventory = self.getBuildInventory('other-project')
+        ivars = inventory['all']['vars']
+        self.assertTrue(ivars['project2'])
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='parent-job', result='SUCCESS', changes='1,1'),
+            dict(name='same-project', result='SUCCESS', changes='1,1'),
+            dict(name='other-project', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+    def test_include_vars_zuul_project(self):
+        # Test zuul-project vars (required and not)
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        # Required and present
+        inventory = self.getBuildInventory('zuul-project')
+        ivars = inventory['all']['vars']
+        self.assertTrue(ivars['zuulproject'])
+
+        # Optional and not present
+        inventory = self.getBuildInventory('zuul-project-missing-ok')
+        ivars = inventory['all']['vars']
+        self.assertFalse('zuulproject' in ivars)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='zuul-project', result='SUCCESS', changes='1,1'),
+            dict(name='zuul-project-missing-ok',
+                 result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        # Required and not present
+        self.assertTrue(re.search(
+            '- zuul-project-required .* ERROR Required vars file '
+            'missing-vars.yaml not found',
+            A.messages[-1]))
+
+    def test_include_vars_config_error(self):
+        # Test the mutual exclusion of project and zuul-project
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: badjob
+                include-vars:
+                  - name: foo.yaml
+                    project: org/project
+                    zuul-project: true
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1,
+                         "A should report failure")
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
+        self.assertIn('extra keys not allowed', A.messages[0])
