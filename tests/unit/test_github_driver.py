@@ -404,6 +404,30 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual(1, len(C.reviews))
         self.assertEqual('APPROVE', C.reviews[0].as_dict()['state'])
 
+    @simple_layout('layouts/gate-github.yaml', driver='github')
+    def test_conversations(self):
+        project = self.fake_github.getProject('org/project')
+        github = self.fake_github.getGithubClient(project.name)
+        repo = github.repo_from_project('org/project')
+        repo._set_branch_protection('master',
+                                    require_conversation_resolution=True,
+                                    protected=True)
+
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        review = A.addReview('user', 'COMMENTED')
+        thread = A.addReviewThread(review)
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertHistory([])
+
+        thread.resolved = True
+        self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-test1', result='SUCCESS'),
+            dict(name='project-test2', result='SUCCESS'),
+        ], ordered=False)
+
     @simple_layout('layouts/basic-github.yaml', driver='github')
     def test_timer_event(self):
         self.executor_server.hold_jobs_in_build = True
@@ -2927,3 +2951,33 @@ class TestGithubGraphQL(ZuulTestCase):
         # We should have one run from each app; the duplicate runs are
         # dropped by github.
         self.assertEqual(num_apps + 1, len(result['checks'].keys()))
+
+    @simple_layout('layouts/basic-github.yaml', driver='github')
+    def test_graphql_query_canmerge_conversations(self):
+        project = self.fake_github.getProject('org/project')
+        github = self.fake_github.getGithubClient(project.name)
+        repo = github.repo_from_project('org/project')
+
+        repo._set_branch_protection('master',
+                                    require_conversation_resolution=True,
+                                    protected=True)
+
+        A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+        num_threads = 102
+        for thread_no in range(num_threads):
+            review = A.addReview('user', 'COMMENTED')
+            thread = A.addReviewThread(review)
+            thread.resolved = True
+
+        # Since we short circuit on the first unresolved thread, mark
+        # all of them as resolved except the last.
+        thread.resolved = False
+        conn = self.scheds.first.sched.connections.connections["github"]
+        change_key = ChangeKey(conn.connection_name, "org/project",
+                               "PullRequest", str(A.number), str(A.head_sha))
+        change = conn.getChange(change_key, refresh=True)
+        result = self.fake_github.graphql_client.fetch_canmerge(
+            github, change)
+        self.assertTrue(result['protected'])
+        self.assertTrue(result['requiresConversationResolution'])
+        self.assertTrue(result['unresolvedConversations'])

@@ -45,7 +45,8 @@ class GithubChangeReference(git.Reference):
     _points_to_commits_only = True
 
 
-class FakeGithubPullRequest(object):
+class FakeGithubPullRequest:
+    _graphene_type = 'PullRequest'
 
     def __init__(self, github, number, project, branch,
                  subject, upstream_root, files=None, number_of_commits=1,
@@ -57,6 +58,7 @@ class FakeGithubPullRequest(object):
         If the `files` argument is provided it must be a dictionary of
         file names OR FakeFile instances -> content.
         """
+        self.id = str(uuid.uuid4())
         self.source_hostname = github.canonical_hostname
         self.github_server = github.server
         self.number = number
@@ -75,6 +77,7 @@ class FakeGithubPullRequest(object):
         self.labels = []
         self.statuses = {}
         self.reviews = []
+        self.review_threads = []
         self.writers = []
         self.admins = []
         self.updated_at = None
@@ -343,14 +346,24 @@ class FakeGithubPullRequest(object):
             submitted_at = time.strftime(
                 gh_time_format, granted_on.timetuple())
 
-        self.reviews.append(FakeGHReview({
+        review = FakeGithubReview({
             'state': state,
             'user': {
                 'login': user,
                 'email': user + "@example.com",
             },
             'submitted_at': submitted_at,
-        }))
+        })
+        self.reviews.append(review)
+        return review
+
+    def addReviewThread(self, review):
+        # Create and return a new list of reviews which constitute a
+        # thread
+        thread = FakeGithubReviewThread()
+        thread.addReview(review)
+        self.review_threads.append(thread)
+        return thread
 
     def getPRReference(self):
         return '%s/head' % self.number
@@ -579,13 +592,23 @@ class FakeCheckRun:
         self.status = "completed"
 
 
-class FakeGHReview(object):
+class FakeGithubReview(object):
 
     def __init__(self, data):
         self.data = data
 
     def as_dict(self):
         return self.data
+
+
+class FakeGithubReviewThread(object):
+
+    def __init__(self):
+        self.resolved = False
+        self.reviews = []
+
+    def addReview(self, review):
+        self.reviews.append(review)
 
 
 class FakeCombinedStatus(object):
@@ -698,6 +721,7 @@ class FakeRepository(object):
 
     def _set_branch_protection(self, branch_name, protected=True,
                                contexts=None, require_review=False,
+                               require_conversation_resolution=False,
                                locked=False):
         if not protected:
             if branch_name in self._branch_protection_rules:
@@ -708,6 +732,7 @@ class FakeRepository(object):
         rule.pattern = branch_name
         rule.required_contexts = contexts or []
         rule.require_reviews = require_review
+        rule.require_conversation_resolution = require_conversation_resolution
         rule.matching_refs = [branch_name]
         rule.lock_branch = locked
         return rule
@@ -955,7 +980,7 @@ class FakePull(object):
         return self._fake_pull_request.reviews
 
     def create_review(self, body, commit_id, event):
-        review = FakeGHReview({
+        review = FakeGithubReview({
             'state': event,
             'user': {
                 'login': 'fakezuul',
@@ -1218,6 +1243,7 @@ class FakeBranchProtectionRule:
         self.pattern = None
         self.required_contexts = []
         self.require_reviews = False
+        self.require_conversation_resolution = False
         self.require_codeowners_review = False
 
 

@@ -1782,6 +1782,8 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.mergeable = (canmerge_data.get('mergeable', 'MERGEABLE').lower()
                             in ('mergeable', 'unknown'))
         change.review_decision = canmerge_data['reviewDecision']
+        change.unresolved_conversations = canmerge_data.get(
+            'unresolvedConversations', False)
         change.required_contexts = set(
             canmerge_data['requiredStatusCheckContexts']
         )
@@ -2083,6 +2085,12 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if change.review_decision and change.review_decision != 'APPROVED':
             # If we got a review decision it must be approved
             log.debug('Change %s can not merge because it is not approved',
+                      change)
+            return False
+
+        if change.unresolved_conversations:
+            log.debug('Change %s can not merge because '
+                      'it has unresolved conversations',
                       change)
             return False
 

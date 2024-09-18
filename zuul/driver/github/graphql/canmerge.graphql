@@ -16,6 +16,7 @@ query canMergeData(
         requiredStatusCheckContexts
         requiresApprovingReviews
         requiresCodeOwnerReviews
+	requiresConversationResolution
         matchingRefs(first: 100, query: $ref_name) {
           nodes {
             name
@@ -24,9 +25,19 @@ query canMergeData(
       }
     }
     pullRequest(number: $pull) {
+      id
       isDraft
       mergeable
       reviewDecision
+      reviewThreads(first: 100) {
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+        nodes {
+          isResolved
+        }
+      }
     }
     object(expression: $head_sha) {
       ... on Commit {
