@@ -1326,7 +1326,6 @@ class Scheduler(threading.Thread):
                         log.debug(
                             "Skipping layout update of locked tenant %s",
                             tenant_name)
-                        self.layout_update_event.set()
                     except Exception:
                         log.exception("Error updating layout of tenant %s",
                                       tenant_name)

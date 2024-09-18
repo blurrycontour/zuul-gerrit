@@ -134,7 +134,7 @@ def tenant_read_lock(client, tenant_name, log=None, blocking=True):
     ) as lock:
         try:
             if log:
-                log.debug("Aquired %s read tenant lock", tenant_name)
+                log.debug("Acquired %s read tenant lock", tenant_name)
             yield lock
         finally:
             if log:
@@ -157,7 +157,7 @@ def tenant_write_lock(client, tenant_name, log=None, blocking=True,
     ) as lock:
         try:
             if log:
-                log.debug("Aquired %s write tenant lock (id: %s)",
+                log.debug("Acquired %s write tenant lock (id: %s)",
                           tenant_name, identifier)
             yield lock
         finally:
