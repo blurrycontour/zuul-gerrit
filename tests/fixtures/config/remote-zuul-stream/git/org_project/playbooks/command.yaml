@@ -69,6 +69,10 @@
         - failed_in_loop1
         - failed_in_loop2
 
+    - command: touch /tmp/testfile
+      args:
+        creates: "/tmp/testfile"
+
   handlers:
     - name: test handler
       command: echo "This is a handler"

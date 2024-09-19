@@ -180,6 +180,9 @@ class FunctionalZuulStreamMixIn:
             self.assertLogLine(
                 r'controller \| ok: Runtime: \d:\d\d:\d\d\.\d\d\d\d\d\d', text)
             self.assertLogLine(r'TASK \[Show contents of second file\]', text)
+            self.assertLogLine(r'TASK \[command: touch /tmp/testfile\]', text)
+            self.assertLogLine(r'compute1 \| ok: Runtime: None', text)
+            self.assertLogLine(r'controller \| ok: Runtime: None', text)
             self.assertLogLine(r'compute1 \| command test two', text)
             self.assertLogLine(r'controller \| command test two', text)
             self.assertLogLine(r'compute1 \| This is a rescue task', text)
