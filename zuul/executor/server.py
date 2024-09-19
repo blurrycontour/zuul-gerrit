@@ -409,31 +409,54 @@ class KubeFwd(object):
         self.context = context
         self.namespace = namespace
         self.pod = pod
+        self.socket = None
+
+    def _getSocket(self):
+        # Reserve a port so that we can restart the forwarder if it
+        # exits, which it will if there is any connection problem at
+        # all.
+        self.socket = socket.socket(socket.AF_INET6, socket.SOCK_STREAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.socket.bind(('::', 0))
+        self.port = self.socket.getsockname()[1]
 
     def start(self):
         if self.fwd:
             return
+
+        if self.socket is None:
+            self._getSocket()
+
+        cmd = [
+            'while', '!',
+            self.kubectl_command,
+            shlex.quote('--kubeconfig=%s' % self.kubeconfig),
+            shlex.quote('--context=%s' % self.context),
+            '-n',
+            shlex.quote(self.namespace),
+            'port-forward',
+            shlex.quote('pod/%s' % self.pod),
+            '%s:19885' % self.port,
+            ';', 'do', ':;', 'done',
+        ]
+        cmd = ' '.join(cmd)
+
         with open('/dev/null', 'r+') as devnull:
-            fwd = subprocess.Popen(
-                [self.kubectl_command, '--kubeconfig=%s' % self.kubeconfig,
-                 '--context=%s' % self.context,
-                 '-n', self.namespace,
-                 'port-forward',
-                 'pod/%s' % self.pod, ':19885'],
-                close_fds=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                stdin=devnull)
+            fwd = subprocess.Popen(cmd,
+                                   shell=True,
+                                   close_fds=True,
+                                   start_new_session=True,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.STDOUT,
+                                   stdin=devnull)
         line = fwd.stdout.readline().decode('utf8')
         m = re.match(r'^Forwarding from 127.0.0.1:(\d+) -> 19885', line)
+        port = None
         if m:
-            self.port = m.group(1)
-        else:
-            try:
-                self.log.error("Could not find the forwarded port: %s", line)
-                fwd.kill()
-            except Exception:
-                pass
+            port = m.group(1)
+        if port != str(self.port):
+            self.log.error("Could not find the forwarded port: %s", line)
+            self.stop()
             raise Exception("Unable to start kubectl port forward")
         self.fwd = fwd
         self.log.info('Started Kubectl port forward on port {}'.format(
@@ -442,7 +465,8 @@ class KubeFwd(object):
     def stop(self):
         try:
             if self.fwd:
-                self.fwd.kill()
+                pgid = os.getpgid(self.fwd.pid)
+                os.killpg(pgid, signal.SIGKILL)
                 self.fwd.wait()
 
                 # clear stdout buffer before its gone to not miss out on
@@ -456,6 +480,12 @@ class KubeFwd(object):
                 self.fwd = None
         except Exception:
             self.log.exception('Unable to stop kubectl port-forward:')
+        try:
+            if self.socket:
+                self.socket.close()
+                self.socket = None
+        except Exception:
+            self.log.exception('Unable to close port-forward socket:')
 
     def __del__(self):
         try:

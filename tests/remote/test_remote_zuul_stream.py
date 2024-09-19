@@ -18,6 +18,8 @@ import logging
 import os
 import re
 import textwrap
+import yaml
+from unittest import skip
 from datetime import datetime, timedelta
 
 from tests.base import AnsibleZuulTestCase
@@ -45,42 +47,43 @@ class FunctionalZuulStreamMixIn:
         ansible_remote = os.environ.get('ZUUL_REMOTE_IPV4')
         self.assertIsNotNone(ansible_remote)
 
-    def _run_job(self, job_name, create=True, split='false'):
+    def _run_job(self, job_name, create=True, nodes=None, split=False):
         # Keep the jobdir around so we can inspect contents if an
         # assert fails. It will be cleaned up anyway as it is contained
         # in a tmp dir which gets cleaned up after the test.
         self.executor_server.keep_jobdir = True
 
+        if nodes is None:
+            nodes = [
+                {'name': 'compute1',
+                 'label': 'whatever'},
+                {'name': 'controller',
+                 'label': 'whatever'},
+            ]
+
         # Output extra ansible info so we might see errors.
         self.executor_server.verbose = True
         if create:
-            conf = textwrap.dedent(
-                """
-                - job:
-                    name: {job_name}
-                    run: playbooks/{job_name}.yaml
-                    ansible-version: {version}
-                    ansible-split-streams: {split}
-                    vars:
-                      test_console_port: {console_port}
-                    roles:
-                      - zuul: org/common-config
-                    nodeset:
-                      nodes:
-                        - name: compute1
-                          label: whatever
-                        - name: controller
-                          label: whatever
-
-                - project:
-                    check:
-                      jobs:
-                        - {job_name}
-                """.format(
-                    job_name=job_name,
-                    version=self.ansible_version,
-                    split=split,
-                    console_port=self.log_console_port))
+            conf = [
+                {
+                    'job': {
+                        'name': job_name,
+                        'run': f'playbooks/{job_name}.yaml',
+                        'ansible-version': self.ansible_version,
+                        'ansible-split-streams': split,
+                        'vars': {
+                            'test_console_port': self.log_console_port,
+                        },
+                        'roles': [
+                            {'zuul': 'org/common-config'},
+                        ],
+                        'nodeset': {'nodes': nodes},
+                    }
+                }, {
+                    'project': {'check': {'jobs': [job_name]}}
+                }
+            ]
+            conf = yaml.safe_dump(conf)
         else:
             conf = textwrap.dedent(
                 """
@@ -261,7 +264,7 @@ class FunctionalZuulStreamMixIn:
                 r"""compute1 \| ok: \{'string': '\d.""", text)
 
     def test_command_split_streams(self):
-        job = self._run_job('command', split='true')
+        job = self._run_job('command', split=True)
         with self.jobLog(job):
             build = self.history[-1]
             self.assertEqual(build.result, 'SUCCESS')
@@ -406,6 +409,39 @@ class FunctionalZuulStreamMixIn:
             regex = r'controller \|   "msg": "New-style module did not ' \
                 r'handle its own exit"'
             self.assertLogLine(regex, text)
+
+    # These twe tests are helpful to have for local debugging, but we
+    # don't run them in the gate (yet) for two reasons:
+    # 1) The VM test has no useful assertions since it was created as
+    #    a comparison for the pod test
+    # 2) The pod test can not be run in the gate.
+    @skip("No useful assertions")
+    def test_vm(self):
+        # This test is not particularly useful, it is mostly a
+        # benchmark to compare with the pod test below.
+        nodes = [{'name': 'controller', 'label': 'whatever'}]
+        job = self._run_job('vm', nodes=nodes)
+        with self.jobLog(job):
+            build = self.history[-1]
+            path = os.path.join(self.jobdir_root, build.uuid,
+                                'work', 'logs', 'job-output.txt')
+            with open(path) as f:
+                self.log.debug(f.read())
+
+    @skip("Pod unavailable in gate")
+    def test_pod(self):
+        # This test could be used to verify the kubectl restart
+        # functionality if we had a gate job with access to a pod.
+        # TODO: add microk8s or kind to the stream test and enable
+        # this
+        nodes = [{'name': 'controller', 'label': 'remote-pod'}]
+        job = self._run_job('pod', nodes=nodes)
+        with self.jobLog(job):
+            build = self.history[-1]
+            path = os.path.join(self.jobdir_root, build.uuid,
+                                'work', 'logs', 'job-output.txt')
+            with open(path) as f:
+                self.log.debug(f.read())
 
 
 class TestZuulStream8(AnsibleZuulTestCase, FunctionalZuulStreamMixIn):
