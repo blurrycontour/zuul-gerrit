@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba768d7a_8f529e11",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 8975,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-09-19T10:56:58Z",
+      "side": 0,
+      "message": "Note for reviewers: project-test6 is no longer executed as it is waiting for a pending node request (paused Nodepool).",
+      "revId": "cddc0e096ebddb7fec01f4914ec7ee473eaffe3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
