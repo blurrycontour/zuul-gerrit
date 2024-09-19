@@ -2270,6 +2270,13 @@ class PipelineManager(metaclass=ABCMeta):
             tenant.semaphore_handler.release(
                 event_queue, build_set.item, job)
 
+            if build_set.fail_fast and job.voting:
+                # If fail-fast is set and the node(set) request is not
+                # successful cancel all remaining jobs.
+                log.debug("Node(set) request %s failed and fail-fast enabled, "
+                          "canceling running builds", request.id)
+                self._cancelRunningBuilds(build_set)
+
         log.info("Completed node(set) request %s for job %s of item %s "
                  "with nodes %s",
                  request, job.name, build_set.item, request.nodes)
