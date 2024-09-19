@@ -169,6 +169,20 @@ class FunctionalZuulStreamMixIn:
                              result['stdout'])
             self.assertEqual("", result['stderr'])
 
+            # Find the "creates" tasks
+            create1_task = data[0]['plays'][4]['tasks'][3]
+            create1_host = create1_task['hosts']['compute1']
+            self.assertIsNotNone(create1_host['delta'])
+            self.assertNotIn("Did not run command since", create1_host['msg'])
+            self.assertEqual("Creates file that does not exist",
+                             create1_task['task']['name'])
+            create2_task = data[0]['plays'][5]['tasks'][0]
+            create2_host = create2_task['hosts']['controller']
+            self.assertIsNone(create2_host['delta'])
+            self.assertIn("Did not run command since", create2_host['msg'])
+            self.assertEqual("Creates file that already exists",
+                             create2_task['task']['name'])
+
             self.assertLogLine(
                 r'RUN START: \[untrusted : review.example.com/org/project/'
                 r'playbooks/command.yaml@master\]', text)
@@ -275,6 +289,20 @@ class FunctionalZuulStreamMixIn:
             result = data[0]['plays'][1]['tasks'][2]['hosts']['compute1']
             self.assertEqual(token_stdout, result['stdout'])
             self.assertEqual(token_stderr, result['stderr'])
+
+            # Find the "creates" tasks
+            create1_task = data[0]['plays'][4]['tasks'][3]
+            create1_host = create1_task['hosts']['compute1']
+            self.assertIsNotNone(create1_host['delta'])
+            self.assertNotIn("Did not run command since", create1_host['msg'])
+            self.assertEqual("Creates file that does not exist",
+                             create1_task['task']['name'])
+            create2_task = data[0]['plays'][5]['tasks'][0]
+            create2_host = create2_task['hosts']['controller']
+            self.assertIsNone(create2_host['delta'])
+            self.assertIn("Did not run command since", create2_host['msg'])
+            self.assertEqual("Creates file that already exists",
+                             create2_task['task']['name'])
 
             self.assertLogLine(
                 r'RUN START: \[untrusted : review.example.com/org/project/'
