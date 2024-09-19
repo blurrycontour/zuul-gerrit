@@ -606,11 +606,20 @@ class CallbackModule(default.CallbackModule):
             self._process_deferred(result)
 
     def v2_runner_on_ok(self, result):
+        result_dict = dict(result._result)
+
+        if result._task.action in ('command', 'shell'):
+            # The command module has a small set of msgs it returns;
+            # we can use that to detect if decided not to execute the
+            # command:
+            # "Did/Would not run command since 'path' exists/does not exist"
+            # is the message we're looking for.
+            if 'not run command since' in result_dict.get('msg', ''):
+                self._stop_skipped_task_streamer(result._task)
+
         if (self._play.strategy == 'free'
                 and self._last_task_banner != result._task._uuid):
             self._print_task_banner(result._task)
-
-        result_dict = dict(result._result)
 
         self._clean_results(result_dict, result._task.action)
         if '_zuul_nolog_return' in result_dict:
