@@ -606,6 +606,11 @@ class CallbackModule(default.CallbackModule):
             self._process_deferred(result)
 
     def v2_runner_on_ok(self, result):
+        # The command module has a small set of msgs it returns; we can
+        # use that to detect if decided not to execute the command:
+        if result._task.action in ('command', 'shell'):
+            self._stop_skipped_task_streamer(result._task)
+
         if (self._play.strategy == 'free'
                 and self._last_task_banner != result._task._uuid):
             self._print_task_banner(result._task)
