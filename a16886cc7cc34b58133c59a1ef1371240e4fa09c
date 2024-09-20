@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10b1f9d0_48dc0336",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-09-20T19:42:17Z",
+      "side": 1,
+      "message": "Adding BMW people as CC because they implemented https://review.opendev.org/c/zuul/zuul/+/831925 in 2022.",
+      "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
