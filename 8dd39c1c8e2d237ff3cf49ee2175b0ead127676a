@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f80b45d_e3398b2c",
+        "filename": "zuul/driver/github/graphql/canmerge.graphql",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-09-23T13:02:43Z",
+      "side": 1,
+      "message": "nit: should this be a tab?",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 1
+      },
+      "revId": "8dd39c1c8e2d237ff3cf49ee2175b0ead127676a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
