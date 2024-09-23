@@ -1,6 +1,52 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "35222784_409eac57",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-09-23T05:42:11Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand the reason for performing repo updates outside of Zuul, but the executor also dumps a `workspace-repos.json` to the log root that might be handy.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 33
+      },
+      "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01128d8e_79795d0f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-09-23T05:42:11Z",
+      "side": 1,
+      "message": "You can identify the changes that are in a circular dependency (and with that part of the same queue item) by looking at the `zuul.buildset_refs`.",
+      "range": {
+        "startLine": 11,
+        "startChar": 22,
+        "endLine": 12,
+        "endChar": 13
+      },
+      "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "10b1f9d0_48dc0336",
@@ -14,6 +60,46 @@
       "writtenOn": "2024-09-20T19:42:17Z",
       "side": 1,
       "message": "Adding BMW people as CC because they implemented https://review.opendev.org/c/zuul/zuul/+/831925 in 2022.",
+      "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69407346_8884ceac",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-09-23T05:42:11Z",
+      "side": 1,
+      "message": "This is not true. The item will receive a new buildset (ID), but the queue item (ID) will still be the same. The buildset ID is already available as `zuul.buildset`.",
+      "range": {
+        "startLine": 654,
+        "startChar": 9,
+        "endLine": 655,
+        "endChar": 51
+      },
+      "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76307803_c40fb013",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 661,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-09-23T05:42:11Z",
+      "side": 1,
+      "message": "I\u0027d rather use the buildset\u0027s `configure_time` or `start_time` here due to the reason mentioned above. The `enqueue_time` shouldn\u0027t change during a gate-reset.",
       "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
