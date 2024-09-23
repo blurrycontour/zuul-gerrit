@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41c17e7e_f09e4b89",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-23T23:46:03Z",
+      "side": 1,
+      "message": "I think global min-ready is what we want.  It is most close to the current nodepool behavior.  It is also necessary for systems which may have slower or even completely idle tenants.  Opendev is such a system.  In those cases, a per-tenant min-ready would mean permanently idle nodes and lost capacity.\n\nConceptually, we may be able to think about implementing global min-ready like this:\n\n  For each tenant:\n    For each provider:\n      For each label:\n        If min-ready is satisfied by ready or min-ready building nodes on this endpoint: continue\n        else, launch min-ready nodes\n\nThat should produce the desired behavior.  Which provider actually launches the nodes is somewhat arbitrary, but from each provider\u0027s perspective, min-ready is satisfied one way or another.",
+      "revId": "abfdf0f243e15c041668dba7cf6a83451be4e7a9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
