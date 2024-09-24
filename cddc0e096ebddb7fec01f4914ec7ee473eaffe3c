@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bed545b5_26415fcf",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1329,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-09-24T19:06:55Z",
+      "side": 0,
+      "message": "I think that\u0027s expected, see L1334, we want to try again until the tenant is unlocked. I guess this could be improved by retrying only the locked tenant, but I guess the reasoning is that this action is idempotent and it doesn\u0027t really hurt to retry them all in that case.",
+      "revId": "cddc0e096ebddb7fec01f4914ec7ee473eaffe3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
