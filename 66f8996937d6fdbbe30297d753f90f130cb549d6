@@ -16,6 +16,24 @@
       "message": "I think we should normalize to zuul characteristics here.  I think this should be \"launch-attempts: 3\" to match the job \"attempts:\" attribute which defaults to 3.\n\n(Or should we just call this \"attempts\" as well?  I think launch-attempts but I\u0027m open to it.)",
       "revId": "66f8996937d6fdbbe30297d753f90f130cb549d6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31d31960_2b1bdc18",
+        "filename": "tests/fixtures/layouts/nodepool.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-09-24T05:50:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87bcead2_c2b13bba",
+      "revId": "66f8996937d6fdbbe30297d753f90f130cb549d6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
