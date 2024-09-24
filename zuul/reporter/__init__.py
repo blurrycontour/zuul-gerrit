@@ -60,6 +60,22 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
     def postConfig(self):
         """Run tasks after configuration is reloaded"""
 
+    def _configErrorMatchesChange(self, err, change):
+        context = err.key.context
+        mark = err.key.mark
+        if not (context and mark and err.short_error):
+            return False
+        if context.project_canonical_name != \
+                change.project.canonical_name:
+            return False
+        if not hasattr(change, 'branch'):
+            return False
+        if context.branch != change.branch:
+            return False
+        if context.path not in change.files:
+            return False
+        return True
+
     def addConfigurationErrorComments(self, item, change, comments):
         """Add file comments for configuration errors.
 
@@ -75,16 +91,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         for err in item.getConfigErrors():
             context = err.key.context
             mark = err.key.mark
-            if not (context and mark and err.short_error):
-                continue
-            if context.project_canonical_name != \
-                    change.project.canonical_name:
-                continue
-            if not hasattr(change, 'branch'):
-                continue
-            if context.branch != change.branch:
-                continue
-            if context.path not in change.files:
+            if not self._configErrorMatchesChange(err, change):
                 continue
             existing_comments = comments.setdefault(context.path, [])
             existing_comments.append(dict(line=mark.end_line,
@@ -147,11 +154,12 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
         }
         return format_methods[action]
 
-    def _formatItemReport(self, item, with_jobs=True, action=None):
+    def _formatItemReport(self, item, change=None,
+                          with_jobs=True, action=None):
         """Format a report from the given items. Usually to provide results to
         a reporter taking free-form text."""
         action = action or self._action
-        ret = self._getFormatter(action)(item, with_jobs)
+        ret = self._getFormatter(action)(item, change, with_jobs)
 
         config_warnings = item.getConfigErrors(errors=False, warnings=True)
         if config_warnings:
@@ -170,7 +178,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
 
         return ret
 
-    def _formatItemReportEnqueue(self, item, with_jobs=True):
+    def _formatItemReportEnqueue(self, item, change, with_jobs=True):
         if status_url := self.connection.sched.globals.web_status_url:
             status_url = item.formatUrlPattern(status_url)
 
@@ -182,7 +190,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             item_url=item.formatItemUrl(),
             status_url=status_url)
 
-    def _formatItemReportStart(self, item, with_jobs=True):
+    def _formatItemReportStart(self, item, change, with_jobs=True):
         if status_url := self.connection.sched.globals.web_status_url:
             status_url = item.formatUrlPattern(status_url)
 
@@ -194,7 +202,7 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             item_url=item.formatItemUrl(),
             status_url=status_url)
 
-    def _formatItemReportSuccess(self, item, with_jobs=True):
+    def _formatItemReportSuccess(self, item, change, with_jobs=True):
         msg = item.pipeline.success_message
         if with_jobs:
             item_url = item.formatItemUrl()
@@ -203,24 +211,43 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             msg += '\n\n' + self._formatItemReportJobs(item)
         return msg
 
-    def _formatItemReportFailure(self, item, with_jobs=True):
+    def _formatItemReportFailure(self, item, change, with_jobs=True):
         if len(item.changes) > 1:
-            change_text = 'These changes'
+            _this_change = 'These changes'
+            _depends = 'depend'
+            _is = 'are'
         else:
-            change_text = 'This change'
+            _this_change = 'This change'
+            _depends = 'depends'
+            _is = 'is'
+
         if item.dequeued_needing_change:
-            msg = f'{change_text} depends on a change that failed to merge.\n'
+            msg = (f'{_this_change} {_depends} on a change '
+                   'that failed to merge.\n')
             if isinstance(item.dequeued_needing_change, str):
                 msg += '\n' + item.dequeued_needing_change + '\n'
         elif item.dequeued_missing_requirements:
-            msg = (f'{change_text} is unable to merge '
+            msg = (f'{_this_change} {_is} unable to merge '
                    'due to a missing merge requirement.\n')
         elif len(item.changes) > 1:
-            msg = f'{change_text} is part of a dependency cycle that failed.\n'
+            # No plural phrasing here; we are specifically talking
+            # about this change as part of a cycle.
+            msg = ('This change is part of a dependency cycle '
+                   'that failed.\n\n')
+
+            # Attempt to provide relevant config error information
+            # since we will not add it below.
+            changes_with_errors = self._getChangesWithErrors(item)
+            if change in changes_with_errors:
+                msg += str(item.getConfigErrors(
+                    errors=True, warnings=False)[0].error)
+            change_annotations = {c: ' (config error)'
+                                  for c in changes_with_errors}
             if with_jobs:
-                msg = '{}\n\n{}'.format(msg, self._formatItemReportJobs(item))
-            msg = "{}\n\n{}".format(
-                msg, self._formatItemReportOtherChanges(item))
+                msg = '{}\n{}'.format(msg, self._formatItemReportJobs(item))
+            msg = "{}\n{}".format(
+                msg, self._formatItemReportOtherChanges(item,
+                                                        change_annotations))
         elif item.didMergerFail():
             msg = item.pipeline.merge_conflict_message
         elif item.current_build_set.has_blocking_errors:
@@ -235,20 +262,33 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
                 msg += '\n\n' + self._formatItemReportJobs(item)
         return msg
 
-    def _formatItemReportMergeConflict(self, item, with_jobs=True):
+    def _getChangesWithErrors(self, item):
+        # Attempt to determine whether this change is the source of a
+        # configuration error.  This is best effort.
+        if not item.current_build_set.has_blocking_errors:
+            return []
+
+        ret = []
+        for change in item.changes:
+            for err in item.getConfigErrors():
+                if self._configErrorMatchesChange(err, change):
+                    ret.append(change)
+        return ret
+
+    def _formatItemReportMergeConflict(self, item, change, with_jobs=True):
         return item.pipeline.merge_conflict_message
 
-    def _formatItemReportMergeFailure(self, item, with_jobs=True):
+    def _formatItemReportMergeFailure(self, item, change, with_jobs=True):
         return 'This change was not merged by the code review system.\n'
 
-    def _formatItemReportConfigError(self, item, with_jobs=True):
+    def _formatItemReportConfigError(self, item, change, with_jobs=True):
         if item.getConfigErrors():
             msg = str(item.getConfigErrors()[0].error)
         else:
             msg = "Unknown configuration error"
         return msg
 
-    def _formatItemReportNoJobs(self, item, with_jobs=True):
+    def _formatItemReportNoJobs(self, item, change, with_jobs=True):
         if status_url := self.connection.sched.globals.web_status_url:
             status_url = item.formatUrlPattern(status_url)
 
@@ -260,23 +300,26 @@ class BaseReporter(object, metaclass=abc.ABCMeta):
             item_url=item.formatItemUrl(),
             status_url=status_url)
 
-    def _formatItemReportDisabled(self, item, with_jobs=True):
+    def _formatItemReportDisabled(self, item, change, with_jobs=True):
         if item.current_build_set.result == 'SUCCESS':
-            return self._formatItemReportSuccess(item)
+            return self._formatItemReportSuccess(item, change)
         elif item.current_build_set.result == 'FAILURE':
-            return self._formatItemReportFailure(item)
+            return self._formatItemReportFailure(item, change)
         else:
-            return self._formatItemReport(item)
+            return self._formatItemReport(item, change)
 
-    def _formatItemReportDequeue(self, item, with_jobs=True):
+    def _formatItemReportDequeue(self, item, change, with_jobs=True):
         msg = item.pipeline.dequeue_message
         if with_jobs:
             msg += '\n\n' + self._formatItemReportJobs(item)
         return msg
 
-    def _formatItemReportOtherChanges(self, item):
-        return "Related changes:\n{}\n".format("\n".join(
-            f'  - {c.url}' for c in item.changes))
+    def _formatItemReportOtherChanges(self, item, change_annotations):
+        change_lines = []
+        for change in item.changes:
+            annotation = change_annotations.get(change, '')
+            change_lines.append(f'  - {change.url}{annotation}')
+        return "Related changes:\n{}\n".format("\n".join(change_lines))
 
     def _getItemReportJobsFields(self, item):
         # Extract the report elements from an item

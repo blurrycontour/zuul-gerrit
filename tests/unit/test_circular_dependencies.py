@@ -4143,6 +4143,47 @@ class TestGerritCircularDependencies(ZuulTestCase):
             dict(name="project-job", result="ABORTED", changes="1,1 2,1"),
         ], ordered=False)
 
+    def test_circular_dependency_config_error(self):
+        use_job = textwrap.dedent(
+            """
+            - project:
+                queue: integrated
+                check:
+                  jobs:
+                    - bad-job
+                gate:
+                  jobs:
+                    - new-job
+            """)
+        A = self.fake_gerrit.addFakeChange("org/project", "master", "A")
+        B = self.fake_gerrit.addFakeChange("org/project1", "master", "B",
+                                           files={"zuul.yaml": use_job})
+
+        # A <-> B (via commit-depends)
+        A.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            A.subject, B.data["url"]
+        )
+        B.data["commitMessage"] = "{}\n\nDepends-On: {}\n".format(
+            B.subject, A.data["url"]
+        )
+
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([])
+        self.assertEqual(len(A.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(A.patchsets[-1]["approvals"][0]["value"], "-1")
+        self.assertEqual(len(B.patchsets[-1]["approvals"]), 1)
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["type"], "Verified")
+        self.assertEqual(B.patchsets[-1]["approvals"][0]["value"], "-1")
+        # Only report the error message to B
+        self.assertNotIn("bad-job not defined", A.messages[-1])
+        self.assertIn("bad-job not defined", B.messages[-1])
+        # Indicate that B has an error
+        self.assertIn("/2 (config error)", A.messages[-1])
+        self.assertIn("/2 (config error)", B.messages[-1])
+
 
 class TestGithubCircularDependencies(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
