@@ -26,6 +26,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4037f08e_fa442af6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-09-24T10:32:33Z",
+      "side": 1,
+      "message": "It is possible to use the `merge_ops` object in `workspace-repos.json` to find timestamps of each commit and match each merge command to the `zuul.items` list. We would still miss the information about which items belong to the same dependency cycle, unless we group them by timestamp because the timestamps (most probably) are different for each merge command.\n\nThe merging that Zuul does is not sufficient for our purpose, we would like to update more information in each repository, e.g. version numbers, submodule pointers etc., in the same way as our final submitted result looks like on our Git server after gate has succeeded.",
+      "parentUuid": "35222784_409eac57",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 33
+      },
+      "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "01128d8e_79795d0f",
         "filename": "/COMMIT_MSG",
         "patchSetId": 3
@@ -37,6 +61,30 @@
       "writtenOn": "2024-09-23T05:42:11Z",
       "side": 1,
       "message": "You can identify the changes that are in a circular dependency (and with that part of the same queue item) by looking at the `zuul.buildset_refs`.",
+      "range": {
+        "startLine": 11,
+        "startChar": 22,
+        "endLine": 12,
+        "endChar": 13
+      },
+      "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1912c538_78784d25",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-09-24T10:32:33Z",
+      "side": 1,
+      "message": "`zuul.buildset_refs` only contains the current queue item, not the items ahead.",
+      "parentUuid": "01128d8e_79795d0f",
       "range": {
         "startLine": 11,
         "startChar": 22,
@@ -87,6 +135,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd5d2624_517615bf",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-09-24T10:32:33Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "69407346_8884ceac",
+      "range": {
+        "startLine": 654,
+        "startChar": 9,
+        "endLine": 655,
+        "endChar": 51
+      },
+      "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76307803_c40fb013",
@@ -100,6 +172,24 @@
       "writtenOn": "2024-09-23T05:42:11Z",
       "side": 1,
       "message": "I\u0027d rather use the buildset\u0027s `configure_time` or `start_time` here due to the reason mentioned above. The `enqueue_time` shouldn\u0027t change during a gate-reset.",
+      "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "208eec8c_5c20ea98",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 3
+      },
+      "lineNbr": 661,
+      "author": {
+        "id": 37096
+      },
+      "writtenOn": "2024-09-24T10:32:33Z",
+      "side": 1,
+      "message": "`configure_time` and `start_time` are not available if the items ahead are not live, e.g. in a check pipeline. To always provide these fields, I\u0027m using data from the queue item.",
+      "parentUuid": "76307803_c40fb013",
       "revId": "a16886cc7cc34b58133c59a1ef1371240e4fa09c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
