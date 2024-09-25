@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "36b54998_63e185cb",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-25T23:56:14Z",
+      "side": 1,
+      "message": "Because they are opened in __init__, so that better matches the lifecycle.\n\n(Really the whole thing should not be a Thread and it should have a start method and that\u0027s where we should open them and then we should close them in stop, but that\u0027s a bigger change.)",
+      "parentUuid": "079c80fa_614c7c84",
+      "revId": "9e4a29b56b159a3034a54490f39dec788088ff0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "390ad064_2d4c3138",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 1
