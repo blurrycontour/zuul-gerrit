@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "079c80fa_614c7c84",
+        "filename": "tests/base.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-09-25T23:46:08Z",
+      "side": 1,
+      "message": "Out of curiousity why not close these in stop()?",
+      "revId": "9e4a29b56b159a3034a54490f39dec788088ff0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "390ad064_2d4c3138",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2247,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-09-25T23:46:08Z",
+      "side": 1,
+      "message": "Same question for the statsd fake object. Why not close these in stop()?",
+      "revId": "9e4a29b56b159a3034a54490f39dec788088ff0d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
