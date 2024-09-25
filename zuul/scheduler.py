@@ -441,6 +441,7 @@ class Scheduler(threading.Thread):
         self.zk_client.disconnect()
         self.log.debug("Stopping tracing")
         self.tracing.stop()
+        self.statsd.close()
 
     def runCommand(self):
         while self._command_running:

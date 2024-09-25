@@ -2242,6 +2242,10 @@ class StreamManager(object):
         self.poll.register(self.wake_read, self.bitmask)
         self.poll_lock = threading.Lock()
 
+    def __del__(self):
+        os.close(self.wake_read)
+        os.close(self.wake_write)
+
     def start(self):
         self._stopped = False
         self.thread = threading.Thread(
