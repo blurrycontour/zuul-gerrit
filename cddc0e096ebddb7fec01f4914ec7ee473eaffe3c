@@ -16,6 +16,24 @@
       "message": "I think that\u0027s expected, see L1334, we want to try again until the tenant is unlocked. I guess this could be improved by retrying only the locked tenant, but I guess the reasoning is that this action is idempotent and it doesn\u0027t really hurt to retry them all in that case.",
       "revId": "cddc0e096ebddb7fec01f4914ec7ee473eaffe3c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e0c98a3_a718b6a7",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1329,
+      "author": {
+        "id": 36322
+      },
+      "writtenOn": "2024-09-25T08:15:35Z",
+      "side": 0,
+      "message": "Yes, retrying is expected and idempotent, but the issue here is the redundant signaling, which leads to unnecessary wake-ups and noise in the logs. By removing the signal after a lock exception, we avoid forcing layout updates for locked tenants, keeping retries efficient without extra wake-ups",
+      "parentUuid": "bed545b5_26415fcf",
+      "revId": "cddc0e096ebddb7fec01f4914ec7ee473eaffe3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
