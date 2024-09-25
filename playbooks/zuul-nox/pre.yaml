@@ -1,5 +1,12 @@
 - hosts: all
+  pre_tasks:
+    # Temporary so we can identify any unexpected values
+    - name: Show current ulimits
+      shell: ulimit -a
   roles:
+    - role: ulimit
+      ulimit_soft_limits:
+        nofile: 2048
     - ensure-dstat-graph
     - run-dstat
     - role: ensure-zookeeper
