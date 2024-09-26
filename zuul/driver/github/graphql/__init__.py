@@ -41,6 +41,7 @@ class GraphQLClient:
             'canmerge-page-rules',
             'canmerge-page-suites',
             'canmerge-page-runs',
+            'canmerge-page-threads',
             'branch-protection',
             'branch-protection-inner',
         ]
@@ -134,6 +135,8 @@ class GraphQLClient:
                 'requiresApprovingReviews')
             result['requiresCodeOwnerReviews'] = matching_rule.get(
                 'requiresCodeOwnerReviews')
+            result['requiresConversationResolution'] = matching_rule.get(
+                'requiresConversationResolution')
             result['protected'] = True
         else:
             result['requiredStatusCheckContexts'] = []
@@ -152,6 +155,14 @@ class GraphQLClient:
         # None to signal if the field is not present.
         result['reviewDecision'] = nested_get(
             pull_request, 'reviewDecision', default=None)
+
+        if result.get('requiresConversationResolution'):
+            result['unresolvedConversations'] = False
+            for thread in self._fetch_canmerge_threads(
+                    github, log, pull_request):
+                if not thread.get('isResolved'):
+                    result['unresolvedConversations'] = True
+                    break
 
         # Add status checks
         result['status'] = {}
@@ -201,6 +212,21 @@ class GraphQLClient:
                 suite_node_id=suite_id,
                 cursor=page_info['endCursor'])
             suite = nested_get(data, 'data', 'node')
+
+    def _fetch_canmerge_threads(self, github, log, pull_request):
+        pull_id = pull_request['id']
+        while True:
+            for thread in nested_get(
+                    pull_request, 'reviewThreads', 'nodes', default=[]):
+                yield thread
+            page_info = nested_get(pull_request, 'reviewThreads', 'pageInfo')
+            if not page_info['hasNextPage']:
+                return
+            data = self._run_query(
+                log, github, 'canmerge-page-threads',
+                pull_node_id=pull_id,
+                cursor=page_info['endCursor'])
+            pull_request = nested_get(data, 'data', 'node')
 
     def _fetch_branch_protection(self, log, github, project,
                                  zuul_event_id=None):

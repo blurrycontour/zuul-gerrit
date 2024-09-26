@@ -42,6 +42,8 @@ class Node(Interface):
             return Commit
         elif kind == 'CheckSuite':
             return CheckSuite
+        elif kind == 'PullRequest':
+            return PullRequest
 
 
 class PageInfo(ObjectType):
@@ -86,6 +88,7 @@ class BranchProtectionRule(ObjectType):
     pattern = String()
     requiredStatusCheckContexts = List(String)
     requiresApprovingReviews = Boolean()
+    requiresConversationResolution = Boolean()
     requiresCodeOwnerReviews = Boolean()
     matchingRefs = Field(MatchingRefs, first=Int(), after=String(),
                          query=String())
@@ -102,6 +105,9 @@ class BranchProtectionRule(ObjectType):
 
     def resolve_requiresApprovingReviews(parent, info):
         return parent.require_reviews
+
+    def resolve_requiresConversationResolution(parent, info):
+        return parent.require_conversation_resolution
 
     def resolve_requiresCodeOwnerReviews(parent, info):
         return parent.require_codeowners_review
@@ -277,16 +283,55 @@ class Commit(ObjectType):
         )
 
 
+class PullRequestReviewThread(ObjectType):
+    isResolved = Boolean()
+
+    def resolve_isResolved(parent, info):
+        return parent.resolved
+
+
+class PullRequestReviewThreads(ObjectType):
+    nodes = List(PullRequestReviewThread)
+    pageInfo = Field(PageInfo)
+
+    def resolve_nodes(parent, info):
+        return parent['nodes']
+
+    def resolve_pageInfo(parent, info):
+        return parent
+
+
 class PullRequest(ObjectType):
+    class Meta:
+        interfaces = (Node, )
+
+    id = ID(required=True)
     isDraft = Boolean()
     reviewDecision = String()
     mergeable = String()
+    reviewThreads = Field(PullRequestReviewThreads,
+                          first=Int(), after=String())
+
+    def resolve_id(parent, info):
+        return parent.id
 
     def resolve_isDraft(parent, info):
         return parent.draft
 
     def resolve_mergeable(parent, info):
         return "MERGEABLE" if parent.mergeable else "CONFLICTING"
+
+    def resolve_reviewThreads(parent, info, first, after=None):
+        if after is None:
+            after = '0'
+        after = int(after)
+        values = parent.review_threads
+        return dict(
+            length=len(values),
+            nodes=values[after:after + first],
+            first=first,
+            after=after,
+        )
 
     def resolve_reviewDecision(parent, info):
         if hasattr(info.context, 'version') and info.context.version:
@@ -358,6 +403,9 @@ class FakeGithubQuery(ObjectType):
                 for suite in commit._check_suites.values():
                     if suite.id == id:
                         return suite
+        for pr in info.context._data.pull_requests.values():
+            if pr.id == id:
+                return pr
 
 
 def getGrapheneSchema():

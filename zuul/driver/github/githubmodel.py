@@ -40,6 +40,7 @@ class PullRequest(Change):
         self.draft = None
         self.mergeable = True
         self.review_decision = None
+        self.unresolved_conversations = None
         self.required_contexts = set()
         self.contexts = set()
         self.branch_protected = False
@@ -77,6 +78,7 @@ class PullRequest(Change):
             "draft": self.draft,
             "mergeable": self.mergeable,
             "review_decision": self.review_decision,
+            "unresolved_conversations": self.unresolved_conversations,
             "required_contexts": list(self.required_contexts),
             "contexts": list(self.contexts),
             "branch_protected": self.branch_protected,
@@ -94,6 +96,7 @@ class PullRequest(Change):
         self.draft = data.get("draft")
         self.mergeable = data.get("mergeable", True)
         self.review_decision = data.get("review_decision")
+        self.unresolved_conversations = data.get("unresolved_conversations")
         self.required_contexts = set(data.get("required_contexts", []))
         self.contexts = set(tuple(c) for c in data.get("contexts", []))
         self.branch_protected = data.get("branch_protected", False)
