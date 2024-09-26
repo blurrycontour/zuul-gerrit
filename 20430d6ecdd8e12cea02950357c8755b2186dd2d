@@ -162,6 +162,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "11a7590b_471c02bf",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-26T20:17:44Z",
+      "side": 1,
+      "message": "Okay, I think I have synthesized all of this in PS8.",
+      "parentUuid": "0b6e0012_24cce437",
+      "range": {
+        "startLine": 102,
+        "startChar": 6,
+        "endLine": 102,
+        "endChar": 13
+      },
+      "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "50cc5cac_02ad50b2",
         "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
         "patchSetId": 6
@@ -262,6 +286,24 @@
       "side": 1,
       "message": "Sounds reasonable.",
       "parentUuid": "e7c15dad_84a69034",
+      "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf887b10_9c3016bf",
+        "filename": "doc/source/developer/specs/zuul-workload-identity-federation.rst",
+        "patchSetId": 6
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-26T20:17:44Z",
+      "side": 1,
+      "message": "Included in PS8.",
+      "parentUuid": "ef361b27_27f4eaa4",
       "revId": "20430d6ecdd8e12cea02950357c8755b2186dd2d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
