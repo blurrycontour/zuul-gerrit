@@ -2,7 +2,6 @@ ansible
 # 7.2.5 has this issue:
 # https://github.com/sphinx-doc/sphinx/issues/11662
 sphinx>=1.8,!=7.2.5
-sphinxcontrib-blockdiag>=1.1.0
 sphinxcontrib-programoutput
 sphinx-autodoc-typehints
 sphinxcontrib-openapi>=0.4.0
@@ -14,6 +13,3 @@ zuul-sphinx
 # remove this requirement once this issue is fixed:
 # https://github.com/sphinx-contrib/openapi/issues/121
 mistune<2.0
-# sphinxcontrib-blockdiag uses pillow and is not compatible with 10.0.0
-# - corvus 2023-07-06
-Pillow<10.0.0
