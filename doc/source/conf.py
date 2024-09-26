@@ -29,7 +29,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx_autodoc_typehints',
     'sphinx.ext.graphviz',
-    'sphinxcontrib.blockdiag',
     'sphinxcontrib.programoutput',
     'sphinxcontrib.openapi',
     'zuul_sphinx',

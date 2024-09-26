@@ -60,13 +60,14 @@ For example, if a reviewer approves five changes in rapid succession::
 Zuul queues those changes in the order they were approved, and notes
 that each subsequent change depends on the one ahead of it merging:
 
-.. blockdiag::
+.. graphviz::
 
-  blockdiag foo {
-    node_width = 40;
-    span_width = 40;
-    A <- B <- C <- D <- E;
-  }
+   digraph foo {
+     rankdir="LR";
+     node [shape=box];
+     edge [dir=back];
+     A -> B -> C -> D -> E;
+   }
 
 Zuul then starts immediately testing all of the changes in parallel.
 But in the case of changes that depend on others, it instructs the
@@ -82,131 +83,159 @@ well::
 
 Hence jobs triggered to tests A will only test A and ignore B, C, D:
 
-.. blockdiag::
+.. graphviz::
 
-  blockdiag foo {
-    node_width = 40;
-    span_width = 40;
-    master -> A -> B -> C -> D -> E;
-    group jobs_for_A {
-        label = "Merged changes for A";
-        master -> A;
-    }
-    group ignored_to_test_A {
-        label = "Ignored changes";
-        color = "lightgray";
-        B -> C -> D -> E;
-    }
-  }
+   digraph foo {
+     rankdir="LR";
+     node [shape=box];
+     edge [dir=back];
+
+     subgraph cluster_merged {
+       label="Merged Changes for A";
+       style=filled;
+       color=orange;
+       node [style=filled,color=black,fillcolor=white];
+       master -> A;
+     }
+
+     subgraph cluster_ignored {
+       label="Ignored Changes";
+       style=filled;
+       color=lightgrey;
+       node [style=filled,color=black,fillcolor=white];
+       B -> C -> D -> E;
+     }
+
+     A -> B;
+   }
 
 The jobs for E would include the whole dependency chain: A, B, C, D, and E.
 E will be tested assuming A, B, C, and D passed:
 
-.. blockdiag::
+.. graphviz::
 
-  blockdiag foo {
-    node_width = 40;
-    span_width = 40;
-    group jobs_for_E {
-        label = "Merged changes for E";
-        master -> A -> B -> C -> D -> E;
-    }
-  }
+   digraph foo {
+     rankdir="LR";
+     node [shape=box];
+     edge [dir=back];
+
+     subgraph cluster_merged {
+       label="Merged Changes for E";
+       style=filled;
+       color=orange;
+       node [style=filled,color=black,fillcolor=white];
+       master -> A -> B -> C -> D -> E;
+     }
+   }
 
 If changes *A* and *B* pass tests (green), and *C*, *D*, and *E* fail (red):
 
-.. blockdiag::
+.. graphviz::
 
-  blockdiag foo {
-    node_width = 40;
-    span_width = 40;
+   digraph foo{
+     rankdir="LR";
+     node [shape=box];
+     edge [dir=back];
 
-    A [color = lightgreen];
-    B [color = lightgreen];
-    C [color = pink];
-    D [color = pink];
-    E [color = pink];
-
-    master <- A <- B <- C <- D <- E;
-  }
+     A [style=filled,color=black,fillcolor=lightgreen];
+     B [style=filled,color=black,fillcolor=lightgreen];
+     C [style=filled,color=black,fillcolor=lightpink];
+     D [style=filled,color=black,fillcolor=lightpink];
+     E [style=filled,color=black,fillcolor=lightpink];
+     master -> A -> B -> C -> D -> E;
+   }
 
 Zuul will merge change *A* followed by change *B*, leaving this queue:
 
-.. blockdiag::
+.. graphviz::
 
-  blockdiag foo {
-    node_width = 40;
-    span_width = 40;
+   digraph foo {
+     rankdir="LR";
+     node [shape=box];
+     edge [dir=back];
 
-    C [color = pink];
-    D [color = pink];
-    E [color = pink];
-
-    C <- D <- E;
-  }
+     C [style=filled,color=black,fillcolor=lightpink];
+     D [style=filled,color=black,fillcolor=lightpink];
+     E [style=filled,color=black,fillcolor=lightpink];
+     C -> D -> E;
+   }
 
 Since *D* was dependent on *C*, it is not clear whether *D*'s failure is the
 result of a defect in *D* or *C*:
 
-.. blockdiag::
+.. graphviz::
 
-  blockdiag foo {
-    node_width = 40;
-    span_width = 40;
+   digraph foo {
+     rankdir="LR";
+     node [shape=box];
+     edge [dir=back];
 
-    C [color = pink];
-    D [label = "D\n?"];
-    E [label = "E\n?"];
-
-    C <- D <- E;
-  }
+     C [style=filled,color=black,fillcolor=lightpink];
+     D [label="D\n?"];
+     E [label="E\n?"];
+     C -> D -> E;
+   }
 
 Since *C* failed, Zuul will report its failure and drop *C* from the queue,
 keeping D and E:
 
-.. blockdiag::
+.. graphviz::
 
-  blockdiag foo {
-    node_width = 40;
-    span_width = 40;
+   digraph foo {
+     rankdir="LR";
+     node [shape=box];
+     edge [dir=back];
 
-    D [label = "D\n?"];
-    E [label = "E\n?"];
-
-    D <- E;
-  }
+     D [label="D\n?"];
+     E [label="E\n?"];
+     D -> E;
+   }
 
 This queue is the same as if two new changes had just arrived, so Zuul
 starts the process again testing *D* against the tip of the branch, and
 *E* against *D*:
 
-.. blockdiag::
+.. graphviz::
 
-  blockdiag foo {
-    node_width = 40;
-    span_width = 40;
-    master -> D -> E;
-    group jobs_for_D {
-        label = "Merged changes for D";
-        master -> D;
-    }
-    group ignored_to_test_D {
-        label = "Skip";
-        color = "lightgray";
-        E;
-    }
-  }
+   digraph foo {
+     rankdir="LR";
+     node [shape=box];
+     edge [dir=back];
 
-.. blockdiag::
+     subgraph cluster_merged {
+       label="Merged Changes for D";
+       style=filled;
+       color=orange;
+       node [style=filled,color=black,fillcolor=white];
+       master -> D;
+     }
 
-  blockdiag foo {
-    node_width = 40;
-    span_width = 40;
-    group jobs_for_E {
-        label = "Merged changes for E";
-        master -> D -> E;
-    }
-  }
+     subgraph cluster_skip {
+       label="Skip";
+       style=filled;
+       color=lightgrey;
+       node [style=filled,color=black,fillcolor=white];
+       E;
+     }
+
+     D -> E;
+   }
+
+.. graphviz::
+
+   digraph foo {
+     rankdir="LR";
+     node [shape=box];
+     edge [dir=back];
+
+     subgraph cluster_merged {
+       label="Merged Changes for E";
+       style=filled;
+       color=orange;
+       node [style=filled,color=black,fillcolor=white];
+       master -> D -> E;
+     }
+   }
 
 .. _pipeline_window:
 
@@ -221,23 +250,32 @@ are held in the queue without running jobs.  As changes exit the head
 of the queue, the changes outside the window will move up and
 eventually start their jobs.
 
-.. blockdiag::
+.. graphviz::
 
-  blockdiag foo {
-    node_width = 40;
-    span_width = 40;
-    master <- A <- B <- C <- D <- E;
-    group window {
-        label = "Pipeline active window";
-        color = "lightblue";
-        A <- B <- C;
-    }
-    group outside {
-        label = "Waiting to run jobs";
-        color = "lightgray";
-        D <- E;
-    }
-  }
+   digraph foo {
+     rankdir="LR";
+     node [shape=box];
+     edge [dir=back];
+
+     subgraph cluster_active {
+       label="Pipeline Active Window";
+       style=filled;
+       color=lightblue1;
+       node [style=filled,color=black,fillcolor=white];
+       A -> B -> C;
+     }
+
+     subgraph cluster_inactive {
+       label="Waiting to run jobs";
+       style=filled;
+       color=lightgrey;
+       node [style=filled,color=black,fillcolor=white];
+       D -> E;
+     }
+
+     master -> A;
+     C -> D;
+   }
 
 The window is designed to control the amount of resources used for
 parallel testing.  As described above, if changes fail testing in a
@@ -356,25 +394,18 @@ them in the usual manner when enqueuing them into a pipeline.  This
 means that if change A depends on B, then when they are added to a
 dependent pipeline, B will appear first and A will follow:
 
-.. blockdiag::
-  :align: center
+.. graphviz::
 
-  blockdiag crd {
-    orientation = portrait
-    span_width = 30
-    class greendot [
-        label = "",
-        shape = circle,
-        color = green,
-        width = 20, height = 20
-    ]
+   digraph crd {
+     stat_B [shape=circle,style=filled,color=black,fillcolor=forestgreen,label=""];
+     stat_A [shape=circle,style=filled,color=black,fillcolor=forestgreen,label=""];
+     stat_B -> stat_A [arrowhead="none"];
 
-    A_status [ class = greendot ]
-    B_status [ class = greendot ]
-    B_status -- A_status
+     change_B [shape=box,fixedsize=true,width=1.75,height=0.75,label="Change B\nURL: .../4"];
+     change_A [shape=box,fixedsize=true,width=1.75,height=0.75,label="Change A\nDepends-On: .../4"];
 
-    'Change B\nURL: .../4' <- 'Change A\nDepends-On: .../4'
-  }
+     change_B -> change_A [dir=back];
+   }
 
 If tests for B fail, both B and A will be removed from the pipeline, and
 it will not be possible for A to merge until B does.
@@ -412,24 +443,18 @@ When looking at this graph on the status page, you will note that the
 dependencies show up as grey dots, while the actual change tested shows
 up as red or green (depending on the jobs results):
 
-.. blockdiag::
-  :align: center
+.. graphviz::
 
-  blockdiag crdgrey {
-    orientation = portrait
-    span_width = 30
-    class dot [
-        label = "",
-        shape = circle,
-        width = 20, height = 20
-    ]
+   digraph crdgrey {
+     stat_B [shape=circle,style=filled,color=black,fillcolor=grey,label=""];
+     stat_A [shape=circle,style=filled,color=black,fillcolor=forestgreen,label=""];
+     stat_B -> stat_A [arrowhead="none"];
 
-    A_status [class = "dot", color = green]
-    B_status [class = "dot", color = grey]
-    B_status -- A_status
+     change_B [shape=box,fixedsize=true,width=1.75,height=0.75,label="Change B\nURL: .../4"];
+     change_A [shape=box,fixedsize=true,width=1.75,height=0.75,label="Change A\nDepends-On: .../4"];
 
-    "Change B\nURL: .../4" <- "Change A\nDepends-On: .../4"
-  }
+     change_B -> change_A [dir=back];
+   }
 
 This is to indicate that the grey changes are only there to establish
 dependencies.  Even if one of the dependencies is also being tested, it
@@ -445,35 +470,35 @@ A change may list more than one dependency by simply adding more
 for a change in project A to depend on a change in project B and a
 change in project C.
 
-.. blockdiag::
-  :align: center
+.. graphviz::
 
-  blockdiag crdmultichanges {
-    orientation = portrait
-    span_width = 30
-    class greendot [
-        label = "",
-        shape = circle,
-        color = green,
-        width = 20, height = 20
-    ]
+   digraph crdmultchanges {
+     splines=ortho;
+     stat_B [shape=circle,style=filled,color=black,fillcolor=forestgreen,label=""];
+     stat_C [shape=circle,style=filled,color=black,fillcolor=forestgreen,label=""];
+     stat_A [shape=circle,style=filled,color=black,fillcolor=forestgreen,label=""];
+     stat_B -> stat_C -> stat_A [arrowhead="none"];
 
-    C_status [ class = "greendot" ]
-    B_status [ class = "greendot" ]
-    A_status [ class = "greendot" ]
-    C_status -- B_status -- A_status
+     subgraph cluster_deps {
+       label="Dependencies";
+       style=filled;
+       color=lightgrey;
+       node [style=filled,color=black,fillcolor=white];
+       repo_B [shape=box,fixedsize=true,width=1.75,height=0.75,label="Repo B\nURL: .../3",group=redir];
+       repo_C [shape=box,fixedsize=true,width=1.75,height=0.75,label="Repo C\nURL: .../4",group=redir];
+       {rank=same;repo_B;redir_B}
+       // We use the redirect point, group redir, and ortho splines to keep
+       // repo A,B,C nodes in a vertical line then draw lines from A around
+       // C to B.
+       redir_B [label="",shape=point,height=.005]
+       repo_B -> repo_C [dir=back];
+     }
 
-    A [ label = "Repo A\nDepends-On: .../3\nDepends-On: .../4" ]
-    group {
-        orientation = portrait
-        label = "Dependencies"
-        color = "lightgray"
-
-        B [ label = "Repo B\nURL: .../3" ]
-        C [ label = "Repo C\nURL: .../4" ]
-    }
-    B, C <- A
-  }
+     repo_A [shape=box,fixedsize=true,width=1.75,height=0.75,label="Repo A\nDepends-On: .../3\nDepends-On: .../4",group=redir];
+     repo_B -> redir_B [dir=back];
+     redir_B -> repo_A [arrowhead=none];
+     repo_C -> repo_A [dir=back];
+   }
 
 Cycles
 ~~~~~~
