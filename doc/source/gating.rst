@@ -500,12 +500,15 @@ change in project C.
        node [style=filled,color=black,fillcolor=white];
        repo_B [shape=box,fixedsize=true,width=1.75,height=0.75,label="Repo B\nURL: .../3",group=redir];
        repo_C [shape=box,fixedsize=true,width=1.75,height=0.75,label="Repo C\nURL: .../4",group=redir];
-       {rank=same;stat_B;repo_B;redir_B}
-       {rank=same;stat_C;repo_C}
+       {rank=same;repo_B;redir_B}
        // We use the redirect point, group redir, and ortho splines to keep
        // repo A,B,C nodes in a vertical line then draw lines from A around
        // C to B.
        redir_B [label="",shape=point,height=.005];
+       // This is an invisible edge because we want them vertically aligned
+       // and ordered but there is no git/zuul dependency between the changes
+       // so we don't draw the edge.
+       repo_B -> repo_C [style=invis];
      }
 
      repo_A [shape=box,fixedsize=true,width=1.75,height=0.75,label="Repo A\nDepends-On: .../3\nDepends-On: .../4",group=redir];
