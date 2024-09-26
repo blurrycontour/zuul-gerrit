@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d549863_917703ac",
+        "filename": "doc/source/gating.rst",
+        "patchSetId": 2
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-09-26T16:34:24Z",
+      "side": 1,
+      "message": "This edge shouldn\u0027t exist because C doesn\u0027t depend on B. They are just enqueued in that order. I\u0027ve cleaned that up and to continue to have them listed vertically I had to add the extra rank same line in the new patchset.",
+      "revId": "2d29d4bceabc0c273972285b1f351797a3491e00",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
