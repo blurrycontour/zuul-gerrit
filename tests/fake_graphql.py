@@ -1,4 +1,5 @@
 # Copyright 2019 BMW Group
+# Copyright 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -12,7 +13,16 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from graphene import Boolean, Field, Int, List, ObjectType, String, Schema
+from graphene import (
+    Boolean,
+    Field,
+    Int,
+    Interface,
+    List,
+    ObjectType,
+    Schema,
+    String,
+)
 
 
 class ID(String):
@@ -20,18 +30,32 @@ class ID(String):
     pass
 
 
-class PageInfo(ObjectType):
-    end_cursor = String()
-    has_previous_page = Boolean()
-    has_next_page = Boolean()
+class Node(Interface):
+    id = ID(required=True)
 
-    def resolve_end_cursor(parent, info):
+    @classmethod
+    def resolve_type(cls, instance, info):
+        kind = getattr(instance, '_graphene_type', None)
+        if kind == 'BranchProtectionRule':
+            return BranchProtectionRule
+        elif kind == 'Commit':
+            return Commit
+        elif kind == 'CheckSuite':
+            return CheckSuite
+
+
+class PageInfo(ObjectType):
+    endCursor = String()
+    hasPreviousPage = Boolean()
+    hasNextPage = Boolean()
+
+    def resolve_endCursor(parent, info):
         return str(parent['after'] + parent['first'])
 
-    def resolve_has_previous_page(parent, info):
+    def resolve_hasPreviousPage(parent, info):
         return parent['after'] > 0
 
-    def resolve_has_next_page(parent, info):
+    def resolve_hasNextPage(parent, info):
         return parent['after'] + parent['first'] < parent['length']
 
 
@@ -54,12 +78,17 @@ class MatchingRefs(ObjectType):
 
 
 class BranchProtectionRule(ObjectType):
-    id = ID()
+
+    class Meta:
+        interfaces = (Node, )
+
+    id = ID(required=True)
     pattern = String()
     requiredStatusCheckContexts = List(String)
     requiresApprovingReviews = Boolean()
     requiresCodeOwnerReviews = Boolean()
-    matchingRefs = Field(MatchingRefs, first=Int(), after=String())
+    matchingRefs = Field(MatchingRefs, first=Int(), after=String(),
+                         query=String())
     lockBranch = Boolean()
 
     def resolve_id(parent, info):
@@ -80,11 +109,13 @@ class BranchProtectionRule(ObjectType):
     def resolve_lockBranch(parent, info):
         return parent.lock_branch
 
-    def resolve_matchingRefs(parent, info, first, after=None):
+    def resolve_matchingRefs(parent, info, first, after=None, query=None):
         if after is None:
             after = '0'
         after = int(after)
         values = parent.matching_refs
+        if query:
+            values = [v for v in values if v == query]
         return dict(
             length=len(values),
             nodes=values[after:after + first],
@@ -132,6 +163,11 @@ class Status(ObjectType):
 
 
 class CheckRun(ObjectType):
+
+    class Meta:
+        interfaces = (Node, )
+
+    id = ID(required=True)
     name = String()
     conclusion = String()
 
@@ -146,8 +182,12 @@ class CheckRun(ObjectType):
 
 class CheckRuns(ObjectType):
     nodes = List(CheckRun)
+    pageInfo = Field(PageInfo)
 
     def resolve_nodes(parent, info):
+        return parent['nodes']
+
+    def resolve_pageInfo(parent, info):
         return parent
 
 
@@ -157,43 +197,61 @@ class App(ObjectType):
 
 
 class CheckSuite(ObjectType):
+
+    class Meta:
+        interfaces = (Node, )
+
+    id = ID(required=True)
     app = Field(App)
-    checkRuns = Field(CheckRuns, first=Int())
+    checkRuns = Field(CheckRuns, first=Int(), after=String())
 
     def resolve_app(parent, info):
-        if not parent:
+        if not parent.runs:
             return None
-        return parent[0].app
+        return parent.runs[0].app
 
-    def resolve_checkRuns(parent, info, first=None):
-        # We only want to return the latest result for a check run per app.
+    def resolve_checkRuns(parent, info, first, after=None):
+        # Github will only return the single most recent check run for
+        # a given name (this is true for REST or graphql), despite the
+        # format of the result being a list.
         # Since the check runs are ordered from latest to oldest result we
         # need to traverse the list in reverse order.
         check_runs_by_name = {
-            "{}:{}".format(cr.app, cr.name): cr for cr in reversed(parent)
+            "{}:{}".format(cr.app.name, cr.name):
+            cr for cr in reversed(parent.runs)
         }
-        return check_runs_by_name.values()
+        if after is None:
+            after = '0'
+        after = int(after)
+        values = list(check_runs_by_name.values())
+        return dict(
+            length=len(values),
+            nodes=values[after:after + first],
+            first=first,
+            after=after,
+        )
 
 
 class CheckSuites(ObjectType):
 
     nodes = List(CheckSuite)
+    pageInfo = Field(PageInfo)
 
     def resolve_nodes(parent, info):
-        # Note: we only use a single check suite in the tests so return a
-        # single item to keep it simple.
-        return [parent]
+        return parent['nodes']
+
+    def resolve_pageInfo(parent, info):
+        return parent
 
 
 class Commit(ObjectType):
 
     class Meta:
-        # Graphql object type that defaults to the class name, but we require
-        # 'Commit'.
-        name = 'Commit'
+        interfaces = (Node, )
 
+    id = ID(required=True)
     status = Field(Status)
-    checkSuites = Field(CheckSuites, first=Int())
+    checkSuites = Field(CheckSuites, first=Int(), after=String())
 
     def resolve_status(parent, info):
         seen = set()
@@ -205,9 +263,18 @@ class Commit(ObjectType):
         # Github returns None if there are no results
         return result or None
 
-    def resolve_checkSuites(parent, info, first=None):
-        # Tests only utilize one check suite so return all runs for that.
-        return parent._check_runs
+    def resolve_checkSuites(parent, info, first, after=None):
+        if after is None:
+            after = '0'
+        after = int(after)
+        # Each value is a list of check runs for that suite
+        values = list(parent._check_suites.values())
+        return dict(
+            length=len(values),
+            nodes=values[after:after + first],
+            first=first,
+            after=after,
+        )
 
 
 class PullRequest(ObjectType):
@@ -275,7 +342,7 @@ class Repository(ObjectType):
 class FakeGithubQuery(ObjectType):
     repository = Field(Repository, owner=String(required=True),
                        name=String(required=True))
-    node = Field(BranchProtectionRule, id=ID(required=True))
+    node = Field(Node, id=ID(required=True))
 
     def resolve_repository(root, info, owner, name):
         return info.context._data.repos.get((owner, name))
@@ -285,6 +352,12 @@ class FakeGithubQuery(ObjectType):
             for rule in repo._branch_protection_rules.values():
                 if rule.id == id:
                     return rule
+            for commit in repo._commits.values():
+                if commit.id == id:
+                    return commit
+                for suite in commit._check_suites.values():
+                    if suite.id == id:
+                        return suite
 
 
 def getGrapheneSchema():
