@@ -1,9 +1,3 @@
-.logo img {
-    width: 75%;
-}
-div.sphinxsidebarwrapper p.logo {
-    text-align: left;
-}
-dl.zuul.path {
+div.graphviz {
     margin-bottom: 1em;
 }
