@@ -193,8 +193,8 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
             node.tags,
             log)
 
-    def getDeleteStateMachine(self, node, external_id, log):
-        return AwsDeleteStateMachine(self.endpoint, node, external_id, log)
+    def getDeleteStateMachine(self, node, log):
+        return AwsDeleteStateMachine(self.endpoint, node, log)
 
     def listInstances(self):
         return self.endpoint.listInstances()

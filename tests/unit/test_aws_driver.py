@@ -248,8 +248,7 @@ class TestAwsDriver(ZuulTestCase):
             for _ in iterate_timeout(60, "delete state machine to complete"):
                 with node.activeContext(ctx):
                     # Re-create the SM from the state in ZK
-                    sm = provider.getDeleteStateMachine(
-                        node, node.create_state["external_id"], self.log)
+                    sm = provider.getDeleteStateMachine(node, self.log)
                     node.delete_state_machine = sm
                     sm.advance()
                 if sm.complete:

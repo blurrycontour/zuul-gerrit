@@ -66,48 +66,45 @@ class AwsDeleteStateMachine(statemachine.StateMachine):
     INSTANCE_DELETING = 'deleting instance'
     COMPLETE = 'complete'
 
-    def __init__(self, endpoint, node, external_id, log):
+    def __init__(self, endpoint, node, log):
         self.log = log
         self.endpoint = endpoint
         super().__init__(node.delete_state)
-        if self.external_id is None:
-            # Initialize the external ID
-            self.external_id = external_id
 
         # Restore local objects
         self.host = None
-        if "host" in self.external_id:
-            host = dict(HostId=self.external_id['host'])
+        if node.aws_dedicated_host_id:
+            host = dict(HostId=node.aws_dedicated_host_id)
             self.host = self.endpoint._refreshDelete(host)
         self.instance = None
-        if "instance" in self.external_id:
-            instance = dict(InstanceId=self.external_id['instance'])
+        if node.aws_instance_id:
+            instance = dict(InstanceId=node.aws_instance_id)
             self.instance = self.endpoint._refreshDelete(instance)
 
     def advance(self):
         if self.state == self.START:
-            if 'instance' in self.external_id:
+            if self.instance:
                 self.state = self.INSTANCE_DELETING_START
-            elif 'host' in self.external_id:
+            elif self.host:
                 self.state = self.HOST_RELEASING_START
             else:
                 self.state = self.COMPLETE
 
         if self.state == self.INSTANCE_DELETING_START:
             self.instance = self.endpoint._deleteInstance(
-                self.external_id['instance'], self.log)
+                self.instance, self.log)
             self.state = self.INSTANCE_DELETING
 
         if self.state == self.INSTANCE_DELETING:
             if self.instance is None:
-                if 'host' in self.external_id:
+                if self.host:
                     self.state = self.HOST_RELEASING_START
                 else:
                     self.state = self.COMPLETE
 
         if self.state == self.HOST_RELEASING_START:
             self.host = self.endpoint._releaseHost(
-                self.external_id['host'], self.log)
+                self.host, self.log)
             self.state = self.HOST_RELEASING
 
         if self.state == self.HOST_RELEASING:
@@ -143,12 +140,9 @@ class AwsCreateStateMachine(statemachine.StateMachine):
         self.host_create_future = None
         self.create_future = None
         super().__init__(node.create_state)
-        # Overwrite external_id and use a dict by default
-        self.external_id = node.create_state.get("external_id", {})
         self.attempts = node.create_state.get("attempts", 0)
         self.image_external_id = node.create_state.get(
             "image_external_id", image_external_id)
-        self.dedicated_host_id = node.create_state.get("dedicated_host_id")
 
         # Restore local objects
         self.quota = self.endpoint.getQuotaForLabel(
@@ -157,24 +151,27 @@ class AwsCreateStateMachine(statemachine.StateMachine):
         if self.state in (
                 self.HOST_ALLOCATING_START, self.INSTANCE_CREATING_START):
             for instance in self.endpoint.listInstances():
+                # TODO: use the nodepool node id tag instead
                 if instance.metadata.get("Name") == hostname:
-                    self.external_id.update(instance.external_id)
-            if "instance" in self.external_id:
+                    self.node.aws_instance_id = instance.aws_instance_id
+                    self.node.aws_dedicated_host_id =\
+                        instance.aws_dedicated_host_id
+            if self.node.aws_instance_id:
                 self.state = self.INSTANCE_CREATING
-            elif "host" in self.external_id:
+            elif self.node.aws_dedicated_host_id:
                 self.state = self.HOST_ALLOCATING
 
         self.host = None
-        if "host" in self.external_id:
+        if self.node.aws_dedicated_host_id:
             host = dict(
-                HostId=self.external_id['host'],
+                HostId=self.node.aws_dedicated_host_id,
                 State=dict(Name='pending'),
             )
             self.host = self.endpoint._refresh(host)
         self.instance = None
-        if "instance" in self.external_id:
+        if self.node.aws_instance_id:
             instance = dict(
-                InstanceId=self.external_id['instance'],
+                InstanceId=self.node.aws_instance_id,
                 State=dict(Name='pending'),
             )
             self.instance = self.endpoint._refresh(instance)
@@ -184,7 +181,6 @@ class AwsCreateStateMachine(statemachine.StateMachine):
         data.update(
             attempts=self.attempts,
             image_external_id=self.image_external_id,
-            dedicated_host_id=self.dedicated_host_id
         )
         return data
 
@@ -206,7 +202,7 @@ class AwsCreateStateMachine(statemachine.StateMachine):
             if host is None:
                 return
             self.host = host
-            self.external_id['host'] = host['HostId']
+            self.node.aws_dedicated_host_id = host['HostId']
             self.state = self.HOST_ALLOCATING
 
         if self.state == self.HOST_ALLOCATING:
@@ -214,7 +210,7 @@ class AwsCreateStateMachine(statemachine.StateMachine):
 
             state = self.host['State'].lower()
             if state == 'available':
-                self.dedicated_host_id = self.host['HostId']
+                self.node.aws_dedicated_host_id = self.host['HostId']
                 self.state = self.INSTANCE_CREATING_START
             elif state in [
                     'permanent-failure', 'released',
@@ -229,14 +225,14 @@ class AwsCreateStateMachine(statemachine.StateMachine):
                 self.create_future = self.endpoint._submitCreateInstance(
                     self.label, self.flavor, self.image,
                     self.image_external_id, self.tags, self.hostname,
-                    self.dedicated_host_id, self.log)
+                    self.node.aws_dedicated_host_id, self.log)
 
             instance = self.endpoint._completeCreateInstance(
                 self.create_future)
             if instance is None:
                 return
             self.instance = instance
-            self.external_id['instance'] = instance['InstanceId']
+            self.node.aws_instance_id = instance['InstanceId']
             self.state = self.INSTANCE_CREATING
 
         if self.state == self.INSTANCE_CREATING:
