@@ -13,11 +13,17 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+from concurrent.futures import ThreadPoolExecutor
+import collections
 import logging
+import os
 import random
 import socket
 import threading
+import time
 import uuid
+
+import requests
 
 from zuul import model
 from zuul.lib import commandsocket, tracing
@@ -30,6 +36,7 @@ from zuul.lib.logutil import get_annotated_logger
 from zuul.version import get_version_string
 from zuul.zk import ZooKeeperClient
 from zuul.zk.components import COMPONENT_REGISTRY, LauncherComponent
+from zuul.zk.exceptions import LockException
 from zuul.zk.event_queues import (
     PipelineResultEventQueue,
     TenantTriggerEventQueue,
@@ -58,6 +65,87 @@ class ProviderNodeError(Exception):
     pass
 
 
+class UploadJob:
+    log = logging.getLogger("zuul.Launcher")
+
+    def __init__(self, launcher, image_build_artifact, uploads):
+        self.launcher = launcher
+        self.image_build_artifact = image_build_artifact
+        self.uploads = uploads
+
+    def run(self):
+        try:
+            self._run()
+        except Exception:
+            self.log.exception("Error in upload job")
+
+    def _run(self):
+        # TODO: check if endpoint can handle direct import from URL,
+        # and skip download
+        acquired = []
+        path = None
+        try:
+            try:
+                with self.image_build_artifact.locked(
+                        self.launcher.zk_client, blocking=False):
+                    for upload in self.uploads:
+                        if upload.acquireLock(
+                                self.launcher.zk_client, blocking=False):
+                            acquired.append(upload)
+            except LockException:
+                return
+
+            if not acquired:
+                return
+
+            path = self.launcher.downloadArtifact(self.image_build_artifact)
+            futures = []
+            for upload in acquired:
+                future = self.launcher.endpoint_upload_executor.submit(
+                    EndpointUploadJob(self.launcher, upload, path).run)
+                futures.append((upload, future))
+            for upload, future in futures:
+                try:
+                    future.result()
+                except Exception:
+                    self.log.exception("Unable to upload image %s", upload)
+        finally:
+            for upload in acquired:
+                try:
+                    upload.releaseLock()
+                except Exception:
+                    self.log.exception("Unable to release lock for %s", upload)
+            if path:
+                try:
+                    os.unlink(path)
+                except Exception:
+                    self.log.exception("Unable to delete %s", path)
+
+
+class EndpointUploadJob:
+    log = logging.getLogger("zuul.Launcher")
+
+    def __init__(self, launcher, upload, path):
+        self.launcher = launcher
+        self.upload = upload
+        self.path = path
+
+    def run(self):
+        try:
+            self._run()
+        except Exception:
+            self.log.exception("Error in endpoint upload job")
+
+    def _run(self):
+        endpoint = self.launcher.endpoints[self.upload.endpoint_name]
+        external_id = endpoint.uploadImage(self.path)
+        with self.launcher.createZKContext(self.upload._lock, self.log) as ctx:
+            self.upload.updateAttributes(
+                ctx,
+                external_id=external_id,
+                timestamp=time.time())
+
+
 class Launcher:
     log = logging.getLogger("zuul.Launcher")
 
@@ -65,7 +153,11 @@ class Launcher:
         self._running = True
         self.config = config
         self.connections = connections
+        # All tenants and all providers
         self.tenant_providers = {}
+        # Only endpoints corresponding to connections handled by this
+        # launcher
+        self.endpoints = {}
 
         self.tracing = tracing.Tracing(self.config)
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
@@ -94,6 +186,9 @@ class Launcher:
             self.zk_client, COMPONENT_REGISTRY.registry, self.component_info,
             self.wake_event.set, self.connection_filter)
 
+        self.temp_dir = get_default(self.config, 'launcher', 'temp_dir',
+                                    '/tmp', expand_user=True)
+
         self.command_map = {
             commandsocket.StopCommand.name: self.stop,
         }
@@ -106,6 +201,8 @@ class Launcher:
         self.layout_updated_event = threading.Event()
         self.layout_updated_event.set()
 
+        self.upload_added_event = threading.Event()
+
         self.tenant_layout_state = LayoutStateStore(
             self.zk_client, self._layoutUpdatedCallback)
         self.layout_providers_store = LayoutProvidersStore(
@@ -113,15 +210,33 @@ class Launcher:
         self.local_layout_state = {}
 
         self.image_build_registry = ImageBuildRegistry(self.zk_client)
-        self.image_upload_registry = ImageUploadRegistry(self.zk_client)
+        self.image_upload_registry = ImageUploadRegistry(
+            self.zk_client,
+            self._uploadAddedCallback
+        )
 
         self.launcher_thread = threading.Thread(
             target=self.run,
             name="Launcher",
         )
+        # Simultaneous image artifact processes (download+upload)
+        self.upload_executor = ThreadPoolExecutor(
+            max_workers=1,
+            thread_name_prefix="UploadWorker",
+        )
+        # Simultaneous uploads
+        self.endpoint_upload_executor = ThreadPoolExecutor(
+            # TODO: make configurable
+            max_workers=10,
+            thread_name_prefix="UploadWorker",
+        )
 
     def _layoutUpdatedCallback(self):
         self.layout_updated_event.set()
+        self.wake_event.set()
+
+    def _uploadAddedCallback(self):
+        self.upload_added_event.set()
         self.wake_event.set()
 
     def run(self):
@@ -140,6 +255,9 @@ class Launcher:
             self.layout_updated_event.clear()
             if self.updateTenantProviders():
                 self.checkMissingImages()
+                self.checkMissingUploads()
+        if self.upload_added_event.is_set():
+            self.checkMissingUploads()
         self._processRequests()
         self._processNodes()
 
@@ -338,6 +456,8 @@ class Launcher:
         self._command_running = False
         self.command_socket.stop()
         self.connections.stop()
+        self.upload_executor.shutdown()
+        self.endpoint_upload_executor.shutdown()
         self.log.debug("Stopped launcher")
 
     def join(self):
@@ -369,11 +489,23 @@ class Launcher:
         tenant_names = set(self.tenant_providers.keys())
         tenant_names.update(self.tenant_layout_state)
 
+        endpoints = {}
         updated = False
         for tenant_name in tenant_names:
             # Reload the tenant if the layout changed.
             if self._updateTenantProviders(tenant_name):
                 updated = True
+
+        if updated:
+            for providers in self.tenant_providers.values():
+                for provider in providers:
+                    if (self.connection_filter and
+                        provider.connection_name not in
+                        self.connection_filter):
+                        continue
+                    endpoint = provider.getEndpoint()
+                    endpoints[endpoint.name] = endpoint
+            self.endpoints = endpoints
         return updated
 
     def _updateTenantProviders(self, tenant_name):
@@ -442,3 +574,26 @@ class Launcher:
         key = (image.project_canonical_name, image.branch)
         images = images_by_project_branch.setdefault(key, set())
         images.add(image.name)
+
+    def checkMissingUploads(self):
+        uploads_by_artifact_id = collections.defaultdict(list)
+        self.upload_added_event.clear()
+        for upload in self.image_upload_registry.getItems():
+            if upload.external_id:
+                continue
+            if upload.endpoint_name not in self.endpoints:
+                continue
+            upload_list = uploads_by_artifact_id[upload.artifact_uuid]
+            upload_list.append(upload)
+
+        for artifact_uuid, uploads in uploads_by_artifact_id.items():
+            iba = self.image_build_registry.getItem(artifact_uuid)
+            self.upload_executor.submit(UploadJob(self, iba, uploads).run)
+
+    def downloadArtifact(self, image_build_artifact):
+        path = os.path.join(self.temp_dir, image_build_artifact.uuid)
+        with open(path, 'wb') as f:
+            with requests.get(image_build_artifact.url, stream=True) as resp:
+                for chunk in resp.iter_content(chunk_size=1024 * 8):
+                    f.write(chunk)
+        return path
