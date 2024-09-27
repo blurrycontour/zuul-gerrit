@@ -18,14 +18,21 @@ import time
 class StateMachine:
     START = 'start'
 
-    def __init__(self):
-        self.state = self.START
-        self.external_id = None
+    def __init__(self, initial_state):
+        self.state = initial_state.get("state", self.START)
+        self.external_id = initial_state.get("external_id", None)
         self.complete = False
-        self.start_time = time.monotonic()
+        self.start_time = initial_state.get("start_time", time.monotonic())
 
     def advance(self):
         pass
+
+    def toDict(self):
+        return dict(
+            state=self.state,
+            external_id=self.external_id,
+            start_time=self.start_time,
+        )
 
 
 class Instance:

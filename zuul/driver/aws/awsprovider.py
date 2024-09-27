@@ -184,6 +184,7 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         image = self.images[label.image]
         return AwsCreateStateMachine(
             self.endpoint,
+            node,
             hostname,
             label,
             flavor,
@@ -192,8 +193,8 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
             node.tags,
             log)
 
-    def getDeleteStateMachine(self, external_id, log):
-        return AwsDeleteStateMachine(self.endpoint, external_id, log)
+    def getDeleteStateMachine(self, node, external_id, log):
+        return AwsDeleteStateMachine(self.endpoint, node, external_id, log)
 
     def listInstances(self):
         return self.endpoint.listInstances()

@@ -94,6 +94,9 @@
 - flavor:
     name: large
 
+- flavor:
+    name: dedicated
+
 - label:
     name: debian-normal
     image: debian
@@ -103,6 +106,11 @@
     name: debian-large
     image: debian
     flavor: large
+
+- label:
+    name: debian-dedicated
+    image: debian
+    flavor: dedicated
 
 - section:
     name: aws-base
@@ -119,6 +127,9 @@
         instance-type: t3.medium
       - name: large
         instance-type: t3.large
+      - name: dedicated
+        instance-type: t3.large
+        dedicated-host: True
     images:
       - name: debian
         image-id: ami-1e749f67
@@ -135,4 +146,6 @@
       - name: debian-normal
         key-name: zuul
       - name: debian-large
+        key-name: zuul
+      - name: debian-dedicated
         key-name: zuul

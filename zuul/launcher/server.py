@@ -59,7 +59,7 @@ class Launcher:
     log = logging.getLogger("zuul.Launcher")
 
     def __init__(self, config, connections):
-        self._running = False
+        self._running = True
         self.config = config
         self.connections = connections
         self.tenant_providers = {}
@@ -123,7 +123,7 @@ class Launcher:
     def run(self):
         self.component_info.state = self.component_info.RUNNING
         self.log.debug("Launcher running")
-        while not self.stop_event.is_set():
+        while self._running:
             try:
                 self._run()
             except Exception:
@@ -277,7 +277,6 @@ class Launcher:
     def _buildNode(self, node, log):
         log.debug("Building node %s", node)
         provider = self._getProvider(node.tenant_name, node.provider)
-        _ = provider.getEndpoint()
         with self.createZKContext(node._lock, self.log) as ctx:
             with node.activeContext(ctx):
                 # TODO: this may be provided by Zuul once image
@@ -289,14 +288,23 @@ class Launcher:
 
     def _checkNode(self, node, log):
         log.debug("Checking node %s", node)
-        node.create_state_machine.advance()
-        if not node.create_state_machine.complete:
-            self.wake_event.set()
-            return
-        state = model.ProviderNode.State.READY
-        log.debug("Marking node %s as %s", node, state)
         with self.createZKContext(node._lock, self.log) as ctx:
-            node.updateAttributes(ctx, state=state)
+            with node.activeContext(ctx):
+                if not node.create_state_machine:
+                    provider = self._getProvider(
+                        node.tenant_name, node.provider)
+                    # TODO: this may be provided by Zuul once image
+                    # uploads are supported
+                    image_external_id = None
+                    node.create_state_machine = provider.getCreateStateMachine(
+                        node, image_external_id, log)
+
+                node.create_state_machine.advance()
+                if not node.create_state_machine.complete:
+                    self.wake_event.set()
+                    return
+                node.state = model.ProviderNode.State.READY
+                log.debug("Marking node %s as %s", node, node.state)
         node.releaseLock()
 
     def _getProvider(self, tenant_name, provider_name):
@@ -320,7 +328,7 @@ class Launcher:
 
     def stop(self):
         self.log.debug("Stopping launcher")
-        self.stop_event.set()
+        self._running = False
         self.wake_event.set()
         self.component_info.state = self.component_info.STOPPED
         self._command_running = False
@@ -331,6 +339,9 @@ class Launcher:
     def join(self):
         self.log.debug("Joining launcher")
         self.launcher_thread.join()
+        # Don't set the stop event until after the main thread is
+        # joined because doing so will terminate the ZKContext.
+        self.stop_event.set()
         self.api.stop()
         self.zk_client.disconnect()
         self.tracing.stop()
