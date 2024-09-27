@@ -49,7 +49,7 @@ class ZuulReporter(BaseReporter):
                     if metadata.get('type') == 'zuul_image':
                         iba = sched.createImageBuildArtifact(
                             self.pipeline.tenant.name, image, build,
-                            metadata['format'], artifact['url'],
+                            metadata, artifact['url'],
                             self.image_validated)
                         sched.createImageUploads(iba)
 

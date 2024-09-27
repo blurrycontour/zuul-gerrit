@@ -600,9 +600,10 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         #         iops=label.iops))
         return quota
 
-    def uploadImage(self, provider_image, image_name, filename,
+    def uploadImage(self, provider_image, filename,
                     image_format, metadata, md5, sha256, bucket_name,
                     timeout):
+        image_name = provider_image.name
         self.log.debug(f"Uploading image {image_name}")
 
         # There is no IMDS support option for the import_image call
