@@ -58,6 +58,7 @@ def getSchema():
             'parent-change-enqueued',
             'project-change-merged',
             'image-build',
+            'image-validate',
         )),
         'pipeline': scalar_or_list(v.Any(ZUUL_REGEX, str)),
     }

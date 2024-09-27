@@ -13,6 +13,7 @@
 # under the License.
 
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 import abc
 import contextlib
 import json
@@ -27,6 +28,7 @@ from kazoo.retry import KazooRetry
 
 from zuul.zk import sharding
 from zuul.zk import ZooKeeperClient
+from zuul.zk.exceptions import LockException
 from zuul.zk.locks import SessionAwareLock
 
 
@@ -508,6 +510,19 @@ class LockableZKObject(ZKObject):
         :returns: A string representation of the Znode path
         """
         raise NotImplementedError()
+
+    @contextmanager
+    def locked(self, zk_client, blocking=True, timeout=None):
+        if not (lock := self.acquireLock(zk_client, blocking=blocking,
+                                         timeout=timeout)):
+            raise LockException(f"Failed to acquire lock on {self}")
+        try:
+            yield lock
+        finally:
+            try:
+                self.releaseLock()
+            except Exception:
+                self.log.exception("Failed to release lock on %s", self)
 
     def acquireLock(self, zk_client, blocking=True, timeout=None):
         have_lock = False

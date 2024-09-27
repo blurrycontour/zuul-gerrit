@@ -353,9 +353,9 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
     IMAGE_UPLOAD_SLEEP = 30
 
     def __init__(self, driver, connection, region):
-        super().__init__(driver, connection)
+        name = f'{connection.connection_name}-{region}'
+        super().__init__(driver, connection, name)
         self.region = region
-        self.name = f'{connection.connection_name}-{region}'
 
         # Wrap these instance methods with a per-instance LRU cache so
         # that we don't leak memory over time when the adapter is

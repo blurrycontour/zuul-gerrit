@@ -65,6 +65,8 @@ from zuul.model import (
     EnqueueEvent,
     FilesChangesCompletedEvent,
     HoldRequest,
+    ImageBuildArtifact,
+    ImageUpload,
     MergeCompletedEvent,
     NodeRequest,
     NodesProvisionedEvent,
@@ -3223,6 +3225,62 @@ class Scheduler(threading.Thread):
             event_queue = self.pipeline_result_events[
                 tenant.name][pipeline.name]
             tenant.semaphore_handler.release(event_queue, item, job)
+
+    # Image related methods
+    def createImageBuildArtifact(self, image, build, image_format,
+                                 artifact_url, validated):
+        log = get_annotated_logger(self.log, build.zuul_event_id,
+                                   build=build.uuid)
+        art_uuid = uuid.uuid4().hex
+        log.info(
+            "Storing image build artifact metadata: "
+            "uuid: %s name: %s format: %s build: %s url: %s",
+            art_uuid, image.canonical_name, image_format, build.uuid,
+            artifact_url)
+        with self.createZKContext(None, self.log) as ctx:
+            return ImageBuildArtifact.new(
+                ctx,
+                uuid=art_uuid,
+                canonical_name=image.canonical_name,
+                build_uuid=build.uuid,
+                format=image_format,
+                url=artifact_url,
+                timestamp=build.end_time,
+                validated=validated,
+            )
+
+    def createImageUploads(self, iba):
+        # iba is an ImageBuildArtifact
+        with iba.locked(self.zk_client) as lock:
+            with self.createZKContext(lock, self.log) as ctx:
+                # Uploads go to endpoints, but providers indicate what
+                # images each section has.  Loop over all the
+                # providers to find the endpoints that need this image.
+                endpoints = {}
+                for tenant in self.abide.tenants.values():
+                    for provider in tenant.layout.providers.values():
+                        for image in provider.images.values():
+                            if (image.canonical_name == iba.canonical_name and
+                                image.format == iba.format):
+                                # This image is needed, add this endpoint
+                                endpoint = provider.getEndpoint()
+                                endpoints[endpoint.name] = endpoint
+                for endpoint in endpoints.values():
+                    upload_uuid = uuid.uuid4().hex
+                    self.log.info(
+                        "Storing image upload: "
+                        "uuid: %s name: %s artifact uuid: %s endpoint: %s",
+                        upload_uuid, iba.canonical_name, iba.uuid,
+                        endpoint.name)
+                    ImageUpload.new(
+                        ctx,
+                        uuid=upload_uuid,
+                        canonical_name=iba.canonical_name,
+                        artifact_uuid=iba.uuid,
+                        endpoint_name=endpoint.name,
+                        timestamp=time.time(),
+                        validated=iba.validated,
+                    )
 
     def createZKContext(self, lock, log):
         return ZKContext(self.zk_client, lock, self.stop_event, log)

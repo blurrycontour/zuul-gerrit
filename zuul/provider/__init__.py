@@ -38,7 +38,7 @@ class BaseProviderImage(metaclass=abc.ABCMeta):
     def __init__(self, config):
         self.__dict__.update(self.schema(config))
         # TODO: generate this automatically from config
-        self.formats = set(['raw'])
+        self.format = 'raw'
 
     @property
     def canonical_name(self):
@@ -79,9 +79,10 @@ class BaseProviderEndpoint(metaclass=abc.ABCMeta):
     the unit of visibility of instances, VPCs, images, etc.
     """
 
-    def __init__(self, driver, connection):
+    def __init__(self, driver, connection, name):
         self.driver = driver
         self.connection = connection
+        self.name = name
 
 
 class BaseProviderSchema(metaclass=abc.ABCMeta):
