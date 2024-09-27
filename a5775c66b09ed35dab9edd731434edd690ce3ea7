@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "030796b8_bc2d8a9a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-09-27T05:40:54Z",
+      "side": 1,
+      "message": "Broken: https://zuul-ci.org/docs/zuul/latest/gating.html#multiple-changes\nFixed: https://ba79a5854b7bb6f2b1df-25f8dcd5db154e1632e2236aa5a8224a.ssl.cf1.rackcdn.com/930654/1/check/zuul-nox-docs/e7bdbff/docs/gating.html#multiple-changes",
+      "revId": "a5775c66b09ed35dab9edd731434edd690ce3ea7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
