@@ -18,10 +18,13 @@ import uuid
 from unittest import mock
 
 from zuul import model
+from zuul.launcher.client import LauncherClient
 from zuul.zk.event_queues import PipelineResultEventQueue
 from zuul.zk.locks import pipeline_lock
 
 import responses
+import testtools
+from kazoo.exceptions import NoNodeError
 from moto import mock_aws
 
 from tests.base import (
@@ -288,6 +291,140 @@ class TestLauncher(ZuulTestCase):
 
         request.delete(ctx)
         self.waitUntilSettled()
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_node_lifecycle(self):
+        result_queue = PipelineResultEventQueue(
+            self.zk_client, "tenant-one", "check")
+        nodeset = model.NodeSet()
+        nodeset.addNode(model.Node("node", "debian-normal"))
+
+        ctx = self.createZKContext(None)
+        # Lock the pipeline, so we can grab the result event
+        with pipeline_lock(self.zk_client, "tenant-one", "check"):
+            model.NodesetRequest.new(
+                ctx,
+                tenant_name="tenant-one",
+                pipeline_name="check",
+                buildset_uuid=uuid.uuid4().hex,
+                job_uuid=uuid.uuid4().hex,
+                job_name="foobar",
+                labels=[n.label for n in nodeset.getNodes()],
+                priority=100,
+                request_time=time.time(),
+                zuul_event_id=uuid.uuid4().hex,
+                span_info=None,
+            )
+            for _ in iterate_timeout(
+                    10, "nodeset request to be fulfilled"):
+                result_events = list(result_queue)
+                if result_events:
+                    for event in result_events:
+                        # Remove event(s) from queue
+                        result_queue.ack(event)
+                    break
+
+        self.assertEqual(len(result_events), 1)
+        for event in result_queue:
+            self.assertIsInstance(event, model.NodesProvisionedEvent)
+
+        client = LauncherClient(self.zk_client, None)
+        request = client.getRequest(event.request_id)
+
+        self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
+        self.assertEqual(len(request.provider_nodes), 1)
+
+        client.acceptNodeset(request, nodeset)
+        self.waitUntilSettled()
+
+        with testtools.ExpectedException(NoNodeError):
+            # Request should be gone
+            request.refresh(ctx)
+
+        for node in nodeset.getNodes():
+            pnode = node._provider_node
+            self.assertIsNotNone(pnode)
+            self.assertTrue(pnode.hasLock())
+
+        client.useNodeset(nodeset)
+        self.waitUntilSettled()
+
+        for node in nodeset.getNodes():
+            pnode = node._provider_node
+            self.assertTrue(pnode.hasLock())
+            self.assertTrue(pnode.state, pnode.State.IN_USE)
+
+        client.returnNodeset(nodeset)
+        self.waitUntilSettled()
+
+        for node in nodeset.getNodes():
+            pnode = node._provider_node
+            self.assertFalse(pnode.hasLock())
+            self.assertTrue(pnode.state, pnode.State.USED)
+
+            for _ in iterate_timeout(60, "node to be deleted"):
+                try:
+                    pnode.refresh(ctx)
+                except NoNodeError:
+                    break
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_lost_nodeset_request(self):
+        result_queue = PipelineResultEventQueue(
+            self.zk_client, "tenant-one", "check")
+
+        ctx = self.createZKContext(None)
+        # Lock the pipeline, so we can grab the result event
+        with pipeline_lock(self.zk_client, "tenant-one", "check"):
+            model.NodesetRequest.new(
+                ctx,
+                tenant_name="tenant-one",
+                pipeline_name="check",
+                buildset_uuid=uuid.uuid4().hex,
+                job_uuid=uuid.uuid4().hex,
+                job_name="foobar",
+                labels=["debian-normal"],
+                priority=100,
+                request_time=time.time(),
+                zuul_event_id=uuid.uuid4().hex,
+                span_info=None,
+            )
+            for _ in iterate_timeout(
+                    10, "nodeset request to be fulfilled"):
+                result_events = list(result_queue)
+                if result_events:
+                    for event in result_events:
+                        # Remove event(s) from queue
+                        result_queue.ack(event)
+                    break
+
+        self.assertEqual(len(result_events), 1)
+        for event in result_queue:
+            self.assertIsInstance(event, model.NodesProvisionedEvent)
+
+        client = LauncherClient(self.zk_client, None)
+        request = client.getRequest(event.request_id)
+
+        provider_nodes = []
+        for node_id in request.provider_nodes:
+            provider_nodes.append(model.ProviderNode.fromZK(
+                ctx, path=model.ProviderNode._getPath(node_id)))
+
+        client.deleteRequest(request)
+        self.waitUntilSettled()
+
+        with testtools.ExpectedException(NoNodeError):
+            # Request should be gone
+            request.refresh(ctx)
+
+        # TODO: in the future the nodes should be reused instead of being
+        # cleaned up
+        for pnode in provider_nodes:
+            for _ in iterate_timeout(60, "node to be deleted"):
+                try:
+                    pnode.refresh(ctx)
+                except NoNodeError:
+                    break
 
 
 class TestLauncherImagePermissions(ZuulTestCase):
