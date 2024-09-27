@@ -28,3 +28,4 @@ documentation instead.
    tenant-scoped-admin-web-API
    tracing
    zuul-runner
+   zuul-workload-identity-federation
