@@ -2921,6 +2921,7 @@ class FrozenJob(zkobject.ZKObject):
                   'config_hash',
                   'deduplicate',
                   'failure_output',
+                  'image_build_name',
                   )
 
     job_data_attributes = ('artifact_data',
@@ -2936,8 +2937,11 @@ class FrozenJob(zkobject.ZKObject):
 
     def __init__(self):
         super().__init__()
-        self._set(ref=None,
-                  other_refs=[])
+        self._set(
+            ref=None,
+            other_refs=[],
+            image_build_name=None,
+        )
 
     def __repr__(self):
         name = getattr(self, 'name', '<UNKNOWN>')
@@ -3341,6 +3345,7 @@ class Job(ConfigObject):
         d['match_on_config_updates'] = self.match_on_config_updates
         d['deduplicate'] = self.deduplicate
         d['failure_output'] = self.failure_output
+        d['image_build_name'] = self.image_build_name
         if self.isBase():
             d['parent'] = None
         elif self.parent:
@@ -3421,6 +3426,7 @@ class Job(ConfigObject):
             post_review=None,
             workspace_scheme=SCHEME_GOLANG,
             failure_output=(),
+            image_build_name=None,
         )
 
         override_control = defaultdict(lambda: True)
@@ -3702,7 +3708,7 @@ class Job(ConfigObject):
             return ns
         return self.nodeset
 
-    def validateReferences(self, layout):
+    def validateReferences(self, layout, project_config=False):
         # Verify that references to other objects in the layout are
         # valid.
         if not self.isBase() and self.parent:
@@ -3760,6 +3766,55 @@ class Job(ConfigObject):
             layout.getJob(dependency.name)
         for pb in self.pre_run + self.run + self.post_run + self.cleanup_run:
             pb.validateReferences(layout)
+
+        # A job that builds an image is not allowed to be attached to
+        # a project except in the same project where the image is
+        # defined.  Perform a quick check here for the common cases,
+        # and rely on job freezing to validate the final value.
+        if project_config:
+            image_build_name = Job.getImageBuildName(self, layout)
+            if not image_build_name:
+                for job in layout.getJobs(self.name):
+                    image_build_name = Job.getImageBuildName(job, layout)
+                    if image_build_name:
+                        job.assertImagePermissions(
+                            image_build_name, project_config, layout)
+            else:
+                self.assertImagePermissions(
+                    image_build_name, project_config, layout)
+
+    @staticmethod
+    def getImageBuildName(job, layout):
+        # Walk up the inheritance hierarchy to find the first
+        # image-build-name set, in order to guess what it will end up
+        # being for this job.  This is a best-effort method designed
+        # to catch common configuration errors quickly, but could be
+        # fooled by a weird configuration.  We rely on the freezeJob
+        # method to perform a final check.
+        if not job:
+            return None
+        if job.image_build_name:
+            return job.image_build_name
+        if job.parent:
+            for parent in layout.getJobs(job.parent):
+                if ret := Job.getImageBuildName(parent, layout):
+                    return ret
+        return None
+
+    def assertImagePermissions(self, image_build_name, config_object, layout):
+        # config_object may be a project or an anonymous job variant
+        image = layout.images.get(image_build_name)
+        if image is None:
+            raise JobConfigurationError(
+                f'The job "{self.name}" references an unknown image '
+                f'"{image_build_name}"')
+        ppc_origin = config_object.source_context.project_canonical_name
+        image_origin = image.source_context.project_canonical_name
+        if ppc_origin != image_origin:
+            raise JobConfigurationError(
+                f'The image build job "{self.name}" may not be attached '
+                f'to a pipeline in {ppc_origin} while referencing the '
+                f'image "{image_build_name}" defined in {image_origin}')
 
     def addRoles(self, roles):
         newroles = []
@@ -9028,6 +9083,9 @@ class Layout(object):
                     add_debug_line(debug_messages,
                                    "Pipeline variant {variant} matched".format(
                                        variant=repr(variant)), indent=2)
+                    if final_job.image_build_name:
+                        final_job.assertImagePermissions(
+                            final_job.image_build_name, variant, self)
                 else:
                     log.debug("Pipeline variant %s did not match %s",
                               repr(variant), change)

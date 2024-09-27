@@ -849,6 +849,61 @@ class TestJob(BaseTestCase):
                                         override, override_value,
                                         errors)
 
+    @mock.patch("zuul.model.zkobject.ZKObject._save")
+    def test_image_permissions(self, save_mock):
+        self.pipeline.post_review = False
+        image = self.pcontext.image_parser.fromYaml({
+            '_source_context': self.context,
+            '_start_mark': self.start_mark,
+            'name': 'image',
+            'type': 'zuul',
+        })
+        self.layout.addImage(image)
+
+        job_project = model.Project('other-project', self.source)
+        job_context = model.SourceContext(
+            job_project.canonical_name, job_project.name,
+            job_project.connection_name, 'master', 'test', True)
+        tpc = model.TenantProjectConfig(job_project)
+        self.tenant.addTPC(tpc)
+
+        job = self.pcontext.job_parser.fromYaml({
+            '_source_context': job_context,
+            '_start_mark': self.start_mark,
+            'name': 'job',
+            'parent': None,
+            'post-review': True,
+            'image-build-name': 'image',
+        }, None)
+
+        self.layout.addJob(job)
+
+        project_config = self.pcontext.project_parser.fromYaml({
+            '_source_context': job_context,
+            '_start_mark': self.start_mark,
+            'name': 'other-project',
+            'gate': {
+                'jobs': [
+                    'job'
+                ]
+            }
+        })
+
+        self.layout.addProjectConfig(project_config)
+
+        change = model.Change(job_project)
+        # Test master
+        change.branch = 'master'
+        change.cache_stat = Dummy(key=Dummy(reference=uuid.uuid4().hex))
+        item = self.queue.enqueueChanges([change], None)
+        with testtools.ExpectedException(
+                model.JobConfigurationError,
+                "The image build job"):
+            with self.zk_context as ctx:
+                item.freezeJobGraph(self.layout, ctx,
+                                    skip_file_matcher=False,
+                                    redact_secrets_and_keys=False)
+
 
 class FakeFrozenJob(model.Job):
 
