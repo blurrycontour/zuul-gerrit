@@ -619,6 +619,7 @@ class Launcher:
     def checkMissingImage(self, tenant_name, image, images_by_project_branch):
         # If there is already a successful build for
         # this image, skip.
+        self.log.debug("Checking for missing images")
         seen_formats = set()
         for build in self.image_build_registry.getArtifactsForImage(
                 image.canonical_name):
@@ -636,9 +637,11 @@ class Launcher:
         images.add(image.name)
 
     def checkMissingUploads(self):
+        self.log.debug("Checking for missing uploads")
         uploads_by_artifact_id = collections.defaultdict(list)
         self.upload_added_event.clear()
         for upload in self.image_upload_registry.getItems():
+            self.log.debug("Checking %s", upload)
             if upload.external_id:
                 continue
             if upload.endpoint_name not in self.endpoints:

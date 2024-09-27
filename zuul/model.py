@@ -1527,6 +1527,13 @@ class ImageUpload(zkobject.LockableZKObject):
             validated=None,
         )
 
+    def __repr__(self):
+        return (f"<ImageUpload {self.uuid} "
+                f"endpoint: {self.endpoint_name} "
+                f"artifact: {self.artifact_uuid} "
+                f"validated: {self.validated} "
+                f"external_id: {self.external_id}>")
+
     def getPath(self):
         return f"{self.ROOT}/{self.UPLOADS_PATH}/{self.uuid}"
 
