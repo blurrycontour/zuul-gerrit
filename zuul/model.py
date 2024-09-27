@@ -1470,6 +1470,10 @@ class ImageBuildArtifact(zkobject.LockableZKObject):
         self._set(
             uuid=None,  # A random UUID for the image build artifact
             canonical_name=None,
+            name=None,  # For validation builds
+            project_canonical_name=None,  # For validation builds
+            project_branch=None,  # For validation builds
+            build_tenant_name=None,  # For validation builds
             build_uuid=None,  # The UUID of the build job
             format=None,
             url=None,
@@ -1486,7 +1490,11 @@ class ImageBuildArtifact(zkobject.LockableZKObject):
     def serialize(self, context):
         data = dict(
             uuid=self.uuid,
+            name=self.name,
             canonical_name=self.canonical_name,
+            project_canonical_name=self.project_canonical_name,
+            project_branch=self.project_branch,
+            build_tenant_name=self.build_tenant_name,
             build_uuid=self.build_uuid,
             format=self.format,
             url=self.url,
@@ -1565,12 +1573,19 @@ class Image(ConfigObject):
                 self.type == other.type and
                 self.description == other.description)
 
+    @property
+    def project_canonical_name(self):
+        return self.source_context.project_canonical_name
+
+    @property
+    def branch(self):
+        return self.source_context.branch
+
     def toDict(self):
-        sc = self.source_context
         return {
-            'project_canonical_name': sc.project_canonical_name,
+            'project_canonical_name': self.project_canonical_name,
             'name': self.name,
-            'branch': sc.branch,
+            'branch': self.branch,
             'type': self.type,
             'description': self.description,
         }
@@ -5655,7 +5670,10 @@ class EventInfo:
         self.timestamp = time.time()
         self.span_context = None
         self.ref = None
+        # Image build related events carry information that's needed
+        # by the reporter.
         self.image_names = None
+        self.image_upload_uuid = None
 
     @classmethod
     def fromEvent(cls, event, event_ref_key):
@@ -5668,6 +5686,7 @@ class EventInfo:
         else:
             tinfo.ref = None
         tinfo.image_names = getattr(event, 'image_names', None)
+        tinfo.image_upload_uuid = getattr(event, 'image_upload_uuid', None)
         return tinfo
 
     @classmethod
@@ -5679,6 +5698,7 @@ class EventInfo:
         # MODEL_API <= 26
         tinfo.ref = d.get("ref")
         tinfo.image_names = d.get("image_names")
+        tinfo.image_upload_uuid = d.get("image_upload_uuid")
         return tinfo
 
     def toDict(self):
@@ -5688,6 +5708,7 @@ class EventInfo:
             "span_context": self.span_context,
             "ref": self.ref,
             "image_names": self.image_names,
+            "image_upload_uuid": self.image_upload_uuid,
         }
 
 

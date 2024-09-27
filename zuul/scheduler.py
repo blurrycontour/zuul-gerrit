@@ -3227,8 +3227,12 @@ class Scheduler(threading.Thread):
             tenant.semaphore_handler.release(event_queue, item, job)
 
     # Image related methods
-    def createImageBuildArtifact(self, image, build, image_format,
-                                 artifact_url, validated):
+    def createImageBuildArtifact(self, tenant_name, image, build,
+                                 image_format, artifact_url,
+                                 validated):
+        # Image builds are not tenant scoped; the tenant_name
+        # parameter is present to support triggering validation builds
+        # in the same tenant.
         log = get_annotated_logger(self.log, build.zuul_event_id,
                                    build=build.uuid)
         art_uuid = uuid.uuid4().hex
@@ -3241,7 +3245,11 @@ class Scheduler(threading.Thread):
             return ImageBuildArtifact.new(
                 ctx,
                 uuid=art_uuid,
+                name=image.name,
                 canonical_name=image.canonical_name,
+                project_canonical_name=image.project_canonical_name,
+                project_branch=image.branch,
+                build_tenant_name=tenant_name,
                 build_uuid=build.uuid,
                 format=image_format,
                 url=artifact_url,
@@ -3281,6 +3289,19 @@ class Scheduler(threading.Thread):
                         timestamp=time.time(),
                         validated=iba.validated,
                     )
+
+    def validateImageUpload(self, image_upload_uuid):
+        with self.createZKContext(None, self.log) as ctx:
+            upload = ImageUpload()
+            upload._set(uuid=image_upload_uuid)
+            upload.refresh(ctx)
+        with upload.locked(self.zk_client, blocking=True) as lock:
+            with self.createZKContext(lock, self.log) as ctx:
+                upload.updateAttributes(
+                    ctx,
+                    validated=True,
+                    timestamp=time.time(),
+                )
 
     def createZKContext(self, lock, log):
         return ZKContext(self.zk_client, lock, self.stop_event, log)
