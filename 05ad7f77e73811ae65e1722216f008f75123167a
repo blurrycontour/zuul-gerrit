@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07141387_6ee8f1d1",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1837,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-09-27T06:53:41Z",
+      "side": 1,
+      "message": "I think this should use `hashlib.sha256()` as the hash-builtin isn\u0027t stable across Python interpreters.",
+      "revId": "05ad7f77e73811ae65e1722216f008f75123167a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
