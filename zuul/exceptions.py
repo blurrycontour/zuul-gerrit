@@ -75,6 +75,10 @@ class CapacityException(Exception):
     statsd_key = 'error.capacity'
 
 
+class RuntimeConfigurationException(Exception):
+    pass
+
+
 # Authentication Exceptions
 class AuthTokenException(Exception):
     defaultMsg = 'Unknown Error'

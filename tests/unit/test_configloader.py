@@ -1398,6 +1398,10 @@ class TestNodepoolConfig(ZuulTestCase):
         self.assertEqual('debian-dedicated', label.name)
         self.assertEqual('debian', label.image)
         self.assertEqual('dedicated', label.flavor)
+        label = layout.labels['debian-invalid']
+        self.assertEqual('debian-invalid', label.name)
+        self.assertEqual('debian', label.image)
+        self.assertEqual('invalid', label.flavor)
         section = layout.sections['aws-base']
         self.assertEqual('aws-base', section.name)
         self.assertEqual(True, section.abstract)
@@ -1406,11 +1410,12 @@ class TestNodepoolConfig(ZuulTestCase):
         self.assertEqual('aws-us-east-1-main', provider_config.name)
         self.assertEqual('aws-us-east-1', provider_config.section)
         provider = layout.providers['aws-us-east-1-main']
-        self.assertEqual(3, len(provider.labels))
+        self.assertEqual(4, len(provider.labels))
         labels = sorted([x for x in provider.labels.keys()])
         self.assertEqual('debian-dedicated', labels[0])
-        self.assertEqual('debian-large', labels[1])
-        self.assertEqual('debian-normal', labels[2])
+        self.assertEqual('debian-invalid', labels[1])
+        self.assertEqual('debian-large', labels[2])
+        self.assertEqual('debian-normal', labels[3])
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_section_inheritance(self):
