@@ -1395,20 +1395,21 @@ class Scheduler(threading.Thread):
             return False
         return True
 
-    def _checkTenantSourceConf(self, config):
+    @staticmethod
+    def _checkTenantSourceConf(config):
         tenant_config = None
         script = False
-        if self.config.has_option(
+        if config.has_option(
             'scheduler', 'tenant_config'):
-            tenant_config = self.config.get(
+            tenant_config = config.get(
                 'scheduler', 'tenant_config')
-        if self.config.has_option(
+        if config.has_option(
             'scheduler', 'tenant_config_script'):
             if tenant_config:
                 raise Exception(
                     "tenant_config and tenant_config_script options "
                     "are exclusive.")
-            tenant_config = self.config.get(
+            tenant_config = config.get(
                 'scheduler', 'tenant_config_script')
             script = True
         if not tenant_config:
@@ -1418,6 +1419,8 @@ class Scheduler(threading.Thread):
         return tenant_config, script
 
     def validateTenants(self, config, tenants_to_validate):
+        # This validates the Zuul configuration inside the tenants.
+        # It uses source connections and ZooKeeper.
         self.config = config
         self.log.info("Config validation beginning")
         start = time.monotonic()
@@ -1464,6 +1467,34 @@ class Scheduler(threading.Thread):
         duration = round(time.monotonic() - start, 3)
         self.log.info("Config validation complete (duration: %s seconds)",
                       duration)
+
+    @classmethod
+    def validateTenantSyntax(cls, connections, config):
+        # This only performs syntax validation of the tenant config
+        # file, and does not use network resources.
+        self_globals = SystemAttributes.fromConfig(config)
+        ansible_manager = AnsibleManager(
+            default_version=self_globals.default_ansible_version)
+        loader = configloader.ConfigLoader(
+            connections, None, self_globals,
+            None, None,
+            None, None, None)
+        tenant_config, script = cls._checkTenantSourceConf(config)
+        unparsed_abide = loader.readConfig(
+            tenant_config,
+            from_script=script)
+        available_tenants = list(unparsed_abide.tenants)
+
+        abide = Abide()
+        loader.loadAuthzRules(abide, unparsed_abide)
+        loader.loadSemaphores(abide, unparsed_abide)
+        loader.loadTPCs(abide, unparsed_abide)
+        for tenant_name in available_tenants:
+            loader.loadTenant(abide, tenant_name, ansible_manager,
+                              unparsed_abide, min_ltimes=None,
+                              syntax_check_only=True)
+
+        print("Config syntax validation complete")
 
     def _doReconfigureEvent(self, event):
         # This is called in the scheduler loop after another thread submits

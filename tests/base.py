@@ -2244,12 +2244,12 @@ class ZuulTestCase(BaseTestCase):
 
     """
 
-    config_file: str = 'zuul.conf'
-    run_ansible: bool = False
-    create_project_keys: bool = False
-    use_ssl: bool = False
-    git_url_with_auth: bool = False
-    log_console_port: int = 19885
+    config_file = 'zuul.conf'
+    run_ansible = False
+    create_project_keys = False
+    use_ssl = False
+    git_url_with_auth = False
+    log_console_port = 19885
     validate_tenants = None
     wait_for_init = None
     disable_pipelines = False
@@ -2510,7 +2510,7 @@ class ZuulTestCase(BaseTestCase):
             'zuul.driver.elasticsearch.ElasticsearchDriver.getConnection',
             getElasticsearchConnection))
 
-    def setup_config(self, config_file: str):
+    def setup_config(self, config_file):
         # This creates the per-test configuration object.  It can be
         # overridden by subclasses, but should not need to be since it
         # obeys the config_file and tenant_config_file attributes.

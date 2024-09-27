@@ -1,0 +1,8 @@
+- tenant:
+    name: tenant-broken
+    source:
+      gerrit:
+        config-projects:
+          - common-config
+        untrusted-projects:
+          - common-config

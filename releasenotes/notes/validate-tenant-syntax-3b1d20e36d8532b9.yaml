@@ -1,0 +1,14 @@
+---
+features:
+  - |
+    The syntax of the tenant configuration file may be validated by
+    running the zuul-scheduler program with the argument
+    ``--validate-tenant-syntax``.  This will check for simple YAML
+    format errors or errors such as listing a project twice, but will
+    not perform any network operations to validate that projects
+    actually exist or that the tenant configuration itself is valid.
+
+    This may be used to ensure that an update to a tenant
+    configuration file will not cause Zuul to be unable to load the
+    tenant at all.  Since it should be able to load the tenant,
+    further errors may be discovered through the web UI.
