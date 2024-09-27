@@ -39,6 +39,11 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
                                  'listed, all tenants will be validated. '
                                  'Note: this requires ZooKeeper and '
                                  'will distribute work to mergers.')
+        parser.add_argument('--validate-tenant-syntax',
+                            action='store_true',
+                            dest='validate_tenant_syntax',
+                            help='Perform syntax validation (only) of the '
+                                 'tenant configuration file.')
         parser.add_argument('--wait-for-init', dest='wait_for_init',
                             action='store_true',
                             default=self.envBool('ZUUL_WAIT_FOR_INIT'),
@@ -84,8 +89,16 @@ class Scheduler(zuul.cmd.ZuulDaemonApp):
         self.sched.stop()
         self.sched.join()
 
+    def validateTenantSyntax(self):
+        self.configure_connections(sources=True)
+        zuul.scheduler.Scheduler.validateTenantSyntax(self.connections,
+                                                      self.config)
+        sys.exit(0)
+
     def run(self):
         self.handleCommands()
+        if self.args.validate_tenant_syntax:
+            self.validateTenantSyntax()
 
         self.setup_logging('scheduler', 'log_config')
         self.log = logging.getLogger("zuul.Scheduler")

@@ -1984,7 +1984,7 @@ class TenantParser(object):
 
     def fromYaml(self, abide, conf, ansible_manager, executor, min_ltimes=None,
                  layout_uuid=None, branch_cache_min_ltimes=None,
-                 ignore_cat_exception=True):
+                 ignore_cat_exception=True, syntax_check_only=False):
         # Note: This vs schema validation is not necessary in most cases as we
         # verify the schema when loading tenant configs into zookeeper.
         # However, it is theoretically possible in a multi scheduler setup that
@@ -2034,6 +2034,9 @@ class TenantParser(object):
         # tpcs is TenantProjectConfigs
         for tpc in abide.getAllTPCs(tenant.name):
             tenant.addTPC(tpc)
+
+        if syntax_check_only:
+            return tenant
 
         # Get branches in parallel
         branch_futures = {}
@@ -2313,8 +2316,11 @@ class TenantParser(object):
                 tpcs = self._getProjects(source, conf_repo, current_include)
                 for tpc in tpcs:
                     tpc.trusted = True
-                    futures.append(executor.submit(
-                        self._loadProjectKeys, source_name, tpc.project))
+                    if self.keystorage:
+                        # Normally we have a keystorage; but we may
+                        # not if we are only validating syntax.
+                        futures.append(executor.submit(
+                            self._loadProjectKeys, source_name, tpc.project))
                     config_projects.append(tpc)
 
             current_include = frozenset(default_include - set(['pipeline']))
@@ -2323,8 +2329,9 @@ class TenantParser(object):
                                          current_include)
                 for tpc in tpcs:
                     tpc.trusted = False
-                    futures.append(executor.submit(
-                        self._loadProjectKeys, source_name, tpc.project))
+                    if self.keystorage:
+                        futures.append(executor.submit(
+                            self._loadProjectKeys, source_name, tpc.project))
                     untrusted_projects.append(tpc)
 
         for f in futures:
@@ -3190,7 +3197,8 @@ class ConfigLoader(object):
 
     def loadTenant(self, abide, tenant_name, ansible_manager, unparsed_abide,
                    min_ltimes=None, layout_uuid=None,
-                   branch_cache_min_ltimes=None, ignore_cat_exception=True):
+                   branch_cache_min_ltimes=None, ignore_cat_exception=True,
+                   syntax_check_only=False):
         """(Re-)load a single tenant.
 
         Description of cache stages:
@@ -3270,12 +3278,15 @@ class ConfigLoader(object):
             new_tenant = self.tenant_parser.fromYaml(
                 abide, unparsed_config, ansible_manager, executor,
                 min_ltimes, layout_uuid, branch_cache_min_ltimes,
-                ignore_cat_exception)
+                ignore_cat_exception, syntax_check_only)
         # Copy tenants dictionary to not break concurrent iterations.
         with abide.tenant_lock:
             tenants = abide.tenants.copy()
             tenants[tenant_name] = new_tenant
             abide.tenants = tenants
+        if syntax_check_only:
+            # New tenant does not have a layout
+            return new_tenant
         if len(new_tenant.layout.loading_errors):
             self.log.warning(
                 "%s errors detected during %s tenant configuration loading",

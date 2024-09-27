@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import configparser
 import io
 import json
 import logging
@@ -39,6 +40,7 @@ from zuul.zk.blob_store import BlobStore
 from tests.base import (
     AnsibleZuulTestCase,
     FIXTURE_DIR,
+    BaseTestCase,
     ZuulTestCase,
     iterate_timeout,
     simple_layout,
@@ -5694,6 +5696,45 @@ class TestValidateWarningsAcceptable(ZuulTestCase):
             # New job runs despite warnings existing in the config.
             dict(name='new-job', result='SUCCESS', changes='2,1'),
         ], ordered=False)
+
+
+class ValidateSyntaxBase(BaseTestCase):
+    validate_tenant_syntax = True
+    config_file = 'zuul.conf'
+    scheduler_count = 1
+
+    def setUp(self):
+        super().setUp()
+        self.config = configparser.ConfigParser()
+        self.config.read(os.path.join(FIXTURE_DIR, self.config_file))
+        self.config.set(
+            'scheduler', 'tenant_config',
+            os.path.join(FIXTURE_DIR, self.tenant_config_file))
+
+        self.connections = zuul.lib.connections.ConnectionRegistry(
+            check_bwrap=False)
+        self.addCleanup(self.connections.stop)
+        self.connections.configure(self.config, sources=True)
+
+
+class TestValidateSyntaxGood(ValidateSyntaxBase):
+    tenant_config_file = 'config/broken/main.yaml'
+
+    def test_validate_tenant_config_syntax_good(self):
+        zuul.scheduler.Scheduler.validateTenantSyntax(
+            self.connections, self.config)
+
+
+class TestValidateSyntaxBad(ValidateSyntaxBase):
+    tenant_config_file = 'config/broken/validate-syntax.yaml'
+
+    def test_validate_tenant_config_syntax_bad(self):
+        self.assertRaises(
+            Exception,
+            lambda:
+            zuul.scheduler.Scheduler.validateTenantSyntax(
+                self.connections, self.config)
+        )
 
 
 class TestPCREDeprecation(ZuulTestCase):
