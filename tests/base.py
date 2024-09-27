@@ -528,6 +528,10 @@ class FakeStatsd(threading.Thread):
         self.join()
         self.sock.close()
 
+    def __del__(self):
+        os.close(self.wake_read)
+        os.close(self.wake_write)
+
 
 class FakeBuild(object):
     log = logging.getLogger("zuul.test")
