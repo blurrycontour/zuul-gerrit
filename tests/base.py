@@ -3243,6 +3243,13 @@ class ZuulTestCase(BaseTestCase):
         return (self.scheds.first.sched.local_layout_state ==
                 self.launcher.local_layout_state)
 
+    def __areAllImagesUploaded(self):
+        # TODO: this may need to check for failed image uploads
+        for upload in self.launcher.image_upload_registry.getItems():
+            if not upload.external_id:
+                return False
+        return True
+
     def waitUntilSettled(self, msg="", matcher=None) -> None:
         self.log.debug("Waiting until settled... (%s)", msg)
         start = time.time()
@@ -3253,7 +3260,7 @@ class ZuulTestCase(BaseTestCase):
                 self.log.error("Timeout waiting for Zuul to settle")
                 self.log.debug("All schedulers primed: %s",
                                self.__areAllSchedulersPrimed(matcher))
-                self.log.debug("All launchers primed: %s",
+                self.log.debug("All launchers synced: %s",
                                self.__areAllLaunchersSynced())
                 self._logQueueStatus(
                     self.log.error, matcher,
@@ -3263,6 +3270,7 @@ class ZuulTestCase(BaseTestCase):
                     self.__areAllBuildsWaiting(),
                     self.__areAllNodeRequestsComplete(),
                     self.__areAllNodesetRequestsComplete(),
+                    self.__areAllImagesUploaded(),
                     all(self.__eventQueuesEmpty(matcher))
                 )
                 raise Exception("Timeout waiting for Zuul to settle")
@@ -3286,6 +3294,7 @@ class ZuulTestCase(BaseTestCase):
                         self.__areAllBuildsWaiting() and
                         self.__areAllNodeRequestsComplete() and
                         self.__areAllNodesetRequestsComplete() and
+                        self.__areAllImagesUploaded() and
                         self.__areZooKeeperEventQueuesEmpty() and
                         all(self.__eventQueuesEmpty(matcher))):
                         # The queue empty check is placed at the end to
@@ -3331,6 +3340,7 @@ class ZuulTestCase(BaseTestCase):
                         all_merge_jobs_waiting, all_builds_reported,
                         all_builds_waiting, all_node_requests_completed,
                         all_nodeset_requests_completed,
+                        all_images_uploaded,
                         all_event_queues_empty):
         logger("Queue status:")
         for event_queue in self.__event_queues(matcher):
@@ -3343,6 +3353,7 @@ class ZuulTestCase(BaseTestCase):
         logger("All requests completed: %s", all_node_requests_completed)
         logger("All nodeset requests completed: %s",
                all_nodeset_requests_completed)
+        logger("All images uploaded: %s", all_images_uploaded)
         logger("All event queues empty: %s", all_event_queues_empty)
 
     def waitForPoll(self, poller, timeout=30):
