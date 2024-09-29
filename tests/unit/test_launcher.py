@@ -15,7 +15,7 @@
 
 import time
 import uuid
-from unittest import mock
+from unittest import mock, skip
 
 from zuul import model
 from zuul.launcher.client import LauncherClient
@@ -547,7 +547,15 @@ class TestLauncherImagePermissions(ZuulTestCase):
     tenant_config_file = 'config/launcher-config-error/main.yaml'
     mock_aws = mock_aws()
 
+    @skip("TODO: re-enable this check")
     def test_image_permissions(self):
+        # The check to implement this was too costly (or flawed) in
+        # production so was emergency disabled.  It is not strictly
+        # necessary since we perform a permissions check when we
+        # freeze the job (and that code path also has a test which is
+        # still enabled); this check is to find the error sooner for
+        # the user.
+        # TODO: attempt to re-implement if possible.
         self.waitUntilSettled()
         self.assertHistory([])
 

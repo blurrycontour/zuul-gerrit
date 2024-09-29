@@ -3854,40 +3854,6 @@ class Job(ConfigObject):
         for pb in self.pre_run + self.run + self.post_run + self.cleanup_run:
             pb.validateReferences(layout)
 
-        # A job that builds an image is not allowed to be attached to
-        # a project except in the same project where the image is
-        # defined.  Perform a quick check here for the common cases,
-        # and rely on job freezing to validate the final value.
-        if project_config:
-            image_build_name = Job.getImageBuildName(self, layout)
-            if not image_build_name:
-                for job in layout.getJobs(self.name):
-                    image_build_name = Job.getImageBuildName(job, layout)
-                    if image_build_name:
-                        job.assertImagePermissions(
-                            image_build_name, project_config, layout)
-            else:
-                self.assertImagePermissions(
-                    image_build_name, project_config, layout)
-
-    @staticmethod
-    def getImageBuildName(job, layout):
-        # Walk up the inheritance hierarchy to find the first
-        # image-build-name set, in order to guess what it will end up
-        # being for this job.  This is a best-effort method designed
-        # to catch common configuration errors quickly, but could be
-        # fooled by a weird configuration.  We rely on the freezeJob
-        # method to perform a final check.
-        if not job:
-            return None
-        if job.image_build_name:
-            return job.image_build_name
-        if job.parent:
-            for parent in layout.getJobs(job.parent):
-                if ret := Job.getImageBuildName(parent, layout):
-                    return ret
-        return None
-
     def assertImagePermissions(self, image_build_name, config_object, layout):
         # config_object may be a project or an anonymous job variant
         image = layout.images.get(image_build_name)
