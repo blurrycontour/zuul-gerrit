@@ -32,6 +32,7 @@ import zuul.driver.pagure
 import zuul.driver.gitlab
 import zuul.driver.elasticsearch
 import zuul.driver.aws
+import zuul.driver.openstack
 from zuul.connection import BaseConnection
 from zuul.driver import (
     ProviderInterface,
@@ -69,6 +70,7 @@ class ConnectionRegistry(object):
         self.registerDriver(zuul.driver.gitlab.GitlabDriver())
         self.registerDriver(zuul.driver.elasticsearch.ElasticsearchDriver())
         self.registerDriver(zuul.driver.aws.AwsDriver())
+        self.registerDriver(zuul.driver.openstack.OpenstackDriver())
 
     def registerDriver(self, driver):
         if driver.name in self.drivers:

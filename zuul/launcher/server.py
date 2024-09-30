@@ -487,6 +487,7 @@ class Launcher:
 
                 log.debug("Checking node %s", node)
                 node.create_state_machine.advance()
+                print('JEB', node.create_state_machine.state)
                 if not node.create_state_machine.complete:
                     self.wake_event.set()
                     return

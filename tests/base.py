@@ -86,11 +86,12 @@ from zuul.driver.gitlab import GitlabDriver
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.elasticsearch import ElasticsearchDriver
 from zuul.driver.aws import AwsDriver
+from zuul.driver.openstack import OpenstackDriver
 from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.connections import ConnectionRegistry
 from zuul.zk import zkobject, ZooKeeperClient
 from zuul.zk.components import SchedulerComponent, COMPONENT_REGISTRY
-from zuul.zk.event_queues import ConnectionEventQueue
+from zuul.zk.event_queues import ConnectionEventQueue, PipelineResultEventQueue
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.locks import tenant_read_lock, pipeline_lock, SessionAwareLock
 from zuul.zk.merger import MergerApi
@@ -456,6 +457,7 @@ class TestConnectionRegistry(ConnectionRegistry):
             self, test_config, config, upstream_root, additional_event_queues))
         self.registerDriver(ElasticsearchDriver())
         self.registerDriver(AwsDriver())
+        self.registerDriver(OpenstackDriver())
 
 
 class FakeAnsibleManager(zuul.lib.ansible.AnsibleManager):
@@ -3828,6 +3830,45 @@ class ZuulTestCase(BaseTestCase):
     def loadChangeDB(self):
         path = os.path.join(self.test_root, "changes.data")
         self.test_config.changes.load(path)
+
+    def requestNodes(self, labels, tenant="tenant-one", pipeline="check"):
+        result_queue = PipelineResultEventQueue(
+            self.zk_client, tenant, pipeline)
+
+        with self.createZKContext(None) as ctx:
+            # Lock the pipeline, so we can grab the result event
+            with (self.scheds.first.sched.run_handler_lock,
+                  pipeline_lock(self.zk_client, tenant, pipeline)):
+                request = model.NodesetRequest.new(
+                    ctx,
+                    tenant_name="tenant-one",
+                    pipeline_name="check",
+                    buildset_uuid=uuid.uuid4().hex,
+                    job_uuid=uuid.uuid4().hex,
+                    job_name="foobar",
+                    labels=labels,
+                    priority=100,
+                    request_time=time.time(),
+                    zuul_event_id=uuid.uuid4().hex,
+                    span_info=None,
+                )
+                for _ in iterate_timeout(
+                        10, "nodeset request to be fulfilled"):
+                    result_events = list(result_queue)
+                    if result_events:
+                        for event in result_events:
+                            # Remove event(s) from queue
+                            result_queue.ack(event)
+                        break
+
+            self.assertEqual(len(result_events), 1)
+            for event in result_queue:
+                self.assertIsInstance(event, model.NodesProvisionedEvent)
+                self.assertEqual(event.request_id, request.uuid)
+                self.assertEqual(event.build_set_uuid, request.buildset_uuid)
+
+            request.refresh(ctx)
+        return request
 
 
 class AnsibleZuulTestCase(ZuulTestCase):
