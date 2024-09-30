@@ -13,14 +13,10 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import time
-import uuid
 from unittest import mock
 
 from zuul import model
 from zuul.launcher.client import LauncherClient
-from zuul.zk.event_queues import PipelineResultEventQueue
-from zuul.zk.locks import pipeline_lock
 
 import responses
 import testtools
@@ -267,44 +263,6 @@ class TestLauncher(ZuulTestCase):
         self.assertEqual("test_external_id", uploads[0].external_id)
         self.assertTrue(uploads[0].validated)
 
-    def _requestNodes(self, labels):
-        result_queue = PipelineResultEventQueue(
-            self.zk_client, "tenant-one", "check")
-
-        with self.createZKContext(None) as ctx:
-            # Lock the pipeline, so we can grab the result event
-            with pipeline_lock(self.zk_client, "tenant-one", "check"):
-                request = model.NodesetRequest.new(
-                    ctx,
-                    tenant_name="tenant-one",
-                    pipeline_name="check",
-                    buildset_uuid=uuid.uuid4().hex,
-                    job_uuid=uuid.uuid4().hex,
-                    job_name="foobar",
-                    labels=labels,
-                    priority=100,
-                    request_time=time.time(),
-                    zuul_event_id=uuid.uuid4().hex,
-                    span_info=None,
-                )
-                for _ in iterate_timeout(
-                        10, "nodeset request to be fulfilled"):
-                    result_events = list(result_queue)
-                    if result_events:
-                        for event in result_events:
-                            # Remove event(s) from queue
-                            result_queue.ack(event)
-                        break
-
-            self.assertEqual(len(result_events), 1)
-            for event in result_queue:
-                self.assertIsInstance(event, model.NodesProvisionedEvent)
-                self.assertEqual(event.request_id, request.uuid)
-                self.assertEqual(event.build_set_uuid, request.buildset_uuid)
-
-            request.refresh(ctx)
-        return request
-
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_jobs_executed(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
@@ -357,7 +315,7 @@ class TestLauncher(ZuulTestCase):
     def test_launcher_missing_label(self):
         ctx = self.createZKContext(None)
         labels = ["debian-normal", "debian-unavailable"]
-        request = self._requestNodes(labels)
+        request = self.requestNodes(labels)
         self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
         self.assertEqual(len(request.nodes), 0)
 
@@ -370,7 +328,7 @@ class TestLauncher(ZuulTestCase):
         nodeset.addNode(model.Node("node", "debian-normal"))
 
         ctx = self.createZKContext(None)
-        request = self._requestNodes([n.label for n in nodeset.getNodes()])
+        request = self.requestNodes([n.label for n in nodeset.getNodes()])
 
         client = LauncherClient(self.zk_client, None)
         request = client.getRequest(request.uuid)
@@ -415,7 +373,7 @@ class TestLauncher(ZuulTestCase):
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_lost_nodeset_request(self):
         ctx = self.createZKContext(None)
-        request = self._requestNodes(["debian-normal"])
+        request = self.requestNodes(["debian-normal"])
 
         provider_nodes = []
         for node_id in request.nodes:
@@ -442,7 +400,7 @@ class TestLauncher(ZuulTestCase):
     @okay_tracebacks('_getQuotaForInstanceType')
     def test_failed_node(self):
         ctx = self.createZKContext(None)
-        request = self._requestNodes(["debian-invalid"])
+        request = self.requestNodes(["debian-invalid"])
         self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
         provider_nodes = request.provider_nodes[0]
         self.assertEqual(len(provider_nodes), 2)
@@ -499,7 +457,7 @@ class TestLauncher(ZuulTestCase):
         nodeset.addNode(model.Node("node", "debian-local-normal"))
 
         ctx = self.createZKContext(None)
-        request = self._requestNodes([n.label for n in nodeset.getNodes()])
+        request = self.requestNodes([n.label for n in nodeset.getNodes()])
 
         client = LauncherClient(self.zk_client, None)
         request = client.getRequest(request.uuid)
