@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08128582_fa9b4e86",
+        "filename": "tests/fake_graphql.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-09-30T16:50:22Z",
+      "side": 1,
+      "message": "I think we should add a test case where this can return True.  Currently the case where an error is returned but the merge succeeds anyway is not tested, and I think that\u0027s complex enough it warrants test coverage.",
+      "revId": "56a61c147ec3dbf2291861426c8d070673eaf4fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
