@@ -162,8 +162,10 @@ class TestAwsDriver(ZuulTestCase):
     def _test_state_machines(self, label):
         # Stop the launcher main loop, so we can drive the state machine
         # on our own.
-        self.launcher._running = False
         self.waitUntilSettled()
+        self.launcher._running = False
+        self.launcher.wake_event.set()
+        self.launcher.launcher_thread.join()
 
         layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
         provider = layout.providers['aws-us-east-1-main']
