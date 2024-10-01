@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "848a5cf2_bcd1d971",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-01T16:51:17Z",
+      "side": 1,
+      "message": "Nit should be \u0027must\u0027. Not worth a new ps unless something else forces it to happen.",
+      "range": {
+        "startLine": 84,
+        "startChar": 36,
+        "endLine": 84,
+        "endChar": 38
+      },
+      "revId": "e473d2899b858430b4dcfd525512abae712f4a17",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
