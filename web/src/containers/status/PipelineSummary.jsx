@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
@@ -66,7 +66,7 @@ QueueItemSquare.propTypes = {
   item: PropTypes.object,
 }
 
-function QueueCard({ pipeline, queue, allQueuesExpanded }) {
+function QueueCard({ pipeline, queue, allQueuesExpanded, jobsExpanded }) {
   const [isQueueExpanded, setIsQueueExpanded] = useState(undefined)
   const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(undefined)
 
@@ -113,7 +113,7 @@ function QueueCard({ pipeline, queue, allQueuesExpanded }) {
         </CardBody>
       }
       {isQueueExpanded ?
-        <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} />
+       <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} jobsExpanded={jobsExpanded} />
         : null
       }
     </Card>
@@ -124,9 +124,10 @@ QueueCard.propTypes = {
   pipeline: PropTypes.object,
   queue: PropTypes.object,
   allQueuesExpanded: PropTypes.bool,
+  jobsExpanded: PropTypes.bool,
 }
 
-function QueueSummary({ pipeline, showAllQueues, allQueuesExpanded }) {
+function QueueSummary({ pipeline, showAllQueues, allQueuesExpanded, jobsExpanded }) {
   let changeQueues = pipeline.change_queues
 
   if (!showAllQueues) {
@@ -143,6 +144,7 @@ function QueueSummary({ pipeline, showAllQueues, allQueuesExpanded }) {
             pipeline={pipeline}
             queue={queue}
             allQueuesExpanded={allQueuesExpanded}
+            jobsExpanded={jobsExpanded}
           />
         )
       } else {
@@ -152,7 +154,7 @@ function QueueSummary({ pipeline, showAllQueues, allQueuesExpanded }) {
         // where each change is enqueued in it's own queue by design.
         return (
           allQueuesExpanded ?
-            <ChangeQueue key={idx} queue={queue} pipeline={pipeline} showTitle={false} />
+            <ChangeQueue key={idx} queue={queue} pipeline={pipeline} showTitle={false} jobsExpanded={jobsExpanded} />
             :
             <Flex
               key={idx}
@@ -177,16 +179,21 @@ QueueSummary.propTypes = {
   pipeline: PropTypes.object,
   showAllQueues: PropTypes.bool,
   allQueuesExpanded: PropTypes.bool,
+  jobsExpanded: PropTypes.bool,
 }
 
-function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
+function PipelineSummary({ pipeline, tenant, showAllQueues, areAllJobsExpanded, filters }) {
 
   const pipelineType = pipeline.manager || 'unknown'
   const itemCount = pipeline._count
-  const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(undefined)
+  const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(areAllJobsExpanded)
   const onQueueToggle = () => {
     setAreAllQueuesExpanded(!areAllQueuesExpanded)
   }
+
+  useEffect(() => {
+    setAreAllQueuesExpanded(areAllJobsExpanded)
+  }, [areAllJobsExpanded])
 
   return (
     <Card className="zuul-pipeline-summary zuul-compact-card">
@@ -228,6 +235,7 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, filters }) {
           pipeline={pipeline}
           showAllQueues={showAllQueues}
           allQueuesExpanded={areAllQueuesExpanded}
+          jobsExpanded={areAllJobsExpanded}
         />
       </CardBody>
 
@@ -239,6 +247,7 @@ PipelineSummary.propTypes = {
   pipeline: PropTypes.object,
   tenant: PropTypes.object,
   showAllQueues: PropTypes.bool,
+  areAllJobsExpanded: PropTypes.bool,
   filters: PropTypes.object,
 }
 
