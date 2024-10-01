@@ -79,7 +79,9 @@ class BlobStore:
     def _checkKey(self, key):
         # This returns whether the key is in the store.  If it is in
         # the store, it also touches the flag file so that the cleanup
-        # routine can know the last time an entry was used.
+        # routine can know the last time an entry was used.  Because
+        # of the critical section between the get and delete calls in
+        # the delete method, this much be called with the key lock.
         flag = self._getFlagPath(key)
 
         if self.context.sessionIsInvalid():
@@ -119,9 +121,6 @@ class BlobStore:
 
         path = self._getPath(key)
         flag = self._getFlagPath(key)
-
-        if self._checkKey(key):
-            return key
 
         with locked(
                 SessionAwareLock(
