@@ -14,6 +14,7 @@
 
 import concurrent.futures
 import configparser
+import functools
 import json
 import logging
 import os
@@ -290,6 +291,31 @@ class AnsibleManager:
         if not ansible:
             raise Exception('Requested ansible version %s not found' % version)
         return ansible
+
+    @functools.lru_cache(maxsize=10)
+    def getCallbackPlugins(self, zuul_ansible_callback_paths, version):
+        # TODO
+        ansible = self._getAnsible(version)
+        callbacks = ansible.callback_plugins
+        iter_callbacks = callbacks.split(':')
+        result = None
+        for callback in iter_callbacks:
+            if "zuul" in callback:
+                break
+            else:
+                try:
+                    _python = self.getAnsibleCommand(version, 'python')
+                    result = subprocess.run(
+                        [_python, '-m', 'ara.setup.callback_plugins'],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                        check=True).stdout.decode().strip()
+                    self.log.info(
+                        'Ansible version %s ARA callback plugin: %s', version, result)
+                except Exception:
+                    self.log.exception(
+                        'Ansible version %s ARA not installed' % version)
+        return result
 
     def getAnsibleCommand(self, version, command='ansible-playbook'):
         ansible = self._getAnsible(version)

@@ -1067,6 +1067,9 @@ class AnsibleJob(object):
 
         plugin_dir = self.executor_server.ansible_manager.getAnsiblePluginDir(
             self.ansible_version)
+        self.callback_plugins = \
+            self.executor_server.ansible_manager.getCallbackPlugins(
+                self.ansible_version)
         self.library_dir = os.path.join(plugin_dir, 'library')
         self.action_dir = os.path.join(plugin_dir, 'action')
         self.callback_dir = os.path.join(plugin_dir, 'callback')
@@ -2864,6 +2867,9 @@ class AnsibleJob(object):
 
     def writeAnsibleConfig(self, jobdir_playbook):
         callback_path = self.callback_dir
+        if self.callback_plugins:
+            for callback in self.callback_plugins:
+                callback_path = callback_path + ':%s' % (os.path.dirname(callback))
         with open(jobdir_playbook.ansible_config, 'w') as config:
             config.write('[defaults]\n')
             config.write('inventory = %s\n' % jobdir_playbook.inventory)
@@ -2969,6 +2975,9 @@ class AnsibleJob(object):
                     for key, value in os.environ.copy().items()
                     if not key.startswith("ZUUL_")}
         env_copy.update(self.ssh_agent.env)
+        if self.callback_plugins and 'ANSIBLE_PLUGIN_LOG_VARS' in env_copy:
+            for item in env_copy['ANSIBLE_PLUGIN_LOG_VARS']:
+                env_copy[item] = self.jobdir.logging_json
         env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOB_FAILURE_OUTPUT'] = self.failure_output
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root
