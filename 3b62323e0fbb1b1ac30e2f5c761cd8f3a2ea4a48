@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4bc467c6_5497d004",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 1002,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-04T23:49:21Z",
+      "side": 1,
+      "message": "Yep, that\u0027s what I\u0027m thinking.  Basically, optional \"project variables\" where we would use sane defaults.  Almost certainly only useful for general jobs (like python tox/nox, nodejs, etc -- not project-specific jobs where you know there would definitely be a file).",
+      "parentUuid": "1e1b77f4_bb5a6dc5",
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8e6e6e04_4f5da2c3",
         "filename": "tests/fixtures/config/include-vars/git/org_project1/zuul.yaml",
         "patchSetId": 4
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-04T21:53:58Z",
       "side": 1,
       "message": "Does this implicitly require project2? I think I find that to be a bit unintuitive. I would consider it necessary to require project2 and then you can load vars from it. Otherwise error?",
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c0a0c86_a8dd45b2",
+        "filename": "tests/fixtures/config/include-vars/git/org_project1/zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-04T23:49:21Z",
+      "side": 1,
+      "message": "It behaves like the \"roles\" job attribute, which is why I chose to implement it this way.  And just like roles, it might not appear in the working directory checkout (unless they are explicitly required by required-projects).",
+      "parentUuid": "8e6e6e04_4f5da2c3",
       "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -54,6 +90,24 @@
         "endLine": 10818,
         "endChar": 61
       },
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fd90d8b_08028605",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 10818,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-04T23:49:21Z",
+      "side": 1,
+      "message": "You are right... more like waiting for all jobs to start.",
+      "parentUuid": "991012f9_bb72e1ee",
       "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -94,6 +148,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6884f8c9_fa8a04a3",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3083,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-04T23:49:21Z",
+      "side": 1,
+      "message": "Good idea.",
+      "parentUuid": "63e3ccb4_4b139c5c",
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4bdaca27_a0d9ec5e",
         "filename": "zuul/model.py",
         "patchSetId": 4
@@ -105,6 +177,24 @@
       "writtenOn": "2024-10-04T21:53:58Z",
       "side": 1,
       "message": "This line seems redundant with the one on line 3336.",
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c510889_de2a427b",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3314,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-04T23:49:21Z",
+      "side": 1,
+      "message": "Yes it is.",
+      "parentUuid": "4bdaca27_a0d9ec5e",
       "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
