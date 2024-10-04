@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e1b77f4_bb5a6dc5",
+        "filename": "doc/source/config/job.rst",
+        "patchSetId": 4
+      },
+      "lineNbr": 1002,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-04T21:53:58Z",
+      "side": 1,
+      "message": "I\u0027m a little curious about what sorts of situations we think it would be ok to not have the file be present. Is that for the python/js version variables file that may fallback to sane defaults?",
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e6e6e04_4f5da2c3",
+        "filename": "tests/fixtures/config/include-vars/git/org_project1/zuul.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-04T21:53:58Z",
+      "side": 1,
+      "message": "Does this implicitly require project2? I think I find that to be a bit unintuitive. I would consider it necessary to require project2 and then you can load vars from it. Otherwise error?",
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "991012f9_bb72e1ee",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 10818,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-04T21:53:58Z",
+      "side": 1,
+      "message": "I don\u0027t think this string is accurate since we\u0027re holding jobs in build they won\u0027t finish until later. Instead we\u0027re waiting for them to enqueue after the parent finishes?",
+      "range": {
+        "startLine": 10818,
+        "startChar": 31,
+        "endLine": 10818,
+        "endChar": 61
+      },
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d626899_c77a2ed6",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 2710,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-04T21:53:58Z",
+      "side": 1,
+      "message": "This line replaces the line removed at ~line 1096. Mostly a mental note to myself and other reviewers of what is happening here.",
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63e3ccb4_4b139c5c",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3083,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-04T21:53:58Z",
+      "side": 1,
+      "message": "Should this line have a schema comment since we should be able to remove it in the future once the schema is new enough?",
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4bdaca27_a0d9ec5e",
+        "filename": "zuul/model.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3314,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-04T21:53:58Z",
+      "side": 1,
+      "message": "This line seems redundant with the one on line 3336.",
+      "revId": "3b62323e0fbb1b1ac30e2f5c761cd8f3a2ea4a48",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
