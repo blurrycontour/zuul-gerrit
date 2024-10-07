@@ -299,29 +299,42 @@ class Console(object):
         self.logfile.write(outln)
 
 
-def follow(stdout, stderr, log_uuid):
+def _follow(fd, log_lines, console):
     newline_warning = False
+    while True:
+        line = fd.readline()
+        if not line:
+            break
+        log_lines.append(line)
+        if not line[-1] != b'\n':
+            line += b'\n'
+            newline_warning = True
+        console.addLine(line)
+    if newline_warning:
+        console.addLine('[Zuul] No trailing newline\n')
+
+
+def follow(stdout, stderr, log_uuid):
+    threads = []
     with Console(log_uuid) as console:
-        rselect = list(s for s in (stdout, stderr) if s is not None)
-        while True:
-            if not rselect:
-                break
-            rready, _, __ = select.select(rselect, [], [])
-            for fd in rready:
-                line = fd.readline()
-                if not line:
-                    rselect.remove(fd)
-                    continue
-                if fd == stdout:
-                    _log_lines.append(line)
-                else:
-                    _stderr_log_lines.append(line)
-                if not line[-1] != b'\n':
-                    line += b'\n'
-                    newline_warning = True
-                console.addLine(line)
-        if newline_warning:
-            console.addLine('[Zuul] No trailing newline\n')
+        if stdout:
+            t = threading.Thread(
+                target=_follow,
+                args=(stdout, _log_lines, console)
+            )
+            t.daemon = True
+            t.start()
+            threads.append(t)
+        if stderr:
+            t = threading.Thread(
+                target=_follow,
+                args=(stderr, _stderr_log_lines, console)
+            )
+            t.daemon = True
+            t.start()
+            threads.append(t)
+        for t in threads:
+            t.join()
 
 
 # Taken from ansible/module_utils/basic.py ... forking the method for now
