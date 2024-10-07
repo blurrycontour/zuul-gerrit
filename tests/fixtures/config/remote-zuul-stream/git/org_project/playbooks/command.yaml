@@ -145,3 +145,11 @@
       loop:
         - 1
         - 2
+
+# Test large output
+- hosts: all
+  tasks:
+    - name: Output 70KB each to stdout and stderr
+      # We use print (as opposed to write) so this uses buffered
+      # output in order to encourage a deadlock.
+      command: python3 -c 'import sys; print("x" * 70000, file=sys.stdout); print("x" * 70000, file=sys.stderr)'
