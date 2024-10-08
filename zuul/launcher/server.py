@@ -702,6 +702,7 @@ class Launcher:
 
     def downloadArtifact(self, image_build_artifact):
         path = os.path.join(self.temp_dir, image_build_artifact.uuid)
+        # TODO: verify checksum here
         with open(path, 'wb') as f:
             with requests.get(image_build_artifact.url, stream=True) as resp:
                 for chunk in resp.iter_content(chunk_size=1024 * 8):
