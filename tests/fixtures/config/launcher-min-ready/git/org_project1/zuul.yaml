@@ -11,6 +11,7 @@
     image: debian
     flavor: normal
     min-ready: 1
+    max-ready-age: 900
 
 - section:
     name: aws-europe-base

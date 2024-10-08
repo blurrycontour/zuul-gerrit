@@ -551,6 +551,13 @@ class TestMinReadyLauncher(LauncherBaseTestCase):
     config_file = 'zuul-launcher-multi-region.conf'
     tenant_config_file = "config/launcher-min-ready/main.yaml"
 
+    def _nodes_by_label(self):
+        nodes = self.launcher.api.nodes_cache.getItems()
+        nodes_by_label = defaultdict(list)
+        for node in nodes:
+            nodes_by_label[node.label].append(node)
+        return nodes_by_label
+
     def test_min_ready(self):
         for _ in iterate_timeout(60, "nodes to be ready"):
             nodes = self.launcher.api.nodes_cache.getItems()
@@ -616,9 +623,48 @@ class TestMinReadyLauncher(LauncherBaseTestCase):
         self.assertGreaterEqual(len(nodes), 3)
         self.assertLessEqual(len(nodes), 5)
 
+    def test_max_ready_age(self):
+        for _ in iterate_timeout(60, "nodes to be ready"):
+            nodes = self.launcher.api.nodes_cache.getItems()
+            # Since we are randomly picking a provider to fill the
+            # min-ready slots we might end up with 3-5 nodes
+            # depending on the choice of providers.
+            if not 3 <= len(nodes) <= 5:
+                continue
+            if all(n.state == n.State.READY for n in nodes):
+                break
 
-class TestMinReadyTenantVariant(LauncherBaseTestCase):
-    config_file = 'zuul-launcher-multi-region.conf'
+        self.waitUntilSettled()
+        nodes = self.launcher.api.nodes_cache.getItems()
+        self.assertGreaterEqual(len(nodes), 3)
+        self.assertLessEqual(len(nodes), 5)
+
+        nodes_by_label = self._nodes_by_label()
+        self.assertEqual(1, len(nodes_by_label['debian-emea']))
+        node = nodes_by_label['debian-emea'][0]
+
+        ctx = self.createZKContext(None)
+        try:
+            node.acquireLock(ctx)
+            node.updateAttributes(ctx, expiry_time=1)
+        finally:
+            node.releaseLock()
+
+        for _ in iterate_timeout(60, "node to be cleaned up"):
+            nodes = self.launcher.api.nodes_cache.getItems()
+            if node in nodes:
+                continue
+            if not 3 <= len(nodes) <= 5:
+                continue
+            if all(n.state == n.State.READY for n in nodes):
+                break
+
+        self.waitUntilSettled()
+        nodes_by_label = self._nodes_by_label()
+        self.assertEqual(1, len(nodes_by_label['debian-emea']))
+
+
+class TestMinReadyTenantVariant(TestMinReadyLauncher):
     tenant_config_file = "config/launcher-min-ready/tenant-variant.yaml"
 
     def test_min_ready(self):
@@ -633,10 +679,7 @@ class TestMinReadyTenantVariant(LauncherBaseTestCase):
         nodes = self.launcher.api.nodes_cache.getItems()
         self.assertEqual(5, len(nodes))
 
-        nodes_by_label = defaultdict(list)
-        for node in nodes:
-            nodes_by_label[node.label].append(node)
-
+        nodes_by_label = self._nodes_by_label()
         self.assertEqual(4, len(nodes_by_label['debian-normal']))
         debian_normal_cfg_hashes = {
             n.label_config_hash for n in nodes_by_label['debian-normal']
@@ -667,10 +710,7 @@ class TestMinReadyTenantVariant(LauncherBaseTestCase):
         nodes = self.launcher.api.nodes_cache.getItems()
         self.assertEqual(5, len(nodes))
 
-        nodes_by_label = defaultdict(list)
-        for node in nodes:
-            nodes_by_label[node.label].append(node)
-
+        nodes_by_label = self._nodes_by_label()
         self.assertEqual(1, len(nodes_by_label['debian-emea']))
         self.assertEqual(4, len(nodes_by_label['debian-normal']))
         debian_normal_cfg_hashes = {
