@@ -434,14 +434,16 @@ class TestLauncher(LauncherBaseTestCase):
             # Request should be gone
             request.refresh(ctx)
 
-        # TODO: in the future the nodes should be reused instead of being
-        # cleaned up
         for pnode in provider_nodes:
-            for _ in iterate_timeout(60, "node to be deleted"):
-                try:
-                    pnode.refresh(ctx)
-                except NoNodeError:
+            for _ in iterate_timeout(60, "node to be deallocated"):
+                pnode.refresh(ctx)
+                if pnode.request_id is None:
                     break
+
+        request = self._requestNodes(["debian-normal"])
+        self.waitUntilSettled()
+        # Node should be re-used as part of the new request
+        self.assertEqual(set(request.nodes), {n.uuid for n in provider_nodes})
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     @okay_tracebacks('_getQuotaForInstanceType')
