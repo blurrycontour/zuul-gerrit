@@ -528,6 +528,18 @@ class Launcher:
                         node.updateAttributes(ctx, state=state)
                         self.wake_event.set()
 
+            # Deallocate ready node w/o a request for re-use
+            if (node.request_id and not request
+                    and node.state == node.State.READY):
+                log.debug("Deallocating ready node %s from missing request %s",
+                          node, node.request_id)
+                with self.createZKContext(node._lock, self.log) as ctx:
+                    node.updateAttributes(
+                        ctx,
+                        request_id=None,
+                        tenant_name=None,
+                        provider=None)
+
             # Mark outdated nodes w/o a request for cleanup
             if not request and (
                     node.hasExpired() or not self._hasProvider(node)):
