@@ -1658,13 +1658,15 @@ class Label(ConfigObject):
     Labels are associated with provider-specific instance types.
     """
 
-    def __init__(self, name, image, flavor, description, min_ready):
+    def __init__(self, name, image, flavor, description, min_ready,
+                 max_ready_age):
         super().__init__()
         self.name = name
         self.image = image
         self.flavor = flavor
         self.description = description
         self.min_ready = min_ready
+        self.max_ready_age = max_ready_age
 
     @property
     def canonical_name(self):
@@ -1687,7 +1689,8 @@ class Label(ConfigObject):
                 self.image == other.image and
                 self.flavor == other.flavor and
                 self.description == other.description and
-                self.min_ready == other.min_ready)
+                self.min_ready == other.min_ready and
+                self.max_ready_age == other.max_ready_age)
 
     def toDict(self):
         sc = self.source_context
@@ -1698,6 +1701,7 @@ class Label(ConfigObject):
             'flavor': self.flavor,
             'description': self.description,
             'min_ready': self.min_ready,
+            'max_ready_age': self.max_ready_age,
         }
 
     def validateReferences(self, layout):
@@ -2445,6 +2449,7 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             uuid=uuid4().hex,
             request_id=None,
             zuul_event_id=None,
+            expiry_time=None,
             state=self.State.REQUESTED,
             label="",
             label_config_hash=None,
@@ -2504,6 +2509,7 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             uuid=self.uuid,
             request_id=self.request_id,
             zuul_event_id=self.zuul_event_id,
+            expiry_time=self.expiry_time,
             state=self.state,
             label=self.label,
             label_config_hash=self.label_config_hash,
@@ -2515,6 +2521,9 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             **self.getDriverData(),
         )
         return json.dumps(data, sort_keys=True).encode("utf-8")
+
+    def hasExpired(self):
+        return self.expiry_time and self.expiry_time < time.time()
 
     def getDriverData(self):
         return dict()
