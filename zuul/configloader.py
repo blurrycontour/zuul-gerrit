@@ -467,6 +467,7 @@ class LabelParser(object):
         vs.Required('flavor'): str,
         'description': str,
         'min-ready': int,
+        'max-ready-age': int,
     }
     schema = vs.Schema(label)
 
@@ -479,7 +480,8 @@ class LabelParser(object):
         self.schema(conf)
 
         label = model.Label(conf['name'], conf['image'], conf['flavor'],
-                            conf.get('description'), conf.get('min-ready'))
+                            conf.get('description'), conf.get('min-ready'),
+                            conf.get('max-ready-age'))
         label.source_context = conf.get('_source_context')
         label.start_mark = conf.get('_start_mark')
         label.freeze()
@@ -3004,7 +3006,7 @@ class TenantParser(object):
                 with parse_context.accumulator.catchErrors():
                     label.validateReferences(shadow_layout)
         for section in shadow_layout.sections.values():
-            with parse_context.errorContext(stanza='section', conf=label):
+            with parse_context.errorContext(stanza='section', conf=section):
                 with parse_context.accumulator.catchErrors():
                     section.validateReferences(shadow_layout)
         # Add providers to the shadow (or real) layout
