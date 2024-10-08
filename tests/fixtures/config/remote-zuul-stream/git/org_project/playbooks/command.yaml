@@ -172,3 +172,18 @@
       # We use print (as opposed to write) so this uses buffered
       # output in order to encourage a deadlock.
       command: python3 -c 'import sys; print("x" * 70000, file=sys.stdout); print("x" * 70000, file=sys.stderr)'
+
+- hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Add a fake host
+      add_host:
+        hostname: fake
+        ansible_host: notexisting.example.notexisting
+
+- hosts: fake
+  gather_facts: no
+  tasks:
+    - name: Skip a command on an unreachable host
+      command: echo nope
+      when: false

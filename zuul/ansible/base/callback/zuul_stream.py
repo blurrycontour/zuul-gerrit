@@ -114,6 +114,7 @@ class Streamer:
         self.log_id = log_id
         self._zuul_console_version = 0
         self.stopped = False
+        self.connected = False
 
     def start(self):
         self.thread = threading.Thread(target=self._read_log)
@@ -133,7 +134,7 @@ class Streamer:
 
     def _read_log_connect(self):
         logger_retries = 0
-        while True:
+        while not self.stopped:
             try:
                 s = socket.create_connection((self.ip, self.port), 5)
                 # Disable the socket timeout after we have successfully
@@ -155,25 +156,34 @@ class Streamer:
                 s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 9)
                 return s
             except socket.timeout:
-                self.callback._log_streamline(
-                    "localhost",
-                    "Timeout exception waiting for the logger. "
-                    "Please check connectivity to [%s:%s]"
-                    % (self.ip, self.port),
-                    stopped=True)
+                if not self.stopped:
+                    self.callback._log_streamline(
+                        "localhost",
+                        "Timeout exception waiting for the logger. "
+                        "Please check connectivity to [%s:%s]"
+                        % (self.ip, self.port),
+                        stopped=True)
                 return None
             except Exception:
+                if self.stopped:
+                    return None
                 if logger_retries % 10 == 0:
                     self.callback._log("[%s] Waiting on logger" % self.host)
                 logger_retries += 1
                 time.sleep(0.1)
                 continue
+        self.connected = True
 
     def _read_log(self):
         s = self._read_log_connect()
         if s is None:
             # Can't connect; _read_log_connect() already logged an
             # error for us, just bail
+            return
+
+        # If we were asked to stop during the connection attempt, return
+        # now.
+        if self.stopped:
             return
 
         # Find out what version we are running against
@@ -501,10 +511,15 @@ class CallbackModule(default.CallbackModule):
             return
         # Give no grace since we don't expect the log to exist
         streamer.stop(0)
-        streamer.join(30)
-        if streamer.is_alive():
-            msg = "[Zuul] Log Stream did not terminate"
-            self._log(msg)
+        # If the streamer connected, then we need to wait to join the
+        # thread.  If not, then we can skip it because even if the
+        # streamer is still attempting to connect, it will exit before
+        # doing anything else.
+        if streamer.connected:
+            streamer.join(30)
+            if streamer.is_alive():
+                msg = "[Zuul] Log Stream did not terminate"
+                self._log(msg)
 
     def _process_result_for_localhost(self, result, is_task=True):
         result_dict = dict(result._result)
