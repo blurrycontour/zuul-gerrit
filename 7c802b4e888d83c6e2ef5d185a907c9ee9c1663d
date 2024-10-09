@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fad0db3c_c1fc6849",
+        "filename": "tests/unit/test_openstack_driver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-09T18:45:50Z",
+      "side": 1,
+      "message": "The requestNodes method actually does wait for the result event for the request, so we should be stable here.  waitUntilSettled would actually be a noop because of the way requestNodes uses the pipeline lock to get the result event.",
+      "parentUuid": "9b604f43_caf2dea8",
+      "revId": "7c802b4e888d83c6e2ef5d185a907c9ee9c1663d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b58dd62_9930249a",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-10-09T18:38:42Z",
       "side": 1,
       "message": "See above. We wait at this point after accepting the nodeset on the client side. This makes the refresh below non racy I think.",
+      "revId": "7c802b4e888d83c6e2ef5d185a907c9ee9c1663d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ab78421_4c273ac9",
+        "filename": "tests/unit/test_openstack_driver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-09T18:45:50Z",
+      "side": 1,
+      "message": "TBH, I\u0027m not sure the wait is needed here; I think the action we\u0027re checking below is actually synchronous.  Doesn\u0027t hurt though.",
+      "parentUuid": "4b58dd62_9930249a",
       "revId": "7c802b4e888d83c6e2ef5d185a907c9ee9c1663d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
