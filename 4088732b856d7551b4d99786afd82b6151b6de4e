@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e69d3b2_bdee0a85",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37071
+      },
+      "writtenOn": "2024-10-09T07:51:42Z",
+      "side": 1,
+      "message": "Updated the job-content.rst file, as suggested.",
+      "revId": "4088732b856d7551b4d99786afd82b6151b6de4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
