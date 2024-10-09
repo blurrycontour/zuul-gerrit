@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2dd770ef_8715304f",
+        "filename": "tests/fixtures/zuul-launcher-multi-region.conf",
+        "patchSetId": 19
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-09T20:25:58Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s relevant for this change, but this stands out since this isn\u0027t how I would expect this to be set up.\n\nNormally I\u0027d expect a single AWS connection with a single credential, and that credential has access to multiple regions.  Each region would be a section with the same connection.\n\nSince this is early work, I\u0027m a little worried about copy-pasta from this and people getting the idea that this is how you have multiple regions.  Is this necessary here, or can we put two sections on the same connection?",
+      "revId": "766ee0e849c81be906c689dd2284d6393a4a25ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a09bc1d8_e4765de4",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-09T20:25:58Z",
+      "side": 1,
+      "message": "I\u0027d say \"assigned ready node\" since we will have ready nodes that are not the result of min-ready (nodes that were created for aborted jobs).",
+      "revId": "766ee0e849c81be906c689dd2284d6393a4a25ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9e117de_8c5ea479",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-09T20:25:58Z",
+      "side": 1,
+      "message": "These are nodes without a request *and* this launcher does not have a provider for it; so the idea is another launcher will handle that, right?\n\nI guess we would need a two-launcher test case to test this, right?  That\u0027s probably worth doing at some point (but probably doesn\u0027t have to happen in this change).",
+      "revId": "766ee0e849c81be906c689dd2284d6393a4a25ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
