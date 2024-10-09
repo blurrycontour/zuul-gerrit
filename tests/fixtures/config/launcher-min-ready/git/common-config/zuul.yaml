@@ -127,6 +127,24 @@
     parent: aws-base
     region: us-east-1
 
+- section:
+    name: aws-eu-central-1
+    parent: aws-base
+    region: eu-central-1
+    flavors:
+      - name: normal
+        instance-type: t3.medium
+
+- section:
+    name: aws-ca-central-1
+    parent: aws-base
+    region: ca-central-1
+    flavors:
+      - name: normal
+        # This section is mapping a small instance to the
+        # 'normal' flavor in contrast to the 'aws-us-east-1' section.
+        instance-type: t3.small
+
 - provider:
     name: aws-us-east-1-main
     section: aws-us-east-1
