@@ -548,7 +548,6 @@ class TestLauncher(LauncherBaseTestCase):
 
 
 class TestMinReadyLauncher(LauncherBaseTestCase):
-    config_file = 'zuul-launcher-multi-region.conf'
     tenant_config_file = "config/launcher-min-ready/main.yaml"
 
     def test_min_ready(self):
@@ -618,10 +617,30 @@ class TestMinReadyLauncher(LauncherBaseTestCase):
 
 
 class TestMinReadyTenantVariant(LauncherBaseTestCase):
-    config_file = 'zuul-launcher-multi-region.conf'
     tenant_config_file = "config/launcher-min-ready/tenant-variant.yaml"
 
     def test_min_ready(self):
+        # tenant-one:
+        #   common-config:
+        #     Provider aws-us-east-1-main
+        #       debian-normal (t3.medium)  (hash A)
+        #   project1:
+        #     Provider aws-eu-central-1-main
+        #       debian-emea
+        #     Provider aws-ca-central-1-main
+        #       debian-normal (t3.small)   (hash B)
+        # tenant-two:
+        #   common-config:
+        #     Provider aws-us-east-1-main
+        #       debian-normal (t3.medium)  (hash C)
+        #   project2:
+        #     Image debian (for tenant 2)
+
+        # min-ready=2 for debian-normal
+        #   2 from aws-us-east-1-main
+        #   2 from aws-ca-central-1-main
+        # min-ready=1 for debian-emea
+        #   1 from aws-eu-central-1-main
         for _ in iterate_timeout(60, "nodes to be ready"):
             nodes = self.launcher.api.nodes_cache.getItems()
             if len(nodes) != 5:
@@ -641,7 +660,10 @@ class TestMinReadyTenantVariant(LauncherBaseTestCase):
         debian_normal_cfg_hashes = {
             n.label_config_hash for n in nodes_by_label['debian-normal']
         }
-        self.assertEqual(2, len(debian_normal_cfg_hashes))
+        # We will get 2 nodes with hash C, and then 2 nodes with hash
+        # A or B, so that's 2 or 3 hashes.
+        self.assertGreaterEqual(len(debian_normal_cfg_hashes), 2)
+        self.assertLessEqual(len(debian_normal_cfg_hashes), 3)
 
         files = {
             'zuul-extra.d/image.yaml': textwrap.dedent(
@@ -676,7 +698,8 @@ class TestMinReadyTenantVariant(LauncherBaseTestCase):
         debian_normal_cfg_hashes = {
             n.label_config_hash for n in nodes_by_label['debian-normal']
         }
-        self.assertEqual(2, len(debian_normal_cfg_hashes))
+        self.assertGreaterEqual(len(debian_normal_cfg_hashes), 2)
+        self.assertLessEqual(len(debian_normal_cfg_hashes), 3)
 
 
 class TestLauncherImagePermissions(ZuulTestCase):

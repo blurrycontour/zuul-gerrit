@@ -378,7 +378,7 @@ class Launcher:
                                 tags=tags,
                             )
                         ready_nodes[label.name].remove(node)
-                        log.debug("Assigned min-ready node %s", node.uuid)
+                        log.debug("Assigned ready node %s", node.uuid)
                         break
                     except Exception:
                         log.exception("Faild to assign ready node %s", node)
@@ -601,7 +601,7 @@ class Launcher:
                 self.system.system_id, label, node_uuid)
             node_class = provider.driver.getProviderNodeClass()
             with self.createZKContext(None, self.log) as ctx:
-                node_class.new(
+                node = node_class.new(
                     ctx,
                     uuid=node_uuid,
                     label=label.name,
@@ -613,6 +613,8 @@ class Launcher:
                     provider=None,
                     tags=tags,
                 )
+                self.log.debug("Created min-ready node %s via provider %s",
+                               node, provider)
 
     def _getMissingMinReadySlots(self):
         candidate_launchers = {
