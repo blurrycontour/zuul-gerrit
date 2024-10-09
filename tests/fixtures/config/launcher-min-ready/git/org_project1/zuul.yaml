@@ -1,46 +1,8 @@
-- project:
-    check:
-      jobs:
-        - check-job
-    gate:
-      jobs:
-        - check-job
-
 - label:
     name: debian-emea
     image: debian
     flavor: normal
     min-ready: 1
-
-- section:
-    name: aws-europe-base
-    abstract: true
-    connection: aws-europe
-    boot-timeout: 120
-    launch-timeout: 600
-    launch-attempts: 2
-    object-storage:
-      bucket-name: zuul
-    # TODO
-    # key-name: zuul
-    flavors:
-      - name: normal
-        instance-type: t3.medium
-      - name: large
-        instance-type: t3.large
-      - name: dedicated
-        instance-type: t3.large
-        dedicated-host: True
-      - name: invalid
-        instance-type: invalid
-    images:
-      - name: debian
-        image-id: ami-1e749f67
-
-- section:
-    name: aws-eu-central-1
-    parent: aws-europe-base
-    region: eu-central-1
 
 - provider:
     name: aws-eu-central-1-main
@@ -49,31 +11,17 @@
       - name: debian-emea
         key-name: zuul
 
-- section:
-    name: aws-ca-central-1
-    # FIXME: why do we need to mark this as not abstract?
-    abstract: False
-    connection: aws
-    boot-timeout: 120
-    launch-timeout: 600
-    launch-attempts: 2
-    object-storage:
-      bucket-name: zuul
-    # TODO
-    # key-name: zuul
-    flavors:
-      - name: normal
-        # This section is mapping a small instance to the
-        # 'normal' flavor in contrast to the 'aws-us-east-1' section.
-        instance-type: t3.small
-    images:
-      - name: debian
-        image-id: ami-1e749f67
-    region: aws-ca-central-1
-
 - provider:
     name: aws-ca-central-1-main
     section: aws-ca-central-1
     labels:
       - name: debian-normal
         key-name: zuul
+
+- project:
+    check:
+      jobs:
+        - check-job
+    gate:
+      jobs:
+        - check-job
