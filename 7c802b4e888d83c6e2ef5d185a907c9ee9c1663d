@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1186b803_6cacb954",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-09T18:38:42Z",
+      "side": 1,
+      "message": "I\u0027ll be honest I mostly skimmed the actual driver implementation as I know this is largely and adaptation of existing code in nodepool. Instead I tried to review the new code whcih is primarily tests and fixtures.\n\nI did find one thing that may create race condition problems in the test case which I noted inline but otherwise this looks how I expected it to.",
+      "revId": "7c802b4e888d83c6e2ef5d185a907c9ee9c1663d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b604f43_caf2dea8",
+        "filename": "tests/unit/test_openstack_driver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-09T18:38:42Z",
+      "side": 1,
+      "message": "Do we need to wait for settled or similar here to ensure the nodeset request state has moved to fulfilled instead of requested? I suspect in the test framework this is very fast but it could still race depending on thread scheduling?",
+      "revId": "7c802b4e888d83c6e2ef5d185a907c9ee9c1663d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b58dd62_9930249a",
+        "filename": "tests/unit/test_openstack_driver.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-09T18:38:42Z",
+      "side": 1,
+      "message": "See above. We wait at this point after accepting the nodeset on the client side. This makes the refresh below non racy I think.",
+      "revId": "7c802b4e888d83c6e2ef5d185a907c9ee9c1663d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
