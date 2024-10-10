@@ -16,6 +16,23 @@
       "message": "PS20 resolved a merge conflict",
       "revId": "43fd705c946262ba4f308eec2f2dd482bbede141",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eee2f101_0cd032f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 20
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-10T10:19:30Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "43fd705c946262ba4f308eec2f2dd482bbede141",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
