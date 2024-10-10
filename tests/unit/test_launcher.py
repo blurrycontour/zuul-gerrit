@@ -119,6 +119,17 @@ class TestLauncher(ZuulTestCase):
         self.mock_aws.stop()
         super().tearDown()
 
+    @simple_layout('layouts/nodepool-missing-connection.yaml', enable_nodepool=True)
+    def test_launcher_missing_connection(self):
+        tenant = self.scheds.first.sched.abide.tenants.get("tenant-one")
+        errors = tenant.layout.loading_errors
+        self.assertEqual(len(errors), 1)
+
+        idx = 0
+        self.assertEqual(errors[idx].severity, model.SEVERITY_ERROR)
+        self.assertEqual(errors[idx].name, 'Unknown Connection')
+        self.assertIn('provider stanza', errors[idx].error)
+
     @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
     @return_data(
         'build-debian-local-image',
