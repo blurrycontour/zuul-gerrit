@@ -347,11 +347,7 @@ class TestLauncher(ZuulTestCase):
                 image: debian-local
                 flavor: normal
             - section:
-                name: aws-base
-                abstract: true
-            - section:
                 name: aws-us-east-1
-                parent: aws-base
                 connection: aws
                 region: us-east-1
                 boot-timeout: 120
