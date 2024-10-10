@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f39b1c09_f365cf89",
+        "filename": "tests/unit/test_launcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-10T21:53:29Z",
+      "side": 1,
+      "message": "Why do we use a loop here when the list has a single entry?",
+      "revId": "0abdbe111b95084366101748c9491a08ff88b497",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
