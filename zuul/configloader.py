@@ -3481,6 +3481,13 @@ class ConfigLoader(object):
             # time. So we do not support dynamic semaphore
             # configuration changes.
             layout.semaphores = tenant.layout.semaphores
+            # We also don't support dynamic changes to
+            # provider-related objects.
+            layout.images = tenant.layout.images
+            layout.flavors = tenant.layout.flavors
+            layout.labels = tenant.layout.labels
+            layout.sections = tenant.layout.sections
+            layout.providers = tenant.layout.providers
             dynamic_layout = True
         else:
             dynamic_layout = False

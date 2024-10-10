@@ -20,6 +20,7 @@ from zuul.launcher.client import LauncherClient
 
 import responses
 import testtools
+import textwrap
 from kazoo.exceptions import NoNodeError
 from moto import mock_aws
 import boto3
@@ -322,6 +323,134 @@ class TestLauncher(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(self.getJobFromHistory('check-job').node,
                          'debian-normal')
+
+    @simple_layout('layouts/nodepool-untrusted-conf.yaml',
+                   enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        debian_return_data,
+    )
+    @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
+                return_value="test_external_id")
+    def test_launcher_untrusted_project(self, mock_uploadImage):
+        # Test that we can add all the configuration in an untrusted
+        # project (most other tests just do everything in a
+        # config-project).
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - image: {'name': 'debian-local', 'type': 'zuul'}
+            - flavor: {'name': 'normal'}
+            - label:
+                name: debian-local-normal
+                image: debian-local
+                flavor: normal
+            - section:
+                name: aws-base
+                abstract: true
+            - section:
+                name: aws-us-east-1
+                parent: aws-base
+                connection: aws
+                region: us-east-1
+                boot-timeout: 120
+                launch-timeout: 600
+                object-storage:
+                  bucket-name: zuul
+                flavors:
+                  - name: normal
+                    instance-type: t3.medium
+                images:
+                  - name: debian-local
+            - provider:
+                name: aws-us-east-1-main
+                section: aws-us-east-1
+                labels:
+                  - name: debian-local-normal
+                    key-name: zuul
+            """)
+
+        file_dict = {'zuul.d/images.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: build-debian-local-image
+                image-build-name: debian-local
+            - project:
+                check:
+                  jobs:
+                    - build-debian-local-image
+                gate:
+                  jobs:
+                    - build-debian-local-image
+                image-build:
+                  jobs:
+                    - build-debian-local-image
+            """)
+        file_dict = {'zuul.d/image-jobs.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        B.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', changes='1,1'),
+            dict(name='test-job', result='SUCCESS', changes='2,1'),
+            dict(name='build-debian-local-image', result='SUCCESS',
+                 changes='2,1'),
+        ], ordered=False)
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        for _ in iterate_timeout(
+                30, "scheduler and launcher to have the same layout"):
+            if (self.scheds.first.sched.local_layout_state.get("tenant-one") ==
+                self.launcher.local_layout_state.get("tenant-one")):
+                break
+
+        # The build should not run again because the image is no
+        # longer missing
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='test-job', result='SUCCESS', changes='1,1'),
+            dict(name='test-job', result='SUCCESS', changes='2,1'),
+            dict(name='build-debian-local-image', result='SUCCESS',
+                 changes='2,1'),
+            dict(name='build-debian-local-image', result='SUCCESS',
+                 ref='refs/heads/master'),
+        ], ordered=False)
+        for name in [
+                'review.example.com%2Forg%2Fproject/debian-local',
+        ]:
+            artifacts = self.launcher.image_build_registry.\
+                getArtifactsForImage(name)
+            self.assertEqual(2, len(artifacts))
+            self.assertEqual('qcow2', artifacts[0].format)
+            self.assertEqual('raw', artifacts[1].format)
+            self.assertTrue(artifacts[0].validated)
+            self.assertTrue(artifacts[1].validated)
+            uploads = self.launcher.image_upload_registry.getUploadsForImage(
+                name)
+            self.assertEqual(1, len(uploads))
+            self.assertEqual(artifacts[1].uuid, uploads[0].artifact_uuid)
+            self.assertEqual("test_external_id", uploads[0].external_id)
+            self.assertTrue(uploads[0].validated)
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_launcher_missing_label(self):
