@@ -3011,8 +3011,10 @@ class TenantParser(object):
                 with parse_context.accumulator.catchErrors():
                     flat_config = provider_config.flattenConfig(shadow_layout)
                     connection_name = flat_config.get('connection')
-                    connection = parse_context.connections.connections[
-                        connection_name]
+                    connection = parse_context.connections.connections.get(
+                        connection_name)
+                    if connection is None:
+                        raise UnknownConnection(connection_name)
                     schema = connection.driver.getProviderSchema()
                     schema(flat_config)
                     provider = connection.driver.getProvider(
