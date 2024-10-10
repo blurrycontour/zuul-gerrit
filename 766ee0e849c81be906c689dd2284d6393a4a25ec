@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "863eba38_5176419a",
+        "filename": "tests/fixtures/zuul-launcher-multi-region.conf",
+        "patchSetId": 19
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-10T09:23:27Z",
+      "side": 1,
+      "message": "Ack, I don\u0027t think we need a second AWS connection.",
+      "parentUuid": "f8212fde_3176f431",
+      "revId": "766ee0e849c81be906c689dd2284d6393a4a25ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a09bc1d8_e4765de4",
@@ -71,6 +89,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "516e2970_69cd8366",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-10T09:23:27Z",
+      "side": 1,
+      "message": "Ack, that makes sense!",
+      "parentUuid": "4c4d3280_4ae5ddba",
+      "revId": "766ee0e849c81be906c689dd2284d6393a4a25ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9e117de_8c5ea479",
@@ -84,6 +120,24 @@
       "writtenOn": "2024-10-09T20:25:58Z",
       "side": 1,
       "message": "These are nodes without a request *and* this launcher does not have a provider for it; so the idea is another launcher will handle that, right?\n\nI guess we would need a two-launcher test case to test this, right?  That\u0027s probably worth doing at some point (but probably doesn\u0027t have to happen in this change).",
+      "revId": "766ee0e849c81be906c689dd2284d6393a4a25ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca8743aa_720c88df",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-10T09:23:27Z",
+      "side": 1,
+      "message": "We expect all launchers to have a complete view of all providers. So when we can not find a provider, this means that the label config changed and we no longer have a provider that\u0027s using this particular label config.\n\nSince we won\u0027t be able to use nodes with an outdated label config we mark them for cleanup.\n\nHaving said that, I\u0027m wondering if we need to make sure our local provider layouts are up-to-date. Otherwise there might be race-conditions when a launcher already updated to a newer provider, created min-ready nodes and the launcher processing such a min-ready node can\u0027t find a matching provider yet.",
+      "parentUuid": "b9e117de_8c5ea479",
       "revId": "766ee0e849c81be906c689dd2284d6393a4a25ec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
