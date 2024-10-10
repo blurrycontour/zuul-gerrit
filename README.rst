@@ -3,15 +3,15 @@ Zuul
 
 Zuul is a project gating system.
 
-The latest documentation for Zuul v3 is published at:
+The latest documentation for the current version of Zuul is published at:
 https://zuul-ci.org/docs/zuul/
 
 If you are looking for the Edge routing service named Zuul that is
 related to Netflix, it can be found here:
 https://github.com/Netflix/zuul
 
-If you are looking for the Javascript testing tool named Zuul, it
-can be found here:
+If you are looking for the Javascript testing tool named Zuul, its
+archive can be found here:
 https://github.com/defunctzombie/zuul
 
 Getting Help
@@ -40,7 +40,7 @@ Bugs are handled at: https://storyboard.openstack.org/#!/project/zuul/zuul
 
 Suspected security vulnerabilities are most appreciated if first
 reported privately following any of the supported mechanisms
-described at https://zuul-ci.org/docs/zuul/user/vulnerabilities.html
+described at https://zuul-ci.org/docs/zuul/latest/vulnerabilities.html
 
 Code reviews are handled by gerrit at https://review.opendev.org
 
