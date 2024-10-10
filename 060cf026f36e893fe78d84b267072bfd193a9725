@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba7e7f26_3b499239",
+        "filename": "tests/unit/test_launcher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 624,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-10T21:59:58Z",
+      "side": 1,
+      "message": "I\u0027m not sure if we do this anywhere else... But this will inherit both tests above, then override test_min_ready to do something different.  test_max_ready_age can run as written.\n\nThis seems like it might cause confusion later (once we forget about this inheritance).  But maybe most tests we write will be like test_max_ready_age and work in both places.  I\u0027m okay giving this a try (and if it\u0027s problematic, we can unwind it later), assuming that was your intent.  :)",
+      "revId": "060cf026f36e893fe78d84b267072bfd193a9725",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f926f792_4df75c7e",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-10T21:59:58Z",
+      "side": 1,
+      "message": "My inclination would be to set this when a label transitions to the ready state.  This patch has 2 places where this happens, and we\u0027re going to add a third in the next patch when we reuse nodes.  If we just start out with a setter for state (or method or something) that sets this every time we set state\u003dready, that would simplify things a bit, make it more future proof, and also, just a little more accurate dpending on how long clouds take to launch nodes.  :)\n\n(Also, in nodepool, we had a state_time which was really useful for knowing how long a node had been in a state; we may still want that in Zuul).\n\nNot a minus 1, but I do think it\u0027s worth doing either now or later.",
+      "revId": "060cf026f36e893fe78d84b267072bfd193a9725",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
