@@ -69,6 +69,24 @@
       "parentUuid": "f926f792_4df75c7e",
       "revId": "060cf026f36e893fe78d84b267072bfd193a9725",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "443c09a1_49b82f7f",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-11T09:37:56Z",
+      "side": 1,
+      "message": "Follow-up https://review.opendev.org/c/zuul/zuul/+/932170",
+      "parentUuid": "c9e064b1_5279f4b5",
+      "revId": "060cf026f36e893fe78d84b267072bfd193a9725",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
