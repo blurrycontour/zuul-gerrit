@@ -449,17 +449,14 @@ class Launcher:
         tags = provider.getNodeTags(
             self.system.system_id, label, node_uuid, provider, request)
         node_class = provider.driver.getProviderNodeClass()
-        expiry_time = None
-        if label.max_ready_age:
-            expiry_time = time.time() + label.max_ready_age
         node = node_class.new(
             ctx,
             uuid=node_uuid,
             label=label.name,
             label_config_hash=label.config_hash,
+            max_ready_age=label.max_ready_age,
             request_id=request.uuid,
             zuul_event_id=request.zuul_event_id,
-            expiry_time=expiry_time,
             connection_name=provider.connection_name,
             tenant_name=request.tenant_name,
             provider=provider.canonical_name,
@@ -532,7 +529,8 @@ class Launcher:
                     state = node.State.FAILED
                     log.exception("Marking node %s as %s", node, state)
                     with self.createZKContext(node._lock, self.log) as ctx:
-                        node.updateAttributes(ctx, state=state)
+                        with node.activeContext(ctx):
+                            node.setState(state)
                         self.wake_event.set()
 
             # Deallocate ready node w/o a request for re-use
@@ -553,7 +551,8 @@ class Launcher:
                 state = node.State.OUTDATED
                 log.debug("Marking node %s as %s", node, state)
                 with self.createZKContext(node._lock, self.log) as ctx:
-                    node.updateAttributes(ctx, state=state)
+                    with node.activeContext(ctx):
+                        node.setState(state)
 
             # Clean up the node if ...
             if (
@@ -614,7 +613,7 @@ class Launcher:
                     self.wake_event.set()
                     return
                 self._updateNodeFromInstance(node, instance)
-                node.state = model.ProviderNode.State.READY
+                node.setState(node.State.READY)
                 self.wake_event.set()
                 log.debug("Marking node %s as %s", node, node.state)
         node.releaseLock()
@@ -670,19 +669,16 @@ class Launcher:
             tags = provider.getNodeTags(
                 self.system.system_id, label, node_uuid)
             node_class = provider.driver.getProviderNodeClass()
-            expiry_time = None
-            if label.max_ready_age:
-                expiry_time = time.time() + label.max_ready_age
             with self.createZKContext(None, self.log) as ctx:
                 node = node_class.new(
                     ctx,
                     uuid=node_uuid,
                     label=label.name,
                     label_config_hash=label.config_hash,
+                    max_ready_age=label.max_ready_age,
                     request_id=None,
                     connection_name=provider.connection_name,
                     zuul_event_id=uuid.uuid4().hex,
-                    expiry_time=expiry_time,
                     tenant_name=None,
                     provider=None,
                     tags=tags,
