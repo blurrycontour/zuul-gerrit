@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9115b1d_b234ad49",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3075,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-11T08:55:09Z",
+      "side": 1,
+      "message": "The original intention was to avoid executor OOMs. Since the limit is quite low, maybe we can just remove the log line here (or fix the limit to actually be at 50MiB).",
+      "revId": "14d8795bd0aa0c930d2231bd3156da13fa2de101",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
