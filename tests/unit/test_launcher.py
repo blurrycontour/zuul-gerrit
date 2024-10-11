@@ -741,7 +741,7 @@ class TestMinReadyLauncher(LauncherBaseTestCase):
         ctx = self.createZKContext(None)
         try:
             node.acquireLock(ctx)
-            node.updateAttributes(ctx, expiry_time=1)
+            node.updateAttributes(ctx, state_time=0)
         finally:
             node.releaseLock()
 
