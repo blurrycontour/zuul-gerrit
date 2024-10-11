@@ -538,9 +538,14 @@ class Launcher:
                         tenant_name=None,
                         provider=None)
 
-            # Mark outdated nodes w/o a request for cleanup
+            # Mark outdated nodes w/o a request for cleanup when ...
             if not request and (
-                    node.hasExpired() or not self._hasProvider(node)):
+                    # ... it expired
+                    node.hasExpired() or
+                    # ... we are sure that our providers are up-to-date
+                    # and we can't find a provider for this node.
+                    (not self.layout_updated_event.is_set()
+                     and not self._hasProvider(node))):
                 state = node.State.OUTDATED
                 log.debug("Marking node %s as %s", node, state)
                 with self.createZKContext(node._lock, self.log) as ctx:
@@ -573,7 +578,11 @@ class Launcher:
         elif node.hasExpired():
             return True
         elif not self._hasProvider(node):
-            # We no longer have a provider that use the given node
+            if self.layout_updated_event.is_set():
+                # If our providers are not up-to-date we can't be sure
+                # there is no provider for this node.
+                return False
+            # We no longer have a provider that uses the given node
             return True
 
         return False
