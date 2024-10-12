@@ -48,20 +48,22 @@ class OpenstackDriver(Driver, ConnectionInterface, ProviderInterface):
     def getProviderNodeClass(self):
         return openstackmodel.OpenstackProviderNode
 
-    def getEndpoint(self, provider):
-        region = provider.region or ''
+    def _getEndpoint(self, connection, region):
+        region_str = region or ''
         endpoint_id = '/'.join([
-            urllib.parse.quote_plus(provider.connection.connection_name),
-            urllib.parse.quote_plus(region),
+            urllib.parse.quote_plus(connection.connection_name),
+            urllib.parse.quote_plus(region_str),
         ])
         try:
             return self.endpoints[endpoint_id]
         except KeyError:
             pass
-        endpoint = self._endpoint_class(
-            self, provider.connection, provider.region)
+        endpoint = self._endpoint_class(self, connection, region)
         self.endpoints[endpoint_id] = endpoint
         return endpoint
+
+    def getEndpoint(self, provider):
+        return self._getEndpoint(provider.connection, provider.region)
 
     def stop(self):
         for endpoint in self.endpoints.values():

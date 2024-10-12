@@ -576,6 +576,9 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
             rate_limit=self.connection.rate,
         )
 
+    def getImageFormat(self):
+        return self._client.config.config['image_format']
+
     def _submitApi(self, api, *args, **kw):
         return self.api_executor.submit(
             api, *args, **kw)

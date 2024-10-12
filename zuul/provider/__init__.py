@@ -148,7 +148,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
             config = config.copy()
             config.pop('_source_context')
             config.pop('_start_mark')
-            parsed_config = self.parseConfig(config)
+            parsed_config = self.parseConfig(config, connection)
             parsed_config.pop('connection')
             self._set(
                 driver=driver,
@@ -177,7 +177,8 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
 
         """
         raw_data, zstat = cls._loadData(context, path)
-        obj = cls._fromRaw(raw_data, zstat)
+        extra = {'connections': connections}
+        obj = cls._fromRaw(raw_data, zstat, extra)
         connection = connections.connections[obj.connection_name]
         obj._set(connection=connection,
                  driver=connection.driver)
@@ -186,9 +187,16 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
     def getProviderSchema(self):
         return self.schema
 
-    def parseConfig(self, config):
+    def parseProviderConfig(self, config):
+        """Parse the provider config without any images/labels/flavors
+        so that the other objects can collect any information they
+        need from the cloud region when they are parsed"""
         schema = self.getProviderSchema()
         ret = schema(config)
+        return ret
+
+    def parseFullConfig(self, config):
+        ret = self.parseProviderConfig(config)
         ret.update(dict(
             images=self.parseImages(config),
             flavors=self.parseFlavors(config),
@@ -196,9 +204,23 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         ))
         return ret
 
-    def deserialize(self, raw, context):
+    def parseConfig(self, config, connection):
+        schema = self.getProviderSchema()
+        ret = schema(config)
+        ret.update(dict(
+            images=self.parseImages(config, connection),
+            flavors=self.parseFlavors(config, connection),
+            labels=self.parseLabels(config, connection),
+        ))
+        return ret
+
+    def deserialize(self, raw, context, extra):
         data = super().deserialize(raw, context)
-        data.update(self.parseConfig(data['config']))
+        connections = extra['connections']
+        connection = connections.connections[data['connection_name']]
+        data['connection'] = connection
+        data['driver'] = connection.driver
+        data.update(self.parseConfig(data['config'], connection))
         return data
 
     def serialize(self, context):
@@ -214,24 +236,24 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
     def tenant_scoped_name(self):
         return f'{self.tenant_name}-{self.name}'
 
-    def parseImages(self, config):
+    def parseImages(self, config, connection):
         images = {}
         for image_config in config.get('images', []):
-            i = self.parseImage(image_config, config)
+            i = self.parseImage(image_config, config, connection)
             images[i.name] = i
         return images
 
-    def parseFlavors(self, config):
+    def parseFlavors(self, config, connection):
         flavors = {}
         for flavor_config in config.get('flavors', []):
-            f = self.parseFlavor(flavor_config, config)
+            f = self.parseFlavor(flavor_config, config, connection)
             flavors[f.name] = f
         return flavors
 
-    def parseLabels(self, config):
+    def parseLabels(self, config, connection):
         labels = {}
         for label_config in config.get('labels', []):
-            l = self.parseLabel(label_config, config)
+            l = self.parseLabel(label_config, config, connection)
             labels[l.name] = l
         return labels
 

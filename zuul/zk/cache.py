@@ -289,7 +289,7 @@ class ZuulTreeCache(abc.ABC):
                 if getattr(old_obj, 'lock', None):
                     # Don't update a locked object
                     return
-                old_obj._updateFromRaw(data, stat)
+                old_obj._updateFromRaw(data, stat, None)
             else:
                 obj = self.objectFromDict(data, stat)
                 self._cached_objects[key] = obj

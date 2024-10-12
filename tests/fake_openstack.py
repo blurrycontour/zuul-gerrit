@@ -109,12 +109,19 @@ class FakeOpenstackSession:
             return FakeOpenstackResponse({'servers': server_list})
 
 
+class FakeOpenstackConfig:
+    pass
+
+
 class FakeOpenstackConnection:
     log = logging.getLogger("zuul.FakeOpenstackConnection")
 
     def __init__(self, cloud):
         self.cloud = cloud
         self.compute = FakeOpenstackSession(cloud)
+        self.config = FakeOpenstackConfig()
+        self.config.config = {}
+        self.config.config['image_format'] = 'qcow2'
 
     def list_flavors(self, get_extra=False):
         return self.cloud.flavors

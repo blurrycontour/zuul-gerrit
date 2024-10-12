@@ -162,16 +162,19 @@ class ZKObject:
         raise NotImplementedError()
 
     # This should work for most classes
-    def deserialize(self, data, context):
+    def deserialize(self, data, context, extra=None):
         """Implement this method to convert serialized data into object
         attributes.
 
         :param bytes data: A byte string to deserialize
         :param ZKContext context: A ZKContext object with the current
             ZK session and lock.
+        :param extra dict: A dictionary of extra data for use in
+            deserialization.
 
         :returns: A dictionary of attributes and values to be set on
         the object.
+
         """
         if isinstance(data, dict):
             return data
@@ -376,7 +379,7 @@ class ZKObject:
         if path is None:
             path = self.getPath()
         compressed_data, zstat = self._loadData(context, path)
-        self._updateFromRaw(compressed_data, zstat, context)
+        self._updateFromRaw(compressed_data, zstat, None, context)
 
     @classmethod
     def _loadData(cls, context, path):
@@ -396,17 +399,16 @@ class ZKObject:
         return compressed_data, zstat
 
     @classmethod
-    def _fromRaw(cls, raw_data, zstat, **kw):
+    def _fromRaw(cls, raw_data, zstat, extra, **kw):
         obj = cls()
-        obj._set(**kw)
-        obj._updateFromRaw(raw_data, zstat)
+        obj._updateFromRaw(raw_data, zstat, extra)
         return obj
 
-    def _updateFromRaw(self, raw_data, zstat, context=None):
+    def _updateFromRaw(self, raw_data, zstat, extra, context=None):
         try:
             self._set(_zkobject_hash=None)
             data = self._decompressData(raw_data)
-            self._set(**self.deserialize(data, context))
+            self._set(**self.deserialize(data, context, extra))
             self._set(_zstat=zstat,
                       _zkobject_hash=hash(data),
                       _zkobject_compressed_size=len(raw_data),
@@ -600,7 +602,7 @@ class PolymorphicZKObjectMixin(abc.ABC):
     @classmethod
     def fromZK(cls, context, path, **kw):
         raw_data, zstat = cls._loadData(context, path)
-        return cls._fromRaw(raw_data, zstat, **kw)
+        return cls._fromRaw(raw_data, zstat, None, **kw)
 
     @classmethod
     def _compressData(cls, data):
@@ -613,11 +615,12 @@ class PolymorphicZKObjectMixin(abc.ABC):
         return super()._decompressData(compressed_data)
 
     @classmethod
-    def _fromRaw(cls, raw_data, zstat, **kw):
+    def _fromRaw(cls, raw_data, zstat, extra, **kw):
         subclass_id, _, _ = raw_data.partition(b"\0")
         try:
             klass = cls._subclasses[subclass_id]
         except KeyError:
             raise RuntimeError(f"Unknown subclass id: {subclass_id}")
         return super(
-            PolymorphicZKObjectMixin, klass)._fromRaw(raw_data, zstat, **kw)
+            PolymorphicZKObjectMixin, klass)._fromRaw(
+                raw_data, zstat, extra, **kw)

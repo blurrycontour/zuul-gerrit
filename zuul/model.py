@@ -382,7 +382,7 @@ class ConfigurationErrorList(zkobject.ShardedZKObject):
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 
-    def deserialize(self, raw, context):
+    def deserialize(self, raw, context, extra=None):
         data = super().deserialize(raw, context)
         data.update({
             "errors": [ConfigurationError.deserialize(d)
@@ -869,7 +869,7 @@ class PipelineState(zkobject.ZKObject):
             self._set(**self._lateInitData())
             self.internalCreate(context)
 
-    def deserialize(self, raw, context):
+    def deserialize(self, raw, context, extra=None):
         # We may have old change objects in the pipeline cache, so
         # make sure they are the same objects we would get from the
         # source change cache.
@@ -1081,7 +1081,7 @@ class PipelineChangeList(zkobject.ShardedZKObject):
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 
-    def deserialize(self, raw, context):
+    def deserialize(self, raw, context, extra=None):
         data = super().deserialize(raw, context)
         change_keys = []
         # We must have a dictionary with a 'changes' key; otherwise we
@@ -1200,7 +1200,7 @@ class ChangeQueue(zkobject.ZKObject):
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 
-    def deserialize(self, raw, context):
+    def deserialize(self, raw, context, extra=None):
         data = super().deserialize(raw, context)
 
         existing_items = {}
@@ -3149,7 +3149,7 @@ class FrozenJob(zkobject.ZKObject):
         # Use json_dumps to strip any ZuulMark entries
         return json_dumps(data, sort_keys=True).encode("utf8")
 
-    def deserialize(self, raw, context):
+    def deserialize(self, raw, context, extra=None):
         # Ensure that any special handling in this method is matched
         # in Job.freezeJob so that FrozenJobs are identical regardless
         # of whether they have been deserialized.
@@ -4976,7 +4976,7 @@ class Build(zkobject.ZKObject):
 
         return json.dumps(data, sort_keys=True).encode("utf8")
 
-    def deserialize(self, raw, context):
+    def deserialize(self, raw, context, extra=None):
         data = super().deserialize(raw, context)
 
         # Deserialize build events
@@ -5425,7 +5425,7 @@ class BuildSet(zkobject.ZKObject):
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 
-    def deserialize(self, raw, context):
+    def deserialize(self, raw, context, extra=None):
         data = super().deserialize(raw, context)
         # Set our UUID so that getPath() returns the correct path for
         # child objects.
@@ -5907,7 +5907,7 @@ class QueueItem(zkobject.ZKObject):
         }
         return json.dumps(data, sort_keys=True).encode("utf8")
 
-    def deserialize(self, raw, context):
+    def deserialize(self, raw, context, extra=None):
         data = super().deserialize(raw, context)
         # Set our UUID so that getPath() returns the correct path for
         # child objects.

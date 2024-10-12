@@ -230,8 +230,8 @@ class BranchCacheZKObject(ShardedZKObject):
             "default_branch": default_branch,
         }
 
-    def deserialize(self, raw, context):
-        data = super().deserialize(raw, context)
+    def deserialize(self, raw, context, extra=None):
+        data = super().deserialize(raw, context, extra)
         if "protected" in data:
             # MODEL_API < 27
             self.deserialize_old(data)

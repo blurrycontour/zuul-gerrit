@@ -183,13 +183,13 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         self._set(_endpoint=self.getEndpoint())
         return self._endpoint
 
-    def parseImage(self, image_config, provider_config):
+    def parseImage(self, image_config, provider_config, connection):
         return AwsProviderImage(image_config, provider_config)
 
-    def parseFlavor(self, flavor_config, provider_config):
+    def parseFlavor(self, flavor_config, provider_config, connection):
         return AwsProviderFlavor(flavor_config, provider_config)
 
-    def parseLabel(self, label_config, provider_config):
+    def parseLabel(self, label_config, provider_config, connection):
         return AwsProviderLabel(label_config, provider_config)
 
     def getEndpoint(self):

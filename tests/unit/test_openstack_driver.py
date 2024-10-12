@@ -46,7 +46,7 @@ class TestOpenstackDriver(ZuulTestCase):
                     'metadata': {
                         'type': 'zuul_image',
                         'image_name': 'debian-local',
-                        'format': 'raw',
+                        'format': 'qcow2',
                         'sha256': ('59984dd82f51edb3777b969739a92780'
                                    'a520bb314b8d64b294d5de976bd8efb9'),
                         'md5sum': '262278e1632567a907e4604e9edd2e83',
@@ -146,7 +146,7 @@ class TestOpenstackDriver(ZuulTestCase):
         artifacts = self.launcher.image_build_registry.\
             getArtifactsForImage(name)
         self.assertEqual(1, len(artifacts))
-        self.assertEqual('raw', artifacts[0].format)
+        self.assertEqual('qcow2', artifacts[0].format)
         self.assertTrue(artifacts[0].validated)
         uploads = self.launcher.image_upload_registry.getUploadsForImage(
             name)

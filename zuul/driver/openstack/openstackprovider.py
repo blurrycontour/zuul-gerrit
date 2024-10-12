@@ -80,10 +80,11 @@ class OpenstackProviderImage(BaseProviderImage):
         discriminant=discriminate(
             lambda val, alt: val['type'] == alt['type']))
 
-    def __init__(self, image_config, provider_config):
+    def __init__(self, image_config, provider_config, image_format):
         self.image_id = None
         self.image_filters = None
         super().__init__(image_config, provider_config)
+        self.format = image_format
 
 
 class OpenstackProviderFlavor(BaseProviderFlavor):
@@ -167,13 +168,19 @@ class OpenstackProvider(BaseProvider, subclass_id='openstack'):
         self._set(_endpoint=self.getEndpoint())
         return self._endpoint
 
-    def parseImage(self, image_config, provider_config):
-        return OpenstackProviderImage(image_config, provider_config)
+    def parseImage(self, image_config, provider_config, connection):
+        # We are not fully constructed yet at this point, so we need
+        # to peek to get the region and endpoint.
+        region = provider_config.get('region')
+        endpoint = connection.driver._getEndpoint(connection, region)
+        return OpenstackProviderImage(
+            image_config, provider_config,
+            image_format=endpoint.getImageFormat())
 
-    def parseFlavor(self, flavor_config, provider_config):
+    def parseFlavor(self, flavor_config, provider_config, connection):
         return OpenstackProviderFlavor(flavor_config, provider_config)
 
-    def parseLabel(self, label_config, provider_config):
+    def parseLabel(self, label_config, provider_config, connection):
         return OpenstackProviderLabel(label_config, provider_config)
 
     def getEndpoint(self):
