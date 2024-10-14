@@ -22,6 +22,7 @@ from zuul.zk.components import (
 from tests.base import (
     BaseTestCase,
     ZuulTestCase,
+    gerrit_config,
     simple_layout,
     iterate_timeout,
     model_version,
@@ -62,6 +63,54 @@ class TestModelUpgrade(ZuulTestCase):
         for _ in iterate_timeout(30, "model api to update"):
             if component_registry.model_api == 1:
                 break
+
+
+class TestModelUpgradeGerritCircularDependencies(ZuulTestCase):
+    config_file = "zuul-gerrit-github.conf"
+    tenant_config_file = "config/circular-dependencies/main.yaml"
+
+    @model_version(31)
+    @gerrit_config(submit_whole_topic=True)
+    def test_model_31_32(self):
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
+                                           topic='test-topic')
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        B.addApproval("Approved", 1)
+
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        first = self.scheds.first
+        second = self.createScheduler()
+        second.start()
+        self.assertEqual(len(self.scheds), 2)
+        for _ in iterate_timeout(10, "until priming is complete"):
+            state_one = first.sched.local_layout_state.get("tenant-one")
+            if state_one:
+                break
+
+        for _ in iterate_timeout(
+                10, "all schedulers to have the same layout state"):
+            if (second.sched.local_layout_state.get(
+                    "tenant-one") == state_one):
+                break
+
+        self.model_test_component_info.model_api = 32
+        with first.sched.layout_update_lock, first.sched.run_handler_lock:
+            self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+            self.waitUntilSettled(matcher=[second])
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "MERGED")
 
 
 class TestGithubModelUpgrade(ZuulTestCase):
