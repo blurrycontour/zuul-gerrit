@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9c6fc92_b0b46f41",
+        "filename": "zuul/provider/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 5263
+      },
+      "writtenOn": "2024-10-14T01:44:30Z",
+      "side": 1,
+      "message": "Does this method need to have a none default like the ones in the model classes?",
+      "revId": "5f784ff7dcdf9f0303c2243791ad966e1fc347d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
