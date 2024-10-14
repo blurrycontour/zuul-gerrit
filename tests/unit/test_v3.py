@@ -8664,7 +8664,14 @@ class TestJsonStringResults(AnsibleZuulTestCase):
         self.assertNotIn('this is a secret string', text_log)
 
 
-class TestUnreachable(AnsibleZuulTestCase):
+class TestUnreachableBase(AnsibleZuulTestCase):
+    def _get_file(self, build, path):
+        p = os.path.join(build.jobdir.root, path)
+        with open(p) as f:
+            return f.read()
+
+
+class TestUnreachable(TestUnreachableBase):
     tenant_config_file = 'config/ansible-unreachable/main.yaml'
 
     def _get_file(self, build, path):
@@ -8718,6 +8725,67 @@ class TestUnreachable(AnsibleZuulTestCase):
         conn = self.scheds.first.sched.sql.connection
         for build in conn.getBuilds():
             self.assertEqual(build.error_detail, 'Host unreachable')
+
+
+class TestUnreachableGroup(TestUnreachableBase):
+    tenant_config_file = 'config/ansible-unreachable-group/main.yaml'
+
+    def test_group_zuul_unreachable(self):
+        self.wait_timeout = 120
+
+        # Output extra ansible info so we might see errors.
+        self.executor_server.verbose = True
+        self.executor_server.keep_jobdir = True
+
+        # Unit tests don't use any nodes which are accessible via SSH. So we
+        # force to disable remote ansible.
+        self.fake_nodepool.remote_ansible = False
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(
+                name='unreachable-group-in-zuul-no-hosts-leaves',
+                result=None,
+                changes='1,1'
+            ),
+            dict(
+                name='unreachable-group-in-zuul-no-hosts-leaves',
+                result=None,
+                changes='1,1'
+            ),
+            dict(
+                name='unreachable-group-in-zuul',
+                result="SUCCESS",
+                changes='1,1'
+            ),
+        ], ordered=False)
+
+        for build in self.history:
+            output_path = os.path.join(build.jobdir.root,
+                                       'work/logs/job-output.txt')
+            with open(output_path) as f:
+                job_output = f.read()
+            self.log.debug(job_output)
+
+            if build.name == "unreachable-group-in-zuul":
+                self.assertIn(
+                    "This host is not unreachable: available-host", job_output
+                )
+                self.assertIn(
+                    "This host is unreachable: unreachable-host", job_output
+                )
+            elif build.name == "unreachable-group-in-zuul-no-hosts-leaves":
+                self.assertIn(
+                    (
+                        "Specified inventory, host pattern and/or --limit "
+                        "leaves us with no hosts to target"
+                    ),
+                    job_output,
+                )
 
 
 class TestJobPause(AnsibleZuulTestCase):

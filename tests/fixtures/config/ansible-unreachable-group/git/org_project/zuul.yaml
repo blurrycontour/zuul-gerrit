@@ -1,0 +1,50 @@
+- pipeline:
+    name: check
+    manager: independent
+    post-review: true
+    trigger:
+      gerrit:
+        - event: patchset-created
+    success:
+      gerrit:
+        Verified: 1
+    failure:
+      gerrit:
+        Verified: -1
+
+- job:
+    name: base
+    parent: null
+    run: playbooks/run.yaml
+    attempts: 2
+
+- job:
+    name: unreachable-group-in-zuul
+    description: |
+      Test capability to add host to zuul_unreachable from a nodeset definition
+    nodeset: &unreachable-nodeset
+      nodes:
+        - name: available-host
+          label: available-host
+        - name: unreachable-host
+          label: unreachable-host
+      groups:
+        - name: zuul_unreachable
+          nodes:
+            - unreachable-host
+
+- job:
+    name: unreachable-group-in-zuul-no-hosts-leaves
+    description: |
+      The job should fail because we ban all hosts via the zuul_unreachable group
+    nodeset:
+      <<: *unreachable-nodeset
+      nodes:
+        - name: unreachable-host
+          label: unreachable-host
+
+- project:
+    check:
+      jobs:
+        - unreachable-group-in-zuul
+        - unreachable-group-in-zuul-no-hosts-leaves

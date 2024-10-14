@@ -900,7 +900,7 @@ def squash_variables(nodes, nodeset, jobvars, groupvars, extravars):
     return ret
 
 
-def make_setup_inventory_dict(nodes, hostvars):
+def make_setup_inventory_dict(nodes, hostvars, unreachable_nodes):
     hosts = {}
     for node in nodes:
         if (hostvars[node['name']]['ansible_connection'] in
@@ -911,8 +911,14 @@ def make_setup_inventory_dict(nodes, hostvars):
     inventory = {
         'all': {
             'hosts': hosts,
+            'children': {},
         }
     }
+
+    inventory['all']['children'].update({
+        'zuul_unreachable': {
+            'hosts': {n: None for n in unreachable_nodes}
+        }})
 
     return inventory
 
@@ -1596,6 +1602,12 @@ class AnsibleJob(object):
             self.prepareVars(args, zuul_resources)
         except VariableNameError as e:
             raise ExecutorError(str(e))
+
+        for group in self.nodeset.getGroups():
+            if group.name != "zuul_unreachable":
+                continue
+            self.unreachable_nodes.update(group.nodes)
+
         self.writeDebugInventory()
         self.writeRepoStateFile(repos)
 
@@ -2862,7 +2874,7 @@ class AnsibleJob(object):
     def writeSetupInventory(self):
         jobdir_playbook = self.jobdir.setup_playbook
         setup_inventory = make_setup_inventory_dict(
-            self.host_list, self.original_hostvars)
+            self.host_list, self.original_hostvars, self.unreachable_nodes)
         setup_inventory = yaml.mark_strings_unsafe(setup_inventory)
 
         with open(jobdir_playbook.inventory, 'w') as inventory_yaml:
@@ -3274,7 +3286,9 @@ class AnsibleJob(object):
             command='ansible')
         cmd = [ansible, '*', verbose, '-m', 'setup',
                '-i', playbook.inventory,
-               '-a', 'gather_subset=!all']
+               '-a', 'gather_subset=!all',
+               '--limit=!zuul_unreachable']
+
         if self.executor_variables_file is not None:
             cmd.extend(['-e@%s' % self.executor_variables_file])
 
@@ -3350,7 +3364,8 @@ class AnsibleJob(object):
             verbose = '-v'
 
         cmd = ['ansible', '*', verbose, '-m', 'meta',
-               '-a', 'reset_connection']
+               '-a', 'reset_connection',
+               '--limit=!zuul_unreachable']
 
         result, code = self.runAnsible(
             cmd=cmd, timeout=60, playbook=playbook,

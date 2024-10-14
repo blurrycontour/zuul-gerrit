@@ -1,0 +1,17 @@
+- hosts: all:!zuul_unreachable
+  tasks:
+    - name: Output debug statement
+      debug:
+        msg: "This host is not unreachable: {{ inventory_hostname }}"
+
+- hosts: zuul_unreachable
+  tasks:
+    - name: Output debug statement
+      debug:
+        msg: "This host is unreachable: {{ inventory_hostname }}"
+
+- hosts: localhost
+  tasks:
+    - name: Output debug statement
+      debug:
+        msg: "This host is localhost"

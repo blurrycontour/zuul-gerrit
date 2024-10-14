@@ -112,6 +112,10 @@ specify nodes and groups, or alternative nodesets, but not both.
       Additional groups can be defined which are accessible from the ansible
       playbooks.
 
+      It is possible for Zuul and Nodepool to use nodes that are not reachable by Zuul.
+      In this case nodes must be added to ``zuul_unreachable`` group and hosts must have
+      ``host-key-checking: false`` option in the Nodepool configuration.
+
       .. attr:: name
          :required:
 
