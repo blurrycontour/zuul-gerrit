@@ -21,6 +21,7 @@ from zuul.model import ImageBuildArtifact, ImageUpload
 class ImageBuildRegistry(LockableZKObjectCache):
 
     def __init__(self, zk_client):
+        self.builds_by_image_name = collections.defaultdict(set)
         super().__init__(
             zk_client,
             None,
@@ -29,7 +30,6 @@ class ImageBuildRegistry(LockableZKObjectCache):
             locks_path=ImageBuildArtifact.LOCKS_PATH,
             zkobject_class=ImageBuildArtifact,
         )
-        self.builds_by_image_name = collections.defaultdict(set)
 
     def postCacheHook(self, event, data, stat, key, obj):
         super().postCacheHook(event, data, stat, key, obj)
@@ -55,6 +55,8 @@ class ImageBuildRegistry(LockableZKObjectCache):
 class ImageUploadRegistry(LockableZKObjectCache):
 
     def __init__(self, zk_client, upload_added_event=None):
+        self.uploads_by_image_name = collections.defaultdict(set)
+        self.upload_added_event = upload_added_event
         super().__init__(
             zk_client,
             None,
@@ -63,8 +65,6 @@ class ImageUploadRegistry(LockableZKObjectCache):
             locks_path=ImageUpload.LOCKS_PATH,
             zkobject_class=ImageUpload,
         )
-        self.uploads_by_image_name = collections.defaultdict(set)
-        self.upload_added_event = upload_added_event
 
     def postCacheHook(self, event, data, stat, key, obj):
         super().postCacheHook(event, data, stat, key, obj)
