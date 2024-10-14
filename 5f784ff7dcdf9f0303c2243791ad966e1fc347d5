@@ -16,6 +16,24 @@
       "message": "Does this method need to have a none default like the ones in the model classes?",
       "revId": "5f784ff7dcdf9f0303c2243791ad966e1fc347d5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03c0aaac_90bd2316",
+        "filename": "zuul/provider/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-14T16:12:47Z",
+      "side": 1,
+      "message": "6 of one.  If it ever were to be called with None, then we\u0027d crash at line 219.",
+      "parentUuid": "b9c6fc92_b0b46f41",
+      "revId": "5f784ff7dcdf9f0303c2243791ad966e1fc347d5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ],
   "submitRequirementResults": [
