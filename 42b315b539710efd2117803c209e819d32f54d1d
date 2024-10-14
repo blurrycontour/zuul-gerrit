@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a248b866_265d6298",
+        "filename": "doc/source/config/nodeset.rst",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 37375
+      },
+      "writtenOn": "2024-10-14T20:06:11Z",
+      "side": 1,
+      "message": "zuul docs have description for zuul_unreachable group https://zuul-ci.org/docs/zuul/latest/job-content.html#ansible-groups\n\nProbably docs in job-content should be updated as well?",
+      "revId": "42b315b539710efd2117803c209e819d32f54d1d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52d2b607_194e1651",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1607,
+      "author": {
+        "id": 37375
+      },
+      "writtenOn": "2024-10-14T20:06:11Z",
+      "side": 1,
+      "message": "It would be preferred if zuul automatically would add nodes with disabled host-key-checking to zuul_unreachable group - users would not be required to duplicate information about nodes unavailability in jobs.\n\nWhat do you think?",
+      "revId": "42b315b539710efd2117803c209e819d32f54d1d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
