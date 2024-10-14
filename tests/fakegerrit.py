@@ -659,6 +659,11 @@ class FakeGerritChange(object):
     def setReported(self):
         self.reported += 1
 
+    def setAbandoned(self):
+        self.data['status'] = 'ABANDONED'
+        self.data['open'] = False
+        self.open = False
+
 
 class FakeGerritPoller(gerritconnection.GerritChecksPoller):
     """A Fake Gerrit poller for use in tests.
@@ -1171,13 +1176,16 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         if not self._fake_submit_whole_topic:
             topic = None
         if topic:
-            results = self._simpleQuery(f'topic:{topic}', http=True)
+            results = self._simpleQuery(f'status: open topic:{topic}',
+                                        http=True)
         else:
             results = [change.queryHTTP(internal=True)]
         for dep in change.data.get('dependsOn', []):
             dep_change = self.changes.get(int(dep['number']))
             r = dep_change.queryHTTP(internal=True)
             if r['status'] == 'MERGED':
+                continue
+            if not r.open:
                 continue
             if r not in results:
                 results.append(r)
@@ -1272,6 +1280,17 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
                         if 'topic' in change.data
                         and topic in change.data['topic']
                     ]
+                if part.startswith('status:'):
+                    status = part[len('status:'):].strip().strip('"\'').lower()
+                    if status == 'open':
+                        l = [
+                            change for change in l if change.open
+                        ]
+                    else:
+                        l = [
+                            change for change in l
+                            if change.data['status'].lower() == status
+                        ]
             l = [queryMethod(change) for change in l]
         return l
 

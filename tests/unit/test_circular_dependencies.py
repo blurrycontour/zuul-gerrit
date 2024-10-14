@@ -4180,6 +4180,38 @@ class TestGerritCircularDependencies(ZuulTestCase):
         self.assertIn("/2 (config error)", A.messages[-1])
         self.assertIn("/2 (config error)", B.messages[-1])
 
+    @gerrit_config(submit_whole_topic=True)
+    def test_abandoned_change(self):
+        # Test that we can re-enqueue a topic cycle after abandoning a
+        # change (out of band).
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
+                                           topic='test-topic',
+                                           files={'conflict': 'B'})
+        X = self.fake_gerrit.addFakeChange('org/project2', "master", "X",
+                                           topic='test-topic',
+                                           files={'conflict': 'X'})
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        X.addApproval("Code-Review", 2)
+        X.addApproval("Approved", 1)
+        B.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        X.setAbandoned()
+        self.waitUntilSettled("abandoned")
+
+        self.log.debug("add reapproval")
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.waitUntilSettled("reapproved")
+
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "MERGED")
+        self.assertEqual(X.data["status"], "ABANDONED")
+
 
 class TestGithubCircularDependencies(ZuulTestCase):
     config_file = "zuul-gerrit-github.conf"
