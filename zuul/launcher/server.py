@@ -473,6 +473,7 @@ class Launcher:
                     log.exception("Marking node %s as %s", node, state)
                     with self.createZKContext(node._lock, self.log) as ctx:
                         node.updateAttributes(ctx, state=state)
+                        self.wake_event.set()
 
             # TODO: implement node re-use
             # * deallocate from request here
@@ -499,6 +500,7 @@ class Launcher:
                     self.wake_event.set()
                     return
                 node.state = model.ProviderNode.State.READY
+                self.wake_event.set()
                 log.debug("Marking node %s as %s", node, node.state)
         node.releaseLock()
 
