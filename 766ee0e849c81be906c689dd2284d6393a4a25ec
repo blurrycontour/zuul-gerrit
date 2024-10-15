@@ -140,6 +140,24 @@
       "parentUuid": "b9e117de_8c5ea479",
       "revId": "766ee0e849c81be906c689dd2284d6393a4a25ec",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d6c3762_2cf7bb4d",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 19
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-15T15:43:09Z",
+      "side": 1,
+      "message": "So \"OUTDATED\" means \"human must deal with this\"?\n\nYour second point does indeed sound like a hole we should close.",
+      "parentUuid": "ca8743aa_720c88df",
+      "revId": "766ee0e849c81be906c689dd2284d6393a4a25ec",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
