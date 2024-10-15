@@ -1483,6 +1483,12 @@ class ImageBuildArtifact(zkobject.LockableZKObject):
             validated=None,
         )
 
+    def __repr__(self):
+        return (f"<ImageBuildArtifact {self.uuid} "
+                f"canonical_name: {self.canonical_name} "
+                f"build_uuid: {self.build_uuid} "
+                f"validated: {self.validated}>")
+
     def getPath(self):
         return f"{self.ROOT}/{self.IMAGES_PATH}/{self.uuid}"
 

@@ -303,7 +303,7 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         flavor = self.flavors[label.flavor]
         return self.endpoint.getQuotaForLabel(label, flavor)
 
-    def uploadImage(self, provider_image,
+    def uploadImage(self, provider_image, image_name,
                     filename, image_format, metadata, md5, sha256):
         # TODO this needs to move to the section or connection config
         # since it's used by endpoints.
@@ -312,7 +312,7 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         # timeout = self.image_import_timeout
         timeout = 300
         return self.endpoint.uploadImage(
-            provider_image,
+            provider_image, image_name,
             filename, image_format, metadata, md5, sha256,
             bucket_name, timeout)
 

@@ -93,6 +93,8 @@ class UploadJob:
                         if upload.acquireLock(
                                 self.launcher.zk_client, blocking=False):
                             acquired.append(upload)
+                            self.log.debug("Acquired upload lock for %s",
+                                           upload)
             except LockException:
                 return
 
@@ -109,17 +111,20 @@ class UploadJob:
             for upload, future in futures:
                 try:
                     future.result()
+                    self.log.info("Finished upload %s", upload)
                 except Exception:
                     self.log.exception("Unable to upload image %s", upload)
         finally:
             for upload in acquired:
                 try:
                     upload.releaseLock()
+                    self.log.debug("Released upload lock for %s", upload)
                 except Exception:
                     self.log.exception("Unable to release lock for %s", upload)
             if path:
                 try:
                     os.unlink(path)
+                    self.log.info("Deleted %s", path)
                 except Exception:
                     self.log.exception("Unable to delete %s", path)
 
@@ -142,6 +147,7 @@ class EndpointUploadJob:
     def _run(self):
         # The upload has a list of providers with identical
         # configurations.  Pick one of them as a representative.
+        self.log.info("Starting upload %s", self.upload)
         provider_cname = self.upload.providers[0]
         provider = self.launcher._getProviderByCanonicalName(provider_cname)
         provider_image = None
@@ -154,15 +160,17 @@ class EndpointUploadJob:
 
         # TODO: add upload id, etc
         metadata = {}
+        image_name = f'{provider_image.name}-{self.artifact.uuid}'
         external_id = provider.uploadImage(
-            provider_image, self.path, self.artifact.format, metadata,
-            self.artifact.md5sum, self.artifact.sha256)
+            provider_image, image_name, self.path, self.artifact.format,
+            metadata, self.artifact.md5sum, self.artifact.sha256)
         with self.launcher.createZKContext(self.upload._lock, self.log) as ctx:
             self.upload.updateAttributes(
                 ctx,
                 external_id=external_id,
                 timestamp=time.time())
-        self.launcher.addImageValidateEvent(self.upload)
+        if not self.upload.validated:
+            self.launcher.addImageValidateEvent(self.upload)
 
 
 class Launcher:
@@ -702,10 +710,14 @@ class Launcher:
 
     def downloadArtifact(self, image_build_artifact):
         path = os.path.join(self.temp_dir, image_build_artifact.uuid)
+        self.log.info("Downloading artifact %s into %s",
+                      image_build_artifact, path)
+        count = 0
         with open(path, 'wb') as f:
             with requests.get(image_build_artifact.url, stream=True) as resp:
                 for chunk in resp.iter_content(chunk_size=1024 * 8):
-                    f.write(chunk)
+                    count += f.write(chunk)
+        self.log.debug("Downloaded %s bytes to %s", count, path)
         return path
 
     def getImageExternalId(self, node, provider):
