@@ -2462,9 +2462,9 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
 
     def serialize(self, context):
         if self.create_state_machine:
-            self.create_state = self.create_state_machine.toDict()
+            self._set(create_state=self.create_state_machine.toDict())
         if self.delete_state_machine:
-            self.delete_state = self.delete_state_machine.toDict()
+            self._set(delete_state=self.delete_state_machine.toDict())
 
         data = dict(
             uuid=self.uuid,

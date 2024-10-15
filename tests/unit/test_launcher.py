@@ -536,8 +536,39 @@ class TestLauncher(ZuulTestCase):
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     @okay_tracebacks('_getQuotaForInstanceType')
     def test_failed_node(self):
+        # Test a node failure outside of the create state machine
         ctx = self.createZKContext(None)
         request = self.requestNodes(["debian-invalid"])
+        self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
+        provider_nodes = request.provider_nodes[0]
+        self.assertEqual(len(provider_nodes), 2)
+        self.assertEqual(len(request.nodes), 1)
+        self.assertEqual(provider_nodes[-1], request.nodes[-1])
+
+        provider_nodes = []
+        for node_id in request.nodes:
+            provider_nodes.append(model.ProviderNode.fromZK(
+                ctx, path=model.ProviderNode._getPath(node_id)))
+
+        request.delete(ctx)
+        self.waitUntilSettled()
+
+        for pnode in provider_nodes:
+            for _ in iterate_timeout(60, "node to be deleted"):
+                try:
+                    pnode.refresh(ctx)
+                except NoNodeError:
+                    break
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    @mock.patch(
+        'zuul.driver.aws.awsendpoint.AwsProviderEndpoint._createInstance',
+        side_effect=Exception("Fake error"))
+    @okay_tracebacks('_completeCreateInstance')
+    def test_failed_node2(self, mock_createInstance):
+        # Test a node failure inside the create state machine
+        ctx = self.createZKContext(None)
+        request = self.requestNodes(["debian-normal"])
         self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
         provider_nodes = request.provider_nodes[0]
         self.assertEqual(len(provider_nodes), 2)
