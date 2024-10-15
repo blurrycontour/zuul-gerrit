@@ -33,6 +33,7 @@ from tests.base import (
     simple_layout,
     return_data,
 )
+from tests.unit.test_launcher import ImageMocksFixture
 
 
 class TestOpenstackDriver(ZuulTestCase):
@@ -58,6 +59,7 @@ class TestOpenstackDriver(ZuulTestCase):
 
     def setUp(self):
         self.initTestConfig()
+        self.useFixture(ImageMocksFixture())
         clouds_yaml = os.path.join(FIXTURE_DIR, 'clouds.yaml')
         self.useFixture(
             fixtures.EnvironmentVariable('OS_CLIENT_CONFIG_FILE', clouds_yaml))

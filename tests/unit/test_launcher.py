@@ -31,7 +31,22 @@ from tests.base import (
     okay_tracebacks,
     simple_layout,
     return_data,
+    ResponsesFixture,
 )
+
+
+class ImageMocksFixture(ResponsesFixture):
+    def __init__(self):
+        super().__init__()
+        self.requests_mock.add_passthru("http://localhost")
+        self.requests_mock.add(
+            responses.GET,
+            'http://example.com/image.raw',
+            body="test raw image")
+        self.requests_mock.add(
+            responses.GET,
+            'http://example.com/image.qcow2',
+            body="test qcow2 image")
 
 
 class TestLauncher(ZuulTestCase):
@@ -98,18 +113,8 @@ class TestLauncher(ZuulTestCase):
 
     def setUp(self):
         self.mock_aws.start()
-
-        self.responses = responses.RequestsMock()
-        self.responses.start()
-        self.responses.add_passthru("http://localhost")
-        self.responses.add(
-            responses.GET,
-            'http://example.com/image.raw',
-            body="test raw image")
-        self.responses.add(
-            responses.GET,
-            'http://example.com/image.qcow2',
-            body="test qcow2 image")
+        # Must start responses after mock_aws
+        self.useFixture(ImageMocksFixture())
         self.s3 = boto3.resource('s3', region_name='us-west-2')
         self.s3.create_bucket(
             Bucket='zuul',

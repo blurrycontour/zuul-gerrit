@@ -36,6 +36,7 @@ import zlib
 
 import prometheus_client
 import requests
+import responses
 import select
 import shutil
 import socket
@@ -1422,6 +1423,17 @@ class FakeNodepool(object):
             keys.append("%s %s" % (key.get_name(), key.get_base64()))
 
         return keys
+
+
+class ResponsesFixture(fixtures.Fixture):
+    def __init__(self):
+        super().__init__()
+        self.requests_mock = responses.RequestsMock(
+            assert_all_requests_are_fired=False)
+
+    def _setUp(self):
+        self.requests_mock.start()
+        self.addCleanup(self.requests_mock.stop)
 
 
 class ChrootedKazooFixture(fixtures.Fixture):

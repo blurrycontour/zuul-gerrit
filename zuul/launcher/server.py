@@ -715,6 +715,7 @@ class Launcher:
         count = 0
         with open(path, 'wb') as f:
             with requests.get(image_build_artifact.url, stream=True) as resp:
+                resp.raise_for_status()
                 for chunk in resp.iter_content(chunk_size=1024 * 8):
                     count += f.write(chunk)
         self.log.debug("Downloaded %s bytes to %s", count, path)
