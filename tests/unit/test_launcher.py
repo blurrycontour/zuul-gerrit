@@ -34,6 +34,21 @@ from tests.base import (
 )
 
 
+def setupImageMocks():
+    resp = responses.RequestsMock()
+    resp.start()
+    resp.add_passthru("http://localhost")
+    resp.add(
+        responses.GET,
+        'http://example.com/image.raw',
+        body="test raw image")
+    resp.add(
+        responses.GET,
+        'http://example.com/image.qcow2',
+        body="test qcow2 image")
+    return resp
+
+
 class TestLauncher(ZuulTestCase):
     config_file = 'zuul-connections-nodepool.conf'
     mock_aws = mock_aws()
@@ -98,18 +113,8 @@ class TestLauncher(ZuulTestCase):
 
     def setUp(self):
         self.mock_aws.start()
-
-        self.responses = responses.RequestsMock()
-        self.responses.start()
-        self.responses.add_passthru("http://localhost")
-        self.responses.add(
-            responses.GET,
-            'http://example.com/image.raw',
-            body="test raw image")
-        self.responses.add(
-            responses.GET,
-            'http://example.com/image.qcow2',
-            body="test qcow2 image")
+        # Must start responses after mock_aws
+        self.responses = setupImageMocks()
         self.s3 = boto3.resource('s3', region_name='us-west-2')
         self.s3.create_bucket(
             Bucket='zuul',

@@ -31,6 +31,7 @@ from tests.base import (
     simple_layout,
     return_data,
 )
+from tests.unit.test_launcher import setupImageMocks
 
 
 class TestAwsDriver(ZuulTestCase):
@@ -66,6 +67,8 @@ class TestAwsDriver(ZuulTestCase):
 
         self.fake_aws = FakeAws()
         self.mock_aws.start()
+        # Must start responses after mock_aws
+        self.responses = setupImageMocks()
 
         self.ec2 = boto3.resource('ec2', region_name='us-west-2')
         self.ec2_client = boto3.client('ec2', region_name='us-west-2')
