@@ -2950,7 +2950,9 @@ class TenantParser(object):
             for job in jobs:
                 with parse_context.errorContext(stanza='job', conf=job):
                     with parse_context.accumulator.catchErrors():
-                        job.validateReferences(layout)
+                        job.validateReferences(
+                            layout,
+                            accumulator=parse_context.accumulator)
         for pipeline in layout.pipelines.values():
             with parse_context.errorContext(stanza='pipeline', conf=pipeline):
                 with parse_context.accumulator.catchErrors():

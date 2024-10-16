@@ -10899,3 +10899,54 @@ class TestIncludeVars(ZuulTestCase):
                          "A should report failure")
         self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
         self.assertIn('extra keys not allowed', A.messages[0])
+
+
+class TestDoubleRename(ZuulTestCase):
+    tenant_config_file = 'config/double-rename/main.yaml'
+
+    def test_double_rename(self):
+        # This tests a situation where two repos have been renamed
+        # behind Zuul's back, and the user is now trying to correct
+        # their configurations.  Each of the renamed repos has a job
+        # that is broken by its repo being renamed.  There is a third
+        # repo with a job (project-job) that references both of the
+        # broken jobs (project1-job and project2-job).  The
+        # independent changes to fix each job should theoretically be
+        # allowed by Zuul, but in its original behavior, one of them
+        # would fail because Zuul would only store one of the errors
+        # for the broken project-job.  Fixing the error Zuul knew
+        # about would unmask the second error, which appears as a new
+        # error to Zuul, so it rejects the change.  This test verifies
+        # that we don't mask certain errors anymore and therefore
+        # changes to fix both projects are allowed.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project1-job
+                required-projects:
+                    - org/project1
+            """)
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1,
+                         "A should report success")
+        self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "1")
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: project2-job
+                required-projects:
+                    - org/project2
+            """)
+        file_dict = {'zuul.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(B.reported, 1,
+                         "B should report success")
+        self.assertEqual(B.patchsets[0]['approvals'][0]['value'], "1")

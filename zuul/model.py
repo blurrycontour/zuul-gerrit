@@ -3828,7 +3828,8 @@ class Job(ConfigObject):
             return ns
         return self.nodeset
 
-    def validateReferences(self, layout, project_config=False):
+    def validateReferences(self, layout, project_config=False,
+                           accumulator=None):
         # Verify that references to other objects in the layout are
         # valid.
         if not self.isBase() and self.parent:
@@ -3883,7 +3884,13 @@ class Job(ConfigObject):
                         maxnodes=layout.tenant.max_nodes_per_job))
 
         for dependency in self.dependencies:
-            layout.getJob(dependency.name)
+            try:
+                layout.getJob(dependency.name)
+            except JobNotDefinedError as e:
+                if accumulator:
+                    accumulator.addError(e)
+                else:
+                    raise
         for pb in self.pre_run + self.run + self.post_run + self.cleanup_run:
             pb.validateReferences(layout)
 

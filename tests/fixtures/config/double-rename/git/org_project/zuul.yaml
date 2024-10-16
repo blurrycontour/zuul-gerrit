@@ -1,0 +1,7 @@
+- job:
+    name: project-job
+    dependencies:
+      - name: project1-job
+        soft: true
+      - name: project2-job
+        soft: true
