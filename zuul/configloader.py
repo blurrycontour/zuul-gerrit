@@ -2947,16 +2947,19 @@ class TenantParser(object):
         for nodeset in layout.nodesets.values():
             with parse_context.errorContext(stanza='nodeset', conf=nodeset):
                 with parse_context.accumulator.catchErrors():
-                    nodeset.validateReferences(layout)
+                    nodeset.validateReferences(
+                        layout, parse_context.accumulator)
         for jobs in layout.jobs.values():
             for job in jobs:
                 with parse_context.errorContext(stanza='job', conf=job):
                     with parse_context.accumulator.catchErrors():
-                        job.validateReferences(layout)
+                        job.validateReferences(
+                            layout, parse_context.accumulator)
         for pipeline in layout.pipelines.values():
             with parse_context.errorContext(stanza='pipeline', conf=pipeline):
                 with parse_context.accumulator.catchErrors():
-                    pipeline.validateReferences(layout)
+                    pipeline.validateReferences(
+                        layout, parse_context.accumulator)
 
         if dynamic_layout:
             # We should not actually update the layout with new
@@ -3001,11 +3004,13 @@ class TenantParser(object):
         for label in shadow_layout.labels.values():
             with parse_context.errorContext(stanza='label', conf=label):
                 with parse_context.accumulator.catchErrors():
-                    label.validateReferences(shadow_layout)
+                    label.validateReferences(
+                        shadow_layout, parse_context.accumulator)
         for section in shadow_layout.sections.values():
             with parse_context.errorContext(stanza='section', conf=label):
                 with parse_context.accumulator.catchErrors():
-                    section.validateReferences(shadow_layout)
+                    section.validateReferences(
+                        shadow_layout, parse_context.accumulator)
         # Add providers to the shadow (or real) layout
         for provider_config in shadow_layout.provider_configs.values():
             with parse_context.errorContext(stanza='provider',
@@ -3061,7 +3066,7 @@ class TenantParser(object):
 
     def _validateProjectPipelineConfigs(self, tenant, layout, parse_context):
         # Validate references to other config objects
-        def inner_validate_ppcs(project_config, ppc):
+        def inner_validate_ppcs(project_config, ppc, accumulator):
             for jobs in ppc.job_list.jobs.values():
                 for job in jobs:
                     # validate that the job exists on its own (an
@@ -3069,7 +3074,7 @@ class TenantParser(object):
                     # jobs)
                     layout.getJob(job.name)
                     job.validateReferences(
-                        layout, project_config=project_config)
+                        layout, accumulator, project_config=project_config)
 
         for project_name in layout.project_configs:
             for project_config in layout.project_configs[project_name]:
@@ -3089,7 +3094,7 @@ class TenantParser(object):
                                     with acc.catchErrors():
                                         for ppc in p_tmpl.pipelines.values():
                                             inner_validate_ppcs(
-                                                project_config, ppc)
+                                                project_config, ppc, acc)
                         for ppc in project_config.pipelines.values():
                             inner_validate_ppcs(project_config, ppc)
             # Set a merge mode if we don't have one for this project.

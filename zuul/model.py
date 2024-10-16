@@ -619,17 +619,17 @@ class Pipeline(object):
     def getSafeAttributes(self):
         return Attributes(name=self.name)
 
-    def validateReferences(self, layout):
+    def validateReferences(self, layout, accumulator):
         # Verify that references to other objects in the layout are
         # valid.
 
         for pipeline in self.supercedes:
             if not layout.pipelines.get(pipeline):
-                raise Exception(
+                accumulator.addError(Exception(
                     'The pipeline "{this}" supercedes an unknown pipeline '
                     '{other}.'.format(
                         this=self.name,
-                        other=pipeline))
+                        other=pipeline)))
 
     def setManager(self, manager):
         self.manager = manager
@@ -1697,15 +1697,15 @@ class Label(ConfigObject):
             'description': self.description,
         }
 
-    def validateReferences(self, layout):
+    def validateReferences(self, layout, accumulator):
         if not layout.images.get(self.image):
-            raise Exception(
+            accumulator.addError(Exception(
                 f'The label "{self.name}" references an unknown image '
-                f'"{self.image}"')
+                f'"{self.image}"'))
         if not layout.flavors.get(self.flavor):
-            raise Exception(
+            accumulator.addError(Exception(
                 f'The label "{self.name}" references an unknown flavor '
-                f'"{self.flavor}"')
+                f'"{self.flavor}"'))
 
 
 class Section(ConfigObject):
@@ -1751,15 +1751,15 @@ class Section(ConfigObject):
                 self.connection == other.connection and
                 self.config == other.config)
 
-    def validateReferences(self, layout):
+    def validateReferences(self, layout, accumulator):
         if not self.parent:
             return
         parent = layout.sections.get(self.parent)
         if (parent.source_context.project_canonical_name !=
             self.source_context.project_canonical_name):
-            raise Exception(
+            accumulator.addError(Exception(
                 f'The section "{self.name}" references a section '
-                'in a different project.')
+                'in a different project.'))
 
 
 class ProviderConfig(ConfigObject):
@@ -2115,8 +2115,11 @@ class NodeSet(ConfigObject):
         else:
             alternatives.append(ns)
 
-    def validateReferences(self, layout):
-        self.flattenAlternatives(layout)
+    def validateReferences(self, layout, accumulator):
+        try:
+            self.flattenAlternatives(layout)
+        except Exception as e:
+            accumulator.addError(e)
 
     def __repr__(self):
         if self.name:
@@ -2756,22 +2759,22 @@ class PlaybookContext(ConfigObject):
                             self.cleanup)
         return r
 
-    def validateReferences(self, layout):
+    def validateReferences(self, layout, accumulator):
         # Verify that references to other objects in the layout are
         # valid.
         for secret_use in self.secrets:
             secret = layout.secrets.get(secret_use.name)
             if secret is None:
-                raise Exception(
+                accumulator.addError(Exception(
                     'The secret "{name}" was not found.'.format(
-                        name=secret_use.name))
+                        name=secret_use.name)))
             check_varnames({secret_use.alias: ''})
             if not secret.source_context.isSameProject(self.source_context):
-                raise Exception(
+                accumulator.addError(Exception(
                     "Unable to use secret {name}.  Secrets must be "
                     "defined in the same project in which they "
                     "are used".format(
-                        name=secret_use.name))
+                        name=secret_use.name)))
             project = layout.tenant.getProject(
                 self.source_context.project_canonical_name)[1]
             # Decrypt a copy of the secret to verify it can be done
@@ -3835,13 +3838,14 @@ class Job(ConfigObject):
             return ns
         return self.nodeset
 
-    def validateReferences(self, layout, project_config=False):
+    def validateReferences(self, layout, accumulator, project_config=False):
         # Verify that references to other objects in the layout are
         # valid.
         if not self.isBase() and self.parent:
             parents = layout.getJobs(self.parent)
             if not parents:
-                raise Exception("Job %s not defined" % (self.parent,))
+                accumulator.addError(JobNotDefinedError(
+                    "Job %s not defined" % (self.parent,)))
             # For the following checks, we allow some leeway to
             # account for the possibility that there may be
             # nonconforming job variants that would not match and
@@ -3866,33 +3870,36 @@ class Job(ConfigObject):
                     break
 
             if not nonfinal_parent_found:
-                raise Exception(
+                accumulator.addError(Exception(
                     f'The parent of job "{self.name}", "{self.parent}" '
-                    'is final and can not act as a parent')
+                    'is final and can not act as a parent'))
             if not nonintermediate_parent_found and not self.abstract:
-                raise Exception(
+                accumulator.addError(Exception(
                     f'The parent of job "{self.name}", "{self.parent}" '
-                    f'is intermediate but "{self.name}" is not abstract')
+                    f'is intermediate but "{self.name}" is not abstract'))
             if (not nonprotected_parent_found and
                 parents[0].source_context.project_canonical_name !=
                 self.source_context.project_canonical_name):
-                raise Exception(
+                accumulator.addError(Exception(
                     f'The parent of job "{self.name}", "{self.parent}" '
-                    f'is a protected job in a different project')
+                    f'is a protected job in a different project'))
 
         for ns in self.flattenNodesetAlternatives(layout):
             if layout.tenant.max_nodes_per_job != -1 and \
                len(ns) > layout.tenant.max_nodes_per_job:
-                raise Exception(
+                accumulator.addError(Exception(
                     'The job "{job}" exceeds tenant '
                     'max-nodes-per-job {maxnodes}.'.format(
                         job=self.name,
-                        maxnodes=layout.tenant.max_nodes_per_job))
+                        maxnodes=layout.tenant.max_nodes_per_job)))
 
         for dependency in self.dependencies:
-            layout.getJob(dependency.name)
+            try:
+                layout.getJob(dependency.name)
+            except JobNotDefinedError as e:
+                accumulator.addError(e)
         for pb in self.pre_run + self.run + self.post_run + self.cleanup_run:
-            pb.validateReferences(layout)
+            pb.validateReferences(layout, accumulator)
 
     def assertImagePermissions(self, image_build_name, config_object, layout):
         # config_object may be a project or an anonymous job variant

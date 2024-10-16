@@ -1,0 +1,4 @@
+- job:
+    name: project1-job
+    required-projects:
+      - org/project1-old
