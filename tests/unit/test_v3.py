@@ -10834,6 +10834,7 @@ class TestIncludeVars(ZuulTestCase):
         inventory = self.getBuildInventory('other-project')
         ivars = inventory['all']['vars']
         self.assertTrue(ivars['project2'])
+        self.assertEqual('original', ivars['project2_var'])
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -10899,3 +10900,91 @@ class TestIncludeVars(ZuulTestCase):
                          "A should report failure")
         self.assertEqual(A.patchsets[0]['approvals'][0]['value'], "-1")
         self.assertIn('extra keys not allowed', A.messages[0])
+
+    def test_include_vars_tag(self):
+        # Test including vars in a tag job
+        self.executor_server.hold_jobs_in_build = True
+
+        # Create a tag with the original values
+        event = self.fake_gerrit.addFakeTag('org/project1', 'master',
+                                            'foo', 'test message')
+        # Create a tag on the "other" project too
+        self.fake_gerrit.addFakeTag('org/project2', 'master',
+                                    'foo', 'test message')
+
+        # Update master with new values
+        in_repo_vars = textwrap.dedent(
+            """
+            project1: true
+            job_var_precedence: include-vars-master
+            project_var_precedence: include-vars-master
+            parent_var_precedence: include-vars-master
+            """)
+        file_dict = {'project1-vars.yaml': in_repo_vars}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        in_repo_vars = textwrap.dedent(
+            """
+            project2: true
+            project2_var: master
+            """)
+        file_dict = {'project2-vars.yaml': in_repo_vars}
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B',
+                                           files=file_dict)
+        B.setMerged()
+        self.fake_gerrit.addEvent(B.getChangeMergedEvent())
+        self.waitUntilSettled()
+
+        # Send the tag
+        self.executor_server.returnData(
+            'parent-job', 'refs/tags/foo',
+            {
+                'parent_var_precedence': 'parent-vars',
+                'parent_vars': True,
+            }
+        )
+        self.fake_gerrit.addEvent(event)
+        self.waitUntilSettled("waiting for parent job to be running")
+
+        self.executor_server.release('parent-job')
+        self.waitUntilSettled("waiting for remaining jobs to start")
+
+        inventory = self.getBuildInventory('same-project')
+        ivars = inventory['all']['vars']
+        # We read a variable from the expected file
+        self.assertTrue(ivars['project1'])
+        # Job and project vars have higher precedence than file
+        self.assertEqual('job-vars', ivars['job_var_precedence'])
+        self.assertEqual('project-vars', ivars['project_var_precedence'])
+        # Files have higher precedence than returned parent data
+        self.assertEqual('include-vars', ivars['parent_var_precedence'])
+        # Make sure we did get returned parent data
+        self.assertTrue(ivars['parent_vars'])
+
+        inventory = self.getBuildInventory('other-project')
+        ivars = inventory['all']['vars']
+        self.assertTrue(ivars['project2'])
+        # We don't check out the tag on project2 (even though it has a
+        # matching tag) because this is not an event for that tag.
+        self.assertEqual('master', ivars['project2_var'])
+
+        inventory = self.getBuildInventory('same-project-no-ref')
+        ivars = inventory['all']['vars']
+        # We read a variable from the expected file
+        self.assertTrue(ivars['project1'])
+        # Files have higher precedence than returned parent data
+        self.assertEqual('include-vars-master', ivars['parent_var_precedence'])
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='parent-job', result='SUCCESS', ref='refs/tags/foo'),
+            dict(name='same-project', result='SUCCESS', ref='refs/tags/foo'),
+            dict(name='same-project-no-ref', result='SUCCESS',
+                 ref='refs/tags/foo'),
+            dict(name='other-project', result='SUCCESS', ref='refs/tags/foo'),
+        ], ordered=False)

@@ -3628,6 +3628,7 @@ class Job(ConfigObject):
             project_default_branch=default_branch,
             trusted=trusted,
             required=include_vars.required,
+            use_ref=include_vars.use_ref,
         )
 
     def _deduplicateSecrets(self, context, frozen_playbooks):
@@ -4283,25 +4284,28 @@ class Job(ConfigObject):
 class JobIncludeVars(ConfigObject):
     """ A reference to a variables file from a job. """
 
-    def __init__(self, name, project_canonical_name, required):
+    def __init__(self, name, project_canonical_name, required, use_ref):
         super().__init__()
         self.name = name
         # The repo to look for the file in, or None for the zuul project
         self.project_canonical_name = project_canonical_name
         self.required = required
+        self.use_ref = use_ref
 
     def toDict(self):
         d = dict()
         d['name'] = self.name
         d['project_canonical_name'] = self.project_canonical_name
         d['required'] = self.required
+        d['use_ref'] = self.use_ref
         return d
 
     @classmethod
     def fromDict(cls, data):
         return cls(data['name'],
                    data['canonical_project_name'],
-                   data['required'])
+                   data['required'],
+                   data.get('use_ref', True))
 
     def __hash__(self):
         return hash(json.dumps(self.toDict(), sort_keys=True))

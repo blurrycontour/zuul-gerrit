@@ -749,6 +749,7 @@ class JobParser(object):
     complex_include_vars_zuul_project_def = {
         vs.Required('name'): str,
         'zuul-project': bool,
+        'use-ref': bool,
         'required': bool,
     }
 
@@ -1166,6 +1167,7 @@ class JobParser(object):
                         iv['name'],
                         project_cn,
                         iv.get('required', True),
+                        iv.get('use-ref', True),
                     )
                     include_vars.append(job_include_vars)
                 job.include_vars = tuple(include_vars)

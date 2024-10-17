@@ -9,6 +9,12 @@
       job_var_precedence: job-vars
 
 - job:
+    name: same-project-no-ref
+    include-vars:
+      - name: project1-vars.yaml
+        use-ref: false
+
+- job:
     name: other-project
     include-vars:
       - project: org/project2
@@ -24,3 +30,11 @@
             dependencies:
               - parent-job
         - other-project
+    tag:
+      jobs:
+        - parent-job
+        - same-project:
+            dependencies:
+              - parent-job
+        - other-project
+        - same-project-no-ref

@@ -1019,6 +1019,18 @@ Here is an example of two job definitions:
          This option is mutually exclusive with
          :attr:`job.include-vars.project`.
 
+      .. attr:: use-ref
+         :default: true
+
+         When this is ``true`` (the default) if the job is triggered
+         by a ref, and that ref is for the include-vars project, then
+         Zuul will checkout the ref and use the file from that ref
+         checkout.  If the include-vars is for a different project
+         than the triggering ref, or the job is not triggered by a
+         ref, or this is set to ``false``, then Zuul will follow the
+         normal fallback procedure for branches to determine from
+         which branch to load the file.
+
       An example using job-vars:
 
       .. code-block:: yaml

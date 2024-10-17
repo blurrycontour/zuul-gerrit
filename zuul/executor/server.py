@@ -2481,7 +2481,8 @@ class AnsibleJob(object):
         # It is neither a bare role, nor a collection of roles
         raise RoleNotFoundError("Unable to find role in %s" % (path,))
 
-    def selectBranchForProject(self, project, project_default_branch):
+    def selectBranchForProject(self, project, project_default_branch,
+                               consider_ref=None):
         # Find if the project is one of the job-specified projects.
         # If it is, we can honor the project checkout-override options.
         args = self.arguments
@@ -2491,9 +2492,19 @@ class AnsibleJob(object):
                 args_project = p
                 break
 
+        ref = None
+        if consider_ref:
+            # If this project is the Zuul project and this is a ref
+            # rather than a change, checkout the ref.
+            if (project.canonical_name ==
+                args['zuul']['project']['canonical_name'] and
+                (not args['zuul'].get('branch')) and
+                args['zuul'].get('ref')):
+                ref = args['zuul']['ref']
+
         return self.resolveBranch(
             project.canonical_name,
-            None,
+            ref,
             args['branch'],
             self.job.override_branch,
             self.job.override_checkout,
@@ -2685,7 +2696,8 @@ class AnsibleJob(object):
             project = source.getProject(iv['project'])
 
             branch, selected_desc = self.selectBranchForProject(
-                project, iv['project_default_branch'])
+                project, iv['project_default_branch'],
+                consider_ref=iv.get('use_ref', True))
             self.log.debug("Include-vars project %s using %s %s",
                            project.canonical_name, selected_desc, branch)
             if not iv['trusted']:
