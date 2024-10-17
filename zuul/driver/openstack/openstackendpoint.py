@@ -285,12 +285,12 @@ class OpenstackCreateStateMachine(statemachine.StateMachine):
                 key_name=self.label.key_name,
                 az=self.az,
                 config_drive=self.config_drive,
-                # networks=self.label.networks,
-                # security_groups=self.label.pool.security_groups,
+                networks=self.label.networks,
+                security_groups=self.label.security_groups,
                 boot_from_volume=self.label.boot_from_volume,
-                # volume_size=self.label.volume_size,
+                volume_size=self.label.volume_size,
                 instance_properties=self.metadata,
-                # userdata=self.label.userdata,
+                userdata=self.label.userdata,
             )
             self.state = self.SERVER_CREATING_SUBMIT
 
@@ -323,13 +323,13 @@ class OpenstackCreateStateMachine(statemachine.StateMachine):
             self.server = self.endpoint._refreshServer(self.server)
 
             if self.server['status'] == 'ACTIVE':
-                # if (self.label.pool.auto_floating_ip and
-                #     self.endpoint._needsFloatingIp(self.server)):
-                #     self.floating_ip = self.endpoint._createFloatingIp(
-                #         self.server)
-                #     self.state = self.FLOATING_IP_CREATING
-                # else:
-                self.state = self.COMPLETE
+                if (self.label.auto_floating_ip and
+                    self.endpoint._needsFloatingIp(self.server)):
+                    self.floating_ip = self.endpoint._createFloatingIp(
+                        self.server)
+                    self.state = self.FLOATING_IP_CREATING
+                else:
+                    self.state = self.COMPLETE
             elif self.server['status'] == 'ERROR':
                 if ('fault' in self.server and self.server['fault'] is not None
                     and 'message' in self.server['fault']):

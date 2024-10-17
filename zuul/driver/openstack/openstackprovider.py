@@ -105,15 +105,24 @@ class OpenstackProviderFlavor(BaseProviderFlavor):
 
 class OpenstackProviderLabel(BaseProviderLabel):
     openstack_label_schema = vs.Schema({
+        Optional('volume-size'): Nullable(int),
+        Optional('userdata'): Nullable(str),
+    })
+    inheritable_openstack_label_schema = vs.Schema({
+        Optional('auto-floating-ip', default=True): bool,
         Optional('boot-from-volume', default=False): bool,
+        Optional('networks', default=[]): [str],  # TODO: as_list?
+        Optional('security-groups', default=[]): [str],  # TODO: as_list?
     })
     inheritable_schema = assemble(
         BaseProviderLabel.inheritable_schema,
         provider_schema.ssh_label,
+        inheritable_openstack_label_schema,
     )
     schema = assemble(
         BaseProviderLabel.schema,
         provider_schema.ssh_label,
+        inheritable_openstack_label_schema,
         openstack_label_schema,
     )
 

@@ -494,8 +494,13 @@ class Launcher:
                     node.create_state_machine = provider.getCreateStateMachine(
                         node, image_external_id, log)
 
+                old_state = node.create_state_machine.state
                 log.debug("Checking node %s", node)
                 node.create_state_machine.advance()
+                new_state = node.create_state_machine.state
+                if old_state != new_state:
+                    log.debug("Node %s advanced from %s to %s",
+                              node, old_state, new_state)
                 if not node.create_state_machine.complete:
                     self.wake_event.set()
                     return
@@ -514,8 +519,13 @@ class Launcher:
                     node.delete_state_machine = provider.getDeleteStateMachine(
                         node, log)
 
+                old_state = node.delete_state_machine.state
                 log.debug("Checking node %s cleanup", node)
                 node.delete_state_machine.advance()
+                new_state = node.delete_state_machine.state
+                if old_state != new_state:
+                    log.debug("Node %s advanced from %s to %s",
+                              node, old_state, new_state)
 
             if not node.delete_state_machine.complete:
                 self.wake_event.set()
