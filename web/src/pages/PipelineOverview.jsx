@@ -53,15 +53,9 @@ import { useDocumentVisibility, useInterval } from '../Hooks'
 
 const filterCategories = [
   {
-    key: 'pipeline',
-    title: 'Pipeline',
-    placeholder: 'Filter by pipeline...',
-    type: 'fuzzy-search',
-  },
-  {
-    key: 'queue',
-    title: 'Queue',
-    placeholder: 'Filter by Queue...',
+    key: 'change',
+    title: 'Change',
+    placeholder: 'Filter by Change...',
     type: 'fuzzy-search',
   },
   {
@@ -71,9 +65,15 @@ const filterCategories = [
     type: 'fuzzy-search',
   },
   {
-    key: 'change',
-    title: 'Change',
-    placeholder: 'Filter by Change...',
+    key: 'queue',
+    title: 'Queue',
+    placeholder: 'Filter by Queue...',
+    type: 'fuzzy-search',
+  },
+  {
+    key: 'pipeline',
+    title: 'Pipeline',
+    placeholder: 'Filter by Pipeline...',
     type: 'fuzzy-search',
   },
 ]
