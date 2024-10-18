@@ -600,10 +600,9 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         #         iops=label.iops))
         return quota
 
-    def uploadImage(self, provider_image, filename,
+    def uploadImage(self, provider_image, image_name, filename,
                     image_format, metadata, md5, sha256, bucket_name,
                     timeout):
-        image_name = provider_image.name
         self.log.debug(f"Uploading image {image_name} "
                        f"via {provider_image.import_method}")
 

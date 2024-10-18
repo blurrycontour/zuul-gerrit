@@ -227,13 +227,13 @@ class OpenstackProvider(BaseProvider, subclass_id='openstack'):
         flavor = self.flavors[label.flavor]
         return self.endpoint.getQuotaForLabel(label, flavor)
 
-    def uploadImage(self, provider_image,
+    def uploadImage(self, provider_image, image_name,
                     filename, image_format, metadata, md5, sha256):
         # TODO make this configurable
         # timeout = self.image_import_timeout
         timeout = 300
         return self.endpoint.uploadImage(
-            provider_image,
+            provider_image, image_name,
             filename, image_format, metadata, md5, sha256,
             timeout)
 

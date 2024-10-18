@@ -521,7 +521,7 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
             return False
         return True
 
-    def uploadImage(self, provider_image, filename,
+    def uploadImage(self, provider_image, image_name, filename,
                     image_format, metadata, md5, sha256, timeout):
         # configure glance and upload image.  Note the meta flags
         # are provided as custom glance properties
@@ -539,7 +539,7 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
             metadata['disk_format'] = image_format
         # with Timer(self.log, 'API call create_image'):
         image = self._client.create_image(
-            name=provider_image.name,
+            name=image_name,
             filename=filename,
             is_public=False,
             wait=True,
