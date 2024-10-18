@@ -111,6 +111,8 @@
     images:
       - name: debian
         image-id: fake-image
+    networks:
+      - fake-network
 
 - section:
     name: openstack

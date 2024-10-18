@@ -36,7 +36,7 @@ from tests.base import (
 from tests.unit.test_launcher import ImageMocksFixture
 
 
-class TestOpenstackDriver(ZuulTestCase):
+class BaseOpenstackDriverTest(ZuulTestCase):
     config_file = 'zuul-connections-nodepool.conf'
     debian_return_data = {
         'zuul': {
@@ -56,6 +56,8 @@ class TestOpenstackDriver(ZuulTestCase):
             ]
         }
     }
+    openstack_needs_floating_ip = False
+    openstack_auto_attach_floating_ip = True
 
     def setUp(self):
         self.initTestConfig()
@@ -63,7 +65,10 @@ class TestOpenstackDriver(ZuulTestCase):
         clouds_yaml = os.path.join(FIXTURE_DIR, 'clouds.yaml')
         self.useFixture(
             fixtures.EnvironmentVariable('OS_CLIENT_CONFIG_FILE', clouds_yaml))
-        self.fake_cloud = FakeOpenstackCloud()
+        self.fake_cloud = FakeOpenstackCloud(
+            needs_floating_ip=self.openstack_needs_floating_ip,
+            auto_attach_floating_ip=self.openstack_auto_attach_floating_ip,
+        )
         self.patch(OpenstackDriver, '_endpoint_class',
                    FakeOpenstackProviderEndpoint)
         self.patch(FakeOpenstackProviderEndpoint,
@@ -73,19 +78,9 @@ class TestOpenstackDriver(ZuulTestCase):
     def tearDown(self):
         super().tearDown()
 
-    # TODO: make this a generic driver test
-    @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
-    def test_openstack_config(self):
-        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
-        provider = layout.providers['openstack-main']
-        endpoint = provider.getEndpoint()
-        self.assertEqual([], list(endpoint.listInstances()))
-
-    # TODO: make this a generic driver test
-    @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
-    def test_openstack_node_lifecycle(self):
+    def _test_openstack_node_lifecycle(self, label):
         nodeset = model.NodeSet()
-        nodeset.addNode(model.Node("node", "debian-normal"))
+        nodeset.addNode(model.Node("node", label))
 
         ctx = self.createZKContext(None)
         request = self.requestNodes([n.label for n in nodeset.getNodes()])
@@ -130,13 +125,28 @@ class TestOpenstackDriver(ZuulTestCase):
                 except NoNodeError:
                     break
 
+
+class TestOpenstackDriver(BaseOpenstackDriverTest):
+    # TODO: make this a generic driver test
+    @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
+    def test_openstack_config(self):
+        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
+        provider = layout.providers['openstack-main']
+        endpoint = provider.getEndpoint()
+        self.assertEqual([], list(endpoint.listInstances()))
+
+    # TODO: make this a generic driver test
+    @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
+    def test_openstack_node_lifecycle(self):
+        self._test_openstack_node_lifecycle('debian-normal')
+
     # TODO: make this a generic driver test
     @simple_layout('layouts/openstack/nodepool-image.yaml',
                    enable_nodepool=True)
     @return_data(
         'build-debian-local-image',
         'refs/heads/master',
-        debian_return_data,
+        BaseOpenstackDriverTest.debian_return_data,
     )
     def test_openstack_diskimage(self):
         self.waitUntilSettled()
@@ -156,3 +166,24 @@ class TestOpenstackDriver(ZuulTestCase):
         self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
         self.assertIsNotNone(uploads[0].external_id)
         self.assertTrue(uploads[0].validated)
+
+
+# Openstack-driver specific tests
+class TestOpenstackDriverFloatingIp(BaseOpenstackDriverTest):
+    # This test is for nova-net clouds with floating ips that require
+    # manual attachment.
+    openstack_needs_floating_ip = True
+    openstack_auto_attach_floating_ip = False
+
+    @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
+    def test_openstack_fip(self):
+        self._test_openstack_node_lifecycle('debian-normal')
+
+
+class TestOpenstackDriverAutoAttachFloatingIp(BaseOpenstackDriverTest):
+    openstack_needs_floating_ip = True
+    openstack_auto_attach_floating_ip = True
+
+    @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
+    def test_openstack_auto_attach_fip(self):
+        self._test_openstack_node_lifecycle('debian-normal')

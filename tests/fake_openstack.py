@@ -63,19 +63,44 @@ class FakeOpenstackImage(FakeOpenstackObject):
     pass
 
 
+class FakeOpenstackNetwork(FakeOpenstackObject):
+    pass
+
+
+class FakeOpenstackFloatingIp(FakeOpenstackObject):
+    def _fake_toDict(self):
+        return {
+            'version': 4,
+            'addr': self.floating_ip_address,
+            'OS-EXT-IPS:type': 'floating',
+        }
+
+
 class FakeOpenstackCloud:
     log = logging.getLogger("zuul.FakeOpenstackCloud")
 
-    def __init__(self):
+    def __init__(self,
+                 needs_floating_ip=False,
+                 auto_attach_floating_ip=True,
+                 ):
+        self._fake_needs_floating_ip = needs_floating_ip
+        self._fake_auto_attach_floating_ip = auto_attach_floating_ip
         self.servers = []
         self.volumes = []
         self.images = []
+        self.floating_ips = []
         self.flavors = [
             FakeOpenstackFlavor(
                 id='425e3203150e43d6b22792f86752533d',
                 name='Fake Flavor',
                 ram=8192,
                 vcpus=4,
+            )
+        ]
+        self.networks = [
+            FakeOpenstackNetwork(
+                id=uuid.uuid4().hex,
+                name='fake-network',
             )
         ]
 
@@ -123,32 +148,52 @@ class FakeOpenstackConnection:
         self.config.config = {}
         self.config.config['image_format'] = 'qcow2'
 
+    def _needs_floating_ip(self, server, nat_destination):
+        return self.cloud._fake_needs_floating_ip
+
+    def _has_floating_ips(self):
+        return False
+
     def list_flavors(self, get_extra=False):
         return self.cloud.flavors
 
     def list_volumes(self):
         return self.cloud.volumes
 
+    def get_network(self, name_or_id, filters=None):
+        for x in self.cloud.networks:
+            if x.id == name_or_id or x.name == name_or_id:
+                return x
+
     def list_servers(self):
         return self.cloud.servers
 
     def create_server(self, wait=None, name=None, image=None,
                       flavor=None, config_drive=None, key_name=None,
-                      meta=None):
+                      nics=None, meta=None):
         location = FakeOpenstackLocation(zone=None)
-        server = FakeOpenstackServer(
+        if self.cloud._fake_needs_floating_ip:
+            addresses = dict(
+                public=[],
+                private=[dict(version=4, addr='fake')]
+            )
+        else:
+            addresses = dict(
+                public=[dict(version=4, addr='fake'),
+                        dict(version=6, addr='fake_v6')],
+                private=[dict(version=4, addr='fake')]
+            )
+
+        args = dict(
             id=uuid.uuid4().hex,
             name=name,
             host_id='fake_host_id',
             location=location,
             volumes=[],
             status='ACTIVE',
-            addresses=dict(
-                public=[dict(version=4, addr='fake'),
-                        dict(version=6, addr='fake_v6')],
-                private=[dict(version=4, addr='fake')]
-            )
+            addresses=addresses,
         )
+        server = FakeOpenstackServer(**args)
         self.cloud.servers.append(server)
         return server
 
@@ -178,6 +223,35 @@ class FakeOpenstackConnection:
             if x.id == name_or_id:
                 self.cloud.servers.remove(x)
                 return
+
+    def create_floating_ip(self, server, wait=None):
+        args = dict(
+            id=uuid.uuid4().hex,
+            floating_ip_address='fake',
+            status='ACTIVE',
+        )
+        if self.cloud._fake_auto_attach_floating_ip:
+            args['port_id'] = 'fake'
+        fip = FakeOpenstackFloatingIp(**args)
+        self.cloud.floating_ips.append(fip)
+        if self.cloud._fake_auto_attach_floating_ip:
+            server['addresses']['public'].append(fip._fake_toDict())
+        return fip
+
+    def list_floating_ips(self):
+        return self.cloud.floating_ips
+
+    def delete_floating_ip(self, name_or_id):
+        for x in self.cloud.floating_ips:
+            if x.id == name_or_id:
+                self.cloud.floating_ips.remove(x)
+                return
+
+    def _attach_ip_to_server(self, server, floating_ip, skip_attach=False):
+        if floating_ip.get('port_id'):
+            raise Exception("Attaching already attached fip")
+        floating_ip['port_id'] = 'fake'
+        server['addresses']['public'].append(floating_ip._fake_toDict())
 
 
 class FakeOpenstackProviderEndpoint(OpenstackProviderEndpoint):
