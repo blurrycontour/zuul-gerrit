@@ -1427,6 +1427,10 @@ class TestNodepoolConfig(ZuulTestCase):
             - section:
                 name: badsection
                 parent: aws-base
+            - provider:
+                name: badprovider
+                section: badsection
+                region: foo
             """)
         file_dict = {'zuul.yaml': in_repo_conf}
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
@@ -1436,3 +1440,8 @@ class TestNodepoolConfig(ZuulTestCase):
         self.assertEqual(A.reported, 1)
         self.assertEqual(A.patchsets[-1]['approvals'][0]['value'], '-1')
         self.assertIn('references a section', A.messages[0])
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        self.assertFalse('badprovider' in tenant.layout.providers)
