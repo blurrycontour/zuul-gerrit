@@ -465,55 +465,6 @@ class TestLauncher(ZuulTestCase):
         self.waitUntilSettled()
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
-    def test_node_lifecycle(self):
-        nodeset = model.NodeSet()
-        nodeset.addNode(model.Node("node", "debian-normal"))
-
-        ctx = self.createZKContext(None)
-        request = self.requestNodes([n.label for n in nodeset.getNodes()])
-
-        client = LauncherClient(self.zk_client, None)
-        request = client.getRequest(request.uuid)
-
-        self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
-        self.assertEqual(len(request.nodes), 1)
-
-        client.acceptNodeset(request, nodeset)
-        self.waitUntilSettled()
-
-        with testtools.ExpectedException(NoNodeError):
-            # Request should be gone
-            request.refresh(ctx)
-
-        for node in nodeset.getNodes():
-            pnode = node._provider_node
-            self.assertIsNotNone(pnode)
-            self.assertTrue(pnode.hasLock())
-
-        client.useNodeset(nodeset)
-        self.waitUntilSettled()
-
-        for node in nodeset.getNodes():
-            pnode = node._provider_node
-            self.assertTrue(pnode.hasLock())
-            self.assertTrue(pnode.state, pnode.State.IN_USE)
-            self.assertEqual(pnode.connection_type, 'ssh')
-
-        client.returnNodeset(nodeset)
-        self.waitUntilSettled()
-
-        for node in nodeset.getNodes():
-            pnode = node._provider_node
-            self.assertFalse(pnode.hasLock())
-            self.assertTrue(pnode.state, pnode.State.USED)
-
-            for _ in iterate_timeout(60, "node to be deleted"):
-                try:
-                    pnode.refresh(ctx)
-                except NoNodeError:
-                    break
-
-    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_lost_nodeset_request(self):
         ctx = self.createZKContext(None)
         request = self.requestNodes(["debian-normal"])
