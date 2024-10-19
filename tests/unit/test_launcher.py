@@ -595,6 +595,41 @@ class TestLauncher(ZuulTestCase):
                 except NoNodeError:
                     break
 
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    @mock.patch(
+        'zuul.driver.aws.awsendpoint.AwsCreateStateMachine.advance',
+        side_effect=Exception("Fake error"))
+    @mock.patch(
+        'zuul.driver.aws.awsendpoint.AwsDeleteStateMachine.advance',
+        side_effect=Exception("Fake error"))
+    @mock.patch('zuul.launcher.server.Launcher.DELETE_TIMEOUT', 1)
+    @okay_tracebacks('_execute_mock_call')
+    def test_failed_node3(self, mock_create, mock_delete):
+        # Test a node failure inside both the create and delete state
+        # machines
+        ctx = self.createZKContext(None)
+        request = self.requestNodes(["debian-normal"])
+        self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
+        provider_nodes = request.provider_nodes[0]
+        self.assertEqual(len(provider_nodes), 2)
+        self.assertEqual(len(request.nodes), 1)
+        self.assertEqual(provider_nodes[-1], request.nodes[-1])
+
+        provider_nodes = []
+        for node_id in request.nodes:
+            provider_nodes.append(model.ProviderNode.fromZK(
+                ctx, path=model.ProviderNode._getPath(node_id)))
+
+        request.delete(ctx)
+        self.waitUntilSettled()
+
+        for pnode in provider_nodes:
+            for _ in iterate_timeout(60, "node to be deleted"):
+                try:
+                    pnode.refresh(ctx)
+                except NoNodeError:
+                    break
+
     @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
     @return_data(
         'build-debian-local-image',
