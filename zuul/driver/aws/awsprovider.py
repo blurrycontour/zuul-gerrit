@@ -95,6 +95,9 @@ class AwsProviderImage(BaseProviderImage):
         self.image_id = None
         self.image_filters = None
         super().__init__(image_config, provider_config)
+        # Implement provider defaults
+        if self.connection_type is None:
+            self.connection_type = 'ssh'
 
 
 class AwsProviderFlavor(BaseProviderFlavor):

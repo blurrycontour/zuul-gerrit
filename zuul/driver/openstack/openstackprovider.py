@@ -85,6 +85,9 @@ class OpenstackProviderImage(BaseProviderImage):
         self.image_filters = None
         super().__init__(image_config, provider_config)
         self.format = image_format
+        # Implement provider defaults
+        if self.connection_type is None:
+            self.connection_type = 'ssh'
 
 
 class OpenstackProviderFlavor(BaseProviderFlavor):

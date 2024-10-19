@@ -388,6 +388,7 @@ class Launcher:
         # the request UUID as namespace.
         node_uuid = uuid.uuid4().hex
         label = provider.labels[label_name]
+        image = provider.images[label.image]
         tags = provider.getNodeTags(
             self.system.system_id, request, provider, label,
             node_uuid)
@@ -401,6 +402,8 @@ class Launcher:
             tenant_name=request.tenant_name,
             provider=provider.name,
             tags=tags,
+            # Set any node attributes we already know here
+            connection_type=image.connection_type,
         )
         log.debug("Requested node %s", node)
         return node
