@@ -26,16 +26,17 @@ from zuul.driver.aws.awsmodel import AwsProviderNode
 
 from tests.fake_aws import FakeAws, FakeAwsProviderEndpoint
 from tests.base import (
-    ZuulTestCase,
     iterate_timeout,
     simple_layout,
     return_data,
 )
 from tests.unit.test_launcher import ImageMocksFixture
+from tests.unit.test_cloud_driver import BaseCloudDriverTest
 
 
-class TestAwsDriver(ZuulTestCase):
+class TestAwsDriver(BaseCloudDriverTest):
     config_file = 'zuul-connections-nodepool.conf'
+    cloud_test_image_format = 'raw'
     mock_aws = mock_aws()
     debian_return_data = {
         'zuul': {
@@ -146,13 +147,38 @@ class TestAwsDriver(ZuulTestCase):
         super().tearDown()
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
-    def test_aws_config(self):
-        aws_conn = self.scheds.first.sched.connections.connections['aws']
-        self.assertEqual('fake', aws_conn.access_key_id)
-        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
-        provider = layout.providers['aws-us-east-1-main']
-        endpoint = provider.getEndpoint()
-        self.assertEqual([], list(endpoint.listInstances()))
+    def test_aws_node_lifecycle(self):
+        self._test_node_lifecycle('debian-normal')
+
+    @simple_layout('layouts/aws/nodepool-image-snapshot.yaml',
+                   enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        debian_return_data,
+    )
+    def test_aws_diskimage_snapshot(self):
+        self._test_diskimage()
+
+    @simple_layout('layouts/aws/nodepool-image-image.yaml',
+                   enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        debian_return_data,
+    )
+    def test_aws_diskimage_image(self):
+        self._test_diskimage()
+
+    @simple_layout('layouts/aws/nodepool-image-ebs-direct.yaml',
+                   enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        debian_return_data,
+    )
+    def test_aws_diskimage_ebs_direct(self):
+        self._test_diskimage()
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_state_machines_instance(self):
@@ -219,54 +245,3 @@ class TestAwsDriver(ZuulTestCase):
                 'zuul.driver.aws.awsendpoint.AwsProviderEndpoint.'
                 '_completeCreateInstance', return_value=None)):
             yield
-
-    # Test the 3 image import methods:
-
-    def _test_aws_diskimage_import(self):
-        self.waitUntilSettled()
-        self.assertHistory([
-            dict(name='build-debian-local-image', result='SUCCESS'),
-        ], ordered=False)
-
-        name = 'review.example.com%2Forg%2Fcommon-config/debian-local'
-        artifacts = self.launcher.image_build_registry.\
-            getArtifactsForImage(name)
-        self.assertEqual(1, len(artifacts))
-        self.assertEqual('raw', artifacts[0].format)
-        self.assertTrue(artifacts[0].validated)
-        uploads = self.launcher.image_upload_registry.getUploadsForImage(
-            name)
-        self.assertEqual(1, len(uploads))
-        self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
-        self.assertIn('ami-', uploads[0].external_id)
-        self.assertTrue(uploads[0].validated)
-
-    @simple_layout('layouts/aws/nodepool-image-snapshot.yaml',
-                   enable_nodepool=True)
-    @return_data(
-        'build-debian-local-image',
-        'refs/heads/master',
-        debian_return_data,
-    )
-    def test_aws_diskimage_snapshot(self):
-        self._test_aws_diskimage_import()
-
-    @simple_layout('layouts/aws/nodepool-image-image.yaml',
-                   enable_nodepool=True)
-    @return_data(
-        'build-debian-local-image',
-        'refs/heads/master',
-        debian_return_data,
-    )
-    def test_aws_diskimage_image(self):
-        self._test_aws_diskimage_import()
-
-    @simple_layout('layouts/aws/nodepool-image-ebs-direct.yaml',
-                   enable_nodepool=True)
-    @return_data(
-        'build-debian-local-image',
-        'refs/heads/master',
-        debian_return_data,
-    )
-    def test_aws_diskimage_ebs_direct(self):
-        self._test_aws_diskimage_import()
