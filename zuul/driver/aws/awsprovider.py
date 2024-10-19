@@ -98,6 +98,8 @@ class AwsProviderImage(BaseProviderImage):
         # Implement provider defaults
         if self.connection_type is None:
             self.connection_type = 'ssh'
+        if self.connection_port is None:
+            self.connection_port = 22
 
 
 class AwsProviderFlavor(BaseProviderFlavor):

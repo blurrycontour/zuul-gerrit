@@ -403,6 +403,7 @@ class Launcher:
             provider=provider.name,
             tags=tags,
             # Set any node attributes we already know here
+            connection_port=image.connection_port,
             connection_type=image.connection_type,
         )
         log.debug("Requested node %s", node)
@@ -505,7 +506,7 @@ class Launcher:
 
                 old_state = node.create_state_machine.state
                 log.debug("Checking node %s", node)
-                node.create_state_machine.advance()
+                instance = node.create_state_machine.advance()
                 new_state = node.create_state_machine.state
                 if old_state != new_state:
                     log.debug("Node %s advanced from %s to %s",
@@ -513,6 +514,7 @@ class Launcher:
                 if not node.create_state_machine.complete:
                     self.wake_event.set()
                     return
+                self._updateNodeFromInstance(node, instance)
                 node.state = model.ProviderNode.State.READY
                 self.wake_event.set()
                 log.debug("Marking node %s as %s", node, node.state)
@@ -554,6 +556,52 @@ class Launcher:
                 log.debug("Removing provider node %s", node)
                 node.delete(ctx)
                 node.releaseLock()
+
+    def _updateNodeFromInstance(self, node, instance):
+        if instance is None:
+            return
+
+        # TODO:
+        # if (pool.use_internal_ip and
+        #     (instance.private_ipv4 or instance.private_ipv6)):
+        #     server_ip = instance.private_ipv4 or instance.private_ipv6
+        # else:
+        server_ip = instance.interface_ip
+
+        node.interface_ip = server_ip
+        node.public_ipv4 = instance.public_ipv4
+        node.private_ipv4 = instance.private_ipv4
+        node.public_ipv6 = instance.public_ipv6
+        node.private_ipv6 = instance.private_ipv6
+        node.host_id = instance.host_id
+        node.cloud = instance.cloud
+        node.region = instance.region
+        node.az = instance.az
+        node.driver_data = instance.driver_data
+        node.slot = instance.slot
+
+        # If we did not know the resource information before
+        # launching, update it now.
+        # TODO:
+        # node.resources = instance.getQuotaInformation().get_resources()
+
+        # Optionally, if the node has updated values that we set from
+        # the image attributes earlier, set those.
+        for attr in ('username', 'python_path', 'shell_type',
+                     'connection_port', 'connection_type',
+                     'host_keys'):
+            if hasattr(instance, attr):
+                setattr(node, attr, getattr(instance, attr))
+
+        # As a special case for metastatic, if we got node_attributes
+        # from the backing driver, use them as default values and let
+        # the values from the pool override.
+        instance_node_attrs = getattr(instance, 'node_attributes', None)
+        if instance_node_attrs is not None:
+            attrs = instance_node_attrs.copy()
+            if node.attributes:
+                attrs.update(node.attributes)
+            node.attributes = attrs
 
     def _getProvider(self, tenant_name, provider_name):
         for provider in self.tenant_providers[tenant_name]:
