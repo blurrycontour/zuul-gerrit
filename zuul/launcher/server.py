@@ -177,6 +177,7 @@ class Launcher:
     log = logging.getLogger("zuul.Launcher")
     # Max. time the main event loop is allowed to sleep
     MAX_SLEEP = 1
+    DELETE_TIMEOUT = 600
 
     def __init__(self, config, connections):
         self._running = True
@@ -479,9 +480,14 @@ class Launcher:
             # * deallocate from request here
             # * re-allocated similar to min-ready
             if not request or node.state in node.State.FAILED:
-                self._cleanupNode(node, log)
+                try:
+                    self._cleanupNode(node, log)
+                except Exception:
+                    log.exception("Error in node cleanup")
+                    self.wake_event.set()
 
     def _checkNode(self, node, log):
+        # TODO: check timeout
         with self.createZKContext(node._lock, self.log) as ctx:
             with node.activeContext(ctx):
                 if not node.create_state_machine:
@@ -521,11 +527,19 @@ class Launcher:
 
                 old_state = node.delete_state_machine.state
                 log.debug("Checking node %s cleanup", node)
-                node.delete_state_machine.advance()
-                new_state = node.delete_state_machine.state
-                if old_state != new_state:
-                    log.debug("Node %s advanced from %s to %s",
-                              node, old_state, new_state)
+
+                now = time.time()
+                if now - node.delete_state_machine.start_time > self.DELETE_TIMEOUT:
+                    log.error("Timeout deleting node %s", node)
+                    node.delete_state_machine.state = node.delete_state_machine.COMPLETE
+                    node.delete_state_machine.complete = True
+
+                if not node.delete_state_machine.complete:
+                    node.delete_state_machine.advance()
+                    new_state = node.delete_state_machine.state
+                    if old_state != new_state:
+                        log.debug("Node %s advanced from %s to %s",
+                                  node, old_state, new_state)
 
             if not node.delete_state_machine.complete:
                 self.wake_event.set()

@@ -21,7 +21,7 @@ class StateMachine:
     def __init__(self, initial_state):
         self.state = initial_state.get("state", self.START)
         self.complete = False
-        self.start_time = initial_state.get("start_time", time.monotonic())
+        self.start_time = initial_state.get("start_time", time.time())
 
     def advance(self):
         pass
