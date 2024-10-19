@@ -15,11 +15,7 @@
 import os
 
 import fixtures
-import testtools
-from kazoo.exceptions import NoNodeError
 
-from zuul import model
-from zuul.launcher.client import LauncherClient
 from zuul.driver.openstack import OpenstackDriver
 
 from tests.fake_openstack import (
@@ -29,14 +25,15 @@ from tests.fake_openstack import (
 from tests.base import (
     FIXTURE_DIR,
     ZuulTestCase,
-    iterate_timeout,
     simple_layout,
     return_data,
 )
 from tests.unit.test_launcher import ImageMocksFixture
+from tests.unit.test_cloud_driver import BaseCloudDriverTest
 
 
 class BaseOpenstackDriverTest(ZuulTestCase):
+    cloud_test_image_format = 'qcow2'
     config_file = 'zuul-connections-nodepool.conf'
     debian_return_data = {
         'zuul': {
@@ -78,70 +75,12 @@ class BaseOpenstackDriverTest(ZuulTestCase):
     def tearDown(self):
         super().tearDown()
 
-    def _test_openstack_node_lifecycle(self, label):
-        nodeset = model.NodeSet()
-        nodeset.addNode(model.Node("node", label))
 
-        ctx = self.createZKContext(None)
-        request = self.requestNodes([n.label for n in nodeset.getNodes()])
-
-        client = LauncherClient(self.zk_client, None)
-        request = client.getRequest(request.uuid)
-
-        self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
-        self.assertEqual(len(request.nodes), 1)
-
-        client.acceptNodeset(request, nodeset)
-        self.waitUntilSettled()
-
-        with testtools.ExpectedException(NoNodeError):
-            # Request should be gone
-            request.refresh(ctx)
-
-        for node in nodeset.getNodes():
-            pnode = node._provider_node
-            self.assertIsNotNone(pnode)
-            self.assertTrue(pnode.hasLock())
-
-        client.useNodeset(nodeset)
-        self.waitUntilSettled()
-
-        for node in nodeset.getNodes():
-            pnode = node._provider_node
-            self.assertTrue(pnode.hasLock())
-            self.assertTrue(pnode.state, pnode.State.IN_USE)
-            self.assertEqual(pnode.connection_type, 'ssh')
-
-        client.returnNodeset(nodeset)
-        self.waitUntilSettled()
-
-        for node in nodeset.getNodes():
-            pnode = node._provider_node
-            self.assertFalse(pnode.hasLock())
-            self.assertTrue(pnode.state, pnode.State.USED)
-
-            for _ in iterate_timeout(60, "node to be deleted"):
-                try:
-                    pnode.refresh(ctx)
-                except NoNodeError:
-                    break
-
-
-class TestOpenstackDriver(BaseOpenstackDriverTest):
-    # TODO: make this a generic driver test
-    @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
-    def test_openstack_config(self):
-        layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
-        provider = layout.providers['openstack-main']
-        endpoint = provider.getEndpoint()
-        self.assertEqual([], list(endpoint.listInstances()))
-
-    # TODO: make this a generic driver test
+class TestOpenstackDriver(BaseOpenstackDriverTest, BaseCloudDriverTest):
     @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
     def test_openstack_node_lifecycle(self):
-        self._test_openstack_node_lifecycle('debian-normal')
+        self._test_node_lifecycle('debian-normal')
 
-    # TODO: make this a generic driver test
     @simple_layout('layouts/openstack/nodepool-image.yaml',
                    enable_nodepool=True)
     @return_data(
@@ -150,27 +89,12 @@ class TestOpenstackDriver(BaseOpenstackDriverTest):
         BaseOpenstackDriverTest.debian_return_data,
     )
     def test_openstack_diskimage(self):
-        self.waitUntilSettled()
-        self.assertHistory([
-            dict(name='build-debian-local-image', result='SUCCESS'),
-        ], ordered=False)
-
-        name = 'review.example.com%2Forg%2Fcommon-config/debian-local'
-        artifacts = self.launcher.image_build_registry.\
-            getArtifactsForImage(name)
-        self.assertEqual(1, len(artifacts))
-        self.assertEqual('qcow2', artifacts[0].format)
-        self.assertTrue(artifacts[0].validated)
-        uploads = self.launcher.image_upload_registry.getUploadsForImage(
-            name)
-        self.assertEqual(1, len(uploads))
-        self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
-        self.assertIsNotNone(uploads[0].external_id)
-        self.assertTrue(uploads[0].validated)
+        self._test_diskimage()
 
 
 # Openstack-driver specific tests
-class TestOpenstackDriverFloatingIp(BaseOpenstackDriverTest):
+class TestOpenstackDriverFloatingIp(BaseOpenstackDriverTest,
+                                    BaseCloudDriverTest):
     # This test is for nova-net clouds with floating ips that require
     # manual attachment.
     openstack_needs_floating_ip = True
@@ -178,13 +102,14 @@ class TestOpenstackDriverFloatingIp(BaseOpenstackDriverTest):
 
     @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
     def test_openstack_fip(self):
-        self._test_openstack_node_lifecycle('debian-normal')
+        self._test_node_lifecycle('debian-normal')
 
 
-class TestOpenstackDriverAutoAttachFloatingIp(BaseOpenstackDriverTest):
+class TestOpenstackDriverAutoAttachFloatingIp(BaseOpenstackDriverTest,
+                                              BaseCloudDriverTest):
     openstack_needs_floating_ip = True
     openstack_auto_attach_floating_ip = True
 
     @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
     def test_openstack_auto_attach_fip(self):
-        self._test_openstack_node_lifecycle('debian-normal')
+        self._test_node_lifecycle('debian-normal')
