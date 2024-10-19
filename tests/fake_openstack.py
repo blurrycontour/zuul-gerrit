@@ -177,12 +177,14 @@ class FakeOpenstackConnection:
                 public=[],
                 private=[dict(version=4, addr='fake')]
             )
+            interface_ip = 'fake'
         else:
             addresses = dict(
                 public=[dict(version=4, addr='fake'),
                         dict(version=6, addr='fake_v6')],
                 private=[dict(version=4, addr='fake')]
             )
+            interface_ip = 'fake'
 
         args = dict(
             id=uuid.uuid4().hex,
@@ -192,6 +194,7 @@ class FakeOpenstackConnection:
             volumes=[],
             status='ACTIVE',
             addresses=addresses,
+            interface_ip=interface_ip,
         )
         server = FakeOpenstackServer(**args)
         self.cloud.servers.append(server)
