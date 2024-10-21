@@ -67,6 +67,8 @@ class RawZKIO(io.RawIOBase):
 
     def write(self, data):
         byte_count = len(data)
+        if byte_count > NODE_BYTE_SIZE_LIMIT:
+            raise Exception(f"ZK data size too large: {byte_count}")
         start = time.perf_counter()
         if self.create:
             _, self.zstat = self.client.create(
