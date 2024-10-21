@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5060ba6f_76eb5040",
+        "filename": "tests/unit/test_openstack_driver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-21T09:23:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0dfab816_1908a400",
+      "revId": "60110a9b1724486162607c90c2235e7caa3ce8fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f5132b4_429a16fa",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-21T09:16:32Z",
       "side": 1,
       "message": "same here",
+      "revId": "60110a9b1724486162607c90c2235e7caa3ce8fc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0faeb192_bd1b27ab",
+        "filename": "tests/unit/test_openstack_driver.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-21T09:23:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f5132b4_429a16fa",
       "revId": "60110a9b1724486162607c90c2235e7caa3ce8fc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
