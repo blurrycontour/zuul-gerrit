@@ -16,6 +16,24 @@
       "message": "I\u0027m not sure we want to do this.  The zuul_unreachable group is for hosts that have *become* unreachable, but this appears to serve hosts that were never reachable.  If we were to do this, I think it should not use that group.\n\nBut also, I\u0027m not sure nodepool is the right way to supply nodes to zuul that zuul can\u0027t interact with.  In other words, I\u0027m not convinced this is a feature zuul and nodepool should support.",
       "revId": "c269f77703f45f8ca9667ec009b51f671d8da1e3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c75283a_28867809",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37375
+      },
+      "writtenOn": "2024-10-22T07:07:53Z",
+      "side": 1,
+      "message": "Can you explain, please, what a use case for the \"host-key-checking\" option in Nodepool? In the description [1] there is written:\n\n\u003e Disable this if nodepool-launcher and the nodes it launches are on different networks, where the launcher is unable to reach the nodes directly, or when using Nodepool with non-SSH node platforms.\n\nFor me it looks like \"you may use nodes which are unreachable for Nodepool and as a consequence for Zuul too\". Arguably, I misunderstand this description.\n\n[1] https://zuul-ci.org/docs/nodepool/latest/static.html#attr-providers.[static].pools.nodes.host-key-checking",
+      "parentUuid": "8a9f6db2_5ece02ff",
+      "revId": "c269f77703f45f8ca9667ec009b51f671d8da1e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
