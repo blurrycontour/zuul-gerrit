@@ -66,19 +66,28 @@ class TestAwsDriver(BaseCloudDriverTest):
         self.useFixture(
             fixtures.EnvironmentVariable('AWS_SECRET_ACCESS_KEY', aws_key))
 
+        # Moto doesn't handle some aspects of instance creation, so we
+        # intercept and log the calls.
+        def _fake_run_instances(*args, **kwargs):
+            self.__testcase.run_instances_calls.append(kwargs)
+            if self.__testcase.run_instances_exception:
+                raise self.__testcase.run_instances_exception
+            return self.ec2_client.run_instances_orig(*args, **kwargs)
+
         self.fake_aws = FakeAws()
         self.mock_aws.start()
         # Must start responses after mock_aws
         self.useFixture(ImageMocksFixture())
 
-        self.ec2 = boto3.resource('ec2', region_name='us-west-2')
-        self.ec2_client = boto3.client('ec2', region_name='us-west-2')
-        self.s3 = boto3.resource('s3', region_name='us-west-2')
-        self.s3_client = boto3.client('s3', region_name='us-west-2')
-        self.iam = boto3.resource('iam', region_name='us-west-2')
-        self.s3.create_bucket(
-            Bucket='zuul',
-            CreateBucketConfiguration={'LocationConstraint': 'us-west-2'})
+        self.ec2 = boto3.resource('ec2', region_name='us-east-1')
+        self.ec2_client = boto3.client('ec2', region_name='us-east-1')
+        self.s3 = boto3.resource('s3', region_name='us-east-1')
+        self.s3_client = boto3.client('s3', region_name='us-east-1')
+        self.iam = boto3.resource('iam', region_name='us-east-1')
+        self.s3.create_bucket(Bucket='zuul')
+
+        self.ec2_client.run_instances_orig = self.ec2_client.run_instances
+        self.ec2_client.run_instances = _fake_run_instances
 
         # A list of args to method calls for validation
         self.run_instances_calls = []
@@ -145,6 +154,15 @@ class TestAwsDriver(BaseCloudDriverTest):
     def tearDown(self):
         self.mock_aws.stop()
         super().tearDown()
+
+    def _assertProviderNodeAttributes(self, pnode):
+        super()._assertProviderNodeAttributes(pnode)
+        self.assertEqual(
+            self.run_instances_calls[0]['BlockDeviceMappings'][0]['Ebs']
+            ['Iops'], 1000)
+        self.assertEqual(
+            self.run_instances_calls[0]['BlockDeviceMappings'][0]['Ebs']
+            ['Throughput'], 200)
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_aws_node_lifecycle(self):
