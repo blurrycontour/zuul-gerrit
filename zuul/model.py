@@ -1834,12 +1834,21 @@ class ProviderConfig(ConfigObject):
     def flattenConfig(self, layout):
         config = copy.deepcopy(Freezable.thaw(self.config))
         parent_name = self.section
+        previous_section = None
         while parent_name:
             parent_section = layout.sections[parent_name]
+            # Prevent sections from referencing sections in other projects
+            if (previous_section and
+                parent_section.source_context.project_canonical_name !=
+                previous_section.source_context.project_canonical_name):
+                raise Exception(
+                    f'The section "{previous_section.name}" references a '
+                    'section in a different project.')
             parent_config = copy.deepcopy(Freezable.thaw(
                 parent_section.config))
             config = ProviderConfig._mergeDict(parent_config, config)
             parent_name = parent_section.parent
+            previous_section = parent_section
         # Provide defaults from the images/flavors/labels objects
         for image in config.get('images', []):
             layout_image = self._dropNone(
