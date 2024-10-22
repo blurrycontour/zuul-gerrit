@@ -140,16 +140,20 @@ class OpenstackDeleteStateMachine(statemachine.StateMachine):
 
     def advance(self):
         if self.state == self.START:
-            self.server = self.endpoint._getServer(self.external_id)
-            if (self.server and
-                self.endpoint._hasFloatingIps() and
-                self.server.get('addresses')):
-                self.floating_ips = self.endpoint._getFloatingIps(self.server)
-                for fip in self.floating_ips:
-                    self.endpoint._deleteFloatingIp(fip)
-                    self.state = self.FLOATING_IP_DELETING
-            if not self.floating_ips:
-                self.state = self.SERVER_DELETE_SUBMIT
+            if self.external_id:
+                self.server = self.endpoint._getServer(self.external_id)
+                if (self.server and
+                    self.endpoint._hasFloatingIps() and
+                    self.server.get('addresses')):
+                    self.floating_ips = self.endpoint._getFloatingIps(
+                        self.server)
+                    for fip in self.floating_ips:
+                        self.endpoint._deleteFloatingIp(fip)
+                        self.state = self.FLOATING_IP_DELETING
+                if not self.floating_ips:
+                    self.state = self.SERVER_DELETE_SUBMIT
+            else:
+                self.state = self.COMPLETE
 
         if self.state == self.FLOATING_IP_DELETING:
             fips = []
