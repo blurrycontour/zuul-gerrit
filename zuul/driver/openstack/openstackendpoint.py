@@ -36,6 +36,7 @@ from zuul.driver.util import (
     LazyExecutorTTLCache,
     QuotaInformation,
     RateLimiter,
+    Timer,
 )
 from zuul.provider import (
     BaseProviderEndpoint,
@@ -469,11 +470,11 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
             yield OpenstackInstance(self.provider, server, quota)
 
     def getQuotaLimits(self):
-        # with Timer(self.log, 'API call get_compute_limits'):
-        compute = self._client.get_compute_limits()
+        with Timer(self.log, 'API call get_compute_limits'):
+            compute = self._client.get_compute_limits()
         try:
-            # with Timer(self.log, 'API call get_volume_limits'):
-            volume = self._client.get_volume_limits()
+            with Timer(self.log, 'API call get_volume_limits'):
+                volume = self._client.get_volume_limits()
         except EndpointNotFound:
             volume = None
         return quota_from_limits(compute, volume)
@@ -537,22 +538,22 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
             metadata = {}
         if image_format:
             metadata['disk_format'] = image_format
-        # with Timer(self.log, 'API call create_image'):
-        image = self._client.create_image(
-            name=image_name,
-            filename=filename,
-            is_public=False,
-            wait=True,
-            md5=md5,
-            sha256=sha256,
-            timeout=timeout,
-            **metadata)
+        with Timer(self.log, 'API call create_image'):
+            image = self._client.create_image(
+                name=image_name,
+                filename=filename,
+                is_public=False,
+                wait=True,
+                md5=md5,
+                sha256=sha256,
+                timeout=timeout,
+                **metadata)
         return image.id
 
     def deleteImage(self, external_id):
         self.log.debug(f"Deleting image {external_id}")
-        # with Timer(self.log, 'API call delete_image'):
-        return self._client.delete_image(external_id)
+        with Timer(self.log, 'API call delete_image'):
+            return self._client.delete_image(external_id)
 
     # Local implementation
 
@@ -626,8 +627,8 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
             create_args['meta'] = instance_properties
 
         try:
-            # with Timer(self.log, 'API call create_server'):
-            return self._client.create_server(wait=False, **create_args)
+            with Timer(self.log, 'API call create_server'):
+                return self._client.create_server(wait=False, **create_args)
         except openstack.exceptions.BadRequestException:
             # We've gotten a 400 error from nova - which means the request
             # was malformed. The most likely cause of that, unless something
@@ -645,26 +646,26 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
 
     # This method is wrapped with an LRU cache in the constructor.
     def _listAZs(self):
-        # with Timer(self.log, 'API call list_availability_zone_names'):
-        return self._client.list_availability_zone_names()
+        with Timer(self.log, 'API call list_availability_zone_names'):
+            return self._client.list_availability_zone_names()
 
     # This method is wrapped with an LRU cache in the constructor.
     def _findImage(self, name):
-        # with Timer(self.log, 'API call get_image'):
-        return self._client.get_image(name, filters={'status': 'active'})
+        with Timer(self.log, 'API call get_image'):
+            return self._client.get_image(name, filters={'status': 'active'})
 
     # This method is wrapped with an LRU cache in the constructor.
     def _listFlavors(self):
-        # with Timer(self.log, 'API call list_flavors'):
-        flavors = self._client.list_flavors(get_extra=False)
+        with Timer(self.log, 'API call list_flavors'):
+            flavors = self._client.list_flavors(get_extra=False)
         flavors.sort(key=operator.itemgetter('ram', 'name'))
         return flavors
 
     # This method is only used by the nodepool alien-image-list
     # command and only works with the openstack driver.
     def _listImages(self):
-        # with Timer(self.log, 'API call list_images'):
-        return self._client.list_images()
+        with Timer(self.log, 'API call list_images'):
+            return self._client.list_images()
 
     def _findFlavorByName(self, flavor_name):
         for f in self._listFlavors():
@@ -693,8 +694,8 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
 
     # This method is wrapped with an LRU cache in the constructor.
     def _findNetwork(self, name):
-        # with Timer(self.log, 'API call get_network'):
-        network = self._client.get_network(name)
+        with Timer(self.log, 'API call get_network'):
+            network = self._client.get_network(name)
         if not network:
             raise Exception("Unable to find network %s in provider %s" % (
                 name, self.provider.name))
@@ -786,19 +787,19 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
         return next_link, params
 
     def _listServers(self):
-        # with Timer(self.log, 'API call detailed server list'):
-        return self._simpleServerList()
+        with Timer(self.log, 'API call detailed server list'):
+            return self._simpleServerList()
 
     def _listVolumes(self):
         try:
-            # with Timer(self.log, 'API call list_volumes'):
-            return self._client.list_volumes()
+            with Timer(self.log, 'API call list_volumes'):
+                return self._client.list_volumes()
         except EndpointNotFound:
             return []
 
     def _listFloatingIps(self):
-        # with Timer(self.log, 'API call list_floating_ips'):
-        return self._client.list_floating_ips()
+        with Timer(self.log, 'API call list_floating_ips'):
+            return self._client.list_floating_ips()
 
     def _refreshServer(self, obj):
         ret = self._getServer(obj['id'])
@@ -821,8 +822,8 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
     def _getServerByIdNow(self, server_id):
         # A synchronous get server by id.  Only to be used in error
         # handling where we can't wait for the list to update.
-        # with Timer(self.log, 'API call get_server_by_id'):
-        return self._client.get_server_by_id(server_id)
+        with Timer(self.log, 'API call get_server_by_id'):
+            return self._client.get_server_by_id(server_id)
 
     def _refreshServerDelete(self, obj):
         if obj is None:
@@ -851,21 +852,21 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
         return None
 
     def _needsFloatingIp(self, server):
-        # with Timer(self.log, 'API call _needs_floating_ip'):
-        return self._client._needs_floating_ip(
-            server=server, nat_destination=None)
+        with Timer(self.log, 'API call _needs_floating_ip'):
+            return self._client._needs_floating_ip(
+                server=server, nat_destination=None)
 
     def _createFloatingIp(self, server):
-        # with Timer(self.log, 'API call create_floating_ip'):
-        return self._client.create_floating_ip(server=server, wait=True)
+        with Timer(self.log, 'API call create_floating_ip'):
+            return self._client.create_floating_ip(server=server, wait=True)
 
     def _attachIpToServer(self, server, fip):
         # skip_attach is ignored for nova, which is the only time we
         # should actually call this method.
-        # with Timer(self.log, 'API call _attach_ip_to_server'):
-        return self._client._attach_ip_to_server(
-            server=server, floating_ip=fip,
-            skip_attach=True)
+        with Timer(self.log, 'API call _attach_ip_to_server'):
+            return self._client._attach_ip_to_server(
+                server=server, floating_ip=fip,
+                skip_attach=True)
 
     def _hasFloatingIps(self):
         # Not a network call
@@ -876,18 +877,18 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
             server['addresses'], ext_tag='floating')
         ret = []
         for fip in fips:
-            # with Timer(self.log, 'API call get_floating_ip'):
-            ret.append(self._client.get_floating_ip(
-                id=None, filters={'floating_ip_address': fip['addr']}))
+            with Timer(self.log, 'API call get_floating_ip'):
+                ret.append(self._client.get_floating_ip(
+                    id=None, filters={'floating_ip_address': fip['addr']}))
         return ret
 
     def _deleteFloatingIp(self, fip):
-        # with Timer(self.log, 'API call delete_floating_ip'):
-        self._client.delete_floating_ip(fip['id'], retry=0)
+        with Timer(self.log, 'API call delete_floating_ip'):
+            self._client.delete_floating_ip(fip['id'], retry=0)
 
     def _deleteServer(self, external_id):
-        # with Timer(self.log, 'API call delete_server'):
-        self._client.delete_server(external_id)
+        with Timer(self.log, 'API call delete_server'):
+            self._client.delete_server(external_id)
         return True
 
     def _getFlavorFromServer(self, server):
