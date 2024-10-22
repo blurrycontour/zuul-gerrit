@@ -9,24 +9,25 @@ below to join an IRC channel.  The example below is for the
 ``#opendev`` channel on OFTC, but the process is similar for other
 channels or networks.
 
-Click the plus icon next to `Rooms` on the left of the screen, then
-click `Explore public rooms` in the dropdown that appears.
+Click the plus icon next to the `Home` space on the left of the
+screen, then click `Join public room` in the dropdown that appears.
 
 .. image:: /images/matrix/account-rooms-dropdown.png
    :align: center
 
-A popup dialog will appear; below the search bar in the dialog, click
-the dropdown selector labeled `Matrix rooms (matrix.org)` and change
-it to `OFTC rooms (matrix.org)`.  Then enter ``#opendev`` into the search
-box.
+A popup dialog will appear where you can enter the name of the room to
+join.  IRC channels are bridged to matrix with a special room name.
+OFTC channels are prefixed with ``#_oftc_`` and suffixed with
+``:matrix.org``.  To join the ``#opendev`` IRC channel, enter
+``#_oftc_#opendev:matrix.org`` into the text field.
 
 .. image:: /images/matrix/account-rooms-opendev.png
    :align: center
 
-It will display `No results for "#opendev"` which is an unfortunate
-consequence of one of the anti-spam measures that is necessary on IRC.
-Disregard that and hit `enter` or click `Join`, and you will join the
-room.
+There will be no search results; an unfortunate consequence of one of
+the anti-spam measures necessary on IRC.  Disregard that and hit
+`enter` or click `Join #oftc_#opendev:matrix.org`, and you will join
+the room.
 
 If this is your first time joining an OFTC channel, you will also
 receive an invitation to join the `OFTC IRC Bridge status` room.
