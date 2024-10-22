@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a04cde98_2a841b31",
+        "filename": "tests/fixtures/config/remote-zuul-stream/git/org_project/playbooks/command.yaml",
+        "patchSetId": 4
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-22T23:17:44Z",
+      "side": 1,
+      "message": "Is this skipped because the previous task run against compute1 affects the filesystem for the controller (they are effectively the same node?). It might be worth a comment here that that is what is happening as it isn\u0027t super obvious if just reading the ansible in this test case.",
+      "revId": "21be3b2d4be943c8044ea2784f344eb270ddc5a7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
