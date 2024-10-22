@@ -46,6 +46,13 @@ class AwsProviderImage(BaseProviderImage):
         'name': str,
         'values': [str],
     }
+    # This is used here and in flavors and labels
+    inheritable_aws_volume_schema = vs.Schema({
+        Optional('volume-size'): Nullable(int),
+        Optional('volume-type', default='gp3'): str,
+        Optional('iops'): Nullable(int),
+        Optional('throughput'): Nullable(int),
+    })
     aws_cloud_schema = vs.Schema({
         vs.Exclusive(Required('image-id'), 'spec'): str,
         vs.Exclusive(Required('image-filters'), 'spec'): [aws_image_filters],
@@ -55,6 +62,7 @@ class AwsProviderImage(BaseProviderImage):
         assemble(
             BaseProviderImage.schema,
             aws_cloud_schema,
+            inheritable_aws_volume_schema,
         ),
         RequiredExclusive('image_id', 'image_filters',
                           msg=('Provide either '
@@ -67,10 +75,6 @@ class AwsProviderImage(BaseProviderImage):
         Optional('imds-support', default=None): vs.Any('v2.0', None),
         Optional('architecture', default='x86_64'): str,
         Optional('ena-support', default=True): bool,
-        Optional('volume-size'): Nullable(int),
-        Optional('volume-type', default='gp3'): str,
-        Optional('iops'): Nullable(int),
-        Optional('throughput'): Nullable(int),
     })
     aws_zuul_schema = vs.Schema({
         Required('type'): 'zuul',
@@ -79,11 +83,12 @@ class AwsProviderImage(BaseProviderImage):
     zuul_schema = assemble(
         BaseProviderImage.schema,
         aws_zuul_schema,
+        inheritable_aws_volume_schema,
         inheritable_aws_zuul_schema,
     )
-
     inheritable_schema = assemble(
         BaseProviderImage.inheritable_schema,
+        inheritable_aws_volume_schema,
         inheritable_aws_zuul_schema,
     )
     schema = vs.Union(
@@ -105,7 +110,6 @@ class AwsProviderImage(BaseProviderImage):
 class AwsProviderFlavor(BaseProviderFlavor):
     aws_flavor_schema = vs.Schema({
         Required('instance-type'): str,
-        Optional('volume-type'): Nullable(str),
         Optional('dedicated-host', default=False): bool,
         Optional('ebs-optimized', default=False): bool,
         Optional('market-type', default='on-demand'): vs.Any(
@@ -114,11 +118,15 @@ class AwsProviderFlavor(BaseProviderFlavor):
 
     inheritable_schema = assemble(
         BaseProviderFlavor.inheritable_schema,
+        # This is already included via the image, but listed again
+        # here for clarity.
+        AwsProviderImage.inheritable_aws_volume_schema,
         provider_schema.cloud_flavor,
     )
     schema = assemble(
         BaseProviderFlavor.schema,
         provider_schema.cloud_flavor,
+        AwsProviderImage.inheritable_aws_volume_schema,
         aws_flavor_schema,
     )
 
@@ -126,11 +134,19 @@ class AwsProviderFlavor(BaseProviderFlavor):
 class AwsProviderLabel(BaseProviderLabel):
     inheritable_schema = assemble(
         BaseProviderLabel.inheritable_schema,
+        # This is already included via the image, but listed again
+        # here for clarity.
+        AwsProviderImage.inheritable_aws_volume_schema,
         provider_schema.ssh_label,
     )
     schema = assemble(
         BaseProviderLabel.schema,
+        AwsProviderImage.inheritable_aws_volume_schema,
         provider_schema.ssh_label,
+    )
+
+    image_flavor_inheritable_schema = assemble(
+        AwsProviderImage.inheritable_aws_volume_schema,
     )
 
 

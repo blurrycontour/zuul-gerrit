@@ -77,6 +77,7 @@ class BaseProviderLabel(CNameMixin, metaclass=abc.ABCMeta):
     schema = assemble(
         provider_schema.base_label,
     )
+    image_flavor_inheritable_schema = assemble()
 
     def __init__(self, label_config, provider_config):
         new_config = label_config.copy()
@@ -89,6 +90,21 @@ class BaseProviderLabel(CNameMixin, metaclass=abc.ABCMeta):
     def __repr__(self):
         return (f"<{self.__class__.__name__} "
                 f"canonical_name={self.canonical_name} >")
+
+    def inheritFrom(self, image, flavor):
+        # Some label attributes should default to values specified in
+        # a flavor or image (for example, volume types) but can be
+        # overridden by a label.  This method implements that
+        # inheritance, using the attributes specified in
+        # image_label_inhertable_schema.
+        for attr in self.image_flavor_inheritable_schema.schema:
+            # Get the vs.Optional attribute mutation
+            if hasattr(attr, 'output'):
+                attr = attr.output
+            if getattr(self, attr, None) is None:
+                setattr(self, attr,
+                        getattr(flavor, attr,
+                                getattr(image, attr, None)))
 
 
 class BaseProviderEndpoint(metaclass=abc.ABCMeta):
@@ -214,10 +230,15 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
     def parseConfig(self, config, connection):
         schema = self.getProviderSchema()
         ret = schema(config)
+        images = self.parseImages(config, connection)
+        flavors = self.parseFlavors(config, connection)
+        labels = self.parseLabels(config, connection)
+        for label in labels.values():
+            label.inheritFrom(images[label.image], flavors[label.flavor])
         ret.update(dict(
-            images=self.parseImages(config, connection),
-            flavors=self.parseFlavors(config, connection),
-            labels=self.parseLabels(config, connection),
+            images=images,
+            flavors=flavors,
+            labels=labels,
         ))
         return ret
 
