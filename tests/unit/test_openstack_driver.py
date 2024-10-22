@@ -110,6 +110,7 @@ class BaseOpenstackDriverTest(ZuulTestCase):
             pnode = node._provider_node
             self.assertTrue(pnode.hasLock())
             self.assertTrue(pnode.state, pnode.State.IN_USE)
+            self.assertEqual(pnode.connection_type, 'ssh')
 
         client.returnNodeset(nodeset)
         self.waitUntilSettled()
