@@ -1,3 +1,21 @@
+:root {
+    /* Zuul color schema based on the default Patternfly 4 colors, but
+     * with a slightly different green tone to improve usability for
+     * users who are colorblind.
+     *
+     * This colors are also suitable for the dark mode.
+     */
+    --zuul-color-success: #5ba352; /* --pf-global--palette--green-400 */
+    --zuul-color-danger: #c9190b; /* --pf-global--palette--red-100 */
+    --zuul-color-warning: #f0ab00; /* --pf-global--warning-color--100 */
+    --zuul-color-info: #2b9af3; /* --pf-global--info-color--100 */
+    --zuul-color-disabled: #8a8d90; /* --pf-global--palette--black-500 */
+}
+
+:root:where(.pf-theme-dark) {
+    --zuul-color-disabled: #444548; /* --pf-global--palette--black-500 */
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -284,44 +302,38 @@ a.refresh {
 
 .zuul-item-square {
     cursor: pointer;
-    opacity: 0.7;
     padding: 0 !important;
 }
 
 .zuul-item-square-success {
-    color: var(--pf-global--success-color--100) !important;
+    color: var(--zuul-color-success) !important;
 }
 .zuul-item-square-success svg:hover {
-    opacity: 1;
     color: var(--pf-global--palette--green-600) !important;
 }
 .zuul-item-square-danger {
-    color: var(--pf-global--danger-color--100) !important;
+    color: var(--zuul-color-danger) !important;
 }
 .zuul-item-square-danger svg:hover {
-    opacity: 1;
-    color: var(--pf-global--danger-color--200) !important;
+    color: var(--pf-global--palette--red-300) !important;
 }
 .zuul-item-square-info {
-    color: var(--pf-global--info-color--100) !important;
+    color: var(--zuul-color-info) !important;
 }
 .zuul-item-square-info svg:hover {
-    opacity: 1;
     color: var(--pf-global--palette--blue-500) !important;
 }
 .zuul-item-square-warning {
-    color: var(--pf-global--warning-color--100) !important;
+    color: var(--zuul-color-warning) !important;
 }
 .zuul-item-square-warning svg:hover {
-    opacity: 1;
     color: var(--pf-global--palette--orange-400) !important;
 }
 .zuul-item-square-pending {
-    color: var(--pf-global--palette--black-500) !important;
+    color: var(--zuul-color-disabled) !important;
 }
 .zuul-item-square-pending svg:hover {
-    opacity: 1;
-    color: var(--pf-global--palette--black-700) !important;
+    color: var(--pf-global--palette--black-800) !important;
 }
 
 /* Make the cards within a zuul-change-queue even more compact */
@@ -415,24 +427,24 @@ a.refresh {
 }
 
 .zuul-job-result-label.pf-c-label.pf-m-green {
-    background-color: var(--pf-global--palette--green-400);
+    background-color: var(--zuul-color-success);
 }
 
 .zuul-job-result-label.pf-c-label.pf-m-red {
-    background-color: var(--pf-global--palette--red-100);
+    background-color: var(--zuul-color-danger);
 }
 
 .zuul-job-result-label.pf-c-label.pf-m-orange {
-    background-color: var(--pf-global--warning-color--100);
+    background-color: var(--zuul-color-warning);
 }
 
 .zuul-job-result-label.pf-c-label.pf-m-blue {
-    background-color: var(--pf-global--info-color--100);
+    background-color: var(--zuul-color-info);
 }
 
 .zuul-job-result-label.pf-c-label {
     /* grey variant, without additional "pf-m-" class */
-    background-color: var(--pf-global--palette--black-500);
+    background-color: var(--zuul-color-disabled);
 }
 
 .zuul-job-result-label.pf-c-label .pf-c-label__content::before {
@@ -507,6 +519,9 @@ a.refresh {
 }
 
 .pf-c-progress.zuul-item-progress {
+    --pf-c-progress--m-success__bar--BackgroundColor: var(--zuul-color-success);
+    --pf-c-progress--m-warning__bar--BackgroundColor: var(--zuul-color-warning);
+    --pf-c-progress--m-danger__bar--BackgroundColor: var(--zuul-color-danger);
     height: 24px;
 }
 
@@ -947,26 +962,6 @@ details.foldable[open] summary::before {
 
 .pf-theme-dark .pf-c-empty-state {
     color: #fff !important;
-}
-
-.pf-theme-dark .zuul-item-square-success {
-    color: var(--pf-global--palette--green-300) !important;
-}
-
-.pf-theme-dark .zuul-item-square-success svg:hover {
-    color: var(--pf-global--palette--green-500) !important;
-}
-
-.pf-theme-dark .zuul-item-square-danger svg:hover {
-    color: var(--pf-global--palette--red-200) !important;
-}
-
-.pf-theme-dark .zuul-item-square-pending {
-    color: var(--pf-global--palette--black-400) !important
-}
-
-.pf-theme-dark .zuul-item-square-pending svg:hover {
-    color: var(--pf-global--palette--black-500) !important;
 }
 
 .pf-theme-dark .zuul-queue-item-popover {
