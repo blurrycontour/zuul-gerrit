@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cff24d75_8aac8eba",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1124,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-23T22:01:53Z",
+      "side": 1,
+      "message": "These tests cover cases where we\u0027re using \"unsafe\" characters in a name and not encoding them which is I suspect works because things are being implicitly encoded by the browser/requests and then cherrypy is similarly expecing things to be encoded? However, that won\u0027t work if we use unsafe characters that are unsafe because they are part of url parameter passing. \n\nDoes this still work happily if we use characters like `\u0026` and `?`? Mostly worried that we might have a regression for jobs that use those characters due to their use for encoding parameters.",
+      "revId": "2d21c091661e220ab8db1cffac567260f0c13428",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
