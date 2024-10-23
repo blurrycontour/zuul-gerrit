@@ -145,7 +145,7 @@ function fetchOpenApi() {
 }
 
 function fetchTenants() {
-  return makeRequest(apiUrl + 'tenants')
+  return makeRequest(apiUrl + 'tenant-list')
 }
 
 function fetchTenantStatus(apiPrefix) {

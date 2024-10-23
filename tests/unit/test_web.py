@@ -318,6 +318,22 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(3, data[0]['projects'])
         self.assertEqual(1, data[0]['queue'])
 
+    def test_web_tenant_names(self):
+        "Test that we can retrieve JSON tenant name list"
+        resp = self.get_url("api/tenant-list")
+        self.assertIn('Content-Length', resp.headers)
+        self.assertIn('Content-Type', resp.headers)
+        self.assertEqual(
+            'application/json; charset=utf-8', resp.headers['Content-Type'])
+
+        data = resp.json()
+        expected = [
+            {
+                'name': 'tenant-one',
+            },
+        ]
+        self.assertEqual(expected, data)
+
     def test_web_connections_list(self):
         data = self.get_url('api/connections').json()
         connection = {

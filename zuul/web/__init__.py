@@ -1175,6 +1175,7 @@ class ZuulWebAPI(object):
             'components': '/api/components',
             'authorizations': '/api/authorizations',
             'tenants': '/api/tenants',
+            'tenant_list': '/api/tenant-list',
             'tenant_info': '/api/tenant/{tenant}/info',
             'status': '/api/tenant/{tenant}/status',
             'status_change': '/api/tenant/{tenant}/status/change/{change}',
@@ -1390,6 +1391,22 @@ class ZuulWebAPI(object):
         last_modified_header = last_modified.strftime('%a, %d %b %Y %X GMT')
         resp.headers["Last-modified"] = last_modified_header
         return self.tenants_cache
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.check_root_auth()
+    @openapi_response(
+        code=200,
+        content_type='application/json',
+        description='Returns the list of tenant names',
+        schema=Prop('The list of tenant names', [{
+            'name': Prop('Tenant name', str),
+        }]),
+    )
+    def tenant_list(self, auth):
+        tenants = sorted(self.zuulweb.abide.tenants.keys())
+        return [{"name": t} for t in tenants]
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
@@ -2352,6 +2369,8 @@ class ZuulWeb(object):
                           controller=api, action='components')
         route_map.connect('api', '/api/tenants',
                           controller=api, action='tenants')
+        route_map.connect('api', '/api/tenant-list',
+                          controller=api, action='tenant_list')
         route_map.connect('api', '/api/tenant/{tenant_name}/info',
                           controller=api, action='tenant_info')
         route_map.connect('api', '/api/tenant/{tenant_name}/status',
