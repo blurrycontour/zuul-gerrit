@@ -46,27 +46,27 @@ import { ExternalLink, formatTime } from '../../Misc'
 const QUEUE_ITEM_ICON_CONFIGS = {
   SUCCESS: {
     icon: CheckIcon,
-    color: 'var(--pf-global--success-color--100)',
+    color: 'var(--zuul-color-success)',
     variant: 'success',
   },
   FAILURE: {
     icon: TimesIcon,
-    color: 'var(--pf-global--danger-color--100)',
+    color: 'var(--zuul-color-danger)',
     variant: 'danger',
   },
   MERGE_CONFLICT: {
     icon: ExclamationIcon,
-    color: 'var(--pf-global--warning-color--100)',
+    color: 'var(--zuul-color-warning)',
     variant: 'warning',
   },
   QUEUED: {
     icon: OutlinedClockIcon,
-    color: 'var(--pf-global--info-color--100)',
+    color: 'var(--zuul-color-info)',
     variant: 'info',
   },
   NON_LIVE: {
     icon: InfoIcon,
-    color: 'var(--pf-global--disabled-color--100)',
+    color: 'var(--zuul-color-disabled)',
     variant: 'pending',
   },
 }
@@ -113,79 +113,79 @@ const DEFAULT_PIPELINE_ICON_CONFIG = PIPELINE_ICON_CONFIGS['unknown']
 const JOB_STATE_ICON_CONFIGS = {
   SUCCESS: {
     icon: CheckIcon,
-    color: 'var(--pf-global--success-color--100)',
+    color: 'var(--zuul-color-success)',
     variant: 'success',
     labelColor: 'green',
   },
   FAILURE: {
     icon: TimesIcon,
-    color: 'var(--pf-global--danger-color--100)',
+    color: 'var(--zuul-color-danger)',
     variant: 'danger',
     labelColor: 'red',
   },
   LOST: {
     icon: TimesIcon,
-    color: 'var(--pf-global--danger-color--100)',
+    color: 'var(--zuul-color-danger)',
     variant: 'danger',
     labelColor: 'red',
   },
   PAUSED: {
     icon: PauseIcon,
-    color: 'var(--pf-global--info-color--100)',
+    color: 'var(--zuul-color-info)',
     variant: 'info',
     labelColor: 'blue',
   },
   QUEUED: {
     icon: OutlinedClockIcon,
-    color: 'var(--pf-global--info-color--100)',
+    color: 'var(--zuul-color-pending)',
     variant: 'pending',
     labelColor: 'grey',
   },
   SKIPPED: {
     icon: AngleDoubleRightIcon,
-    color: 'var(--pf-global--info-color--100)',
+    color: 'var(--zuul-color-info)',
     variant: 'info',
     labelColor: 'blue',
   },
   WAITING: {
     icon: OutlinedClockIcon,
-    color: 'var(--pf-global--disabled-color--100)',
+    color: 'var(--zuul-color-disabled)',
     variant: 'pending',
     labelColor: 'grey',
   },
   CANCELED: {
     icon: TimesIcon,
-    color: 'var(--pf-global--warning-color--100)',
+    color: 'var(--zuul-color-warning)',
     variant: 'warning',
     labelColor: 'orange',
   },
   POST_FAILURE: {
     icon: TimesIcon,
-    color: 'var(--pf-global--warning-color--100)',
+    color: 'var(--zuul-color-warning)',
     variant: 'warning',
     labelColor: 'orange',
   },
   NODE_FAILURE: {
     icon: TimesIcon,
-    color: 'var(--pf-global--warning-color--100)',
+    color: 'var(--zuul-color-warning)',
     variant: 'warning',
     labelColor: 'orange',
   },
   TIMED_OUT: {
     icon: TimesIcon,
-    color: 'var(--pf-global--warning-color--100)',
+    color: 'var(--zuul-color-warning)',
     variant: 'warning',
     labelColor: 'orange',
   },
   RETRY_LIMIT: {
     icon: TimesIcon,
-    color: 'var(--pf-global--warning-color--100)',
+    color: 'var(--zuul-color-warning)',
     variant: 'warning',
     labelColor: 'orange',
   },
   UNSTABLE: {
     icon: TimesIcon,
-    color: 'var(--pf-global--warning-color--100)',
+    color: 'var(--zuul-color-warning)',
     variant: 'warning',
     labelColor: 'orange',
   },
@@ -193,7 +193,7 @@ const JOB_STATE_ICON_CONFIGS = {
 
 const DEFAULT_JOB_STATE_ICON_CONFIG = {
   icon: InProgressIcon,
-  color: 'var(--pf-global--disabled-color--100)',
+  color: 'var(--zuul-color-disabled)',
   variant: 'info',
   labelColor: 'grey',
 }
