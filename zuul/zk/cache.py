@@ -14,11 +14,13 @@
 # under the License.
 
 import abc
+import contextlib
 import json
 import logging
 import queue
 import threading
 import time
+from uuid import uuid4
 
 from kazoo import exceptions as kze
 from kazoo.protocol.states import (
@@ -40,8 +42,11 @@ class ZuulTreeCache(abc.ABC):
     qsize_warning_threshold = 1024
 
     def __init__(self, zk_client, root):
+        self.zk_client = zk_client
         self.client = zk_client.client
         self.root = root
+        self.sync_path = f"{root}/_sync/{uuid4().hex}"
+        self.sync_events = {}
         self._last_event_warning = time.monotonic()
         self._last_playback_warning = time.monotonic()
         self._cached_objects = {}
@@ -201,7 +206,8 @@ class ZuulTreeCache(abc.ABC):
             fetch = False
 
         key = self.parsePath(event.path)
-        if key is None and event.type != EventType.NONE:
+        if (key is None and event.type != EventType.NONE
+                and event.path != self.sync_path):
             # The cache doesn't care about this path, so we don't need
             # to fetch (unless the type is none (re-initialization) in
             # which case we always need to fetch in order to determine
@@ -272,7 +278,14 @@ class ZuulTreeCache(abc.ABC):
             self._cached_paths.discard(event.path)
 
         # Some caches have special handling for certain sub-objects
-        self.preCacheHook(event, exists)
+        self.preCacheHook(event, exists, stat)
+
+        if event.path == self.sync_path and stat is not None:
+            for ltime in list(self.sync_events.keys()):
+                if ltime > stat.mzxid:
+                    continue
+                with contextlib.suppress(KeyError):
+                    self.sync_events[ltime].set()
 
         # If we don't actually cache this kind of object, return now
         if key is None:
@@ -305,8 +318,27 @@ class ZuulTreeCache(abc.ABC):
     def ensureReady(self):
         self._ready.wait()
 
+    def waitForSync(self, timeout=None):
+        sync_ltime = self.zk_client.getCurrentLtime()
+        try:
+            sync_event = threading.Event()
+            self.sync_events[sync_ltime] = sync_event
+            try:
+                self.client.set(self.sync_path, b"")
+            except kze.NoNodeError:
+                # If the node was created in the meantime we will
+                # still be notified.
+                with contextlib.suppress(kze.NodeExistsError):
+                    self.client.create(
+                        self.sync_path, ephemeral=True, makepath=True)
+            self.log.debug("Waiting for cache sync (ltime=%s, timeout=%s)",
+                           sync_ltime, timeout)
+            return sync_event.wait(timeout)
+        finally:
+            self.sync_events.pop(sync_ltime, None)
+
     # Methods for subclasses:
-    def preCacheHook(self, event, exists):
+    def preCacheHook(self, event, exists, stat=None):
         """Called before the cache is updated
 
         This is called for any add/update/remove event under the root,
@@ -321,6 +353,7 @@ class ZuulTreeCache(abc.ABC):
 
         :param EventType event: The event.
         :param bool exists: Whether the object exists in ZK.
+        :param ZnodeStat stat: ZNode stat when the node exists, else None
 
         """
         return None
