@@ -9321,8 +9321,10 @@ class Tenant(object):
         :returns: A list of TenantProjectConfigs describing the found
             projects.
         """
-
-        matcher = re2.compile(regex)
+        if isinstance(regex, str):
+            matcher = re2.compile(regex)
+        else:
+            matcher = regex
         projects = []
         result = []
 

@@ -1309,7 +1309,7 @@ class ProjectParser(object):
         }
 
         project = {
-            'name': str,
+            'name': vs.Any(ZUUL_REGEX, str),
             'description': str,
             'branches': to_list(vs.Any(ZUUL_REGEX, str)),
             'vars': ansible_vars_dict,
@@ -1339,9 +1339,13 @@ class ProjectParser(object):
 
         source_tpc = self.pcontext.tenant.getTPC(
             source_context.project_canonical_name)
-        if project_name.startswith('^'):
+        if isinstance(project_name, dict) or project_name.startswith('^'):
+            if isinstance(project_name, dict):
+                project_regex = make_regex(project_name, self.pcontext)
+            else:
+                project_regex = project_name
             for other_tpc in \
-                self.pcontext.tenant.getTPCsByRegex(project_name):
+                self.pcontext.tenant.getTPCsByRegex(project_regex):
                 if not source_tpc.canConfigureProject(other_tpc):
                     raise ProjectNotPermittedError()
 
@@ -1350,7 +1354,10 @@ class ProjectParser(object):
             project_config = self.pcontext.project_template_parser. \
                 fromYaml(conf, validate=False, freeze=False)
 
-            project_config.name = project_name
+            if isinstance(project_name, dict):
+                project_config.name = tuple(sorted(project_name.items()))
+            else:
+                project_config.name = project_name
         else:
             other_tpc = self.pcontext.tenant.getTPC(project_name)
             if other_tpc is None:
@@ -2798,7 +2805,10 @@ class TenantParser(object):
                     name = config_project.get('name')
                     parsed_project = pcontext.project_parser.fromYaml(
                         config_project)
-                    if name and name.startswith('^'):
+                    if name and isinstance(name, dict):
+                        parsed_config.projects_by_regex.setdefault(
+                            tuple(sorted(name.items())), []).append(parsed_project)
+                    elif name and name.startswith('^'):
                         parsed_config.projects_by_regex.setdefault(
                             name, []).append(parsed_project)
                     else:
@@ -2987,6 +2997,8 @@ class TenantParser(object):
         # project stanzas and organized by regex. We need to loop over each
         # regex and copy each stanza below the regex for each matching project.
         for regex, config_projects in parsed_config.projects_by_regex.items():
+            if isinstance(regex, tuple):
+                regex = make_regex(dict(regex), parse_context)
             projects_matching_regex = tenant.getProjectsByRegex(regex)
 
             for trusted, project in projects_matching_regex:
