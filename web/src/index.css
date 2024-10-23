@@ -510,6 +510,10 @@ a.refresh {
     height: 24px;
 }
 
+.pf-c-progress.zuul-item-progress:not(:first-child) {
+    border-left: 2px solid transparent;
+}
+
 .pf-c-progress.zuul-item-progress .pf-c-progress__indicator {
     height: 24px;
 }
