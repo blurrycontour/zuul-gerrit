@@ -1370,26 +1370,12 @@ class ZuulWebAPI(object):
         description='Returns the list of tenants',
         schema=Prop('The list of tenants', [{
             'name': Prop('Tenant name', str),
-            'projects': Prop('Tenant project count', int),
-            'queue': Prop('Active changes count', int),
         }]),
     )
     @openapi_response(404, description='Tenant not found')
     def tenants(self, auth):
-        cache_time = self.tenants_cache_time
-        if time.time() - cache_time > self.cache_expiry:
-            with self.tenants_cache_lock:
-                self.tenants_cache = self._tenants()
-                self.tenants_cache_time = time.time()
-
-        resp = cherrypy.response
-        resp.headers["Cache-Control"] = f"public, max-age={self.cache_expiry}"
-        last_modified = datetime.utcfromtimestamp(
-            self.tenants_cache_time
-        )
-        last_modified_header = last_modified.strftime('%a, %d %b %Y %X GMT')
-        resp.headers["Last-modified"] = last_modified_header
-        return self.tenants_cache
+        tenants = sorted(self.zuulweb.abide.tenants.keys())
+        return [{"name": t} for t in tenants]
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')

@@ -19,12 +19,10 @@ import { Link } from 'react-router-dom'
 import {
   BuildIcon,
   CubeIcon,
-  CubesIcon,
   DesktopIcon,
   FolderIcon,
   HomeIcon,
   RepositoryIcon,
-  TrendUpIcon,
   ThumbtackIcon,
 } from '@patternfly/react-icons'
 import {
@@ -72,8 +70,6 @@ class TenantsPage extends React.Component {
           { title: (<Link to={'/t/' + tenant.name + '/builds'}>Builds</Link>) },
           { title: (<Link to={'/t/' + tenant.name + '/buildsets'}>Buildsets</Link>) },
           { title: (<Link to={'/t/' + tenant.name + '/autoholds'}>Autoholds</Link>) },
-          tenant.projects,
-          tenant.queue
         ]
       }
     })
@@ -106,14 +102,6 @@ class TenantsPage extends React.Component {
         title: <IconProperty icon={<ThumbtackIcon />} value="Autoholds" />,
         dataLabel: 'Autoholds',
       },
-      {
-        title: <IconProperty icon={<CubesIcon />} value="Project count" />,
-        dataLabel: 'Project count',
-      },
-      {
-        title: <IconProperty icon={<TrendUpIcon />} value="Queue" />,
-        dataLabel: 'Queue',
-      }
     ]
 
     return (
