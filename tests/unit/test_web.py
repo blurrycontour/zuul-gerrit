@@ -267,56 +267,20 @@ class TestWeb(BaseTestWeb):
             self.assertIn(key, data["web"][0])
 
     def test_web_tenants(self):
-        "Test that we can retrieve JSON status info"
-        # Disable tenant list caching
-        self.web.web.api.cache_expiry = 0
-        self.add_base_changes()
-        self.executor_server.hold_jobs_in_build = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        A.addApproval('Code-Review', 2)
-        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
-        self.waitUntilSettled()
-
-        self.executor_server.release('project-merge')
-        self.waitUntilSettled()
-
+        "Test that we can retrieve a JSON tenant list"
         resp = self.get_url("api/tenants")
         self.assertIn('Content-Length', resp.headers)
         self.assertIn('Content-Type', resp.headers)
         self.assertEqual(
             'application/json; charset=utf-8', resp.headers['Content-Type'])
-        # self.assertIn('Access-Control-Allow-Origin', resp.headers)
-        # self.assertIn('Cache-Control', resp.headers)
-        # self.assertIn('Last-Modified', resp.headers)
         data = resp.json()
 
-        self.assertEqual('tenant-one', data[0]['name'])
-        self.assertEqual(3, data[0]['projects'])
-        self.assertEqual(3, data[0]['queue'])
-
-        # release jobs and check if the queue size is 0
-        self.executor_server.hold_jobs_in_build = False
-        self.executor_server.release()
-        self.waitUntilSettled()
-
-        data = self.get_url("api/tenants").json()
-        self.assertEqual('tenant-one', data[0]['name'])
-        self.assertEqual(3, data[0]['projects'])
-        self.assertEqual(0, data[0]['queue'])
-
-        # test that non-live items are not counted
-        self.executor_server.hold_jobs_in_build = True
-        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
-        B.setDependsOn(A, 1)
-        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
-        self.waitUntilSettled()
-
-        data = self.get_url("api/tenants").json()
-
-        self.assertEqual('tenant-one', data[0]['name'])
-        self.assertEqual(3, data[0]['projects'])
-        self.assertEqual(1, data[0]['queue'])
+        expected = [
+            {
+                'name': 'tenant-one',
+            },
+        ]
+        self.assertEqual(expected, data)
 
     def test_web_connections_list(self):
         data = self.get_url('api/connections').json()
