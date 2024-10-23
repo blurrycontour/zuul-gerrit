@@ -114,9 +114,6 @@
       command: "touch {{ testfile }}"
       args:
         creates: "{{ testfile }}"
-
-- hosts: controller
-  tasks:
     - name: Creates file that already exists
       command: "touch {{ testfile }}"
       args:
