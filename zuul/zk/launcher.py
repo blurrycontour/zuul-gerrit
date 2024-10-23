@@ -12,13 +12,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import contextlib
 import json
 import logging
 import threading
 from operator import attrgetter
+from uuid import uuid4
 
 import mmh3
-from kazoo.exceptions import NoNodeError
+from kazoo.exceptions import NodeExistsError, NoNodeError
 
 from zuul.model import NodesetRequest, ProviderNode
 from zuul.zk.cache import ZuulTreeCache
@@ -42,6 +44,8 @@ class LockableZKObjectCache(ZuulTreeCache):
     def __init__(self, zk_client, updated_event, root, items_path,
                  locks_path, zkobject_class):
         self.updated_event = updated_event
+        self.sync_path = f"{root}/_sync/{uuid4().hex}"
+        self.sync_events = {}
         self.items_path = items_path
         self.locks_path = locks_path
         self.zkobject_class = zkobject_class
@@ -53,7 +57,8 @@ class LockableZKObjectCache(ZuulTreeCache):
         path = path[len(self.root) + 1:]
         parts = path.split('/')
         # We are interested in requests with a parts that look like:
-        # ([<self.items_path>, <self.locks_path>], <uuid>, ...)
+        # ([<self.sync_path>, <self.items_path>, <self.locks_path>],
+        #  <uuid>, ...)
         if len(parts) < 2:
             return None
         return parts
@@ -69,13 +74,22 @@ class LockableZKObjectCache(ZuulTreeCache):
         item_uuid = parts[-1]
         return (item_uuid,)
 
-    def preCacheHook(self, event, exists):
+    def forceFetch(self, event):
+        return event.path == self.sync_path
+
+    def preCacheHook(self, event, exists, stat):
         parts = self._parsePath(event.path)
         if parts is None:
             return
 
         # Expecting (<self.locks_path>, <uuid>, <lock>,)
         if len(parts) != 3:
+            if event.path == self.sync_path:
+                for ltime in list(self.sync_events.keys()):
+                    if ltime > stat.mzxid:
+                        continue
+                    with contextlib.suppress(KeyError):
+                        self.sync_events[ltime].set()
             return
 
         object_type, request_uuid, *_ = parts
@@ -108,6 +122,25 @@ class LockableZKObjectCache(ZuulTreeCache):
         # the _cached_nodes dict gets updated while iterating
         self.ensureReady()
         return list(self._cached_objects.values())
+
+    def waitForSync(self, timeout=None):
+        sync_ltime = self.zk_client.getCurrentLtime()
+        try:
+            sync_event = threading.Event()
+            self.sync_events[sync_ltime] = sync_event
+            try:
+                self.client.set(self.sync_path, b"")
+            except NoNodeError:
+                # If the node was created in the meantime we will
+                # still be notified.
+                with contextlib.suppress(NodeExistsError):
+                    self.client.create(
+                        self.sync_path, ephemeral=True, makepath=True)
+            self.log.debug("Waiting for cache sync (ltime=%s, timeout=%s)",
+                           sync_ltime, timeout)
+            return sync_event.wait(timeout)
+        finally:
+            self.sync_events.pop(sync_ltime, None)
 
 
 class LauncherApi:

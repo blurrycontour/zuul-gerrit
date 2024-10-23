@@ -40,6 +40,7 @@ class ZuulTreeCache(abc.ABC):
     qsize_warning_threshold = 1024
 
     def __init__(self, zk_client, root):
+        self.zk_client = zk_client
         self.client = zk_client.client
         self.root = root
         self._last_event_warning = time.monotonic()
@@ -206,7 +207,7 @@ class ZuulTreeCache(abc.ABC):
             # to fetch (unless the type is none (re-initialization) in
             # which case we always need to fetch in order to determine
             # existence).
-            fetch = False
+            fetch = self.forceFetch(event)
 
         if fetch:
             future = self.client.get_async(event.path)
@@ -272,7 +273,7 @@ class ZuulTreeCache(abc.ABC):
             self._cached_paths.discard(event.path)
 
         # Some caches have special handling for certain sub-objects
-        self.preCacheHook(event, exists)
+        self.preCacheHook(event, exists, stat)
 
         # If we don't actually cache this kind of object, return now
         if key is None:
@@ -306,7 +307,7 @@ class ZuulTreeCache(abc.ABC):
         self._ready.wait()
 
     # Methods for subclasses:
-    def preCacheHook(self, event, exists):
+    def preCacheHook(self, event, exists, stat):
         """Called before the cache is updated
 
         This is called for any add/update/remove event under the root,
@@ -321,6 +322,7 @@ class ZuulTreeCache(abc.ABC):
 
         :param EventType event: The event.
         :param bool exists: Whether the object exists in ZK.
+        :param ZnodeStat stat: ZNode stat when the node exists, else None
 
         """
         return None
@@ -328,6 +330,10 @@ class ZuulTreeCache(abc.ABC):
     def postCacheHook(self, event, data, stat, key, obj):
         """Called after the cache has been updated"""
         return None
+
+    def forceFetch(self, event):
+        """Called to determine if we should force a fetch for the event"""
+        return False
 
     @abc.abstractmethod
     def parsePath(self, path):
