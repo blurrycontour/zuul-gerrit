@@ -176,13 +176,13 @@ class FunctionalZuulStreamMixIn:
             self.assertNotIn("Did not run command since", create1_host['msg'])
             self.assertEqual("Creates file that does not exist",
                              create1_task['task']['name'])
-            create2_task = data[0]['plays'][5]['tasks'][0]
-            create2_host = create2_task['hosts']['controller']
+            create2_task = data[0]['plays'][4]['tasks'][4]
+            create2_host = create2_task['hosts']['compute1']
             self.assertIsNone(create2_host['delta'])
             self.assertIn("Did not run command since", create2_host['msg'])
             self.assertEqual("Creates file that already exists",
                              create2_task['task']['name'])
-            self.assertLogLine(r'controller \| ok: Runtime: None', text)
+            self.assertLogLine(r'compute1 \| ok: Runtime: None', text)
 
             self.assertLogLine(
                 r'RUN START: \[untrusted : review.example.com/org/project/'
@@ -298,13 +298,13 @@ class FunctionalZuulStreamMixIn:
             self.assertNotIn("Did not run command since", create1_host['msg'])
             self.assertEqual("Creates file that does not exist",
                              create1_task['task']['name'])
-            create2_task = data[0]['plays'][5]['tasks'][0]
-            create2_host = create2_task['hosts']['controller']
+            create2_task = data[0]['plays'][4]['tasks'][4]
+            create2_host = create2_task['hosts']['compute1']
             self.assertIsNone(create2_host['delta'])
             self.assertIn("Did not run command since", create2_host['msg'])
             self.assertEqual("Creates file that already exists",
                              create2_task['task']['name'])
-            self.assertLogLine(r'controller \| ok: Runtime: None', text)
+            self.assertLogLine(r'compute1 \| ok: Runtime: None', text)
 
             self.assertLogLine(
                 r'RUN START: \[untrusted : review.example.com/org/project/'
