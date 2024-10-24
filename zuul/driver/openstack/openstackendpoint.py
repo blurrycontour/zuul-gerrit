@@ -134,14 +134,15 @@ class OpenstackDeleteStateMachine(statemachine.StateMachine):
     def __init__(self, endpoint, node, log):
         self.log = log
         self.endpoint = endpoint
+        self.node = node
         super().__init__(node.delete_state)
-        self.external_id = node.openstack_server_id
         self.floating_ips = None
 
     def advance(self):
         if self.state == self.START:
-            if self.external_id:
-                self.server = self.endpoint._getServer(self.external_id)
+            if self.node.openstack_server_id:
+                self.server = self.endpoint._getServer(
+                    self.node.openstack_server_id)
                 if (self.server and
                     self.endpoint._hasFloatingIps() and
                     self.server.get('addresses')):
@@ -172,7 +173,7 @@ class OpenstackDeleteStateMachine(statemachine.StateMachine):
         if self.state == self.SERVER_DELETE_SUBMIT:
             self.delete_future = self.endpoint._submitApi(
                 self.endpoint._deleteServer,
-                self.external_id)
+                self.node.openstack_server_id)
             self.state = self.SERVER_DELETE
 
         if self.state == self.SERVER_DELETE:
@@ -201,6 +202,7 @@ class OpenstackCreateStateMachine(statemachine.StateMachine):
                  image_external_id, tags, log):
         self.log = log
         self.endpoint = endpoint
+        self.node = node
         self.label = label
         self.flavor = flavor
         self.image = image
@@ -260,14 +262,15 @@ class OpenstackCreateStateMachine(statemachine.StateMachine):
             # min_ram=self.label.min_ram,
         )
         self.quota = quota_from_flavor(self.os_flavor, label=self.label)
-        self.external_id = None
+        self.node.openstack_server_id = None
 
     def _handleServerFault(self):
         # Return True if this is a quota fault
-        if not self.external_id:
+        if not self.node.openstack_server_id:
             return
         try:
-            server = self.endpoint._getServerByIdNow(self.external_id)
+            server = self.endpoint._getServerByIdNow(
+                self.node.openstack_server_id)
             if not server:
                 return
             fault = server.get('fault', {}).get('message')
@@ -281,7 +284,7 @@ class OpenstackCreateStateMachine(statemachine.StateMachine):
 
     def advance(self):
         if self.state == self.START:
-            self.external_id = None
+            self.node.openstack_server_id = None
             self.create_future = self.endpoint._submitApi(
                 self.endpoint._createServer,
                 self.hostname,
@@ -306,11 +309,11 @@ class OpenstackCreateStateMachine(statemachine.StateMachine):
                         self.create_future)
                     if self.server is None:
                         return
-                    self.external_id = self.server['id']
+                    self.node.openstack_server_id = self.server['id']
                     self.state = self.SERVER_CREATING
                 except openstack.cloud.exc.OpenStackCloudCreateException as e:
                     if e.resource_id:
-                        self.external_id = e.resource_id
+                        self.node.openstack_server_id = e.resource_id
                         if self._handleServerFault():
                             self.log.exception("Launch attempt failed:")
                             raise exceptions.QuotaException("Quota exceeded")
@@ -471,7 +474,8 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
                 if volume:
                     server_volumes.append(volume)
             quota = quota_from_flavor(flavor, volumes=server_volumes)
-            yield OpenstackInstance(self.provider, server, quota)
+            yield OpenstackInstance(self.connection.cloud_name,
+                                    self.getRegionName(), server, quota)
 
     def getQuotaLimits(self):
         with Timer(self.log, 'API call get_compute_limits'):

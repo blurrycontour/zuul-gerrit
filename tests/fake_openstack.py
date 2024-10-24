@@ -196,6 +196,7 @@ class FakeOpenstackConnection:
             status='ACTIVE',
             addresses=addresses,
             interface_ip=interface_ip,
+            flavor=flavor,
         )
         server = FakeOpenstackServer(**args)
         self.cloud.servers.append(server)

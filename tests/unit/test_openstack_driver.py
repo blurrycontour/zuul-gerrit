@@ -17,6 +17,7 @@ import os
 import fixtures
 
 from zuul.driver.openstack import OpenstackDriver
+import zuul.driver.openstack.openstackendpoint
 
 from tests.fake_openstack import (
     FakeOpenstackCloud,
@@ -34,6 +35,7 @@ from tests.unit.test_cloud_driver import BaseCloudDriverTest
 
 class BaseOpenstackDriverTest(ZuulTestCase):
     cloud_test_image_format = 'qcow2'
+    cloud_test_provider_name = 'openstack-main'
     config_file = 'zuul-connections-nodepool.conf'
     debian_return_data = {
         'zuul': {
@@ -70,6 +72,8 @@ class BaseOpenstackDriverTest(ZuulTestCase):
                    FakeOpenstackProviderEndpoint)
         self.patch(FakeOpenstackProviderEndpoint,
                    '_fake_cloud', self.fake_cloud)
+        self.patch(zuul.driver.openstack.openstackendpoint,
+                   'CACHE_TTL', 1)
         super().setUp()
 
     def tearDown(self):
