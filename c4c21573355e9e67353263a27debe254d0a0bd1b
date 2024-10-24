@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0eb2a0f8_a524910b",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-24T06:13:21Z",
+      "side": 1,
+      "message": "This change is no longer necessary, but I think it also doesn\u0027t hurt to pass the stat info.",
+      "revId": "c4c21573355e9e67353263a27debe254d0a0bd1b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
