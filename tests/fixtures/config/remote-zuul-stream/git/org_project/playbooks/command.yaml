@@ -69,6 +69,10 @@
         - failed_in_loop1
         - failed_in_loop2
 
+    - name: Set testfile path name for later test
+      set_fact:
+        testfile: "/tmp/testfile-{{ zuul.build }}"
+
   handlers:
     - name: test handler
       command: echo "This is a handler"
@@ -106,6 +110,17 @@
         - failed_in_loop1
         - failed_in_loop2
       ignore_errors: True
+    - name: Creates file that does not exist
+      command: "touch {{ testfile }}"
+      args:
+        creates: "{{ testfile }}"
+
+- hosts: controller
+  tasks:
+    - name: Creates file that already exists
+      command: "touch {{ testfile }}"
+      args:
+        creates: "{{ testfile }}"
 
 # Try transitive includes two different ways
 - hosts: compute1
@@ -145,3 +160,10 @@
       loop:
         - 1
         - 2
+
+- hosts: all
+  tasks:
+    - name: Clean up tmpfile
+      file:
+        path: "{{ testfile }}"
+        state: absent
