@@ -69,7 +69,7 @@ class LockableZKObjectCache(ZuulTreeCache):
         item_uuid = parts[-1]
         return (item_uuid,)
 
-    def preCacheHook(self, event, exists):
+    def preCacheHook(self, event, exists, stat=None):
         parts = self._parsePath(event.path)
         if parts is None:
             return
