@@ -22,6 +22,30 @@
       },
       "revId": "87279d4d30ac741e3f6599189132fd15ec050307",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9de93baf_2b68b5a9",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 27
+      },
+      "lineNbr": 641,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-24T05:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5d72f82_69813c21",
+      "range": {
+        "startLine": 641,
+        "startChar": 30,
+        "endLine": 641,
+        "endChar": 37
+      },
+      "revId": "87279d4d30ac741e3f6599189132fd15ec050307",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
