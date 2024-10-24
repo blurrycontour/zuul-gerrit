@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d931aaf_a5fa05bf",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-24T06:11:41Z",
+      "side": 1,
+      "message": "Moved the sync impl. into this class.",
+      "parentUuid": "89654e52_c88d82b1",
+      "revId": "f27f2186d8a10dc2ef42d86560dc5571a33adac4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66b5bad7_9c69af8d",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-10-23T23:42:28Z",
       "side": 1,
       "message": "stat can theoretically be None, but that would only happen if the stat node is deleted, and if I\u0027m following correctly, we never expect that to happen.\n\nHowever, I do wonder if we should still gracefully handle that.  Maybe we should just ignore it and return in that case?",
+      "revId": "f27f2186d8a10dc2ef42d86560dc5571a33adac4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "433e0231_33e91706",
+        "filename": "zuul/zk/launcher.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-24T06:11:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66b5bad7_9c69af8d",
       "revId": "f27f2186d8a10dc2ef42d86560dc5571a33adac4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
