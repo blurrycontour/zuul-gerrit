@@ -1779,11 +1779,12 @@ A job build may have the following status:
   Job executed correctly, but exited with a failure.
 
 **RETRY**
-  The ``pre-run`` playbook failed and the job will be retried.
+  The ``pre-run`` playbook failed or the node became unreachable
+  and the job will be retried.
 
 **RETRY_LIMIT**
-  The ``pre-run`` playbook failed more than the maximum number of
-  retry ``attempts``.
+  The ``pre-run`` playbook failed or the node became unreachable
+  more than the maximum number of retry ``attempts``.
 
 **POST_FAILURE**
   The ``post-run`` playbook failed.
