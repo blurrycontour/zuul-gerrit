@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "718aa6e2_a2e005b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-24T17:52:24Z",
+      "side": 1,
+      "message": "\u003e I think #1 sounds reasonable (and still hope to do #3 some day in the\nfuture).\n\nThis seems reasonable to me as well. They are already far off into corner case territory with things not working quite right.",
+      "revId": "2d21c091661e220ab8db1cffac567260f0c13428",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cff24d75_8aac8eba",
@@ -14,6 +31,24 @@
       "writtenOn": "2024-10-23T22:01:53Z",
       "side": 1,
       "message": "These tests cover cases where we\u0027re using \"unsafe\" characters in a name and not encoding them which is I suspect works because things are being implicitly encoded by the browser/requests and then cherrypy is similarly expecing things to be encoded? However, that won\u0027t work if we use unsafe characters that are unsafe because they are part of url parameter passing. \n\nDoes this still work happily if we use characters like `\u0026` and `?`? Mostly worried that we might have a regression for jobs that use those characters due to their use for encoding parameters.",
+      "revId": "2d21c091661e220ab8db1cffac567260f0c13428",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6249c797_288648a2",
+        "filename": "tests/unit/test_web.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1124,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-24T17:52:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cff24d75_8aac8eba",
       "revId": "2d21c091661e220ab8db1cffac567260f0c13428",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
