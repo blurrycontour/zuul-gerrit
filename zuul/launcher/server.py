@@ -24,10 +24,12 @@ import threading
 import time
 import uuid
 
+import mmh3
 import requests
 
 from zuul import model
 from zuul.lib import commandsocket, tracing
+from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.config import get_default
 from zuul.zk.image_registry import (
     ImageBuildRegistry,
@@ -54,6 +56,13 @@ from zuul.zk.zkobject import ZKContext
 COMMANDS = (
     commandsocket.StopCommand,
 )
+
+
+def scores_for_label(label_cname, candidate_names):
+    return {
+        mmh3.hash(f"{n}-{label_cname}", signed=False): n
+        for n in candidate_names
+    }
 
 
 class NodesetRequestError(Exception):
@@ -175,6 +184,8 @@ class EndpointUploadJob:
 
 class Launcher:
     log = logging.getLogger("zuul.Launcher")
+    # Max. time to wait for a cache to sync
+    CACHE_SYNC_TIMEOUT = 10
     # Max. time the main event loop is allowed to sleep
     MAX_SLEEP = 1
     DELETE_TIMEOUT = 600
@@ -293,8 +304,10 @@ class Launcher:
             self.checkMissingUploads()
         self._processRequests()
         self._processNodes()
+        self._processMinReady()
 
     def _processRequests(self):
+        ready_nodes = self._getUnassignedReadyNodes()
         for request in self.api.getMatchingRequests():
             log = get_annotated_logger(self.log, request, request=request.uuid)
             if not request.hasLock():
@@ -312,7 +325,7 @@ class Launcher:
 
             try:
                 if request.state == model.NodesetRequest.State.REQUESTED:
-                    self._acceptRequest(request, log)
+                    self._acceptRequest(request, log, ready_nodes)
                 elif request.state == model.NodesetRequest.State.ACCEPTED:
                     self._checkRequest(request, log)
             except NodesetRequestError as err:
@@ -337,15 +350,56 @@ class Launcher:
             for n in itertools.chain.from_iterable(request.provider_nodes)
         )
 
-    def _acceptRequest(self, request, log):
+    def _acceptRequest(self, request, log, ready_nodes):
         log.debug("Accepting request %s", request)
         # Create provider nodes for the requested labels
         provider_nodes = []
         label_providers = self._selectProviders(request, log)
         with self.createZKContext(request._lock, log) as ctx:
-            for i, (label_name, provider) in enumerate(label_providers):
-                node = self._requestNode(
-                    label_name, request, provider, log, ctx)
+            for i, (label, provider) in enumerate(label_providers):
+                # TODO: sort by age? use old nodes first? random to reduce
+                # chance of thundering herd?
+                for node in list(ready_nodes.get(label.name, [])):
+                    if node.is_locked:
+                        continue
+                    for provider in self.tenant_providers[request.tenant_name]:
+                        if provider.connection_name != node.connection_name:
+                            continue
+                        if not (plabel := provider.labels.get(label.name)):
+                            continue
+                        if node.label_config_hash != plabel.config_hash:
+                            continue
+                        break
+                    else:
+                        continue
+
+                    if not node.acquireLock(self.zk_client, blocking=False):
+                        log.debug("Failed to lock matching ready node %s",
+                                  node)
+                        continue
+                    try:
+                        tags = provider.getNodeTags(
+                            self.system.system_id, label, node.uuid,
+                            provider, request)
+                        with self.createZKContext(node._lock, self.log) as ctx:
+                            node.updateAttributes(
+                                ctx,
+                                request_id=request.uuid,
+                                tenant_name=request.tenant_name,
+                                tags=tags,
+                            )
+                        ready_nodes[label.name].remove(node)
+                        log.debug("Assigned ready node %s", node.uuid)
+                        break
+                    except Exception:
+                        log.exception("Faild to assign ready node %s", node)
+                        continue
+                    finally:
+                        node.releaseLock()
+                else:
+                    node = self._requestNode(
+                        label, request, provider, log, ctx)
+                    log.debug("Requested node %s", node.uuid)
                 provider_nodes.append([node.uuid])
 
             request.updateAttributes(
@@ -368,39 +422,41 @@ class Launcher:
             if n.state == n.State.FAILED)
 
         label_providers = []
-        for i, label in enumerate(request.labels):
+        for i, label_name in enumerate(request.labels):
             candidate_providers = [
                 p for p in providers
-                if p.hasLabel(label)
-                and provider_failures[p.name] < p.launch_attempts
+                if p.hasLabel(label_name)
+                and provider_failures[p.canonical_name] < p.launch_attempts
             ]
             if not candidate_providers:
                 raise NodesetRequestError(
-                    f"No provider found for label {label}")
+                    f"No provider found for label {label_name}")
 
             log.debug("Candidate providers: %s", candidate_providers)
             # TODO: make provider selection more sophisticated
-            label_providers.append((label, random.choice(candidate_providers)))
+            provider = random.choice(candidate_providers)
+            label = provider.labels[label_name]
+            label_providers.append((label, provider))
         return label_providers
 
-    def _requestNode(self, label_name, request, provider, log, ctx):
+    def _requestNode(self, label, request, provider, log, ctx):
         # Create a deterministic node UUID by using
         # the request UUID as namespace.
         node_uuid = uuid.uuid4().hex
-        label = provider.labels[label_name]
         image = provider.images[label.image]
         tags = provider.getNodeTags(
-            self.system.system_id, request, provider, label,
-            node_uuid)
+            self.system.system_id, label, node_uuid, provider, request)
         node_class = provider.driver.getProviderNodeClass()
         node = node_class.new(
             ctx,
             uuid=node_uuid,
-            label=label_name,
+            label=label.name,
+            label_config_hash=label.config_hash,
             request_id=request.uuid,
+            zuul_event_id=request.zuul_event_id,
             connection_name=provider.connection_name,
             tenant_name=request.tenant_name,
-            provider=provider.name,
+            provider=provider.canonical_name,
             tags=tags,
             # Set any node attributes we already know here
             connection_port=image.connection_port,
@@ -419,11 +475,11 @@ class Launcher:
             node = self.api.getProviderNode(node_id)
             if node.state == node.State.FAILED:
                 label_providers = self._selectProviders(request, log)
-                label_name, provider = label_providers[i]
+                label, provider = label_providers[i]
                 log.info("Retrying request with provider %s", provider)
                 with self.createZKContext(request._lock, log) as ctx:
                     node = self._requestNode(
-                        label_name, request, provider, log, ctx)
+                        label, request, provider, log, ctx)
                     with request.activeContext(ctx):
                         request.provider_nodes[i].append(node.uuid)
 
@@ -454,41 +510,64 @@ class Launcher:
         for node in self.api.getMatchingProviderNodes():
             log = get_annotated_logger(self.log, node, request=node.request_id)
             if not node.hasLock():
-                if node.is_locked:
-                    continue
-
-                # There is an associated nodeset request and we can't advance
-                # the node state.
-                if (self.api.getNodesetRequest(node.request_id)
-                        and node.state not in node.LAUNCHER_STATES):
+                if not self._isNodeActionable(node):
                     continue
 
                 if not node.acquireLock(self.zk_client, blocking=False):
                     log.debug("Failed to lock matching node %s", node)
                     continue
 
-            if request := self.api.getNodesetRequest(node.request_id):
+            request = self.api.getNodesetRequest(node.request_id)
+            if ((request or node.request_id is None)
+                    and node.state in node.CREATE_STATES):
                 try:
-                    if node.state in node.CREATE_STATES:
-                        self._checkNode(node, log)
-                    if node.state == model.ProviderNode.State.READY:
-                        node.releaseLock()
+                    self._checkNode(node, log)
                 except Exception:
-                    state = model.ProviderNode.State.FAILED
+                    state = node.State.FAILED
                     log.exception("Marking node %s as %s", node, state)
                     with self.createZKContext(node._lock, self.log) as ctx:
                         node.updateAttributes(ctx, state=state)
                         self.wake_event.set()
 
-            # TODO: implement node re-use
-            # * deallocate from request here
-            # * re-allocated similar to min-ready
-            if not request or node.state in node.State.FAILED:
+            # Mark outdated nodes w/o a request for cleanup
+            if not request and not self._hasProvider(node):
+                state = node.State.OUTDATED
+                log.debug("Marking node %s as %s", node, state)
+                with self.createZKContext(node._lock, self.log) as ctx:
+                    node.updateAttributes(ctx, state=state)
+
+            # Clean up the node if ...
+            if (
+                # ... it is associated with a request that no
+                # longer exists
+                (node.request_id is not None and not request)
+                # ... it is failed/outdated
+                or node.state in (node.State.FAILED, node.State.OUTDATED)
+            ):
                 try:
                     self._cleanupNode(node, log)
                 except Exception:
                     log.exception("Error in node cleanup")
                     self.wake_event.set()
+
+            if node.state == model.ProviderNode.State.READY:
+                node.releaseLock()
+
+    def _isNodeActionable(self, node):
+        if node.is_locked:
+            return False
+
+        if node.state in node.LAUNCHER_STATES:
+            return True
+
+        if node.request_id:
+            request_exists = bool(self.api.getNodesetRequest(node.request_id))
+            return not request_exists
+        elif not self._hasProvider(node):
+            # We no longer have a provider that use the given node
+            return True
+
+        return False
 
     def _checkNode(self, node, log):
         # TODO: check timeout
@@ -496,8 +575,7 @@ class Launcher:
             with node.activeContext(ctx):
                 if not node.create_state_machine:
                     log.debug("Building node %s", node)
-                    provider = self._getProvider(
-                        node.tenant_name, node.provider)
+                    provider = self._getProviderForNode(node)
                     image_external_id = self.getImageExternalId(node, provider)
                     log.debug("Node %s external id %s",
                               node, image_external_id)
@@ -525,8 +603,8 @@ class Launcher:
             with node.activeContext(ctx):
                 if not node.delete_state_machine:
                     log.debug("Cleaning up node %s", node)
-                    provider = self._getProvider(
-                        node.tenant_name, node.provider)
+                    provider = self._getProviderForNode(
+                        node, ignore_label=True)
                     node.delete_state_machine = provider.getDeleteStateMachine(
                         node, log)
 
@@ -556,6 +634,133 @@ class Launcher:
                 log.debug("Removing provider node %s", node)
                 node.delete(ctx)
                 node.releaseLock()
+
+    def _processMinReady(self):
+        if not self.api.nodes_cache.waitForSync(
+                timeout=self.CACHE_SYNC_TIMEOUT):
+            self.log.warning("Timeout waiting %ss for node cache to sync",
+                             self.CACHE_SYNC_TIMEOUT)
+            return
+
+        for label, provider in self._getMissingMinReadySlots():
+            node_uuid = uuid.uuid4().hex
+            # We don't pass a provider here as the node should not
+            # be directly associated with a tenant or provider.
+            tags = provider.getNodeTags(
+                self.system.system_id, label, node_uuid)
+            node_class = provider.driver.getProviderNodeClass()
+            with self.createZKContext(None, self.log) as ctx:
+                node = node_class.new(
+                    ctx,
+                    uuid=node_uuid,
+                    label=label.name,
+                    label_config_hash=label.config_hash,
+                    request_id=None,
+                    connection_name=provider.connection_name,
+                    zuul_event_id=uuid.uuid4().hex,
+                    tenant_name=None,
+                    provider=None,
+                    tags=tags,
+                )
+                self.log.debug("Created min-ready node %s via provider %s",
+                               node, provider)
+
+    def _getMissingMinReadySlots(self):
+        candidate_launchers = {
+            c.hostname: c for c in COMPONENT_REGISTRY.registry.all("launcher")}
+        candidate_names = set(candidate_launchers.keys())
+        label_scores = DefaultKeyDict(
+            lambda lcn: scores_for_label(lcn, candidate_names))
+
+        # Collect min-ready labels that we need to process
+        tenant_labels = collections.defaultdict(
+            lambda: collections.defaultdict(list))
+        for tenant_name, tenant_providers in self.tenant_providers.items():
+            for tenant_provider in tenant_providers:
+                for label in tenant_provider.labels.values():
+                    if not label.min_ready:
+                        continue
+                    # Check if this launcher is responsible for
+                    # spawning min-ready nodes for this label.
+                    if not self._hasHighestMinReadyScore(
+                            label.canonical_name,
+                            label_scores,
+                            candidate_launchers):
+                        continue
+                    # We collect all label variants to determin if
+                    # min-ready is satisfied based on the config hashes
+                    tenant_labels[tenant_name][label.name].append(label)
+
+        unassigned_hashes = self._getUnassignedNodeLabelHashes()
+        for tenant_name, min_ready_labels in tenant_labels.items():
+            for label_name, labels in min_ready_labels.items():
+                valid_label_hashes = set(lbl.config_hash for lbl in labels)
+                tenant_min_ready = sum(
+                    1 for h in unassigned_hashes[label_name]
+                    if h in valid_label_hashes
+                )
+                label_providers = [
+                    p for p in self.tenant_providers[tenant_name]
+                    if p.hasLabel(label_name)
+                ]
+                for _ in range(tenant_min_ready, labels[0].min_ready):
+                    provider = random.choice(label_providers)
+                    label = provider.labels[label_name]
+                    yield label, provider
+                    unassigned_hashes[label.name].append(label.config_hash)
+
+    def _hasHighestMinReadyScore(
+            self, label_cname, label_scores, candidate_launchers):
+        scores = sorted(label_scores[label_cname].items())
+        for score, launcher_name in scores:
+            launcher = candidate_launchers.get(launcher_name)
+            if not launcher:
+                continue
+            if launcher.state != launcher.RUNNING:
+                continue
+            if (launcher.hostname
+                    == self.component_info.hostname):
+                return True
+            return False
+        return False
+
+    def _getUnassignedNodeLabelHashes(self):
+        ready_nodes = collections.defaultdict(list)
+        for node in self.api.getProviderNodes():
+            if node.request_id is not None:
+                continue
+            ready_nodes[node.label].append(node.label_config_hash)
+        return ready_nodes
+
+    def _getUnassignedReadyNodes(self):
+        ready_nodes = collections.defaultdict(list)
+        for node in self.api.getProviderNodes():
+            if node.request_id is not None:
+                continue
+            if node.is_locked or node.state != node.State.READY:
+                continue
+            ready_nodes[node.label].append(node)
+        return ready_nodes
+
+    def _getProviderForNode(self, node, ignore_label=False):
+        for tenant_name, tenant_providers in self.tenant_providers.items():
+            # Min-ready nodes don't have an assigned tenant
+            if node.tenant_name and tenant_name != node.tenant_name:
+                continue
+            for provider in tenant_providers:
+                # Common case when a node is assigned to a provider
+                if provider.canonical_name == node.provider:
+                    return provider
+                # Fallback for min-ready nodes w/o a assigned provider
+                if provider.connection_name != node.connection_name:
+                    continue
+                if ignore_label:
+                    return provider
+                if not (label := provider.labels.get(node.label)):
+                    continue
+                if label.config_hash == node.label_config_hash:
+                    return provider
+        raise ProviderNodeError(f"Unable to find provider for node {node}")
 
     def _updateNodeFromInstance(self, node, instance):
         if instance is None:
@@ -609,6 +814,13 @@ class Launcher:
                 return provider
         raise ProviderNodeError(
             f"Unable to find {provider_name} in tenant {tenant_name}")
+
+    def _hasProvider(self, node):
+        try:
+            self._getProviderForNode(node)
+        except ProviderNodeError:
+            return False
+        return True
 
     def _getProviderByCanonicalName(self, provider_cname):
         for tenant_providers in self.tenant_providers.values():
