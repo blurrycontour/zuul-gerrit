@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfb416a1_4b0cece1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-24T14:36:47Z",
+      "side": 1,
+      "message": "recheck failure was in a diskimage test waiting for zuul to settle. Seems unrelated to this change.",
+      "revId": "4909c7746f94c88269901f6c7cfed9251915b7e4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
