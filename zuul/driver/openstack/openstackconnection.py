@@ -32,8 +32,10 @@ class OpenstackConnection(BaseConnection):
             'client_config_file',
             os.getenv('OS_CLIENT_CONFIG_FILE', None))
 
+        if 'cloud' not in self.connection_config:
+            raise Exception('The "cloud" parameter is required for '
+                            f'OpenStack connections in {self.connection_name}')
         self.cloud_name = self.connection_config.get('cloud')
-        self.region_name = self.connection_config.get('region')
 
         # Rate limit: requests/second
         self.rate = self.connection_config.get('rate', 2)
