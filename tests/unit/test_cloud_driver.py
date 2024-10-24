@@ -27,6 +27,14 @@ from tests.base import (
 class BaseCloudDriverTest(ZuulTestCase):
     cloud_test_connection_type = 'ssh'
     cloud_test_image_format = ''
+    cloud_test_provider_name = ''
+
+    def _getEndpoint(self):
+        # Use the launcher provider so that we're using the same ttl
+        # method caches.
+        for provider in self.launcher.tenant_providers['tenant-one']:
+            if provider.name == self.cloud_test_provider_name:
+                return provider.getEndpoint()
 
     def _assertProviderNodeAttributes(self, pnode):
         self.assertEqual(pnode.connection_type,
@@ -35,6 +43,12 @@ class BaseCloudDriverTest(ZuulTestCase):
 
     def _test_node_lifecycle(self, label):
         # Call this in a test to run a node lifecycle
+        for _ in iterate_timeout(
+                30, "scheduler and launcher to have the same layout"):
+            if (self.scheds.first.sched.local_layout_state.get("tenant-one") ==
+                self.launcher.local_layout_state.get("tenant-one")):
+                break
+        endpoint = self._getEndpoint()
         nodeset = model.NodeSet()
         nodeset.addNode(model.Node("node", label))
 
@@ -60,6 +74,7 @@ class BaseCloudDriverTest(ZuulTestCase):
             self.assertTrue(pnode.hasLock())
             self._assertProviderNodeAttributes(pnode)
 
+        self.assertGreater(len(list(endpoint.listInstances())), 0)
         client.useNodeset(nodeset)
         self.waitUntilSettled()
 
@@ -81,6 +96,12 @@ class BaseCloudDriverTest(ZuulTestCase):
                     pnode.refresh(ctx)
                 except NoNodeError:
                     break
+
+        # Iterate here because the aws driver (at least) performs
+        # delayed async deletes.
+        for _ in iterate_timeout(60, "instances to be deleted"):
+            if len(list(endpoint.listInstances())) == 0:
+                break
 
     def _test_diskimage(self):
         self.waitUntilSettled()

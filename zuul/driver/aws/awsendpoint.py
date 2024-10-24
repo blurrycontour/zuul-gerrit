@@ -70,6 +70,7 @@ class AwsDeleteStateMachine(statemachine.StateMachine):
     def __init__(self, endpoint, node, log):
         self.log = log
         self.endpoint = endpoint
+        self.node = node
         super().__init__(node.delete_state)
 
         # Restore local objects
@@ -93,10 +94,11 @@ class AwsDeleteStateMachine(statemachine.StateMachine):
 
         if self.state == self.INSTANCE_DELETING_START:
             self.instance = self.endpoint._deleteInstance(
-                self.instance, self.log)
+                self.node.aws_instance_id, self.log)
             self.state = self.INSTANCE_DELETING
 
         if self.state == self.INSTANCE_DELETING:
+            self.instance = self.endpoint._refreshDelete(self.instance)
             if self.instance is None:
                 if self.host:
                     self.state = self.HOST_RELEASING_START
@@ -105,7 +107,7 @@ class AwsDeleteStateMachine(statemachine.StateMachine):
 
         if self.state == self.HOST_RELEASING_START:
             self.host = self.endpoint._releaseHost(
-                self.host, self.log)
+                self.node.aws_dedicated_host_id, self.log)
             self.state = self.HOST_RELEASING
 
         if self.state == self.HOST_RELEASING:
