@@ -21,15 +21,13 @@ from zuul.driver.openstack import (
     openstackprovider,
     openstackendpoint,
 )
+from zuul.provider import EndpointCacheMixin
 
 
-class OpenstackDriver(Driver, ConnectionInterface, ProviderInterface):
+class OpenstackDriver(Driver, EndpointCacheMixin,
+                      ConnectionInterface, ProviderInterface):
     name = 'openstack'
     _endpoint_class = openstackendpoint.OpenstackProviderEndpoint
-
-    def __init__(self, *args, **kw):
-        super().__init__(*args, **kw)
-        self.endpoints = {}
 
     def getConnection(self, name, config):
         return openstackconnection.OpenstackConnection(self, name, config)
@@ -54,13 +52,8 @@ class OpenstackDriver(Driver, ConnectionInterface, ProviderInterface):
             urllib.parse.quote_plus(connection.connection_name),
             urllib.parse.quote_plus(region_str),
         ])
-        try:
-            return self.endpoints[endpoint_id]
-        except KeyError:
-            pass
-        endpoint = self._endpoint_class(self, connection, region)
-        self.endpoints[endpoint_id] = endpoint
-        return endpoint
+        return self.getEndpointById(endpoint_id,
+                                    create_args=(self, connection, region))
 
     def getEndpoint(self, provider):
         return self._getEndpoint(provider.connection, provider.region)
