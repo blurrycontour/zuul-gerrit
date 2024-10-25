@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43ce7081_12f260f6",
+        "filename": "tests/fixtures/config/remote-zuul-stream/git/org_project/playbooks/command.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-25T20:19:40Z",
+      "side": 1,
+      "message": "Re my comments in the implementation side of things I wonder if we should assert the total size of the resulting console output to ensure we don\u0027t get short reads after the fact due to short/over writes.",
+      "revId": "7c25cbcc7f2778892aba717debd54d0b1efa7f3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ce64d1b_95601c4f",
+        "filename": "zuul/ansible/8/library/command.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-25T20:19:40Z",
+      "side": 1,
+      "message": "See comment in the base implementation.",
+      "revId": "7c25cbcc7f2778892aba717debd54d0b1efa7f3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d37157c_727566c6",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-25T20:19:40Z",
+      "side": 1,
+      "message": "The console object is shared between two threads which means we share a single self.logfile reference that we write against. With multiple threads attempting to write to this file is it possible that the file position indicator for our write location to not be thread safe resulting in us writing stdout over stderr or vice versa?\n\nDo we need to synchronize around the lock to prevent that from happening?",
+      "revId": "7c25cbcc7f2778892aba717debd54d0b1efa7f3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
