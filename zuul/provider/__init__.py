@@ -15,6 +15,7 @@
 import abc
 import json
 import math
+import threading
 import urllib.parse
 
 from zuul.lib.voluputil import Required, Optional, Nullable, assemble
@@ -526,3 +527,20 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         :param ProviderNode node: The node of the server
         """
         pass
+
+
+class EndpointCacheMixin:
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        self.endpoints = {}
+        self.endpoints_lock = threading.Lock()
+
+    def getEndpointById(self, endpoint_id, create_args):
+        with self.endpoints_lock:
+            try:
+                return self.endpoints[endpoint_id]
+            except KeyError:
+                pass
+            endpoint = self._endpoint_class(*create_args)
+            self.endpoints[endpoint_id] = endpoint
+        return endpoint

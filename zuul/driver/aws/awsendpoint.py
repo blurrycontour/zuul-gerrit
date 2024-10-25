@@ -60,6 +60,10 @@ KIB = 1024
 GIB = 1024 ** 3
 
 
+class StopException(Exception):
+    pass
+
+
 class AwsDeleteStateMachine(statemachine.StateMachine):
     HOST_RELEASING_START = 'start releasing host'
     HOST_RELEASING = 'releasing host'
@@ -398,7 +402,6 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         self.delete_host_queue = queue.Queue()
         self.delete_instance_queue = queue.Queue()
         self.delete_thread = threading.Thread(target=self._deleteThread)
-        self.delete_thread.daemon = True
         self.delete_thread.start()
 
         self.rate_limiter = RateLimiter(self.name,
@@ -467,9 +470,13 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                 self._listEBSQuotas)
 
     def stop(self):
+        self.log.debug("Stopping AWS endpoint")
         self.create_executor.shutdown()
         self.api_executor.shutdown()
         self._running = False
+        self.delete_host_queue.put(None)
+        self.delete_instance_queue.put(None)
+        self.delete_thread.join()
 
     def listResources(self, bucket_name):
         for host in self._listHosts():
@@ -1494,6 +1501,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         while self._running:
             try:
                 self._deleteThreadInner()
+            except StopException:
+                continue
             except Exception:
                 self.log.exception("Error in delete thread:")
                 time.sleep(5)
@@ -1502,12 +1511,18 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
     def _getBatch(the_queue):
         records = []
         try:
-            records.append(the_queue.get(block=True, timeout=10))
+            record = the_queue.get(block=True, timeout=10)
+            if record is None:
+                raise StopException()
+            records.append(record)
         except queue.Empty:
             return []
         while True:
             try:
-                records.append(the_queue.get(block=False))
+                record = the_queue.get(block=False)
+                if record is None:
+                    raise StopException()
+                records.append(record)
             except queue.Empty:
                 break
             # The terminate call has a limit of 1k, but AWS recommends
