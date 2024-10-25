@@ -16,15 +16,13 @@ import urllib
 
 from zuul.driver import Driver, ConnectionInterface, ProviderInterface
 from zuul.driver.aws import awsconnection, awsmodel, awsprovider, awsendpoint
+from zuul.provider import EndpointCacheMixin
 
 
-class AwsDriver(Driver, ConnectionInterface, ProviderInterface):
+class AwsDriver(Driver, EndpointCacheMixin,
+                ConnectionInterface, ProviderInterface):
     name = 'aws'
     _endpoint_class = awsendpoint.AwsProviderEndpoint
-
-    def __init__(self, *args, **kw):
-        super().__init__(*args, **kw)
-        self.endpoints = {}
 
     def getConnection(self, name, config):
         return awsconnection.AwsConnection(self, name, config)
@@ -52,15 +50,9 @@ class AwsDriver(Driver, ConnectionInterface, ProviderInterface):
             urllib.parse.quote_plus(provider.connection.connection_name),
             urllib.parse.quote_plus(provider.region),
         ])
-        try:
-            return self.endpoints[endpoint_id]
-        except KeyError:
-            pass
-        endpoint = self._endpoint_class(
-            self, provider.connection, provider.region)
-        self.endpoints[endpoint_id] = endpoint
-        return endpoint
+        return self.getEndpointById(
+            endpoint_id,
+            create_args=(self, provider.connection, provider.region))
 
     def stop(self):
-        for endpoint in self.endpoints.values():
-            endpoint.stop()
+        self.stopEndpoints()

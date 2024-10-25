@@ -15,6 +15,7 @@
 import abc
 import json
 import math
+import threading
 import urllib.parse
 
 from zuul.lib.voluputil import Required, Optional, Nullable, assemble
@@ -121,6 +122,23 @@ class BaseProviderEndpoint(metaclass=abc.ABCMeta):
         self.driver = driver
         self.connection = connection
         self.name = name
+        self.start_lock = threading.Lock()
+        self.started = False
+        self.stopped = False
+
+    def start(self):
+        with self.start_lock:
+            if not self.stopped and not self.started:
+                self.startEndpoint()
+                self.started = True
+
+    def stop(self):
+        with self.start_lock:
+            if self.started:
+                self.stopEndpoint()
+            # Set the stopped flag regardless of whether we started so
+            # that we won't start after stopping.
+            self.stopped = True
 
     @property
     def canonical_name(self):
@@ -128,6 +146,21 @@ class BaseProviderEndpoint(metaclass=abc.ABCMeta):
             urllib.parse.quote_plus(self.connection.connection_name),
             urllib.parse.quote_plus(self.name),
         ])
+
+    def handleStart(self):
+        """Start the endpoint
+
+        This method may start any threads necessary for the endpoint.
+
+        """
+        raise NotImplementedError()
+
+    def handleStop(self):
+        """Stop the endpoint
+
+        This method must stop all endpoint threads.
+        """
+        raise NotImplementedError()
 
 
 class BaseProviderSchema(metaclass=abc.ABCMeta):
@@ -526,3 +559,25 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         :param ProviderNode node: The node of the server
         """
         pass
+
+
+class EndpointCacheMixin:
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        self.endpoints = {}
+        self.endpoints_lock = threading.Lock()
+
+    def getEndpointById(self, endpoint_id, create_args):
+        with self.endpoints_lock:
+            try:
+                return self.endpoints[endpoint_id]
+            except KeyError:
+                pass
+            endpoint = self._endpoint_class(*create_args)
+            self.endpoints[endpoint_id] = endpoint
+        return endpoint
+
+    def stopEndpoints(self):
+        with self.endpoints_lock:
+            for endpoint in self.endpoints.values():
+                endpoint.stop()
