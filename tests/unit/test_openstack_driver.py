@@ -77,6 +77,11 @@ class BaseOpenstackDriverTest(ZuulTestCase):
 
 
 class TestOpenstackDriver(BaseOpenstackDriverTest, BaseCloudDriverTest):
+    def _assertProviderNodeAttributes(self, pnode):
+        super()._assertProviderNodeAttributes(pnode)
+        self.assertEqual('fakecloud', pnode.cloud)
+        self.assertEqual('region1', pnode.region)
+
     @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
     def test_openstack_node_lifecycle(self):
         self._test_node_lifecycle('debian-normal')

@@ -147,6 +147,7 @@ class FakeOpenstackConnection:
         self.config = FakeOpenstackConfig()
         self.config.config = {}
         self.config.config['image_format'] = 'qcow2'
+        self.config.config['region_name'] = 'region1'
 
     def _needs_floating_ip(self, server, nat_destination):
         return self.cloud._fake_needs_floating_ip

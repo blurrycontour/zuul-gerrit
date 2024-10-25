@@ -564,7 +564,7 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
     def _getInstance(self, server, quota):
         return OpenstackInstance(
             self.connection.cloud_name,
-            self.connection.region_name,
+            self.getRegionName(),
             server, quota)
 
     def _getClient(self):
@@ -574,7 +574,7 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
             app_name='zuul',
         )
         region = config.get_one(cloud=self.connection.cloud_name,
-                                region_name=self.connection.region_name)
+                                region_name=self.region)
         return openstack.connection.Connection(
             config=region,
             use_direct_get=False,
@@ -583,6 +583,12 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
 
     def getImageFormat(self):
         return self._client.config.config['image_format']
+
+    def getRegionName(self):
+        # With OpenStackSDK, users can omit the region and the SDK may
+        # supply a default region.  This helper method will return the
+        # actual region in use regardless of what the user supplied.
+        return self._client.config.config['region_name']
 
     def _submitApi(self, api, *args, **kw):
         return self.api_executor.submit(
