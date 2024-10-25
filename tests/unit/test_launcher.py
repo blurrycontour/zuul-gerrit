@@ -62,11 +62,8 @@ class LauncherBaseTestCase(ZuulTestCase):
         self.s3.create_bucket(
             Bucket='zuul',
             CreateBucketConfiguration={'LocationConstraint': 'us-west-2'})
+        self.addCleanup(self.mock_aws.stop)
         super().setUp()
-
-    def tearDown(self):
-        self.mock_aws.stop()
-        super().tearDown()
 
     def _nodes_by_label(self):
         nodes = self.launcher.api.nodes_cache.getItems()
