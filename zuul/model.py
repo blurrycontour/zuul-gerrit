@@ -2458,8 +2458,9 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             uuid=uuid4().hex,
             request_id=None,
             zuul_event_id=None,
-            expiry_time=None,
+            max_ready_age=None,
             state=self.State.REQUESTED,
+            state_time=time.time(),
             label="",
             label_config_hash=None,
             tags={},
@@ -2518,8 +2519,9 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             uuid=self.uuid,
             request_id=self.request_id,
             zuul_event_id=self.zuul_event_id,
-            expiry_time=self.expiry_time,
+            max_ready_age=self.max_ready_age,
             state=self.state,
+            state_time=self.state_time,
             label=self.label,
             label_config_hash=self.label_config_hash,
             tags=self.tags,
@@ -2531,8 +2533,18 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
         )
         return json.dumps(data, sort_keys=True).encode("utf-8")
 
+    def setState(self, new_state):
+        if self.state == new_state:
+            return
+        self.state = new_state
+        self.state_time = time.time()
+
     def hasExpired(self):
-        return self.expiry_time and self.expiry_time < time.time()
+        if not self.max_ready_age:
+            return False
+        if self.state != self.State.READY:
+            return False
+        return (self.state_time + self.max_ready_age) < time.time()
 
     def getDriverData(self):
         return dict()
