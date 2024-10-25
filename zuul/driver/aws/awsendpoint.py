@@ -15,6 +15,7 @@
 
 import base64
 import cachetools.func
+import copy
 import functools
 import hashlib
 import uuid
@@ -592,12 +593,11 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             quota = self._getQuotaForInstanceType(
                 flavor.instance_type,
                 SPOT if flavor.market_type == 'spot' else ON_DEMAND)
-        # TODO
-        # if label.volume_type:
-        #     quota.add(self._getQuotaForVolumeType(
-        #         label.volume_type,
-        #         storage=label.volume_size,
-        #         iops=label.iops))
+        if label.volume_type:
+            quota.add(self._getQuotaForVolumeType(
+                label.volume_type,
+                storage=label.volume_size,
+                iops=label.iops))
         return quota
 
     def uploadImage(self, provider_image, image_name, filename,
@@ -1419,30 +1419,28 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         # We might need to supply our own mapping before lauching the instance.
         # We basically want to make sure DeleteOnTermination is true and be
         # able to set the volume type and size.
-        image = self._getImage(image_id)
+        aws_image = self._getImage(image_id)
         # TODO: Flavors can also influence whether or not the VM spawns with a
         # volume -- we basically need to ensure DeleteOnTermination is true.
         # However, leaked volume detection may mitigate this.
-
-        # TODO
-        # if image.get('BlockDeviceMappings'):
-        #     bdm = image['BlockDeviceMappings']
-        #     mapping = copy.deepcopy(bdm[0])
-        #     if 'Ebs' in mapping:
-        #         mapping['Ebs']['DeleteOnTermination'] = True
-        #         if label.volume_size:
-        #             mapping['Ebs']['VolumeSize'] = label.volume_size
-        #         if label.volume_type:
-        #             mapping['Ebs']['VolumeType'] = label.volume_type
-        #         if label.iops:
-        #             mapping['Ebs']['Iops'] = label.iops
-        #         if label.throughput:
-        #             mapping['Ebs']['Throughput'] = label.throughput
-        #         # If the AMI is a snapshot, we cannot supply an "encrypted"
-        #         # parameter
-        #         if 'Encrypted' in mapping['Ebs']:
-        #             del mapping['Ebs']['Encrypted']
-        #         args['BlockDeviceMappings'] = [mapping]
+        if aws_image.get('BlockDeviceMappings'):
+            bdm = aws_image['BlockDeviceMappings']
+            mapping = copy.deepcopy(bdm[0])
+            if 'Ebs' in mapping:
+                mapping['Ebs']['DeleteOnTermination'] = True
+                if label.volume_size:
+                    mapping['Ebs']['VolumeSize'] = label.volume_size
+                if label.volume_type:
+                    mapping['Ebs']['VolumeType'] = label.volume_type
+                if label.iops:
+                    mapping['Ebs']['Iops'] = label.iops
+                if label.throughput:
+                    mapping['Ebs']['Throughput'] = label.throughput
+                # If the AMI is a snapshot, we cannot supply an "encrypted"
+                # parameter
+                if 'Encrypted' in mapping['Ebs']:
+                    del mapping['Ebs']['Encrypted']
+                args['BlockDeviceMappings'] = [mapping]
 
         # TODO
         # if flavor.market_type == 'spot':

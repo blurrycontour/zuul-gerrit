@@ -134,6 +134,10 @@
     flavors:
       - name: normal
         instance-type: t3.medium
+        volume-type: gp3
+        volume-size: 40
+        iops: 500
+        throughput: 200
       - name: large
         instance-type: t3.large
       - name: dedicated
@@ -156,6 +160,11 @@
     labels:
       - name: debian-normal
         key-name: zuul
+        volume-type: gp3
+        volume-size: 40
+        # Change iops and omit throughput to test label overriding the
+        # flavor
+        iops: 1000
       - name: debian-large
         key-name: zuul
       - name: debian-dedicated
