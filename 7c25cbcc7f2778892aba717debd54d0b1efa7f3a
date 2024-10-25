@@ -50,6 +50,24 @@
       "message": "The console object is shared between two threads which means we share a single self.logfile reference that we write against. With multiple threads attempting to write to this file is it possible that the file position indicator for our write location to not be thread safe resulting in us writing stdout over stderr or vice versa?\n\nDo we need to synchronize around the lock to prevent that from happening?",
       "revId": "7c25cbcc7f2778892aba717debd54d0b1efa7f3a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b81ad8c9_8e87dbf1",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-10-25T21:01:17Z",
+      "side": 1,
+      "message": "This should be safe because (logical proof follows!):\n\n* We open the file with buffering\u003d0; this returns an io.FileIO object[1].\n\n* \"FileIO objects are thread-safe to the extent that the operating\n  system calls (such as read(2) under Unix) they wrap are thread-safe too. [2]\n\n* The OS call we are concerned with is \"write\".\n\n* write is thread-safe starting in Linux 3.14[3].\n\n* Linux 3.14 was released in 2014.\n\nAssuming that the remote node has a kernel no older than 10 years, we should not see any problems.  If we decide we do need to support an older kernel, we should\nadd a lock.\n\nOf course, it may produce interleaved output, but we\u0027re okay with that.  In fact,\nwe should be so lucky.  :)\n\n[1] https://docs.python.org/3/library/io.html#raw-i-o\n[2] https://docs.python.org/3/library/io.html#multi-threading\n[3] https://man7.org/linux/man-pages/man2/write.2.html#BUGS",
+      "parentUuid": "1d37157c_727566c6",
+      "revId": "7c25cbcc7f2778892aba717debd54d0b1efa7f3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
