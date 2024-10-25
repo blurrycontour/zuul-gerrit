@@ -368,6 +368,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
 
         self.log = logging.getLogger(f"zuul.aws.{self.name}")
         self._running = True
+        self.log.debug("Starting AWS endpoint")
 
         # AWS has a default rate limit for creating instances that
         # works out to a sustained 2 instances/sec, but the actual
@@ -385,7 +386,9 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         # values, and only less if users slow down the rate.
         workers = max(min(int(connection.rate * 4), 8), 1)
         self.log.info("Create executor with max workers=%s", workers)
-        self.create_executor = ThreadPoolExecutor(max_workers=workers)
+        self.create_executor = ThreadPoolExecutor(
+            thread_name_prefix=f'aws-create-{self.name}',
+            max_workers=workers)
 
         # We can batch delete instances using the AWS API, so to do
         # that, create a queue for deletes, and a thread to process
@@ -397,8 +400,9 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         # of requests leaves more time for create instance calls.
         self.delete_host_queue = queue.Queue()
         self.delete_instance_queue = queue.Queue()
-        self.delete_thread = threading.Thread(target=self._deleteThread)
-        self.delete_thread.daemon = True
+        self.delete_thread = threading.Thread(
+            name=f'aws-delete-{self.name}',
+            target=self._deleteThread)
         self.delete_thread.start()
 
         self.rate_limiter = RateLimiter(self.name,
@@ -467,9 +471,13 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
                 self._listEBSQuotas)
 
     def stop(self):
+        self.log.debug("Stopping AWS endpoint")
         self.create_executor.shutdown()
         self.api_executor.shutdown()
         self._running = False
+        self.delete_host_queue.put(None)
+        self.delete_instance_queue.put(None)
+        self.delete_thread.join()
 
     def listResources(self, bucket_name):
         for host in self._listHosts():
@@ -1502,12 +1510,18 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
     def _getBatch(the_queue):
         records = []
         try:
-            records.append(the_queue.get(block=True, timeout=10))
+            record = the_queue.get(block=True, timeout=10)
+            if record is None:
+                return records
+            records.append(record)
         except queue.Empty:
             return []
         while True:
             try:
-                records.append(the_queue.get(block=False))
+                record = the_queue.get(block=False)
+                if record is None:
+                    return records
+                records.append(record)
             except queue.Empty:
                 break
             # The terminate call has a limit of 1k, but AWS recommends
@@ -1527,6 +1541,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             with self.rate_limiter(log.debug, f"Deleted {count} instances"):
                 self.ec2_client.terminate_instances(InstanceIds=ids)
 
+        if not self._running:
+            return
         records = self._getBatch(self.delete_host_queue)
         if records:
             ids = []
