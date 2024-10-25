@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fa2cbe5_dc84bab7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-10-25T06:28:06Z",
+      "side": 1,
+      "message": "lgtm, but something seems to be broken with the tests",
+      "revId": "55c41a97e1319bb7db4b3cdb1860ee2a59e899f2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
