@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff3ce0fc_cc138c90",
+        "filename": "tests/fixtures/config/remote-zuul-stream/git/org_project/playbooks/command.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-25T21:16:11Z",
+      "side": 1,
+      "message": "It may still be a good idea to make this test more robust but I am satisfied with the proof through docs unless we see contradictory behavior later.",
+      "parentUuid": "43ce7081_12f260f6",
+      "revId": "7c25cbcc7f2778892aba717debd54d0b1efa7f3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ce64d1b_95601c4f",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-10-25T20:19:40Z",
       "side": 1,
       "message": "See comment in the base implementation.",
+      "revId": "7c25cbcc7f2778892aba717debd54d0b1efa7f3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76f3edc7_ee5410af",
+        "filename": "zuul/ansible/8/library/command.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-25T21:16:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ce64d1b_95601c4f",
       "revId": "7c25cbcc7f2778892aba717debd54d0b1efa7f3a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -66,6 +102,24 @@
       "side": 1,
       "message": "This should be safe because (logical proof follows!):\n\n* We open the file with buffering\u003d0; this returns an io.FileIO object[1].\n\n* \"FileIO objects are thread-safe to the extent that the operating\n  system calls (such as read(2) under Unix) they wrap are thread-safe too. [2]\n\n* The OS call we are concerned with is \"write\".\n\n* write is thread-safe starting in Linux 3.14[3].\n\n* Linux 3.14 was released in 2014.\n\nAssuming that the remote node has a kernel no older than 10 years, we should not see any problems.  If we decide we do need to support an older kernel, we should\nadd a lock.\n\nOf course, it may produce interleaved output, but we\u0027re okay with that.  In fact,\nwe should be so lucky.  :)\n\n[1] https://docs.python.org/3/library/io.html#raw-i-o\n[2] https://docs.python.org/3/library/io.html#multi-threading\n[3] https://man7.org/linux/man-pages/man2/write.2.html#BUGS",
       "parentUuid": "1d37157c_727566c6",
+      "revId": "7c25cbcc7f2778892aba717debd54d0b1efa7f3a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c334231b_ea677307",
+        "filename": "zuul/ansible/base/library/command.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-10-25T21:16:11Z",
+      "side": 1,
+      "message": "\u003e This should be safe because (logical proof follows!):\n\u003e \n\u003e * We open the file with buffering\u003d0; this returns an io.FileIO object[1].\n\u003e \n\u003e * \"FileIO objects are thread-safe to the extent that the operating\n\u003e   system calls (such as read(2) under Unix) they wrap are thread-safe too. [2]\n\u003e \n\u003e * The OS call we are concerned with is \"write\".\n\u003e \n\u003e * write is thread-safe starting in Linux 3.14[3].\n\u003e \n\u003e * Linux 3.14 was released in 2014.\n\nThis all makes sense to me thank you for putting the proof together.\n\n\u003e \n\u003e Assuming that the remote node has a kernel no older than 10 years, we should not see any problems.  If we decide we do need to support an older kernel, we should\n\u003e add a lock.\n\nRHEL/CentOS/etc 7 is on a 3.10 kernel. I suspect that most everything else we may care about is newer than that. I think that Amazon ec2 linux may also have a RHEL 7 variant?\n\n\u003e \n\u003e Of course, it may produce interleaved output, but we\u0027re okay with that.  In fact,\n\u003e we should be so lucky.  :)\n\nYup interleaved is fine. I was only concerned about lost bytes due to overwriting at the wrong position.\n\n\u003e \n\u003e [1] https://docs.python.org/3/library/io.html#raw-i-o\n\u003e [2] https://docs.python.org/3/library/io.html#multi-threading\n\u003e [3] https://man7.org/linux/man-pages/man2/write.2.html#BUGS\n\nFrom an OpenDev perspective I don\u0027t think we care about CentOS 7/RHEL 7 any longer. The release went end of maintenance a few months ago so most people should be moving off of it at this point. I won\u0027t approve this change right now in case we feel we need more feedback from other users.",
+      "parentUuid": "b81ad8c9_8e87dbf1",
       "revId": "7c25cbcc7f2778892aba717debd54d0b1efa7f3a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
