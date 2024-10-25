@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d76a732_beea0fc3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2024-10-25T08:54:13Z",
+      "side": 1,
+      "message": "Thanks for the feedback. I\u0027ve uploaded a new patchset with a reduced border of 1px. Could you have a look at that? This might be a good improvement to provide more information while still visualizing the overall trend without too much noise.\n\nI think it\u0027s a valid reason to decide what we want to use this \"overall\" progress bar for and I get the point about it being mainly there to provide some kind of trend.\n\nHowever, since we are already showing the job names via a tooltip many colleagues in our project are also using that to identify the failing job(s) without the need to expand the job list. I don\u0027t have a strong opinion on this one and we might want to decide if we want to support (and improve) this use case or not.\n\nAnother point is that you can\u0027t see how many jobs are part of a QueueItem and thus, you also don\u0027t know how many jobs are represented by a fragment of the bar. E.g. a bar that is 3/4 blue and 1/4 green could mean that 3 jobs are still running, but it might also be that 30 jobs are still running. I find that showing this information in some way could improve the usability of the overall progress bar. That and the thing about \"weird\" color transitions which could happen if there are no spaces are the main reasons I came up with this change. The color-thingy is definitely a matter of personal taste.",
+      "revId": "dfdbddbcb06f4eece6333c6241f3bf1823801c51",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
