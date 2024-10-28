@@ -665,6 +665,7 @@ class Launcher:
                 node.releaseLock()
 
     def _processMinReady(self):
+        self.log.debug("JEB process min ready")
         if not self.api.nodes_cache.waitForSync(
                 timeout=self.CACHE_SYNC_TIMEOUT):
             self.log.warning("Timeout waiting %ss for node cache to sync",
@@ -702,11 +703,13 @@ class Launcher:
         label_scores = DefaultKeyDict(
             lambda lcn: scores_for_label(lcn, candidate_names))
 
+        self.log.debug("  JEB candidates: %s %s", candidate_names, label_scores)
         # Collect min-ready labels that we need to process
         tenant_labels = collections.defaultdict(
             lambda: collections.defaultdict(list))
         for tenant_name, tenant_providers in self.tenant_providers.items():
             for tenant_provider in tenant_providers:
+                self.log.debug("  JEB provider: %s %s", tenant_name, tenant_provider)
                 for label in tenant_provider.labels.values():
                     if not label.min_ready:
                         continue
@@ -716,14 +719,20 @@ class Launcher:
                             label.canonical_name,
                             label_scores,
                             candidate_launchers):
+                        self.log.debug("    JEB label low score: %s", label)
                         continue
+                    self.log.debug("    JEB label high score: %s", label)
                     # We collect all label variants to determin if
                     # min-ready is satisfied based on the config hashes
                     tenant_labels[tenant_name][label.name].append(label)
 
+        self.log.debug("  JEB tenant labels: %s", tenant_labels)
         unassigned_hashes = self._getUnassignedNodeLabelHashes()
+        self.log.debug("  JEB unassigned hashes: %s", unassigned_hashes)
         for tenant_name, min_ready_labels in tenant_labels.items():
+            self.log.debug("  JEB tenant name: %s %s", tenant_name, min_ready_labels)
             for label_name, labels in min_ready_labels.items():
+                self.log.debug("    JEB label name: %s %s", label_name, labels)
                 valid_label_hashes = set(lbl.config_hash for lbl in labels)
                 tenant_min_ready = sum(
                     1 for h in unassigned_hashes[label_name]
@@ -733,6 +742,8 @@ class Launcher:
                     p for p in self.tenant_providers[tenant_name]
                     if p.hasLabel(label_name)
                 ]
+                self.log.debug("    JEB hashes: %s %s %s",
+                               valid_label_hashes, tenant_min_ready, label_providers)
                 for _ in range(tenant_min_ready, labels[0].min_ready):
                     provider = random.choice(label_providers)
                     label = provider.labels[label_name]
