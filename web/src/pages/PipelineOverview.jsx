@@ -118,7 +118,7 @@ TenantStats.propTypes = {
   reloadCallback: PropTypes.func.isRequired,
 }
 
-function PipelineGallery({ pipelines, tenant, showAllPipelines, isLoading, filters, onClearFilters }) {
+function PipelineGallery({ pipelines, tenant, showAllPipelines, expandAll, isLoading, filters, onClearFilters }) {
   // Filter out empty pipelines if necessary
   if (!showAllPipelines) {
     pipelines = pipelines.filter(ppl => ppl._count > 0)
@@ -134,7 +134,7 @@ function PipelineGallery({ pipelines, tenant, showAllPipelines, isLoading, filte
       >
         {pipelines.map(pipeline => (
           <GalleryItem key={pipeline.name}>
-            <PipelineSummary pipeline={pipeline} tenant={tenant} showAllQueues={showAllPipelines} filters={filters} />
+            <PipelineSummary pipeline={pipeline} tenant={tenant} showAllQueues={showAllPipelines} areAllJobsExpanded={expandAll} filters={filters} />
           </GalleryItem>
         ))}
       </Gallery>
@@ -156,6 +156,7 @@ PipelineGallery.propTypes = {
   pipelines: PropTypes.array,
   tenant: PropTypes.object,
   showAllPipelines: PropTypes.bool,
+  expandAll: PropTypes.bool,
   isLoading: PropTypes.bool,
   filters: PropTypes.object,
   onClearFilters: PropTypes.func,
@@ -166,6 +167,9 @@ function PipelineOverviewPage({
 }) {
   const [showAllPipelines, setShowAllPipelines] = useState(
     localStorage.getItem('zuul_show_all_pipelines') === 'true')
+  const [expandAll, setExpandAll] = useState(
+    localStorage.getItem('zuul_overview_expand_all') === 'true')
+
   const [isReloading, setIsReloading] = useState(false)
   const location = useLocation()
   const history = useHistory()
@@ -177,6 +181,11 @@ function PipelineOverviewPage({
   const onShowAllPipelinesToggle = (isChecked) => {
     setShowAllPipelines(isChecked)
     localStorage.setItem('zuul_show_all_pipelines', isChecked.toString())
+  }
+
+  const onExpandAllToggle = (isChecked) => {
+    setExpandAll(isChecked)
+    localStorage.setItem('zuul_overview_expand_all', isChecked.toString())
   }
 
   const onFilterChanged = (newFilters) => {
@@ -255,6 +264,16 @@ function PipelineOverviewPage({
               <Tooltip content="Disabled when filtering">{allPipelinesSwitch}</Tooltip> :
               allPipelinesSwitch}
           </ToolbarItem>
+          <ToolbarItem>
+            <Switch
+              className="zuul-show-all-switch"
+              aria-label="Expand all"
+              label="Expand all"
+              isReversed
+              onChange={onExpandAllToggle}
+              isChecked={expandAll}
+            />
+          </ToolbarItem>
         </FilterToolbar>
       </PageSection>
       <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
@@ -262,6 +281,7 @@ function PipelineOverviewPage({
           pipelines={pipelines}
           tenant={tenant}
           showAllPipelines={showAllPipelines}
+          expandAll={expandAll}
           isLoading={isFetching}
           filters={filters}
           onClearFilters={onClearFilters}
