@@ -553,10 +553,6 @@ a.refresh {
     width: 40px;
 }
 
-.zuul-pipeline-header h3 {
-    font-weight: var(--pf-global--FontWeight--bold);
-}
-
 .zuul-change {
     margin-bottom: 10px;
 }
@@ -564,10 +560,6 @@ a.refresh {
 .zuul-change-dark {
     margin-bottom: 10px;
     border-color: #222;
-}
-
-.zuul-change-id {
-    float: right;
 }
 
 .zuul-job-result {
@@ -604,11 +596,6 @@ a.refresh {
     opacity: 1;
     transition-duration: 0.2s;
     cursor: progress;
-}
-
-.zuul-change-cell {
-    padding-left: 5px;
-    overflow-wrap: anywhere;
 }
 
 .zuul-change-job {
@@ -697,33 +684,6 @@ a.refresh {
 
 .form-inline > .form-group {
     padding-right: 5px;
-}
-
-.zuul-change-row {
-    height: 100%;
-    padding: 0 0 10px 0;
-    margin: 0;
-    width: 16px;
-    min-width: 16px;
-    overflow: hidden;
-    vertical-align: top;
-}
-
-.zuul-build-status {
-    background: transparent;
-    font-size: 16px;
-}
-
-.zuul-build-merge-conflict:before {
-    color: black;
-}
-
-.zuul-change-row-line {
-    background: linear-gradient(#000, #000) no-repeat center/2px 100%;
-}
-
-.zuul-change-row-line-dark {
-    background: linear-gradient(#fff, #fff) no-repeat center/2px 100%;
 }
 
 .progress-bar-animated {
