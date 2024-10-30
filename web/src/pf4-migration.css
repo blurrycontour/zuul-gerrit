@@ -47,39 +47,6 @@ span.zuul-job-result.label {
     font-size: small;
 }
 
-/* Don't let the "row" class break the page layout */
-.zuul-status-content, .zuul-change-content {
-    margin-left: 0;
-    margin-right: 0;
-}
-
-/* Don't indent the jobs inside a change box */
-.zuul-status-content .list-group {
-    padding-left: 0;
-    margin-left: 0;
-}
-
-/* Avoid that the change boxes are stretched out (too much space in between) */
-.zuul-status-content table:not(:last-child) {
-    margin-bottom: 0;
-}
-
-/* Align the build status indicator (icon left of the change box) at the top */
-.zuul-build-status {
-    vertical-align: top;
-}
-
-/* Restore the menuitem styling */
-.zuul-status-content .pf-c-content ul[role="menu"] {
-    padding-left: 0;
-    list-style: none;
-}
-
-/* Avoid duplicated lines/borders for the job items on the status page */
-.zuul-status-content li+li {
-    margin-top: 0;
-}
-
 /* Restore padding values for the coluns on the status page */
 .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4,
 .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8,
