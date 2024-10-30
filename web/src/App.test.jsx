@@ -23,7 +23,7 @@ import { fetchInfoIfNeeded } from './actions/info'
 import configureStore from './store'
 import App from './App'
 import TenantsPage from './pages/Tenants'
-import StatusPage from './pages/Status'
+import PipelineOverviewPage from './pages/PipelineOverview'
 import ZuulAuthProvider from './ZuulAuthProvider'
 import * as api from './api'
 
@@ -143,7 +143,7 @@ it('renders single tenant', async () => {
   // Info should tell white label tenant openstack
   expect(store.getState().info.tenant).toEqual('openstack')
   // Status page has been rendered
-  expect(application.root.findAllByType(StatusPage)).not.toEqual(null)
+  expect(application.root.findAllByType(PipelineOverviewPage)).not.toEqual(null)
   // Fetch status has been called
   expect(api.fetchStatus).toBeCalled()
   await auth_election.die()

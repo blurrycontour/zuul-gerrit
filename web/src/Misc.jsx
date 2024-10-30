@@ -17,11 +17,6 @@ import PropTypes from 'prop-types'
 import * as moment from 'moment'
 import { ExternalLinkAltIcon } from '@patternfly/react-icons'
 
-function removeHash() {
-  // Remove location hash from url
-  window.history.pushState('', document.title, window.location.pathname)
-}
-
 function ExternalLink(props) {
   const { target } = props
 
@@ -198,7 +193,6 @@ export {
   ExternalLink,
   formatTime,
   IconProperty,
-  removeHash,
   renderRefInfo,
   resolveDarkMode,
   setDarkMode,
