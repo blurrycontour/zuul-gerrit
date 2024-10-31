@@ -23,6 +23,7 @@ import boto3
 
 from zuul.driver.aws import AwsDriver
 from zuul.driver.aws.awsmodel import AwsProviderNode
+import zuul.driver.aws.awsendpoint
 
 from tests.fake_aws import FakeAws, FakeAwsProviderEndpoint
 from tests.base import (
@@ -37,6 +38,7 @@ from tests.unit.test_cloud_driver import BaseCloudDriverTest
 class TestAwsDriver(BaseCloudDriverTest):
     config_file = 'zuul-connections-nodepool.conf'
     cloud_test_image_format = 'raw'
+    cloud_test_provider_name = 'aws-us-east-1-main'
     mock_aws = mock_aws()
     debian_return_data = {
         'zuul': {
@@ -65,6 +67,7 @@ class TestAwsDriver(BaseCloudDriverTest):
             fixtures.EnvironmentVariable('AWS_ACCESS_KEY_ID', aws_id))
         self.useFixture(
             fixtures.EnvironmentVariable('AWS_SECRET_ACCESS_KEY', aws_key))
+        self.patch(zuul.driver.aws.awsendpoint, 'CACHE_TTL', 1)
 
         # Moto doesn't handle some aspects of instance creation, so we
         # intercept and log the calls.
