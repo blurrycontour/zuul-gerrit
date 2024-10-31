@@ -18,6 +18,8 @@ from collections import defaultdict
 import json
 import math
 import queue
+import random
+import string
 import threading
 import time
 import uuid
@@ -1946,6 +1948,37 @@ class TestZKObject(ZooKeeperBaseTestCase):
                 pipeline1.foo = 'five'
             self.assertEqual(pipeline1.foo, 'five')
 
+    def _test_zk_object_too_large(self, zkobject_class):
+        # This produces a consistent string that compresses to > 1MiB
+        rnd = random.Random()
+        rnd.seed(42)
+        size = 1024 * 1200
+        foo = ''.join(rnd.choice(string.printable) for x in range(size))
+
+        stop_event = threading.Event()
+        self.zk_client.client.create('/zuul/pipeline', makepath=True)
+        # Create a new object
+        tenant_name = 'fake_tenant'
+        with tenant_write_lock(self.zk_client, tenant_name) as lock:
+            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            with testtools.ExpectedException(Exception,
+                                             'ZK data size too large'):
+                pipeline1 = zkobject_class.new(context,
+                                               name=tenant_name,
+                                               foo=foo)
+
+            pipeline1 = zkobject_class.new(context,
+                                           name=tenant_name,
+                                           foo='foo')
+
+            with testtools.ExpectedException(Exception,
+                                             'ZK data size too large'):
+                pipeline1.updateAttributes(context, foo=foo)
+
+            # Refresh an existing object
+            pipeline1.refresh(context)
+            self.assertEqual(pipeline1.foo, 'foo')
+
     def test_zk_object(self):
         self._test_zk_object(DummyZKObject)
 
@@ -1957,6 +1990,10 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
     def test_sharded_zk_object_exception(self):
         self._test_zk_object_exception(DummyShardedZKObject)
+
+    def test_zk_object_too_large(self):
+        # This only makes sense for a regular zkobject
+        self._test_zk_object_too_large(DummyZKObject)
 
 
 class TestBranchCache(ZooKeeperBaseTestCase):
