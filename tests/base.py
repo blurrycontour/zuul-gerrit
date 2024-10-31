@@ -1331,6 +1331,21 @@ class FakeNodepool(object):
             if 'fedora-pod' in node_type:
                 data['connection_type'] = 'kubectl'
                 data['connection_port']['pod'] = 'fedora-abcdefg'
+        if 'remote-pod' in node_type:
+            data['connection_type'] = 'kubectl'
+            data['connection_port'] = {
+                'name': os.environ['ZUUL_POD_REMOTE_NAME'],
+                'namespace': os.environ.get(
+                    'ZUUL_POD_REMOTE_NAMESPACE', 'default'),
+                'host': os.environ['ZUUL_POD_REMOTE_SERVER'],
+                'skiptls': False,
+                'token': os.environ['ZUUL_POD_REMOTE_TOKEN'],
+                'ca_crt': os.environ['ZUUL_POD_REMOTE_CA'],
+                'user': os.environ['ZUUL_POD_REMOTE_USER'],
+                'pod': os.environ['ZUUL_POD_REMOTE_NAME'],
+            }
+            data['interface_ip'] = data['connection_port']['pod']
+            data['public_ipv4'] = None
         data['tenant_name'] = request['tenant_name']
         data['requestor'] = request['requestor']
 
