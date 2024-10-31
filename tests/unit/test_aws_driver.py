@@ -216,6 +216,8 @@ class TestAwsDriver(BaseCloudDriverTest):
 
         layout = self.scheds.first.sched.abide.tenants.get('tenant-one').layout
         provider = layout.providers['aws-us-east-1-main']
+        # Start the endpoint since we're going to use the scheduler's endpoint.
+        provider.getEndpoint().start()
 
         with self.createZKContext(None) as ctx:
             node = AwsProviderNode.new(ctx, label=label)

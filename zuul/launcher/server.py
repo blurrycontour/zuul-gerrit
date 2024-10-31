@@ -881,6 +881,7 @@ class Launcher:
         self.connections.stop()
         self.upload_executor.shutdown()
         self.endpoint_upload_executor.shutdown()
+        # Endpoints are stopped by drivers
         self.log.debug("Stopped launcher")
 
     def join(self):
@@ -928,6 +929,7 @@ class Launcher:
                         continue
                     endpoint = provider.getEndpoint()
                     endpoints[endpoint.canonical_name] = endpoint
+                    endpoint.start()
             self.endpoints = endpoints
         return updated
 

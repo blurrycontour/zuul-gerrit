@@ -356,50 +356,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
     def __init__(self, driver, connection, region):
         name = f'{connection.connection_name}-{region}'
         super().__init__(driver, connection, name)
-        self.region = region
-
-        # Wrap these instance methods with a per-instance LRU cache so
-        # that we don't leak memory over time when the adapter is
-        # occasionally replaced.
-        self._getInstanceType = functools.lru_cache(maxsize=None)(
-            self._getInstanceType)
-        self._getImage = functools.lru_cache(maxsize=None)(
-            self._getImage)
-
         self.log = logging.getLogger(f"zuul.aws.{self.name}")
-        self._running = True
-
-        # AWS has a default rate limit for creating instances that
-        # works out to a sustained 2 instances/sec, but the actual
-        # create instance API call takes 1 second or more.  If we want
-        # to achieve faster than 1 instance/second throughput, we need
-        # to parallelize create instance calls, so we set up a
-        # threadworker to do that.
-
-        # A little bit of a heuristic here to set the worker count.
-        # It appears that AWS typically takes 1-1.5 seconds to execute
-        # a create API call.  Figure out how many we have to do in
-        # parallel in order to run at the rate limit, then quadruple
-        # that for headroom.  Max out at 8 so we don't end up with too
-        # many threads.  In practice, this will be 8 with the default
-        # values, and only less if users slow down the rate.
-        workers = max(min(int(connection.rate * 4), 8), 1)
-        self.log.info("Create executor with max workers=%s", workers)
-        self.create_executor = ThreadPoolExecutor(max_workers=workers)
-
-        # We can batch delete instances using the AWS API, so to do
-        # that, create a queue for deletes, and a thread to process
-        # the queue.  It will be greedy and collect as many pending
-        # instance deletes as possible to delete together.  Typically
-        # under load, that will mean a single instance delete followed
-        # by larger batches.  That strikes a balance between
-        # responsiveness and efficiency.  Reducing the overall number
-        # of requests leaves more time for create instance calls.
-        self.delete_host_queue = queue.Queue()
-        self.delete_instance_queue = queue.Queue()
-        self.delete_thread = threading.Thread(target=self._deleteThread)
-        self.delete_thread.daemon = True
-        self.delete_thread.start()
+        self.region = region
 
         self.rate_limiter = RateLimiter(self.name,
                                         connection.rate)
@@ -416,6 +374,16 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         # minutes.
         self.quota_service_rate_limiter = RateLimiter(self.name,
                                                       connection.rate)
+
+        # Wrap these instance methods with a per-instance LRU cache so
+        # that we don't leak memory over time when the adapter is
+        # occasionally replaced.
+        # TODO: This may be able to be a different kind of cache now
+        self._getInstanceType = functools.lru_cache(maxsize=None)(
+            self._getInstanceType)
+        self._getImage = functools.lru_cache(maxsize=None)(
+            self._getImage)
+
         self.image_id_by_filter_cache = cachetools.TTLCache(
             maxsize=8192, ttl=(5 * 60))
 
@@ -430,6 +398,45 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         self.s3_client = self.aws.client('s3')
         self.aws_quotas = self.aws.client("service-quotas")
         self.ebs_client = self.aws.client('ebs')
+
+    def startEndpoint(self):
+        self._running = True
+        self.log.debug("Starting AWS endpoint")
+
+        # AWS has a default rate limit for creating instances that
+        # works out to a sustained 2 instances/sec, but the actual
+        # create instance API call takes 1 second or more.  If we want
+        # to achieve faster than 1 instance/second throughput, we need
+        # to parallelize create instance calls, so we set up a
+        # threadworker to do that.
+
+        # A little bit of a heuristic here to set the worker count.
+        # It appears that AWS typically takes 1-1.5 seconds to execute
+        # a create API call.  Figure out how many we have to do in
+        # parallel in order to run at the rate limit, then quadruple
+        # that for headroom.  Max out at 8 so we don't end up with too
+        # many threads.  In practice, this will be 8 with the default
+        # values, and only less if users slow down the rate.
+        workers = max(min(int(self.connection.rate * 4), 8), 1)
+        self.log.info("Create executor with max workers=%s", workers)
+        self.create_executor = ThreadPoolExecutor(
+            thread_name_prefix=f'aws-create-{self.name}',
+            max_workers=workers)
+
+        # We can batch delete instances using the AWS API, so to do
+        # that, create a queue for deletes, and a thread to process
+        # the queue.  It will be greedy and collect as many pending
+        # instance deletes as possible to delete together.  Typically
+        # under load, that will mean a single instance delete followed
+        # by larger batches.  That strikes a balance between
+        # responsiveness and efficiency.  Reducing the overall number
+        # of requests leaves more time for create instance calls.
+        self.delete_host_queue = queue.Queue()
+        self.delete_instance_queue = queue.Queue()
+        self.delete_thread = threading.Thread(
+            name=f'aws-delete-{self.name}',
+            target=self._deleteThread)
+        self.delete_thread.start()
 
         workers = 10
         self.log.info("Create executor with max workers=%s", workers)
@@ -466,10 +473,14 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             SERVICE_QUOTA_CACHE_TTL, self.api_executor)(
                 self._listEBSQuotas)
 
-    def stop(self):
+    def stopEndpoint(self):
+        self.log.debug("Stopping AWS endpoint")
         self.create_executor.shutdown()
         self.api_executor.shutdown()
         self._running = False
+        self.delete_host_queue.put(None)
+        self.delete_instance_queue.put(None)
+        self.delete_thread.join()
 
     def listResources(self, bucket_name):
         for host in self._listHosts():
@@ -1502,12 +1513,18 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
     def _getBatch(the_queue):
         records = []
         try:
-            records.append(the_queue.get(block=True, timeout=10))
+            record = the_queue.get(block=True, timeout=10)
+            if record is None:
+                return records
+            records.append(record)
         except queue.Empty:
             return []
         while True:
             try:
-                records.append(the_queue.get(block=False))
+                record = the_queue.get(block=False)
+                if record is None:
+                    return records
+                records.append(record)
             except queue.Empty:
                 break
             # The terminate call has a limit of 1k, but AWS recommends
@@ -1527,6 +1544,8 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
             with self.rate_limiter(log.debug, f"Deleted {count} instances"):
                 self.ec2_client.terminate_instances(InstanceIds=ids)
 
+        if not self._running:
+            return
         records = self._getBatch(self.delete_host_queue)
         if records:
             ids = []

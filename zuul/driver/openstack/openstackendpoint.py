@@ -385,6 +385,7 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
     def __init__(self, driver, connection, region):
         name = f'{connection.connection_name}-{region}'
         super().__init__(driver, connection, name)
+        self.log = logging.getLogger(f"zuul.openstack.{self.name}")
         self.region = region
 
         # Wrap these instance methods with a per-instance LRU cache so
@@ -399,9 +400,15 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
         self._listAZs = functools.lru_cache(maxsize=None)(
             self._listAZs)
 
-        self.log = logging.getLogger(f"zuul.openstack.{self.name}")
-        self._running = True
+        self.rate_limiter = RateLimiter(self.name, connection.rate)
 
+        self._last_image_check_failure = time.time()
+        self._last_port_cleanup = None
+        self._client = self._getClient()
+
+    def startEndpoint(self):
+        self.log.debug("Starting OpenStack endpoint")
+        self._running = True
         # The default http connection pool size is 10; match it for
         # efficiency.
         workers = 10
@@ -424,14 +431,8 @@ class OpenstackProviderEndpoint(BaseProviderEndpoint):
             CACHE_TTL, self.api_executor)(
                 self._listFloatingIps)
 
-        self.rate_limiter = RateLimiter(self.name,
-                                        connection.rate)
-
-        self._last_image_check_failure = time.time()
-        self._last_port_cleanup = None
-        self._client = self._getClient()
-
-    def stop(self):
+    def stopEndpoint(self):
+        self.log.debug("Stopping OpenStack endpoint")
         self.api_executor.shutdown()
         self._running = False
 
