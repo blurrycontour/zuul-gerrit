@@ -226,7 +226,8 @@ class GithubReporter(BaseReporter):
         message = self._formatMergeMessage(change, merge_mode)
         merge_mode = self.merge_modes[merge_mode]
 
-        for i in [1, 2]:
+        max_retries = 5
+        for i in range(1, max_retries + 1):
             try:
                 self.connection.mergePull(project, pr_number, message, sha=sha,
                                           method=merge_mode,
@@ -235,13 +236,30 @@ class GithubReporter(BaseReporter):
                                                        is_merged=True)
                 return
             except MergeFailure as e:
-                log.exception('Merge attempt of change %s  %s/2 failed.',
-                              change, i, exc_info=True)
+                log.exception('Merge attempt of change %s  %s/%s failed.',
+                              change, i, max_retries, exc_info=True)
                 error_message = str(e)
-                if i == 1:
-                    time.sleep(2)
-        log.warning('Merge of change %s failed after 2 attempts, giving up',
-                    change)
+                if i < max_retries:
+                    time.sleep(5)
+                    # Sometimes GitHub lies about the merge status and reports
+                    # merge failed but in fact did the merge successfully. To
+                    # account for that re-fetch the PR and check if it's still
+                    # unmerged.
+                    try:
+                        if self.connection.isMerged(change, item.event):
+                            # The change has been merged despite we got an
+                            # error back from GitHub
+                            log.warning(
+                                'Merge attempt of change %s failed but change '
+                                'is merged. Treating as success.', change)
+                            self.connection.updateChangeAttributes(
+                                change, is_merged=True)
+                            return
+                    except Exception:
+                        log.exception('Error while checking for merged '
+                                      'change %s', change)
+        log.warning('Merge of change %s failed after %s attempts, giving up',
+                    change, max_retries)
         raise MergeFailure(error_message)
 
     def addReview(self, item, change):
