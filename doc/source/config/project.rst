@@ -263,7 +263,7 @@ pipeline.
       .. attr:: fail-fast
          :default: false
 
-         If this is set to `true`, Zuul will report a build failure
+         If this is set to `true`, Zuul will report a build or node failure
          immediately and abort all still running builds. This can be used
          to save resources in resource constrained environments at the cost
          of potentially requiring multiple attempts if more than one problem

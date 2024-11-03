@@ -65,6 +65,10 @@
 
 - job:
     name: project-test6
+    nodeset:
+      nodes:
+        - name: controller
+          label: label1
 
 - project:
     name: org/project

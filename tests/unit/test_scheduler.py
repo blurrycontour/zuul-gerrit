@@ -8970,9 +8970,8 @@ class TestSchedulerFailFast(ZuulTestCase):
         self.executor_server.release('project-merge')
         self.waitUntilSettled()
 
-        # Now project-test1, project-test2 and project-test6
-        # should be running
-        self.assertEqual(len(self.builds), 3)
+        # Now project-test1 and project-test2 should be running
+        self.assertEqual(len(self.builds), 2)
 
         # Release project-test1 which will fail
         self.executor_server.release('project-test1')
@@ -8988,7 +8987,6 @@ class TestSchedulerFailFast(ZuulTestCase):
             dict(name='project-merge', result='SUCCESS', changes='1,1'),
             dict(name='project-test1', result='FAILURE', changes='1,1'),
             dict(name='project-test2', result='ABORTED', changes='1,1'),
-            dict(name='project-test6', result='ABORTED', changes='1,1'),
         ], ordered=False)
 
     def test_fail_fast_gate(self):
@@ -9115,6 +9113,79 @@ class TestSchedulerFailFast(ZuulTestCase):
             dict(name='project-test4', result='SUCCESS', changes='1,1'),
             dict(name='project-test5', result='SUCCESS', changes='1,1'),
             dict(name='project-test6', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+    def test_fail_fast_node_failure(self):
+        """
+        Tests that a pipeline that is flagged with fail-fast
+        aborts jobs early if a node request failed.
+        """
+        self.executor_server.hold_jobs_in_build = True
+        self.fake_nodepool.pause()
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 1)
+        self.assertEqual(self.builds[0].name, 'project-merge')
+        self.executor_server.release('project-merge')
+        self.waitUntilSettled()
+
+        # Fail node request for project-test5
+        request = self.fake_nodepool.getNodeRequests()[0]
+        self.fake_nodepool.addFailRequest(request)
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='ABORTED', changes='1,1'),
+            dict(name='project-test2', result='ABORTED', changes='1,1'),
+        ], ordered=False)
+
+    def test_fail_fast_node_failure_nonvoting(self):
+        """
+        Tests that a pipeline that is flagged with fail-fast
+        doesn't abort jobs due to a node failure for non-voting job.
+        """
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.fake_nodepool.pause()
+        self.assertEqual(len(self.builds), 2)
+        self.assertEqual(self.builds[0].name, 'project-merge')
+        self.executor_server.release('project-merge')
+        self.executor_server.release('project-test5')
+        self.waitUntilSettled()
+
+        # Now project-test1 and project-test2 should be running
+        self.assertEqual(len(self.builds), 2)
+
+        # Fail node request for project-test6
+        request = self.fake_nodepool.getNodeRequests()[0]
+        self.fake_nodepool.addFailRequest(request)
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(A.reported, 1)
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='SUCCESS', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+            dict(name='project-test3', result='SUCCESS', changes='1,1'),
+            dict(name='project-test4', result='SUCCESS', changes='1,1'),
+            dict(name='project-test5', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
 
