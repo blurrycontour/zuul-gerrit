@@ -14,7 +14,6 @@
 # under the License.
 
 import abc
-import contextlib
 import json
 import logging
 import queue
@@ -32,6 +31,17 @@ from kazoo.protocol.states import (
 from zuul.zk.vendor.states import AddWatchMode
 
 
+class CacheSyncSentinel:
+    def __init__(self):
+        self.event = threading.Event()
+
+    def set(self):
+        return self.event.set()
+
+    def wait(self, timeout=None):
+        return self.event.wait(timeout)
+
+
 class ZuulTreeCache(abc.ABC):
     '''
     Use watchers to keep a cache of local objects up to date.
@@ -46,7 +56,6 @@ class ZuulTreeCache(abc.ABC):
         self.client = zk_client.client
         self.root = root
         self.sync_path = f"{root}/_sync/{uuid4().hex}"
-        self.sync_events = {}
         self._last_event_warning = time.monotonic()
         self._last_playback_warning = time.monotonic()
         self._cached_objects = {}
@@ -226,6 +235,10 @@ class ZuulTreeCache(abc.ABC):
             if item is None:
                 self._playback_queue.task_done()
                 continue
+            if isinstance(item, CacheSyncSentinel):
+                item.set()
+                self._playback_queue.task_done()
+                continue
 
             qsize = self._playback_queue.qsize()
             if qsize > self.qsize_warning_threshold:
@@ -280,13 +293,6 @@ class ZuulTreeCache(abc.ABC):
         # Some caches have special handling for certain sub-objects
         self.preCacheHook(event, exists, stat)
 
-        if event.path == self.sync_path and stat is not None:
-            for ltime in list(self.sync_events.keys()):
-                if ltime > stat.mzxid:
-                    continue
-                with contextlib.suppress(KeyError):
-                    self.sync_events[ltime].set()
-
         # If we don't actually cache this kind of object, return now
         if key is None:
             return
@@ -319,23 +325,11 @@ class ZuulTreeCache(abc.ABC):
         self._ready.wait()
 
     def waitForSync(self, timeout=None):
-        sync_ltime = self.zk_client.getCurrentLtime()
-        try:
-            sync_event = threading.Event()
-            self.sync_events[sync_ltime] = sync_event
-            try:
-                self.client.set(self.sync_path, b"")
-            except kze.NoNodeError:
-                # If the node was created in the meantime we will
-                # still be notified.
-                with contextlib.suppress(kze.NodeExistsError):
-                    self.client.create(
-                        self.sync_path, ephemeral=True, makepath=True)
-            self.log.debug("Waiting for cache sync (ltime=%s, timeout=%s)",
-                           sync_ltime, timeout)
-            return sync_event.wait(timeout)
-        finally:
-            self.sync_events.pop(sync_ltime, None)
+        if self._playback_queue.qsize() == 0:
+            return
+        sentinel = CacheSyncSentinel()
+        self._playback_queue.put(sentinel)
+        return sentinel.wait(timeout)
 
     # Methods for subclasses:
     def preCacheHook(self, event, exists, stat=None):
