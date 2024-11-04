@@ -69,7 +69,7 @@ class GerritReporter(BaseReporter):
 
         comments = self.getFileComments(item, change)
         if self._create_comment:
-            message = self._formatItemReport(item)
+            message = self._formatItemReport(item, change=change)
         else:
             message = ''
 

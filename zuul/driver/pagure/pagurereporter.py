@@ -80,7 +80,7 @@ class PagureReporter(BaseReporter):
         if phase2 and self._merge:
             self.mergePull(item, change)
             if not change.is_merged:
-                msg = self._formatItemReportMergeConflict(item)
+                msg = self._formatItemReportMergeConflict(item, change)
                 self.addPullComment(item, change, msg)
 
     def _formatItemReportJobs(self, item):

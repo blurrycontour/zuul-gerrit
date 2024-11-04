@@ -76,7 +76,7 @@ class GitlabReporter(BaseReporter):
             if phase2 and self._merge:
                 self.mergeMR(item, change)
                 if not change.is_merged:
-                    msg = self._formatItemReportMergeConflict(item)
+                    msg = self._formatItemReportMergeConflict(item, change)
                     self.addMRComment(item, change, msg)
 
     def addMRComment(self, item, change, comment=None):
