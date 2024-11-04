@@ -15,11 +15,14 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import Counter
+import fixtures
 import re
 import textwrap
+import threading
 import json
 
 from zuul.model import PromoteEvent
+import zuul.scheduler
 
 from tests.base import (
     iterate_timeout,
@@ -4206,6 +4209,65 @@ class TestGerritCircularDependencies(ZuulTestCase):
 
         self.log.debug("add reapproval")
         self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.waitUntilSettled("reapproved")
+
+        self.assertEqual(A.data["status"], "MERGED")
+        self.assertEqual(B.data["status"], "MERGED")
+        self.assertEqual(X.data["status"], "ABANDONED")
+
+    @gerrit_config(submit_whole_topic=True)
+    def test_abandoned_change_refresh_changes(self):
+        # Test that we can re-enqueue a topic cycle after abandoning a
+        # change (out of band).  This adds extra events to refresh all
+        # of the changes while the re-enqueue is in progress in order
+        # to trigger a race condition.
+        A = self.fake_gerrit.addFakeChange('org/project1', "master", "A",
+                                           topic='test-topic')
+        B = self.fake_gerrit.addFakeChange('org/project2', "master", "B",
+                                           topic='test-topic',
+                                           files={'conflict': 'B'})
+        X = self.fake_gerrit.addFakeChange('org/project2', "master", "X",
+                                           topic='test-topic',
+                                           files={'conflict': 'X'})
+
+        A.addApproval("Code-Review", 2)
+        B.addApproval("Code-Review", 2)
+        X.addApproval("Code-Review", 2)
+        X.addApproval("Approved", 1)
+        B.addApproval("Approved", 1)
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        self.waitUntilSettled()
+
+        orig_forward = zuul.scheduler.Scheduler._forward_trigger_event
+        stop_event = threading.Event()
+        go_event = threading.Event()
+
+        def patched_forward(obj, *args, **kw):
+            stop_event.set()
+            go_event.wait()
+            return orig_forward(obj, *args, **kw)
+
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.scheduler.Scheduler._forward_trigger_event',
+            patched_forward))
+
+        X.setAbandoned()
+        X.addApproval("Approved", -1)
+        self.waitUntilSettled("abandoned")
+
+        self.fake_gerrit.addEvent(A.addApproval("Approved", 1))
+        stop_event.wait()
+        stop_event.clear()
+        # The scheduler is waiting to forward the approved event; send
+        # another event that refreshes the cache:
+        self.fake_gerrit.addEvent(A.getChangeCommentEvent(1, 'testcomment'))
+        self.fake_gerrit.addEvent(B.getChangeCommentEvent(1, 'testcomment'))
+        self.fake_gerrit.addEvent(X.getChangeCommentEvent(1, 'testcomment'))
+        for x in iterate_timeout(30, 'events to be submitted'):
+            if len(self.scheds.first.sched.trigger_events['tenant-one']) == 4:
+                break
+        go_event.set()
+        stop_event.wait()
         self.waitUntilSettled("reapproved")
 
         self.assertEqual(A.data["status"], "MERGED")

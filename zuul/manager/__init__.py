@@ -29,10 +29,12 @@ import zuul.lib.tracing as tracing
 from zuul.model import (
     Change, PipelineState, PipelineChangeList,
     filter_severity, EnqueueEvent, FalseWithReason,
+    QueryCacheEntry
 )
 from zuul.zk.change_cache import ChangeKey
 from zuul.zk.exceptions import LockException
 from zuul.zk.locks import pipeline_lock
+from zuul.zk.components import COMPONENT_REGISTRY
 
 from opentelemetry import trace
 
@@ -1054,11 +1056,23 @@ class PipelineManager(metaclass=ABCMeta):
             or change.cache_stat.mzxid <= event.zuul_event_ltime
         )
 
+        if hasattr(event, "zuul_event_ltime"):
+            if COMPONENT_REGISTRY.model_api < 32:
+                topic_out_of_date =\
+                    change.cache_stat.mzxid <= event.zuul_event_ltime
+            else:
+                topic_out_of_date =\
+                    change.topic_query_ltime <= event.zuul_event_ltime
+        else:
+            # The value is unused and doesn't matter because of the
+            # clause below, but True is the safer value.
+            topic_out_of_date = True
+
         must_update_topic_deps = (
             self.useDependenciesByTopic(change.project) and (
                 not hasattr(event, "zuul_event_ltime")
                 or change.topic_needs_changes is None
-                or change.cache_stat.mzxid <= event.zuul_event_ltime
+                or topic_out_of_date
             )
         )
 
@@ -1098,15 +1112,19 @@ class PipelineManager(metaclass=ABCMeta):
             log.debug("  Updating topic dependencies for %s", change)
             new_topic_needs_changes_keys = []
             query_cache_key = (change.project.connection_name, change.topic)
-            changes_by_topic = query_cache.topic_queries.get(query_cache_key)
-            if changes_by_topic is None:
+            cache_entry = query_cache.topic_queries.get(query_cache_key)
+            if cache_entry is None:
                 changes_by_topic = source.getChangesByTopic(change.topic)
-                query_cache.topic_queries[query_cache_key] = changes_by_topic
-            for dep in changes_by_topic:
+                cache_entry = QueryCacheEntry(
+                    self.sched.zk_client.getCurrentLtime(),
+                    changes_by_topic)
+                query_cache.topic_queries[query_cache_key] = cache_entry
+            for dep in cache_entry.results:
                 if dep and (not dep.is_merged) and dep is not change:
                     log.debug("  Adding dependency: %s", dep)
                     new_topic_needs_changes_keys.append(dep.cache_key)
             update_attrs['topic_needs_changes'] = new_topic_needs_changes_keys
+            update_attrs['topic_query_ltime'] = cache_entry.ltime
 
         if update_attrs:
             source.setChangeAttributes(change, **update_attrs)

@@ -147,6 +147,12 @@ def filter_severity(error_list, errors=True, warnings=True):
             )]
 
 
+class QueryCacheEntry:
+    def __init__(self, ltime, results):
+        self.ltime = ltime
+        self.results = results
+
+
 class QueryCache:
     """Cache query information while processing dependencies"""
 
@@ -7302,6 +7308,7 @@ class Change(Branch):
         # drivers in theory, but Gerrit only in practice for
         # emulate-submit-whole-topic):
         self.topic_needs_changes = None
+        self.topic_query_ltime = 0
 
         self.is_current_patchset = True
         self.can_merge = False
@@ -7337,6 +7344,7 @@ class Change(Branch):
             else data.get("commit_needs_changes", [])
         )
         self.topic_needs_changes = data.get("topic_needs_changes")
+        self.topic_query_ltime = data.get("topic_query_ltime", 0)
         self.is_current_patchset = data.get("is_current_patchset", True)
         self.can_merge = data.get("can_merge", False)
         self.is_merged = data.get("is_merged", False)
@@ -7360,6 +7368,7 @@ class Change(Branch):
             "compat_needed_by_changes": self.git_needed_by_changes,
             "commit_needs_changes": self.commit_needs_changes,
             "topic_needs_changes": self.topic_needs_changes,
+            "topic_query_ltime": self.topic_query_ltime,
             "is_current_patchset": self.is_current_patchset,
             "can_merge": self.can_merge,
             "is_merged": self.is_merged,

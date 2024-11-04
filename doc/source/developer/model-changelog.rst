@@ -227,3 +227,9 @@ Version 31
 ----------
 :Prior Zuul version: 11.0.1
 :Description: Upgrade sharded zkobject format.
+
+Version 32
+----------
+:Prior Zuul version: 11.1.0
+:Description: Add topic query timestamp.
+              Affects schedulers.
