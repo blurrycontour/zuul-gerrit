@@ -12,9 +12,9 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useMemo } from 'react'
 
-import { connect } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { withRouter, useLocation, useHistory } from 'react-router-dom'
 import PropTypes from 'prop-types'
 import * as moment_tz from 'moment-timezone'
@@ -162,9 +162,33 @@ PipelineGallery.propTypes = {
   onClearFilters: PropTypes.func,
 }
 
-function PipelineOverviewPage({
-  pipelines, stats, isFetching, tenant, darkMode, autoReload, timezone, fetchStatusIfNeeded
-}) {
+function getPipelines(status, location) {
+  let pipelines = []
+  let stats = {}
+  if (status) {
+    const filters = getFiltersFromUrl(location, filterCategories)
+    // we need to work on a copy of the state..pipelines, because when mutating
+    // the original, we couldn't reset or change the filters without reloading
+    // from the backend first.
+    pipelines = global.structuredClone(status.pipelines)
+    pipelines = filterPipelines(pipelines, filters, filterCategories, true)
+
+    pipelines = pipelines.map(ppl => (
+      countPipelineItems(ppl)
+    ))
+    stats = {
+      trigger_event_queue: status.trigger_event_queue,
+      management_event_queue: status.management_event_queue,
+      last_reconfigured: status.last_reconfigured,
+    }
+  }
+  return {
+    pipelines,
+    stats,
+  }
+}
+
+function PipelineOverviewPage() {
   const [showAllPipelines, setShowAllPipelines] = useState(
     localStorage.getItem('zuul_show_all_pipelines') === 'true')
   const [expandAll, setExpandAll] = useState(
@@ -177,6 +201,16 @@ function PipelineOverviewPage({
   const filterActive = isFilterActive(filters)
 
   const isDocumentVisible = useDocumentVisibility()
+
+  const status = useSelector((state) => state.status.status)
+  const {pipelines, stats} = useMemo(() => getPipelines(status, location), [status, location])
+
+  const isFetching = useSelector((state) => state.status.isFetching)
+  const tenant = useSelector((state) => state.tenant)
+  const darkMode = useSelector((state) => state.preferences.darkMode)
+  const autoReload = useSelector((state) => state.preferences.autoReload)
+  const timezone = useSelector((state) => state.timezone)
+  const dispatch = useDispatch()
 
   const onShowAllPipelinesToggle = (isChecked) => {
     setShowAllPipelines(isChecked)
@@ -204,12 +238,12 @@ function PipelineOverviewPage({
   const updateData = useCallback((tenant) => {
     if (tenant.name) {
       setIsReloading(true)
-      fetchStatusIfNeeded(tenant)
+      dispatch(fetchStatusIfNeeded(tenant))
         .then(() => {
           setIsReloading(false)
         })
     }
-  }, [setIsReloading, fetchStatusIfNeeded])
+  }, [setIsReloading, dispatch])
 
   useEffect(() => {
     document.title = 'Zuul Status'
@@ -289,60 +323,6 @@ function PipelineOverviewPage({
       </PageSection>
     </>
   )
-
 }
 
-PipelineOverviewPage.propTypes = {
-  pipelines: PropTypes.array,
-  stats: PropTypes.object,
-  isFetching: PropTypes.bool,
-  tenant: PropTypes.object,
-  preferences: PropTypes.object,
-  darkMode: PropTypes.bool,
-  autoReload: PropTypes.bool.isRequired,
-  timezone: PropTypes.string,
-  fetchStatusIfNeeded: PropTypes.func,
-}
-
-function mapStateToProps(state, ownProps) {
-  let pipelines = []
-  let stats = {}
-  if (state.status.status) {
-    const filters = getFiltersFromUrl(ownProps.location, filterCategories)
-    // we need to work on a copy of the state..pipelines, because when mutating
-    // the original, we couldn't reset or change the filters without reloading
-    // from the backend first.
-    pipelines = global.structuredClone(state.status.status.pipelines)
-    pipelines = filterPipelines(pipelines, filters, filterCategories, true)
-
-    pipelines = pipelines.map(ppl => (
-      countPipelineItems(ppl)
-    ))
-    stats = {
-      trigger_event_queue: state.status.status.trigger_event_queue,
-      management_event_queue: state.status.status.management_event_queue,
-      last_reconfigured: state.status.status.last_reconfigured,
-    }
-  }
-
-  // TODO (felix): Here we could also order the pipelines by any
-  // criteria (e.g. the pipeline_type) in case we want that. Currently
-  // they are ordered in the way they are defined in the zuul config.
-  // The sorting could also be done via the filter toolbar.
-  return {
-    pipelines,
-    stats,
-    isFetching: state.status.isFetching,
-    tenant: state.tenant,
-    darkMode: state.preferences.darkMode,
-    autoReload: state.preferences.autoReload,
-    timezone: state.timezone,
-  }
-}
-
-const mapDispatchToProps = { fetchStatusIfNeeded }
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(withRouter(PipelineOverviewPage))
+export default withRouter(PipelineOverviewPage)
