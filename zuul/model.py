@@ -6659,19 +6659,33 @@ class QueueItem(zkobject.ZKObject):
                 build.job)
             skipped += to_skip
 
+        zk1_time = 0.0
+        zk2_time = 0.0
+        db_time = 0.0
         for job in skipped:
             child_build = self.current_build_set.getBuild(job)
             if not child_build:
+                zk1_start = time.perf_counter()
                 fakebuild = Build.new(self.pipeline.manager.current_context,
                                       job=job,
                                       build_set=self.current_build_set,
                                       error_detail=skipped_reason,
                                       result='SKIPPED')
+                zk2_start = time.perf_counter()
                 self.addBuild(job, fakebuild)
+                db_start = time.perf_counter()
                 self.pipeline.manager.sched.reportBuildEnd(
                     fakebuild,
                     tenant=self.pipeline.tenant.name,
                     final=True)
+                db_end = time.perf_counter()
+                zk1_time += (zk2_start - zk1_start)
+                zk2_time += (db_start - zk2_start)
+                db_time += (db_end - db_start)
+        if skipped:
+            # TODO: remove this debug log entry after evaluating performance
+            self.log.debug("Skipped job perf timing zk1=%s zk2=%s db=%s count=%s",
+                           zk1_time, zk2_time, db_time, len(skipped))
 
     def setNodeRequestFailure(self, job, error):
         fakebuild = Build.new(
