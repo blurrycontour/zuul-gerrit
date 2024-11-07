@@ -35,6 +35,7 @@ import projects from './projects'
 import preferences from './preferences'
 import semaphores from './semaphores'
 import status from './status'
+import statusExpansion from './statusExpansion'
 import tenant from './tenant'
 import tenants from './tenants'
 import tenantStatus from './tenantStatus'
@@ -63,6 +64,7 @@ const reducers = {
   projects,
   semaphores,
   status,
+  statusExpansion,
   tenant,
   tenants,
   timezone,
