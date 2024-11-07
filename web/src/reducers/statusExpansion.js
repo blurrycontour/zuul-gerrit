@@ -1,4 +1,4 @@
-// Copyright 2018 Red Hat, Inc
+// Copyright 2024 Acme Gating, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may
 // not use this file except in compliance with the License. You may obtain
@@ -12,41 +12,32 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import { TENANT_SET } from '../actions/tenant'
 import {
-  STATUS_FETCH_FAIL,
-  STATUS_FETCH_REQUEST,
-  STATUS_FETCH_SUCCESS
-} from '../actions/status'
+  STATUSEXPANSION_EXPAND_JOBS,
+  STATUSEXPANSION_COLLAPSE_JOBS,
+  STATUSEXPANSION_CLEANUP_JOBS,
+} from '../actions/statusExpansion'
 
 export default (state = {
-  isFetching: false,
-  status: null,
+  expandedJobs: {},
 }, action) => {
   switch (action.type) {
-    case TENANT_SET:
+    case STATUSEXPANSION_EXPAND_JOBS:
       return {
         ...state,
-        isFetching: false,
-        status: null,
+        expandedJobs: {...state.expanded_Jobs, [action.key]: true}
       }
-    case STATUS_FETCH_REQUEST:
+    case STATUSEXPANSION_COLLAPSE_JOBS:
       return {
         ...state,
-        isFetching: true,
-        status: state.status
+        expandedJobs: {...state.expanded_Jobs, [action.key]: false}
       }
-    case STATUS_FETCH_SUCCESS:
+    case STATUSEXPANSION_CLEANUP_JOBS:
+      // eslint-disable-next-line
+      const {[action.key]:undefined, ...newJobs } = state.expandedJobs
       return {
         ...state,
-        isFetching: false,
-        status: action.status,
-      }
-    case STATUS_FETCH_FAIL:
-      return {
-        ...state,
-        isFetching: false,
-        status: state.status,
+        expandedJobs: newJobs,
       }
     default:
       return state
