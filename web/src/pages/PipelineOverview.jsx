@@ -165,16 +165,16 @@ PipelineGallery.propTypes = {
 function PipelineOverviewPage({
   pipelines, stats, isFetching, tenant, darkMode, autoReload, timezone, fetchStatusIfNeeded
 }) {
-  const [showAllPipelines, setShowAllPipelines] = useState(
-    localStorage.getItem('zuul_show_all_pipelines') === 'true')
-  const [expandAll, setExpandAll] = useState(
-    localStorage.getItem('zuul_overview_expand_all') === 'true')
-
-  const [isReloading, setIsReloading] = useState(false)
   const location = useLocation()
   const history = useHistory()
   const filters = getFiltersFromUrl(location, filterCategories)
   const filterActive = isFilterActive(filters)
+
+  const [showAllPipelines, setShowAllPipelines] = useState(
+    filterActive || localStorage.getItem('zuul_show_all_pipelines') === 'true')
+  const [expandAll, setExpandAll] = useState(
+    localStorage.getItem('zuul_overview_expand_all') === 'true')
+  const [isReloading, setIsReloading] = useState(false)
 
   const isDocumentVisible = useDocumentVisibility()
 
