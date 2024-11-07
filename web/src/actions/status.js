@@ -22,7 +22,10 @@ export const requestStatus = () => ({
   type: STATUS_FETCH_REQUEST
 })
 
-export const receiveStatus = json => ({
+// TODO: If we wanted to spend the CPU cycles to do it, we could check
+// here if any state.statusExpansion.expandedJobs are no longer
+// present in the queues and then remove them.
+const receiveStatus = (json) => ({
   type: STATUS_FETCH_SUCCESS,
   status: json,
   receivedAt: Date.now()
