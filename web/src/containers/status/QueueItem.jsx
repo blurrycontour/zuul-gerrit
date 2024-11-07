@@ -12,10 +12,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useHistory, useLocation } from 'react-router-dom'
-import { connect, useDispatch } from 'react-redux'
+import { connect, useDispatch, useSelector } from 'react-redux'
 
 import {
   Button,
@@ -60,6 +60,7 @@ import { dequeue, dequeue_ref, promote } from '../../api'
 import { addDequeueError, addPromoteError } from '../../actions/adminActions'
 import { addNotification } from '../../actions/notifications'
 import { fetchStatusIfNeeded } from '../../actions/status'
+import { expandJobs, collapseJobs } from '../../actions/statusExpansion'
 
 function FilterDropdown({ item, pipeline }) {
   const [isFilterDropdownOpen, setIsFilterDropdownOpen] = useState(false)
@@ -326,20 +327,22 @@ function QueueItem({ item, pipeline, tenant, user, jobsExpanded }) {
   const [isAdminActionsOpen, setIsAdminActionsOpen] = useState(false)
   const [isDequeueModalOpen, setIsDequeueModalOpen] = useState(false)
   const [isPromoteModalOpen, setIsPromoteModalOpen] = useState(false)
-  const [isJobsExpanded, setIsJobsExpanded] = useState(jobsExpanded)
   const [isSkippedJobsExpanded, setIsSkippedJobsExpanded] = useState(false)
+
+  const expansionKey = item.id
+  const expandedJobs = useSelector(state => state.statusExpansion.expandedJobs[expansionKey])
 
   const skippedjobs = item.jobs.filter(j => getJobStrResult(j) === 'skipped')
   const jobs = item.jobs.filter(j => getJobStrResult(j) !== 'skipped')
-
-  useEffect(() => {
-    setIsJobsExpanded(jobsExpanded)
-  }, [jobsExpanded])
-
   const dispatch = useDispatch()
+  const isJobsExpanded = expandedJobs === undefined ? jobsExpanded : expandedJobs
 
   const onJobsToggle = (isExpanded) => {
-    setIsJobsExpanded(isExpanded)
+    if (isExpanded) {
+      dispatch(expandJobs(expansionKey))
+    } else {
+      dispatch(collapseJobs(expansionKey))
+    }
   }
 
   const onSkippedJobsToggle = () => {
@@ -534,4 +537,5 @@ QueueItem.propTypes = {
 export default connect(state => ({
   tenant: state.tenant,
   user: state.user,
+  //expandedJobs: state.statusExpansion.expandedJobs,
 }))(QueueItem)
