@@ -16,10 +16,14 @@ import {
   STATUSEXPANSION_EXPAND_JOBS,
   STATUSEXPANSION_COLLAPSE_JOBS,
   STATUSEXPANSION_CLEANUP_JOBS,
+  STATUSEXPANSION_EXPAND_QUEUE,
+  STATUSEXPANSION_COLLAPSE_QUEUE,
+  STATUSEXPANSION_CLEANUP_QUEUE,
 } from '../actions/statusExpansion'
 
 export default (state = {
   expandedJobs: {},
+  expandedQueue: {},
 }, action) => {
   switch (action.type) {
     case STATUSEXPANSION_EXPAND_JOBS:
@@ -38,6 +42,23 @@ export default (state = {
       return {
         ...state,
         expandedJobs: newJobs,
+      }
+    case STATUSEXPANSION_EXPAND_QUEUE:
+      return {
+        ...state,
+        expandedQueue: {...state.expandedQueue, [action.key]: true}
+      }
+    case STATUSEXPANSION_COLLAPSE_QUEUE:
+      return {
+        ...state,
+        expandedQueue: {...state.expandedQueue, [action.key]: false}
+      }
+    case STATUSEXPANSION_CLEANUP_QUEUE:
+      // eslint-disable-next-line
+    const {[action.key]:unused2, ...newQueue } = state.expandedQueue
+      return {
+        ...state,
+        expandedQueue: newQueue,
       }
     default:
       return state
