@@ -15,10 +15,12 @@
 export const STATUSEXPANSION_EXPAND_JOBS = 'STATUSEXPANSION_EXPAND_JOBS'
 export const STATUSEXPANSION_COLLAPSE_JOBS = 'STATUSEXPANSION_COLLAPSE_JOBS'
 export const STATUSEXPANSION_CLEANUP_JOBS = 'STATUSEXPANSION_CLEANUP_JOBS'
+export const STATUSEXPANSION_CLEAR_JOBS = 'STATUSEXPANSION_CLEAR_JOBS'
 
 export const STATUSEXPANSION_EXPAND_QUEUE = 'STATUSEXPANSION_EXPAND_QUEUE'
 export const STATUSEXPANSION_COLLAPSE_QUEUE = 'STATUSEXPANSION_COLLAPSE_QUEUE'
 export const STATUSEXPANSION_CLEANUP_QUEUE = 'STATUSEXPANSION_CLEANUP_QUEUE'
+export const STATUSEXPANSION_CLEAR_QUEUE = 'STATUSEXPANSION_CLEAR_QUEUE'
 
 export const expandJobsAction = (key) => ({
   type: STATUSEXPANSION_EXPAND_JOBS,
@@ -33,6 +35,10 @@ export const collapseJobsAction = (key) => ({
 export const cleanupJobsAction = (key) => ({
   type: STATUSEXPANSION_CLEANUP_JOBS,
   key: key,
+})
+
+export const clearJobsAction = () => ({
+  type: STATUSEXPANSION_CLEAR_JOBS,
 })
 
 export const expandQueueAction = (key) => ({
@@ -50,6 +56,10 @@ export const cleanupQueueAction = (key) => ({
   key: key,
 })
 
+export const clearQueueAction = () => ({
+  type: STATUSEXPANSION_CLEAR_QUEUE,
+})
+
 export const expandJobs = (key) => (dispatch) => {
   dispatch(expandJobsAction(key))
 }
@@ -62,6 +72,10 @@ export const cleanupJobs = (key) => (dispatch) => {
   dispatch(cleanupJobsAction(key))
 }
 
+export const clearJobs = () => (dispatch) => {
+  dispatch(clearJobsAction())
+}
+
 export const expandQueue = (key) => (dispatch) => {
   dispatch(expandQueueAction(key))
 }
@@ -72,4 +86,8 @@ export const collapseQueue = (key) => (dispatch) => {
 
 export const cleanupQueue = (key) => (dispatch) => {
   dispatch(cleanupQueueAction(key))
+}
+
+export const clearQueue = () => (dispatch) => {
+  dispatch(clearQueueAction())
 }

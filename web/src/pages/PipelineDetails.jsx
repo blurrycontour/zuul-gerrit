@@ -14,7 +14,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
-import { connect } from 'react-redux'
+import { connect, useDispatch } from 'react-redux'
 import { withRouter, useLocation, useHistory } from 'react-router-dom'
 
 import {
@@ -44,6 +44,7 @@ import {
   PipelineIcon,
 } from '../containers/status/Misc'
 import { fetchStatusIfNeeded } from '../actions/status'
+import { clearJobs } from '../actions/statusExpansion'
 import { EmptyBox, EmptyPage } from '../containers/Errors'
 import { Fetching, ReloadButton } from '../containers/Fetching'
 import { useDocumentVisibility, useInterval } from '../Hooks'
@@ -156,6 +157,7 @@ function PipelineDetailsPage({
   const location = useLocation()
   const history = useHistory()
   const filters = getFiltersFromUrl(location, filterCategories)
+  const dispatch = useDispatch()
 
   const updateData = useCallback((tenant) => {
     if (tenant.name) {
@@ -185,6 +187,7 @@ function PipelineDetailsPage({
   const onShowAllJobsToggle = (isChecked) => {
     setIsAllJobsExpanded(isChecked)
     localStorage.setItem('zuul_all_jobs_expanded', isChecked.toString())
+    dispatch(clearJobs())
   }
 
   if (pipeline === undefined || (!isReloading && isFetching)) {

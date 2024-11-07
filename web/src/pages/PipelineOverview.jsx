@@ -35,6 +35,7 @@ import { StreamIcon } from '@patternfly/react-icons'
 import PipelineSummary from '../containers/status/PipelineSummary'
 
 import { fetchStatusIfNeeded } from '../actions/status'
+import { clearQueue } from '../actions/statusExpansion'
 import { Fetching, ReloadButton } from '../containers/Fetching'
 import {
   FilterToolbar,
@@ -220,6 +221,7 @@ function PipelineOverviewPage() {
   const onExpandAllToggle = (isChecked) => {
     setExpandAll(isChecked)
     localStorage.setItem('zuul_overview_expand_all', isChecked.toString())
+    dispatch(clearQueue())
   }
 
   const onFilterChanged = (newFilters) => {
