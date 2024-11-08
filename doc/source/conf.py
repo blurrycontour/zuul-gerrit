@@ -107,6 +107,7 @@ html_theme_options = {
     'collapse_navigation': False,
     'navigation_depth': -1,
     'logo_only': True,
+    'style_nav_header_background': '#41B6E6',
 }
 
 html_context = {
