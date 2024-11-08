@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c9dea0a_109ef2ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-11-08T19:42:14Z",
+      "side": 1,
+      "message": "I was worried this wouldn\u0027t look great but I think the blue on blue does work so +2 from me.",
+      "revId": "d4c5efdb4c61b853fb3f46368b5b70ab7de6b382",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
