@@ -1,5 +1,5 @@
 # Copyright 2020 BMW Group
-# Copyright 2022 Acme Gating, LLC
+# Copyright 2022, 2024 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,9 +14,10 @@
 # under the License.
 
 import hashlib
+import time
 import zlib
 
-from kazoo.exceptions import NoNodeError
+from kazoo.exceptions import NoNodeError, NotEmptyError
 from kazoo.retry import KazooRetry
 
 from zuul.zk.locks import locked, SessionAwareLock
@@ -26,6 +27,7 @@ from zuul.zk import sharding
 
 class BlobStore:
     _retry_interval = 5
+    lock_grace_period = 300
     data_root = "/zuul/cache/blob/data"
     lock_root = "/zuul/cache/blob/lock"
 
@@ -42,6 +44,9 @@ class BlobStore:
     def _getFlagPath(self, key):
         root = self._getRootPath(key)
         return f"{root}/complete"
+
+    def _getLockPath(self, key):
+        return f"{self.lock_root}/{key}"
 
     def _retry(self, context, func, *args, max_tries=-1, **kw):
         kazoo_retry = KazooRetry(max_tries=max_tries,
@@ -81,7 +86,7 @@ class BlobStore:
         # the store, it also touches the flag file so that the cleanup
         # routine can know the last time an entry was used.  Because
         # of the critical section between the get and delete calls in
-        # the delete method, this much be called with the key lock.
+        # the delete method, this must be called with the key lock.
         flag = self._getFlagPath(key)
 
         if self.context.sessionIsInvalid():
@@ -121,11 +126,11 @@ class BlobStore:
 
         path = self._getPath(key)
         flag = self._getFlagPath(key)
-
+        lock_path = self._getLockPath(key)
         with locked(
                 SessionAwareLock(
                     self.context.client,
-                    f"{self.lock_root}/{key}"),
+                    lock_path),
                 blocking=True
         ) as lock:
             if self._checkKey(key):
@@ -145,13 +150,15 @@ class BlobStore:
     def delete(self, key, ltime):
         path = self._getRootPath(key)
         flag = self._getFlagPath(key)
+        lock_path = self._getLockPath(key)
         if self.context.sessionIsInvalid():
             raise Exception("ZooKeeper session or lock not valid")
+        deleted = False
         try:
             with locked(
                     SessionAwareLock(
                         self.context.client,
-                        f"{self.lock_root}/{key}"),
+                        lock_path),
                     blocking=True
             ) as lock:
                 # make a new context based on the old one
@@ -167,8 +174,17 @@ class BlobStore:
                     if zstat.last_modified_transaction_id < ltime:
                         self._retry(locked_context, self.context.client.delete,
                                     path, recursive=True)
+                        deleted = True
         except NoNodeError:
             raise KeyError(key)
+        if deleted:
+            try:
+                lock_path = self._getLockPath(key)
+                self._retry(self.context, self.context.client.delete,
+                            lock_path)
+            except Exception:
+                self.context.log.exception(
+                    "Error deleting lock path %s:", lock_path)
 
     def __iter__(self):
         try:
@@ -196,3 +212,73 @@ class BlobStore:
             if zstat.last_modified_transaction_id < ltime:
                 ret.add(key)
         return ret
+
+    def cleanupLockDirs(self, live_blobs):
+        # This cleanup was not present in an earlier version of Zuul,
+        # therefore lock directory entries could grow without bound.
+        # If there are too many entries, we won't be able to list them
+        # in order to delete them and the connection will be closed.
+        # Before we proceed, make sure that isn't the case here.
+        # The size of the packet will be:
+        # (num_children * (hash_length + int_size))
+        # (num_children * (64 + 4)) = num_children * 68
+        max_children = sharding.NODE_BYTE_SIZE_LIMIT / 68
+        zstat = self._retry(self.context, self.context.client.exists,
+                            self.lock_root)
+        if not zstat:
+            # Lock root does not exist
+            return
+        if zstat.children_count > max_children:
+            self.context.log.error(
+                "Unable to cleanup blob store lock directory "
+                "due to too many lock znodes.")
+            return
+
+        keys = self._retry(self.context, self.context.client.get_children,
+                           self.lock_root)
+        for key in keys:
+            if key in live_blobs:
+                # No need to check a live blob
+                continue
+            path = self._getLockPath(key)
+            zstat = self._retry(self.context, self.context.client.exists,
+                                path)
+            if not zstat:
+                continue
+            # Any lock dir that is not for a live blob is either:
+            # 1) leaked
+            #    created time will be old, okay to delete
+            # 2) is for a newly created blob
+            #    created time will be new, not okay to delete
+            # 3) is for a previously used blob about to be re-created
+            #    created time will be old, not okay to delete
+            # We can not detect case 3, but it is unlikely to happen,
+            # and if it does, the locked context manager in the put
+            # method will recreate the lock directory after we delete
+            # it.
+            now = time.time()
+            if zstat.created > now - self.lock_grace_period:
+                # The lock was recently created, we may have caught it
+                # while it's being created.
+                continue
+            try:
+                self.context.log.debug("Deleting unused key dir: %s", path)
+                self.context.client.delete(path)
+            except NotEmptyError:
+                # It may still be in use
+                pass
+            except Exception:
+                self.context.log.exception(
+                    "Error deleting lock path %s:", path)
+
+    def cleanup(self, start_ltime, live_blobs):
+        # get the set of blob keys unused since the start time
+        # (ie, we have already filtered any newly added keys)
+        unused_blobs = self.getKeysLastUsedBefore(start_ltime)
+        # remove the current refences
+        unused_blobs -= live_blobs
+        # delete what's left
+        for key in unused_blobs:
+            self.context.log.debug("Deleting unused blob: %s", key)
+            self.delete(key, start_ltime)
+        self.cleanupLockDirs(live_blobs)

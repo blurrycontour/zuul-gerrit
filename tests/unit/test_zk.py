@@ -26,6 +26,7 @@ import uuid
 import zlib
 from unittest import mock
 
+import fixtures
 import testtools
 
 from zuul import model
@@ -74,6 +75,7 @@ from zuul.zk.zkobject import (
 )
 from zuul.zk.locks import tenant_write_lock
 
+import kazoo.recipe.lock
 from kazoo.exceptions import ZookeeperError, OperationTimeoutError, NoNodeError
 
 
@@ -2240,6 +2242,14 @@ class TestConfigurationErrorList(ZooKeeperBaseTestCase):
 
 
 class TestBlobStore(ZooKeeperBaseTestCase):
+    def _assertEmptyBlobStore(self, bs, path):
+        with testtools.ExpectedException(KeyError):
+            bs.get(path)
+
+        # Make sure all keys have been cleaned up
+        keys = self.zk_client.client.get_children(bs.lock_root)
+        self.assertEqual([], keys)
+
     def test_blob_store(self):
         stop_event = threading.Event()
         self.zk_client.client.create('/zuul/pipeline', makepath=True)
@@ -2254,24 +2264,94 @@ class TestBlobStore(ZooKeeperBaseTestCase):
             with testtools.ExpectedException(KeyError):
                 bs.get('nope')
 
-            path = bs.put(b'something')
+            key = bs.put(b'something')
 
-            self.assertEqual(bs.get(path), b'something')
-            self.assertEqual([x for x in bs], [path])
+            self.assertEqual(bs.get(key), b'something')
+            self.assertEqual([x for x in bs], [key])
             self.assertEqual(len(bs), 1)
 
-            self.assertTrue(path in bs)
+            self.assertTrue(key in bs)
             self.assertFalse('nope' in bs)
-            self.assertTrue(bs._checkKey(path))
+            self.assertTrue(bs._checkKey(key))
             self.assertFalse(bs._checkKey('nope'))
 
             cur_ltime = self.zk_client.getCurrentLtime()
-            self.assertEqual(bs.getKeysLastUsedBefore(cur_ltime), {path})
+            self.assertEqual(bs.getKeysLastUsedBefore(cur_ltime), {key})
             self.assertEqual(bs.getKeysLastUsedBefore(start_ltime), set())
-            bs.delete(path, cur_ltime)
+            # Test deletion
+            bs.delete(key, cur_ltime)
+            self._assertEmptyBlobStore(bs, key)
 
-            with testtools.ExpectedException(KeyError):
-                bs.get(path)
+            # Put the blob back and test cleanup
+            key = bs.put(b'something')
+            live_blobs = set()
+            cur_ltime = self.zk_client.getCurrentLtime()
+            bs.cleanup(cur_ltime, live_blobs)
+            self._assertEmptyBlobStore(bs, key)
+
+            # Test leaked lock dir cleanup
+            self.zk_client.client.create(bs._getLockPath(key))
+            bs.lock_grace_period = 0
+            bs.cleanup(cur_ltime, live_blobs)
+            self._assertEmptyBlobStore(bs, key)
+
+    def test_blob_store_lock_cleanup_race(self):
+        # The blob store lock cleanup can have a race condition as follows:
+        # [1] Put a blob
+        # [1] Delete the blob but fail to delete the lock path for the blob
+        # [2] Start to put the blob it a second time
+        # [2] Ensure the lock path exists
+        # [1] Delete the leaked lock path
+        # [2] Fail to create the lock because the lock path does not exist
+        # To address this, we will retry the lock if it fails with
+        # NoNodeError.  This test verifies that behavior.
+        stop_event = threading.Event()
+        self.zk_client.client.create('/zuul/pipeline', makepath=True)
+        # Create a new object
+        tenant_name = 'fake_tenant'
+
+        created_event = threading.Event()
+        deleted_event = threading.Event()
+        orig_ensure_path = kazoo.recipe.lock.Lock._ensure_path
+
+        def _create_blob(bs):
+            bs.put(b'something')
+
+        def _ensure_path(*args, **kw):
+            orig_ensure_path(*args, **kw)
+            created_event.set()
+            deleted_event.wait()
+
+        with (tenant_write_lock(self.zk_client, tenant_name) as lock,
+              ZKContext(
+                  self.zk_client, lock, stop_event, self.log) as context):
+            bs = BlobStore(context)
+
+            # Get the key
+            key = bs.put(b'something')
+            cur_ltime = self.zk_client.getCurrentLtime()
+            bs.delete(key, cur_ltime)
+
+            # Recreate the lock dir
+            self.zk_client.client.create(bs._getLockPath(key))
+            # Block the lock method so we can delete from under it
+            self.useFixture(fixtures.MonkeyPatch(
+                'kazoo.recipe.lock.Lock._ensure_path',
+                _ensure_path))
+            # Start recreating the blob
+            thread = threading.Thread(target=_create_blob, args=(bs,))
+            thread.start()
+            created_event.wait()
+            # Run the cleanup
+            live_blobs = set()
+            bs.lock_grace_period = 0
+            bs.cleanup(cur_ltime, live_blobs)
+            self._assertEmptyBlobStore(bs, key)
+            # Finish recreating the blob
+            deleted_event.set()
+            thread.join()
+            # Ensure the blob exists
+            self.assertEqual(bs.get(key), b'something')
 
 
 class TestPipelineInit(ZooKeeperBaseTestCase):
