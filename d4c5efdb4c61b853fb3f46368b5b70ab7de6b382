@@ -16,6 +16,23 @@
       "message": "I was worried this wouldn\u0027t look great but I think the blue on blue does work so +2 from me.",
       "revId": "d4c5efdb4c61b853fb3f46368b5b70ab7de6b382",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44d288e0_21a3ced4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-11T17:37:34Z",
+      "side": 1,
+      "message": "Dark blue on light blue is one of the options in the Zuul style guide, but there is a specific light blue color we should use for the background.  We should use it instead -- it\u0027s easier to read and coordinates better with the dark blue and the rest of the website.  I\u0027ll upload a new patchset with that included.",
+      "revId": "d4c5efdb4c61b853fb3f46368b5b70ab7de6b382",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
