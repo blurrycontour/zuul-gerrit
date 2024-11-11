@@ -109,8 +109,15 @@ class SessionAwareReadLock(SessionAwareMixin, ReadLock):
 
 @contextmanager
 def locked(lock, blocking=True, timeout=None):
-    if not lock.acquire(blocking=blocking, timeout=timeout):
-        raise LockException(f"Failed to acquire lock {lock}")
+    try:
+        if not lock.acquire(blocking=blocking, timeout=timeout):
+            raise LockException(f"Failed to acquire lock {lock}")
+    except NoNodeError:
+        # If we encounter a NoNodeError when locking, try one more
+        # time in case we're racing the cleanup of a lock directory.
+        lock.assured_path = False
+        if not lock.acquire(blocking=blocking, timeout=timeout):
+            raise LockException(f"Failed to acquire lock {lock}")
     try:
         yield lock
     finally:
