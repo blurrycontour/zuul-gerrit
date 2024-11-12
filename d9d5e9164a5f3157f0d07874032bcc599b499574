@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "202285b6_2b050c75",
+        "filename": "tools/cleanup-blobstore.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-12T10:19:34Z",
+      "side": 1,
+      "message": "The input will also contain the lock nodes itself, something like `/zuul/cache/blob/lock/\u003cblob-id\u003e/\u003cuuid\u003e__lock__`, which we would then wrongly remove as we can\u0027t find a blob for that key.",
+      "revId": "d9d5e9164a5f3157f0d07874032bcc599b499574",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "153bbbb0_af1b0573",
+        "filename": "tools/cleanup-blobstore.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-12T10:19:34Z",
+      "side": 1,
+      "message": "We should also ignore the `NoNodeError` here.",
+      "revId": "d9d5e9164a5f3157f0d07874032bcc599b499574",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf604438_71fa088f",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-12T10:19:34Z",
+      "side": 1,
+      "message": "Just wondering if we really want to retry the `get_children()` here. In case our calculation is off and the transaction exceeds the 1MB size limit, we\u0027d hang here indefinitely until the scheduler OOMs (we are leaking some memory with every ZK disconnect).",
+      "revId": "d9d5e9164a5f3157f0d07874032bcc599b499574",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1d86fc8_b07ee145",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-12T10:19:34Z",
+      "side": 1,
+      "message": "I think we should compare the `zstat.czxid` with the `start_ltime` here. Our blob store cleanup routine can take 10+ minutes so the lock grace period of 5min is not enough.",
+      "revId": "d9d5e9164a5f3157f0d07874032bcc599b499574",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "757ac2c5_3c2381fe",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-12T10:19:34Z",
+      "side": 1,
+      "message": "I think we can also ignore the `NoNodeError` here.",
+      "revId": "d9d5e9164a5f3157f0d07874032bcc599b499574",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
