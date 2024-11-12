@@ -52,6 +52,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "240e0e25_63910209",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-12T14:35:50Z",
+      "side": 1,
+      "message": "Sure, we can skip that.",
+      "parentUuid": "bf604438_71fa088f",
+      "revId": "d9d5e9164a5f3157f0d07874032bcc599b499574",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b1d86fc8_b07ee145",
@@ -65,6 +83,24 @@
       "writtenOn": "2024-11-12T10:19:34Z",
       "side": 1,
       "message": "I think we should compare the `zstat.czxid` with the `start_ltime` here. Our blob store cleanup routine can take 10+ minutes so the lock grace period of 5min is not enough.",
+      "revId": "d9d5e9164a5f3157f0d07874032bcc599b499574",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12b60f89_d913709c",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-12T14:35:50Z",
+      "side": 1,
+      "message": "There\u0027s definitely a time component here, for cases where it\u0027s fast and not many transactions are happening.  We want to avoid interfering with current operations.  But I agree that we can also exclude entries that happen after the start ltime, so I\u0027ll do both.",
+      "parentUuid": "b1d86fc8_b07ee145",
       "revId": "d9d5e9164a5f3157f0d07874032bcc599b499574",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
