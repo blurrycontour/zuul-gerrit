@@ -16,6 +16,24 @@
       "message": "Do we need this if condition here or is that just an optimization? It looks like there could be a race here between checking the queue is empty and then joining it (waiting for all items to be acked). As long as there are new messages added to the queue while we wait on the join, the caller will be blocked.",
       "revId": "6c27ac090be3b88f2d62e503cee8857eae987fb5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbfda40d_bd693b32",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-13T19:43:43Z",
+      "side": 1,
+      "message": "You\u0027re right.  I was trying to optimize the common case, but even this has an unacceptable race, so I think we should just drop it.",
+      "parentUuid": "074160e3_bea4f713",
+      "revId": "6c27ac090be3b88f2d62e503cee8857eae987fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
