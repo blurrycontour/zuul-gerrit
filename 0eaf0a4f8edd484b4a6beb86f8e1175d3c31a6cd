@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "553917cd_90e52b3d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-13T19:41:51Z",
+      "side": 1,
+      "message": "The current behavior is as intended.\n\nWe must not report initial config errors on projects that are not in a pipeline.  That\u0027s because someone might add a project to the system only for required-projects or third-party testing or some other reason where reporting on that project would be unexpected.  We don\u0027t want to report on their zuul.yaml errors, or there merge conflicts, etc, in that case.\n\nIn order to address this, we have to tell Zuul explicitly that we want to report on initial config errors.  We do that by adding the project to the pipeline with no jobs.  The only requirement for reporting is that the project be attached to the pipeline -- it doesn\u0027t require jobs in that pipeline.\n\nYou can see an example of how to configure that here: https://zuul-ci.org/docs/zuul/latest/tutorials/quick-start.html#configure-zuul-pipelines\n\nScroll down a few paragraphs and look for \"jobs: []\".\n\nYou can do that with a regular expression in a central config-project and you only need to do it once for all the projects in the system.  If you have other needs, you can adjust the regular expression, or omit it and just specify individual projects.",
+      "revId": "0eaf0a4f8edd484b4a6beb86f8e1175d3c31a6cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1e0dd77b_8f4c3d9e",
