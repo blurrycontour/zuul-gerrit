@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "074160e3_bea4f713",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-13T11:36:54Z",
+      "side": 1,
+      "message": "Do we need this if condition here or is that just an optimization? It looks like there could be a race here between checking the queue is empty and then joining it (waiting for all items to be acked). As long as there are new messages added to the queue while we wait on the join, the caller will be blocked.",
+      "revId": "6c27ac090be3b88f2d62e503cee8857eae987fb5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
