@@ -2414,18 +2414,18 @@ class PipelineManager(metaclass=ABCMeta):
                         break
             except Exception:
                 log.exception("Invalid config for %s", item)
-        if not project_in_pipeline:
+        if item.current_build_set.has_blocking_errors:
+            log.debug("Invalid config for %s", item)
+            action = 'config-error'
+            actions = self.pipeline.config_error_actions
+            item.setReportedResult('CONFIG_ERROR')
+        elif not project_in_pipeline:
             log.debug("Project not in pipeline %s for %s",
                       self.pipeline, item)
             project_in_pipeline = False
             action = 'no-jobs'
             actions = self.pipeline.no_jobs_actions
             item.setReportedResult('NO_JOBS')
-        elif item.current_build_set.has_blocking_errors:
-            log.debug("Invalid config for %s", item)
-            action = 'config-error'
-            actions = self.pipeline.config_error_actions
-            item.setReportedResult('CONFIG_ERROR')
         elif item.didMergerFail():
             log.debug("Merge conflict")
             action = 'merge-conflict'
