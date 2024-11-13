@@ -120,6 +120,24 @@
       "message": "I think we can also ignore the `NoNodeError` here.",
       "revId": "d9d5e9164a5f3157f0d07874032bcc599b499574",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60678f42_40ba1971",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-13T09:05:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "757ac2c5_3c2381fe",
+      "revId": "d9d5e9164a5f3157f0d07874032bcc599b499574",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

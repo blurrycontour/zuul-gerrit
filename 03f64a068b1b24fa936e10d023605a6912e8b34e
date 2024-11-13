@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05c23178_5d0ce6fe",
+        "filename": "zuul/zk/blob_store.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-13T09:05:48Z",
+      "side": 1,
+      "message": "nit: lock path variable from line 153 is in scope",
+      "revId": "03f64a068b1b24fa936e10d023605a6912e8b34e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
