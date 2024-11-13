@@ -16,6 +16,24 @@
       "message": "Changing the order here would lead to config errors being reported from all matching pipelines all the time even if the project has no PPC. I\u0027m not sure that\u0027s the behavior we want.",
       "revId": "0eaf0a4f8edd484b4a6beb86f8e1175d3c31a6cd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e4efa46_65d7ffc4",
+        "filename": "zuul/manager/__init__.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2417,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2024-11-13T14:34:47Z",
+      "side": 1,
+      "message": "That is true. I can not think of a good solution for this. Since if there is config error, we do not know if the new config would be configured for this pipeline. And we are not able to know if the config error has been reported in some other pipeline.\n\nSo in this case, we have to choose either not report config error or report by all matching pipelines.",
+      "parentUuid": "1e0dd77b_8f4c3d9e",
+      "revId": "0eaf0a4f8edd484b4a6beb86f8e1175d3c31a6cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
