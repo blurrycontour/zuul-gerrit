@@ -1162,7 +1162,7 @@ class TestWeb(BaseTestWeb):
         job_params = {
             'job': 'project-test1',
             'ansible_split_streams': None,
-            'ansible_version': '8',
+            'ansible_version': '9',
             'timeout': None,
             'post_timeout': None,
             'items': [],
@@ -1288,7 +1288,7 @@ class TestWeb(BaseTestWeb):
 
         job_params = {
             'ansible_split_streams': None,
-            'ansible_version': '8',
+            'ansible_version': '9',
             'branch': 'master',
             'extra_vars': {},
             'group_vars': {},
