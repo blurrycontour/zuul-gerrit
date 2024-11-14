@@ -39,15 +39,25 @@ from tests.base import (
 class ImageMocksFixture(ResponsesFixture):
     def __init__(self):
         super().__init__()
+        raw_body = "test raw image"
+        qcow2_body = "test qcow2 image"
         self.requests_mock.add_passthru("http://localhost")
         self.requests_mock.add(
             responses.GET,
             'http://example.com/image.raw',
-            body="test raw image")
+            body=raw_body)
         self.requests_mock.add(
             responses.GET,
             'http://example.com/image.qcow2',
-            body="test qcow2 image")
+            body=qcow2_body)
+        self.requests_mock.add(
+            responses.HEAD,
+            'http://example.com/image.raw',
+            headers={'content-length': str(len(raw_body))})
+        self.requests_mock.add(
+            responses.HEAD,
+            'http://example.com/image.qcow2',
+            headers={'content-length': str(len(qcow2_body))})
 
 
 class LauncherBaseTestCase(ZuulTestCase):

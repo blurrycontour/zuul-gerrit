@@ -14,6 +14,7 @@
 # under the License.
 
 from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
 import collections
 import itertools
 import logging
@@ -56,6 +57,13 @@ from zuul.zk.zkobject import ZKContext
 COMMANDS = (
     commandsocket.StopCommand,
 )
+
+# What gets written to disk in a single write() call; should be a
+# multiple of 4k block size.
+DOWNLOAD_BLOCK_SIZE = 1024 * 64
+# The byte range size for an individual GET operation.  Should be a
+# multiple of the above.  Current value is approx 100MiB.
+DOWNLOAD_CHUNK_SIZE = DOWNLOAD_BLOCK_SIZE * 1525
 
 
 def scores_for_label(label_cname, candidate_names):
@@ -1031,17 +1039,33 @@ class Launcher:
             iba = self.image_build_registry.getItem(artifact_uuid)
             self.upload_executor.submit(UploadJob(self, iba, uploads).run)
 
+    def _downloadArtifactChunk(self, url, start, end, path):
+        headers = {'Range': f'bytes={start}-{end}'}
+        with open(path, 'r+b') as f:
+            f.seek(start)
+            with requests.get(url, stream=True, headers=headers) as resp:
+                resp.raise_for_status()
+                for chunk in resp.iter_content(chunk_size=DOWNLOAD_BLOCK_SIZE):
+                    f.write(chunk)
+
     def downloadArtifact(self, image_build_artifact):
         path = os.path.join(self.temp_dir, image_build_artifact.uuid)
         self.log.info("Downloading artifact %s into %s",
                       image_build_artifact, path)
-        count = 0
+        futures = []
+        with requests.head(image_build_artifact.url) as resp:
+            size = int(resp.headers['content-length'])
         with open(path, 'wb') as f:
-            with requests.get(image_build_artifact.url, stream=True) as resp:
-                resp.raise_for_status()
-                for chunk in resp.iter_content(chunk_size=1024 * 8):
-                    count += f.write(chunk)
-        self.log.debug("Downloaded %s bytes to %s", count, path)
+            f.truncate(size)
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            for start in range(0, size, DOWNLOAD_CHUNK_SIZE):
+                end = start + DOWNLOAD_CHUNK_SIZE - 1
+                futures.append(executor.submit(self._downloadArtifactChunk,
+                                               image_build_artifact.url,
+                                               start, end, path))
+            for future in concurrent.futures.as_completed(futures):
+                future.result()
+        self.log.debug("Downloaded %s bytes to %s", size, path)
         return path
 
     def getImageExternalId(self, node, provider):
