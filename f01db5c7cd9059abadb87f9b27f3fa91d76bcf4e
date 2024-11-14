@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff78c334_de9f0cb6",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-11-14T23:45:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe039584_31161ec8",
+      "revId": "f01db5c7cd9059abadb87f9b27f3fa91d76bcf4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1525d5b7_399fba07",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15bbd967_37062ed1",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1048,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-11-14T23:45:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1525d5b7_399fba07",
+      "revId": "f01db5c7cd9059abadb87f9b27f3fa91d76bcf4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "745ad450_a69a0b9b",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-11-14T22:44:13Z",
       "side": 1,
       "message": "This value is defined as a \"constant\" global above and should probably be used that way.",
+      "revId": "f01db5c7cd9059abadb87f9b27f3fa91d76bcf4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce8c53ab_53425cdb",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1055,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-11-14T23:45:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "745ad450_a69a0b9b",
       "revId": "f01db5c7cd9059abadb87f9b27f3fa91d76bcf4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -75,6 +129,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2e970f6_dd47049b",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1062,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-11-14T23:45:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ffdb8da5_f8ffab25",
+      "range": {
+        "startLine": 1062,
+        "startChar": 40,
+        "endLine": 1062,
+        "endChar": 59
+      },
+      "revId": "f01db5c7cd9059abadb87f9b27f3fa91d76bcf4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c5968ada_95448f41",
@@ -88,6 +166,30 @@
       "writtenOn": "2024-11-14T22:44:13Z",
       "side": 1,
       "message": "And then use it again here.",
+      "range": {
+        "startLine": 1063,
+        "startChar": 30,
+        "endLine": 1063,
+        "endChar": 40
+      },
+      "revId": "f01db5c7cd9059abadb87f9b27f3fa91d76bcf4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad934888_6f9c3fbe",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1063,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2024-11-14T23:45:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5968ada_95448f41",
       "range": {
         "startLine": 1063,
         "startChar": 30,
