@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5139d8b5_fdb1dbf3",
+        "filename": "web/src/actions/status.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-11-15T15:33:55Z",
+      "side": 1,
+      "message": "That doesn\u0027t seem possible here, perhaps this comment should be moved to the call site?",
+      "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b229c00e_51b53458",
+        "filename": "web/src/actions/statusExpansion.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-11-15T15:33:55Z",
+      "side": 1,
+      "message": "It doesn\u0027t seem like the `JobsAction` are used standalone, then they could be inlined in the functions below to make the code shorter. Or at least they shouldn\u0027t be exported.",
+      "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ea1620b_ae1143ee",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-11-15T15:33:55Z",
+      "side": 1,
+      "message": "Perhaps it\u0027s not necessary to include dispatch as a dependency because it doesn\u0027t seem like it can change.",
+      "range": {
+        "startLine": 246,
+        "startChar": 22,
+        "endLine": 246,
+        "endChar": 30
+      },
+      "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95b33654_1e00c03b",
+        "filename": "web/src/reducers/statusExpansion.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-11-15T15:33:55Z",
+      "side": 1,
+      "message": "It looks like that\u0027s the new recommended way to remove an attribute. Perhaps the eslint can be silenced by using `_unused` ?",
+      "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
