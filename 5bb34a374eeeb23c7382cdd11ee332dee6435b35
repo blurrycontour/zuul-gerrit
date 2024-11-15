@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "deb3760b_58db65ed",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-11-15T15:40:21Z",
+      "side": 1,
+      "message": "It\u0027s odd that the linter didn\u0027t complained about the extra space here.",
+      "revId": "5bb34a374eeeb23c7382cdd11ee332dee6435b35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c8c088c_bbb2ce46",
+        "filename": "web/src/reducers/statusExpansion.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-11-15T15:40:21Z",
+      "side": 1,
+      "message": "I guess we can also re-use the existing expandedJobs as they key should not conflict.",
+      "revId": "5bb34a374eeeb23c7382cdd11ee332dee6435b35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
