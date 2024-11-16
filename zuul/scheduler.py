@@ -587,6 +587,17 @@ class Scheduler(threading.Thread):
         self.statsd.gauge('zuul.mergers.online', mergers_online)
         self.statsd.gauge('zuul.mergers.jobs_running', merge_running)
         self.statsd.gauge('zuul.mergers.jobs_queued', merge_queue)
+
+        # Count the rest of the components
+        self.statsd.gauge('zuul.scheduler.online',
+                          len(self.component_registry.all("scheduler")))
+        self.statsd.gauge('zuul.fingergws.online',
+                          len(self.component_registry.all("fingergw")))
+        self.statsd.gauge('zuul.web.online',
+                          len(self.component_registry.all("web")))
+        self.statsd.gauge('zuul.launchers.online',
+                          len(self.component_registry.all("launcher")))
+
         self.statsd.gauge('zuul.scheduler.eventqueues.management',
                           self.reconfigure_event_queue.qsize())
         queue_base = 'zuul.scheduler.eventqueues.connection'

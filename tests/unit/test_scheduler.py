@@ -479,6 +479,14 @@ class TestScheduler(ZuulTestCase):
             'zuul.executors.accepting', value='1', kind='g')
         self.assertReportedStat(
             'zuul.mergers.online', value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.scheduler.online', value='1', kind='g')
+        self.assertReportedStat(
+            'zuul.fingergws.online', value='0', kind='g')
+        self.assertReportedStat(
+            'zuul.web.online', value='0', kind='g')
+        self.assertReportedStat(
+            'zuul.launchers.online', value='1', kind='g')
         self.assertReportedStat('zuul.scheduler.eventqueues.connection.gerrit',
                                 value='0', kind='g')
         self.assertReportedStat('zuul.scheduler.run_handler', kind='ms')

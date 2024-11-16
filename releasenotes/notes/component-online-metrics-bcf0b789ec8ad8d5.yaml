@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    New metrics indicating the number of schedulers, finger gateways,
+    and web servers are available.  These may be useful for systems
+    where Zuul is scaled up or down:
+
+    * :stat:`zuul.fingergws.online`
+    * :stat:`zuul.scheduler.online`
+    * :stat:`zuul.web.online`
