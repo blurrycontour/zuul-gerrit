@@ -849,15 +849,7 @@ class Scheduler(threading.Thread):
                             live_blobs.update(item.getBlobKeys())
             with self.createZKContext(None, self.log) as ctx:
                 blobstore = BlobStore(ctx)
-                # get the set of blob keys unused since the start time
-                # (ie, we have already filtered any newly added keys)
-                unused_blobs = blobstore.getKeysLastUsedBefore(start_ltime)
-                # remove the current refences
-                unused_blobs -= live_blobs
-                # delete what's left
-                for key in unused_blobs:
-                    self.log.debug("Deleting unused blob: %s", key)
-                    blobstore.delete(key, start_ltime)
+                blobstore.cleanup(start_ltime, live_blobs)
             self.log.debug("Finished blob store cleanup")
         except Exception:
             self.log.exception("Error in blob store cleanup:")
