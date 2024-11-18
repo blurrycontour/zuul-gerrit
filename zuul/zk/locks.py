@@ -16,7 +16,7 @@ import logging
 from contextlib import contextmanager
 from urllib.parse import quote_plus
 
-from kazoo.exceptions import NoNodeError
+from kazoo.exceptions import NoNodeError, NotEmptyError
 from kazoo.protocol.states import KazooState
 from kazoo.recipe.lock import Lock, ReadLock, WriteLock
 
@@ -108,7 +108,7 @@ class SessionAwareReadLock(SessionAwareMixin, ReadLock):
 
 
 @contextmanager
-def locked(lock, blocking=True, timeout=None):
+def locked(lock, blocking=True, timeout=None, delete_lock_path=False):
     try:
         if not lock.acquire(blocking=blocking, timeout=timeout):
             raise LockException(f"Failed to acquire lock {lock}")
@@ -123,6 +123,16 @@ def locked(lock, blocking=True, timeout=None):
     finally:
         try:
             lock.release()
+            if delete_lock_path:
+                try:
+                    lock.client.delete(lock.path)
+                except NoNodeError:
+                    pass
+                except NotEmptyError:
+                    pass
+                except Exception:
+                    log = logging.getLogger("zuul.zk.locks")
+                    log.exception("Failed to delete lock path %s", lock.path)
         except Exception:
             log = logging.getLogger("zuul.zk.locks")
             log.exception("Failed to release lock %s", lock)

@@ -131,7 +131,8 @@ class BlobStore:
                 SessionAwareLock(
                     self.context.client,
                     lock_path),
-                blocking=True
+                blocking=True,
+                delete_lock_path=True,
         ) as lock:
             if self._checkKey(key):
                 return key
@@ -153,13 +154,13 @@ class BlobStore:
         lock_path = self._getLockPath(key)
         if self.context.sessionIsInvalid():
             raise Exception("ZooKeeper session or lock not valid")
-        deleted = False
         try:
             with locked(
                     SessionAwareLock(
                         self.context.client,
                         lock_path),
-                    blocking=True
+                    blocking=True,
+                    delete_lock_path=True,
             ) as lock:
                 # make a new context based on the old one
                 with ZKContext(self.context.client, lock,
@@ -174,17 +175,17 @@ class BlobStore:
                     if zstat.last_modified_transaction_id < ltime:
                         self._retry(locked_context, self.context.client.delete,
                                     path, recursive=True)
-                        deleted = True
         except NoNodeError:
             raise KeyError(key)
-        if deleted:
-            try:
-                lock_path = self._getLockPath(key)
-                self._retry(self.context, self.context.client.delete,
-                            lock_path)
-            except Exception:
-                self.context.log.exception(
-                    "Error deleting lock path %s:", lock_path)
+
+    def _deleteLock(self, key):
+        try:
+            lock_path = self._getLockPath(key)
+            self._retry(self.context, self.context.client.delete,
+                        lock_path)
+        except Exception:
+            self.context.log.exception(
+                "Error deleting lock path %s:", lock_path)
 
     def __iter__(self):
         try:
