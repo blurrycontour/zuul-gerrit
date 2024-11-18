@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a18c2e7_c09cd5af",
+        "filename": "web/src/actions/status.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-18T18:14:36Z",
+      "side": 1,
+      "message": "I see what you mean, though, when I started writing it, I did so by splitting this into two functions.  One to do the processing, and then another that looks like this one.  I think the comment could go either place; I\u0027ll leave it here for now though since I don\u0027t think it\u0027s completely wrong, and I think it points to approximately the right area.  :)",
+      "parentUuid": "5139d8b5_fdb1dbf3",
+      "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b229c00e_51b53458",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-11-15T15:33:55Z",
       "side": 1,
       "message": "It doesn\u0027t seem like the `JobsAction` are used standalone, then they could be inlined in the functions below to make the code shorter. Or at least they shouldn\u0027t be exported.",
+      "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c25ff71_5dcb94ab",
+        "filename": "web/src/actions/statusExpansion.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-18T18:14:36Z",
+      "side": 1,
+      "message": "Agreed.  I\u0027ll drop the exports but leave the pattern of separate actions and methods to better match the other actions.",
+      "parentUuid": "b229c00e_51b53458",
       "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -58,6 +94,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78775270_a2a0dd84",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 5
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-18T18:14:36Z",
+      "side": 1,
+      "message": "React has a check that all the dependencies are used, so it warns if it\u0027s omitted.  Since it doesn\u0027t change, it\u0027s harmless.",
+      "parentUuid": "8ea1620b_ae1143ee",
+      "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95b33654_1e00c03b",
@@ -71,6 +125,24 @@
       "writtenOn": "2024-11-15T15:33:55Z",
       "side": 1,
       "message": "It looks like that\u0027s the new recommended way to remove an attribute. Perhaps the eslint can be silenced by using `_unused` ?",
+      "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41be3475_bfdddac5",
+        "filename": "web/src/reducers/statusExpansion.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-18T18:14:36Z",
+      "side": 1,
+      "message": "No joy:\n\n  42:7   error  Unexpected lexical declaration in case block  no-case-declarations\n  42:27  error  \u0027_unused\u0027 is assigned a value but never used  no-unused-vars\n\nThe second error shows that _ isn\u0027t enough to supress the unused var, but even if we solved that, it doesn\u0027t like the declaration in a case statement.  I tried a \"let _unused\" outside of the case, and it still doesn\u0027t like it.",
+      "parentUuid": "95b33654_1e00c03b",
       "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
