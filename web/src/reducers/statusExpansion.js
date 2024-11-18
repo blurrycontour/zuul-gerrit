@@ -16,9 +16,11 @@ import {
   STATUSEXPANSION_EXPAND_JOBS,
   STATUSEXPANSION_COLLAPSE_JOBS,
   STATUSEXPANSION_CLEANUP_JOBS,
+  STATUSEXPANSION_CLEAR_JOBS,
   STATUSEXPANSION_EXPAND_QUEUE,
   STATUSEXPANSION_COLLAPSE_QUEUE,
   STATUSEXPANSION_CLEANUP_QUEUE,
+  STATUSEXPANSION_CLEAR_QUEUE,
 } from '../actions/statusExpansion'
 
 export default (state = {
@@ -59,6 +61,18 @@ export default (state = {
       return {
         ...state,
         expandedQueue: newQueue,
+      }
+    case STATUSEXPANSION_CLEAR_QUEUE:
+      // also clears jobs
+      return {
+        ...state,
+        expandedQueue: {},
+        expandedJobs: {},
+      }
+    case STATUSEXPANSION_CLEAR_JOBS:
+      return {
+        ...state,
+        expandedJobs: {},
       }
     default:
       return state
