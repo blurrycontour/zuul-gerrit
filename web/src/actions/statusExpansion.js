@@ -22,41 +22,41 @@ export const STATUSEXPANSION_COLLAPSE_QUEUE = 'STATUSEXPANSION_COLLAPSE_QUEUE'
 export const STATUSEXPANSION_CLEANUP_QUEUE = 'STATUSEXPANSION_CLEANUP_QUEUE'
 export const STATUSEXPANSION_CLEAR_QUEUE = 'STATUSEXPANSION_CLEAR_QUEUE'
 
-export const expandJobsAction = (key) => ({
+const expandJobsAction = (key) => ({
   type: STATUSEXPANSION_EXPAND_JOBS,
   key: key,
 })
 
-export const collapseJobsAction = (key) => ({
+const collapseJobsAction = (key) => ({
   type: STATUSEXPANSION_COLLAPSE_JOBS,
   key: key,
 })
 
-export const cleanupJobsAction = (key) => ({
+const cleanupJobsAction = (key) => ({
   type: STATUSEXPANSION_CLEANUP_JOBS,
   key: key,
 })
 
-export const clearJobsAction = () => ({
+const clearJobsAction = () => ({
   type: STATUSEXPANSION_CLEAR_JOBS,
 })
 
-export const expandQueueAction = (key) => ({
+const expandQueueAction = (key) => ({
   type: STATUSEXPANSION_EXPAND_QUEUE,
   key: key,
 })
 
-export const collapseQueueAction = (key) => ({
+const collapseQueueAction = (key) => ({
   type: STATUSEXPANSION_COLLAPSE_QUEUE,
   key: key,
 })
 
-export const cleanupQueueAction = (key) => ({
+const cleanupQueueAction = (key) => ({
   type: STATUSEXPANSION_CLEANUP_QUEUE,
   key: key,
 })
 
-export const clearQueueAction = () => ({
+const clearQueueAction = () => ({
   type: STATUSEXPANSION_CLEAR_QUEUE,
 })
 

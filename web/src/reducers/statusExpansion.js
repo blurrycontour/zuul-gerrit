@@ -57,7 +57,7 @@ export default (state = {
       }
     case STATUSEXPANSION_CLEANUP_QUEUE:
       // eslint-disable-next-line
-    const {[action.key]:unused2, ...newQueue } = state.expandedQueue
+      const {[action.key]:unused2, ...newQueue } = state.expandedQueue
       return {
         ...state,
         expandedQueue: newQueue,
