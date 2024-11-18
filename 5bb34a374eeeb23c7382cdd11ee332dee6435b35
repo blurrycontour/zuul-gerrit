@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "654a5aec_f58d3dff",
+        "filename": "web/src/containers/status/PipelineSummary.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-18T18:17:37Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "deb3760b_58db65ed",
+      "revId": "5bb34a374eeeb23c7382cdd11ee332dee6435b35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5c8c088c_bbb2ce46",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-11-15T15:40:21Z",
       "side": 1,
       "message": "I guess we can also re-use the existing expandedJobs as they key should not conflict.",
+      "revId": "5bb34a374eeeb23c7382cdd11ee332dee6435b35",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38426908_a64a7077",
+        "filename": "web/src/reducers/statusExpansion.js",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-11-18T18:17:37Z",
+      "side": 1,
+      "message": "True, but I think this is easier to reason about.",
+      "parentUuid": "5c8c088c_bbb2ce46",
       "revId": "5bb34a374eeeb23c7382cdd11ee332dee6435b35",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
