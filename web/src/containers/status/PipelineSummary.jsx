@@ -12,9 +12,10 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useState, useEffect } from 'react'
+import React  from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   Badge,
@@ -36,6 +37,7 @@ import QueueItemPopover from './QueueItemPopover'
 import { PipelineIcon, getQueueItemIconConfig } from './Misc'
 import { makeQueryString } from '../FilterToolbar'
 import ChangeQueue from './ChangeQueue'
+import { expandQueue, collapseQueue } from '../../actions/statusExpansion'
 
 function QueueItemSquareWithPopover({ item }) {
   return (
@@ -67,17 +69,17 @@ QueueItemSquare.propTypes = {
 }
 
 function QueueCard({ pipeline, queue, allQueuesExpanded, jobsExpanded }) {
-  const [isQueueExpanded, setIsQueueExpanded] = useState(undefined)
-  const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(undefined)
+  const expansionKey = `${pipeline.name}/${queue.name}`
+  const expandedQueue = useSelector(state => state.statusExpansion.expandedQueue[expansionKey])
+  const isQueueExpanded = expandedQueue === undefined ? allQueuesExpanded : expandedQueue
+  const dispatch = useDispatch()
 
-  // If the pipeline toggle is changed, update the queue toggles to match.
-  if (allQueuesExpanded !== areAllQueuesExpanded) {
-    setAreAllQueuesExpanded(allQueuesExpanded)
-    setIsQueueExpanded(allQueuesExpanded)
-  }
-
-  const onQueueToggle = () => {
-    setIsQueueExpanded(!isQueueExpanded)
+  const onQueueToggle = (isExpanded) => {
+    if (isExpanded) {
+      dispatch(expandQueue(expansionKey))
+    } else {
+      dispatch(collapseQueue(expansionKey))
+    }
   }
 
   return (
@@ -100,9 +102,9 @@ function QueueCard({ pipeline, queue, allQueuesExpanded, jobsExpanded }) {
           </Badge>
         </Tooltip>
         {isQueueExpanded ?
-          <AngleDownIcon className="zuul-expand-icon" onClick={onQueueToggle} />
+         <AngleDownIcon className="zuul-expand-icon" onClick={() => onQueueToggle(false)} />
           :
-          <AngleRightIcon className="zuul-expand-icon" onClick={onQueueToggle} />
+         <AngleRightIcon className="zuul-expand-icon" onClick={() => onQueueToggle(true)} />
         }
       </CardTitle>
       {isQueueExpanded ? null :
@@ -183,17 +185,21 @@ QueueSummary.propTypes = {
 }
 
 function PipelineSummary({ pipeline, tenant, showAllQueues, areAllJobsExpanded, filters }) {
-
   const pipelineType = pipeline.manager || 'unknown'
   const itemCount = pipeline._count
-  const [areAllQueuesExpanded, setAreAllQueuesExpanded] = useState(areAllJobsExpanded)
-  const onQueueToggle = () => {
-    setAreAllQueuesExpanded(!areAllQueuesExpanded)
-  }
+  const expansionKey = `${pipeline.name}`
+  const expandedQueue = useSelector(state => state.statusExpansion.expandedQueue[expansionKey])
+  const dispatch = useDispatch()
 
-  useEffect(() => {
-    setAreAllQueuesExpanded(areAllJobsExpanded)
-  }, [areAllJobsExpanded])
+  const isQueueExpanded = expandedQueue === undefined ? areAllJobsExpanded : expandedQueue
+
+  const onQueueToggle = (isExpanded) => {
+    if (isExpanded) {
+      dispatch(expandQueue(expansionKey))
+    } else {
+      dispatch(collapseQueue(expansionKey))
+    }
+  }
 
   return (
     <Card className="zuul-pipeline-summary zuul-compact-card">
@@ -224,17 +230,17 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, areAllJobsExpanded, 
             {itemCount}
           </Badge>
         </Tooltip>
-        {areAllQueuesExpanded ?
-          <AngleDownIcon className="zuul-expand-icon" onClick={onQueueToggle} />
+        {isQueueExpanded ?
+         <AngleDownIcon className="zuul-expand-icon" onClick={() => onQueueToggle(false)} />
           :
-          <AngleRightIcon className="zuul-expand-icon" onClick={onQueueToggle} />
+         <AngleRightIcon className="zuul-expand-icon" onClick={() => onQueueToggle(true)} />
         }
       </CardTitle>
       <CardBody>
         <QueueSummary
           pipeline={pipeline}
           showAllQueues={showAllQueues}
-          allQueuesExpanded={areAllQueuesExpanded}
+          allQueuesExpanded={isQueueExpanded}
           jobsExpanded={areAllJobsExpanded}
         />
       </CardBody>
