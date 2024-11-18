@@ -145,6 +145,24 @@
       "parentUuid": "95b33654_1e00c03b",
       "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9495b6e_2886bebd",
+        "filename": "web/src/reducers/statusExpansion.js",
+        "patchSetId": 5
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-11-18T18:38:31Z",
+      "side": 1,
+      "message": "Darn!",
+      "parentUuid": "41be3475_bfdddac5",
+      "revId": "da20e7251fa7a6512b18bffbcd052e58ce8ffeb2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
