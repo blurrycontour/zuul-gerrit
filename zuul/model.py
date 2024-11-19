@@ -6676,10 +6676,10 @@ class QueueItem(zkobject.ZKObject):
             with self.activeContext(self.pipeline.manager.current_context):
                 for fakebuild in fake_builds:
                     self._addBuild(fakebuild)
-                    self.pipeline.manager.sched.reportBuildEnd(
-                        fakebuild,
-                        tenant=self.pipeline.tenant.name,
-                        final=True)
+            self.pipeline.manager.sched.reportBuildEnds(
+                fake_builds,
+                tenant=self.pipeline.tenant.name,
+                final=True)
 
     def setNodeRequestFailure(self, job, error):
         fakebuild = Build.new(
@@ -6752,10 +6752,10 @@ class QueueItem(zkobject.ZKObject):
             with self.activeContext(self.pipeline.manager.current_context):
                 for fakebuild in fake_builds:
                     self._addBuild(fakebuild)
-                    self.pipeline.manager.sched.reportBuildEnd(
-                        fakebuild,
-                        tenant=self.pipeline.tenant.name,
-                        final=True)
+            self.pipeline.manager.sched.reportBuildEnds(
+                fake_builds,
+                tenant=self.pipeline.tenant.name,
+                final=True)
 
     def _setMissingJobsSkipped(self, msg):
         fake_builds = []
@@ -6772,10 +6772,10 @@ class QueueItem(zkobject.ZKObject):
             with self.activeContext(self.pipeline.manager.current_context):
                 for fakebuild in fake_builds:
                     self.addBuild(fakebuild)
-                    self.pipeline.manager.sched.reportBuildEnd(
-                        fakebuild,
-                        tenant=self.pipeline.tenant.name,
-                        final=True)
+            self.pipeline.manager.sched.reportBuildEnds(
+                fake_builds,
+                tenant=self.pipeline.tenant.name,
+                final=True)
 
     def formatUrlPattern(self, url_pattern, job=None, build=None):
         url = None

@@ -21,6 +21,7 @@ import voluptuous as v
 
 import sqlalchemy.exc
 
+from zuul.exceptions import MissingBuildsetError
 from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.reporter import BaseReporter
 
@@ -147,52 +148,27 @@ class SQLReporter(BaseReporter):
                 else:
                     self.log.exception("Unable to create build")
 
-    def reportBuildEnd(self, build, tenant, final,
-                       missing_buildset_okay=False):
+    def reportBuildEnd(self, build, tenant, final):
+        return self.reportBuildEnds([build], tenant, final)
+
+    def reportBuildEnds(self, builds, tenant, final):
         for retry_count in range(self.retry_count):
             try:
                 with self.connection.getSession() as db:
-                    db_build = db.getBuild(tenant=tenant, uuid=build.uuid)
-                    if not db_build:
-                        db_build = self._createBuild(db, build)
-                    if not db_build:
-                        if missing_buildset_okay:
-                            return
-                        raise Exception("Unable to create build in DB")
-
-                    end_time = build.end_time or time.time()
-                    end = datetime.datetime.fromtimestamp(
-                        end_time, tz=datetime.timezone.utc)
-
-                    db_build.result = build.result
-                    db_build.end_time = end
-                    db_build.log_url = build.log_url
-                    db_build.error_detail = build.error_detail
-                    db_build.final = final
-                    db_build.held = build.held
-
-                    for provides in build.job.provides:
-                        db_build.createProvides(name=provides)
-
-                    for artifact in get_artifacts_from_result_data(
-                            build.result_data,
-                            logger=self.log):
-                        if 'metadata' in artifact:
-                            artifact['metadata'] = json.dumps(
-                                artifact['metadata'])
-                        db_build.createArtifact(**artifact)
-
-                    for event in build.events:
-                        # Reformat the event_time so it's compatible to SQL.
-                        # Don't update the event object in place, but only
-                        # the generated dict representation to not alter the
-                        # datastructure for other reporters.
-                        ev = event.toDict()
-                        ev["event_time"] = datetime.datetime.fromtimestamp(
-                            event.event_time, tz=datetime.timezone.utc)
-                        db_build.createBuildEvent(**ev)
-
-                return db_build
+                    buildset = builds[0].build_set
+                    try:
+                        db_buildset = self._getBuildset(db, builds[0])
+                    except MissingBuildsetError:
+                        # let _createBuild handle if necessary
+                        pass
+                    for build in builds:
+                        if build.build_set is not buildset:
+                            raise Exception("All batch reported builds "
+                                            "must be for the same buildset")
+                        self._reportBuildEnd(
+                            db, db_buildset, build, tenant, final)
+                # Exit retry loop
+                return
             except sqlalchemy.exc.DBAPIError:
                 if retry_count < self.retry_count - 1:
                     self.log.error("Unable to update build, will retry")
@@ -200,21 +176,65 @@ class SQLReporter(BaseReporter):
                 else:
                     self.log.exception("Unable to update build")
 
-    def _createBuild(self, db, build):
-        start_time = build.start_time or time.time()
-        start = datetime.datetime.fromtimestamp(start_time,
-                                                tz=datetime.timezone.utc)
+    def _reportBuildEnd(self, db, db_buildset, build, tenant, final):
+        db_build = db.getBuild(tenant=tenant, uuid=build.uuid)
+        if not db_build:
+            db_build = self._createBuild(db, build, db_buildset=db_buildset)
+        end_time = build.end_time or time.time()
+        end = datetime.datetime.fromtimestamp(
+            end_time, tz=datetime.timezone.utc)
+
+        db_build.result = build.result
+        db_build.end_time = end
+        db_build.log_url = build.log_url
+        db_build.error_detail = build.error_detail
+        db_build.final = final
+        db_build.held = build.held
+
+        for provides in build.job.provides:
+            db_build.createProvides(name=provides)
+
+        for artifact in get_artifacts_from_result_data(
+                build.result_data,
+                logger=self.log):
+            if 'metadata' in artifact:
+                artifact['metadata'] = json.dumps(
+                    artifact['metadata'])
+            db_build.createArtifact(**artifact)
+
+        for event in build.events:
+            # Reformat the event_time so it's compatible to SQL.
+            # Don't update the event object in place, but only
+            # the generated dict representation to not alter the
+            # datastructure for other reporters.
+            ev = event.toDict()
+            ev["event_time"] = datetime.datetime.fromtimestamp(
+                event.event_time, tz=datetime.timezone.utc)
+            db_build.createBuildEvent(**ev)
+        return db_build
+
+    def _getBuildset(self, db, build):
         buildset = build.build_set
         if not buildset:
-            return
+            return None
         db_buildset = db.getBuildset(
             tenant=buildset.item.pipeline.tenant.name, uuid=buildset.uuid)
         if not db_buildset:
             self.log.warning("Creating missing buildset %s", buildset.uuid)
             db_buildset = self._createBuildset(db, buildset)
+        return db_buildset
+
+    def _createBuild(self, db, build, db_buildset=None):
+        start_time = build.start_time or time.time()
+        start = datetime.datetime.fromtimestamp(start_time,
+                                                tz=datetime.timezone.utc)
+        if db_buildset is None:
+            db_buildset = self._getBuildset(db, build)
+        if db_buildset is None:
+            raise MissingBuildsetError()
         if db_buildset.first_build_start_time is None:
             db_buildset.first_build_start_time = start
-        item = buildset.item
+        item = build.build_set.item
         change = item.getChangeForJob(build.job)
         ref = db.getOrCreateRef(
             project=change.project.name,
