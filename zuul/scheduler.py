@@ -3209,7 +3209,7 @@ class Scheduler(threading.Thread):
                         buildset.item.pipeline.manager.current_context,
                         job=job, build_set=item.current_build_set,
                         result='CANCELED')
-                    buildset.addBuild(job, fakebuild)
+                    buildset.addBuild(fakebuild)
         finally:
             # Release the semaphore in any case
             pipeline = buildset.item.pipeline
