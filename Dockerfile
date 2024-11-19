@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# DNM I just want to exercise use-docker-mirror
+
 # Set this to "-debug" to build a debug image (includes gdb, debug
 # symbols, and is quite a bit larger).
 ARG IMAGE_FLAVOR=
