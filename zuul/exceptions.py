@@ -42,6 +42,10 @@ class MergeFailure(Exception):
     pass
 
 
+class MissingBuildsetError(Exception):
+    pass
+
+
 class ConfigurationError(Exception):
     pass
 
