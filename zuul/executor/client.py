@@ -88,7 +88,7 @@ class ExecutorClient(object):
 
         log.debug("Adding build %s of job %s to item %s",
                   build, job, item)
-        item.addBuild(job, build)
+        item.addBuild(build)
 
         if job.name == 'noop':
             data = {"start_time": time.time()}
