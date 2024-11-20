@@ -1132,7 +1132,7 @@ class PipelineSummary(zkobject.ShardedZKObject):
         data = {
             "status": self.status,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumps(data, sort_keys=True).encode("utf8")
 
     def refresh(self, context):
         # Ignore exceptions and just re-use the previous state. This
@@ -5056,7 +5056,7 @@ class Build(zkobject.ZKObject):
                 v = {'storage': 'local', 'data': v}
             data[k] = v
 
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context, extra=None):
         data = super().deserialize(raw, context)
@@ -5201,7 +5201,7 @@ class RepoFiles(zkobject.ShardedZKObject):
             "connections": self.connections,
             "_buildset_path": self._buildset_path,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumps(data, sort_keys=True).encode("utf8")
 
 
 class RepoState:
@@ -5505,7 +5505,7 @@ class BuildSet(zkobject.ZKObject):
             "build_versions": self.build_versions,
             # jobs (serialize as separate objects)
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context, extra=None):
         data = super().deserialize(raw, context)
@@ -5634,14 +5634,14 @@ class BuildSet(zkobject.ZKObject):
         version = build.getZKVersion()
         # If zstat is None, we created the object
         if version is not None:
-            self.build_versions[build.uuid] = version + 1
-            self.updateAttributes(context, build_versions=self.build_versions)
+            with self.activeContext(context):
+                self.build_versions[build.uuid] = version + 1
 
     def updateJobVersion(self, context, job):
         version = job.getZKVersion()
         if version is not None:
-            self.job_versions[job.uuid] = version + 1
-            self.updateAttributes(context, job_versions=self.job_versions)
+            with self.activeContext(context):
+                self.job_versions[job.uuid] = version + 1
 
     def shouldRefreshBuild(self, build, build_versions):
         current = build.getZKVersion()
@@ -5991,7 +5991,7 @@ class QueueItem(zkobject.ZKObject):
             "dynamic_state": self.dynamic_state,
             "first_job_start_time": self.first_job_start_time,
         }
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumps(data, sort_keys=True).encode("utf8")
 
     def deserialize(self, raw, context, extra=None):
         data = super().deserialize(raw, context)
@@ -6099,15 +6099,17 @@ class QueueItem(zkobject.ZKObject):
         store the resulting job tree."""
 
         try:
-            results = layout.createJobGraph(context, self, skip_file_matcher,
-                                            redact_secrets_and_keys)
-            job_graph = results['job_graph']
+            with self.current_build_set.activeContext(context):
+                results = layout.createJobGraph(
+                    context, self, skip_file_matcher,
+                    redact_secrets_and_keys)
+                job_graph = results['job_graph']
 
-            # Write the jobs out to ZK
-            for frozen_job in job_graph._job_map.values():
-                frozen_job.internalCreate(context)
+                # Write the jobs out to ZK
+                for frozen_job in job_graph._job_map.values():
+                    frozen_job.internalCreate(context)
 
-            self.current_build_set.updateAttributes(context, **results)
+                self.current_build_set._set(**results)
         except Exception:
             self.current_build_set.updateAttributes(
                 context, job_graph=None, _old_job_graph=None)
