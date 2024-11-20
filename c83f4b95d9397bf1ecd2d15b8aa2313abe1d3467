@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6aa0137_e044268f",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5707,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-20T09:37:30Z",
+      "side": 1,
+      "message": "How about changing this method signature to allow passing multiple builds? (Reason for this suggestion below)\n\n```python\ndef addBuilds(self, *builds):\n   ...\n```",
+      "revId": "c83f4b95d9397bf1ecd2d15b8aa2313abe1d3467",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40572281_0a76c583",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 6061,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-20T09:37:30Z",
+      "side": 1,
+      "message": "I think we should remove this method as it hides that we need to activate the context of the current buildset.",
+      "revId": "c83f4b95d9397bf1ecd2d15b8aa2313abe1d3467",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0eb3c716_97633f56",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 6676,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-20T09:37:30Z",
+      "side": 1,
+      "message": "We should activate the context of `self.current_build_set` here (and also below whenever`self._addBuid()` is called) as that\u0027s the ZKObject we are modifying.",
+      "revId": "c83f4b95d9397bf1ecd2d15b8aa2313abe1d3467",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
