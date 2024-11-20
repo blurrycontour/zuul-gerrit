@@ -10,6 +10,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import json
 import types
 
@@ -24,10 +25,11 @@ class ZuulJSONEncoder(json.JSONEncoder):
             d.pop('_source_context', None)
             d.pop('_start_mark', None)
             return d
-        elif (
-                isinstance(o, zuul.model.SourceContext) or
-                isinstance(o, zuul.model.ZuulMark)):
+        elif isinstance(o, (zuul.model.SourceContext,
+                            zuul.model.ZuulMark)):
             return {}
+        elif isinstance(o, collections.UserDict):
+            return o.data
         return json.JSONEncoder.default(self, o)
 
 
