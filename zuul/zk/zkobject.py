@@ -32,6 +32,35 @@ from zuul.zk.exceptions import LockException
 from zuul.zk.locks import SessionAwareLock
 
 
+from collections import UserDict
+
+
+def convert_zkobject_dict(zkobject, data):
+    if isinstance(data, dict):
+        return ZKObjectDict(
+            zkobject, {k: convert_zkobject_dict(zkobject, v)
+                       for k, v in data.items()})
+    if isinstance(data, list):
+        return list(convert_zkobject_dict(zkobject, v) for v in data)
+    return data
+
+
+class ZKObjectDict(UserDict):
+    def __init__(self, zkobject, data=None):
+        super().__setattr__('_zkobject_parent', zkobject)
+        super().__init__()
+        self.data = {k: convert_zkobject_dict(zkobject, v)
+                     for k, v in data.items()}
+
+    def __setitem__(self, key, value):
+        if self._zkobject_parent._active_context:
+            super().__setitem__(key, convert_zkobject_dict(
+                self._zkobject_parent, value))
+        else:
+            raise Exception("Unable to modify ZKObject %s" %
+                            (repr(self._zkobject_parent),))
+
+
 class BaseZKContext:
     profile_logger = logging.getLogger('zuul.profile')
     profile_default = False
@@ -480,6 +509,7 @@ class ZKObject:
                   )
 
     def __setattr__(self, name, value):
+        value = convert_zkobject_dict(self, value)
         if self._active_context:
             super().__setattr__(name, value)
         else:
@@ -487,6 +517,7 @@ class ZKObject:
                             (repr(self),))
 
     def _set(self, **kw):
+        kw = convert_zkobject_dict(self, kw)
         for name, value in kw.items():
             super().__setattr__(name, value)
 
