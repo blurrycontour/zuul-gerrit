@@ -912,6 +912,10 @@ class FakeFrozenJob(model.Job):
         self.uuid = uuid.uuid4().hex
         self.ref = 'fake reference'
         self.all_refs = [self.ref]
+        self.matches_change = True
+
+    def _set(self, **kw):
+        self.__dict__.update(kw)
 
 
 class TestGraph(BaseTestCase):
@@ -943,7 +947,7 @@ class TestGraph(BaseTestCase):
         with testtools.ExpectedException(
                 Exception,
                 "Dependency cycle detected in job jobX"):
-            graph.freezeDependencies()
+            graph.freezeDependencies(self.log)
 
         # Disallow circular dependencies
         graph = setup_graph()
@@ -954,7 +958,7 @@ class TestGraph(BaseTestCase):
         with testtools.ExpectedException(
                 Exception,
                 "Dependency cycle detected in job job3"):
-            graph.freezeDependencies()
+            graph.freezeDependencies(self.log)
 
         graph = setup_graph()
         jobs[3].dependencies = frozenset([model.JobDependency(jobs[5].name)])
@@ -967,7 +971,7 @@ class TestGraph(BaseTestCase):
         with testtools.ExpectedException(
                 Exception,
                 "Dependency cycle detected in job job3"):
-            graph.freezeDependencies()
+            graph.freezeDependencies(self.log)
 
         graph = setup_graph()
         jobs[3].dependencies = frozenset([model.JobDependency(jobs[2].name)])
@@ -978,7 +982,7 @@ class TestGraph(BaseTestCase):
         graph.addJob(jobs[5])
         jobs[6].dependencies = frozenset([model.JobDependency(jobs[2].name)])
         graph.addJob(jobs[6])
-        graph.freezeDependencies()
+        graph.freezeDependencies(self.log)
 
     def test_job_graph_allows_soft_dependencies(self):
         parent = FakeFrozenJob('parent')
@@ -990,14 +994,14 @@ class TestGraph(BaseTestCase):
         graph = model.JobGraph({})
         graph.addJob(parent)
         graph.addJob(child)
-        graph.freezeDependencies()
+        graph.freezeDependencies(self.log)
         self.assertEqual(graph.getParentJobsRecursively(child),
                          [parent])
 
         # Skip the parent
         graph = model.JobGraph({})
         graph.addJob(child)
-        graph.freezeDependencies()
+        graph.freezeDependencies(self.log)
         self.assertEqual(graph.getParentJobsRecursively(child), [])
 
     def test_job_graph_allows_soft_dependencies4(self):
@@ -1018,7 +1022,7 @@ class TestGraph(BaseTestCase):
         for j in parents:
             graph.addJob(j)
         graph.addJob(child)
-        graph.freezeDependencies()
+        graph.freezeDependencies(self.log)
         self.assertEqual(set(graph.getParentJobsRecursively(child)),
                          set(parents))
 
@@ -1028,7 +1032,7 @@ class TestGraph(BaseTestCase):
             if j is not parents[0]:
                 graph.addJob(j)
         graph.addJob(child)
-        graph.freezeDependencies()
+        graph.freezeDependencies(self.log)
         self.assertEqual(set(graph.getParentJobsRecursively(child)),
                          set(parents) -
                          set([parents[0], parents[2], parents[3]]))
@@ -1039,7 +1043,7 @@ class TestGraph(BaseTestCase):
             if j is not parents[3]:
                 graph.addJob(j)
         graph.addJob(child)
-        graph.freezeDependencies()
+        graph.freezeDependencies(self.log)
         self.assertEqual(set(graph.getParentJobsRecursively(child)),
                          set(parents) - set([parents[3]]))
 
@@ -1068,7 +1072,7 @@ class TestGraph(BaseTestCase):
         graph.addJob(child)
 
         # We don't expect this to raise an exception
-        graph.freezeDependencies()
+        graph.freezeDependencies(self.log)
 
 
 class TestTenant(BaseTestCase):
