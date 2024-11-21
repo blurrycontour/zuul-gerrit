@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52eab64f_2f010d95",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 6776,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-21T12:10:36Z",
+      "side": 1,
+      "message": "We should probably also use `self.addBuilds()` outside the loop.",
+      "revId": "2c116c1d3e064020d22961f498ee94b446d3a2d1",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}

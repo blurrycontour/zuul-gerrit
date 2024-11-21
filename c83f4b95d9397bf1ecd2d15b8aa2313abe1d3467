@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cbdef3d_557273cc",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 5707,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-21T12:10:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "54f612b3_a7040bde",
+      "revId": "c83f4b95d9397bf1ecd2d15b8aa2313abe1d3467",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "40572281_0a76c583",
@@ -49,6 +67,24 @@
       "writtenOn": "2024-11-20T09:37:30Z",
       "side": 1,
       "message": "I think we should remove this method as it hides that we need to activate the context of the current buildset.",
+      "revId": "c83f4b95d9397bf1ecd2d15b8aa2313abe1d3467",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8af5e12_e94754dc",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 6061,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-21T12:10:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40572281_0a76c583",
       "revId": "c83f4b95d9397bf1ecd2d15b8aa2313abe1d3467",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -84,6 +120,24 @@
       "side": 1,
       "message": "Done (in another way).",
       "parentUuid": "0eb3c716_97633f56",
+      "revId": "c83f4b95d9397bf1ecd2d15b8aa2313abe1d3467",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b74ca95_34f71307",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 6676,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-21T12:10:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12cb1ed8_666f1056",
       "revId": "c83f4b95d9397bf1ecd2d15b8aa2313abe1d3467",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
