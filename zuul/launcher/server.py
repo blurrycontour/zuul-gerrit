@@ -1066,6 +1066,11 @@ class Launcher:
             for future in concurrent.futures.as_completed(futures):
                 future.result()
         self.log.debug("Downloaded %s bytes to %s", size, path)
+        if path.endswith('.zst'):
+            subprocess.run(["zstd", "-dq", path],
+                           cwd=self.temp_dir, check=True, capture_output=True)
+            path = path[:-len('.zst')]
+            self.log.debug("Decompressed image to %s", path)
         return path
 
     def getImageExternalId(self, node, provider):

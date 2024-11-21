@@ -116,6 +116,11 @@ FROM zuul as zuul-fingergw
 CMD ["/usr/local/bin/zuul-fingergw", "-f"]
 
 FROM zuul as zuul-launcher
+# Install zstd to decompress images
+RUN apt-get update \
+  && apt-get install -y zstd \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 CMD ["/usr/local/bin/zuul-launcher", "-f"]
 
 FROM zuul as zuul-merger
