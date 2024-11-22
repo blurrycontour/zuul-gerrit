@@ -18,8 +18,6 @@ exposes that log stream over a websocket connection as part of
 :py:class:`zuul.web.ZuulWeb`.
 
 .. autoclass:: zuul.ansible.base.callback.zuul_stream.CallbackModule
-   :members:
-
 .. autoclass:: zuul.lib.log_streamer.LogStreamer
 .. autoclass:: zuul.web.LogStreamHandler
 .. autoclass:: zuul.web.ZuulWeb
