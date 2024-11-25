@@ -28,14 +28,21 @@ CONNECTION_LOCK_ROOT = f"{LOCK_ROOT}/connection"
 
 
 class SessionAwareMixin:
-    def __init__(self, client, path, identifier=None, extra_lock_patterns=()):
+    def __init__(self, client, path, identifier=None, extra_lock_patterns=(),
+                 ensure_path=True):
         self._zuul_ephemeral = None
         self._zuul_session_expired = False
         self._zuul_watching_session = False
         self._zuul_seen_contenders = set()
         self._zuul_seen_contender_names = set()
         self._zuul_contender_watch = None
+        self._zuul_ensure_path = ensure_path
         super().__init__(client, path, identifier, extra_lock_patterns)
+
+    def _ensure_path(self):
+        # Override
+        if self._zuul_ensure_path:
+            return super()._ensure_path()
 
     def acquire(self, blocking=True, timeout=None, ephemeral=True):
         ret = super().acquire(blocking, timeout, ephemeral)

@@ -245,12 +245,13 @@ class LauncherApi:
                 continue
             if self.getNodesetRequest(node.request_id):
                 continue
-            if lock := node.acquireLock(self.zk_client):
-                try:
+            with self.createZKContext(None) as outer_ctx:
+                if lock := node.acquireLock(outer_ctx):
                     with self.createZKContext(lock) as ctx:
-                        node.delete(ctx)
-                except NoNodeError:
-                    # Node is already deleted
-                    pass
-                finally:
-                    node.releaseLock()
+                        try:
+                            node.delete(ctx)
+                        except NoNodeError:
+                            # Node is already deleted
+                            pass
+                        finally:
+                            node.releaseLock(ctx)

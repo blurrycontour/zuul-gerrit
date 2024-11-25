@@ -773,7 +773,7 @@ class TestMinReadyLauncher(LauncherBaseTestCase):
             node.acquireLock(ctx)
             node.updateAttributes(ctx, state_time=0)
         finally:
-            node.releaseLock()
+            node.releaseLock(ctx)
 
         for _ in iterate_timeout(60, "node to be cleaned up"):
             nodes = self.launcher.api.nodes_cache.getItems()

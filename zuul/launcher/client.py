@@ -134,19 +134,19 @@ class LauncherClient:
             provider_node = getattr(node, "_provider_node", None)
             if not provider_node:
                 continue
-            try:
-                node.state = STATE_USED
-                with self.createZKContext(provider_node._lock, log) as ctx:
+            with self.createZKContext(provider_node._lock, log) as ctx:
+                try:
+                    node.state = STATE_USED
                     provider_node.updateAttributes(
                         ctx, state=ProviderNode.State.USED)
-                log.debug("Released %s", provider_node)
-            except Exception:
-                log.exception("Unable to return node %s", provider_node)
-            finally:
-                try:
-                    provider_node.releaseLock()
+                    log.debug("Released %s", provider_node)
                 except Exception:
-                    log.exception("Error unlocking node %s", provider_node)
+                    log.exception("Unable to return node %s", provider_node)
+                finally:
+                    try:
+                        provider_node.releaseLock(ctx)
+                    except Exception:
+                        log.exception("Error unlocking node %s", provider_node)
 
     def createZKContext(self, lock, log):
         return ZKContext(self.zk_client, lock, self.stop_event, log)
