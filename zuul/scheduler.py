@@ -908,6 +908,11 @@ class Scheduler(threading.Thread):
             event, needs_result=False
         )
 
+    def reportBuildEnds(self, builds, tenant, final):
+        self.sql.reportBuildEnds(builds, tenant=tenant, final=final)
+        for build in builds:
+            self._reportBuildStats(build)
+
     def reportBuildEnd(self, build, tenant, final):
         self.sql.reportBuildEnd(build, tenant=tenant, final=final)
         self._reportBuildStats(build)
@@ -2949,22 +2954,20 @@ class Scheduler(threading.Thread):
             )
 
             self._cleanupCompletedBuild(build)
-            # If we have not reported start for this build, we don't
-            # need to report end.  If we haven't reported start, we
-            # won't have a build record in the DB, so we would
-            # normally create one and attach it to a buildset, but we
-            # don't know the buildset, and we don't have enough
-            # information to construct a buildset record from scratch.
-            # Indicate that is acceptable in this situation, so we
-            # don't throw an exception.  In other words: if we don't
-            # have a build record in the DB here, the
-            # "missing_buildset_okay" flag will cause reportBuildEnd
-            # to do nothing.
             try:
                 self.sql.reportBuildEnd(
                     build, tenant=pipeline.tenant.name,
-                    final=True,
-                    missing_buildset_okay=True)
+                    final=True)
+            except exceptions.MissingBuildsetError:
+                # If we have not reported start for this build, we
+                # don't need to report end.  If we haven't reported
+                # start, we won't have a build record in the DB, so we
+                # would normally create one and attach it to a
+                # buildset, but we don't know the buildset, and we
+                # don't have enough information to construct a
+                # buildset record from scratch.  That's okay in this
+                # situation.
+                pass
             except Exception:
                 log.exception("Error reporting build completion to DB:")
 
