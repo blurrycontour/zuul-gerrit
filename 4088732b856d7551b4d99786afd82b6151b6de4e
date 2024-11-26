@@ -16,6 +16,23 @@
       "message": "Updated the job-content.rst file, as suggested.",
       "revId": "4088732b856d7551b4d99786afd82b6151b6de4e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "561c5ab5_39a92b38",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-11-26T09:17:55Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "4088732b856d7551b4d99786afd82b6151b6de4e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
