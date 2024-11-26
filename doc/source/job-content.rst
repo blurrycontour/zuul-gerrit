@@ -1461,6 +1461,14 @@ executor running the job is available:
 
       A private IPv6 address of the node.
 
+   .. var:: node_properties
+
+      Arbitrary mapping of node properties, such as boolean flags representing
+      criteria that were taken into account when a node is allocated to Zuul by
+      Nodepool. Notable properties are `spot` for when a node is an AWS spot
+      instance or `fleet` when the node was created by Nodepool using the AWS
+      fleet API.
+
 
 SSH Keys
 --------

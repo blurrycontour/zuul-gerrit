@@ -2149,7 +2149,8 @@ class AnsibleJob(object):
                         public_ipv4=node.public_ipv4,
                         private_ipv4=node.private_ipv4,
                         public_ipv6=node.public_ipv6,
-                        private_ipv6=node.private_ipv6)))
+                        private_ipv6=node.private_ipv6,
+                        node_properties=node.node_properties)))
 
                 # Ansible >=2.8 introduced "auto" as an
                 # ansible_python_interpreter argument that looks up
