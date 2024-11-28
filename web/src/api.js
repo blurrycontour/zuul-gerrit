@@ -81,6 +81,31 @@ function getAuthToken() {
   return authToken
 }
 
+function checkNullCookie(responseHeaders, cookieName) {
+    // Function to extract cookies from the Set-Cookie header
+    function getSetCookie(headers) {
+        const cookies = headers['set-cookie'] || [];
+        const cookieMap = {};
+
+        cookies.forEach(cookie => {
+            const [cookieNameValue, ...cookieAttributes] = cookie.split(';');
+            const [cookieName, cookieValue] = cookieNameValue.split('=');
+            cookieMap[cookieName.trim()] = cookieValue.trim();
+        });
+
+        return cookieMap;
+    }
+
+    // Get all cookies from the Set-Cookie header
+    const cookies = getSetCookie(responseHeaders);
+
+    if (cookies[cookieName] === 'null') {
+        return true;
+    }
+
+    return false;
+}
+
 function makeRequest(url, method, data) {
   if (method === undefined) {
     method = 'get'
@@ -98,8 +123,18 @@ function makeRequest(url, method, data) {
 
   const config = {method, url, data}
 
-  // First try the request as normal
   let res = instance.request(config).catch(err => {
+    // If Apache/mod_auth_openidc as an authn proxy is between
+    // the browser user-agent and the Zuul API it might happen that
+    // the proxy return a 401 error code in case of session expired.
+    if (err.response &&
+	err.response.status === 401 &&
+        checkNullCookie(err.response.headers, "mod_auth_openidc_session")) {
+      console.log('Received 401 from mod_auth_openidc; ' +
+		  'the page needs to be reloaded')
+      window.location.reload()
+    }
+    // First try the request as normal
     if (err.response === undefined) {
       // This is either a Network, DNS, or CORS error, but we can't tell which.
       // If we're behind an authz proxy, it's possible our creds have timed out
