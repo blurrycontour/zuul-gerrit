@@ -104,15 +104,15 @@ function makeRequest(url, method, data) {
       // This is either a Network, DNS, or CORS error, but we can't tell which.
       // If we're behind an authz proxy, it's possible our creds have timed out
       // and the CORS error is because we're getting a redirect.
-      // Apache mod_auth_mellon (and possibly other authz proxies) will avoid
+      // Apache mod_auth_mellon, mod_auth_openidc (and possibly other authz proxies) will avoid
       // issuing a redirect if X-Requested-With is set to 'XMLHttpRequest' and
-      // will instead issue a 403.  We can use this to detect that case.
+      // will instead issue a 403 or 401.  We can use this to detect that case.
       instance.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
       let res2 = instance.request(config).catch(err2 => {
-        if (err2.response && err2.response.status === 403) {
+        if (err2.response && (err2.response.status === 403 || err2.response.status === 401)) {
           // We might be getting a redirect or something else,
           // so reload the page.
-          console.log('Received 403 after unknown error; reloading')
+          console.log(`Received ${err2.response.status} after unknown error; reloading`)
           window.location.reload()
         }
         // If we're still getting an error, we don't know the cause,
