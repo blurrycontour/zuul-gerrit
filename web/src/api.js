@@ -100,6 +100,18 @@ function makeRequest(url, method, data) {
 
   // First try the request as normal
   let res = instance.request(config).catch(err => {
+    // If an auth proxy (like Apache/mod_auth_openidc) is between
+    // the browser user-agent and the Zuul API it might happen that
+    // the proxy return a 401 error code in case of
+    // session expired.
+    if (err.response.status === 401) {
+      console.log("Received 401; the page will reload in 5 seconds ...")
+      setTimeout(() => {window.location.reload()}, 5000)
+      alert("The Zuul WEB App received an HTTP 401 error code from " +
+            "the Zuul API. You might be behind an authn proxy " +
+            "and your session might have expired.\n" +
+            "This page will refresh in 5 seconds ...")
+    }
     if (err.response === undefined) {
       // This is either a Network, DNS, or CORS error, but we can't tell which.
       // If we're behind an authz proxy, it's possible our creds have timed out
