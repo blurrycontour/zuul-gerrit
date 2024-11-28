@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a4e5a83_09f4ab2d",
+        "filename": "web/src/api.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-11-28T23:45:42Z",
+      "side": 1,
+      "message": "Maybe we should check that `err.response` is defined, just to make sure this doesn\u0027t throw an unexpected exception. I think you just need to add: `if (err.response \u0026\u0026 err.response.status \u003d\u003d 401)`",
+      "revId": "b4e29bd90ddd7745883e35964cff484180be0ed9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b358eef2_331ec927",
+        "filename": "web/src/api.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-11-28T23:45:42Z",
+      "side": 1,
+      "message": "Is the alert discarded by the reload? Perhaps a `console.error` is enough.\n\nAlso, the reason could be simplified as `The Zuul API returned a HTTP 401 response: your authn session might have expired. The page will be reloaded automatically.`",
+      "revId": "b4e29bd90ddd7745883e35964cff484180be0ed9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
