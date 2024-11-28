@@ -81,6 +81,15 @@ function getAuthToken() {
   return authToken
 }
 
+function isCherryPyServer(responseHeaders) {
+  // Get the 'Server' header from the response headers
+  const serverHeader = responseHeaders['server']
+
+  // Check if the 'Server' header contains 'CherryPy'
+  // Might be better if Zuul set its own identity instead of the default
+  return serverHeader && serverHeader.includes('CherryPy'))
+}
+
 function makeRequest(url, method, data) {
   if (method === undefined) {
     method = 'get'
@@ -98,8 +107,18 @@ function makeRequest(url, method, data) {
 
   const config = {method, url, data}
 
-  // First try the request as normal
   let res = instance.request(config).catch(err => {
+    // If Apache/mod_auth_openidc (or others) as an authn proxy is between
+    // the browser user-agent and the Zuul API it might happen that
+    // the proxy return a 401 error code in case of session expired.
+    if (err.response &&
+        err.response.status === 401 &&
+        !isCherryPyServer(err.response.headers)) {
+      console.log('Received 401 from an authn proxy; ' +
+                  'the page needs to be reloaded')
+      window.location.reload()
+    }
+    // First try the request as normal
     if (err.response === undefined) {
       // This is either a Network, DNS, or CORS error, but we can't tell which.
       // If we're behind an authz proxy, it's possible our creds have timed out
