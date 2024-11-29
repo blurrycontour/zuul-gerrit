@@ -33,6 +33,24 @@
       "message": "Is the alert discarded by the reload? Perhaps a `console.error` is enough.\n\nAlso, the reason could be simplified as `The Zuul API returned a HTTP 401 response: your authn session might have expired. The page will be reloaded automatically.`",
       "revId": "b4e29bd90ddd7745883e35964cff484180be0ed9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bbff183_dbcfe2fc",
+        "filename": "web/src/api.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2024-11-29T08:23:00Z",
+      "side": 1,
+      "message": "The alert seems to block code execution. I\u0027ve first started by trying with a setTimeout to perform the page reload after some second and displaying the alert but this does not work well.\nI\u0027m hesitating between by simply log a message and perform the reload, or properly warning the user with the alert then reload. I prefer the latter.",
+      "parentUuid": "b358eef2_331ec927",
+      "revId": "b4e29bd90ddd7745883e35964cff484180be0ed9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
