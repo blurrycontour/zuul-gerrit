@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85cf4f95_cc6c269d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2024-11-29T08:23:37Z",
+      "side": 1,
+      "message": "I\u0027ve tested that last PS and it seems to work as expected.",
+      "revId": "351ee3722f3fb451d2f25707db5b19b2c1ac3175",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
