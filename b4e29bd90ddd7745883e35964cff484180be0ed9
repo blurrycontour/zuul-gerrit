@@ -69,6 +69,24 @@
       "parentUuid": "b358eef2_331ec927",
       "revId": "b4e29bd90ddd7745883e35964cff484180be0ed9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1de485c5_73607489",
+        "filename": "web/src/api.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-12-02T14:23:02Z",
+      "side": 1,
+      "message": "It seems like the session is expected to expire at some point, so the alert might become annoying. Is there something the user can do about it?",
+      "parentUuid": "2bbff183_dbcfe2fc",
+      "revId": "b4e29bd90ddd7745883e35964cff484180be0ed9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
