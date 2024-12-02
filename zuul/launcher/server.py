@@ -103,48 +103,50 @@ class UploadJob:
         # and skip download
         acquired = []
         path = None
-        try:
+        with self.launcher.createZKContext(None, self.log) as ctx:
             try:
-                with self.image_build_artifact.locked(
-                        self.launcher.zk_client, blocking=False):
-                    for upload in self.uploads:
-                        if upload.acquireLock(
-                                self.launcher.zk_client, blocking=False):
-                            acquired.append(upload)
-                            self.log.debug("Acquired upload lock for %s",
+                try:
+                    with self.image_build_artifact.locked(ctx, blocking=False):
+                        for upload in self.uploads:
+                            if upload.acquireLock(ctx, blocking=False):
+                                acquired.append(upload)
+                                self.log.debug("Acquired upload lock for %s",
+                                               upload)
+                except LockException:
+                    return
+
+                if not acquired:
+                    return
+
+                path = self.launcher.downloadArtifact(
+                    self.image_build_artifact)
+                futures = []
+                for upload in acquired:
+                    future = self.launcher.endpoint_upload_executor.submit(
+                        EndpointUploadJob(
+                            self.launcher, self.image_build_artifact,
+                            upload, path).run)
+                    futures.append((upload, future))
+                for upload, future in futures:
+                    try:
+                        future.result()
+                        self.log.info("Finished upload %s", upload)
+                    except Exception:
+                        self.log.exception("Unable to upload image %s", upload)
+            finally:
+                for upload in acquired:
+                    try:
+                        upload.releaseLock(ctx)
+                        self.log.debug("Released upload lock for %s", upload)
+                    except Exception:
+                        self.log.exception("Unable to release lock for %s",
                                            upload)
-            except LockException:
-                return
-
-            if not acquired:
-                return
-
-            path = self.launcher.downloadArtifact(self.image_build_artifact)
-            futures = []
-            for upload in acquired:
-                future = self.launcher.endpoint_upload_executor.submit(
-                    EndpointUploadJob(self.launcher, self.image_build_artifact,
-                                      upload, path).run)
-                futures.append((upload, future))
-            for upload, future in futures:
-                try:
-                    future.result()
-                    self.log.info("Finished upload %s", upload)
-                except Exception:
-                    self.log.exception("Unable to upload image %s", upload)
-        finally:
-            for upload in acquired:
-                try:
-                    upload.releaseLock()
-                    self.log.debug("Released upload lock for %s", upload)
-                except Exception:
-                    self.log.exception("Unable to release lock for %s", upload)
-            if path:
-                try:
-                    os.unlink(path)
-                    self.log.info("Deleted %s", path)
-                except Exception:
-                    self.log.exception("Unable to delete %s", path)
+                if path:
+                    try:
+                        os.unlink(path)
+                        self.log.info("Deleted %s", path)
+                    except Exception:
+                        self.log.exception("Unable to delete %s", path)
 
 
 class EndpointUploadJob:
@@ -324,9 +326,11 @@ class Launcher:
                     # Nothing to do here
                     continue
                 log.debug("Got request %s", request)
-                if not request.acquireLock(self.zk_client, blocking=False):
-                    log.debug("Failed to lock matching request %s", request)
-                    continue
+                with self.createZKContext(None, log) as ctx:
+                    if not request.acquireLock(ctx, blocking=False):
+                        log.debug("Failed to lock matching request %s",
+                                  request)
+                        continue
 
             if not self._cachesReadyForRequest(request):
                 self.log.debug("Caches are not up-to-date for %s", request)
@@ -350,7 +354,8 @@ class Launcher:
             except Exception:
                 log.exception("Error processing request %s", request)
             if request.state in request.FINAL_STATES:
-                request.releaseLock()
+                with self.createZKContext(None, log) as ctx:
+                    request.releaseLock(ctx)
 
     def _cachesReadyForRequest(self, request):
         # Make sure we have all associated provider nodes in the cache
@@ -384,7 +389,7 @@ class Launcher:
                     else:
                         continue
 
-                    if not node.acquireLock(self.zk_client, blocking=False):
+                    if not node.acquireLock(ctx, blocking=False):
                         log.debug("Failed to lock matching ready node %s",
                                   node)
                         continue
@@ -406,7 +411,7 @@ class Launcher:
                         log.exception("Faild to assign ready node %s", node)
                         continue
                     finally:
-                        node.releaseLock()
+                        node.releaseLock(ctx)
                 else:
                     node = self._requestNode(
                         label, request, provider, log, ctx)
@@ -525,9 +530,10 @@ class Launcher:
                 if not self._isNodeActionable(node):
                     continue
 
-                if not node.acquireLock(self.zk_client, blocking=False):
-                    log.debug("Failed to lock matching node %s", node)
-                    continue
+                with self.createZKContext(None, log) as ctx:
+                    if not node.acquireLock(ctx, blocking=False):
+                        log.debug("Failed to lock matching node %s", node)
+                        continue
 
             request = self.api.getNodesetRequest(node.request_id)
             if ((request or node.request_id is None)
@@ -583,7 +589,8 @@ class Launcher:
                     self.wake_event.set()
 
             if node.state == model.ProviderNode.State.READY:
-                node.releaseLock()
+                with self.createZKContext(None, self.log) as ctx:
+                    node.releaseLock(ctx)
 
     def _isNodeActionable(self, node):
         if node.is_locked:
@@ -634,7 +641,7 @@ class Launcher:
                 node.setState(node.State.READY)
                 self.wake_event.set()
                 log.debug("Marking node %s as %s", node, node.state)
-        node.releaseLock()
+            node.releaseLock(ctx)
 
     def _cleanupNode(self, node, log):
         with self.createZKContext(node._lock, self.log) as ctx:
@@ -671,7 +678,7 @@ class Launcher:
             if not self.api.getNodesetRequest(node.request_id):
                 log.debug("Removing provider node %s", node)
                 node.delete(ctx)
-                node.releaseLock()
+                node.releaseLock(ctx)
 
     def _processMinReady(self):
         if not self.api.nodes_cache.waitForSync(

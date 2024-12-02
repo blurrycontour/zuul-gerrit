@@ -2659,7 +2659,7 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
             self.assertIsNotNone(request._zstat)
             self.assertIsNotNone(request.getPath())
 
-        self.assertIsNotNone(request.acquireLock(self.zk_client))
+        self.assertIsNotNone(request.acquireLock(context))
         self.assertTrue(request.hasLock())
         for _ in iterate_timeout(10, "request to be locked"):
             if request.is_locked:
@@ -2687,7 +2687,7 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
 
         # "Fulfill" requested provider nodes
         for node in self.api.getMatchingProviderNodes():
-            self.assertIsNotNone(node.acquireLock(self.zk_client))
+            self.assertIsNotNone(node.acquireLock(context))
             self.assertTrue(node.hasLock())
             for _ in iterate_timeout(10, "node to be locked"):
                 if node.is_locked:
@@ -2696,7 +2696,7 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
                 context,
                 state=model.ProviderNode.State.READY
             )
-            node.releaseLock()
+            node.releaseLock(context)
             self.assertFalse(node.hasLock())
             for _ in iterate_timeout(10, "node to be unlocked"):
                 if not node.is_locked:
@@ -2717,7 +2717,7 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
             context,
             state=model.NodesetRequest.State.FULFILLED,
         )
-        request.releaseLock()
+        request.releaseLock(context)
         self.assertFalse(request.hasLock())
         for _ in iterate_timeout(10, "request to be unlocked"):
             if not request.is_locked:
@@ -2742,7 +2742,7 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
 
         # Mark nodes as used
         for node in provider_nodes:
-            self.assertIsNotNone(node.acquireLock(self.zk_client))
+            self.assertIsNotNone(node.acquireLock(context))
             for _ in iterate_timeout(10, "wait for lock to show up"):
                 if node.is_locked:
                     break
@@ -2750,7 +2750,7 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
                 context,
                 state=model.ProviderNode.State.USED,
             )
-            node.releaseLock()
+            node.releaseLock(context)
 
         # Cleanup used nodes and wait for them to be removed from the cache
         for _ in iterate_timeout(10, "nodes to be removed"):

@@ -19,11 +19,17 @@ import contextlib
 import json
 import logging
 import sys
+import time
 import types
 import zlib
 import collections
 
-from kazoo.exceptions import LockTimeout, NodeExistsError, NoNodeError
+from kazoo.exceptions import (
+    LockTimeout,
+    NoNodeError,
+    NodeExistsError,
+    NotEmptyError,
+)
 from kazoo.retry import KazooRetry
 
 from zuul.zk import sharding
@@ -141,6 +147,7 @@ class ZKObject:
     _retry_interval = 5
     _zkobject_compressed_size = 0
     _zkobject_uncompressed_size = 0
+    _deleted = False
     io_reader_class = sharding.RawZKIO
     io_writer_class = sharding.RawZKIO
     truncate_on_create = False
@@ -293,6 +300,7 @@ class ZKObject:
             context.log.error(
                 "Exception deleting ZKObject %s at %s", self, path)
             raise
+        self._set(_deleted=True)
 
     def estimateDataSize(self, seen=None):
         """Attempt to find all ZKObjects below this one and sum their
@@ -513,32 +521,80 @@ class LockableZKObject(ZKObject):
         """
         raise NotImplementedError()
 
+    @classmethod
+    def new(klass, context, **kw):
+        """Create a new instance and save it in ZooKeeper"""
+        obj = klass()
+        obj._set(**kw)
+        # Create the lock path first.  In the future, if we want to
+        # support creating locked objects, we can acquire it here.
+        obj._createLockPath(context)
+        data = obj._trySerialize(context)
+        obj._save(context, data, create=True)
+        return obj
+
+    def _createLockPath(self, context):
+        if isinstance(context, LocalZKContext):
+            return
+        path = self.getLockPath()
+        if context.sessionIsInvalid():
+            raise Exception("ZooKeeper session or lock not valid")
+        try:
+            self._retry(context, context.client.ensure_path, path)
+        except Exception:
+            context.log.error(
+                "Exception creating ZKObject %s lock path at %s", self, path)
+            raise
+
+    def _deleteLockPath(self, client):
+        path = self.getLockPath()
+        # Give other actors 30 seconds to realize this object
+        # doesn't exist anymore and they should stop trying to
+        # lock it.
+        for x in range(30):
+            # This handles connection-related retries, but not
+            # conflicts.  We ignore the session here because we're
+            # trying to delete a lock; we want to do that even if we
+            # lose whatever lock the context might have.
+            kazoo_retry = KazooRetry(max_tries=-1,
+                                     delay=self._retry_interval,
+                                     backoff=0)
+            try:
+                return kazoo_retry(client.delete, path, recursive=True)
+            except NotEmptyError:
+                time.sleep(1)
+
     @contextmanager
-    def locked(self, zk_client, blocking=True, timeout=None):
-        if not (lock := self.acquireLock(zk_client, blocking=blocking,
+    def locked(self, context, blocking=True, timeout=None):
+        if not (lock := self.acquireLock(context, blocking=blocking,
                                          timeout=timeout)):
             raise LockException(f"Failed to acquire lock on {self}")
         try:
             yield lock
         finally:
             try:
-                self.releaseLock()
+                self.releaseLock(context)
             except Exception:
-                self.log.exception("Failed to release lock on %s", self)
+                context.log.exception("Failed to release lock on %s", self)
 
-    def acquireLock(self, zk_client, blocking=True, timeout=None):
+    def acquireLock(self, context, blocking=True, timeout=None):
         have_lock = False
         lock = None
         path = self.getLockPath()
         try:
-            lock = SessionAwareLock(zk_client.client, path)
+            # We create the lock path when we create the object in ZK,
+            # so there is no need to ensure the path on lock.  This
+            # lets us avoid re-creating the lock if the object was
+            # deleted behind our back.
+            lock = SessionAwareLock(context.client, path,
+                                    ensure_path=False)
             have_lock = lock.acquire(blocking, timeout)
         except NoNodeError:
             # Request disappeared
             have_lock = False
         except LockTimeout:
             have_lock = False
-            self.log.error("Timeout trying to acquire lock: %s", path)
+            context.log.error("Timeout trying to acquire lock: %s", path)
 
         # If we aren't blocking, it's possible we didn't get the lock
         # because someone else has it.
@@ -548,11 +604,18 @@ class LockableZKObject(ZKObject):
         self._set(_lock=lock)
         return lock
 
-    def releaseLock(self):
+    def releaseLock(self, context):
         if self._lock is None:
             return
         self._lock.release()
         self._set(_lock=None)
+        if self._deleted:
+            # If we are releasing the lock after deleting the object,
+            # also cleanup the lock path.
+            try:
+                self._deleteLockPath(context.client)
+            except Exception:
+                context.log.error("Unable to delete lock path for %s", self)
 
     def hasLock(self):
         if self._lock is None:
