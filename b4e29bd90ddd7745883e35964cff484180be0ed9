@@ -87,6 +87,24 @@
       "parentUuid": "2bbff183_dbcfe2fc",
       "revId": "b4e29bd90ddd7745883e35964cff484180be0ed9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d8c66b2_60f0b4e9",
+        "filename": "web/src/api.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2024-12-03T15:59:34Z",
+      "side": 1,
+      "message": "The user can only click \u0027Ok\u0027 and wait for the page to reload.\nIf you think that we should reload without alerting the user, then I can change the behavior.",
+      "parentUuid": "1de485c5_73607489",
+      "revId": "b4e29bd90ddd7745883e35964cff484180be0ed9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
