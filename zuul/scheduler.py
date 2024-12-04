@@ -1093,15 +1093,6 @@ class Scheduler(threading.Thread):
                         self.local_layout_state[tenant_name] = layout_state
                     self.connections.reconfigureDrivers(tenant)
 
-        # TODO(corvus): Consider removing this implicit reconfigure
-        # event with v5.  Currently the expectation is that if you
-        # stop a scheduler, change the tenant config, and start it,
-        # the new tenant config should take effect.  If we change that
-        # expectation with multiple schedulers, we can remove this.
-        event = ReconfigureEvent(smart=True)
-        event.zuul_event_ltime = self.zk_client.getCurrentLtime()
-        self._doReconfigureEvent(event)
-
         # TODO(corvus): This isn't quite accurate; we don't really
         # know when the last reconfiguration took place.  But we
         # need to set some value here in order for the cleanup
