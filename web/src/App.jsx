@@ -143,7 +143,9 @@ class App extends React.Component {
     if (auth.info.read_protected && !user.data) {
       console.log('Read-access login required')
       const redirect_target = window.location.href.slice(getHomepageUrl().length)
-      localStorage.setItem('zuul_auth_redirect', redirect_target)
+      // If the redirect_target is the root url, we set the zuul_auth_redirect to /tenants
+      // so that the auth callback page can redirect to the /tenants page after login
+      localStorage.setItem('zuul_auth_redirect', redirect_target==='' ? '/tenants' : redirect_target)
       this.props.signIn()
       return <Fetching />
     }
