@@ -1328,6 +1328,42 @@ Here is an example of two job definitions:
       Supports override control.  The default is ``!inherit``: values
       are merged without duplication.
 
+   .. attr:: workspace-checkout
+      :default: true
+
+      Whether to perform a full checkout of projects in the workspace.
+
+      This only applies to the workspace on the executor.  Most Zuul
+      jobs copy repositories to remote worker nodes and independently
+      checkout the appropriate refs.  Changing this setting should
+      typically not affect the contents on remote nodes.
+
+      Setting this option may be useful to save time or space when
+      preparing large repositories which are not expected to be used
+      on the Zuul executor, but care is needed to ensure that it does
+      not affect job execution.
+
+      When set to ``true`` (the default and recommended value under
+      most circumstances), Zuul will perform a full git checkout of
+      all of the involved repositories in the executor's workspace.
+
+      When set to ``false``, Zuul will not perform a checkout of any
+      of the involved repositories in the workspace.  Further, when it
+      checks out repositories within private directories in order to
+      run playbooks or roles, it will perform a sparse checkout with
+      only the directories it expects to need.  This may cause
+      problems if playbooks or roles reference files outside of the
+      sparse checkout.  In this case, the option is unsuitable and
+      should be set to ``true`` for the job so that full checkouts are
+      performed.
+
+      When set to the string ``auto``, Zuul will behave as if the
+      value is ``true`` if and only if the job contains an empty
+      nodeset, otherwise it will behave as if the value is ``false``.
+      The reasoning is that jobs with no nodeset are likely to access
+      the contents of the repos on the executor, whereas jobs with a
+      nodeset may access them only on remote nodes.
+
    .. attr:: workspace-scheme
       :default: golang
 
