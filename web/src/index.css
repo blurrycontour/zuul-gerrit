@@ -214,9 +214,12 @@ a.refresh {
     padding-right: 4px;
 }
 
+.zuul-pipeline-summary.pf-c-card {
+    box-shadow: none;
+}
+
 /* Use the same hover effect like for selectable cards, but without
    actually selecting them */
-.zuul-pipeline-summary:hover,
 .zuul-queue-item:hover {
     box-shadow: var(--pf-c-card--m-selectable--active--BoxShadow);
     cursor: default;
@@ -247,15 +250,20 @@ a.refresh {
 /* Override PF4 padding values on compact cards to make them even more
    compact. */
 .pf-c-card.zuul-compact-card .pf-c-card__header {
-    padding: 8px 16px 0 16px;
+    padding: 8px;
 }
 
-.pf-c-card.zuul-compact-card .pf-c-card__title {
-    padding: 16px 16px 0 16px;
+.pf-c-card.zuul-compact-card .pf-c-card__header .pf-c-card__title {
+    padding: 0;
+    overflow-wrap: anywhere;
 }
 
 .pf-c-card.zuul-compact-card .pf-c-card__body {
-    padding: 0 16px 16px 16px;
+    padding: 0 8px 8px 8px;
+}
+
+.pf-c-card.zuul-compact-card .pf-c-expandable-section__toggle {
+    padding-bottom: 0;
 }
 
 .pf-c-card.zuul-compact-card .pf-c-card__actions {
@@ -273,14 +281,6 @@ a.refresh {
 .pf-c-card.zuul-compact-card .pf-c-card__actions .zuul-admin-dropdown {
     margin-right: 4px;
     width: 28px;
-}
-
-/* TODO (felix): Could we put every title within a compact header and
-   remove this css rule? */
-.pf-c-card.zuul-compact-card .pf-c-card__header .pf-c-card__title {
-    padding: 0;
-    padding-bottom: 8px;
-    overflow-wrap: anywhere;
 }
 
 .pf-c-card.zuul-compact-card .pf-c-expandable-section__content {
@@ -336,7 +336,23 @@ a.refresh {
     color: var(--pf-global--palette--black-800) !important;
 }
 
+.zuul-change-queue .pf-c-card__title.zuul-change-queue-name {
+    padding: 0 0 8px 0;
+}
+
+.zuul-change-queue-body {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 /* Make the cards within a zuul-change-queue even more compact */
+
+.zuul-change-queue .pf-c-card__body {
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+}
+
 .zuul-change-queue .pf-c-progress-stepper__step-main {
     margin-bottom: 20px;
     margin-top: 0;
@@ -346,18 +362,6 @@ a.refresh {
     font-size: 0.9rem;
     --pf-c-progress-stepper__step-icon--Width: 1.5rem;
     --pf-c-progress-stepper__step-icon--Height: 1.5rem;
-}
-
-.zuul-change-queue .pf-c-card.zuul-compact-card .pf-c-card__header {
-    padding: 8px 8px 0 8px;
-}
-
-.zuul-change-queue .pf-c-card.zuul-compact-card .pf-c-card__body {
-    padding: 0 8px 8px 8px;
-}
-
-.zuul-change-queue .pf-c-card.zuul-compact-card .pf-c-expandable-section__toggle {
-    padding-bottom: 0;
 }
 
 .zuul-change-queue .pf-c-card.zuul-compact-card .zuul-change-link {

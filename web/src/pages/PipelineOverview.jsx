@@ -312,7 +312,10 @@ function PipelineOverviewPage() {
           </ToolbarItem>
         </FilterToolbar>
       </PageSection>
-      <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+      <PageSection
+        variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
+        style={{paddingTop: '0'}}
+      >
         <PipelineGallery
           pipelines={pipelines}
           tenant={tenant}
