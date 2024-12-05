@@ -68,7 +68,7 @@
         set -e
         git config user.email 'admin@example.com'
         git commit -a -m 'update config'
-        git push http://admin:secret@gerrit:8080/All-Projects +HEAD:refs/meta/config
+        git push -f http://admin:secret@gerrit:8080/All-Projects +HEAD:refs/meta/config
       args:
         chdir: "{{ all_projects_repo }}"
 
