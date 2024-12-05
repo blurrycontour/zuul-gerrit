@@ -67,8 +67,10 @@
       shell: |
         set -e
         git config user.email 'admin@example.com'
+        f="$(git rev-parse --git-dir)/hooks/commit-msg"; curl -o "$f" http://gerrit:8080/tools/hooks/commit-msg ; chmod +x "$f"
         git commit -a -m 'update config'
-        git push http://admin:secret@gerrit:8080/All-Projects +HEAD:refs/meta/config
+        git push http://admin:secret@gerrit:8080/All-Projects +HEAD:refs/for/refs/meta/config
+        ssh -i /var/ssh/admin -p 29418 -l 'admin' gerrit gerrit review -l Code-Review=2 --submit -p All-Projects 1,1
       args:
         chdir: "{{ all_projects_repo }}"
 
