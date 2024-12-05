@@ -16,6 +16,24 @@
       "message": "Is it worth mentioning this also affects runtime system attributes (like the max-hold-age removed in the test below)?  I\u0027m not sure we ever documented how those items in zuul.conf can be changed in a running system other than a restart, so we may need to tell people that smart-reconfigure can do that.",
       "revId": "05f8098b2e76ab23cdeb2889374894d2f2734406",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b390555_9965b1d2",
+        "filename": "releasenotes/notes/rm-implicit-smart-reconfig-722783e814eee0f5.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-12-05T15:10:03Z",
+      "side": 1,
+      "message": "Updated",
+      "parentUuid": "978d26ee_c71be238",
+      "revId": "05f8098b2e76ab23cdeb2889374894d2f2734406",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
