@@ -56,6 +56,7 @@ from zuul.lib.varnames import check_varnames
 
 import zuul.lib.repl
 import zuul.merger.merger
+from zuul.merger.merger import SparsePaths
 import zuul.ansible.logconfig
 from zuul.executor.sensors.cpu import CPUSensor
 from zuul.executor.sensors.hdd import HDDSensor
@@ -1519,10 +1520,14 @@ class AnsibleJob(object):
                     'BuildCloneRepo',
                     attributes={'connection': project['connection'],
                                 'project': project['name']}):
+                if self.checkout_workspace_repos:
+                    sparse_paths = SparsePaths.FULL
+                else:
+                    sparse_paths = SparsePaths.EMPTY
                 repo = self.workspace_merger.getRepo(
                     project['connection'],
                     project['name'],
-                    empty_sparse_checkout=not self.checkout_workspace_repos,
+                    sparse_paths=sparse_paths,
                 )
             repos[project['canonical_name']] = repo
 
@@ -2442,7 +2447,7 @@ class AnsibleJob(object):
                 logger=self.log,
                 scheme=zuul.model.SCHEME_GOLANG)
             if self.checkout_workspace_repos:
-                sparse_paths = None
+                sparse_paths = SparsePaths.FULL
             else:
                 key = (project.connection_name, project.name)
                 sparse_paths = list(self.repo_sparse_paths[key])
@@ -2524,7 +2529,7 @@ class AnsibleJob(object):
             self.log.debug("Cloning %s@%s into new untrusted space %s",
                            project, branch, pi.root)
             if self.checkout_workspace_repos:
-                sparse_paths = None
+                sparse_paths = SparsePaths.FULL
             else:
                 key = (project.connection_name, project.name)
                 sparse_paths = list(self.repo_sparse_paths[key])
