@@ -282,7 +282,10 @@ function PipelineOverviewPage() {
 
   return (
     <>
-      <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+      <PageSection
+        variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
+        style={{paddingBottom: '8px'}}
+      >
         <TenantStats
           stats={stats}
           timezone={timezone}
@@ -312,7 +315,10 @@ function PipelineOverviewPage() {
           </ToolbarItem>
         </FilterToolbar>
       </PageSection>
-      <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+      <PageSection
+        variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
+        style={{paddingTop: '0'}}
+      >
         <PipelineGallery
           pipelines={pipelines}
           tenant={tenant}
