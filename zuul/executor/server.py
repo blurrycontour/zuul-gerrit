@@ -1125,6 +1125,17 @@ class AnsibleJob(object):
         # We don't set normal_vars until we load the include-vars
         # files after preparing repos.
         self.secret_vars = self.arguments["secret_parent_data"]
+        if self.job.workspace_checkout == 'auto':
+            # If workspace-checkout is auto, we perform a checkout iff
+            # we get an empty nodeset; the assumption is that an empty
+            # nodeset performs work on the executor and otherwise on a
+            # remote worker.
+            self.checkout_workspace_repos =\
+                not bool(self.job.nodeset.getNodes())
+        else:
+            self.checkout_workspace_repos = self.job.workspace_checkout
+        self.log.info("Checkout workspace repos: %s",
+                      self.checkout_workspace_repos)
 
     def run(self):
         self.running = True
@@ -1202,6 +1213,7 @@ class AnsibleJob(object):
 
             self.setNodeInfo()
             self.loadRepoState()
+            self.getSparsePaths()
 
             self.ssh_agent.start()
             self.ssh_agent.add(self.private_key_file)
@@ -1521,7 +1533,8 @@ class AnsibleJob(object):
             # The commit ID of the original item (before merging).  Used
             # later for line mapping.
             item_commit = None
-            # The set of repos which have had their state restored
+            # The set of repos which have had their state restored.  This
+            # also doubles as a list of repos that have been checked out.
             restored_repos = set()
 
             self._jobOutput(job_output, "Merging changes")
@@ -1587,7 +1600,19 @@ class AnsibleJob(object):
                         'BuildCheckout',
                         attributes={'connection': project['connection'],
                                     'project': project['name']}):
-                    hexsha = repo.checkout(selected_ref)
+                    if self.checkout_workspace_repos:
+                        hexsha = repo.checkout(selected_ref)
+                    else:
+                        hexsha = repo.getRef(selected_ref)[1]
+                        # So that we have a consistent workspace
+                        # regardless of whether we merged changes, remove
+                        # the working tree if we're not checking out repos
+                        # in the workspace.
+                        if ((project['connection'], project['name'])
+                            in restored_repos):
+                            self.log.info("Emptying work tree for %s",
+                                          project['canonical_name'])
+                            repo.uncheckout()
 
                 # Update the inventory variables to indicate the ref we
                 # checked out
@@ -2236,6 +2261,43 @@ class AnsibleJob(object):
             return path
         raise ExecutorError("Unable to find playbook %s" % path)
 
+    def getSparsePaths(self):
+        # Later we checkout one copy of each context-project-branch
+        # combination of repos that are used for playbooks and roles,
+        # so we need to find the full set of sparse paths for each
+        # repo ahead of time.  Let's not worry about doing that
+        # per-branch, we'll just get the superset of all playbook and
+        # role paths necessary.
+        self.repo_sparse_paths = collections.defaultdict(set)
+        for playbook in (self.job.pre_run +
+                         self.job.run +
+                         self.job.post_run):
+            # For every playbook, add the playbook's containing directory
+            key = (playbook['connection'], playbook['project'])
+            paths = self.repo_sparse_paths[key]
+            pbpath = os.path.dirname(playbook['path'])
+            # Remove any / at the start and add one at the end.
+            pbpath = pbpath.lstrip('/') + '/'
+            paths.add(pbpath)
+            for role in playbook['roles']:
+                # For every role repo, add the roles directory in case
+                # the repo is a collection of roles, and also add all
+                # of the individual role component directories in case
+                # the repo is a bare role.
+                key = (role['connection'], role['project'])
+                paths = self.repo_sparse_paths[key]
+                paths.update({'roles/', 'tasks/', 'handlers/',
+                              'templates/', 'files/', 'vars/',
+                              'defaults/', 'meta/', 'library/',
+                              'module_utils/', 'lookup_plugins/'})
+        for iv in self.job.include_vars:
+            # For each include-vars, add the contining dir
+            key = (iv['connection'], iv['project'])
+            ivpath = os.path.dirname(iv['name'])
+            # Remove any / at the start and add one at the end.
+            ivpath = ivpath.lstrip('/') + '/'
+            paths.add(ivpath)
+
     def preparePlaybooks(self, args):
         self.writeAnsibleConfig(self.jobdir.setup_playbook)
         self.writeAnsibleConfig(self.jobdir.freeze_playbook)
@@ -2385,11 +2447,17 @@ class AnsibleJob(object):
                 self.executor_server.merge_root,
                 logger=self.log,
                 scheme=zuul.model.SCHEME_GOLANG)
+            if self.checkout_workspace_repos:
+                sparse_paths = None
+            else:
+                key = (project.connection_name, project.name)
+                sparse_paths = list(self.repo_sparse_paths[key])
             hexsha = merger.checkoutBranch(
                 project.connection_name, project.name,
                 branch,
                 repo_state=self.repo_state,
                 process_worker=self.executor_server.process_worker,
+                sparse_paths=sparse_paths,
                 zuul_event_id=self.zuul_event_id)
             pi.commit = hexsha
         else:
@@ -2461,10 +2529,16 @@ class AnsibleJob(object):
 
             self.log.debug("Cloning %s@%s into new untrusted space %s",
                            project, branch, pi.root)
+            if self.checkout_workspace_repos:
+                sparse_paths = None
+            else:
+                key = (project.connection_name, project.name)
+                sparse_paths = list(self.repo_sparse_paths[key])
             hexsha = merger.checkoutBranch(
                 project.connection_name, project.name,
                 branch, repo_state=repo_state,
                 process_worker=self.executor_server.process_worker,
+                sparse_paths=sparse_paths,
                 zuul_event_id=self.zuul_event_id)
             pi.commit = hexsha
         else:

@@ -1300,3 +1300,137 @@ class TestExecutorFailure(ZuulTestCase):
         self.assertTrue(
             build_retries[0].error_detail.startswith(
                 "Failed to update project"))
+
+
+class TestExecutorWorkspaceCheckout(ZuulTestCase, ExecutorReposMixin):
+    tenant_config_file = 'config/workspace-checkout/main.yaml'
+
+    def _test_workspace_checkout(self, jobname):
+        self.executor_server.keep_jobdir = True
+        self.executor_server.hold_jobs_in_build = True
+        p1 = "review.example.com/org/project1"
+        p2 = "review.example.com/org/project2"
+        projects = [p1, p2]
+        upstream = self.getUpstreamRepos(projects)
+
+        files = {jobname: 'run'}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=files)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        states = [
+            {p1: dict(present=[A]),
+             p2: dict(commit=str(upstream[p2].commit('master')),
+                      absent=[A]),
+             },
+        ]
+
+        self.assertBuildStates(states, projects)
+
+    def _assert_not_sparse(self):
+        cc = "review.example.com/common-config"
+        rt = "review.example.com/org/roletest"
+        p1 = "review.example.com/org/project1"
+        p2 = "review.example.com/org/project2"
+        path = os.path.join(self.history[0].jobdir.root)
+        file_checks = {
+            f'trusted/project_0/{cc}/otherdirectory/something.txt': True,
+            f'trusted/project_0/{cc}/playbooks/run.yaml': True,
+            f'trusted/project_0/{cc}/includevars/vars.yaml': True,
+            f'trusted/project_1/{rt}/otherdirectory/something.txt': True,
+            f'trusted/project_1/{rt}/tasks/main.yaml': True,
+            f'work/src/{p1}/otherdirectory/something.txt': True,
+            f'work/src/{p2}/otherdirectory/something.txt': True,
+        }
+        for f, expected in file_checks.items():
+            exists = os.path.exists(os.path.join(path, f))
+            self.assertEqual(expected, exists, f)
+
+    def _assert_sparse(self):
+        cc = "review.example.com/common-config"
+        rt = "review.example.com/org/roletest"
+        p1 = "review.example.com/org/project1"
+        p2 = "review.example.com/org/project2"
+        path = os.path.join(self.history[0].jobdir.root)
+        file_checks = {
+            f'trusted/project_0/{cc}/otherdirectory/something.txt': False,
+            f'trusted/project_0/{cc}/playbooks/run.yaml': True,
+            f'trusted/project_0/{cc}/includevars/vars.yaml': True,
+            f'trusted/project_1/{rt}/otherdirectory/something.txt': False,
+            f'trusted/project_1/{rt}/tasks/main.yaml': True,
+            f'work/src/{p1}/otherdirectory/something.txt': False,
+            f'work/src/{p2}/otherdirectory/something.txt': False,
+        }
+        for f, expected in file_checks.items():
+            exists = os.path.exists(os.path.join(path, f))
+            self.assertEqual(expected, exists, f)
+
+    def test_workspace_checkout_true(self):
+        self._test_workspace_checkout('test-workspace-checkout-true')
+        self._assert_not_sparse()
+
+    def test_workspace_checkout_false(self):
+        self._test_workspace_checkout('test-workspace-checkout-false')
+        self._assert_sparse()
+
+    def test_workspace_checkout_auto_nodeset(self):
+        self._test_workspace_checkout(
+            'test-workspace-checkout-auto-nodeset')
+        self._assert_sparse()
+
+    def test_workspace_checkout_auto_no_nodeset(self):
+        self._test_workspace_checkout(
+            'test-workspace-checkout-auto-no-nodeset')
+        self._assert_not_sparse()
+
+    def test_workspace_checkout_line_mapping(self):
+        self.executor_server.keep_jobdir = True
+        self.executor_server.hold_jobs_in_build = True
+        cc = "review.example.com/common-config"
+        rt = "review.example.com/org/roletest"
+        p1 = "review.example.com/org/project1"
+        p2 = "review.example.com/org/project2"
+        projects = [p1, p2]
+        upstream = self.getUpstreamRepos(projects)
+
+        jobname = 'test-workspace-checkout-false'
+        files = {jobname: 'run'}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=files)
+        self.executor_server.returnData(
+            jobname, A,
+            {'zuul':
+             {'file_comments':
+              {'otherdirectory/something.txt': [{
+                  'line': 1,
+                  'message': 'test message'}]
+               }
+              }
+             }
+        )
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        states = [
+            {p1: dict(present=[A]),
+             p2: dict(commit=str(upstream[p2].commit('master')),
+                      absent=[A]),
+             },
+        ]
+
+        self.assertBuildStates(states, projects)
+        path = os.path.join(self.history[0].jobdir.root)
+        file_checks = {
+            f'trusted/project_0/{cc}/otherdirectory/something.txt': False,
+            f'trusted/project_0/{cc}/playbooks/run.yaml': True,
+            f'trusted/project_0/{cc}/includevars/vars.yaml': True,
+            f'trusted/project_1/{rt}/otherdirectory/something.txt': False,
+            f'trusted/project_1/{rt}/tasks/main.yaml': True,
+            # We check this out after the fact for line mapping
+            f'work/src/{p1}/otherdirectory/something.txt': True,
+            f'work/src/{p2}/otherdirectory/something.txt': False,
+        }
+        for f, expected in file_checks.items():
+            exists = os.path.exists(os.path.join(path, f))
+            self.assertEqual(expected, exists, f)

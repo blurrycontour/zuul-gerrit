@@ -393,6 +393,7 @@ class TestWeb(BaseTestWeb):
              'variant_description': '',
              'voting': True,
              'workspace_scheme': 'golang',
+             'workspace_checkout': True,
             }], data)
 
     def test_web_find_job(self):
@@ -480,7 +481,8 @@ class TestWeb(BaseTestWeb):
                 'include_vars': [],
                 'variant_description': '',
                 'voting': True,
-                'workspace_scheme': 'golang'
+                'workspace_scheme': 'golang',
+                'workspace_checkout': True,
             }, {
                 'name': 'project-test1',
                 'abstract': False,
@@ -536,7 +538,8 @@ class TestWeb(BaseTestWeb):
                 'include_vars': [],
                 'variant_description': 'stable',
                 'voting': True,
-                'workspace_scheme': 'golang'
+                'workspace_scheme': 'golang',
+                'workspace_checkout': True,
             }], data)
 
         data = self.get_url('api/tenant/tenant-one/job/test-job').json()
@@ -585,7 +588,8 @@ class TestWeb(BaseTestWeb):
                 'include_vars': [],
                 'variant_description': '',
                 'voting': True,
-                'workspace_scheme': 'golang'
+                'workspace_scheme': 'golang',
+                'workspace_checkout': True,
             }], data)
 
     def test_find_job_complete_playbooks(self):
@@ -715,7 +719,9 @@ class TestWeb(BaseTestWeb):
                   'include_vars': [],
                   'variant_description': '',
                   'voting': True,
-                  'workspace_scheme': 'golang'}],
+                  'workspace_scheme': 'golang',
+                  'workspace_checkout': True,
+                  }],
                 [{'abstract': False,
                   'ansible_split_streams': None,
                   'ansible_version': None,
@@ -759,7 +765,9 @@ class TestWeb(BaseTestWeb):
                   'include_vars': [],
                   'variant_description': '',
                   'voting': True,
-                  'workspace_scheme': 'golang'}],
+                  'workspace_scheme': 'golang',
+                  'workspace_checkout': True,
+                  }],
                 [{'abstract': False,
                   'ansible_split_streams': None,
                   'ansible_version': None,
@@ -803,7 +811,9 @@ class TestWeb(BaseTestWeb):
                   'include_vars': [],
                   'variant_description': '',
                   'voting': True,
-                  'workspace_scheme': 'golang'}],
+                  'workspace_scheme': 'golang',
+                  'workspace_checkout': True,
+                  }],
                 [{'abstract': False,
                   'ansible_split_streams': None,
                   'ansible_version': None,
@@ -847,7 +857,9 @@ class TestWeb(BaseTestWeb):
                   'include_vars': [],
                   'variant_description': '',
                   'voting': True,
-                  'workspace_scheme': 'golang'}]]
+                  'workspace_scheme': 'golang',
+                  'workspace_checkout': True,
+                  }]]
 
         self.assertEqual(
             {
@@ -918,7 +930,9 @@ class TestWeb(BaseTestWeb):
                              'include_vars': [],
                              'variant_description': '',
                              'voting': True,
-                             'workspace_scheme': 'golang'}
+                             'workspace_scheme': 'golang',
+                             'workspace_checkout': True,
+                             }
                         ]],
                     }
                     ]
@@ -1275,6 +1289,7 @@ class TestWeb(BaseTestWeb):
                 'include_vars': [],
             },
             'workspace_scheme': 'golang',
+            'workspace_checkout': True,
         }
 
         self.assertEqual(job_params, resp.json())
@@ -1311,6 +1326,7 @@ class TestWeb(BaseTestWeb):
             'timeout': None,
             'vars': {},
             'workspace_scheme': 'golang',
+            'workspace_checkout': True,
             'zuul': {
                 '_inheritance_path': [
                     '<Job noop branches: None source: None#0>',
