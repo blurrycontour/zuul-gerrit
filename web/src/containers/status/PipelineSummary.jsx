@@ -26,6 +26,7 @@ import {
   Flex,
   FlexItem,
   Tooltip,
+  CardHeader,
 } from '@patternfly/react-core'
 import {
   SquareIcon,
@@ -84,29 +85,31 @@ function QueueCard({ pipeline, queue, allQueuesExpanded, jobsExpanded }) {
 
   return (
     <Card isPlain className="zuul-compact-card">
-      <CardTitle>
-        {queue.name}
-        {queue.branch ? ` (${queue.branch})` : ''}
-        <Tooltip
-          content={
-            <div style={{ textAlign: 'left' }}>
-              Queue length: {queue._count}<br />Window size: {queue.window}
-            </div>
-          }
-        >
-          <Badge
-            isRead
-            style={{ marginLeft: 'var(--pf-global--spacer--sm)', verticalAlign: '0.1em' }}
+      <CardHeader style={{ paddingTop: '0', paddingBottom: '0' }}>
+        <CardTitle>
+          {queue.name}
+          {queue.branch ? ` (${queue.branch})` : ''}
+          <Tooltip
+            content={
+              <div style={{ textAlign: 'left' }}>
+                Queue length: {queue._count}<br />Window size: {queue.window}
+              </div>
+            }
           >
-            {queue._count} / {queue.window}
-          </Badge>
-        </Tooltip>
-        {isQueueExpanded ?
-         <AngleDownIcon className="zuul-expand-icon" onClick={() => onQueueToggle(false)} />
-          :
-         <AngleRightIcon className="zuul-expand-icon" onClick={() => onQueueToggle(true)} />
-        }
-      </CardTitle>
+            <Badge
+              isRead
+              style={{ marginLeft: 'var(--pf-global--spacer--sm)', verticalAlign: '0.1em' }}
+            >
+              {queue._count} / {queue.window}
+            </Badge>
+          </Tooltip>
+          {isQueueExpanded ?
+            <AngleDownIcon className="zuul-expand-icon" onClick={() => onQueueToggle(false)} />
+            :
+            <AngleRightIcon className="zuul-expand-icon" onClick={() => onQueueToggle(true)} />
+          }
+        </CardTitle>
+      </CardHeader>
       {isQueueExpanded ? null :
         <CardBody style={{ paddingBottom: '0' }}>
           {queue.heads.map((head) => (
@@ -115,7 +118,7 @@ function QueueCard({ pipeline, queue, allQueuesExpanded, jobsExpanded }) {
         </CardBody>
       }
       {isQueueExpanded ?
-       <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} jobsExpanded={jobsExpanded} />
+        <ChangeQueue queue={queue} pipeline={pipeline} showTitle={false} jobsExpanded={jobsExpanded} />
         : null
       }
     </Card>
@@ -202,40 +205,42 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, areAllJobsExpanded, 
   }
 
   return (
-    <Card className="zuul-pipeline-summary zuul-compact-card">
-      <CardTitle style={{ paddingBottom: '8px' }} >
-        <Tooltip content={pipeline.description ? pipeline.description : ''}>
-          <PipelineIcon pipelineType={pipelineType} />
-        </Tooltip>
-        <Link
-          to={{
-            pathname: `${tenant.linkPrefix}/status/pipeline/${pipeline.name}`,
-            search: encodeURI(makeQueryString(filters)),
-          }}
-          className="zuul-pipeline-link"
-        >
-          {pipeline.name}
-        </Link>
-        <Tooltip
-          content={
-            itemCount === 1
-              ? <div>{itemCount} item enqueued</div>
-              : <div>{itemCount} items enqueued</div>
-          }
-        >
-          <Badge
-            isRead
-            style={{ marginLeft: 'var(--pf-global--spacer--sm)', verticalAlign: '0.1em' }}
+    <Card isPlain className="zuul-pipeline-summary zuul-compact-card">
+      <CardHeader>
+        <CardTitle>
+          <Tooltip content={pipeline.description ? pipeline.description : ''}>
+            <PipelineIcon pipelineType={pipelineType} />
+          </Tooltip>
+          <Link
+            to={{
+              pathname: `${tenant.linkPrefix}/status/pipeline/${pipeline.name}`,
+              search: encodeURI(makeQueryString(filters)),
+            }}
+            className="zuul-pipeline-link"
           >
-            {itemCount}
-          </Badge>
-        </Tooltip>
-        {isQueueExpanded ?
-         <AngleDownIcon className="zuul-expand-icon" onClick={() => onQueueToggle(false)} />
-          :
-         <AngleRightIcon className="zuul-expand-icon" onClick={() => onQueueToggle(true)} />
-        }
-      </CardTitle>
+            {pipeline.name}
+          </Link>
+          <Tooltip
+            content={
+              itemCount === 1
+                ? <div>{itemCount} item enqueued</div>
+                : <div>{itemCount} items enqueued</div>
+            }
+          >
+            <Badge
+              isRead
+              style={{ marginLeft: 'var(--pf-global--spacer--sm)', verticalAlign: '0.1em' }}
+            >
+              {itemCount}
+            </Badge>
+          </Tooltip>
+          {isQueueExpanded ?
+            <AngleDownIcon className="zuul-expand-icon" onClick={() => onQueueToggle(false)} />
+            :
+            <AngleRightIcon className="zuul-expand-icon" onClick={() => onQueueToggle(true)} />
+          }
+        </CardTitle>
+      </CardHeader>
       <CardBody>
         <QueueSummary
           pipeline={pipeline}
