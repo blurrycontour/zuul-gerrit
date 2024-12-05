@@ -210,9 +210,9 @@ function ChangeQueue({ queue, pipeline, jobsExpanded, showTitle=true }) {
 
   return (
     <>
-      <Card isPlain className="zuul-change-queue">
+      <Card isPlain className="zuul-change-queue zuul-compact-card">
         {showTitle && queue.name ?
-          <CardTitle>
+          <CardTitle className="zuul-change-queue-name">
             <Title headingLevel="h3" style={{ padding: 0, margin: 0 }}>
               {queue.name}
               {queue.branch ? ` (${queue.branch})` : ''}
@@ -233,7 +233,7 @@ function ChangeQueue({ queue, pipeline, jobsExpanded, showTitle=true }) {
             </Title>
           </CardTitle>
           : ''}
-        <CardBody>
+        <CardBody className="zuul-change-queue-body">
           <Panel>
             {trees.map(tree => (
               <ProgressStepper key={tree.id} isVertical>

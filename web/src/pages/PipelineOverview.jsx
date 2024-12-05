@@ -130,7 +130,7 @@ function PipelineGallery({ pipelines, tenant, showAllPipelines, expandAll, isLoa
       <Gallery
         hasGutter
         minWidths={{
-          sm: '450px',
+          sm: '400px',
         }}
       >
         {pipelines.map(pipeline => (
@@ -282,7 +282,10 @@ function PipelineOverviewPage() {
 
   return (
     <>
-      <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+      <PageSection
+        variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
+        className="zuul-toolbar-section"
+      >
         <TenantStats
           stats={stats}
           timezone={timezone}
@@ -312,7 +315,10 @@ function PipelineOverviewPage() {
           </ToolbarItem>
         </FilterToolbar>
       </PageSection>
-      <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+      <PageSection
+        variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
+        className="zuul-main-section"
+      >
         <PipelineGallery
           pipelines={pipelines}
           tenant={tenant}

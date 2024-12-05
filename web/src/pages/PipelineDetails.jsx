@@ -207,7 +207,10 @@ function PipelineDetailsPage({
 
   return (
     <>
-      <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+      <PageSection
+        variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
+        className="zuul-toolbar-section"
+      >
         <Level>
           <LevelItem>
             <FilterToolbar
@@ -237,7 +240,10 @@ function PipelineDetailsPage({
         </Level>
         <PipelineDetails pipeline={pipeline} />
       </PageSection>
-      <PageSection variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}>
+      <PageSection
+        variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
+        className="zuul-main-section"
+      >
         {!isEmpty &&
           <Title headingLevel="h3">
             <StreamIcon
@@ -252,7 +258,7 @@ function PipelineDetailsPage({
         <Gallery
           hasGutter
           minWidths={{
-            sm: '450px',
+            sm: '400px',
           }}
         >
           {
