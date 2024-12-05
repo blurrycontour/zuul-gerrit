@@ -2136,6 +2136,7 @@ class ZuulWebAPI(object):
         params['ansible_version'] = job.ansible_version
         params['ansible_split_streams'] = job.ansible_split_streams
         params['workspace_scheme'] = job.workspace_scheme
+        params['workspace_checkout'] = job.workspace_checkout
         if job.name != 'noop':
             params['playbooks'] = job.run
             params['pre_playbooks'] = job.pre_run
