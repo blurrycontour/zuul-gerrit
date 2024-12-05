@@ -76,13 +76,14 @@ class Repo(object):
     def __init__(self, remote, local, email, username, speed_limit, speed_time,
                  sshkey=None, cache_path=None, logger=None, git_timeout=300,
                  zuul_event_id=None, retry_timeout=None, skip_refs=False,
-                 workspace_project_path=None):
+                 empty_sparse_checkout=False, workspace_project_path=None):
         if logger is None:
             self.log = logging.getLogger("zuul.Repo")
         else:
             self.log = logger
         log = get_annotated_logger(self.log, zuul_event_id)
         self.skip_refs = skip_refs
+        self.empty_sparse_checkout = empty_sparse_checkout
         self.env = {
             'GIT_HTTP_LOW_SPEED_LIMIT': speed_limit,
             'GIT_HTTP_LOW_SPEED_TIME': speed_time,
@@ -177,6 +178,12 @@ class Repo(object):
 
         with git.Repo(self.local_path) as repo:
             repo.git.update_environment(**self.env)
+            if self.empty_sparse_checkout:
+                # If we should never perform a checkout, then set set the
+                # sparse-checkout to the top dir only; that's the minimal
+                # checkout that we can perform and still do worktree-based
+                # merges.
+                repo.git.sparse_checkout('set')
             # Create local branches corresponding to all the remote
             # branches.  Skip this when cloning the workspace repo since
             # we will restore the refs there.
@@ -629,7 +636,8 @@ class Repo(object):
         git.refs.SymbolicReference.delete(repo, path)
         return "Deleted reference %s" % path
 
-    def checkout(self, ref, sparse_paths=None, zuul_event_id=None):
+    def checkout(self, ref, sparse_paths=None,
+                 disable_sparse_checkout=False, zuul_event_id=None):
         # Return the hexsha of the checkout commit
         log = get_annotated_logger(self.log, zuul_event_id)
         with self.createRepoObject(zuul_event_id) as repo:
@@ -641,7 +649,8 @@ class Repo(object):
             else:
                 log.debug("Checking out %s" % ref)
                 try:
-                    self._checkout(repo, sparse_paths, ref)
+                    self._checkout(repo, sparse_paths,
+                                   disable_sparse_checkout, ref)
                 except Exception:
                     lock_path = f"{self.local_path}/.git/index.lock"
                     if os.path.isfile(lock_path):
@@ -649,18 +658,21 @@ class Repo(object):
                                     lock_path)
                         os.unlink(lock_path)
                         # Retry the checkout
-                        self._checkout(repo, sparse_paths, ref)
+                        self._checkout(repo, sparse_paths,
+                                       disable_sparse_checkout, ref)
                     else:
                         raise
             return repo.head.commit.hexsha
 
-    def _checkout(self, repo, sparse_paths, ref):
+    def _checkout(self, repo, sparse_paths, disable_sparse_checkout, ref):
         # Perform a hard reset to the correct ref before checking out so
         # that we clean up anything that might be left over from a merge
         # while still only preparing the working copy once.
         repo.head.reference = ref
         if sparse_paths:
             repo.git.sparse_checkout('set', '--skip-checks', *sparse_paths)
+        if disable_sparse_checkout:
+            repo.git.sparse_checkout('disable')
         repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
         repo.git.checkout(ref)
@@ -812,7 +824,7 @@ class Repo(object):
                 if not any(head.diff(parent)) and \
                         any(fetch_head.diff(fetch_head.parents[0])):
                     log.debug("%s was already applied. Removing it", ref)
-                    self._checkout(repo, None, parent)
+                    self._checkout(repo, None, False, parent)
                     op = zuul.model.MergeOp(comment=f"Already applied {ref}")
             if ops is not None:
                 if op.cmd:
@@ -1091,7 +1103,7 @@ class Merger(object):
             f.write(self.scheme)
 
     def _addProject(self, hostname, connection_name, project_name, url, sshkey,
-                    zuul_event_id, retry_timeout=None):
+                    empty_sparse_checkout, zuul_event_id, retry_timeout=None):
         repo = None
         key = '/'.join([hostname, project_name])
         try:
@@ -1112,6 +1124,7 @@ class Merger(object):
                 logger=self.logger, git_timeout=self.git_timeout,
                 zuul_event_id=zuul_event_id, retry_timeout=retry_timeout,
                 skip_refs=self.execution_context,
+                empty_sparse_checkout=empty_sparse_checkout,
                 workspace_project_path=workspace_project_path)
 
             self.repos[key] = repo
@@ -1122,6 +1135,7 @@ class Merger(object):
         return repo
 
     def getRepo(self, connection_name, project_name,
+                empty_sparse_checkout=False,
                 zuul_event_id=None,
                 keep_remote_url=False):
         source = self.connections.getSource(connection_name)
@@ -1142,7 +1156,7 @@ class Merger(object):
                             " without a url" %
                             (connection_name, project_name,))
         return self._addProject(hostname, connection_name, project_name, url,
-                                sshkey, zuul_event_id,
+                                sshkey, empty_sparse_checkout, zuul_event_id,
                                 retry_timeout=retry_timeout)
 
     def updateRepo(self, connection_name, project_name, repo_state=None,
