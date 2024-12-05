@@ -629,7 +629,7 @@ class Repo(object):
         git.refs.SymbolicReference.delete(repo, path)
         return "Deleted reference %s" % path
 
-    def checkout(self, ref, zuul_event_id=None):
+    def checkout(self, ref, sparse_paths=None, zuul_event_id=None):
         # Return the hexsha of the checkout commit
         log = get_annotated_logger(self.log, zuul_event_id)
         with self.createRepoObject(zuul_event_id) as repo:
@@ -641,7 +641,7 @@ class Repo(object):
             else:
                 log.debug("Checking out %s" % ref)
                 try:
-                    self._checkout(repo, ref)
+                    self._checkout(repo, sparse_paths, ref)
                 except Exception:
                     lock_path = f"{self.local_path}/.git/index.lock"
                     if os.path.isfile(lock_path):
@@ -649,19 +649,26 @@ class Repo(object):
                                     lock_path)
                         os.unlink(lock_path)
                         # Retry the checkout
-                        self._checkout(repo, ref)
+                        self._checkout(repo, sparse_paths, ref)
                     else:
                         raise
             return repo.head.commit.hexsha
 
-    def _checkout(self, repo, ref):
+    def _checkout(self, repo, sparse_paths, ref):
         # Perform a hard reset to the correct ref before checking out so
         # that we clean up anything that might be left over from a merge
         # while still only preparing the working copy once.
         repo.head.reference = ref
+        if sparse_paths:
+            repo.git.sparse_checkout('set', *sparse_paths)
         repo.head.reset(working_tree=True)
         repo.git.clean('-x', '-f', '-d')
         repo.git.checkout(ref)
+
+    def uncheckout(self):
+        with self.createRepoObject(None) as repo:
+            repo.git.read_tree('--empty')
+            repo.git.clean('-x', '-f', '-d')
 
     @staticmethod
     def _getTimestampEnv(timestamp):
@@ -805,7 +812,7 @@ class Repo(object):
                 if not any(head.diff(parent)) and \
                         any(fetch_head.diff(fetch_head.parents[0])):
                     log.debug("%s was already applied. Removing it", ref)
-                    self._checkout(repo, parent)
+                    self._checkout(repo, None, parent)
                     op = zuul.model.MergeOp(comment=f"Already applied {ref}")
             if ops is not None:
                 if op.cmd:
@@ -1174,7 +1181,7 @@ class Merger(object):
 
     def checkoutBranch(self, connection_name, project_name, branch,
                        repo_state=None, zuul_event_id=None,
-                       process_worker=None):
+                       sparse_paths=None, process_worker=None):
         """Check out a branch
 
         Call Merger.updateRepo() first.  This does not reset the repo,
@@ -1192,7 +1199,8 @@ class Merger(object):
             self._restoreRepoState(connection_name, project_name, repo,
                                    repo_state, zuul_event_id,
                                    process_worker=process_worker)
-        return repo.checkout(branch, zuul_event_id=zuul_event_id)
+        return repo.checkout(branch, sparse_paths=sparse_paths,
+                             zuul_event_id=zuul_event_id)
 
     def _saveRepoState(self, connection_name, project_name, repo,
                        repo_state, recent, branches):
