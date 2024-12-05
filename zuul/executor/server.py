@@ -1521,7 +1521,9 @@ class AnsibleJob(object):
                                 'project': project['name']}):
                 repo = self.workspace_merger.getRepo(
                     project['connection'],
-                    project['name'])
+                    project['name'],
+                    empty_sparse_checkout=not self.checkout_workspace_repos,
+                )
             repos[project['canonical_name']] = repo
 
         # The commit ID of the original item (before merging).  Used
@@ -1786,7 +1788,7 @@ class AnsibleJob(object):
         self.log.info("Checking out %s %s for line mapping",
                       project['canonical_name'], selected_ref)
         try:
-            repo.checkout(selected_ref)
+            repo.checkout(selected_ref, disable_sparse_checkout=True)
         except Exception:
             # If checkout fails, abort
             self.log.exception("Error checking out repo for line mapping")
