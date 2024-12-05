@@ -3084,6 +3084,7 @@ class FrozenJob(zkobject.ZKObject):
                   'provides',
                   'requires',
                   'workspace_scheme',
+                  'workspace_checkout',
                   'config_hash',
                   'deduplicate',
                   'failure_output',
@@ -3108,6 +3109,7 @@ class FrozenJob(zkobject.ZKObject):
             ref=None,
             other_refs=[],
             image_build_name=None,
+            workspace_checkout=True,  # MODEL_API <= 32
             # Not serialized
             matches_change=True,
         )
@@ -3535,6 +3537,7 @@ class Job(ConfigObject):
         else:
             d['ansible_version'] = None
         d['workspace_scheme'] = self.workspace_scheme
+        d['workspace_checkout'] = self.workspace_checkout
         return d
 
     def __init__(self, name):
@@ -3598,6 +3601,7 @@ class Job(ConfigObject):
             override_checkout=None,
             post_review=None,
             workspace_scheme=SCHEME_GOLANG,
+            workspace_checkout=True,
             failure_output=(),
             image_build_name=None,
         )

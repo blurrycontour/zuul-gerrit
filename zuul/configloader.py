@@ -816,6 +816,7 @@ class JobParser(object):
                       'post-review': bool,
                       'match-on-config-updates': bool,
                       'workspace-scheme': vs.Any('golang', 'flat', 'unique'),
+                      'workspace-checkout': vs.Any(bool, 'auto'),
                       'deduplicate': vs.Any(bool, 'auto'),
                       'failure-output': override_list(str),
                       'image-build-name': str,
@@ -844,6 +845,7 @@ class JobParser(object):
         'override-checkout',
         'match-on-config-updates',
         'workspace-scheme',
+        'workspace-checkout',
         'deduplicate',
         'image-build-name',
     ]
