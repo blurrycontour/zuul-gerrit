@@ -67,6 +67,6 @@ class HDDSensor(SensorInterface):
             return False, "low disk inodes {:3.1f}% < {}".format(
                 avail_inodes_pct, self.min_avail_inodes)
 
-        return True, "{:3.1f}% <= {}, {:3.1f}% <= {}".format(
+        return True, "hdd {:3.1f}% >= {}%, {:3.1f}% >= {}%".format(
             avail_hdd_pct, self.min_avail_hdd,
             avail_inodes_pct, self.min_avail_inodes)
