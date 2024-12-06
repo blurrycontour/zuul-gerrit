@@ -851,7 +851,7 @@ class TestingMergerApi(HoldableMergerApi):
         # layer.
         all_merge_requests = []
         for merge_uuid in self._getAllRequestIds():
-            merge_request = self.get("/".join(
+            merge_request = self._get("/".join(
                 [self.REQUEST_ROOT, merge_uuid]))
             if merge_request and (not states or merge_request.state in states):
                 all_merge_requests.append(merge_request)
@@ -922,7 +922,7 @@ class TestingExecutorApi(HoldableExecutorApi):
         for zone in self._getAllZones():
             queue = self.zone_queues[zone]
             for build_uuid in queue._getAllRequestIds():
-                build = queue.get(f'{queue.REQUEST_ROOT}/{build_uuid}')
+                build = queue._get(f'{queue.REQUEST_ROOT}/{build_uuid}')
                 if build and (not states or build.state in states):
                     all_builds.append(build)
 
