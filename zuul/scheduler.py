@@ -443,6 +443,7 @@ class Scheduler(threading.Thread):
         self.zk_client.disconnect()
         self.log.debug("Stopping tracing")
         self.tracing.stop()
+        self.executor.stop()
         if self.statsd:
             self.statsd.close()
 

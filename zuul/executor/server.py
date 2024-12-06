@@ -3999,6 +3999,7 @@ class ExecutorServer(BaseMergeServer):
         self.stopRepl()
         self.monitoring_server.stop()
         self.tracing.stop()
+        self.executor_api.stop()
         self.log.debug("Stopped executor")
 
     def join(self):

@@ -186,13 +186,7 @@ def getJobLogStreamAddress(executor_api, uuid, source_zone,
     was found we use the worker information to build the log stream
     address.
     """
-    # Search for the build request in ZooKeeper. This iterates over all
-    # available zones (inlcuding unzoned) and stops when the UUID is
-    # found.
-    # TODO (felix): Remove the zk_worker_zone return value after a deprecation
-    # period. This is kept for backwards-compatibility until all executors
-    # store their zone information in the worker_info dictionary.
-    build_request, zk_worker_zone = executor_api.getByUuid(uuid)
+    build_request = executor_api.getRequest(uuid)
 
     if build_request is None:
         raise StreamingError("Build not found")
@@ -206,7 +200,7 @@ def getJobLogStreamAddress(executor_api, uuid, source_zone,
     if not worker_info:
         raise StreamingError("Build did not start yet")
 
-    worker_zone = worker_info.get("zone", zk_worker_zone)
+    worker_zone = worker_info.get("zone")
     job_log_stream_address = {}
     if worker_zone and source_zone != worker_zone:
         info = _getFingerGatewayInZone(worker_zone)

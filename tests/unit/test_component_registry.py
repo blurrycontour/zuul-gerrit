@@ -16,7 +16,12 @@ import configparser
 from zuul.lib.fingergw import FingerGateway
 from zuul.zk.components import BaseComponent, ComponentRegistry
 
-from tests.base import iterate_timeout, ZuulTestCase, ZuulWebFixture
+from tests.base import (
+    iterate_timeout,
+    okay_tracebacks,
+    ZuulTestCase,
+    ZuulWebFixture,
+)
 
 
 class TestComponentRegistry(ZuulTestCase):
@@ -56,6 +61,8 @@ class TestComponentRegistry(ZuulTestCase):
     def test_scheduler_component(self):
         self.assertComponentState("scheduler", BaseComponent.RUNNING)
 
+    @okay_tracebacks('_start',
+                     '_playbackWorker')
     def test_executor_component(self):
         self.assertComponentState("executor", BaseComponent.RUNNING)
 
@@ -71,6 +78,8 @@ class TestComponentRegistry(ZuulTestCase):
         self.executor_server.register_work()
         self.assertComponentAttr("executor", "accepting_work", True)
 
+        # This can cause tracebacks in the logs when the tree cache
+        # attempts to restart.
         self.executor_server.zk_client.client.stop()
         self.assertComponentStopped("executor")
 

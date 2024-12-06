@@ -4833,6 +4833,8 @@ class JobRequest:
         self.path = None
         self._zstat = None
         self.lock = None
+        self.is_locked = False
+        self.thread_lock = threading.Lock()
 
     def toDict(self):
         return {
