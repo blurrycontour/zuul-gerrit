@@ -40,4 +40,4 @@ class CPUSensor(SensorInterface):
             return False, "high system load {} > {}".format(
                 load_avg, self.max_load_avg)
 
-        return True, "{} <= {}".format(load_avg, self.max_load_avg)
+        return True, "load avg {} <= {}".format(load_avg, self.max_load_avg)
