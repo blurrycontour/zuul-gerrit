@@ -897,6 +897,15 @@ class TestMerger(ZuulTestCase):
 
     tenant_config_file = 'config/single-tenant/main.yaml'
 
+    def getRequest(self, api, request_uuid, state=None):
+        for _ in iterate_timeout(30, "cache to update"):
+            req = api.getRequest(request_uuid)
+            if req:
+                if state is None:
+                    return req
+                if req.state == state:
+                    return req
+
     @staticmethod
     def _item_from_fake_change(fake_change):
         return dict(
@@ -1218,22 +1227,11 @@ class TestMerger(ZuulTestCase):
             pipeline_name='check',
             event_id='1',
         ), payload)
-
-        b = merger_api.get(f"{merger_api.REQUEST_ROOT}/B")
+        b = self.getRequest(merger_api, "B")
 
         b.state = MergeRequest.RUNNING
         merger_api.update(b)
-
-        # Wait until the latest state transition is reflected in the Merger
-        # APIs cache. Using a DataWatch for this purpose could lead to race
-        # conditions depending on which DataWatch is executed first. The
-        # DataWatch might be triggered for the correct event, but the cache
-        # might still be outdated as the DataWatch that updates the cache
-        # itself wasn't triggered yet.
-        cache = merger_api._cached_requests
-        for _ in iterate_timeout(30, "cache to be up-to-date"):
-            if (cache and cache[b.path].state == MergeRequest.RUNNING):
-                break
+        self.getRequest(merger_api, b.uuid, MergeRequest.RUNNING)
 
         # The lost_merges method should only return merges which are running
         # but not locked by any merger, in this case merge b
@@ -1246,7 +1244,7 @@ class TestMerger(ZuulTestCase):
         self.log.debug("Removing lost merge requests")
         merger_client.cleanupLostMergeRequests()
 
-        cache = merger_api._cached_requests
+        cache = merger_api.cache._cached_objects
         for _ in iterate_timeout(30, "cache to be empty"):
             if not cache:
                 break
