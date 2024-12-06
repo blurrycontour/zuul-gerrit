@@ -4218,9 +4218,9 @@ class ExecutorServer(BaseMergeServer):
                 if not ok:
                     # Continue to check all sensors to emit stats
                     unregister = True
+                    self.log.info(
+                        "Unregistering due to {}".format(message))
             if unregister:
-                self.log.info(
-                    "Unregistering due to {}".format(message))
                 self.unregister_work()
         else:
             reregister = True
