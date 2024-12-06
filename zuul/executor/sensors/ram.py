@@ -84,13 +84,13 @@ class RAMSensor(SensorInterface):
 
         if math.isinf(self._get_cgroup_limit()):
             # we have no cgroup defined limit so we're done now
-            return True, "{:3.1f}% <= {}".format(
+            return True, "memory {:3.1f}% >= {}%".format(
                 avail_mem_pct, self.min_avail_mem)
 
         if avail_mem_pct_cgroup < self.min_avail_mem:
-            return False, "low memory cgroup {:3.1f}% < {}".format(
+            return False, "low memory cgroup {:3.1f}% < {}%".format(
                 avail_mem_pct_cgroup, self.min_avail_mem)
 
-        return True, "{:3.1f}% <= {}, {:3.1f}% <= {}".format(
+        return True, "memory cgroup {:3.1f}% >= {}%, {:3.1f}% >= {}%".format(
             avail_mem_pct, self.min_avail_mem,
             avail_mem_pct_cgroup, self.min_avail_mem)
