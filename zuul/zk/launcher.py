@@ -96,8 +96,11 @@ class LockableZKObjectCache(ZuulTreeCache):
         if self.updated_event:
             self.updated_event()
 
-    def objectFromDict(self, d, zstat):
-        return self.zkobject_class._fromRaw(d, zstat, None)
+    def objectFromRaw(self, key, data, zstat):
+        return self.zkobject_class._fromRaw(data, zstat, None)
+
+    def updateFromRaw(self, obj, key, data, zstat):
+        obj._updateFromRaw(data, zstat, None)
 
     def getItem(self, item_id):
         self.ensureReady()
