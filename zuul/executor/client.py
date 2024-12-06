@@ -49,6 +49,7 @@ class ExecutorClient(object):
 
     def stop(self):
         self.log.debug("Stopping")
+        self.executor_api.stop()
 
     def execute(self, job, nodes, item, pipeline, executor_zone,
                 dependent_changes=[], merger_items=[]):

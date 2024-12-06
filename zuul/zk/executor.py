@@ -41,17 +41,8 @@ class ExecutorQueue(JobRequestQueue):
         return self._initial_state_getter()
 
     def lostRequests(self):
-        # Get a list of requests which are running but not locked by
-        # any client.
-        for request in self.inState(self.request_class.RUNNING,
-                                    self.request_class.PAUSED):
-            try:
-                if self.isLocked(request):
-                    continue
-                yield request
-            except NoNodeError:
-                # Request disappeared
-                pass
+        return super().lostRequests(self.request_class.RUNNING,
+                                     self.request_class.PAUSED)
 
 
 class ExecutorApi:
@@ -85,6 +76,10 @@ class ExecutorApi:
             for zone in zone_filter:
                 # For the side effect of creating a queue
                 self.zone_queues[zone]
+
+    def stop(self):
+        for queue in self.zone_queues.values():
+            queue.cache.stop()
 
     def _getInitialState(self):
         return BuildRequest.REQUESTED
@@ -128,7 +123,7 @@ class ExecutorApi:
     def next(self):
         for request in self.inState(BuildRequest.REQUESTED):
             for queue in self.zone_queues.values():
-                request2 = queue._cached_requests.get(request.path)
+                request2 = queue.getRequest(request.uuid)
                 if (request2 and
                     request2.state == BuildRequest.REQUESTED):
                     yield request2
@@ -150,25 +145,23 @@ class ExecutorApi:
         if path.startswith(self.zones_root):
             # Remove zone root so we end up with: <zone>/requests/<uuid>
             rel_path = path[len(f"{self.zones_root}/"):]
-            zone = rel_path.split("/")[0]
+            zone, _, request_uuid = rel_path.split("/")
         else:
+            rel_path = path[len(f"{self.unzoned_root}/"):]
             zone = None
-        return self.zone_queues[zone].get(path)
+            _, request_uuid = rel_path.split("/")
+        return self.zone_queues[zone].getRequest(request_uuid)
 
-    def getByUuid(self, uuid):
+    def getRequest(self, uuid):
         """Find a build request by its UUID.
 
         This method will search for the UUID in all available zones.
         """
         for zone in self._getAllZones():
-            request = self.zone_queues[zone].getByUuid(uuid)
+            request = self.zone_queues[zone].getRequest(uuid)
             if request:
-                # TODO (felix): Remove the zone return value after a
-                # deprecation period. This is kept for backwards compatibility
-                # until all executors store their zone information in the
-                # worker_info dictionary on the BuildRequest.
-                return request, zone
-        return None, None
+                return request
+        return None
 
     def remove(self, request):
         return self.zone_queues[request.zone].remove(request)
@@ -213,3 +206,7 @@ class ExecutorApi:
         for queue in self.zone_queues.values():
             ret.extend(queue._getAllRequestIds())
         return ret
+
+    def waitForSync(self):
+        for queue in self.zone_queues.values():
+            queue.waitForSync()

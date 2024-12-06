@@ -27,11 +27,11 @@ from kazoo.client import TransactionRequest
 from zuul.lib.jsonutil import json_dumps
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import JobRequest
-from zuul.zk import ZooKeeperSimpleBase, sharding
+from zuul.zk import sharding
 from zuul.zk.event_queues import JobResultFuture
 from zuul.zk.exceptions import JobRequestNotFound
-from zuul.zk.vendor.watchers import ExistingDataWatch
 from zuul.zk.locks import SessionAwareLock
+from zuul.zk.cache import ZuulTreeCache
 
 
 class JobRequestEvent(Enum):
@@ -96,15 +96,122 @@ class RequestUpdater:
             )
 
 
-class JobRequestQueue(ZooKeeperSimpleBase):
+class JobRequestCache(ZuulTreeCache):
+    def __init__(self, client, root, request_class,
+                 request_callback=None,
+                 event_callback=None):
+        self.request_class = request_class
+        self.request_callback = request_callback
+        self.event_callback = event_callback
+        super().__init__(client, root)
+
+    def _parsePath(self, path):
+        if not path.startswith(self.root):
+            return None
+        path = path[len(self.root) + 1:]
+        parts = path.split('/')
+        # We are interested in requests with a parts that look like:
+        # ([<self.items_path>, <self.locks_path>], <uuid>, ...)
+        if len(parts) < 2:
+            return None
+        return parts
+
+    def parsePath(self, path):
+        parts = self._parsePath(path)
+        if parts is None:
+            return None
+        if len(parts) != 2:
+            return None
+        if parts[0] == 'requests':
+            return (parts[0], parts[1])
+
+    def preCacheHook(self, event, exists, stat=None):
+        parts = self._parsePath(event.path)
+        if parts is None:
+            return
+
+        if parts[0] == 'requests' and self.event_callback:
+            if event.type == EventType.CREATED:
+                if len(parts) == 3:
+                    job_event = None
+                    if parts[2] == 'cancel':
+                        job_event = JobRequestEvent.CANCELED
+                    elif parts[2] == 'resume':
+                        job_event = JobRequestEvent.RESUMED
+                    if job_event:
+                        request = self.getRequest(parts[1])
+                        if not request:
+                            return
+                        self.event_callback(request, job_event)
+            elif event.type == EventType.DELETED:
+                if len(parts) == 2:
+                    request = self.getRequest(parts[1])
+                    if not request:
+                        return
+                    self.event_callback(request, JobRequestEvent.DELETED)
+        elif parts[0] == 'locks':
+            request = self.getRequest(parts[1])
+            if not request:
+                return
+            request.is_locked = exists
+
+    def objectFromRaw(self, key, data, stat):
+        if key[0] == 'requests':
+            content = self._bytesToDict(data)
+            request = self.request_class.fromDict(content)
+            request._zstat = stat
+            request.path = "/".join([self.root, 'requests', request.uuid])
+            request._old_state = request.state
+            return request
+
+    def updateFromRaw(self, request, key, data, stat):
+        content = self._bytesToDict(data)
+        with request.thread_lock:
+            # TODO: move thread locking into the TreeCache so we don't
+            # duplicate this check.
+            if stat.mzxid >= request._zstat.mzxid:
+                request.updateFromDict(content)
+                request._zstat = stat
+
+    def postCacheHook(self, event, data, stat, key, obj):
+        if key[0] == 'requests' and self.request_callback:
+            if event.type in (EventType.CREATED, EventType.NONE):
+                self.request_callback()
+
+            # This is a test-specific condition: For test cases which
+            # are using hold_*_jobs_in_queue the state change on the
+            # request from HOLD to REQUESTED is done outside of the
+            # server.  Thus, we must also set the wake event (the
+            # callback) so the servercan pick up those jobs after they
+            # are released. To not cause a thundering herd problem in
+            # production for each cache update, the callback is only
+            # called under this very specific condition that can only
+            # occur in the tests.
+            elif (
+                self.request_callback
+                and obj
+                and obj._old_state == self.request_class.HOLD
+                and obj.state == self.request_class.REQUESTED
+            ):
+                obj._old_state = obj.state
+                self.request_callback()
+
+    def getRequest(self, request_uuid):
+        key = ('requests', request_uuid)
+        return self._cached_objects.get(key)
+
+    def getRequests(self):
+        return self._cached_objects.values()
+
+
+class JobRequestQueue:
     log = logging.getLogger("zuul.JobRequestQueue")
     request_class = JobRequest
 
     def __init__(self, client, root, use_cache=True,
                  request_callback=None, event_callback=None):
-        super().__init__(client)
-
-        self.use_cache = use_cache
+        self.zk_client = client
+        self.kazoo_client = client.client
 
         self.REQUEST_ROOT = f"{root}/requests"
         self.LOCK_ROOT = f"{root}/locks"
@@ -113,12 +220,6 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         self.RESULT_DATA_ROOT = f"{root}/result-data"
         self.WAITER_ROOT = f"{root}/waiters"
 
-        self.request_callback = request_callback
-        self.event_callback = event_callback
-
-        # path -> request
-        self._cached_requests = {}
-
         self.kazoo_client.ensure_path(self.REQUEST_ROOT)
         self.kazoo_client.ensure_path(self.PARAM_ROOT)
         self.kazoo_client.ensure_path(self.RESULT_ROOT)
@@ -126,107 +227,21 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         self.kazoo_client.ensure_path(self.WAITER_ROOT)
         self.kazoo_client.ensure_path(self.LOCK_ROOT)
 
-        self.register()
+        if use_cache:
+            self.cache = JobRequestCache(
+                client, root, self.request_class,
+                request_callback, event_callback)
+        else:
+            self.cache = None
+
+    # So far only used by tests
+    def waitForSync(self):
+        self.cache.waitForSync()
 
     @property
     def initial_state(self):
         # This supports holding requests in tests
         return self.request_class.REQUESTED
-
-    def register(self):
-        if self.use_cache:
-            # Register a child watch that listens for new requests
-            self.kazoo_client.ChildrenWatch(
-                self.REQUEST_ROOT,
-                self._makeRequestWatcher(self.REQUEST_ROOT),
-                send_event=True,
-            )
-
-    def _makeRequestWatcher(self, path):
-        def watch(requests, event=None):
-            return self._watchRequests(path, requests)
-        return watch
-
-    def _watchRequests(self, path, requests):
-        # The requests list always contains all active children. Thus,
-        # we first have to find the new ones by calculating the delta
-        # between the requests list and our current cache entries.
-        # NOTE (felix): We could also use this list to determine the
-        # deleted requests, but it's easier to do this in the
-        # DataWatch for the single request instead. Otherwise we have
-        # to deal with race conditions between the children and the
-        # data watch as one watch might update a cache entry while the
-        # other tries to remove it.
-
-        request_paths = {
-            f"{path}/{uuid}" for uuid in requests
-        }
-
-        new_requests = request_paths - set(
-            self._cached_requests.keys()
-        )
-
-        for req_path in new_requests:
-            ExistingDataWatch(self.kazoo_client,
-                              req_path,
-                              self._makeStateWatcher(req_path))
-
-        # Notify the user about new requests if a callback is provided.
-        # When we register the data watch, we will receive an initial
-        # callback immediately.  The list of children may be empty in
-        # that case, so we should not fire our callback since there
-        # are no requests to handle.
-
-        if new_requests and self.request_callback:
-            self.request_callback()
-
-    def _makeStateWatcher(self, path):
-        def watch(data, stat, event=None):
-            return self._watchState(path, data, stat, event)
-        return watch
-
-    def _watchState(self, path, data, stat, event=None):
-        if (not event or event.type == EventType.CHANGED) and data is not None:
-            # As we already get the data and the stat value, we can directly
-            # use it without asking ZooKeeper for the data again.
-            content = self._bytesToDict(data)
-            if not content:
-                return
-
-            # We need this one for the HOLD -> REQUESTED check further down
-            old_request = self._cached_requests.get(path)
-
-            request = self.request_class.fromDict(content)
-            request.path = path
-            request._zstat = stat
-            self._cached_requests[path] = request
-
-            # NOTE (felix): This is a test-specific condition: For test cases
-            # which are using hold_*_jobs_in_queue the state change on the
-            # request from HOLD to REQUESTED is done outside of the server.
-            # Thus, we must also set the wake event (the callback) so the
-            # servercan pick up those jobs after they are released. To not
-            # cause a thundering herd problem in production for each cache
-            # update, the callback is only called under this very specific
-            # condition that can only occur in the tests.
-            if (
-                self.request_callback
-                and old_request
-                and old_request.state == self.request_class.HOLD
-                and request.state == self.request_class.REQUESTED
-            ):
-                self.request_callback()
-
-        elif ((event and event.type == EventType.DELETED) or data is None):
-            request = self._cached_requests.get(path)
-            with suppress(KeyError):
-                del self._cached_requests[path]
-
-            if request and self.event_callback:
-                self.event_callback(request, JobRequestEvent.DELETED)
-
-            # Return False to stop the datawatch as the build got deleted.
-            return False
 
     def inState(self, *states):
         if not states:
@@ -236,7 +251,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
             states = self.request_class.ALL_STATES
 
         requests = [
-            req for req in list(self._cached_requests.values())
+            req for req in list(self.cache.getRequests())
             if req.state in states
         ]
 
@@ -247,7 +262,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
     def next(self):
         for request in self.inState(self.request_class.REQUESTED):
-            request = self._cached_requests.get(request.path)
+            request = self.cache.getRequest(request.uuid)
             if (request and
                 request.state == self.request_class.REQUESTED):
                 yield request
@@ -277,7 +292,7 @@ class JobRequestQueue(ZooKeeperSimpleBase):
                 [self.WAITER_ROOT, request.uuid]
             )
             self.kazoo_client.create(waiter_path, ephemeral=True)
-            result = JobResultFuture(self.client, request.path,
+            result = JobResultFuture(self.zk_client, request.path,
                                      result_path, waiter_path)
             request.result_path = result_path
 
@@ -322,15 +337,14 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         self.kazoo_client.create(request.result_path,
                                  self._dictToBytes(data))
 
-    def get(self, path):
-        """Get a request
+    def getRequest(self, request_uuid):
+        if self.cache:
+            return self.cache.getRequest(request_uuid)
+        else:
+            path = "/".join([self.REQUEST_ROOT, request_uuid])
+            return self._get(path)
 
-        Note: do not mix get with iteration; iteration returns cached
-        requests while get returns a newly created object each
-        time. If you lock a request, you must use the same object to
-        unlock it.
-
-        """
+    def _get(self, path):
         try:
             data, zstat = self.kazoo_client.get(path)
         except NoNodeError:
@@ -340,17 +354,10 @@ class JobRequestQueue(ZooKeeperSimpleBase):
             return None
 
         content = self._bytesToDict(data)
-
         request = self.request_class.fromDict(content)
         request.path = path
         request._zstat = zstat
-
         return request
-
-    def getByUuid(self, uuid):
-        """Get a request by its UUID without using the cache."""
-        path = f"{self.REQUEST_ROOT}/{uuid}"
-        return self.get(path)
 
     def refresh(self, request):
         """Refreshs a request object with the current data from ZooKeeper. """
@@ -366,8 +373,9 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
         content = self._bytesToDict(data)
 
-        request.updateFromDict(content)
-        request._zstat = zstat
+        with request.thread_lock:
+            request.updateFromDict(content)
+            request._zstat = zstat
 
     def remove(self, request):
         log = get_annotated_logger(self.log, request.event_id)
@@ -396,20 +404,6 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
     def fulfillCancel(self, request):
         self.kazoo_client.delete(f"{request.path}/cancel")
-
-    def _watchEvents(self, actions, event=None):
-        if event is None:
-            return
-
-        job_event = None
-        if "cancel" in actions:
-            job_event = JobRequestEvent.CANCELED
-        elif "resume" in actions:
-            job_event = JobRequestEvent.RESUMED
-
-        if job_event:
-            request = self._cached_requests.get(event.path)
-            self.event_callback(request, job_event)
 
     def lock(self, request, blocking=True, timeout=None):
         path = "/".join([self.LOCK_ROOT, request.uuid])
@@ -444,13 +438,6 @@ class JobRequestQueue(ZooKeeperSimpleBase):
             return False
 
         request.lock = lock
-
-        # Create the children watch to listen for cancel/resume actions on this
-        # build request.
-        if self.event_callback:
-            self.kazoo_client.ChildrenWatch(
-                request.path, self._watchEvents, send_event=True)
-
         return True
 
     def _releaseLock(self, request, lock):
@@ -498,24 +485,29 @@ class JobRequestQueue(ZooKeeperSimpleBase):
         is_locked = len(lock.contenders()) > 0
         return is_locked
 
-    def lostRequests(self):
+    def lostRequests(self, *states):
         # Get a list of requests which are running but not locked by
         # any client.
-        for req in self.inState(self.request_class.RUNNING):
+        if not states:
+            states = [self.request_class.RUNNING]
+        self.cache.waitForSync()
+        for req in self.inState(*states):
             try:
                 if self.isLocked(req):
+                    continue
+                # It may have completed in the interim, so double
+                # check that.
+                if req.state not in states:
+                    continue
+                # We may be racing a cache update, so manually
+                # refresh and check again.
+                self.refresh(req)
+                if req.state not in states:
                     continue
             except NoNodeError:
                 # Request was removed in the meantime
                 continue
-            # Double check that our cache isn't out of date: it should
-            # still exist and be running.
-            oldreq = req
-            req = self.get(oldreq.path)
-            if req is None:
-                self._deleteLock(oldreq.uuid)
-            elif req.state == self.request_class.RUNNING:
-                yield req
+            yield req
 
     def _getAllRequestIds(self):
         # Get a list of all request ids without using the cache.
