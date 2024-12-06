@@ -73,4 +73,5 @@ class StartingBuildsSensor(SensorInterface):
             return False, "too many starting builds {} >= {}".format(
                 starting_builds, max_starting_builds)
 
-        return True, "{} <= {}".format(starting_builds, max_starting_builds)
+        return True, "starting builds {} <= {}".format(
+            starting_builds, max_starting_builds)
