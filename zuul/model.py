@@ -3108,6 +3108,8 @@ class FrozenJob(zkobject.ZKObject):
             ref=None,
             other_refs=[],
             image_build_name=None,
+            # Not serialized
+            matches_change=True,
         )
 
     def __repr__(self):
@@ -3649,8 +3651,12 @@ class Job(ConfigObject):
         """
         project_canonical_names = set()
         project_canonical_names.update(self.required_projects.keys())
+        if self.run:
+            run = [self.run[0]]
+        else:
+            run = []
         project_canonical_names.update(self._projectsFromPlaybooks(
-            itertools.chain(self.pre_run, [self.run[0]], self.post_run,
+            itertools.chain(self.pre_run, run, self.post_run,
                             self.cleanup_run), with_implicit=True))
         project_canonical_names.update({
             iv.project_canonical_name
@@ -4624,7 +4630,7 @@ class JobGraph(object):
                 uuids_to_iterate.add((u, current_dependent_uuids[u]['soft']))
         return [self.getJobFromUuid(u) for u in all_dependent_uuids]
 
-    def freezeDependencies(self, layout=None):
+    def freezeDependencies(self, log, layout=None):
         for dependent_uuid, parents in self._dependencies.items():
             dependencies = self.job_dependencies.setdefault(dependent_uuid, {})
             for parent_name, parent_soft in parents.items():
@@ -4646,6 +4652,14 @@ class JobGraph(object):
                         raise JobConfigurationError(
                             "Job %s depends on %s which was not run." %
                             (dependent_job.name, parent_name))
+                    if not parent_soft:
+                        # If this is a hard dependency, then tell the
+                        # parent to ignore file matchers.
+                        if not parent_job.matches_change:
+                            log.debug(
+                                "Forcing non-matching hard dependency "
+                                "%s to run for %s", parent_job, dependent_job)
+                        parent_job._set(matches_change=True)
                     dependencies[parent_job.uuid] = dict(soft=parent_soft)
                     dependents = self.job_dependents.setdefault(
                         parent_job.uuid, {})
@@ -4685,6 +4699,35 @@ class JobGraph(object):
         if name in self.project_metadata:
             return self.project_metadata[name]
         return None
+
+    def removeNonMatchingJobs(self, log):
+        # This is similar to what we do in freezeDependencies
+        for dependent_uuid, parents in self._dependencies.items():
+            for parent_name, parent_soft in parents.items():
+                dependent_job = self._job_map[dependent_uuid]
+                # We typically depend on jobs with the same ref, but
+                # if we have been deduplicated, then we depend on
+                # every job-ref for the given parent job.
+                for ref in dependent_job.all_refs:
+                    parent_job = self.getJob(parent_name, ref)
+                    if parent_job is None:
+                        continue
+                    if not parent_soft:
+                        # If this is a hard dependency, then tell the
+                        # parent to ignore file matchers.
+                        if not parent_job.matches_change:
+                            log.debug(
+                                "Forcing non-matching hard dependency "
+                                "%s to run for %s", parent_job, dependent_job)
+                        parent_job._set(matches_change=True)
+
+        # Afer removing duplicates and walking the dependency graph,
+        # remove any jobs that we shouldn't run because of file
+        # matchers.
+        for job in list(self._job_map.values()):
+            if not job.matches_change:
+                log.debug("Removing non-matching job %s", job)
+                self._removeJob(job)
 
     def deduplicateJobs(self, log, item):
         # Jobs are deduplicated before they start, so returned data
@@ -9271,7 +9314,7 @@ class Layout(object):
 
     def extendJobGraph(self, context, item, change, ppc, job_graph,
                        skip_file_matcher, redact_secrets_and_keys,
-                       debug_messages):
+                       debug_messages, pending_errors):
         log = item.annotateLogger(self.log)
         semaphore_handler = item.pipeline.tenant.semaphore_handler
         job_list = ppc.job_list
@@ -9370,6 +9413,7 @@ class Layout(object):
                         final_job, change, self)
             else:
                 matched_files = True
+            matches_change = True
             if not matched_files:
                 if updates_job_config:
                     # Log the reason we're ignoring the file matcher
@@ -9386,30 +9430,36 @@ class Layout(object):
                     add_debug_line(debug_messages,
                                    "Job {jobname} did not match files".
                                    format(jobname=jobname), indent=2)
-                    continue
+                    # A decision not to run based on a file matcher
+                    # can be overridden later, so we just note our
+                    # initial decision here.
+                    matches_change = False
+            frozen_job = final_job.freezeJob(
+                context, self.tenant, self, item, change,
+                redact_secrets_and_keys)
+            frozen_job._set(matches_change=matches_change)
+            job_graph.addJob(frozen_job)
+
+            # These are only errors if we actually decide to run the job
             if final_job.abstract:
-                raise JobConfigurationError(
+                pending_errors[frozen_job.uuid] = JobConfigurationError(
                     "Job %s is abstract and may not be directly run" %
                     (final_job.name,))
-            if (not final_job.ignore_allowed_projects and
-                final_job.allowed_projects is not None and
-                change.project.name not in final_job.allowed_projects):
-                raise JobConfigurationError(
+            elif (not final_job.ignore_allowed_projects and
+                  final_job.allowed_projects is not None and
+                  change.project.name not in final_job.allowed_projects):
+                pending_errors[frozen_job.uuid] = JobConfigurationError(
                     "Project %s is not allowed to run job %s" %
                     (change.project.name, final_job.name))
-            if ((not pipeline.post_review) and final_job.post_review):
-                raise JobConfigurationError(
+            elif ((not pipeline.post_review) and final_job.post_review):
+                pending_errors[frozen_job.uuid] = JobConfigurationError(
                     "Pre-review pipeline %s does not allow "
                     "post-review job %s" % (
                         pipeline.name, final_job.name))
-            if not final_job.run:
-                raise JobConfigurationError(
+            elif not final_job.run:
+                pending_errors[frozen_job.uuid] = JobConfigurationError(
                     "Job %s does not specify a run playbook" % (
                         final_job.name,))
-
-            job_graph.addJob(final_job.freezeJob(
-                context, self.tenant, self, item, change,
-                redact_secrets_and_keys))
 
     def createJobGraph(self, context, item,
                        skip_file_matcher,
@@ -9429,6 +9479,7 @@ class Layout(object):
         else:
             job_map = item.current_build_set.jobs
         job_graph = JobGraph(job_map)
+        pending_errors = {}
         for change in item.changes:
             ppc = self.getProjectPipelineConfig(item, change)
             if not ppc:
@@ -9439,14 +9490,19 @@ class Layout(object):
                 debug_messages.extend(ppc.debug_messages)
             self.extendJobGraph(
                 context, item, change, ppc, job_graph, skip_file_matcher,
-                redact_secrets_and_keys, debug_messages)
+                redact_secrets_and_keys, debug_messages, pending_errors)
             if ppc.fail_fast is not None:
                 # Any explicit setting of fail_fast takes effect,
                 # last one wins.
                 fail_fast = ppc.fail_fast
 
-        job_graph.deduplicateJobs(self.log, item)
-        job_graph.freezeDependencies(self)
+        log = item.annotateLogger(self.log)
+        job_graph.deduplicateJobs(log, item)
+        job_graph.removeNonMatchingJobs(log)
+        job_graph.freezeDependencies(log, self)
+        for job in job_map.values():
+            if job.uuid in pending_errors:
+                raise pending_errors[job.uuid]
 
         # Copy project metadata to job_graph since this must be independent
         # of the layout as we need it in order to prepare the context for
