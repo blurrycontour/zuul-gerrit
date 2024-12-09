@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f2ca84b_269f3881",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2277,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-12-09T13:41:16Z",
+      "side": 1,
+      "message": "Just wondering if \"bare roles\" are widely used or if they could be deprecated? I could imagine some of those paths might also be used by \"non-bare role\" repositories since they seem quite generic. In those cases we would check out more than necessary.",
+      "range": {
+        "startLine": 2274,
+        "startChar": 40,
+        "endLine": 2277,
+        "endChar": 64
+      },
+      "revId": "e04ba22bbf2f3184fa3af0b041f489e017c10e11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
