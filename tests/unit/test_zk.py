@@ -900,6 +900,98 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         a = reqs[0]
         self.assertEqual(a.uuid, 'A')
 
+    def test_unlock_request(self):
+        # Test that locking and unlocking works
+        request_queue = queue.Queue()
+        event_queue = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put():
+            request_queue.put(None)
+
+        # and the event queue
+        def eq_put(br, e):
+            event_queue.put((br, e))
+
+        # Simulate the client side
+        client = ExecutorApi(self.zk_client)
+        # Simulate the server side
+        server = ExecutorApi(self.zk_client,
+                             build_request_callback=rq_put,
+                             build_event_callback=eq_put)
+
+        # Scheduler submits request
+        request = BuildRequest(
+            "A", None, None, "job", "job_uuid", "tenant", "pipeline", '1')
+        client.submit(request, {'job': 'test'})
+        request_queue.get(timeout=30)
+
+        # Executor receives request
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        a = reqs[0]
+
+        # Get a client copy of the request for later.  Normally the
+        # client does not lock requests, but we will use this to
+        # simulate a second executor attempting to lock a request
+        # while our first executor operates.  This ensures the lock
+        # contender counting works correctly.
+        client_a = self.getRequest(client, a.uuid)
+
+        # Executor locks request
+        self.assertTrue(server.lock(a, blocking=False))
+
+        # Someone else attempts to lock it
+        t = threading.Thread(target=client.lock, args=(client_a, True))
+        t.start()
+
+        # Wait for is_locked to be updated and both lock contenders to
+        # show in the cache:
+        for _ in iterate_timeout(30, "lock to propagate"):
+            r1 = self.getRequest(server, a.uuid)
+            r2 = self.getRequest(client, a.uuid)
+            if (r1.is_locked and
+                r2.is_locked and
+                r1.lock_contenders == 2 and
+                r2.lock_contenders == 2):
+                break
+
+        # Should see no pending requests
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 0)
+        reqs = list(client.next())
+        self.assertEqual(len(reqs), 0)
+
+        # Unlock request
+        server.unlock(a)
+
+        # Wait for client to get lock
+        t.join()
+
+        # Wait for lock_contenders to be updated:
+        for _ in iterate_timeout(30, "lock to propagate"):
+            r1 = self.getRequest(server, a.uuid)
+            r2 = self.getRequest(client, a.uuid)
+            if r1.lock_contenders == r2.lock_contenders == 1:
+                break
+
+        # Release client lock
+        client.unlock(client_a)
+
+        # Wait for is_locked to be updated:
+        for _ in iterate_timeout(30, "lock to propagate"):
+            r1 = self.getRequest(server, a.uuid)
+            r2 = self.getRequest(client, a.uuid)
+            if not r1.is_locked and not r2.is_locked:
+                break
+
+        # Should see pending requests
+        reqs = list(server.next())
+        self.assertEqual(len(reqs), 1)
+        reqs = list(client.next())
+        self.assertEqual(len(reqs), 1)
+        client.remove(a)
+
 
 class TestMergerApi(ZooKeeperBaseTestCase):
     def _assertEmptyRoots(self, client):

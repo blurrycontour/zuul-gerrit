@@ -153,7 +153,13 @@ class JobRequestCache(ZuulTreeCache):
             request = self.getRequest(parts[1])
             if not request:
                 return
-            request.is_locked = exists
+            if len(parts) < 3:
+                return
+            if exists:
+                request.lock_contenders += 1
+            else:
+                request.lock_contenders -= 1
+            request.is_locked = bool(request.lock_contenders)
 
     def objectFromRaw(self, key, data, stat):
         if key[0] == 'requests':
@@ -264,7 +270,8 @@ class JobRequestQueue:
         for request in self.inState(self.request_class.REQUESTED):
             request = self.cache.getRequest(request.uuid)
             if (request and
-                request.state == self.request_class.REQUESTED):
+                request.state == self.request_class.REQUESTED and
+                not request.is_locked):
                 yield request
 
     def submit(self, request, params, needs_result=False):
@@ -493,6 +500,8 @@ class JobRequestQueue:
         self.cache.waitForSync()
         for req in self.inState(*states):
             try:
+                if req.is_locked:
+                    continue
                 if self.isLocked(req):
                     continue
                 # It may have completed in the interim, so double
