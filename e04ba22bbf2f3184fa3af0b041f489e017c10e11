@@ -40,6 +40,48 @@
       "parentUuid": "4f2ca84b_269f3881",
       "revId": "e04ba22bbf2f3184fa3af0b041f489e017c10e11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1557b911_f4bc949c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2277,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-12-09T15:27:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3409054f_2ac8026c",
+      "revId": "e04ba22bbf2f3184fa3af0b041f489e017c10e11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5d8995c_ee117a96",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2277,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-12-09T15:27:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4f2ca84b_269f3881",
+      "range": {
+        "startLine": 2274,
+        "startChar": 40,
+        "endLine": 2277,
+        "endChar": 64
+      },
+      "revId": "e04ba22bbf2f3184fa3af0b041f489e017c10e11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
