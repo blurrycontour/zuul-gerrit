@@ -82,6 +82,23 @@
       },
       "revId": "e04ba22bbf2f3184fa3af0b041f489e017c10e11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "855d4e53_3cf9daa3",
+        "filename": "zuul/merger/merger.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 663,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-12-09T15:39:41Z",
+      "side": 1,
+      "message": "We might want to run this with `--skip-checks` so the command doesn\u0027t fail in case the given path already points to a file instead of a directory.",
+      "revId": "e04ba22bbf2f3184fa3af0b041f489e017c10e11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
