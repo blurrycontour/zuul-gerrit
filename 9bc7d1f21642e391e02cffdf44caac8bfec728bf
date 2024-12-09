@@ -16,6 +16,40 @@
       "message": "recheck",
       "revId": "9bc7d1f21642e391e02cffdf44caac8bfec728bf",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "154b6252_343b63b4",
+        "filename": "web/src/api.js",
+        "patchSetId": 13
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-12-09T13:46:43Z",
+      "side": 1,
+      "message": "Perhaps this could use a custom header to be set by the Zuul auth endpoint so that we don\u0027t rely on a header set by cherrypy, which is an implementation detail here.",
+      "revId": "9bc7d1f21642e391e02cffdf44caac8bfec728bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cbe6c78_254f322f",
+        "filename": "web/src/api.js",
+        "patchSetId": 13
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2024-12-09T13:46:43Z",
+      "side": 1,
+      "message": "It might help readability to move these checks to a new `isProxyAuthExpired` helper.",
+      "revId": "9bc7d1f21642e391e02cffdf44caac8bfec728bf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
