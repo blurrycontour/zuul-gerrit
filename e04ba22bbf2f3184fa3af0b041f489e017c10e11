@@ -22,6 +22,24 @@
       },
       "revId": "e04ba22bbf2f3184fa3af0b041f489e017c10e11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3409054f_2ac8026c",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 2277,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-12-09T15:23:28Z",
+      "side": 1,
+      "message": "They may not be widely used in our experience with Zuul, but they\u0027re pretty much the standard for sharing roles in Ansible, so I would be reluctant to get rid of them.\n\nIf this ends up being a problem, we could probably make a per-repo option for it.",
+      "parentUuid": "4f2ca84b_269f3881",
+      "revId": "e04ba22bbf2f3184fa3af0b041f489e017c10e11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
