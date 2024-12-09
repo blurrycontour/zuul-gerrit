@@ -105,6 +105,24 @@
       "parentUuid": "1de485c5_73607489",
       "revId": "b4e29bd90ddd7745883e35964cff484180be0ed9",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "992bb0bb_3a28c515",
+        "filename": "web/src/api.js",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2024-12-09T08:39:46Z",
+      "side": 1,
+      "message": "I\u0027ve removed the Alert and change the detection method. I\u0027m closing the thread.",
+      "parentUuid": "8d8c66b2_60f0b4e9",
+      "revId": "b4e29bd90ddd7745883e35964cff484180be0ed9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
