@@ -134,7 +134,8 @@ class ExecutorApi:
             for queue in self.zone_queues.values():
                 request2 = queue.getRequest(request.uuid)
                 if (request2 and
-                    request2.state == BuildRequest.REQUESTED):
+                    request2.state == BuildRequest.REQUESTED and
+                    not request2.is_locked):
                     yield request2
                     break
 
