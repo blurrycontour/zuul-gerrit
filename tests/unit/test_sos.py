@@ -211,13 +211,8 @@ class TestScaleOutScheduler(ZuulTestCase):
                     == second_app.sched.unparsed_abide.ltime):
                 break
 
-        # TODO (swestphahl): change this to assertEqual() when we remove
-        # the smart reconfiguration during config priming.
-        # Currently the smart reconfiguration during priming of the second
-        # scheduler will update the system config in Zookeeper and the first
-        # scheduler updates it's config in return.
-        self.assertNotEqual(second_app.sched.globals.max_hold_expiration,
-                            initial_max_hold_exp)
+        self.assertEqual(second_app.sched.globals.max_hold_expiration,
+                         initial_max_hold_exp)
 
     def test_reconfigure(self):
         # Create a second scheduler instance
