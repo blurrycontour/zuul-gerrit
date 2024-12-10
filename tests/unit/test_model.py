@@ -846,6 +846,254 @@ class TestJob(BaseTestCase):
                                         override, override_value,
                                         errors)
 
+    def _test_job_final_control(self, attr, job_attr,
+                                default, default_value,
+                                final):
+        # Default behavior
+        data = configloader.safe_load_yaml(default, self.context)
+        parent = self.pcontext.job_parser.fromYaml(data[0]['job'])
+        child = self.pcontext.job_parser.fromYaml(data[1]['job'])
+        job = parent.copy()
+        job.applyVariant(child, self.layout, None)
+        self.assertEqual(default_value, getattr(job, job_attr))
+
+        # Verify final attr exception
+        data = configloader.safe_load_yaml(final, self.context)
+        parent = self.pcontext.job_parser.fromYaml(data[0]['job'])
+        child = self.pcontext.job_parser.fromYaml(data[1]['job'])
+        job = parent.copy()
+        with testtools.ExpectedException(model.JobConfigurationError,
+                                         ".* final attribute"):
+            job.applyVariant(child, self.layout, None)
+
+    def _test_job_final_control_set(
+            self, attr, job_attr=None,
+            default_override=False,
+            value_factory=lambda values: {v for v in values}):
+        if job_attr is None:
+            job_attr = attr
+        default = textwrap.dedent(
+            f"""
+            - job:
+                name: parent
+                {attr}: parent-{attr}
+            - job:
+                name: child
+                {attr}: child-{attr}
+            """)
+        inherit_value = value_factory([f'parent-{attr}', f'child-{attr}'])
+        override_value = value_factory([f'child-{attr}'])
+        if default_override:
+            default_value = override_value
+        else:
+            default_value = inherit_value
+
+        final = textwrap.dedent(
+            f"""
+            - job:
+                name: parent
+                {attr}: parent-{attr}
+                attribute-control:
+                  {attr}:
+                    final: true
+            - job:
+                name: child
+                {attr}: child-{attr}
+            """)
+
+        self._test_job_final_control(attr, job_attr,
+                                     default, default_value,
+                                     final)
+
+    def test_job_final_control_tags(self):
+        self._test_job_final_control_set('tags')
+
+    def test_job_final_control_requires(self):
+        self._test_job_final_control_set('requires')
+
+    def test_job_final_control_provides(self):
+        self._test_job_final_control_set('provides')
+
+    def test_job_final_control_dependencies(self):
+        self._test_job_final_control_set(
+            'dependencies',
+            default_override=True,
+            value_factory=lambda values:
+            {model.JobDependency(v) for v in values})
+
+    def test_job_final_control_failure_output(self):
+        self._test_job_final_control_set(
+            'failure-output',
+            job_attr='failure_output',
+            value_factory=lambda values: tuple(v for v in sorted(values)))
+
+    def test_job_final_control_files(self):
+        self._test_job_final_control_set(
+            'files',
+            job_attr='file_matcher',
+            default_override=True,
+            value_factory=lambda values: change_matcher.MatchAnyFiles(
+                [change_matcher.FileMatcher(ZuulRegex(v))
+                 for v in sorted(values)]))
+
+    def test_job_final_control_irrelevant_files(self):
+        self._test_job_final_control_set(
+            'irrelevant-files',
+            job_attr='irrelevant_file_matcher',
+            default_override=True,
+            value_factory=lambda values: change_matcher.MatchAllFiles(
+                [change_matcher.FileMatcher(ZuulRegex(v))
+                 for v in sorted(values)]))
+
+    def _test_job_final_control_dict(
+            self, attr, job_attr=None,
+            default_override=False):
+        if job_attr is None:
+            job_attr = attr
+        default = textwrap.dedent(
+            f"""
+            - job:
+                name: parent
+                {attr}:
+                  parent: 1
+            - job:
+                name: child
+                {attr}:
+                  child: 2
+            """)
+
+        final = textwrap.dedent(
+            f"""
+            - job:
+                name: parent
+                {attr}:
+                   parent: 1
+                attribute-control:
+                  {attr}:
+                    final: true
+            - job:
+                name: child
+                {attr}:
+                   child: 2
+            """)
+        inherit_value = {'parent': 1, 'child': 2}
+        default_value = {'child': 2}
+
+        if default_override:
+            default_value = default_value
+        else:
+            default_value = inherit_value
+
+        self._test_job_final_control(attr, job_attr,
+                                     default, default_value,
+                                     final)
+
+    def test_job_final_control_vars(self):
+        self._test_job_final_control_dict(
+            'vars', job_attr='variables')
+
+    def test_job_final_control_extra_vars(self):
+        self._test_job_final_control_dict(
+            'extra-vars', job_attr='extra_variables')
+
+    def _test_job_final_control_host_dict(
+            self, attr, job_attr=None,
+            default_override=False):
+        if job_attr is None:
+            job_attr = attr
+        default = textwrap.dedent(
+            f"""
+            - job:
+                name: parent
+                {attr}:
+                  host:
+                    parent: 1
+            - job:
+                name: child
+                {attr}:
+                  host:
+                    child: 2
+            """)
+
+        final = textwrap.dedent(
+            f"""
+            - job:
+                name: parent
+                {attr}:
+                   host:
+                     parent: 1
+                attribute-control:
+                  {attr}:
+                    final: true
+            - job:
+                name: child
+                {attr}:
+                   host:
+                     child: 2
+            """)
+        inherit_value = {'host': {'parent': 1, 'child': 2}}
+        default_value = {'host': {'child': 2}}
+
+        if default_override:
+            default_value = default_value
+        else:
+            default_value = inherit_value
+
+        self._test_job_final_control(attr, job_attr,
+                                     default, default_value,
+                                     final)
+
+    def test_job_final_control_host_vars(self):
+        self._test_job_final_control_host_dict(
+            'host-vars', job_attr='host_variables')
+
+    def test_job_final_control_group_vars(self):
+        self._test_job_final_control_host_dict(
+            'group-vars', job_attr='group_variables')
+
+    def test_job_final_control_required_projects(self):
+        parent = model.Project('parent-project', self.source)
+        child = model.Project('child-project', self.source)
+        parent_tpc = model.TenantProjectConfig(parent)
+        child_tpc = model.TenantProjectConfig(child)
+        self.tenant.addTPC(parent_tpc)
+        self.tenant.addTPC(child_tpc)
+
+        default = textwrap.dedent(
+            """
+            - job:
+                name: parent
+                required-projects: parent-project
+            - job:
+                name: child
+                required-projects: child-project
+            """)
+
+        final = textwrap.dedent(
+            """
+            - job:
+                name: parent
+                required-projects: parent-project
+                attribute-control:
+                  required-projects:
+                    final: true
+            - job:
+                name: child
+                required-projects: child-project
+            """)
+
+        default_value = {
+            'git.example.com/parent-project': model.JobProject(
+                'git.example.com/parent-project'),
+            'git.example.com/child-project': model.JobProject(
+                'git.example.com/child-project'),
+        }
+
+        self._test_job_final_control('required-projects',
+                                     'required_projects',
+                                     default, default_value,
+                                     final)
+
     @mock.patch("zuul.model.zkobject.ZKObject._save")
     def test_image_permissions(self, save_mock):
         self.pipeline.post_review = False
