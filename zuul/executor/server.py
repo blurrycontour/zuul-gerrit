@@ -87,6 +87,7 @@ from zuul.zk.components import ExecutorComponent, COMPONENT_REGISTRY
 from zuul.zk.exceptions import JobRequestNotFound
 from zuul.zk.executor import ExecutorApi
 from zuul.zk.job_request_queue import JobRequestEvent
+from zuul.zk.merger import MergerApi
 from zuul.zk.system import ZuulSystem
 from zuul.zk.zkobject import ZKContext
 from zuul.zk.semaphore import SemaphoreHandler
@@ -3740,6 +3741,12 @@ class ExecutorServer(BaseMergeServer):
             zone_filter.append(None)
 
         self.component_registry.addListener(self._wakeOnComponentChange)
+        self.merger_api = MergerApi(
+            self.zk_client,
+            self.component_registry,
+            self.component_info,
+            merge_request_callback=self.merger_loop_wake_event.set,
+        )
         self.executor_api = ExecutorApi(
             self.zk_client,
             self.component_registry,
@@ -3756,8 +3763,16 @@ class ExecutorServer(BaseMergeServer):
             self.zk_client, self.statsd, None, None, None)
 
     def _wakeOnComponentChange(self, component):
+        super()._wakeOnComponentChange(component)
         if component.kind == 'executor':
             self.build_loop_wake_event.set()
+            # We could check whether the executor processes merge jobs
+            # here since that currently cannot change without a
+            # restart, however, that might be error-prone depending on
+            # how the restart occurred, and we might want to change
+            # that without a restart in the future, so we are
+            # conservative and run the loop anyway.
+            self.merger_loop_wake_event.set()
 
     def _get_key_store_password(self):
         try:
