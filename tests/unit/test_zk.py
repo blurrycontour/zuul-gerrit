@@ -99,6 +99,10 @@ class ZooKeeperBaseTestCase(BaseTestCase):
         self.component_registry = ComponentRegistry(self.zk_client)
         # We don't have any other component to initialize the global
         # registry in these tests, so we do it ourselves.
+        self.component_info = ExecutorComponent(self.zk_client, 'test')
+        self.component_info.accepting_work = True
+        self.component_info.allow_unzoned = True
+        self.component_info.register()
         COMPONENT_REGISTRY.create(self.zk_client)
 
     def getRequest(self, api, request_uuid, state=None):
@@ -481,8 +485,6 @@ class TestComponentRegistry(ZooKeeperBaseTestCase):
                 break
 
     def test_component_registry(self):
-        self.component_info = ExecutorComponent(self.zk_client, 'test')
-        self.component_info.register()
         self.assertComponentState("executor", BaseComponent.STOPPED)
 
         self.zk_client.client.stop()
@@ -525,9 +527,14 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
             event_queue.put((br, e))
 
         # Simulate the client side
-        client = ExecutorApi(self.zk_client)
+        client = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info)
+
         # Simulate the server side
         server = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info,
                              build_request_callback=rq_put,
                              build_event_callback=eq_put)
 
@@ -617,9 +624,14 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
             event_queue.put((br, e))
 
         # Simulate the client side
-        client = ExecutorApi(self.zk_client)
+        client = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info)
+
         # Simulate the server side
         server = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info,
                              build_request_callback=rq_put,
                              build_event_callback=eq_put)
 
@@ -670,10 +682,15 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
             event_queue.put((br, e))
 
         # Simulate the client side
-        client = HoldableExecutorApi(self.zk_client)
+        client = HoldableExecutorApi(self.zk_client,
+                                     self.component_registry,
+                                     self.component_info)
+
         client.hold_in_queue = True
         # Simulate the server side
         server = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info,
                              build_request_callback=rq_put,
                              build_event_callback=eq_put)
 
@@ -712,7 +729,9 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
             event_queue.put((br, e))
 
         # Simulate the client side
-        client = ExecutorApi(self.zk_client)
+        client = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info)
 
         # Scheduler submits request
         request = BuildRequest(
@@ -722,6 +741,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
 
         # Simulate the server side
         server = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info,
                              build_request_callback=rq_put,
                              build_event_callback=eq_put)
 
@@ -743,7 +764,9 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
             event_queue.put((br, e))
 
         # Simulate the client side
-        client = ExecutorApi(self.zk_client)
+        client = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info)
 
         # Scheduler submits two requests
         request_a = BuildRequest(
@@ -762,6 +785,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
 
         # Simulate the server side
         server = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info,
                              build_request_callback=rq_put,
                              build_event_callback=eq_put)
 
@@ -784,7 +809,9 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
     def test_lost_build_requests(self):
         # Test that lostBuildRequests() returns unlocked running build
         # requests
-        executor_api = ExecutorApi(self.zk_client)
+        executor_api = ExecutorApi(self.zk_client,
+                                   self.component_registry,
+                                   self.component_info)
 
         br = BuildRequest(
             "A", "zone", None, "job", "job_uuid", "tenant", "pipeline", '1')
@@ -841,7 +868,9 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
 
     def test_lost_build_request_params(self):
         # Test cleaning up orphaned request parameters
-        executor_api = ExecutorApi(self.zk_client)
+        executor_api = ExecutorApi(self.zk_client,
+                                   self.component_registry,
+                                   self.component_info)
 
         br = BuildRequest(
             "A", "zone", None, "job", "job_uuid", "tenant", "pipeline", '1')
@@ -880,7 +909,9 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
             event_queue.put((br, e))
 
         # Simulate the client side
-        client = ExecutorApi(self.zk_client)
+        client = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info)
         client.submit(
             BuildRequest(
                 "A", None, None, "job", "job_uuid",
@@ -888,6 +919,8 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
 
         # Simulate the server side
         server = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info,
                              build_request_callback=rq_put,
                              build_event_callback=eq_put)
 
@@ -914,9 +947,14 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
             event_queue.put((br, e))
 
         # Simulate the client side
-        client = ExecutorApi(self.zk_client)
+        client = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info)
+
         # Simulate the server side
         server = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info,
                              build_request_callback=rq_put,
                              build_event_callback=eq_put)
 
@@ -990,6 +1028,77 @@ class TestExecutorApi(ZooKeeperBaseTestCase):
         reqs = list(client.next())
         self.assertEqual(len(reqs), 1)
         client.remove(a)
+
+    def test_build_request_hashing(self):
+        # Test rendezvous hashing of requests
+        request_queue1 = queue.Queue()
+        request_queue2 = queue.Queue()
+        event_queue1 = queue.Queue()
+        event_queue2 = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put1():
+            request_queue1.put(None)
+
+        def rq_put2():
+            request_queue2.put(None)
+
+        # and the event queue
+        def eq_put1(br, e):
+            event_queue1.put((br, e))
+
+        def eq_put2(br, e):
+            event_queue2.put((br, e))
+
+        # Simulate the client side
+        client = ExecutorApi(self.zk_client,
+                             self.component_registry,
+                             self.component_info)
+
+        # Simulate the server side
+        server1 = ExecutorApi(self.zk_client,
+                              self.component_registry,
+                              self.component_info,
+                              build_request_callback=rq_put1,
+                              build_event_callback=eq_put1)
+        self.component_info2 = ExecutorComponent(self.zk_client, 'test2')
+        self.component_info2.accepting_work = True
+        self.component_info2.allow_unzoned = True
+        self.component_info2.register()
+        server2 = ExecutorApi(self.zk_client,
+                              self.component_registry,
+                              self.component_info2,
+                              build_request_callback=rq_put2,
+                              build_event_callback=eq_put2)
+
+        # Scheduler submits request
+        request = BuildRequest(
+            "A", None, None, "job", "job_uuid", "tenant", "pipeline", '1')
+        client.submit(request, {'job': 'test'})
+        request_queue1.get(timeout=30)
+        request_queue2.get(timeout=30)
+
+        # This request hashes to server1
+        reqs = list(server1.next())
+        self.assertEqual(len(reqs), 1)
+        reqs = list(server2.next())
+        self.assertEqual(len(reqs), 0)
+
+        # Take server1 offline
+        self.component_info.accepting_work = False
+        for _ in iterate_timeout(10, "update to propagate"):
+            for e in self.component_registry.all('executor'):
+                if e.hostname == 'test' and not e.accepting_work:
+                    break
+            else:
+                continue
+            break
+
+        # This request hashes to server2 now
+        reqs = list(server1.next())
+        self.assertEqual(len(reqs), 0)
+        reqs = list(server2.next())
+        self.assertEqual(len(reqs), 1)
 
 
 class TestMergerApi(ZooKeeperBaseTestCase):

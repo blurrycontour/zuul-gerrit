@@ -12,13 +12,19 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import logging
 
 from kazoo.exceptions import NoNodeError
+import mmh3
 
 from zuul.lib.collections import DefaultKeyDict
 from zuul.model import BuildRequest
 from zuul.zk.job_request_queue import JobRequestQueue
+
+
+def executor_score(name, request):
+    return mmh3.hash(f"{name}-{request.uuid}", signed=False)
 
 
 class ExecutorQueue(JobRequestQueue):
@@ -57,10 +63,15 @@ class ExecutorQueue(JobRequestQueue):
 class ExecutorApi:
     log = logging.getLogger("zuul.ExecutorApi")
 
-    def __init__(self, client, zone_filter=None, use_cache=True,
+    def __init__(self, client,
+                 component_registry=None,
+                 component_info=None,
+                 zone_filter=None, use_cache=True,
                  build_request_callback=None,
                  build_event_callback=None):
         self.client = client
+        self.component_registry = component_registry
+        self.component_info = component_info
         self.use_cache = use_cache
         self.request_callback = build_request_callback
         self.event_callback = build_event_callback
@@ -129,8 +140,37 @@ class ExecutorApi:
             requests.extend(queue.inState(*states))
         return sorted(requests)
 
+    def _getExecutors(self):
+        executors_by_zone = collections.defaultdict(list)
+        for executor_component in self.component_registry.all("executor"):
+            if executor_component.state != executor_component.RUNNING:
+                continue
+            if not executor_component.accepting_work:
+                continue
+            if executor_component.allow_unzoned:
+                executors_by_zone[None].append(executor_component.hostname)
+            if executor_component.zone:
+                executors_by_zone[executor_component.zone].append(
+                    executor_component.hostname)
+        return executors_by_zone
+
     def next(self):
+        executors_by_zone = self._getExecutors()
         for request in self.inState(BuildRequest.REQUESTED):
+            candidate_names = executors_by_zone[request.zone]
+            if not candidate_names:
+                continue
+            scored_executors = set(request.scores.keys())
+            missing_scores = set(candidate_names) - scored_executors
+            if missing_scores:
+                # (Re-)compute scores
+                request.scores = {executor_score(n, request): n
+                                  for n in candidate_names}
+            executor_scores = sorted(request.scores.items())
+            if executor_scores[0][1] != self.component_info.hostname:
+                # Only yield if we're the first
+                continue
+            # Double check that it's still valid
             for queue in self.zone_queues.values():
                 request2 = queue.getRequest(request.uuid)
                 if (request2 and

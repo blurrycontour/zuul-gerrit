@@ -4788,6 +4788,7 @@ class JobRequest:
         self.lock = None
         self.is_locked = False
         self.lock_contenders = 0
+        self.scores = {}
         self.thread_lock = threading.Lock()
 
     def toDict(self):
