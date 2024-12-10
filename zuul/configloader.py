@@ -819,7 +819,23 @@ class JobParser(object):
                       'deduplicate': vs.Any(bool, 'auto'),
                       'failure-output': override_list(str),
                       'image-build-name': str,
-    }
+                      'attribute-control': {
+                          vs.Any(
+                              'requires',
+                              'provides',
+                              'tags',
+                              'files',
+                              'irrelevant-files',
+                              'required-projects',
+                              'vars',
+                              'extra-vars',
+                              'host-vars',
+                              'group-vars',
+                              'include-vars',
+                              'dependencies',
+                              'failure-output',
+                          ): {'final': True},
+    }}
 
     job_name = {vs.Required('name'): str}
 
@@ -847,6 +863,38 @@ class JobParser(object):
         'deduplicate',
         'image-build-name',
     ]
+
+    attr_control_job_attr_map = {
+        'failure-message': 'failure_message',
+        'success-message': 'success_message',
+        'failure-url': 'failure_url',
+        'success-url': 'success_url',
+        'hold-following-changes': 'hold_following_changes',
+        'files': 'file_matcher',
+        'irrelevant-files': 'irrelevant_file_matcher',
+        'post-timeout': 'post_timeout',
+        'pre-run': 'pre_run',
+        'post-run': 'post_run',
+        'cleanup-run': 'cleanup_run',
+        'ansible-split-streams': 'ansible_split_streams',
+        'ansible-version': 'ansible_version',
+        'required-projects': 'required_projects',
+        'vars': 'variables',
+        'extra-vars': 'extra_variables',
+        'host-vars': 'host_variables',
+        'group-vars': 'group_variables',
+        'include-vars': 'include_variables',
+        'allowed-projects': 'allowed_projects',
+        'override-branch': 'override_branch',
+        'override-checkout': 'override_checkout',
+        'variant-description': 'variant_description',
+        'workspace-scheme': 'workspace_scheme',
+        'failure-output': 'failure_output',
+        'image-build-name': 'image_build_name',
+    }
+
+    def _getAttrControlJobAttr(self, attr):
+        return self.attr_control_job_attr_map.get(attr, attr)
 
     def __init__(self, pcontext):
         self.log = logging.getLogger("zuul.JobParser")
@@ -1233,6 +1281,14 @@ class JobParser(object):
                 re2.compile(x)
             job.failure_output = tuple(sorted(failure_output))
 
+        if 'attribute-control' in conf:
+            with self.pcontext.confAttr(conf,
+                                        'attribute-control') as conf_control:
+                for attr, controls in conf_control.items():
+                    jobattr = self._getAttrControlJobAttr(attr)
+                    for control, value in controls.items():
+                        if value is True:
+                            job.final_control[jobattr] = True
         job.freeze()
         return job
 

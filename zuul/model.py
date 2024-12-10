@@ -3617,6 +3617,8 @@ class Job(ConfigObject):
         override_control['required_projects'] = False
         override_control['failure_output'] = False
 
+        final_control = defaultdict(lambda: False)
+
         # These are generally internal attributes which are not
         # accessible via configuration.
         self.other_attributes = dict(
@@ -3635,6 +3637,8 @@ class Job(ConfigObject):
             waiting_status=None,  # Text description of why its waiting
             # Override settings for context attributes:
             override_control=override_control,
+            # Finalize individual attributes (context or execution):
+            final_control=final_control,
         )
 
         self.attributes = {}
@@ -4041,31 +4045,33 @@ class Job(ConfigObject):
              for zuul_regex in sorted(irrelevant_files,
                                       key=lambda x: x.pattern)])
 
+    def _handleFinalControl(self, other, attr):
+        if getattr(other, attr) is not None:
+            if self.final_control[attr]:
+                # This message says "job foo final attribute bar";
+                # compare to "final job foo attribute bar" elsewhere
+                # to distinguish final jobs from final attrs.
+                raise JobConfigurationError(
+                    "Unable to modify job %s final attribute "
+                    "%s=%s with variant %s" % (
+                        repr(self), attr, other._get(attr),
+                        repr(other)))
+        if other.final_control[attr]:
+            self.final_control[attr] = True
+
+    def _updateVariableAttribute(self, other, attr):
+        self._handleFinalControl(other, attr)
+        if other.override_control[attr]:
+            setattr(self, attr, getattr(other, attr))
+        else:
+            setattr(self, attr, Job._deepUpdate(
+                getattr(self, attr), getattr(other, attr)))
+
     def updateVariables(self, other):
-        if other.variables is not None:
-            if other.override_control['variables']:
-                self.variables = other.variables
-            else:
-                self.variables = Job._deepUpdate(
-                    self.variables, other.variables)
-        if other.extra_variables is not None:
-            if other.override_control['extra_variables']:
-                self.extra_variables = other.extra_variables
-            else:
-                self.extra_variables = Job._deepUpdate(
-                    self.extra_variables, other.extra_variables)
-        if other.host_variables is not None:
-            if other.override_control['host_variables']:
-                self.host_variables = other.host_variables
-            else:
-                self.host_variables = Job._deepUpdate(
-                    self.host_variables, other.host_variables)
-        if other.group_variables is not None:
-            if other.override_control['group_variables']:
-                self.group_variables = other.group_variables
-            else:
-                self.group_variables = Job._deepUpdate(
-                    self.group_variables, other.group_variables)
+        self._updateVariableAttribute(other, 'variables')
+        self._updateVariableAttribute(other, 'extra_variables')
+        self._updateVariableAttribute(other, 'host_variables')
+        self._updateVariableAttribute(other, 'group_variables')
 
     def updateProjectVariables(self, project_vars):
         # Merge project/template variables directly into the job
@@ -4073,6 +4079,7 @@ class Job(ConfigObject):
         self.variables = Job._deepUpdate(project_vars, self.variables)
 
     def updateProjects(self, other):
+        self._handleFinalControl(other, 'required_projects')
         if other.override_control['required_projects']:
             required_projects = {}
         else:
@@ -4106,6 +4113,7 @@ class Job(ConfigObject):
                 # If this is a config object, it's frozen, so it's
                 # safe to shallow copy.
                 setattr(job, k, v)
+        job.final_control = self.final_control
         return job
 
     def freezePlaybooks(self, pblist, layout, semaphore_handler):
@@ -4253,6 +4261,7 @@ class Job(ConfigObject):
             self.cleanup_run = other_cleanup_run + self.cleanup_run
         self.updateVariables(other)
         if other._get('include_vars') is not None:
+            self._handleFinalControl(other, 'include_vars')
             if other.override_control['include_vars']:
                 include_vars = other.include_vars
             else:
@@ -4279,6 +4288,7 @@ class Job(ConfigObject):
             semaphores = set(self.semaphores).union(set(other.semaphores))
             self.semaphores = tuple(sorted(semaphores, key=lambda x: x.name))
         if other._get('failure_output') is not None:
+            self._handleFinalControl(other, 'failure_output')
             if other.override_control['failure_output']:
                 failure_output = other.failure_output
             else:
@@ -4300,6 +4310,7 @@ class Job(ConfigObject):
         for k in self.context_attributes:
             if (v := other._get(k)) is None:
                 continue
+            self._handleFinalControl(other, k)
             if other.override_control[k]:
                 setattr(self, k, v)
             else:
