@@ -3568,7 +3568,7 @@ class ExecutorServer(BaseMergeServer):
         self.component_info = ExecutorComponent(
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
-        COMPONENT_REGISTRY.create(self.zk_client)
+        self.component_registry = COMPONENT_REGISTRY.create(self.zk_client)
         self.zk_context = ZKContext(self.zk_client, None, None, self.log)
         self.monitoring_server = MonitoringServer(self.config, 'executor',
                                                   self.component_info)
@@ -3739,8 +3739,11 @@ class ExecutorServer(BaseMergeServer):
             # subscribed to the default zone.
             zone_filter.append(None)
 
+        self.component_registry.addListener(self._wakeOnComponentChange)
         self.executor_api = ExecutorApi(
             self.zk_client,
+            self.component_registry,
+            self.component_info,
             zone_filter=zone_filter,
             build_request_callback=self.build_loop_wake_event.set,
             build_event_callback=self._handleBuildEvent,
@@ -3751,6 +3754,10 @@ class ExecutorServer(BaseMergeServer):
 
         self.semaphore_handler = SemaphoreHandler(
             self.zk_client, self.statsd, None, None, None)
+
+    def _wakeOnComponentChange(self, component):
+        if component.kind == 'executor':
+            self.build_loop_wake_event.set()
 
     def _get_key_store_password(self):
         try:
@@ -3882,6 +3889,7 @@ class ExecutorServer(BaseMergeServer):
         self.monitoring_server.stop()
         self.tracing.stop()
         self.executor_api.stop()
+        self.component_registry.removeListener(self._wakeOnComponentChange)
         self.log.debug("Stopped executor")
 
     def join(self):
@@ -4111,8 +4119,6 @@ class ExecutorServer(BaseMergeServer):
             self.build_loop_wake_event.wait()
             self.build_loop_wake_event.clear()
             try:
-                # Always delay the response to the first build request
-                delay_response = True
                 for build_request in self.executor_api.next():
                     # Check the sensors again as they might have changed in the
                     # meantime. E.g. the last build started within the next()
@@ -4121,22 +4127,14 @@ class ExecutorServer(BaseMergeServer):
                         break
                     if not self._running:
                         break
-
-                    # Delay our response to running a new job based on
-                    # the number of jobs we're currently running, in
-                    # an attempt to spread load evenly among
-                    # executors.
-                    if delay_response:
-                        workers = len(self.job_workers)
-                        delay = (workers ** 2) / 1000.0
-                        time.sleep(delay)
-
-                    delay_response = self._runBuildWorker(build_request)
+                    self._runBuildWorker(build_request)
             except Exception:
                 self.log.exception("Error in build loop:")
                 time.sleep(5)
 
     def _runBuildWorker(self, build_request: BuildRequest):
+        # Returns whether we started the build
+
         log = get_annotated_logger(
             self.log, event=None, build=build_request.uuid
         )
