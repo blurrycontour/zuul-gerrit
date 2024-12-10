@@ -60,6 +60,7 @@ from zuul.zk.components import (
     ComponentRegistry,
     ExecutorComponent,
     LauncherComponent,
+    MergerComponent,
     COMPONENT_REGISTRY
 )
 from tests.base import (
@@ -104,6 +105,10 @@ class ZooKeeperBaseTestCase(BaseTestCase):
         self.component_info.accepting_work = True
         self.component_info.allow_unzoned = True
         self.component_info.register()
+        self.merger_component_info = MergerComponent(self.zk_client,
+                                                     'testmerger')
+        self.merger_component_info.state = MergerComponent.RUNNING
+        self.merger_component_info.register()
         COMPONENT_REGISTRY.create(self.zk_client)
 
     def getRequest(self, api, request_uuid, state=None):
@@ -1121,9 +1126,14 @@ class TestMergerApi(ZooKeeperBaseTestCase):
             request_queue.put(None)
 
         # Simulate the client side
-        client = MergerApi(self.zk_client)
+        client = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info)
+
         # Simulate the server side
         server = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info,
                            merge_request_callback=rq_put)
 
         # Scheduler submits request
@@ -1174,10 +1184,15 @@ class TestMergerApi(ZooKeeperBaseTestCase):
             request_queue.put(None)
 
         # Simulate the client side
-        client = HoldableMergerApi(self.zk_client)
+        client = HoldableMergerApi(self.zk_client,
+                                   self.component_registry,
+                                   self.merger_component_info)
+
         client.hold_in_queue = True
         # Simulate the server side
         server = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info,
                            merge_request_callback=rq_put)
 
         # Scheduler submits request
@@ -1223,9 +1238,14 @@ class TestMergerApi(ZooKeeperBaseTestCase):
             request_queue.put(None)
 
         # Simulate the client side
-        client = MergerApi(self.zk_client)
+        client = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info)
+
         # Simulate the server side
         server = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info,
                            merge_request_callback=rq_put)
 
         # Scheduler submits request
@@ -1276,7 +1296,9 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
     def test_lost_merge_request_params(self):
         # Test cleaning up orphaned request parameters
-        merger_api = MergerApi(self.zk_client)
+        merger_api = MergerApi(self.zk_client,
+                               self.component_registry,
+                               self.merger_component_info)
 
         # Scheduler submits request
         payload = {'merge': 'test'}
@@ -1317,9 +1339,14 @@ class TestMergerApi(ZooKeeperBaseTestCase):
             request_queue.put(None)
 
         # Simulate the client side
-        client = MergerApi(self.zk_client)
+        client = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info)
+
         # Simulate the server side
         server = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info,
                            merge_request_callback=rq_put)
 
         # Scheduler submits request
@@ -1378,7 +1405,9 @@ class TestMergerApi(ZooKeeperBaseTestCase):
             request_queue.put(None)
 
         # Simulate the client side
-        client = MergerApi(self.zk_client)
+        client = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info)
 
         # Scheduler submits request
         payload = {'merge': 'test'}
@@ -1394,6 +1423,8 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Simulate the server side
         server = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info,
                            merge_request_callback=rq_put)
         server_a = list(server.next())[0]
 
@@ -1415,7 +1446,9 @@ class TestMergerApi(ZooKeeperBaseTestCase):
             event_queue.put((br, e))
 
         # Simulate the client side
-        client = MergerApi(self.zk_client)
+        client = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info)
 
         # Scheduler submits three requests
         payload = {'merge': 'test'}
@@ -1450,6 +1483,8 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Simulate the server side
         server = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info,
                            merge_request_callback=rq_put)
 
         count = 0
@@ -1465,7 +1500,9 @@ class TestMergerApi(ZooKeeperBaseTestCase):
         self.assertEqual(count, 1)
 
     def test_leaked_lock(self):
-        client = MergerApi(self.zk_client)
+        client = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info)
 
         # Manually create a lock with no underlying request
         self.zk_client.client.create(f"{client.LOCK_ROOT}/A", b'')
@@ -1476,7 +1513,9 @@ class TestMergerApi(ZooKeeperBaseTestCase):
     def test_lost_merge_requests(self):
         # Test that lostMergeRequests() returns unlocked running merge
         # requests
-        merger_api = MergerApi(self.zk_client)
+        merger_api = MergerApi(self.zk_client,
+                               self.component_registry,
+                               self.merger_component_info)
 
         payload = {'merge': 'test'}
         merger_api.submit(MergeRequest(
@@ -1547,7 +1586,9 @@ class TestMergerApi(ZooKeeperBaseTestCase):
             request_queue.put(None)
 
         # Simulate the client side
-        client = MergerApi(self.zk_client)
+        client = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info)
         payload = {'merge': 'test'}
         client.submit(MergeRequest(
             uuid='A',
@@ -1560,6 +1601,8 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         # Simulate the server side
         server = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info,
                            merge_request_callback=rq_put)
 
         # Scheduler submits request
@@ -1573,6 +1616,73 @@ class TestMergerApi(ZooKeeperBaseTestCase):
 
         client.remove(a)
         self._assertEmptyRoots(client)
+
+    def test_merge_request_hashing(self):
+        # Test rendezvous hashing of requests
+        request_queue1 = queue.Queue()
+        request_queue2 = queue.Queue()
+
+        # A callback closure for the request queue
+        def rq_put1():
+            request_queue1.put(None)
+
+        def rq_put2():
+            request_queue2.put(None)
+
+        # Simulate the client side
+        client = MergerApi(self.zk_client,
+                           self.component_registry,
+                           self.merger_component_info)
+
+        # Simulate the server side
+        server1 = MergerApi(self.zk_client,
+                            self.component_registry,
+                            self.merger_component_info,
+                            merge_request_callback=rq_put1)
+        self.merger_component_info2 = MergerComponent(
+            self.zk_client, 'test2')
+        self.merger_component_info2.state = MergerComponent.RUNNING
+        self.merger_component_info2.register()
+        server2 = MergerApi(self.zk_client,
+                            self.component_registry,
+                            self.merger_component_info2,
+                            merge_request_callback=rq_put2)
+
+        # Scheduler submits request
+        payload = {'merge': 'test'}
+        request = MergeRequest(
+            uuid='A',
+            job_type=MergeRequest.MERGE,
+            build_set_uuid='AA',
+            tenant_name='tenant',
+            pipeline_name='check',
+            event_id='1',
+        )
+        client.submit(request, payload)
+        request_queue1.get(timeout=30)
+        request_queue2.get(timeout=30)
+
+        # This request hashes to server1
+        reqs = list(server1.next())
+        self.assertEqual(len(reqs), 1)
+        reqs = list(server2.next())
+        self.assertEqual(len(reqs), 0)
+
+        # Take server1 offline
+        self.merger_component_info.state = self.merger_component_info.STOPPED
+        for _ in iterate_timeout(10, "update to propagate"):
+            for e in self.component_registry.all('merger'):
+                if e.hostname == 'testmerger' and e.state == e.STOPPED:
+                    break
+            else:
+                continue
+            break
+
+        # This request hashes to server2 now
+        reqs = list(server1.next())
+        self.assertEqual(len(reqs), 0)
+        reqs = list(server2.next())
+        self.assertEqual(len(reqs), 1)
 
 
 class TestLocks(ZooKeeperBaseTestCase):

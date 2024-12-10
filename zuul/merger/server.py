@@ -71,12 +71,7 @@ class BaseMergeServer(metaclass=ABCMeta):
 
     _repo_locks_class = BaseRepoLocks
 
-    def __init__(
-        self,
-        config: ConfigParser,
-        component: str,
-        connections,
-    ):
+    def __init__(self, config, component, connections):
         self.connections = connections
         self._merger_running = False
         self._merger_paused = False
@@ -110,11 +105,6 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         self.merger_loop_wake_event = threading.Event()
 
-        self.merger_api = MergerApi(
-            self.zk_client,
-            merge_request_callback=self.merger_loop_wake_event.set,
-        )
-
         # This merger and its git repos are used to maintain
         # up-to-date copies of all the repos that are used by jobs, as
         # well as to support the merger:cat functon to supply
@@ -124,6 +114,10 @@ class BaseMergeServer(metaclass=ABCMeta):
 
         # Repo locking is needed on the executor
         self.repo_locks = self._repo_locks_class()
+
+    def _wakeOnComponentChange(self, component):
+        if component.kind in ('merger', 'executor'):
+            self.merger_loop_wake_event.set()
 
     def _getMerger(self, root, cache_root, logger=None,
                    execution_context=True, scheme=None,
@@ -511,11 +505,17 @@ class MergeServer(BaseMergeServer):
         self.component_info = MergerComponent(
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
-        COMPONENT_REGISTRY.create(self.zk_client)
-
+        self.component_registry = COMPONENT_REGISTRY.create(self.zk_client)
         self.monitoring_server = MonitoringServer(self.config, 'merger',
                                                   self.component_info)
         self.monitoring_server.start()
+
+        self.merger_api = MergerApi(
+            self.zk_client,
+            self.component_registry,
+            self.component_info,
+            merge_request_callback=self.merger_loop_wake_event.set,
+        )
 
         self.command_map = {
             commandsocket.StopCommand.name: self.stop,
