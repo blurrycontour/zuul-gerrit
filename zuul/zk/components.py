@@ -231,6 +231,7 @@ class ComponentRegistry(ZooKeeperBase):
         super().__init__(client)
 
         self.client = client
+        self.event_callbacks = []
         self._component_tree = None
         # kind -> hostname -> component
         self._cached_components = defaultdict(dict)
@@ -299,6 +300,11 @@ class ComponentRegistry(ZooKeeperBase):
             if component:
                 if (stat.version <= component._zstat.version):
                     # Don't update to older data
+                    try:
+                        for cb in self.event_callbacks:
+                            cb(component)
+                    except Exception:
+                        self.log.exception("Error in registry callback:")
                     return
                 component.updateFromDict(d)
                 component._zstat = stat
@@ -315,18 +321,36 @@ class ComponentRegistry(ZooKeeperBase):
 
             self._cached_components[kind][hostname] = component
             self._updateMinimumModelApi()
+            try:
+                for cb in self.event_callbacks:
+                    cb(component)
+            except Exception:
+                self.log.exception("Error in registry callback:")
         elif (etype == EventType.DELETED or data is None):
             self.log.info(
                 "Noticed %s component %s disappeared",
                 kind, hostname)
+            component = self._cached_components.get(kind, {}).get(hostname)
             try:
                 del self._cached_components[kind][hostname]
             except KeyError:
                 # If it's already gone, don't care
                 pass
             self._updateMinimumModelApi()
+            try:
+                if component:
+                    for cb in self.event_callbacks:
+                        cb(component)
+            except Exception:
+                self.log.exception("Error in registry callback:")
             # Return False to stop the datawatch
             return False
+
+    def addListener(self, callback):
+        self.event_callbacks.append(callback)
+
+    def removeListener(self, callback):
+        self.event_callbacks.remove(callback)
 
     def all(self, kind=None):
         """Returns a list of components.
