@@ -1261,9 +1261,17 @@ class Merger(object):
         else:
             project[path] = hexsha
 
+    def _finishRestoreRepoState(self, job, zuul_event_id):
+        messages = job.result()
+        ref_log = get_annotated_logger(
+            logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
+        for message in messages:
+            ref_log.debug(message)
+
     def _restoreRepoState(self, connection_name, project_name, repo,
                           repo_state, zuul_event_id,
-                          process_worker=None):
+                          process_worker=None,
+                          do_async=False):
         log = get_annotated_logger(self.log, zuul_event_id)
         projects = repo_state.get(connection_name, {})
         project = projects.get(project_name, {})
@@ -1277,11 +1285,9 @@ class Merger(object):
         else:
             job = process_worker.submit(
                 Repo.setRefsAsync, repo.local_path, repo.env, project)
-            messages = job.result()
-            ref_log = get_annotated_logger(
-                logging.getLogger("zuul.Repo.Ref"), zuul_event_id)
-            for message in messages:
-                ref_log.debug(message)
+            if do_async:
+                return job
+            self._finishRestoreRepoState(job, zuul_event_id)
 
     def _mergeChange(self, item, base, zuul_event_id, ops):
         log = get_annotated_logger(self.log, zuul_event_id)
@@ -1405,7 +1411,7 @@ class Merger(object):
 
     def mergeChanges(self, items, files=None, dirs=None, repo_state=None,
                      repo_locks=None, branches=None, zuul_event_id=None,
-                     process_worker=None, errors=None):
+                     process_worker=None, errors=None, recent=None):
         """Merge changes
 
         Call Merger.updateRepo() first.
@@ -1413,7 +1419,8 @@ class Merger(object):
         # _mergeItem calls reset as necessary.
         log = get_annotated_logger(self.log, zuul_event_id)
         # connection+project+branch -> commit
-        recent = {}
+        if recent is None:
+            recent = {}
         hexsha = None
         # tuple(connection, project, branch) -> dict(config state)
         read_files = OrderedDict()
@@ -1466,17 +1473,36 @@ class Merger(object):
             orig_hexsha, ops
         )
 
-    def setRepoState(self, connection_name, project_name, repo_state,
-                     zuul_event_id=None, process_worker=None):
+    def setBulkRepoState(self, repo_state, zuul_event_id,
+                         process_worker):
         """Set the repo state
 
         Call Merger.updateRepo() first.
         """
-        repo = self.getRepo(connection_name, project_name,
-                            zuul_event_id=zuul_event_id)
-
-        self._restoreRepoState(connection_name, project_name, repo,
-                               repo_state, zuul_event_id)
+        jobs = []
+        recent = {}
+        for connection_name, projects in repo_state.items():
+            for project_name, refs in projects.items():
+                repo = self.getRepo(connection_name, project_name,
+                                    zuul_event_id=zuul_event_id)
+                jobs.append(self._restoreRepoState(
+                    connection_name, project_name, repo,
+                    repo_state, zuul_event_id,
+                    process_worker=process_worker,
+                    do_async=True))
+        # While that's running, populate the recent table with what we
+        # know each branch hexsha should be before any merge
+        # operations.
+        for connection_name, projects in repo_state.items():
+            for project_name, refs in projects.items():
+                for ref, hexsha in refs.items():
+                    if ref.startswith('refs/heads/'):
+                        branch = ref[11:]
+                        key = (connection_name, project_name, branch)
+                        recent[key] = hexsha
+        for job in jobs:
+            self._finishRestoreRepoState(job, zuul_event_id)
+        return recent
 
     def getRepoState(self, items, repo_locks, branches=None):
         """Gets the repo state for items.
