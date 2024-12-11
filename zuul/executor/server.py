@@ -1531,19 +1531,25 @@ class AnsibleJob(object):
                 )
             repos[project['canonical_name']] = repo
 
+        with tracer.start_as_current_span('BuildSetRepoState'):
+            recent = self.workspace_merger.setBulkRepoState(
+                self.repo_state,
+                self.zuul_event_id,
+                self.executor_server.process_worker,
+            )
+
         # The commit ID of the original item (before merging).  Used
         # later for line mapping.
         item_commit = None
-        # The set of repos which have had their state restored.  This
-        # also doubles as a list of repos that have been checked out.
-        restored_repos = set()
+        # Repos that have been checked out during the merge operation.
+        merged_repos = set()
 
         merge_items = [i for i in args['items'] if i.get('number')]
         if merge_items:
             with tracer.start_as_current_span(
                     'BuildMergeChanges'):
                 item_commit = self.doMergeChanges(
-                    merge_items, self.repo_state, restored_repos)
+                    merge_items, self.repo_state, recent, merged_repos)
             if item_commit is None:
                 # There was a merge conflict and we have already sent
                 # a work complete result, don't run any jobs
@@ -1553,17 +1559,6 @@ class AnsibleJob(object):
         if self.aborted:
             self._send_aborted()
             return
-
-        for project in args['projects']:
-            if (project['connection'], project['name']) in restored_repos:
-                continue
-            with tracer.start_as_current_span(
-                    'BuildSetRepoState',
-                    attributes={'connection': project['connection'],
-                                'project': project['name']}):
-                self.workspace_merger.setRepoState(
-                    project['connection'], project['name'], self.repo_state,
-                    process_worker=self.executor_server.process_worker)
 
         # Early abort if abort requested
         if self.aborted:
@@ -1606,7 +1601,7 @@ class AnsibleJob(object):
                     # the working tree if we're not checking out repos
                     # in the workspace.
                     if ((project['connection'], project['name'])
-                        in restored_repos):
+                        in merged_repos):
                         self.log.info("Emptying work tree for %s",
                                       project['canonical_name'])
                         repo.uncheckout()
@@ -1835,11 +1830,12 @@ class AnsibleJob(object):
 
         filecomments.updateLines(fc, new_lines)
 
-    def doMergeChanges(self, items, repo_state, restored_repos):
+    def doMergeChanges(self, items, repo_state, recent, merged_repos):
         try:
             ret = self.workspace_merger.mergeChanges(
                 items, repo_state=repo_state,
-                process_worker=self.executor_server.process_worker)
+                process_worker=self.executor_server.process_worker,
+                recent=recent)
         except ValueError:
             # Return ABORTED so that we'll try again. At this point all of
             # the refs we're trying to merge should be valid refs. If we
@@ -1864,7 +1860,6 @@ class AnsibleJob(object):
         self.merge_ops = ret[5] or []
         for key, commit in recent.items():
             (connection, project, branch) = key
-            restored_repos.add((connection, project))
             # Compare the commit with the repo state. If it's included in the
             # repo state and it's the same we've set this ref already earlier
             # and don't have to set it again.
@@ -1873,6 +1868,7 @@ class AnsibleJob(object):
             repo_state_commit = project_repo_state.get(
                 'refs/heads/%s' % branch)
             if repo_state_commit != commit:
+                merged_repos.add((connection, project))
                 repo = self.workspace_merger.getRepo(connection, project)
                 repo.setRef('refs/heads/' + branch, commit)
         return orig_commit
