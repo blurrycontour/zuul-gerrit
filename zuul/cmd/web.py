@@ -88,7 +88,8 @@ class WebServer(zuul.cmd.ZuulDaemonApp):
 
         try:
             self.configure_connections(database=True, sources=True,
-                                       triggers=True, reporters=True)
+                                       triggers=True, reporters=True,
+                                       providers=True)
             self.configure_authenticators()
             self._run()
         except Exception:
