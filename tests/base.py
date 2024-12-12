@@ -1610,7 +1610,8 @@ class ZuulWebFixture(fixtures.Fixture):
             additional_event_queues, upstream_root,
             poller_events, git_url_with_auth, add_cleanup)
         self.connections.configure(config, database=True, sources=True,
-                                   triggers=True, reporters=True)
+                                   triggers=True, reporters=True,
+                                   providers=True)
 
         self.authenticators = zuul.lib.auth.AuthenticatorRegistry()
         self.authenticators.configure(config)

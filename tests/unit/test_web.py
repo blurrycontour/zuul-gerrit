@@ -38,6 +38,7 @@ from tests.base import (
     iterate_timeout,
     okay_tracebacks,
 )
+from tests.unit.test_launcher import LauncherBaseTestCase
 from tests.base import simple_layout
 
 
@@ -1362,6 +1363,17 @@ class TestWeb(BaseTestWeb):
                 'voting': True}}
 
         self.assertEqual(job_params, resp.json())
+
+
+class TestWebProviders(BaseTestWeb, LauncherBaseTestCase):
+    config_file = 'zuul-connections-nodepool.conf'
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_web_providers(self):
+        resp = self.get_url('api/tenant/tenant-one/providers')
+        data = resp.json()
+        self.assertEqual(1, len(data))
+        self.assertEqual([{'name': 'aws-us-east-1-main'}], data)
 
 
 class TestWebStatusDisplayBranch(BaseTestWeb):
