@@ -38,6 +38,7 @@ from tests.base import (
     iterate_timeout,
     okay_tracebacks,
 )
+from tests.unit.test_launcher import LauncherBaseTestCase
 from tests.base import simple_layout
 
 
@@ -1362,6 +1363,44 @@ class TestWeb(BaseTestWeb):
                 'voting': True}}
 
         self.assertEqual(job_params, resp.json())
+
+
+class TestWebProviders(BaseTestWeb, LauncherBaseTestCase):
+    config_file = 'zuul-connections-nodepool.conf'
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_web_providers(self):
+        resp = self.get_url('api/tenant/tenant-one/providers')
+        data = resp.json()
+        self.assertEqual(1, len(data))
+
+        cc = 'review.example.com%2Forg%2Fcommon-config'
+        expected = [
+            {'canonical_name': f'{cc}/aws-us-east-1-main',
+             'flavors': [
+                 {'canonical_name': f'{cc}/normal',
+                  'name': 'normal'},
+                 {'canonical_name': f'{cc}/large',
+                  'name': 'large'},
+                 {'canonical_name': f'{cc}/dedicated',
+                  'name': 'dedicated'},
+                 {'canonical_name': f'{cc}/invalid',
+                  'name': 'invalid'}],
+             'images': [
+                 {'canonical_name': f'{cc}/debian',
+                  'name': 'debian',
+                  'type': 'cloud'}],
+             'labels': [
+                 {'canonical_name': f'{cc}/debian-normal',
+                  'name': 'debian-normal'},
+                 {'canonical_name': f'{cc}/debian-large',
+                  'name': 'debian-large'},
+                 {'canonical_name': f'{cc}/debian-dedicated',
+                  'name': 'debian-dedicated'},
+                 {'canonical_name': f'{cc}/debian-invalid',
+                  'name': 'debian-invalid'}],
+             'name': 'aws-us-east-1-main'}]
+        self.assertEqual(expected, data)
 
 
 class TestWebStatusDisplayBranch(BaseTestWeb):
