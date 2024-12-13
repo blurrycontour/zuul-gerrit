@@ -23,7 +23,7 @@ import jwt
 import sys
 import subprocess
 import threading
-from unittest import skip
+from unittest import skip, mock
 
 import requests
 
@@ -39,7 +39,7 @@ from tests.base import (
     okay_tracebacks,
 )
 from tests.unit.test_launcher import LauncherBaseTestCase
-from tests.base import simple_layout
+from tests.base import simple_layout, return_data
 
 
 class FakeConfig(object):
@@ -54,7 +54,7 @@ class FakeConfig(object):
         return self.config.get(section, {}).get(option)
 
 
-class BaseWithWeb(ZuulTestCase):
+class WebMixin:
     config_ini_data = {}
 
     def startWebServer(self):
@@ -100,11 +100,11 @@ class BaseWithWeb(ZuulTestCase):
             urllib.parse.urljoin(self.base_url, url), *args, **kwargs)
 
 
-class BaseTestWeb(BaseWithWeb):
+class BaseTestWeb(ZuulTestCase, WebMixin):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
     def setUp(self):
-        super(BaseTestWeb, self).setUp()
+        super().setUp()
         self.startWebServer()
 
     def add_base_changes(self):
@@ -1365,11 +1365,13 @@ class TestWeb(BaseTestWeb):
         self.assertEqual(job_params, resp.json())
 
 
-class TestWebProviders(BaseTestWeb, LauncherBaseTestCase):
+class TestWebProviders(LauncherBaseTestCase, WebMixin):
     config_file = 'zuul-connections-nodepool.conf'
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_web_providers(self):
+        self.waitUntilSettled()
+        self.startWebServer()
         resp = self.get_url('api/tenant/tenant-one/providers')
         data = resp.json()
         self.assertEqual(1, len(data))
@@ -1400,6 +1402,65 @@ class TestWebProviders(BaseTestWeb, LauncherBaseTestCase):
                  {'canonical_name': f'{cc}/debian-invalid',
                   'name': 'debian-invalid'}],
              'name': 'aws-us-east-1-main'}]
+        self.assertEqual(expected, data)
+
+    @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        LauncherBaseTestCase.debian_return_data,
+    )
+    @return_data(
+        'build-ubuntu-local-image',
+        'refs/heads/master',
+        LauncherBaseTestCase.ubuntu_return_data,
+    )
+    @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
+                return_value="test_external_id")
+    def test_web_images(self, mock_uploadImage):
+        self.waitUntilSettled()
+        self.startWebServer()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+        resp = self.get_url('api/tenant/tenant-one/images')
+        data = resp.json()
+        self.assertEqual(4, len(data))
+        self.assertNotIn('build_artifacts', data[0])
+        self.assertEqual(1, len(data[1]['build_artifacts']))
+        self.assertEqual(1, len(data[2]['build_artifacts']))
+        self.assertEqual(1, len(data[1]['build_artifacts'][0]['uploads']))
+        self.assertEqual(1, len(data[2]['build_artifacts'][0]['uploads']))
+        # The builds have a lot of random data
+        data[1].pop('build_artifacts')
+        data[2].pop('build_artifacts')
+        expected = [
+            {'branch': 'master',
+             'canonical_name':
+             'review.example.com%2Forg%2Fcommon-config/debian',
+             'name': 'debian',
+             'project_canonical_name': 'review.example.com/org/common-config',
+             'type': 'cloud'},
+            {'branch': 'master',
+             'canonical_name':
+             'review.example.com%2Forg%2Fcommon-config/debian-local',
+             'name': 'debian-local',
+             'project_canonical_name': 'review.example.com/org/common-config',
+             'type': 'zuul'},
+            {'branch': 'master',
+             'canonical_name':
+             'review.example.com%2Forg%2Fcommon-config/ubuntu-local',
+             'name': 'ubuntu-local',
+             'project_canonical_name': 'review.example.com/org/common-config',
+             'type': 'zuul'},
+            {'branch': 'master',
+             'canonical_name':
+             'review.example.com%2Forg%2Fcommon-config/fedora-local',
+             'name': 'fedora-local',
+             'project_canonical_name': 'review.example.com/org/common-config',
+             'type': 'zuul'},
+        ]
         self.assertEqual(expected, data)
 
 
@@ -1891,7 +1952,7 @@ class TestTenantInfoConfigBroken(BaseTestWeb):
         self.assertEqual(404, resp.status_code)
 
 
-class TestBrokenConfigCache(BaseWithWeb):
+class TestBrokenConfigCache(ZuulTestCase, WebMixin):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
     def test_broken_config_cache(self):
@@ -3892,7 +3953,7 @@ class TestWebStartup(ZuulTestCase):
         self.assertEqual(len(jobs), 10)
 
 
-class TestWebUnprotectedBranches(BaseWithWeb):
+class TestWebUnprotectedBranches(ZuulTestCase, WebMixin):
     config_file = 'zuul-github-driver.conf'
     tenant_config_file = 'config/unprotected-branches/main.yaml'
 
