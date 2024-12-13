@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b3a1012_9f5131d9",
+        "filename": "zuul/zk/executor.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-12-13T14:12:32Z",
+      "side": 1,
+      "message": "Similar to the launcher we could also check if the executor with the highest score is still running. Otherwise it would need to wait until the next iteration to be reconsidered.",
+      "revId": "de8ae6a8bf96f95fcd8d91d64a5b5729dd10df8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
