@@ -73,6 +73,10 @@ from zuul.zk.event_queues import (
     PipelineTriggerEventQueue,
 )
 from zuul.zk.executor import ExecutorApi
+from zuul.zk.image_registry import (
+    ImageBuildRegistry,
+    ImageUploadRegistry,
+)
 from zuul.zk.layout import (
     LayoutProvidersStore,
     LayoutStateStore,
@@ -373,16 +377,29 @@ class ProviderConverter:
     # A class to encapsulate the conversion of Provider objects to
     # API output.
     @staticmethod
-    def toDict(provider):
+    def toDict(provider, build_artifacts, uploads):
         # These are the flattened versions of these objects for this
         # provider.
-        images = [
-            {'name': x.name,
-             'canonical_name': x.canonical_name,
-             'type': x.type,
-             }
-            for x in provider.images.values()
-        ]
+        images = []
+        for image in provider.images.values():
+            ret_image = {
+                'name': image.name,
+                'canonical_name': image.canonical_name,
+                'type': image.type,
+            }
+            images.append(ret_image)
+            build_artifacts = [
+                iba for iba in build_artifacts
+                if iba.canonical_name == image.canonical_name
+            ]
+            if build_artifacts:
+                ret_image['build_artifacts'] = [
+                    ImageBuildArtifactConverter.toDict(
+                        b,
+                        [u for u in uploads if u.artifact_uuid == b.uuid]
+                    )
+                    for b in build_artifacts
+                ]
         labels = [
             {'name': x.name,
              'canonical_name': x.canonical_name,
@@ -412,6 +429,7 @@ class ProviderConverter:
                 {'name': str,
                  'canonical_name': str,
                  'type': str,
+                 'build_artifacts': [ImageBuildArtifactConverter.schema()],
                  }
             ],
             'labels': [
@@ -424,6 +442,110 @@ class ProviderConverter:
                  'canonical_name': str,
                  }
             ]
+        })
+
+
+class ImageUploadConverter:
+    # A class to encapsulate the conversion of image upload objects to
+    # API output.
+    @staticmethod
+    def toDict(upload):
+        timestamp = _datetimeToString(
+            datetime.utcfromtimestamp(upload.timestamp))
+        ret = {
+            'uuid': upload.uuid,
+            'canonical_name': upload.canonical_name,
+            'artifact_uuid': upload.artifact_uuid,
+            'endpoint_name': upload.endpoint_name,
+            'external_id': upload.external_id,
+            'timestamp': timestamp,
+            'validated': upload.validated,
+        }
+        return ret
+
+    @staticmethod
+    def schema():
+        return Prop('The image upload', {
+            'uuid': str,
+            'canonical_name': str,
+            'artifact_uuid': str,
+            'endpoint_name': str,
+            'external_id': str,
+            'timestamp': str,
+            'validated': str,
+        })
+
+
+class ImageBuildArtifactConverter:
+    # A class to encapsulate the conversion of image build objects to
+    # API output.
+    @staticmethod
+    def toDict(build, uploads):
+        timestamp = _datetimeToString(
+            datetime.utcfromtimestamp(build.timestamp))
+        ret = {
+            'uuid': build.uuid,
+            'canonical_name': build.canonical_name,
+            'build_uuid': build.build_uuid,
+            'format': build.format,
+            'md5sum': build.md5sum,
+            'sha256': build.sha256,
+            'url': build.url,
+            'timestamp': timestamp,
+            'validated': build.validated,
+        }
+        if uploads:
+            ret['uploads'] = [ImageUploadConverter.toDict(u)
+                              for u in uploads]
+        return ret
+
+    @staticmethod
+    def schema():
+        return Prop('The image build artifact', {
+            'uuid': str,
+            'canonical_name': str,
+            'build_uuid': str,
+            'format': str,
+            'md5sum': str,
+            'sha256': str,
+            'url': str,
+            'timestamp': str,
+            'validated': str,
+            'uploads': [ImageUploadConverter.schema()],
+        })
+
+
+class ImageConverter:
+    # A class to encapsulate the conversion of Image objects to
+    # API output.
+    @staticmethod
+    def toDict(image, build_artifacts, uploads):
+        ret = {
+            'name': image.name,
+            'canonical_name': image.canonical_name,
+            'project_canonical_name': image.project_canonical_name,
+            'branch': image.branch,
+            'type': image.type,
+        }
+        if build_artifacts:
+            ret['build_artifacts'] = [
+                ImageBuildArtifactConverter.toDict(
+                    b,
+                    [u for u in uploads if u.artifact_uuid == b.uuid]
+                )
+                for b in build_artifacts
+            ]
+        return ret
+
+    @staticmethod
+    def schema():
+        return Prop('The image', {
+            'name': str,
+            'canonical_name': str,
+            'project_canonical_name': str,
+            'branch': str,
+            'type': str,
+            'build_artifacts': [ImageBuildArtifactConverter.schema()],
         })
 
 
@@ -1737,7 +1859,28 @@ class ZuulWebAPI(object):
     @openapi_response(404, 'Tenant not found')
     def providers(self, tenant_name, tenant, auth):
         providers = self.zuulweb.tenant_providers[tenant_name]
-        return [ProviderConverter.toDict(p) for p in providers]
+        ret = []
+        ibr = self.zuulweb.image_build_registry
+        iur = self.zuulweb.image_upload_registry
+        for provider in providers:
+            for image in provider.images.values():
+                if image.type == 'zuul':
+                    uploads = [
+                        u for u in iur.getUploadsForImage(image.canonical_name)
+                        if provider.canonical_name in u.providers
+                    ]
+                    artifact_uuids = set([u.artifact_uuid for u in uploads])
+                    build_artifacts = [
+                        b for b in ibr.getArtifactsForImage(
+                            image.canonical_name)
+                        if b.uuid in artifact_uuids
+                    ]
+                else:
+                    build_artifacts = []
+                    uploads = []
+            ret.append(ProviderConverter.toDict(
+                provider, build_artifacts, uploads))
+        return ret
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1760,6 +1903,46 @@ class ZuulWebAPI(object):
                 })
             ret.append({"name": pipeline, "triggers": triggers})
 
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.check_tenant_auth()
+    @openapi_response(
+        code=200,
+        content_type='application/json',
+        description='Returns the list of images',
+        schema=Prop('The list of images', [ImageConverter.schema()]),
+    )
+    @openapi_response(404, 'Tenant not found')
+    def images(self, tenant_name, tenant, auth):
+        ret = []
+        ibr = self.zuulweb.image_build_registry
+        iur = self.zuulweb.image_upload_registry
+        provider_cnames = set([
+            p.canonical_name
+            for p in self.zuulweb.tenant_providers[tenant_name]
+        ])
+        for image in tenant.layout.images.values():
+            if image.type == 'zuul':
+                # Include uploads used by providers in the tenant
+                uploads = [
+                    u for u in iur.getUploadsForImage(image.canonical_name)
+                    if provider_cnames.intersection(set(u.providers))
+                ]
+                artifact_uuids = set([u.artifact_uuid for u in uploads])
+                # Include build artifacts used by relevant uploads
+                build_artifacts = [
+                    b for b in ibr.getArtifactsForImage(image.canonical_name)
+                    if b.uuid in artifact_uuids
+                ]
+
+            else:
+                build_artifacts = []
+                uploads = []
+            ret.append(ImageConverter.toDict(image, build_artifacts, uploads))
         return ret
 
     @cherrypy.expose
@@ -2476,6 +2659,8 @@ class ZuulWeb(object):
                           controller=api, action='providers')
         route_map.connect('api', '/api/tenant/{tenant_name}/pipelines',
                           controller=api, action='pipelines')
+        route_map.connect('api', '/api/tenant/{tenant_name}/images',
+                          controller=api, action='images')
         route_map.connect('api', '/api/tenant/{tenant_name}/labels',
                           controller=api, action='labels')
         route_map.connect('api', '/api/tenant/{tenant_name}/nodes',
@@ -2578,6 +2763,8 @@ class ZuulWeb(object):
         self.tenant_providers = {}
         self.layout_providers_store = LayoutProvidersStore(
             self.zk_client, self.connections)
+        self.image_build_registry = ImageBuildRegistry(self.zk_client)
+        self.image_upload_registry = ImageUploadRegistry(self.zk_client)
 
         self.management_events = TenantManagementEventQueue.createRegistry(
             self.zk_client)
