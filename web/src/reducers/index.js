@@ -31,6 +31,7 @@ import nodes from './nodes'
 import openapi from './openapi'
 import project from './project'
 import pipelines from './pipelines'
+import pipelinePinning from './pipelinePinning'
 import projects from './projects'
 import preferences from './preferences'
 import semaphores from './semaphores'
@@ -60,6 +61,7 @@ const reducers = {
   nodes,
   openapi,
   pipelines,
+  pipelinePinning,
   project,
   projects,
   semaphores,

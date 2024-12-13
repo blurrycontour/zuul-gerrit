@@ -119,11 +119,26 @@ TenantStats.propTypes = {
   reloadCallback: PropTypes.func.isRequired,
 }
 
-function PipelineGallery({ pipelines, tenant, showAllPipelines, expandAll, isLoading, filters, onClearFilters }) {
+function PipelineGallery({ pipelines, tenant, showAllPipelines, expandAll, isLoading, filters, onClearFilters, pinnedPipelines }) {
   // Filter out empty pipelines if necessary
+  // never filter out pipelines that are pinned
   if (!showAllPipelines) {
-    pipelines = pipelines.filter(ppl => ppl._count > 0)
+    pipelines = pipelines.filter(
+      ppl => ppl._count > 0 || pinnedPipelines[`${tenant.name}/${ppl.name}`] === true
+    )
   }
+
+  // Sort pinned pipelines to the front, otherwise preserving the previous
+  // sorting.
+  // This uses the Array.toSorted method that creates a copy of the
+  // original array instead of the in-place Array.sort. This is to make sure
+  // the component re-renders directly when sorting changes (it might miss
+  // re-renders if the object ref does not change).
+  pipelines = pipelines.toSorted((p1, p2) => {
+    const p1Pin = pinnedPipelines[`${tenant.name}/${p1.name}`] === true
+    const p2Pin = pinnedPipelines[`${tenant.name}/${p2.name}`] === true
+    return p1Pin === p2Pin ? 0 : p1Pin? -1 : 0
+  })
 
   return (
     <>
@@ -161,6 +176,7 @@ PipelineGallery.propTypes = {
   isLoading: PropTypes.bool,
   filters: PropTypes.object,
   onClearFilters: PropTypes.func,
+  pinnedPipelines: PropTypes.object,
 }
 
 function getPipelines(status, location) {
@@ -204,6 +220,7 @@ function PipelineOverviewPage() {
   const isDocumentVisible = useDocumentVisibility()
 
   const status = useSelector((state) => state.status.status)
+  const pinnedPipelines = useSelector(state => state.pipelinePinning.pinnedPipelines)
   const {pipelines, stats} = useMemo(() => getPipelines(status, location), [status, location])
 
   const isFetching = useSelector((state) => state.status.isFetching)
@@ -327,6 +344,7 @@ function PipelineOverviewPage() {
           isLoading={isFetching}
           filters={filters}
           onClearFilters={onClearFilters}
+          pinnedPipelines={pinnedPipelines}
         />
       </PageSection>
     </>

@@ -32,6 +32,7 @@ import {
   SquareIcon,
   AngleRightIcon,
   AngleDownIcon,
+  StarIcon,
 } from '@patternfly/react-icons'
 
 import QueueItemPopover from './QueueItemPopover'
@@ -39,6 +40,7 @@ import { PipelineIcon, getQueueItemIconConfig } from './Misc'
 import { makeQueryString } from '../FilterToolbar'
 import ChangeQueue from './ChangeQueue'
 import { expandQueue, collapseQueue } from '../../actions/statusExpansion'
+import { pinPipeline, unpinPipeline } from '../../actions/pipelinePinning'
 
 function QueueItemSquareWithPopover({ item }) {
   return (
@@ -198,11 +200,22 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, areAllJobsExpanded, 
 
   const isQueueExpanded = expandedQueue === undefined ? areAllJobsExpanded : expandedQueue
 
+  const pinKey = `${tenant.name}/${pipeline.name}`
+  const isPipelinePinned = useSelector(state => state.pipelinePinning.pinnedPipelines[pinKey] === true)
+
   const onQueueToggle = (isExpanded) => {
     if (isExpanded) {
       dispatch(expandQueue(expansionKey))
     } else {
       dispatch(collapseQueue(expansionKey))
+    }
+  }
+
+  const onPipelinePinToggle = (isPinned) => {
+    if (isPinned) {
+      dispatch(pinPipeline(pinKey))
+    } else {
+      dispatch(unpinPipeline(pinKey))
     }
   }
 
@@ -241,6 +254,9 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, areAllJobsExpanded, 
             :
             <AngleRightIcon className="zuul-expand-icon" onClick={() => onQueueToggle(true)} />
           }
+          <Button className="zuul-pipeline-fav" position="right" onClick={() => onPipelinePinToggle(!isPipelinePinned)}>
+            <StarIcon className={isPipelinePinned? 'zuul-pipeline-fav-icon-enabled' : 'zuul-pipeline-fav-icon-disabled'} />
+          </Button>
         </CardTitle>
       </CardHeader>
       <CardBody>
