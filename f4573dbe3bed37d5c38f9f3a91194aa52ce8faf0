@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "72fabd13_f3b9901b",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3767,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-12-13T15:05:08Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "a7cb363c_4bfef252",
+      "revId": "f4573dbe3bed37d5c38f9f3a91194aa52ce8faf0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "38608b28_f20c7784",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-12-13T14:23:14Z",
       "side": 1,
       "message": "I think we also need to wake on executor components here.",
+      "revId": "f4573dbe3bed37d5c38f9f3a91194aa52ce8faf0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3f411e0_56772b3c",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2024-12-13T15:05:08Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "38608b28_f20c7784",
       "revId": "f4573dbe3bed37d5c38f9f3a91194aa52ce8faf0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
