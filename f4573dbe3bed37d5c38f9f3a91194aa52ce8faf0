@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7cb363c_4bfef252",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 3767,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-12-13T14:23:14Z",
+      "side": 1,
+      "message": "I think we need to wake on executor and merge components.",
+      "revId": "f4573dbe3bed37d5c38f9f3a91194aa52ce8faf0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38608b28_f20c7784",
+        "filename": "zuul/merger/server.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-12-13T14:23:14Z",
+      "side": 1,
+      "message": "I think we also need to wake on executor components here.",
+      "revId": "f4573dbe3bed37d5c38f9f3a91194aa52ce8faf0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
