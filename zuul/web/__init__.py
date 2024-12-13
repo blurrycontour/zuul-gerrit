@@ -73,6 +73,9 @@ from zuul.zk.event_queues import (
     PipelineTriggerEventQueue,
 )
 from zuul.zk.executor import ExecutorApi
+from zuul.zk.image_registry import (
+    ImageBuildRegistry,
+)
 from zuul.zk.layout import (
     LayoutProvidersStore,
     LayoutStateStore,
@@ -382,6 +385,77 @@ class ProviderConverter:
     def schema():
         return Prop('The provider', {
             'name': str,
+        })
+
+
+class ImageBuildArtifactConverter:
+    # A class to encapsulate the conversion of image build objects to
+    # API output.
+    @staticmethod
+    def toDict(build):
+        timestamp = _datetimeToString(
+            datetime.utcfromtimestamp(build.timestamp))
+        return {
+            'uuid': build.uuid,
+            'canonical_name': build.canonical_name,
+            'build_uuid': build.build_uuid,
+            'format': build.format,
+            'md5sum': build.md5sum,
+            'sha256': build.sha256,
+            'url': build.url,
+            'timestamp': timestamp,
+            'validated': build.validated,
+        }
+
+    @staticmethod
+    def schema():
+        return Prop('The image build artifact', {
+            'uuid': str,
+            'canonical_name': str,
+            'build_uuid': str,
+            'format': str,
+            'md5sum': str,
+            'sha256': str,
+            'url': str,
+            'timestamp': str,
+            'validated': str,
+        })
+
+
+class ImageConverter:
+    # A class to encapsulate the conversion of Image objects to
+    # API output.
+    @staticmethod
+    def toDict(provider, image, builds):
+        ret = {
+            'provider': ProviderConverter.toDict(provider),
+            'name': image.name,
+            'canonical_name': image.canonical_name,
+            'project_canonical_name': image.project_canonical_name,
+            'branch': image.branch,
+            'type': image.type,
+            'format': image.format,
+            'connection_port': image.connection_port,
+            'connection_type': image.connection_type,
+        }
+        if builds:
+            ret['builds'] = [ImageBuildArtifactConverter.toDict(b)
+                             for b in builds]
+        return ret
+
+    @staticmethod
+    def schema():
+        return Prop('The image', {
+            'provider': ProviderConverter.schema(),
+            'name': str,
+            'canonical_name': str,
+            'project_canonical_name': str,
+            'branch': str,
+            'type': str,
+            'format': str,
+            'connection_port': int,
+            'connection_type': str,
+            'builds': [ImageBuildArtifactConverter.schema()],
         })
 
 
@@ -1725,6 +1799,30 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi_response(
+        code=200,
+        content_type='application/json',
+        description='Returns the list of images',
+        schema=Prop('The list of images', [ImageConverter.schema()]),
+    )
+    @openapi_response(404, 'Tenant not found')
+    def images(self, tenant_name, tenant, auth):
+        ret = []
+        ibr = self.zuulweb.image_build_registry
+        for provider in self.zuulweb.tenant_providers[tenant_name]:
+            for image in provider.images.values():
+                if image.type == 'zuul':
+                    builds = ibr.getArtifactsForImage(image.canonical_name)
+                else:
+                    builds = None
+                ret.append(ImageConverter.toDict(provider, image, builds))
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.check_tenant_auth()
     def labels(self, tenant_name, tenant, auth):
         allowed_labels = tenant.allowed_labels or []
         disallowed_labels = tenant.disallowed_labels or []
@@ -2434,6 +2532,8 @@ class ZuulWeb(object):
                           controller=api, action='providers')
         route_map.connect('api', '/api/tenant/{tenant_name}/pipelines',
                           controller=api, action='pipelines')
+        route_map.connect('api', '/api/tenant/{tenant_name}/images',
+                          controller=api, action='images')
         route_map.connect('api', '/api/tenant/{tenant_name}/labels',
                           controller=api, action='labels')
         route_map.connect('api', '/api/tenant/{tenant_name}/nodes',
@@ -2536,6 +2636,7 @@ class ZuulWeb(object):
         self.tenant_providers = {}
         self.layout_providers_store = LayoutProvidersStore(
             self.zk_client, self.connections)
+        self.image_build_registry = ImageBuildRegistry(self.zk_client)
 
         self.management_events = TenantManagementEventQueue.createRegistry(
             self.zk_client)

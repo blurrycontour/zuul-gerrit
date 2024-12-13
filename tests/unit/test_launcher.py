@@ -63,27 +63,6 @@ class ImageMocksFixture(ResponsesFixture):
 class LauncherBaseTestCase(ZuulTestCase):
     config_file = 'zuul-connections-nodepool.conf'
     mock_aws = mock_aws()
-
-    def setUp(self):
-        self.mock_aws.start()
-        # Must start responses after mock_aws
-        self.useFixture(ImageMocksFixture())
-        self.s3 = boto3.resource('s3', region_name='us-west-2')
-        self.s3.create_bucket(
-            Bucket='zuul',
-            CreateBucketConfiguration={'LocationConstraint': 'us-west-2'})
-        self.addCleanup(self.mock_aws.stop)
-        super().setUp()
-
-    def _nodes_by_label(self):
-        nodes = self.launcher.api.nodes_cache.getItems()
-        nodes_by_label = defaultdict(list)
-        for node in nodes:
-            nodes_by_label[node.label].append(node)
-        return nodes_by_label
-
-
-class TestLauncher(LauncherBaseTestCase):
     debian_return_data = {
         'zuul': {
             'artifacts': [
@@ -143,6 +122,27 @@ class TestLauncher(LauncherBaseTestCase):
         }
     }
 
+    def setUp(self):
+        self.mock_aws.start()
+        # Must start responses after mock_aws
+        self.useFixture(ImageMocksFixture())
+        self.s3 = boto3.resource('s3', region_name='us-west-2')
+        self.s3.create_bucket(
+            Bucket='zuul',
+            CreateBucketConfiguration={'LocationConstraint': 'us-west-2'})
+        self.addCleanup(self.mock_aws.stop)
+        super().setUp()
+
+    def _nodes_by_label(self):
+        nodes = self.launcher.api.nodes_cache.getItems()
+        nodes_by_label = defaultdict(list)
+        for node in nodes:
+            nodes_by_label[node.label].append(node)
+        return nodes_by_label
+
+
+class TestLauncher(LauncherBaseTestCase):
+
     @simple_layout('layouts/nodepool-missing-connection.yaml',
                    enable_nodepool=True)
     def test_launcher_missing_connection(self):
@@ -159,12 +159,12 @@ class TestLauncher(LauncherBaseTestCase):
     @return_data(
         'build-debian-local-image',
         'refs/heads/master',
-        debian_return_data,
+        LauncherBaseTestCase.debian_return_data,
     )
     @return_data(
         'build-ubuntu-local-image',
         'refs/heads/master',
-        ubuntu_return_data,
+        LauncherBaseTestCase.ubuntu_return_data,
     )
     @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
                 return_value="test_external_id")
@@ -212,7 +212,7 @@ class TestLauncher(LauncherBaseTestCase):
     @return_data(
         'build-debian-local-image',
         'refs/heads/master',
-        debian_return_data,
+        LauncherBaseTestCase.debian_return_data,
     )
     @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
                 return_value="test_external_id")
@@ -257,7 +257,7 @@ class TestLauncher(LauncherBaseTestCase):
     @return_data(
         'build-debian-local-image',
         'refs/heads/master',
-        debian_return_data,
+        LauncherBaseTestCase.debian_return_data,
     )
     @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
                 return_value="test_external_id")
@@ -352,7 +352,7 @@ class TestLauncher(LauncherBaseTestCase):
     @return_data(
         'build-debian-local-image',
         'refs/heads/master',
-        debian_return_data,
+        LauncherBaseTestCase.debian_return_data,
     )
     @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
                 return_value="test_external_id")
@@ -606,12 +606,12 @@ class TestLauncher(LauncherBaseTestCase):
     @return_data(
         'build-debian-local-image',
         'refs/heads/master',
-        debian_return_data,
+        LauncherBaseTestCase.debian_return_data,
     )
     @return_data(
         'build-ubuntu-local-image',
         'refs/heads/master',
-        ubuntu_return_data,
+        LauncherBaseTestCase.ubuntu_return_data,
     )
     # Use an existing image id since the upload methods aren't
     # implemented in boto; the actualy upload process will be tested
