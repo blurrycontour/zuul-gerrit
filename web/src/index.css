@@ -995,3 +995,23 @@ details.foldable[open] summary::before {
       transparent
     );
 }
+
+.zuul-pipeline-summary .zuul-pipeline-fav {
+    visibility: hidden;
+    background-color: transparent !important;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.zuul-pipeline-summary:hover .zuul-pipeline-fav {
+    visibility: visible;
+}
+
+.zuul-pipeline-fav-icon-enabled {
+    visibility: visible;
+    color: gold;
+}
+
+.zuul-pipeline-fav-icon-disabled {
+    color: grey;
+}
