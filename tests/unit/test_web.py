@@ -1424,6 +1424,7 @@ class TestWebProviders(LauncherBaseTestCase, WebMixin):
             dict(name='build-debian-local-image', result='SUCCESS'),
             dict(name='build-ubuntu-local-image', result='SUCCESS'),
         ], ordered=False)
+
         resp = self.get_url('api/tenant/tenant-one/images')
         data = resp.json()
         self.assertEqual(4, len(data))
@@ -1761,8 +1762,8 @@ class TestInfo(BaseTestWeb):
         statsd_config = self.config_ini_data.get('statsd', {})
         self.stats_prefix = statsd_config.get('prefix')
 
-    def _expected_info(self):
-        return {
+    def _expected_info(self, niz=None):
+        ret = {
             "info": {
                 "capabilities": {
                     "job_history": True,
@@ -1780,6 +1781,9 @@ class TestInfo(BaseTestWeb):
                 "websocket_url": self.websocket_url,
             }
         }
+        if niz is not None:
+            ret['info']['capabilities']['auth']['niz'] = niz
+        return ret
 
     def test_info(self):
         info = self.get_url("api/info").json()
@@ -1788,7 +1792,7 @@ class TestInfo(BaseTestWeb):
 
     def test_tenant_info(self):
         info = self.get_url("api/tenant/tenant-one/info").json()
-        expected_info = self._expected_info()
+        expected_info = self._expected_info(niz=False)
         expected_info['info']['tenant'] = 'tenant-one'
         self.assertEqual(
             info, expected_info)
@@ -1798,7 +1802,7 @@ class TestWebCapabilitiesInfo(TestInfo):
 
     config_file = 'zuul-admin-web-oidc.conf'
 
-    def _expected_info(self):
+    def _expected_info(self, niz=None):
         info = super(TestWebCapabilitiesInfo, self)._expected_info()
         info['info']['capabilities']['auth'] = {
             'realms': {
@@ -1828,6 +1832,8 @@ class TestWebCapabilitiesInfo(TestInfo):
             'default_realm': 'myOIDC1',
             'read_protected': False,
         }
+        if niz is not None:
+            info['info']['capabilities']['auth']['niz'] = niz
         return info
 
 
@@ -1836,7 +1842,7 @@ class TestTenantAuthRealmInfo(TestWebCapabilitiesInfo):
     tenant_config_file = 'config/authorization/rules-templating/main.yaml'
 
     def test_tenant_info(self):
-        expected_info = self._expected_info()
+        expected_info = self._expected_info(niz=False)
         info = self.get_url("api/tenant/tenant-zero/info").json()
         expected_info['info']['tenant'] = 'tenant-zero'
         expected_info['info']['capabilities']['auth']['default_realm'] =\
@@ -1873,7 +1879,7 @@ class TestRootAuth(TestWebCapabilitiesInfo):
         self.assertEqual(expected_info, info)
 
     def test_tenant_info(self):
-        expected_info = self._expected_info()
+        expected_info = self._expected_info(niz=False)
         info = self.get_url("api/tenant/tenant-zero/info").json()
         expected_info['info']['tenant'] = 'tenant-zero'
         expected_info['info']['capabilities']['auth']['default_realm'] =\
