@@ -388,17 +388,17 @@ class ProviderConverter:
                 'type': image.type,
             }
             images.append(ret_image)
-            build_artifacts = [
+            image_build_artifacts = [
                 iba for iba in build_artifacts
                 if iba.canonical_name == image.canonical_name
             ]
-            if build_artifacts:
+            if image_build_artifacts:
                 ret_image['build_artifacts'] = [
                     ImageBuildArtifactConverter.toDict(
                         b,
                         [u for u in uploads if u.artifact_uuid == b.uuid]
                     )
-                    for b in build_artifacts
+                    for b in image_build_artifacts
                 ]
         labels = [
             {'name': x.name,
@@ -1409,7 +1409,7 @@ class ZuulWebAPI(object):
             auth_info['default_realm'] = root_realm
         read_protected = bool(self.zuulweb.abide.api_root.access_rules)
         auth_info['read_protected'] = read_protected
-        return self._handleInfo(info)
+        return self._handleInfo(info.toDict())
 
     @cherrypy.expose
     @cherrypy.tools.save_params()
@@ -1422,16 +1422,19 @@ class ZuulWebAPI(object):
         auth_info = info.capabilities.capabilities['auth']
         info.tenant = tenant_name
         tenant = self.zuulweb.abide.tenants.get(tenant_name)
+        info = info.toDict()
         if tenant is not None:
             # TODO: should we return 404 if tenant not found?
             if tenant.default_auth_realm is not None:
                 auth_info['default_realm'] = tenant.default_auth_realm
             read_protected = bool(tenant.access_rules)
             auth_info['read_protected'] = read_protected
+            # TODO: remove this after NIZ transition is complete
+            auth_info['niz'] = bool(self.zuulweb.tenant_providers[tenant_name])
         return self._handleInfo(info)
 
     def _handleInfo(self, info):
-        ret = {'info': info.toDict()}
+        ret = {'info': info}
         resp = cherrypy.response
         if self.static_cache_expiry:
             resp.headers['Cache-Control'] = "public, max-age=%d" % \

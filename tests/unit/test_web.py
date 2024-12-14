@@ -1424,6 +1424,7 @@ class TestWebProviders(LauncherBaseTestCase, WebMixin):
             dict(name='build-debian-local-image', result='SUCCESS'),
             dict(name='build-ubuntu-local-image', result='SUCCESS'),
         ], ordered=False)
+
         resp = self.get_url('api/tenant/tenant-one/images')
         data = resp.json()
         self.assertEqual(4, len(data))
