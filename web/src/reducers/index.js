@@ -33,6 +33,7 @@ import project from './project'
 import pipelines from './pipelines'
 import projects from './projects'
 import preferences from './preferences'
+import providers from './providers'
 import semaphores from './semaphores'
 import status from './status'
 import statusExpansion from './statusExpansion'
@@ -62,6 +63,7 @@ const reducers = {
   pipelines,
   project,
   projects,
+  providers,
   semaphores,
   status,
   statusExpansion,
