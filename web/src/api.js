@@ -212,6 +212,10 @@ function fetchProjects(apiPrefix) {
   return makeRequest(apiPrefix + 'projects')
 }
 
+function fetchProviders(apiPrefix) {
+  return makeRequest(apiPrefix + 'providers')
+}
+
 function fetchJob(apiPrefix, jobName) {
   return makeRequest(apiPrefix + 'job/' + jobName)
 }
@@ -361,6 +365,7 @@ export {
   fetchPipelines,
   fetchProject,
   fetchProjects,
+  fetchProviders,
   fetchSemaphores,
   fetchStatus,
   fetchTenantInfo,
