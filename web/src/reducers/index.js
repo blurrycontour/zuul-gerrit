@@ -21,6 +21,7 @@ import component from './component'
 import freezejob from './freezejob'
 import notifications from './notifications'
 import build from './build'
+import images from './images'
 import info from './info'
 import job from './job'
 import jobgraph from './jobgraph'
@@ -52,6 +53,7 @@ const reducers = {
   tenantStatus,
   freezejob,
   notifications,
+  images,
   info,
   job,
   jobgraph,

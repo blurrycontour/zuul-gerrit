@@ -12,32 +12,34 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import ComponentsPage from './pages/Components'
-import FreezeJobPage from './pages/FreezeJob'
-import ChangeStatusPage from './pages/ChangeStatus'
-import ProjectPage from './pages/Project'
-import ProjectsPage from './pages/Projects'
-import ProvidersPage from './pages/Providers'
-import ProviderPage from './pages/Provider'
-import ProviderImagePage from './pages/ProviderImage'
-import JobPage from './pages/Job'
-import JobsPage from './pages/Jobs'
-import LabelsPage from './pages/Labels'
-import NodesPage from './pages/Nodes'
-import SemaphorePage from './pages/Semaphore'
-import SemaphoresPage from './pages/Semaphores'
-import AutoholdsPage from './pages/Autoholds'
 import AutoholdPage from './pages/Autohold'
+import AutoholdsPage from './pages/Autoholds'
 import BuildPage from './pages/Build'
 import BuildsPage from './pages/Builds'
 import BuildsetPage from './pages/Buildset'
 import BuildsetsPage from './pages/Buildsets'
+import ChangeStatusPage from './pages/ChangeStatus'
+import ComponentsPage from './pages/Components'
 import ConfigErrorsPage from './pages/ConfigErrors'
-import TenantsPage from './pages/Tenants'
-import StreamPage from './pages/Stream'
+import FreezeJobPage from './pages/FreezeJob'
+import JobPage from './pages/Job'
+import JobsPage from './pages/Jobs'
+import ImagePage from './pages/Image'
+import ImagesPage from './pages/Images'
+import LabelsPage from './pages/Labels'
+import NodesPage from './pages/Nodes'
 import OpenApiPage from './pages/OpenApi'
 import PipelineDetailsPage from './pages/PipelineDetails'
 import PipelineOverviewPage from './pages/PipelineOverview'
+import ProjectPage from './pages/Project'
+import ProjectsPage from './pages/Projects'
+import ProviderImagePage from './pages/ProviderImage'
+import ProviderPage from './pages/Provider'
+import ProvidersPage from './pages/Providers'
+import SemaphorePage from './pages/Semaphore'
+import SemaphoresPage from './pages/Semaphores'
+import StreamPage from './pages/Stream'
+import TenantsPage from './pages/Tenants'
 
 // The Route object are created in the App component.
 // Object with a title are created in the menu.
@@ -190,6 +192,19 @@ const routes = (info) => {
       {
         to: '/provider/:providerName/image/:imageName',
         component: ProviderImagePage,
+      }
+    )
+    ret.push(
+      {
+        title: 'Images',
+        to: '/images',
+        component: ImagesPage,
+      }
+    )
+    ret.push(
+      {
+        to: '/image/:imageName',
+        component: ImagePage,
       }
     )
   }
