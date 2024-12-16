@@ -13,13 +13,16 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import {
+  Button,
   EmptyState,
   EmptyStateBody,
   Spinner,
   Title,
+  Modal,
+  ModalVariant,
 } from '@patternfly/react-core'
 import {
   Table,
@@ -29,7 +32,8 @@ import {
 } from '@patternfly/react-table'
 
 function ImageUploadTable(props) {
-  const { uploads, fetching } = props
+  const { build, uploads, fetching } = props
+  const [showDeleteUploadModal, setShowDeleteUploadModal] = useState(false)
 
   const columns = [
     {
@@ -56,6 +60,7 @@ function ImageUploadTable(props) {
 
   function createImageUploadRow(upload) {
     return {
+      canDelete: build.build_tenant,
       cells: [
         {
           title: upload.uuid
@@ -95,6 +100,43 @@ function ImageUploadTable(props) {
     return rows
   }
 
+  const actionResolver = (rowData) => {
+    if (!rowData.canDelete) {
+      return []
+    }
+    return [
+       {
+         title: 'Delete upload',
+         onClick: () => {setShowDeleteUploadModal(true)}
+       },
+    ]
+  }
+
+  function renderDeleteUploadModal() {
+    const title = 'Delete image upload'
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        isOpen={showDeleteUploadModal}
+        title={title}
+        onClose={() => { setShowDeleteUploadModal(false) }}
+        actions={[
+          <Button key="confirm" variant="primary"
+                  onClick={() => {setShowDeleteUploadModal(false) }}>
+            Confirm
+          </Button>,
+          <Button key="cancel" variant="link"
+                  onClick={() => {setShowDeleteUploadModal(false) }}>
+            Cancel
+          </Button>,
+        ]}>
+        <p>
+          Please confirm that you want to delete this image upload.
+        </p>
+      </Modal>
+    )
+  }
+
   const haveUploads = uploads && uploads.length > 0
 
   let rows = []
@@ -117,7 +159,7 @@ function ImageUploadTable(props) {
         variant={TableVariant.compact}
         cells={columns}
         rows={rows}
-        className="zuul-table"
+        actionResolver={actionResolver}
       >
         <TableHeader />
         <TableBody />
@@ -133,11 +175,13 @@ function ImageUploadTable(props) {
           </EmptyStateBody>
         </EmptyState>
       )}
+      {renderDeleteUploadModal()}
     </>
   )
 }
 
 ImageUploadTable.propTypes = {
+  build: PropTypes.object,
   uploads: PropTypes.array,
   fetching: PropTypes.bool.isRequired,
 }
