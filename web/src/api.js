@@ -200,6 +200,10 @@ function fetchBuildsets(apiPrefix, queryString) {
   return makeRequest(apiPrefix + path)
 }
 
+function fetchImages(apiPrefix) {
+  return makeRequest(apiPrefix + 'images')
+}
+
 function fetchPipelines(apiPrefix) {
   return makeRequest(apiPrefix + 'pipelines')
 }
@@ -355,6 +359,7 @@ export {
   fetchComponents,
   fetchConfigErrors,
   fetchFreezeJob,
+  fetchImages,
   fetchInfo,
   fetchJob,
   fetchJobGraph,
