@@ -377,7 +377,7 @@ class ProviderConverter:
     # A class to encapsulate the conversion of Provider objects to
     # API output.
     @staticmethod
-    def toDict(provider, build_artifacts, uploads):
+    def toDict(tenant, provider, build_artifacts, uploads):
         # These are the flattened versions of these objects for this
         # provider.
         images = []
@@ -395,7 +395,7 @@ class ProviderConverter:
             if image_build_artifacts:
                 ret_image['build_artifacts'] = [
                     ImageBuildArtifactConverter.toDict(
-                        b,
+                        tenant, b,
                         [u for u in uploads if u.artifact_uuid == b.uuid]
                     )
                     for b in image_build_artifacts
@@ -480,12 +480,13 @@ class ImageBuildArtifactConverter:
     # A class to encapsulate the conversion of image build objects to
     # API output.
     @staticmethod
-    def toDict(build, uploads):
+    def toDict(tenant, build, uploads):
         timestamp = _datetimeToString(
             datetime.utcfromtimestamp(build.timestamp))
         ret = {
             'uuid': build.uuid,
             'canonical_name': build.canonical_name,
+            'build_tenant': tenant.name == build.build_tenant_name,
             'build_uuid': build.build_uuid,
             'format': build.format,
             'md5sum': build.md5sum,
@@ -504,6 +505,7 @@ class ImageBuildArtifactConverter:
         return Prop('The image build artifact', {
             'uuid': str,
             'canonical_name': str,
+            'build_tenant': bool,
             'build_uuid': str,
             'format': str,
             'md5sum': str,
@@ -519,7 +521,7 @@ class ImageConverter:
     # A class to encapsulate the conversion of Image objects to
     # API output.
     @staticmethod
-    def toDict(image, build_artifacts, uploads):
+    def toDict(tenant, image, build_artifacts, uploads):
         ret = {
             'name': image.name,
             'canonical_name': image.canonical_name,
@@ -530,7 +532,7 @@ class ImageConverter:
         if build_artifacts:
             ret['build_artifacts'] = [
                 ImageBuildArtifactConverter.toDict(
-                    b,
+                    tenant, b,
                     [u for u in uploads if u.artifact_uuid == b.uuid]
                 )
                 for b in build_artifacts
@@ -1882,7 +1884,7 @@ class ZuulWebAPI(object):
                     build_artifacts = []
                     uploads = []
             ret.append(ProviderConverter.toDict(
-                provider, build_artifacts, uploads))
+                tenant, provider, build_artifacts, uploads))
         return ret
 
     @cherrypy.expose
@@ -1941,11 +1943,11 @@ class ZuulWebAPI(object):
                     b for b in ibr.getArtifactsForImage(image.canonical_name)
                     if b.uuid in artifact_uuids
                 ]
-
             else:
                 build_artifacts = []
                 uploads = []
-            ret.append(ImageConverter.toDict(image, build_artifacts, uploads))
+            ret.append(ImageConverter.toDict(tenant, image,
+                                             build_artifacts, uploads))
         return ret
 
     @cherrypy.expose
