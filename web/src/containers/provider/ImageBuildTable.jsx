@@ -13,14 +13,17 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
+  Button,
   EmptyState,
   EmptyStateBody,
   Spinner,
   Title,
+  Modal,
+  ModalVariant,
 } from '@patternfly/react-core'
 import {
   Table,
@@ -34,7 +37,8 @@ import ImageUploadTable from './ImageUploadTable'
 
 function ImageBuildTable(props) {
   const { buildArtifacts, fetching } = props
-  const [collapsedRows, setCollapsedRows] = React.useState([])
+  const [collapsedRows, setCollapsedRows] = useState([])
+  const [showDeleteImageModal, setShowDeleteImageModal] = useState(false)
   const setRowCollapsed = (idx, isCollapsing = true) =>
         setCollapsedRows(prevCollapsed => {
           const otherCollapsedRows = prevCollapsed.filter(r => r !== idx)
@@ -65,9 +69,18 @@ function ImageBuildTable(props) {
   ]
 
   function createImageBuildRow(rows, build) {
+    // Only link to the build if it is in this tenant
+    const buildUUID = build.build_tenant?
+          <Link to={`${tenant.linkPrefix}/build/${build.build_uuid}`}>
+            {build.build_uuid}
+          </Link>
+          :
+          build.build_uuid
     return {
+      uuid: build.uuid,
       id: rows.length,
       isOpen: !isRowCollapsed(rows.length),
+      canDelete: build.build_tenant,
       cells: [
         {
           title: build.uuid
@@ -79,23 +92,22 @@ function ImageBuildTable(props) {
           title: build.validated.toString()
         },
         {
-          // TODO: This may not be a valid link if it's outside this tenant;
-          // consider hiding it in that case.
-          title: <Link to={`${tenant.linkPrefix}/build/${build.build_uuid}`}>
-                   {build.build_uuid}
-                 </Link>
+          title: buildUUID
         },
       ]
     }
   }
+
   function createImageUploadRow(rows, parent, build) {
     return {
       id: rows.length,
       parent: parent.id,
       cells: [
         {
-          title: <ImageUploadTable uploads={build.uploads}
-                                   fetching={fetching}/>
+          title: <ImageUploadTable
+                   build={build}
+                   uploads={build.uploads}
+                   fetching={fetching}/>
         },
       ]
     }
@@ -137,6 +149,44 @@ function ImageBuildTable(props) {
     }
   }
 
+  const actionResolver = (rowData) => {
+    if (rowData.parent !== undefined || !rowData.canDelete) {
+      return []
+    }
+    return [
+       {
+         title: 'Delete build',
+         onClick: () => {setShowDeleteImageModal(true)}
+       },
+    ]
+  }
+
+  function renderDeleteImageModal() {
+    const title = 'Delete image build'
+    return (
+      <Modal
+        variant={ModalVariant.small}
+        isOpen={showDeleteImageModal}
+        title={title}
+        onClose={() => { setShowDeleteImageModal(false) }}
+        actions={[
+          <Button key="confirm" variant="primary"
+                  onClick={() => {setShowDeleteImageModal(false) }}>
+            Confirm
+          </Button>,
+          <Button key="cancel" variant="link"
+                  onClick={() => {setShowDeleteImageModal(false) }}>
+            Cancel
+          </Button>,
+        ]}>
+        <p>
+          Please confirm that you want to delete this image
+          and all of its uploads.
+        </p>
+      </Modal>
+    )
+  }
+
   return (
     <>
       <Title headingLevel="h3">
@@ -147,10 +197,10 @@ function ImageBuildTable(props) {
         variant={TableVariant.compact}
         cells={columns}
         rows={rows}
+        actionResolver={actionResolver}
         onCollapse={(_event, rowIndex, isOpen, rowData) => {
           setRowCollapsed(rowIndex, !isOpen)
         }}
-        className="zuul-table"
       >
         <TableHeader />
         <TableBody />
@@ -166,6 +216,7 @@ function ImageBuildTable(props) {
           </EmptyStateBody>
         </EmptyState>
       )}
+      {renderDeleteImageModal()}
     </>
   )
 }
