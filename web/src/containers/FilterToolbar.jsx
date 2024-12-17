@@ -23,6 +23,7 @@ import {
   DropdownPosition,
   DropdownToggle,
   InputGroup,
+  Label,
   TextInput,
   Toolbar,
   ToolbarContent,
@@ -39,6 +40,46 @@ import { FilterSelect } from './filters/Select'
 import { FilterTernarySelect } from './filters/TernarySelect'
 import { FilterCheckbox } from './filters/Checkbox'
 
+
+function ToolbarStatsGroup({ children }) {
+  return (
+    <ToolbarGroup variant="icon-button-group" className="zuul-toolbar-stats">
+      {children}
+    </ToolbarGroup>
+  )
+}
+
+ToolbarStatsGroup.propTypes = {
+  children: PropTypes.array.isRequired,
+}
+
+function ToolbarStatsItem({ name, value, tooltipContent, reverse = false }) {
+
+  const value_span = <span className="zuul-toolbar-stats-item__value">{value}</span>
+  const name_span = <span className="zuul-toolbar-stats-item__name">{name}</span>
+  const label = reverse ? <>{name_span} {value_span}</> : <>{value_span} {name_span}</>
+
+  return (
+    <ToolbarItem className={`zuul-toolbar-stats-item${reverse ? '-reverse' : ''}`}>
+      <Tooltip
+        content={
+          <div className="zuul-toolbar-stats-item__extended">
+            {tooltipContent}
+          </div>
+        }
+        position="bottom"
+      >
+        <Label>{label}</Label>
+      </Tooltip>
+    </ToolbarItem>
+  )
+}
+
+ToolbarStatsItem.propTypes = {
+  name: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  tooltipContent: PropTypes.object.isRequired,
+}
 
 function FilterToolbar(props) {
   const dispatch = useDispatch()
@@ -399,5 +440,7 @@ export {
   getFiltersFromUrl,
   isFilterActive,
   makeQueryString,
+  ToolbarStatsGroup,
+  ToolbarStatsItem,
   writeFiltersToUrl,
 }
