@@ -1153,6 +1153,7 @@ class Scheduler(threading.Thread):
 
         # No need to lock it since we are creating a new one.
         self.nodepool.zk_nodepool.storeHoldRequest(request)
+        return request.id
 
     def autohold_list(self):
         '''
