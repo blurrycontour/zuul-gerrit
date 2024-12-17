@@ -23,6 +23,7 @@ import {
   DropdownPosition,
   DropdownToggle,
   InputGroup,
+  Label,
   TextInput,
   Toolbar,
   ToolbarContent,
@@ -39,6 +40,48 @@ import { FilterSelect } from './filters/Select'
 import { FilterTernarySelect } from './filters/TernarySelect'
 import { FilterCheckbox } from './filters/Checkbox'
 
+
+function ToolbarStatsGroup({ children }) {
+  return (
+    <ToolbarGroup variant="icon-button-group" className="zuul-tenant-stats">
+      {children}
+    </ToolbarGroup>
+  )
+}
+
+ToolbarStatsGroup.propTypes = {
+  children: PropTypes.array.isRequired,
+}
+
+function ToolbarStatsItem({ name, value, tooltipContent }) {
+  return (
+    <ToolbarItem className="zuul-tenant-stats-item">
+      <Tooltip
+        content={
+          <div className="zuul-tenant-stats-item__extended">
+            {tooltipContent}
+          </div>
+        }
+        position="bottom"
+      >
+        <Label>
+          <span className="zuul-tenant-stats-item__value">
+            {value}
+          </span>
+          <span className="zuul-tenant-stats-item__name">
+            {name}
+          </span>
+        </Label>
+      </Tooltip>
+    </ToolbarItem>
+  )
+}
+
+ToolbarStatsItem.propTypes = {
+  name: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  tooltipContent: PropTypes.object.isRequired,
+}
 
 function FilterToolbar(props) {
   const dispatch = useDispatch()
@@ -399,5 +442,7 @@ export {
   getFiltersFromUrl,
   isFilterActive,
   makeQueryString,
+  ToolbarStatsGroup,
+  ToolbarStatsItem,
   writeFiltersToUrl,
 }

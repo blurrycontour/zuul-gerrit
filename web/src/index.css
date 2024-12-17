@@ -80,6 +80,33 @@ a.refresh {
     background: #000;
 }
 
+/* Toolbar */
+
+.zuul-toolbar-section .pf-l-level {
+    /* Don't align items on center, as this would shift the reload button
+       and toolbar stats when a filter is applied and the chip group
+       shows up below the search input field. */
+    align-items: normal;
+}
+
+.zuul-tenant-stats-item.pf-c-toolbar__item {
+    margin-right: 0.5rem;
+}
+
+.zuul-tenant-stats-item .pf-c-label__content {
+    font-size: var(--pf-global--FontSize--xs);
+}
+
+.zuul-tenant-stats-item__value {
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+.zuul-tenant-stats-item__extended {
+    text-align: left;
+    font-size: var(--pf-global--FontSize--sm);
+}
+
 /* Config error modal */
 .zuul-config-errors-title {
     font-size: var(--pf-global--FontSize--xl);
@@ -916,6 +943,7 @@ details.foldable[open] summary::before {
 
 .zuul-reload-button button {
     padding-right: 4px;
+    padding-left: 8px;
 }
 
 .zuul-reload-spinner.pf-c-spinner {
