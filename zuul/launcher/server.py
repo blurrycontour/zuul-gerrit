@@ -303,7 +303,7 @@ class Launcher:
         self.layout_updated_event = threading.Event()
         self.layout_updated_event.set()
 
-        self.upload_added_event = threading.Event()
+        self.image_changed_event = threading.Event()
         self.upload_deleted_event = threading.Event()
 
         self.tenant_layout_state = LayoutStateStore(
@@ -312,10 +312,13 @@ class Launcher:
             self.zk_client, self.connections)
         self.local_layout_state = {}
 
-        self.image_build_registry = ImageBuildRegistry(self.zk_client)
+        self.image_build_registry = ImageBuildRegistry(
+            self.zk_client,
+            self._imageChangedCallback
+        )
         self.image_upload_registry = ImageUploadRegistry(
             self.zk_client,
-            self._uploadAddedCallback
+            self._imageChangedCallback
         )
 
         self.launcher_thread = threading.Thread(
@@ -338,8 +341,8 @@ class Launcher:
         self.layout_updated_event.set()
         self.wake_event.set()
 
-    def _uploadAddedCallback(self):
-        self.upload_added_event.set()
+    def _imageChangedCallback(self):
+        self.image_changed_event.set()
         self.wake_event.set()
 
     def run(self):
@@ -363,7 +366,7 @@ class Launcher:
                 self.checkOldImages()
                 self.checkMissingImages()
                 self.checkMissingUploads()
-        if self.upload_added_event.is_set():
+        if self.image_changed_event.is_set():
             self.checkOldImages()
             self.checkMissingUploads()
         if self.upload_deleted_event.is_set():
@@ -1155,7 +1158,7 @@ class Launcher:
     def checkMissingUploads(self):
         self.log.debug("Checking for missing uploads")
         uploads_by_artifact_id = collections.defaultdict(list)
-        self.upload_added_event.clear()
+        self.image_changed_event.clear()
         for upload in self.image_upload_registry.getItems():
             if upload.endpoint_name not in self.endpoints:
                 continue
