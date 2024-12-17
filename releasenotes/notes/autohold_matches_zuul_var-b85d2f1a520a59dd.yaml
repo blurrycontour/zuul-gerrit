@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Add a new Ansible variable to zuul_vars called "autohold_matches". This
+    variable contains a list of IDs of autohold requests that match the current build.
+    This can be useful to prepare a debug environment, or take any other
+    required steps, in case a autohold occurs.

@@ -2154,6 +2154,31 @@ class TestScheduler(ZuulTestCase):
                          'FAILURE')
 
     @simple_layout('layouts/autohold.yaml')
+    def test_autohold_matches_zuul_var(self):
+        ah_id = self.scheds.first.sched.autohold(
+            'tenant-one', 'review.example.com/org/project', 'project-test2',
+            ".*", "reason text", 1, None)
+
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        build = self.getBuildByName('project-test2')
+        inv_path = os.path.join(build.jobdir.root,
+                                'ansible', 'inventory.yaml')
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
+            z_vars = inventory['all']['vars']['zuul']
+            self.assertIn('autohold_matches', z_vars)
+            self.assertIn(ah_id, z_vars['autohold_matches'])
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+    @simple_layout('layouts/autohold.yaml')
     def test_autohold(self):
         self.scheds.first.sched.autohold(
             'tenant-one', 'review.example.com/org/project', 'project-test2',

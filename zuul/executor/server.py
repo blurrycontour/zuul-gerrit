@@ -2801,6 +2801,20 @@ class AnsibleJob(object):
                        if ri.role_path is not None],
             ))
 
+        # Add autohold info
+        autohold_matches = []
+        try:
+            autoholds = self.executor_server._getAutoholdRequest(args, True)
+            autohold_matches = [ah.id for ah in autoholds]
+        except Exception:
+            tenant = args["zuul"]["tenant"]
+            project = args["zuul"]["project"]["canonical_name"]
+            job = args["zuul"]["job"]
+            self.log.exception('Autohold lookup error with arguments: '
+                               'tenant:"%s" project:"%s" job:"%s"'
+                               % (tenant, project, job))
+        zuul_vars['autohold_matches'] = autohold_matches
+
         # The zuul vars in the debug inventory.yaml file should not
         # have any !unsafe tags, so save those before we update the
         # execution version of those.
@@ -4330,7 +4344,7 @@ class ExecutorServer(BaseMergeServer):
 
         return True
 
-    def _getAutoholdRequest(self, args):
+    def _getAutoholdRequest(self, args, list_all=False):
         autohold_key_base = (
             args["zuul"]["tenant"],
             args["zuul"]["project"]["canonical_name"],
@@ -4359,7 +4373,7 @@ class ExecutorServer(BaseMergeServer):
         # if it matches. Lastly, make sure that we match the most
         # specific autohold request by comparing "scopes"
         # of requests - the most specific is selected.
-        autohold = None
+        autoholds = []
         scope = Scope.NONE
         self.log.debug("Checking build autohold key %s", autohold_key_base)
         for request_id in self.nodepool.zk_nodepool.getHoldRequests():
@@ -4398,9 +4412,12 @@ class ExecutorServer(BaseMergeServer):
             )
             if candidate_scope > scope:
                 scope = candidate_scope
-                autohold = request
-
-        return autohold
+                autoholds.append(request)
+        if list_all:
+            return autoholds
+        if len(autoholds) != 0:
+            return autoholds[-1]
+        return None
 
     def _processAutohold(self, ansible_job, duration, result):
         # We explicitly only want to hold nodes for jobs if they have

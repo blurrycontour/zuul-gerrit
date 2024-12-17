@@ -1045,6 +1045,15 @@ The following variables related to the job are available:
 
          The metadata of the artifact (as supplied to :ref:`return_artifacts`).
 
+   .. var:: autohold_matches
+
+      A list of IDs of autohold requests that match the current build. Note that
+      this doesn't guarantee that an autohold will be triggered under the right
+      circumstances, as this variable is evaluated at build startup, whereas the
+      actual autohold is handled at the end of the build. Enough time might have
+      passed for an autohold request to have expired or been used up by a different
+      build.
+
    .. var:: build
 
       The UUID of the build.  A build is a single execution of a job.
