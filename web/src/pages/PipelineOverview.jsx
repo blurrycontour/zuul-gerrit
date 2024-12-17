@@ -27,6 +27,8 @@ import {
   PageSection,
   PageSectionVariants,
   Switch,
+  Toolbar,
+  ToolbarContent,
   ToolbarItem,
   Tooltip,
 } from '@patternfly/react-core'
@@ -41,6 +43,8 @@ import {
   FilterToolbar,
   getFiltersFromUrl,
   isFilterActive,
+  ToolbarStatsGroup,
+  ToolbarStatsItem,
 } from '../containers/FilterToolbar'
 import {
   clearFilters,
@@ -79,45 +83,6 @@ const filterCategories = [
   },
 ]
 
-function TenantStats({ stats, timezone, isReloading, reloadCallback }) {
-  return (
-    <Level>
-      <LevelItem>
-        <p>
-          Queue lengths:{' '}
-          <span>
-            {stats.trigger_event_queue ? stats.trigger_event_queue.length : '0'}
-          </span> trigger events,{' '}
-          <span>
-            {stats.management_event_queue ? stats.management_event_queue.length : '0'}
-          </span> management events.
-        </p>
-      </LevelItem>
-      <LevelItem>
-        <Tooltip
-          position="bottom"
-          content={moment_tz.utc(stats.last_reconfigured).tz(timezone).format('llll')}
-        >
-          <span>
-            Last reconfigured:{' '}
-            {moment_tz.utc(stats.last_reconfigured).tz(timezone).fromNow()}
-          </span>
-        </Tooltip>
-        <ReloadButton
-          isReloading={isReloading}
-          reloadCallback={reloadCallback}
-        />
-      </LevelItem>
-    </Level>
-  )
-}
-
-TenantStats.propTypes = {
-  stats: PropTypes.object,
-  timezone: PropTypes.string,
-  isReloading: PropTypes.bool.isRequired,
-  reloadCallback: PropTypes.func.isRequired,
-}
 
 function PipelineGallery({ pipelines, tenant, showAllPipelines, expandAll, isLoading, filters, onClearFilters }) {
   // Filter out empty pipelines if necessary
@@ -204,7 +169,7 @@ function PipelineOverviewPage() {
   const isDocumentVisible = useDocumentVisibility()
 
   const status = useSelector((state) => state.status.status)
-  const {pipelines, stats} = useMemo(() => getPipelines(status, location), [status, location])
+  const { pipelines, stats } = useMemo(() => getPipelines(status, location), [status, location])
 
   const isFetching = useSelector((state) => state.status.isFetching)
   const tenant = useSelector((state) => state.tenant)
@@ -280,41 +245,76 @@ function PipelineOverviewPage() {
     />
   )
 
+  let trigger_events = stats.trigger_event_queue ? stats.trigger_event_queue.length : '0'
+  let management_events = stats.management_event_queue ? stats.management_event_queue.length : '0'
+
   return (
     <>
       <PageSection
         variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
         className="zuul-toolbar-section"
       >
-        <TenantStats
-          stats={stats}
-          timezone={timezone}
-          isReloading={isReloading}
-          reloadCallback={() => updateData(tenant)}
-        />
-        <FilterToolbar
-          filterCategories={filterCategories}
-          onFilterChange={onFilterChanged}
-          filters={filters}
-          filterInputValidation={filterInputValidation}
-        >
-          <ToolbarItem>
-            {filterActive ?
-              <Tooltip content="Disabled when filtering">{allPipelinesSwitch}</Tooltip> :
-              allPipelinesSwitch}
-          </ToolbarItem>
-          <ToolbarItem>
-            <Switch
-              className="zuul-show-all-switch"
-              aria-label="Expand all"
-              label="Expand all"
-              isReversed
-              onChange={onExpandAllToggle}
-              isChecked={expandAll}
-            />
-          </ToolbarItem>
-        </FilterToolbar>
-      </PageSection>
+        <Level>
+          <LevelItem>
+            <FilterToolbar
+              filterCategories={filterCategories}
+              onFilterChange={onFilterChanged}
+              filters={filters}
+              filterInputValidation={filterInputValidation}
+            >
+              <ToolbarItem>
+                {filterActive ?
+                  <Tooltip content="Disabled when filtering">{allPipelinesSwitch}</Tooltip> :
+                  allPipelinesSwitch}
+              </ToolbarItem>
+              <ToolbarItem>
+                <Switch
+                  className="zuul-show-all-switch"
+                  aria-label="Expand all"
+                  label="Expand all"
+                  isReversed
+                  onChange={onExpandAllToggle}
+                  isChecked={expandAll}
+                />
+              </ToolbarItem>
+            </FilterToolbar>
+          </LevelItem>
+          <LevelItem>
+            <Toolbar>
+              <ToolbarContent style={{paddingRight: '0'}}>
+                <ToolbarStatsGroup>
+                  <ToolbarStatsItem
+                    name="events"
+                    value={`${trigger_events} / ${management_events}`}
+                    tooltipContent={
+                      <div>
+                        Trigger events: {trigger_events} <br />
+                        Management events: {management_events}
+                      </div>}
+                  />
+                  <ToolbarStatsItem
+                    name="reconfigured"
+                    value={moment_tz.utc(stats.last_reconfigured).tz(timezone).fromNow()}
+                    reverse
+                    tooltipContent={
+                      <div>
+                        Last reconfigured: <br />
+                        {moment_tz.utc(stats.last_reconfigured).tz(timezone).format('llll')}
+                      </div>
+                    }
+                  />
+                  <ToolbarItem>
+                    <ReloadButton
+                      isReloading={isReloading}
+                      reloadCallback={() => updateData(tenant)}
+                    />
+                  </ToolbarItem>
+                </ToolbarStatsGroup>
+              </ToolbarContent>
+            </Toolbar>
+          </LevelItem>
+        </Level>
+      </PageSection >
       <PageSection
         variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
         className="zuul-main-section"
