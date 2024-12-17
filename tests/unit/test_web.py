@@ -1464,6 +1464,117 @@ class TestWebProviders(LauncherBaseTestCase, WebMixin):
         ]
         self.assertEqual(expected, data)
 
+    @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        LauncherBaseTestCase.debian_return_data,
+    )
+    @return_data(
+        'build-ubuntu-local-image',
+        'refs/heads/master',
+        LauncherBaseTestCase.ubuntu_return_data,
+    )
+    @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
+                return_value="test_external_id")
+    def test_web_image_delete(self, mock_uploadImage):
+        self.waitUntilSettled()
+        self.startWebServer()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+
+        resp = self.get_url('api/tenant/tenant-one/images')
+        data = resp.json()
+        self.assertEqual(4, len(data))
+        self.assertNotIn('build_artifacts', data[0])
+        self.assertEqual(1, len(data[1]['build_artifacts']))
+        self.assertEqual(1, len(data[2]['build_artifacts']))
+        self.assertEqual(1, len(data[1]['build_artifacts'][0]['uploads']))
+        self.assertEqual(1, len(data[2]['build_artifacts'][0]['uploads']))
+        art = data[1]['build_artifacts'][0]
+        # Test that unauthenticated access fails
+        resp = self.delete_url(
+            f"api/tenant/tenant-one/image-build-artifact/{art['uuid']}"
+        )
+        self.assertEqual(401, resp.status_code, resp.text)
+        # Do it again with auth
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': int(time.time()) + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        resp = self.delete_url(
+            f"api/tenant/tenant-one/image-build-artifact/{art['uuid']}",
+            headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(204, resp.status_code, resp.text)
+        for _ in iterate_timeout(10, "artifact to be deleted"):
+            resp = self.get_url('api/tenant/tenant-one/images')
+            data = resp.json()
+            if 'build_artifacts' not in data[1]:
+                break
+            time.sleep(1)
+
+    @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        LauncherBaseTestCase.debian_return_data,
+    )
+    @return_data(
+        'build-ubuntu-local-image',
+        'refs/heads/master',
+        LauncherBaseTestCase.ubuntu_return_data,
+    )
+    @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
+                return_value="test_external_id")
+    def test_web_upload_delete(self, mock_uploadImage):
+        self.waitUntilSettled()
+        self.startWebServer()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+
+        resp = self.get_url('api/tenant/tenant-one/images')
+        data = resp.json()
+        self.assertEqual(4, len(data))
+        self.assertNotIn('build_artifacts', data[0])
+        self.assertEqual(1, len(data[1]['build_artifacts']))
+        self.assertEqual(1, len(data[2]['build_artifacts']))
+        self.assertEqual(1, len(data[1]['build_artifacts'][0]['uploads']))
+        self.assertEqual(1, len(data[2]['build_artifacts'][0]['uploads']))
+        upload = data[1]['build_artifacts'][0]['uploads'][0]
+        # Test that unauthenticated access fails
+        resp = self.delete_url(
+            f"api/tenant/tenant-one/image-upload/{upload['uuid']}"
+        )
+        self.assertEqual(401, resp.status_code, resp.text)
+        # Do it again with auth
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': int(time.time()) + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        resp = self.delete_url(
+            f"api/tenant/tenant-one/image-upload/{upload['uuid']}",
+            headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(204, resp.status_code, resp.text)
+        for _ in iterate_timeout(30, "artifact to be deleted"):
+            resp = self.get_url('api/tenant/tenant-one/images')
+            data = resp.json()
+            if 'build_artifacts' not in data[1]:
+                break
+
 
 class TestWebStatusDisplayBranch(BaseTestWeb):
     tenant_config_file = 'config/change-queues/main.yaml'
