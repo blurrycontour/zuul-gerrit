@@ -300,17 +300,16 @@ class ZuulTreeCache(abc.ABC):
         obj = None
         if data:
             # Perform an in-place update of the cached object if possible
-            old_obj = self._cached_objects.get(key)
-            if old_obj:
-                if stat.mzxid <= old_obj._zstat.mzxid:
-                    # Don't update to older data
-                    return
-                if getattr(old_obj, 'lock', None):
-                    # Don't update a locked object
-                    return
-                old_obj._updateFromRaw(data, stat, None)
+
+            obj = self._cached_objects.get(key)
+            if obj:
+                # Don't update to older data
+                # Don't update a locked object
+                if (stat.mzxid > obj._zstat.mzxid and
+                    getattr(obj, 'lock', None) is None):
+                    self.updateFromRaw(obj, key, data, stat)
             else:
-                obj = self.objectFromDict(data, stat)
+                obj = self.objectFromRaw(key, data, stat)
                 self._cached_objects[key] = obj
         else:
             try:
@@ -370,13 +369,27 @@ class ZuulTreeCache(abc.ABC):
         return None
 
     @abc.abstractmethod
-    def objectFromDict(self, d, key):
+    def objectFromRaw(self, key, data, stat):
         """Construct an object from ZooKeeper data
 
-        Given a dictionary of data from ZK and cache key, construct
+        Given data from ZK and cache key, construct
         and return an object to insert into the cache.
 
-        :param dict d: The dictionary.
         :param object key: The key as returned by parsePath.
+        :param dict data: The raw data.
+        :param Zstat stat: The zstat of the znode.
+        """
+        pass
+
+    @abc.abstractmethod
+    def updateFromRaw(self, obj, key, data, stat):
+        """Construct an object from ZooKeeper data
+
+        Update an existing object with new data.
+
+        :param object obj: The old object.
+        :param object key: The key as returned by parsePath.
+        :param dict data: The raw data.
+        :param Zstat stat: The zstat of the znode.
         """
         pass

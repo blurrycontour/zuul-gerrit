@@ -321,6 +321,7 @@ class Launcher:
         )
         self.image_upload_registry = ImageUploadRegistry(
             self.zk_client,
+            self._imageUpdatedCallback
         )
 
         self.launcher_thread = threading.Thread(
