@@ -195,17 +195,110 @@ class TestLauncher(LauncherBaseTestCase):
         ]:
             artifacts = self.launcher.image_build_registry.\
                 getArtifactsForImage(name)
-            self.assertEqual(2, len(artifacts))
-            self.assertEqual('qcow2', artifacts[0].format)
-            self.assertEqual('raw', artifacts[1].format)
+            self.assertEqual(1, len(artifacts))
+            self.assertEqual('raw', artifacts[0].format)
             self.assertTrue(artifacts[0].validated)
-            self.assertTrue(artifacts[1].validated)
             uploads = self.launcher.image_upload_registry.getUploadsForImage(
                 name)
             self.assertEqual(1, len(uploads))
-            self.assertEqual(artifacts[1].uuid, uploads[0].artifact_uuid)
+            self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
             self.assertEqual("test_external_id", uploads[0].external_id)
             self.assertTrue(uploads[0].validated)
+
+    @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        LauncherBaseTestCase.debian_return_data,
+    )
+    @return_data(
+        'build-ubuntu-local-image',
+        'refs/heads/master',
+        LauncherBaseTestCase.ubuntu_return_data,
+    )
+    @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
+                return_value="test_external_id")
+    def test_launcher_image_expire(self, mock_uploadImage):
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+        self.scheds.execute(lambda app: app.sched.reconfigure(app.config))
+
+        for _ in iterate_timeout(
+                30, "scheduler and launcher to have the same layout"):
+            if (self.scheds.first.sched.local_layout_state.get("tenant-one") ==
+                self.launcher.local_layout_state.get("tenant-one")):
+                break
+
+        # The build should not run again because the image is no
+        # longer missing
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+        for name in [
+                'review.example.com%2Forg%2Fcommon-config/debian-local',
+                'review.example.com%2Forg%2Fcommon-config/ubuntu-local',
+        ]:
+            artifacts = self.launcher.image_build_registry.\
+                getArtifactsForImage(name)
+            self.assertEqual(1, len(artifacts))
+            self.assertEqual('raw', artifacts[0].format)
+            self.assertTrue(artifacts[0].validated)
+            uploads = self.launcher.image_upload_registry.getUploadsForImage(
+                name)
+            self.assertEqual(1, len(uploads))
+            self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
+            self.assertEqual("test_external_id", uploads[0].external_id)
+            self.assertTrue(uploads[0].validated)
+
+        image_cname = 'review.example.com%2Forg%2Fcommon-config/ubuntu-local'
+        # Run another build event manually
+        driver = self.launcher.connections.drivers['zuul']
+        event = driver.getImageBuildEvent(
+            ['ubuntu-local'], 'review.example.com',
+            'org/common-config', 'master')
+        self.launcher.trigger_events['tenant-one'].put(
+            event.trigger_name, event)
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+        artifacts = self.launcher.image_build_registry.\
+            getArtifactsForImage(image_cname)
+        self.assertEqual(2, len(artifacts))
+
+        # Run another build event manually
+        driver = self.launcher.connections.drivers['zuul']
+        event = driver.getImageBuildEvent(
+            ['ubuntu-local'], 'review.example.com',
+            'org/common-config', 'master')
+        self.launcher.trigger_events['tenant-one'].put(
+            event.trigger_name, event)
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+        artifacts = self.launcher.image_build_registry.\
+            getArtifactsForImage(image_cname)
+        self.assertEqual(3, len(artifacts))
+
+        # Trigger a deletion run
+        self.launcher.upload_deleted_event.set()
+        self.launcher.wake_event.set()
+        for _ in iterate_timeout(30, "artifacts deleted"):
+            artifacts = self.launcher.image_build_registry.\
+                getArtifactsForImage(image_cname)
+            if len(artifacts) == 2:
+                break
 
     @simple_layout('layouts/nodepool-image-no-validate.yaml',
                    enable_nodepool=True)
@@ -240,15 +333,13 @@ class TestLauncher(LauncherBaseTestCase):
         name = 'review.example.com%2Forg%2Fcommon-config/debian-local'
         artifacts = self.launcher.image_build_registry.getArtifactsForImage(
             name)
-        self.assertEqual(2, len(artifacts))
-        self.assertEqual('qcow2', artifacts[0].format)
-        self.assertEqual('raw', artifacts[1].format)
+        self.assertEqual(1, len(artifacts))
+        self.assertEqual('raw', artifacts[0].format)
         self.assertFalse(artifacts[0].validated)
-        self.assertFalse(artifacts[1].validated)
         uploads = self.launcher.image_upload_registry.getUploadsForImage(
             name)
         self.assertEqual(1, len(uploads))
-        self.assertEqual(artifacts[1].uuid, uploads[0].artifact_uuid)
+        self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
         self.assertEqual("test_external_id", uploads[0].external_id)
         self.assertFalse(uploads[0].validated)
 
@@ -287,15 +378,13 @@ class TestLauncher(LauncherBaseTestCase):
         name = 'review.example.com%2Forg%2Fcommon-config/debian-local'
         artifacts = self.launcher.image_build_registry.getArtifactsForImage(
             name)
-        self.assertEqual(2, len(artifacts))
-        self.assertEqual('qcow2', artifacts[0].format)
-        self.assertEqual('raw', artifacts[1].format)
+        self.assertEqual(1, len(artifacts))
+        self.assertEqual('raw', artifacts[0].format)
         self.assertFalse(artifacts[0].validated)
-        self.assertFalse(artifacts[1].validated)
         uploads = self.launcher.image_upload_registry.getUploadsForImage(
             name)
         self.assertEqual(1, len(uploads))
-        self.assertEqual(artifacts[1].uuid, uploads[0].artifact_uuid)
+        self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
         self.assertEqual("test_external_id", uploads[0].external_id)
         self.assertTrue(uploads[0].validated)
 
@@ -459,15 +548,13 @@ class TestLauncher(LauncherBaseTestCase):
         ]:
             artifacts = self.launcher.image_build_registry.\
                 getArtifactsForImage(name)
-            self.assertEqual(2, len(artifacts))
-            self.assertEqual('qcow2', artifacts[0].format)
-            self.assertEqual('raw', artifacts[1].format)
+            self.assertEqual(1, len(artifacts))
+            self.assertEqual('raw', artifacts[0].format)
             self.assertTrue(artifacts[0].validated)
-            self.assertTrue(artifacts[1].validated)
             uploads = self.launcher.image_upload_registry.getUploadsForImage(
                 name)
             self.assertEqual(1, len(uploads))
-            self.assertEqual(artifacts[1].uuid, uploads[0].artifact_uuid)
+            self.assertEqual(artifacts[0].uuid, uploads[0].artifact_uuid)
             self.assertEqual("test_external_id", uploads[0].external_id)
             self.assertTrue(uploads[0].validated)
 
