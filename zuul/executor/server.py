@@ -2801,6 +2801,21 @@ class AnsibleJob(object):
                        if ri.role_path is not None],
             ))
 
+        # Add autohold info
+        autohold_if_failure = None
+        try:
+            autohold_if_failure = (
+                self.executor_server._getAutoholdRequest(args) is not None
+            )
+        except Exception:
+            tenant = args["zuul"]["tenant"]
+            project = args["zuul"]["project"]["canonical_name"]
+            job = args["zuul"]["job"]
+            self.log.exception('Autohold lookup error with arguments: '
+                               'tenant:"%s" project:"%s" job:"%s"'
+                               % (tenant, project, job))
+        zuul_vars['autohold_if_failure'] = autohold_if_failure
+
         # The zuul vars in the debug inventory.yaml file should not
         # have any !unsafe tags, so save those before we update the
         # execution version of those.

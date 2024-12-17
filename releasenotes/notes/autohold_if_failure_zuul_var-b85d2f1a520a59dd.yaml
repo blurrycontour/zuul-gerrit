@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Add a new Ansible variable to zuul_vars called "autohold_if_failure". This
+    variable is set to true if the current job will trigger an autohold should
+    it fail. This can be useful to prepare a debug environment, or take any other
+    required steps, in a post playbook should this variable be true and zuul_success
+    be set to false.
