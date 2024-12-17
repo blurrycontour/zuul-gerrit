@@ -88,13 +88,17 @@ class LockableZKObjectCache(ZuulTreeCache):
         if not request:
             return
 
-        if self.updated_event:
-            self.updated_event()
         request._set(is_locked=exists)
 
     def postCacheHook(self, event, data, stat, key, obj):
         if self.updated_event:
             self.updated_event()
+
+    def objectFromRaw(self, key, data, zstat):
+        return self.zkobject_class._fromRaw(data, zstat, None)
+
+    def updateFromRaw(self, obj, key, data, zstat):
+        obj._updateFromRaw(data, zstat, None)
 
     def objectFromDict(self, d, zstat):
         return self.zkobject_class._fromRaw(d, zstat, None)
