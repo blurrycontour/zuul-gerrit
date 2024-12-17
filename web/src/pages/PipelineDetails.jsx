@@ -19,6 +19,10 @@ import { withRouter, useLocation, useHistory } from 'react-router-dom'
 
 import {
   Badge,
+  Dropdown,
+  DropdownItem,
+  DropdownPosition,
+  DropdownToggle,
   Flex,
   FlexItem,
   Gallery,
@@ -31,11 +35,13 @@ import {
   Text,
   TextContent,
   TextVariants,
+  Toolbar,
+  ToolbarGroup,
   ToolbarItem,
   Tooltip,
   Switch,
 } from '@patternfly/react-core'
-import { StreamIcon } from '@patternfly/react-icons'
+import { ChartLineIcon, StreamIcon } from '@patternfly/react-icons'
 
 import ChangeQueue from '../containers/status/ChangeQueue'
 import {
@@ -77,21 +83,6 @@ const filterCategories = [
   }
 ]
 
-function PipelineStats({ pipeline }) {
-  return (
-    <>
-      <Title headingLevel="h3" style={{ margin: 0 }}>Events</Title>
-      Trigger: {pipeline.trigger_events} <br />
-      Management: {pipeline.management_events} <br />
-      Result: {pipeline.result_events} <br />
-    </>
-  )
-}
-
-PipelineStats.propTypes = {
-  pipeline: PropTypes.object.isRequired,
-}
-
 function PipelineDetails({ pipeline }) {
 
   const pipelineType = pipeline.manager || 'unknown'
@@ -131,11 +122,6 @@ function PipelineDetails({ pipeline }) {
             </TextContent>
           </FlexItem>
         </Flex>
-        <Flex flex={{ sm: 'flex_1' }}>
-          <FlexItem>
-            <PipelineStats pipeline={pipeline} />
-          </FlexItem>
-        </Flex>
       </Flex>
     </>
   )
@@ -151,6 +137,7 @@ function PipelineDetailsPage({
   const [isReloading, setIsReloading] = useState(false)
   const [isAllJobsExpanded, setIsAllJobsExpanded] = useState(
     localStorage.getItem('zuul_all_jobs_expanded') === 'true')
+  const [isStatsDropdownOpen, setIsStatsDropdownOpen] = useState(false)
 
   const isDocumentVisible = useDocumentVisibility()
 
@@ -190,6 +177,10 @@ function PipelineDetailsPage({
     dispatch(clearJobs())
   }
 
+  const onStatsToggle = (isOpen) => {
+    setIsStatsDropdownOpen(isOpen)
+  }
+
   if (pipeline === undefined || (!isReloading && isFetching)) {
     return <Fetching />
   }
@@ -204,6 +195,23 @@ function PipelineDetailsPage({
       />
     )
   }
+
+  const statsDropdownItems = [
+    <DropdownItem key="stats" component="button">
+      <div>
+        <b>Stats:</b><br />
+        <span>
+          {pipeline.trigger_events}{' '}trigger events<br />
+        </span>
+        <span>
+          {pipeline.management_events}{' '}management events<br />
+        </span>
+        <span>
+          {pipeline.result_events}{' '}result events
+        </span>
+      </div>
+    </DropdownItem>,
+  ]
 
   return (
     <>
@@ -232,10 +240,29 @@ function PipelineDetailsPage({
             </FilterToolbar>
           </LevelItem>
           <LevelItem>
-            <ReloadButton
-              isReloading={isReloading}
-              reloadCallback={() => updateData(tenant)}
-            />
+            <Toolbar>
+              <ToolbarGroup variant="icon-button-group">
+                <ToolbarItem>
+                  <Dropdown
+                    toggle={
+                      <DropdownToggle toggleIndicator={null} onToggle={onStatsToggle}>
+                        <ChartLineIcon />
+                      </DropdownToggle>
+                    }
+                    isOpen={isStatsDropdownOpen}
+                    isPlain
+                    dropdownItems={statsDropdownItems}
+                    position={DropdownPosition.right}
+                  />
+                </ToolbarItem>
+                <ToolbarItem>
+                  <ReloadButton
+                    isReloading={isReloading}
+                    reloadCallback={() => updateData(tenant)}
+                  />
+                </ToolbarItem>
+              </ToolbarGroup>
+            </Toolbar>
           </LevelItem>
         </Level>
         <PipelineDetails pipeline={pipeline} />
