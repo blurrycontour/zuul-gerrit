@@ -20,6 +20,11 @@ import PropTypes from 'prop-types'
 import * as moment_tz from 'moment-timezone'
 
 import {
+  Dropdown,
+  DropdownItem,
+  DropdownPosition,
+  DropdownSeparator,
+  DropdownToggle,
   Gallery,
   GalleryItem,
   Level,
@@ -27,10 +32,12 @@ import {
   PageSection,
   PageSectionVariants,
   Switch,
+  Toolbar,
+  ToolbarGroup,
   ToolbarItem,
   Tooltip,
 } from '@patternfly/react-core'
-import { StreamIcon } from '@patternfly/react-icons'
+import { ChartLineIcon, StreamIcon } from '@patternfly/react-icons'
 
 import PipelineSummary from '../containers/status/PipelineSummary'
 
@@ -79,45 +86,6 @@ const filterCategories = [
   },
 ]
 
-function TenantStats({ stats, timezone, isReloading, reloadCallback }) {
-  return (
-    <Level>
-      <LevelItem>
-        <p>
-          Queue lengths:{' '}
-          <span>
-            {stats.trigger_event_queue ? stats.trigger_event_queue.length : '0'}
-          </span> trigger events,{' '}
-          <span>
-            {stats.management_event_queue ? stats.management_event_queue.length : '0'}
-          </span> management events.
-        </p>
-      </LevelItem>
-      <LevelItem>
-        <Tooltip
-          position="bottom"
-          content={moment_tz.utc(stats.last_reconfigured).tz(timezone).format('llll')}
-        >
-          <span>
-            Last reconfigured:{' '}
-            {moment_tz.utc(stats.last_reconfigured).tz(timezone).fromNow()}
-          </span>
-        </Tooltip>
-        <ReloadButton
-          isReloading={isReloading}
-          reloadCallback={reloadCallback}
-        />
-      </LevelItem>
-    </Level>
-  )
-}
-
-TenantStats.propTypes = {
-  stats: PropTypes.object,
-  timezone: PropTypes.string,
-  isReloading: PropTypes.bool.isRequired,
-  reloadCallback: PropTypes.func.isRequired,
-}
 
 function PipelineGallery({ pipelines, tenant, showAllPipelines, expandAll, isLoading, filters, onClearFilters }) {
   // Filter out empty pipelines if necessary
@@ -200,11 +168,12 @@ function PipelineOverviewPage() {
   const [expandAll, setExpandAll] = useState(
     localStorage.getItem('zuul_overview_expand_all') === 'true')
   const [isReloading, setIsReloading] = useState(false)
+  const [isStatsDropdownOpen, setIsStatsDropdownOpen] = useState(false)
 
   const isDocumentVisible = useDocumentVisibility()
 
   const status = useSelector((state) => state.status.status)
-  const {pipelines, stats} = useMemo(() => getPipelines(status, location), [status, location])
+  const { pipelines, stats } = useMemo(() => getPipelines(status, location), [status, location])
 
   const isFetching = useSelector((state) => state.status.isFetching)
   const tenant = useSelector((state) => state.tenant)
@@ -222,6 +191,10 @@ function PipelineOverviewPage() {
     setExpandAll(isChecked)
     localStorage.setItem('zuul_overview_expand_all', isChecked.toString())
     dispatch(clearQueue())
+  }
+
+  const onStatsToggle = (isOpen) => {
+    setIsStatsDropdownOpen(isOpen)
   }
 
   const onFilterChanged = (newFilters) => {
@@ -280,40 +253,91 @@ function PipelineOverviewPage() {
     />
   )
 
+  const statsDropdownItems = [
+    <DropdownItem key="stats" component="button">
+      <div>
+        <b>Stats:</b><br />
+        <span>
+          {stats.trigger_event_queue ? stats.trigger_event_queue.length : '0'}
+          {' '}trigger events<br />
+        </span>
+        <span>
+          {stats.management_event_queue ? stats.management_event_queue.length : '0'}
+          {' '}management events
+        </span>
+      </div>
+    </DropdownItem>,
+    <DropdownSeparator key="separator" />,
+    <DropdownItem
+      key="last-reconfigured"
+      component="button"
+      tooltip={moment_tz.utc(stats.last_reconfigured).tz(timezone).format('llll')}
+      tooltipProps={{ position: 'bottom' }}
+    >
+      <span>
+        <b>Last reconfigured:</b><br />
+        {moment_tz.utc(stats.last_reconfigured).tz(timezone).fromNow()}
+      </span>
+    </DropdownItem>,
+  ]
+
   return (
     <>
       <PageSection
         variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
         className="zuul-toolbar-section"
       >
-        <TenantStats
-          stats={stats}
-          timezone={timezone}
-          isReloading={isReloading}
-          reloadCallback={() => updateData(tenant)}
-        />
-        <FilterToolbar
-          filterCategories={filterCategories}
-          onFilterChange={onFilterChanged}
-          filters={filters}
-          filterInputValidation={filterInputValidation}
-        >
-          <ToolbarItem>
-            {filterActive ?
-              <Tooltip content="Disabled when filtering">{allPipelinesSwitch}</Tooltip> :
-              allPipelinesSwitch}
-          </ToolbarItem>
-          <ToolbarItem>
-            <Switch
-              className="zuul-show-all-switch"
-              aria-label="Expand all"
-              label="Expand all"
-              isReversed
-              onChange={onExpandAllToggle}
-              isChecked={expandAll}
-            />
-          </ToolbarItem>
-        </FilterToolbar>
+        <Level>
+          <LevelItem>
+            <FilterToolbar
+              filterCategories={filterCategories}
+              onFilterChange={onFilterChanged}
+              filters={filters}
+              filterInputValidation={filterInputValidation}
+            >
+              <ToolbarItem>
+                {filterActive ?
+                  <Tooltip content="Disabled when filtering">{allPipelinesSwitch}</Tooltip> :
+                  allPipelinesSwitch}
+              </ToolbarItem>
+              <ToolbarItem>
+                <Switch
+                  className="zuul-show-all-switch"
+                  aria-label="Expand all"
+                  label="Expand all"
+                  isReversed
+                  onChange={onExpandAllToggle}
+                  isChecked={expandAll}
+                />
+              </ToolbarItem>
+            </FilterToolbar>
+          </LevelItem>
+          <LevelItem>
+            <Toolbar>
+              <ToolbarGroup variant="icon-button-group">
+                <ToolbarItem>
+                  <Dropdown
+                    toggle={
+                      <DropdownToggle toggleIndicator={null} onToggle={onStatsToggle}>
+                        <ChartLineIcon />
+                      </DropdownToggle>
+                    }
+                    isOpen={isStatsDropdownOpen}
+                    isPlain
+                    dropdownItems={statsDropdownItems}
+                    position={DropdownPosition.right}
+                  />
+                </ToolbarItem>
+                <ToolbarItem>
+                  <ReloadButton
+                    isReloading={isReloading}
+                    reloadCallback={() => updateData(tenant)}
+                  />
+                </ToolbarItem>
+              </ToolbarGroup>
+            </Toolbar>
+          </LevelItem>
+        </Level>
       </PageSection>
       <PageSection
         variant={darkMode ? PageSectionVariants.dark : PageSectionVariants.light}
