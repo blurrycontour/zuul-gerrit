@@ -84,6 +84,41 @@ class ProviderNodeError(Exception):
     pass
 
 
+class DeleteJob:
+    log = logging.getLogger("zuul.Launcher")
+
+    def __init__(self, launcher, image_build_artifact, upload):
+        self.launcher = launcher
+        self.image_build_artifact = image_build_artifact
+        self.upload = upload
+
+    def run(self):
+        try:
+            self._run()
+        except Exception:
+            self.log.exception("Error in delete job")
+
+    def _run(self):
+        try:
+            with self.launcher.createZKContext(None, self.log) as ctx:
+                try:
+                    with self.upload.locked(ctx, blocking=False):
+                        self.log.info("Deleting image upload %s", self.upload)
+                        with self.upload.activeContext(ctx):
+                            self.upload.state = model.STATE_DELETING
+                        provider_cname = self.upload.providers[0]
+                        provider = self.launcher.\
+                            _getProviderByCanonicalName(provider_cname)
+                        provider.deleteImage(self.upload.external_id)
+                        self.upload.delete(ctx)
+                        self.launcher.upload_deleted_event.set()
+                        self.launcher.wake_event.set()
+                except LockException:
+                    return
+        except Exception:
+            self.log.exception("Unable to delete upload %s", self.upload)
+
+
 class UploadJob:
     log = logging.getLogger("zuul.Launcher")
 
@@ -112,6 +147,8 @@ class UploadJob:
                                 acquired.append(upload)
                                 self.log.debug("Acquired upload lock for %s",
                                                upload)
+                                with upload.activeContext(ctx):
+                                    upload.state = model.STATE_UPLOADING
                 except LockException:
                     # We may have raced another launcher; set the
                     # event to try again.
@@ -143,6 +180,15 @@ class UploadJob:
                         self.log.debug("Released upload lock for %s", upload)
                     except Exception:
                         self.log.exception("Unable to release lock for %s",
+                                           upload)
+                    try:
+                        with upload.activeContext(ctx):
+                            if upload.external_id:
+                                upload.state = model.STATE_READY
+                            else:
+                                upload.state = model.STATE_PENDING
+                    except Exception:
+                        self.log.exception("Unable to update state for %s",
                                            upload)
                 if path:
                     try:
@@ -257,6 +303,7 @@ class Launcher:
         self.layout_updated_event.set()
 
         self.image_updated_event = threading.Event()
+        self.upload_deleted_event = threading.Event()
 
         self.tenant_layout_state = LayoutStateStore(
             self.zk_client, self._layoutUpdatedCallback)
@@ -314,10 +361,14 @@ class Launcher:
         if self.layout_updated_event.is_set():
             self.layout_updated_event.clear()
             if self.updateTenantProviders():
+                self.checkOldImages()
                 self.checkMissingImages()
                 self.checkMissingUploads()
         if self.image_updated_event.is_set():
+            self.checkOldImages()
             self.checkMissingUploads()
+        if self.upload_deleted_event.is_set():
+            self.checkOldImages()
         self._processRequests()
         self._processNodes()
         self._processMinReady()
@@ -1002,6 +1053,18 @@ class Launcher:
                       tenant_name, iba.name)
         self.trigger_events[tenant_name].put(event.trigger_name, event)
 
+    def addImageDeleteEvent(self, iba):
+        project_hostname, project_name = \
+            iba.project_canonical_name.split('/', 1)
+        tenant_name = iba.build_tenant_name
+        driver = self.connections.drivers['zuul']
+        event = driver.getImageDeleteEvent(
+            [iba.name], project_hostname, project_name, iba.project_branch,
+            iba.uuid)
+        self.log.info("Submitting image delete event for %s %s",
+                      tenant_name, iba.name)
+        self.trigger_events[tenant_name].put(event.trigger_name, event)
+
     def checkMissingImages(self):
         for tenant_name, providers in self.tenant_providers.items():
             images_by_project_branch = {}
@@ -1020,9 +1083,9 @@ class Launcher:
         # this image, skip.
         self.log.debug("Checking for missing images")
         seen_formats = set()
-        for build in self.image_build_registry.getArtifactsForImage(
+        for iba in self.image_build_registry.getArtifactsForImage(
                 image.canonical_name):
-            seen_formats.add(build.format)
+            seen_formats.add(iba.format)
 
         if image.format in seen_formats:
             # We have at least one build with the required
@@ -1035,15 +1098,72 @@ class Launcher:
         images = images_by_project_branch.setdefault(key, set())
         images.add(image.name)
 
+    def checkOldImages(self):
+        self.log.debug("Checking for old images")
+        self.upload_deleted_event.clear()
+        keep_uploads = set()
+        for tenant_name, providers in self.tenant_providers.items():
+            for provider in providers:
+                for image in provider.images.values():
+                    if image.type == 'zuul':
+                        self.checkOldImage(tenant_name, provider, image,
+                                           keep_uploads)
+
+        uploads_by_artifact = collections.defaultdict(list)
+        latest_upload_timestamp = 0
+        for upload in self.image_upload_registry.getItems():
+            if upload.timestamp > latest_upload_timestamp:
+                latest_upload_timestamp = upload.timestamp
+            uploads_by_artifact[upload.artifact_uuid].append(upload)
+            iba = self.image_build_registry.getItem(upload.artifact_uuid)
+            if (iba.state == model.STATE_DELETING or
+                upload.state == model.STATE_DELETING or
+                (upload.state == model.STATE_READY and
+                 upload not in keep_uploads)):
+                self.upload_executor.submit(DeleteJob(self, iba, upload).run)
+        for iba in self.image_build_registry.getItems():
+            if iba.state not in (model.STATE_DELETING, model.STATE_READY):
+                continue
+            if (iba.timestamp > latest_upload_timestamp or
+                not latest_upload_timestamp):
+                # Ignore artifacts that are newer than the newest upload
+                continue
+            if len(uploads_by_artifact[iba.uuid]) == 0:
+                self.log.info("Deleting image build artifact "
+                              "with no uploads: %s", iba)
+                with self.createZKContext(None, self.log) as ctx:
+                    try:
+                        with iba.locked(ctx, blocking=False):
+                            iba.delete(ctx)
+                    except LockException:
+                        pass
+
+    def checkOldImage(self, tenant_name, provider, image,
+                      keep_uploads):
+        self.log.debug("Checking for old artifacts for image %s",
+                       image.canonical_name)
+        image_cname = image.canonical_name
+        uploads = self.image_upload_registry.getUploadsForImage(image_cname)
+        valid_uploads = [
+            upload for upload in uploads
+            if (provider.canonical_name in upload.providers and
+                upload.validated and
+                upload.external_id)
+        ]
+        # Keep the 2 most recent (uploads are already sorted by timestamp)
+        keep_uploads.update(set(valid_uploads[-2:]))
+
     def checkMissingUploads(self):
         self.log.debug("Checking for missing uploads")
         uploads_by_artifact_id = collections.defaultdict(list)
         self.image_updated_event.clear()
         for upload in self.image_upload_registry.getItems():
-            self.log.debug("Checking %s", upload)
-            if upload.external_id:
-                continue
             if upload.endpoint_name not in self.endpoints:
+                continue
+            iba = self.image_build_registry.getItem(upload.artifact_uuid)
+            if iba.state == model.STATE_DELETING:
+                continue
+            if upload.state != model.STATE_PENDING:
                 continue
             upload_list = uploads_by_artifact_id[upload.artifact_uuid]
             upload_list.append(upload)
