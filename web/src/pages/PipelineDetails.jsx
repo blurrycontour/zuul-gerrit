@@ -19,10 +19,10 @@ import { withRouter, useLocation, useHistory } from 'react-router-dom'
 
 import {
   Badge,
-  Flex,
-  FlexItem,
   Gallery,
   GalleryItem,
+  Grid,
+  GridItem,
   Level,
   LevelItem,
   PageSection,
@@ -31,6 +31,8 @@ import {
   Text,
   TextContent,
   TextVariants,
+  Toolbar,
+  ToolbarContent,
   ToolbarItem,
   Tooltip,
   Switch,
@@ -48,7 +50,12 @@ import { clearJobs } from '../actions/statusExpansion'
 import { EmptyBox, EmptyPage } from '../containers/Errors'
 import { Fetching, ReloadButton } from '../containers/Fetching'
 import { useDocumentVisibility, useInterval } from '../Hooks'
-import { FilterToolbar, getFiltersFromUrl } from '../containers/FilterToolbar'
+import {
+  FilterToolbar,
+  getFiltersFromUrl,
+  ToolbarStatsGroup,
+  ToolbarStatsItem,
+} from '../containers/FilterToolbar'
 import {
   filterPipelines,
   handleFilterChange,
@@ -76,21 +83,6 @@ const filterCategories = [
     type: 'fuzzy-search',
   }
 ]
-
-function PipelineStats({ pipeline }) {
-  return (
-    <>
-      <Title headingLevel="h3" style={{ margin: 0 }}>Events</Title>
-      Trigger: {pipeline.trigger_events} <br />
-      Management: {pipeline.management_events} <br />
-      Result: {pipeline.result_events} <br />
-    </>
-  )
-}
-
-PipelineStats.propTypes = {
-  pipeline: PropTypes.object.isRequired,
-}
 
 function PipelineDetails({ pipeline }) {
 
@@ -121,22 +113,15 @@ function PipelineDetails({ pipeline }) {
           </Badge>
         </Tooltip>
       </Title>
-      <Flex>
-        <Flex flex={{ sm: 'flex_3' }}>
-          <FlexItem>
-            <TextContent>
-              <Text component={TextVariants.p}>
-                {pipeline.description}
-              </Text>
-            </TextContent>
-          </FlexItem>
-        </Flex>
-        <Flex flex={{ sm: 'flex_1' }}>
-          <FlexItem>
-            <PipelineStats pipeline={pipeline} />
-          </FlexItem>
-        </Flex>
-      </Flex>
+      <Grid>
+        <GridItem span={8}>
+          <TextContent>
+            <Text component={TextVariants.p}>
+              {pipeline.description}
+            </Text>
+          </TextContent>
+        </GridItem>
+      </Grid>
     </>
   )
 }
@@ -232,10 +217,29 @@ function PipelineDetailsPage({
             </FilterToolbar>
           </LevelItem>
           <LevelItem>
-            <ReloadButton
-              isReloading={isReloading}
-              reloadCallback={() => updateData(tenant)}
-            />
+            <Toolbar>
+              <ToolbarContent style={{paddingRight: '0'}}>
+                <ToolbarStatsGroup>
+                  <ToolbarStatsItem
+                    name="events"
+                    value={`${pipeline.trigger_events} / ${pipeline.management_events} / ${pipeline.result_events}`}
+                    tooltipContent={
+                      <div>
+                        Trigger events: {pipeline.trigger_events} <br />
+                        Management events: {pipeline.management_events} <br />
+                        Result events: {pipeline.result_events}
+                      </div>
+                    }
+                  />
+                  <ToolbarItem>
+                    <ReloadButton
+                      isReloading={isReloading}
+                      reloadCallback={() => updateData(tenant)}
+                    />
+                  </ToolbarItem>
+                </ToolbarStatsGroup>
+              </ToolbarContent>
+            </Toolbar>
           </LevelItem>
         </Level>
         <PipelineDetails pipeline={pipeline} />
