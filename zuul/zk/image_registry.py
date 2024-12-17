@@ -20,8 +20,9 @@ from zuul.model import ImageBuildArtifact, ImageUpload
 
 class ImageBuildRegistry(LockableZKObjectCache):
 
-    def __init__(self, zk_client):
+    def __init__(self, zk_client, image_changed_event=None):
         self.builds_by_image_name = collections.defaultdict(set)
+        self.image_changed_event = image_changed_event
         super().__init__(
             zk_client,
             None,
@@ -33,18 +34,22 @@ class ImageBuildRegistry(LockableZKObjectCache):
 
     def postCacheHook(self, event, data, stat, key, obj):
         super().postCacheHook(event, data, stat, key, obj)
-        if obj is None:
-            return
         exists = key in self._cached_objects
-        builds = self.builds_by_image_name[obj.canonical_name]
         if exists:
-            builds.add(key)
+            if obj:
+                builds = self.builds_by_image_name[obj.canonical_name]
+                builds.add(key)
         else:
-            builds.discard(key)
+            if obj:
+                builds = self.builds_by_image_name[obj.canonical_name]
+                builds.discard(key)
+        if self.image_changed_event:
+            self.image_changed_event()
 
     def getArtifactsForImage(self, image_canonical_name):
         keys = list(self.builds_by_image_name[image_canonical_name])
-        arts = [self._cached_objects[key] for key in keys]
+        arts = [self._cached_objects.get(key) for key in keys]
+        arts = [a for a in arts if a is not None]
         # Sort in a stable order, primarily by timestamp, then format
         # for identical timestamps.
         arts = sorted(arts, key=lambda x: x.format)
@@ -54,9 +59,11 @@ class ImageBuildRegistry(LockableZKObjectCache):
 
 class ImageUploadRegistry(LockableZKObjectCache):
 
-    def __init__(self, zk_client, upload_added_event=None):
+    def __init__(self, zk_client,
+                 upload_changed_event=None,
+                 ):
         self.uploads_by_image_name = collections.defaultdict(set)
-        self.upload_added_event = upload_added_event
+        self.upload_changed_event = upload_changed_event
         super().__init__(
             zk_client,
             None,
@@ -68,19 +75,21 @@ class ImageUploadRegistry(LockableZKObjectCache):
 
     def postCacheHook(self, event, data, stat, key, obj):
         super().postCacheHook(event, data, stat, key, obj)
-        if obj is None:
-            return
         exists = key in self._cached_objects
-        uploads = self.uploads_by_image_name[obj.canonical_name]
         if exists:
-            uploads.add(key)
-            if self.upload_added_event:
-                self.upload_added_event()
+            if obj:
+                uploads = self.uploads_by_image_name[obj.canonical_name]
+                uploads.add(key)
         else:
-            uploads.discard(key)
+            if obj:
+                uploads = self.uploads_by_image_name[obj.canonical_name]
+                uploads.discard(key)
+        if self.upload_changed_event:
+            self.upload_changed_event()
 
     def getUploadsForImage(self, image_canonical_name):
         keys = list(self.uploads_by_image_name[image_canonical_name])
-        uploads = [self._cached_objects[key] for key in keys]
+        uploads = [self._cached_objects.get(key) for key in keys]
+        uploads = [u for u in uploads if u is not None]
         uploads = sorted(uploads, key=lambda x: x.timestamp)
         return uploads
