@@ -112,6 +112,7 @@ class TestInventoryGithub(TestInventoryBase):
         self.assertIn('ansible_version', z_vars)
         self.assertIn('job', z_vars)
         self.assertIn('event_id', z_vars)
+        self.assertIn('autohold_if_failure', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
         self.assertEqual(z_vars['change_url'],
@@ -145,6 +146,7 @@ class TestInventoryPythonPath(TestInventoryBase):
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('ansible_version', z_vars)
         self.assertIn('job', z_vars)
+        self.assertIn('autohold_if_failure', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
 
@@ -176,6 +178,7 @@ class TestInventoryShellType(TestInventoryBase):
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('ansible_version', z_vars)
         self.assertIn('job', z_vars)
+        self.assertIn('autohold_if_failure', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
 
@@ -205,6 +208,7 @@ class InventoryAutoPythonMixin:
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
+        self.assertIn('autohold_if_failure', z_vars)
         self.assertEqual(z_vars['job'],
                          f'ansible-version{self.ansible_version}-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
@@ -249,6 +253,7 @@ class TestInventory(TestInventoryBase):
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
+        self.assertIn('autohold_if_failure', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
 
@@ -270,6 +275,7 @@ class TestInventory(TestInventoryBase):
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
+        self.assertIn('autohold_if_failure', z_vars)
         self.assertEqual(z_vars['job'], 'single-inventory-list')
 
         self.executor_server.release()
@@ -290,6 +296,7 @@ class TestInventory(TestInventoryBase):
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
+        self.assertIn('autohold_if_failure', z_vars)
         self.assertEqual(z_vars['job'], 'executor-only-inventory')
         self.assertEqual(z_vars['message'], 'QQ==')
 
@@ -332,6 +339,7 @@ class TestInventory(TestInventoryBase):
         self.assertIn('executor', z_vars)
         self.assertIn('src_root', z_vars['executor'])
         self.assertIn('job', z_vars)
+        self.assertIn('autohold_if_failure', z_vars)
         self.assertEqual(z_vars['job'], 'group-inventory')
 
         self.executor_server.release()
