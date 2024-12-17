@@ -1045,6 +1045,10 @@ The following variables related to the job are available:
 
          The metadata of the artifact (as supplied to :ref:`return_artifacts`).
 
+   .. var:: autohold_if_failure
+
+      True if this job will trigger a autohold of its nodes on failure.
+
    .. var:: build
 
       The UUID of the build.  A build is a single execution of a job.
