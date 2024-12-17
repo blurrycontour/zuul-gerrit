@@ -2245,6 +2245,12 @@ class TestScheduler(ZuulTestCase):
         # project-test2
         self.assertEqual(self.history[1].result, 'FAILURE')
         self.assertTrue(build.held)
+        inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
+            z_vars = inventory['all']['vars']['zuul']
+            self.assertIn('autohold_if_failure', z_vars)
+            self.assertEqual(True, z_vars['autohold_if_failure'])
 
         # Check nodepool for a held node
         held_node = None
