@@ -1471,6 +1471,15 @@ class ImageBuildArtifact(zkobject.LockableZKObject):
     IMAGES_PATH = "artifacts"
     LOCKS_PATH = "locks"
 
+    class State(StrEnum):
+        READY = "ready"
+        DELETING = "deleting"
+
+    STATES = set([
+        State.READY,
+        State.DELETING,
+    ])
+
     def __init__(self):
         super().__init__()
         self._set(
@@ -1487,10 +1496,27 @@ class ImageBuildArtifact(zkobject.LockableZKObject):
             url=None,
             timestamp=None,
             validated=None,
+            _state=None,
+            state_time=None,
+            # Attributes that are not serialized
+            lock=None,
+            is_locked=False,
         )
+
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, value):
+        if value not in self.STATES:
+            raise TypeError("'%s' is not a valid state" % value)
+        self._state = value
+        self.state_time = time.time()
 
     def __repr__(self):
         return (f"<ImageBuildArtifact {self.uuid} "
+                f"state: {self.state} "
                 f"canonical_name: {self.canonical_name} "
                 f"build_uuid: {self.build_uuid} "
                 f"validated: {self.validated}>")
@@ -1516,6 +1542,8 @@ class ImageBuildArtifact(zkobject.LockableZKObject):
             url=self.url,
             timestamp=self.timestamp,
             validated=self.validated,
+            _state=self._state,
+            state_time=self.state_time,
         )
         return json.dumps(data, sort_keys=True).encode("utf-8")
 
@@ -1524,6 +1552,19 @@ class ImageUpload(zkobject.LockableZKObject):
     ROOT = "/zuul/image-uploads"
     UPLOADS_PATH = "uploads"
     LOCKS_PATH = "locks"
+
+    class State(StrEnum):
+        READY = "ready"
+        DELETING = "deleting"
+        PENDING = "pending"
+        UPLOADING = "uploading"
+
+    STATES = set([
+        State.READY,
+        State.DELETING,
+        State.PENDING,
+        State.UPLOADING,
+    ])
 
     def __init__(self):
         super().__init__()
@@ -1537,10 +1578,27 @@ class ImageUpload(zkobject.LockableZKObject):
             external_id=None,
             timestamp=None,
             validated=None,
+            _state=None,
+            state_time=None,
+            # Attributes that are not serialized
+            lock=None,
+            is_locked=False,
         )
+
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, value):
+        if value not in self.STATES:
+            raise TypeError("'%s' is not a valid state" % value)
+        self._state = value
+        self.state_time = time.time()
 
     def __repr__(self):
         return (f"<ImageUpload {self.uuid} "
+                f"state: {self.state} "
                 f"endpoint: {self.endpoint_name} "
                 f"artifact: {self.artifact_uuid} "
                 f"validated: {self.validated} "
@@ -1563,6 +1621,8 @@ class ImageUpload(zkobject.LockableZKObject):
             external_id=self.external_id,
             timestamp=self.timestamp,
             validated=self.validated,
+            _state=self._state,
+            state_time=self.state_time,
         )
         return json.dumps(data, sort_keys=True).encode("utf-8")
 
@@ -5880,6 +5940,7 @@ class EventInfo:
         # by the reporter.
         self.image_names = None
         self.image_upload_uuid = None
+        self.image_build_uuid = None
 
     @classmethod
     def fromEvent(cls, event, event_ref_key):
@@ -5893,6 +5954,7 @@ class EventInfo:
             tinfo.ref = None
         tinfo.image_names = getattr(event, 'image_names', None)
         tinfo.image_upload_uuid = getattr(event, 'image_upload_uuid', None)
+        tinfo.image_build_uuid = getattr(event, 'image_build_uuid', None)
         return tinfo
 
     @classmethod
@@ -5905,6 +5967,7 @@ class EventInfo:
         tinfo.ref = d.get("ref")
         tinfo.image_names = d.get("image_names")
         tinfo.image_upload_uuid = d.get("image_upload_uuid")
+        tinfo.image_build_uuid = d.get("image_build_uuid")
         return tinfo
 
     def toDict(self):
@@ -5915,6 +5978,7 @@ class EventInfo:
             "ref": self.ref,
             "image_names": self.image_names,
             "image_upload_uuid": self.image_upload_uuid,
+            "image_build_uuid": self.image_build_uuid,
         }
 
 
