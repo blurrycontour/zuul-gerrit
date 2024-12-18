@@ -14,7 +14,7 @@
 // under the License.
 
 import React, { useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
   Button,
@@ -34,11 +34,16 @@ import {
 } from '@patternfly/react-table'
 import { Link } from 'react-router-dom'
 import ImageUploadTable from './ImageUploadTable'
+import { fetchImages } from '../../actions/images'
+import { fetchProviders } from '../../actions/providers'
+import { addNotification, addApiError } from '../../actions/notifications'
+import { deleteImageBuildArtifact } from '../../api'
 
 function ImageBuildTable(props) {
   const { buildArtifacts, fetching } = props
   const [collapsedRows, setCollapsedRows] = useState([])
   const [showDeleteImageModal, setShowDeleteImageModal] = useState(false)
+  const [pendingDeleteRow, setPendingDeleteRow] = useState(null)
   const setRowCollapsed = (idx, isCollapsing = true) =>
         setCollapsedRows(prevCollapsed => {
           const otherCollapsedRows = prevCollapsed.filter(r => r !== idx)
@@ -47,6 +52,8 @@ function ImageBuildTable(props) {
         })
   const isRowCollapsed = idx => collapsedRows.includes(idx)
   const tenant = useSelector((state) => state.tenant)
+  const user = useSelector((state) => state.user)
+  const dispatch = useDispatch()
 
   const columns = [
     {
@@ -77,7 +84,7 @@ function ImageBuildTable(props) {
           :
           build.build_uuid
     return {
-      uuid: build.uuid,
+      _uuid: build.uuid,
       id: rows.length,
       isOpen: !isRowCollapsed(rows.length),
       canDelete: build.build_tenant,
@@ -150,15 +157,21 @@ function ImageBuildTable(props) {
   }
 
   const actionResolver = (rowData) => {
-    if (rowData.parent !== undefined || !rowData.canDelete) {
-      return []
+    if (rowData.parent === undefined &&
+        rowData.canDelete &&
+        user.isAdmin &&
+        user.scope.indexOf(tenant.name) !== -1) {
+      return [
+        {
+          title: 'Delete build',
+          onClick: () => {
+            setPendingDeleteRow(rowData)
+            setShowDeleteImageModal(true)
+          }
+        },
+      ]
     }
-    return [
-       {
-         title: 'Delete build',
-         onClick: () => {setShowDeleteImageModal(true)}
-       },
-    ]
+    return []
   }
 
   function renderDeleteImageModal() {
@@ -171,7 +184,25 @@ function ImageBuildTable(props) {
         onClose={() => { setShowDeleteImageModal(false) }}
         actions={[
           <Button key="confirm" variant="primary"
-                  onClick={() => {setShowDeleteImageModal(false) }}>
+                  onClick={() => {
+                    setShowDeleteImageModal(false)
+                    deleteImageBuildArtifact(tenant.apiPrefix,
+                                             pendingDeleteRow._uuid
+                                            ).then(() => {
+                      dispatch(addNotification(
+                        {
+                          text: 'Delete successful.',
+                          type: 'success',
+                          status: '',
+                          url: '',
+                        }))
+                      dispatch(fetchProviders(tenant))
+                      dispatch(fetchImages(tenant))
+                    })
+                      .catch(error => {
+                        dispatch(addApiError(error))
+                      })
+                  }}>
             Confirm
           </Button>,
           <Button key="cancel" variant="link"
