@@ -41,7 +41,7 @@ import {
 import {
   AngleDoubleUpIcon,
   BanIcon,
-  SearchPlusIcon,
+  FilterIcon,
 } from '@patternfly/react-icons'
 
 import {
@@ -141,7 +141,7 @@ function FilterDropdown({ item, pipeline }) {
           aria-label="Change filters"
           id={`toggle-change-filters-${ref.id || ref.ref}`}
         >
-          <SearchPlusIcon />
+          <FilterIcon />
         </DropdownToggle>
       }
       isOpen={isFilterDropdownOpen}
