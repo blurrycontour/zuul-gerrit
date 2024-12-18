@@ -33,7 +33,7 @@ import {
   CubeIcon,
   StreamIcon,
   FlagIcon,
-  SearchPlusIcon,
+  FilterIcon,
 } from '@patternfly/react-icons'
 import {
   Table,
@@ -191,7 +191,7 @@ function ConfigErrorTable({
 
   const filterToggle = (filterProps) => (
     <DropdownToggle toggleIndicator={null} onToggle={filterProps.onToggle}>
-      <SearchPlusIcon color='var(--pf-global--Color--200)'/>
+      <FilterIcon color='var(--pf-global--Color--200)'/>
     </DropdownToggle>
   )
 
