@@ -16,8 +16,16 @@
 import voluptuous as vs
 
 
+MAX_LENGTH_MAP = {
+    "ARTIFACT_NAME": 255,
+}
+
+
 artifact = {
-    vs.Required('name'): str,
+    vs.Required('name'): vs.All(
+        str,
+        vs.Length(max=MAX_LENGTH_MAP["ARTIFACT_NAME"])
+    ),
     vs.Required('url'): str,
     'metadata': dict,
 }
