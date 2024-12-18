@@ -15,9 +15,14 @@
 
 import voluptuous as vs
 
+from zuul.model import MAX_LENGTH_MAP
+
 
 artifact = {
-    vs.Required('name'): str,
+    vs.Required('name'): vs.All(
+        str,
+        vs.Length(max=MAX_LENGTH_MAP["ARTIFACT_NAME"])
+    ),
     vs.Required('url'): str,
     'metadata': dict,
 }
