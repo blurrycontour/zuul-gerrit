@@ -1262,6 +1262,22 @@ class TestTenantSuperprojectConfigProject(TenantParserTestCase):
         pass
 
 
+class TestTenantLengthValidation(TenantParserTestCase):
+    tenant_config_file = ('config/length-check/'
+                          'long-tenant.yaml')
+    scheduler_count = 1
+
+    def setUp(self):
+        # TODO let's see what voluptuous comes up with
+        err = ".*may not configure config-project.*"
+        with testtools.ExpectedException(Exception, err):
+            super().setUp()
+
+    def test_tenant_superproject_config_project(self):
+        # The magic is in setUp
+        pass
+
+
 class TestTenantSuperprojectConfigProjectRegex(TenantParserTestCase):
     tenant_config_file = ('config/tenant-parser/'
                           'superproject-config-project-regex.yaml')

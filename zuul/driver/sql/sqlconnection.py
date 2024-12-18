@@ -27,6 +27,8 @@ from sqlalchemy import orm
 import sqlalchemy.pool
 
 from zuul.connection import BaseConnection
+from zuul.model import MAX_LENGTH_MAP
+from zuul.ansible.schema import MAX_LENGTH_MAP as ARTIFACT_LENGTH_MAP
 from zuul.zk.locks import CONNECTION_LOCK_ROOT, locked, SessionAwareLock
 
 
@@ -687,9 +689,11 @@ class SQLConnection(BaseConnection):
         class RefModel(Base):
             __tablename__ = self.table_prefix + REF_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
-            project = sa.Column(sa.String(255), nullable=False)
+            project = sa.Column(
+                sa.String(MAX_LENGTH_MAP["PROJECT_NAME"]),
+                nullable=False)
             ref = sa.Column(sa.String(255), nullable=False)
-            ref_url = sa.Column(sa.String(255), nullable=False)
+            ref_url = sa.Column(sa.TEXT(), nullable=False)
             change = sa.Column(ChangeType, nullable=False)
             patchset = sa.Column(SHAType(40), nullable=False)
             oldrev = sa.Column(SHAType(40), nullable=False)
@@ -710,9 +714,11 @@ class SQLConnection(BaseConnection):
         class BuildSetModel(Base):
             __tablename__ = self.table_prefix + BUILDSET_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
-            pipeline = sa.Column(sa.String(255))
+            pipeline = sa.Column(
+                sa.String(MAX_LENGTH_MAP["PIPELINE_NAME"]))
             message = sa.Column(sa.TEXT())
-            tenant = sa.Column(sa.String(255))
+            tenant = sa.Column(
+                sa.String(MAX_LENGTH_MAP["TENANT_NAME"]))
             result = sa.Column(sa.String(255))
             uuid = sa.Column(sa.String(36))
             event_id = sa.Column(sa.String(255), nullable=True)
@@ -790,16 +796,17 @@ class SQLConnection(BaseConnection):
                 name=self.table_prefix + 'zuul_build_buildset_id_fkey',
             ))
             uuid = sa.Column(sa.String(36))
-            job_name = sa.Column(sa.String(255))
+            job_name = sa.Column(
+                sa.String(MAX_LENGTH_MAP["JOB_NAME"]))
             result = sa.Column(sa.String(255))
             start_time = sa.Column(sa.DateTime)
             end_time = sa.Column(sa.DateTime)
             voting = sa.Column(sa.Boolean)
-            log_url = sa.Column(sa.String(255))
+            log_url = sa.Column(sa.TEXT())
             error_detail = sa.Column(sa.TEXT())
             final = sa.Column(sa.Boolean)
             held = sa.Column(sa.Boolean)
-            nodeset = sa.Column(sa.String(255))
+            nodeset = sa.Column(sa.TEXT())
             ref_id = sa.Column(sa.Integer, sa.ForeignKey(
                 self.table_prefix + REF_TABLE + ".id",
                 name=self.table_prefix + 'zuul_build_ref_id_fkey',
@@ -874,7 +881,8 @@ class SQLConnection(BaseConnection):
                 self.table_prefix + BUILD_TABLE + ".id",
                 name=self.table_prefix + 'zuul_artifact_build_id_fkey',
             ))
-            name = sa.Column(sa.String(255))
+            name = sa.Column(
+                sa.String(ARTIFACT_LENGTH_MAP["ARTIFACT_NAME"]))
             url = sa.Column(sa.TEXT())
             meta = sa.Column('metadata', sa.TEXT())
             build = orm.relationship(BuildModel,
@@ -891,7 +899,8 @@ class SQLConnection(BaseConnection):
                 self.table_prefix + BUILD_TABLE + ".id",
                 name=self.table_prefix + 'zuul_provides_build_id_fkey',
             ))
-            name = sa.Column(sa.String(255))
+            name = sa.Column(
+                sa.String(MAX_LENGTH_MAP["PROVIDES_NAME"]))
             build = orm.relationship(BuildModel,
                                      backref=orm.backref(
                                          "provides",
