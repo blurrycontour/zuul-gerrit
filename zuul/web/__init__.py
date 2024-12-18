@@ -1952,6 +1952,34 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options(allowed_methods=['POST'])
+    @cherrypy.tools.check_tenant_auth(require_admin=True)
+    def image_build(self, tenant_name, tenant, auth, image_name):
+        providers = self.zuulweb.tenant_providers.get(tenant.name)
+        if not providers:
+            raise cherrypy.HTTPError(404, "Image not found in tenant")
+
+        image = None
+        for provider in providers:
+            image = provider.images.get(image_name)
+            if image:
+                break
+        if not image or image.type != "zuul":
+            raise cherrypy.HTTPError(404, "Image not found in tenant")
+
+        project_hostname, project_name = \
+            image.project_canonical_name.split('/', 1)
+        driver = self.zuulweb.connections.drivers['zuul']
+        event = driver.getImageBuildEvent(
+            [image.name], project_hostname, project_name, image.branch)
+
+        self.log.info('User %s requesting image-build for %s %s',
+                      auth.uid, tenant.name, image.name)
+        self.zuulweb.trigger_events[tenant.name].put(
+            event.trigger_name, event)
+
+    @cherrypy.expose
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options(allowed_methods=['DELETE'])
     @cherrypy.tools.check_tenant_auth(require_admin=True)
     def image_build_artifact_delete(self, tenant_name, tenant, auth,
@@ -2717,6 +2745,12 @@ class ZuulWeb(object):
                           controller=api, action='pipelines')
         route_map.connect('api', '/api/tenant/{tenant_name}/images',
                           controller=api, action='images')
+        route_map.connect('api',
+                          '/api/tenant/{tenant_name}/'
+                          'image/{image_name}/build',
+                          controller=api,
+                          conditions=dict(method=['POST', 'OPTIONS']),
+                          action='image_build')
         route_map.connect('api',
                           '/api/tenant/{tenant_name}/'
                           'image-build-artifact/{artifact_id}',
