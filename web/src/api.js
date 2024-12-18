@@ -204,16 +204,23 @@ function fetchImages(apiPrefix) {
   return makeRequest(apiPrefix + 'images')
 }
 
+function buildImage(apiPrefix, imageName) {
+  return makeRequest(
+    apiPrefix + 'image/' + imageName + '/build',
+    'post'
+  )
+}
+
 function deleteImageBuildArtifact(apiPrefix, artifactId) {
   return makeRequest(
-    apiPrefix + '/image-build-artifact/' + artifactId,
+    apiPrefix + 'image-build-artifact/' + artifactId,
     'delete'
   )
 }
 
 function deleteImageUpload(apiPrefix, uploadId) {
   return makeRequest(
-    apiPrefix + '/image-upload/' + uploadId,
+    apiPrefix + 'image-upload/' + uploadId,
     'delete'
   )
 }
@@ -359,6 +366,7 @@ export {
   apiUrl,
   autohold,
   autohold_delete,
+  buildImage,
   deleteImageBuildArtifact,
   deleteImageUpload,
   dequeue,
