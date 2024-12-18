@@ -761,6 +761,7 @@ class JobParser(object):
                                       complex_include_vars_zuul_project_def,
                                       ))
 
+    provides_name_max = model.MAX_LENGTH_MAP['PROVIDES_NAME']
     # Attributes of a job that can also be used in Project and ProjectTemplate
     job_attributes = {'parent': vs.Any(str, None),
                       'final': bool,
@@ -768,7 +769,10 @@ class JobParser(object):
                       'protected': bool,
                       'intermediate': bool,
                       'requires': override_list(str),
-                      'provides': override_list(str),
+                      'provides': override_list(
+                          vs.All(str,
+                                 vs.Length(max=provides_name_max))
+                      ),
                       'failure-message': str,
                       'success-message': str,
                       # TODO: ignored, remove for v5
@@ -821,7 +825,10 @@ class JobParser(object):
                       'image-build-name': str,
     }
 
-    job_name = {vs.Required('name'): str}
+    job_name = {vs.Required('name'): vs.All(
+                    str,
+                    vs.Length(max=model.MAX_LENGTH_MAP["JOB_NAME"]))
+                }
 
     job = dict(collections.ChainMap(job_name, job_attributes))
 
@@ -1363,7 +1370,9 @@ class ProjectParser(object):
         }
 
         project = {
-            'name': str,
+            'name': vs.All(
+                str,
+                vs.Length(max=model.MAX_LENGTH_MAP["PROJECT_NAME"])),
             'description': str,
             'branches': to_list(vs.Any(ZUUL_REGEX, str)),
             'vars': ansible_vars_dict,
@@ -1532,7 +1541,10 @@ class PipelineParser(object):
         window_type = vs.Any('linear', 'exponential')
         window_factor = vs.All(int, vs.Range(min=1))
 
-        pipeline = {vs.Required('name'): str,
+        pipeline = {vs.Required('name'): vs.All(
+                        str,
+                        vs.Length(max=model.MAX_LENGTH_MAP["PIPELINE_NAME"])
+                    ),
                     vs.Required('manager'): manager,
                     'allow-other-connections': bool,
                     'precedence': precedence,
@@ -2011,7 +2023,10 @@ class TenantParser(object):
         self.tenant_source(value)
 
     def getSchema(self):
-        tenant = {vs.Required('name'): str,
+        tenant = {vs.Required('name'): vs.All(
+                    str,
+                    vs.Length(max=model.MAX_LENGTH_MAP["TENANT_NAME"])
+                  ),
                   'max-changes-per-pipeline': int,
                   'max-dependencies': int,
                   'max-nodes-per-job': int,

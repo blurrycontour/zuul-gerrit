@@ -1,0 +1,10 @@
+---
+fixes:
+  - |
+    Enforce length limits on project's name, pipeline's name, tenant's name,
+    job's name, artifact's name and provides' name. This is to reflect the constraints
+    on the SQL reporter.
+  - |
+    Increase sql reporter's storage for ref_url, log_url and nodeset (from varchar(255)
+    to text). This will prevent errors in reporting when any of these values is longer
+    than 255 characters.
