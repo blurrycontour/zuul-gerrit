@@ -16,8 +16,14 @@
 import voluptuous as vs
 
 
+SQL_MAX_STRING_LENGTH = 255
+
+
 artifact = {
-    vs.Required('name'): str,
+    vs.Required('name'): vs.All(
+        str,
+        vs.Length(max=SQL_MAX_STRING_LENGTH)
+    ),
     vs.Required('url'): str,
     'metadata': dict,
 }
