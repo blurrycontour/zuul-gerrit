@@ -1127,6 +1127,8 @@ class TestTenantExtra(TenantParserTestCase):
             dict(name='common-config-job', result='SUCCESS', changes='1,1'),
             dict(name='project2-extra-file2', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+        # REMOVEME just to check logging
+        self.assertTrue(False)
 
     def test_dynamic_extra_dir(self):
         in_repo_conf = textwrap.dedent(
