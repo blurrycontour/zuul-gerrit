@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import {
@@ -20,12 +20,17 @@ import {
   LevelItem,
   PageSection,
   PageSectionVariants,
+  Tab,
+  Tabs,
+  TabTitleText,
   Title,
 } from '@patternfly/react-core'
 import PropTypes from 'prop-types'
 import { fetchProviders, fetchProvidersIfNeeded } from '../actions/providers'
 import ProviderDetail from '../containers/provider/ProviderDetail'
 import ImageTable from '../containers/provider/ImageTable'
+import FlavorTable from '../containers/provider/FlavorTable'
+import LabelTable from '../containers/provider/LabelTable'
 import { ReloadButton } from '../containers/Fetching'
 
 function ProviderPage(props) {
@@ -35,6 +40,7 @@ function ProviderPage(props) {
   const isFetching = useSelector((state) => state.status.isFetching)
   const darkMode = useSelector((state) => state.preferences.darkMode)
   const dispatch = useDispatch()
+  const [activeTabKey, setActiveTabKey] = useState('images')
 
   const provider = useMemo(() =>
     providers?providers.find((e) => e.name === providerName):null,
@@ -44,6 +50,10 @@ function ProviderPage(props) {
     document.title = 'Zuul Provider'
     dispatch(fetchProvidersIfNeeded(tenant))
   }, [tenant, dispatch])
+
+  const handleTabClick = (event, tabIndex) => {
+    setActiveTabKey(tabIndex)
+  }
 
   return (
     <>
@@ -64,12 +74,39 @@ function ProviderPage(props) {
         {provider &&
          <>
            <ProviderDetail provider={provider}/>
-           {provider.images &&
-            <ImageTable
-              images={provider.images}
-              fetching={false}
-              linkPrefix={`${tenant.linkPrefix}/provider/${providerName}/image`}/>
-           }
+           <Tabs activeKey={activeTabKey} onSelect={handleTabClick}>
+             <Tab
+               eventKey="images"
+               title={<TabTitleText>Images</TabTitleText>}
+             >
+               {provider.images &&
+                <ImageTable
+                  images={provider.images}
+                  fetching={false}
+                  linkPrefix={`${tenant.linkPrefix}/provider/${providerName}/image`}/>
+               }
+             </Tab>
+             <Tab
+               eventKey="flavors"
+               title={<TabTitleText>Flavors</TabTitleText>}
+             >
+               {provider.flavors &&
+                <FlavorTable
+                  flavors={provider.flavors}
+                  fetching={false}/>
+               }
+             </Tab>
+             <Tab
+               eventKey="labels"
+               title={<TabTitleText>Labels</TabTitleText>}
+             >
+               {provider.labels &&
+                <LabelTable
+                  labels={provider.labels}
+                  fetching={false}/>
+               }
+             </Tab>
+           </Tabs>
          </>
         }
       </PageSection>
