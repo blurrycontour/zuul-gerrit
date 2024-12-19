@@ -121,6 +121,15 @@ SCHEME_GOLANG = 'golang'
 SCHEME_FLAT = 'flat'
 SCHEME_UNIQUE = 'unique'
 
+# Length constraints imposed by the sql reporter
+MAX_LENGTH_MAP = {
+    "PROJECT_NAME": 255,
+    "PIPELINE_NAME": 255,
+    "TENANT_NAME": 255,
+    "JOB_NAME": 255,
+    "PROVIDES_NAME": 255,
+}
+
 
 def add_debug_line(debug_messages, msg, indent=0):
     if debug_messages is None:
