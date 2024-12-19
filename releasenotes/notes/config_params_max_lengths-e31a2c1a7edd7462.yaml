@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Enforce length limits on project's name, pipeline's name, tenant's name,
+    job's name, artifact's name and provides' name. This is to reflect the constraints
+    on the SQL reporter, as any such input being longer that 255 characters would result
+    in an error within the reporter.

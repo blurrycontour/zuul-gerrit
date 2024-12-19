@@ -1262,6 +1262,21 @@ class TestTenantSuperprojectConfigProject(TenantParserTestCase):
         pass
 
 
+class TestTenantLengthValidation(TenantParserTestCase):
+    tenant_config_file = ('config/length-check/'
+                          'long-tenant.yaml')
+    scheduler_count = 1
+
+    def setUp(self):
+        err = ".*length of value must be at most.*"
+        with testtools.ExpectedException(Exception, err):
+            super().setUp()
+
+    def test_long_tenant_name_is_forbidden(self):
+        # The magic is in setUp
+        pass
+
+
 class TestTenantSuperprojectConfigProjectRegex(TenantParserTestCase):
     tenant_config_file = ('config/tenant-parser/'
                           'superproject-config-project-regex.yaml')
