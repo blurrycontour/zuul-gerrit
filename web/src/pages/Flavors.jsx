@@ -22,21 +22,23 @@ import {
   PageSectionVariants,
   Title,
 } from '@patternfly/react-core'
-import { fetchProviders, fetchProvidersIfNeeded } from '../actions/providers'
-import ProviderTable from '../containers/provider/ProviderTable'
+import { fetchFlavors, fetchFlavorsIfNeeded } from '../actions/flavors'
+import FlavorTable from '../containers/provider/FlavorTable'
 import { ReloadButton } from '../containers/Fetching'
 
-function ProvidersPage() {
+function FlavorsPage() {
   const tenant = useSelector((state) => state.tenant)
-  const providers = useSelector((state) => state.providers.providers[tenant.name])
+  const flavors = useSelector((state) => state.flavors.flavors[tenant.name])
   const isFetching = useSelector((state) => state.status.isFetching)
   const darkMode = useSelector((state) => state.preferences.darkMode)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    document.title = 'Zuul Providers'
-    dispatch(fetchProvidersIfNeeded(tenant))
+    document.title = 'Zuul Flavors'
+    dispatch(fetchFlavorsIfNeeded(tenant))
   }, [tenant, dispatch])
+
+  console.log(flavors)
 
   return (
     <>
@@ -47,19 +49,21 @@ function ProvidersPage() {
           <LevelItem>
             <ReloadButton
               isReloading={isFetching}
-              reloadCallback={() => {dispatch(fetchProviders(tenant))}}
+              reloadCallback={() => {dispatch(fetchFlavors(tenant))}}
             />
           </LevelItem>
         </Level>
         <Title headingLevel="h2">
-          Providers
+          Flavors
         </Title>
-        <ProviderTable
-          providers={providers}
-          fetching={isFetching} />
+        <FlavorTable
+          flavors={flavors}
+          fetching={isFetching}
+          linkPrefix={`${tenant.linkPrefix}/flavor`}
+        />
       </PageSection>
     </>
   )
 }
 
-export default withRouter(ProvidersPage)
+export default withRouter(FlavorsPage)

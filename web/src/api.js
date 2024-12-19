@@ -225,6 +225,10 @@ function deleteImageUpload(apiPrefix, uploadId) {
   )
 }
 
+function fetchFlavors(apiPrefix) {
+  return makeRequest(apiPrefix + 'flavors')
+}
+
 function fetchPipelines(apiPrefix) {
   return makeRequest(apiPrefix + 'pipelines')
 }
@@ -382,6 +386,7 @@ export {
   fetchChangeStatus,
   fetchComponents,
   fetchConfigErrors,
+  fetchFlavors,
   fetchFreezeJob,
   fetchImages,
   fetchInfo,
