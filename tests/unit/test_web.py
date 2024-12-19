@@ -1630,6 +1630,57 @@ class TestWebProviders(LauncherBaseTestCase, WebMixin):
             dict(name='build-ubuntu-local-image', result='SUCCESS'),
         ], ordered=False)
 
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_web_flavors(self):
+        self.waitUntilSettled()
+        self.startWebServer()
+        resp = self.get_url('api/tenant/tenant-one/flavors')
+        data = resp.json()
+        self.assertEqual(4, len(data))
+
+        cc = 'review.example.com%2Forg%2Fcommon-config'
+        expected = [
+            {'canonical_name': f'{cc}/normal',
+             'description': None,
+             'name': 'normal'},
+            {'canonical_name': f'{cc}/large',
+             'description': None,
+             'name': 'large'},
+            {'canonical_name': f'{cc}/dedicated',
+             'description': None,
+             'name': 'dedicated'},
+            {'canonical_name': f'{cc}/invalid',
+             'description': None,
+             'name': 'invalid'},
+        ]
+        self.assertEqual(expected, data)
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_web_labels(self):
+        self.waitUntilSettled()
+        self.startWebServer()
+        resp = self.get_url('api/tenant/tenant-one/labels')
+        data = resp.json()
+        self.assertEqual(5, len(data))
+
+        cc = 'review.example.com%2Forg%2Fcommon-config'
+        expected = [
+            {'name': 'label1'},
+            {'canonical_name': f'{cc}/debian-normal',
+             'description': None,
+             'name': 'debian-normal'},
+            {'canonical_name': f'{cc}/debian-large',
+             'description': None,
+             'name': 'debian-large'},
+            {'canonical_name': f'{cc}/debian-dedicated',
+             'description': None,
+             'name': 'debian-dedicated'},
+            {'canonical_name': f'{cc}/debian-invalid',
+             'description': None,
+             'name': 'debian-invalid'},
+        ]
+        self.assertEqual(expected, data)
+
 
 class TestWebStatusDisplayBranch(BaseTestWeb):
     tenant_config_file = 'config/change-queues/main.yaml'
