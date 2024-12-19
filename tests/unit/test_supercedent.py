@@ -274,6 +274,9 @@ class TestSupercedentCircularDependencies(ZuulTestCase):
 
     @simple_layout('layouts/supercedent-circular-github.yaml', driver='github')
     def test_supercedent_github_circular_deps_closed(self):
+        # Make sure the zkobjects to be created so that the nologs
+        # check below doesn't see the initial error message.
+        self.waitUntilSettled("create pipeline objects")
         # We leave testing pre-merge changes to the gerrit test above.
         # In this test, we're testing post-merge change objects (not
         # refs) via github since there is a reasonable post-merge
