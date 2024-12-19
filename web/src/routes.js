@@ -26,6 +26,7 @@ import JobPage from './pages/Job'
 import JobsPage from './pages/Jobs'
 import ImagePage from './pages/Image'
 import ImagesPage from './pages/Images'
+import FlavorsPage from './pages/Flavors'
 import LabelsPage from './pages/Labels'
 import NodesPage from './pages/Nodes'
 import OpenApiPage from './pages/OpenApi'
@@ -205,6 +206,13 @@ const routes = (info) => {
       {
         to: '/image/:imageName',
         component: ImagePage,
+      }
+    )
+    ret.push(
+      {
+        title: 'Flavors',
+        to: '/flavors',
+        component: FlavorsPage,
       }
     )
   }

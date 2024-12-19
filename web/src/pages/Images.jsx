@@ -20,6 +20,7 @@ import {
   LevelItem,
   PageSection,
   PageSectionVariants,
+  Title,
 } from '@patternfly/react-core'
 import { fetchImages, fetchImagesIfNeeded } from '../actions/images'
 import ImageTable from '../containers/provider/ImageTable'
@@ -52,6 +53,9 @@ function ImagesPage() {
             />
           </LevelItem>
         </Level>
+        <Title headingLevel="h2">
+          Images
+        </Title>
         <ImageTable
           images={images}
           fetching={isFetching}
