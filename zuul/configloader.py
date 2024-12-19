@@ -70,6 +70,11 @@ ZUUL_REGEX = {
 }
 
 
+# FIXME? Due to import orders the SQL max string size constant
+# needs to be set in zuul.ansible.schema (it can't import from other modules)
+from zuul.ansible.schema import SQL_MAX_STRING_LENGTH
+
+
 # Several forms accept either a single item or a list, this makes
 # specifying that in the schema easy (and explicit).
 def to_list(x):
@@ -754,6 +759,9 @@ class JobParser(object):
                                       complex_include_vars_zuul_project_def,
                                       ))
 
+    vs_provides = vs.All(
+        str,
+        vs.Length(max=SQL_MAX_STRING_LENGTH))
     # Attributes of a job that can also be used in Project and ProjectTemplate
     job_attributes = {'parent': vs.Any(str, None),
                       'final': bool,
@@ -761,7 +769,7 @@ class JobParser(object):
                       'protected': bool,
                       'intermediate': bool,
                       'requires': override_list(str),
-                      'provides': override_list(str),
+                      'provides': override_list(vs_provides),
                       'failure-message': str,
                       'success-message': str,
                       # TODO: ignored, remove for v5
@@ -815,7 +823,10 @@ class JobParser(object):
                       'image-build-name': str,
     }
 
-    job_name = {vs.Required('name'): str}
+    vs_name = vs.All(
+        str,
+        vs.Length(max=SQL_MAX_STRING_LENGTH))
+    job_name = {vs.Required('name'): vs_name}
 
     job = dict(collections.ChainMap(job_name, job_attributes))
 
@@ -1355,7 +1366,9 @@ class ProjectParser(object):
         }
 
         project = {
-            'name': str,
+            'name': vs.All(
+                str,
+                vs.Length(max=SQL_MAX_STRING_LENGTH)),
             'description': str,
             'branches': to_list(vs.Any(ZUUL_REGEX, str)),
             'vars': ansible_vars_dict,
@@ -1523,7 +1536,10 @@ class PipelineParser(object):
         window_type = vs.Any('linear', 'exponential')
         window_factor = vs.All(int, vs.Range(min=1))
 
-        pipeline = {vs.Required('name'): str,
+        vs_name = vs.All(
+            str,
+            vs.Length(max=SQL_MAX_STRING_LENGTH))
+        pipeline = {vs.Required('name'): vs_name,
                     vs.Required('manager'): manager,
                     'allow-other-connections': bool,
                     'precedence': precedence,
@@ -1998,7 +2014,9 @@ class TenantParser(object):
         self.tenant_source(value)
 
     def getSchema(self):
-        tenant = {vs.Required('name'): str,
+        vs_name = vs.All(str,
+                         vs.Length(SQL_MAX_STRING_LENGTH))
+        tenant = {vs.Required('name'): vs_name,
                   'max-changes-per-pipeline': int,
                   'max-dependencies': int,
                   'max-nodes-per-job': int,
