@@ -18,6 +18,7 @@ import auth from './auth'
 import autoholds from './autoholds'
 import change from './change'
 import component from './component'
+import flavors from './flavors'
 import freezejob from './freezejob'
 import notifications from './notifications'
 import build from './build'
@@ -51,6 +52,7 @@ const reducers = {
   change,
   component,
   tenantStatus,
+  flavors,
   freezejob,
   notifications,
   images,
