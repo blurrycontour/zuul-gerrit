@@ -1681,6 +1681,24 @@ class TestWebProviders(LauncherBaseTestCase, WebMixin):
         ]
         self.assertEqual(expected, data)
 
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    def test_web_nodes_list_niz(self):
+        self.waitUntilSettled()
+        self.startWebServer()
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+        data = self.get_url('api/tenant/tenant-one/nodes').json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(
+            'review.example.com%2Forg%2Fcommon-config/aws-us-east-1-main',
+            data[0]["provider"])
+        self.assertEqual("debian-normal", data[0]["label"])
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
 
 class TestWebStatusDisplayBranch(BaseTestWeb):
     tenant_config_file = 'config/change-queues/main.yaml'
