@@ -3346,6 +3346,7 @@ class ConfigLoader(object):
     def _loadDynamicProjectData(self, config, project, files,
                                 additional_project_branches, trusted,
                                 item, pcontext):
+        log = get_annotated_logger(self.log, item.event)
         tenant = item.pipeline.tenant
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
@@ -3417,7 +3418,7 @@ class ConfigLoader(object):
                         # project-branch (unless an "extra" file/dir).
                         if (conf_root in ZUUL_CONF_ROOT):
                             if loaded and loaded != conf_root:
-                                self.log.warning(
+                                log.warning(
                                     "Configuration in %s ignored because "
                                     "project-branch is already configured",
                                     source_context)
@@ -3427,10 +3428,8 @@ class ConfigLoader(object):
                                     source_context)
                                 continue
                             loaded = conf_root
-
-                        self.log.info(
-                            "Loading configuration dynamically from %s" %
-                            (source_context,))
+                        log.info("Loading configuration dynamically from %s"
+                                 % (source_context,))
                         incdata = self.tenant_parser.loadProjectYAML(
                             data, source_context, pcontext.accumulator)
 
@@ -3450,7 +3449,7 @@ class ConfigLoader(object):
                             include_config_projects=False,
                             zuul_event_id=None):
         tenant = item.pipeline.tenant
-        log = get_annotated_logger(self.log, zuul_event_id)
+        log = get_annotated_logger(self.log, item.event)
         pcontext = ParseContext(self.connections, self.scheduler,
                                 tenant, ansible_manager)
         if include_config_projects:

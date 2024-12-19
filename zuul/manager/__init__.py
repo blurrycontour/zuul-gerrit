@@ -1363,7 +1363,8 @@ class PipelineManager(metaclass=ABCMeta):
             # actually run with that config.
             files = build_set.getFiles(self.current_context)
             if trusted_updates:
-                log.debug("Loading dynamic layout (phase 1)")
+                log.debug("Loading dynamic layout "
+                          "(phase 1: including changes to config repos)")
                 trusted_layout = loader.createDynamicLayout(
                     item,
                     files,
@@ -1378,7 +1379,9 @@ class PipelineManager(metaclass=ABCMeta):
             # Then create the config a second time but without changes
             # to config repos so that we actually use this config.
             if untrusted_updates:
-                log.debug("Loading dynamic layout (phase 2)")
+                log.debug("Loading dynamic layout "
+                          "(phase 2: including changes to "
+                          "untrusted repos only)")
                 untrusted_layout = loader.createDynamicLayout(
                     item,
                     files,
