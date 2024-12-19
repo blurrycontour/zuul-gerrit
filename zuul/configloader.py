@@ -3345,7 +3345,7 @@ class ConfigLoader(object):
 
     def _loadDynamicProjectData(self, config, project, files,
                                 additional_project_branches, trusted,
-                                item, pcontext):
+                                item, pcontext, logger=None):
         tenant = item.pipeline.tenant
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
@@ -3427,10 +3427,12 @@ class ConfigLoader(object):
                                     source_context)
                                 continue
                             loaded = conf_root
-
-                        self.log.info(
-                            "Loading configuration dynamically from %s" %
-                            (source_context,))
+                        msg = ("Loading configuration dynamically from %s"
+                               % (source_context,))
+                        if logger is None:
+                            self.log.info(msg)
+                        else:
+                            logger.info(msg)
                         incdata = self.tenant_parser.loadProjectYAML(
                             data, source_context, pcontext.accumulator)
 
@@ -3458,14 +3460,16 @@ class ConfigLoader(object):
             for project in tenant.config_projects:
                 self._loadDynamicProjectData(config, project, files,
                                              additional_project_branches,
-                                             True, item, pcontext)
+                                             True, item, pcontext,
+                                             logger=log)
         else:
             config = tenant.config_projects_config.copy()
 
         for project in tenant.untrusted_projects:
             self._loadDynamicProjectData(config, project, files,
                                          additional_project_branches,
-                                         False, item, pcontext)
+                                         False, item, pcontext,
+                                         logger=log)
 
         layout = model.Layout(tenant, item.layout_uuid)
         layout.loading_errors = pcontext.loading_errors

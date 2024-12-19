@@ -5965,6 +5965,12 @@ class QueueItem(zkobject.ZKObject):
             return self.queue.pipeline
         return None
 
+    @property
+    def zuul_event_id(self):
+        if self.current_build_set:
+            return self.current_build_set.zuul_event_id
+        return None
+
     @classmethod
     def new(klass, context, **kw):
         obj = klass()
