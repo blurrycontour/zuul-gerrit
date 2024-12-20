@@ -2866,6 +2866,16 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual("some reason", request['reason'])
         self.assertEqual(1, request['max_count'])
 
+    def test_autohold_invalid_ref_filter(self):
+        """Test that incorrect ref filters are rejected"""
+        args = {"reason": "some reason",
+                "count": 1,
+                'job': 'project-test2',
+                'change': None,
+                'ref': '*abc',
+                'node_hold_expiration': None}
+        self._test_autohold(args, code=400)
+
     def test_autohold_change(self):
         """Test that autohold can be set through the admin web interface
         with a change supplied"""
