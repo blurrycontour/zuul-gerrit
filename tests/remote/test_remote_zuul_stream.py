@@ -22,7 +22,7 @@ import yaml
 from unittest import skip
 from datetime import datetime, timedelta
 
-from tests.base import AnsibleZuulTestCase
+from tests.base import AnsibleZuulTestCase, zuul_config
 
 
 class FunctionalZuulStreamMixIn:
@@ -385,6 +385,18 @@ class FunctionalZuulStreamMixIn:
             # ... handling loops is a different path, and that does
             self.assertLogLineStartsWith(
                 r"""compute1 \| ok: \{'string': '\d.""", text)
+
+    @zuul_config('executor', 'output_max_bytes', '2')
+    def test_command_output_max_bytes(self):
+        job = self._run_job('command')
+        with self.jobLog(job):
+            build = self.history[-1]
+            self.assertEqual(build.result, 'FAILURE')
+
+            console_output = self.console_output.getvalue()
+            self.assertNotIn('[WARNING]: Failure using method', console_output)
+            text = self._get_job_output(build)
+            self.assertIn('[Zuul] Log output exceeded max of 2', text)
 
     def test_module_exception(self):
         job = self._run_job('module_failure_exception')
