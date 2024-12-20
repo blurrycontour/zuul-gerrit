@@ -94,6 +94,7 @@ from zuul.zk.semaphore import SemaphoreHandler
 
 BUFFER_LINES_FOR_SYNTAX = 200
 OUTPUT_MAX_LINE_BYTES = 51200  # 50 MiB
+OUTPUT_MAX_BYTES = 1024 * 1024 * 1024  # 1GiB
 DEFAULT_FINGER_PORT = 7900
 DEFAULT_STREAM_PORT = 19885
 BLACKLISTED_ANSIBLE_CONNECTION_TYPES = [
@@ -1094,6 +1095,13 @@ class AnsibleJob(object):
         if self.executor_server.config.has_option('executor', 'variables'):
             self.executor_variables_file = self.executor_server.config.get(
                 'executor', 'variables')
+
+        if self.executor_server.config.has_option('executor',
+                                                  'output_max_bytes'):
+            self.output_max_bytes = self.executor_server.config.get(
+                'executor', 'output_max_bytes')
+        else:
+            self.output_max_bytes = OUTPUT_MAX_BYTES
 
         plugin_dir = self.executor_server.ansible_manager.getAnsiblePluginDir(
             self.ansible_version)
@@ -3040,6 +3048,7 @@ class AnsibleJob(object):
                     for key, value in os.environ.copy().items()
                     if not key.startswith("ZUUL_")}
         env_copy.update(self.ssh_agent.env)
+        env_copy['ZUUL_OUTPUT_MAX_BYTES'] = str(self.output_max_bytes)
         env_copy['ZUUL_JOB_LOG_CONFIG'] = self.jobdir.logging_json
         env_copy['ZUUL_JOB_FAILURE_OUTPUT'] = self.failure_output
         env_copy['ZUUL_JOBDIR'] = self.jobdir.root

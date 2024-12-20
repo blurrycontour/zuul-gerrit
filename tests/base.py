@@ -281,6 +281,20 @@ def okay_tracebacks(*args):
     return decorator
 
 
+def zuul_config(section, key, value):
+    """Set a zuul.conf value."""
+
+    def decorator(test):
+        config_dict = getattr(test, '__zuul_config__', None)
+        if config_dict is None:
+            config_dict = {}
+            test.__zuul_config__ = config_dict
+        section_dict = config_dict.setdefault(section, {})
+        section_dict[key] = value
+        return test
+    return decorator
+
+
 def registerProjects(source_name, client, config):
     path = config.get('scheduler', 'tenant_config')
     with open(os.path.join(FIXTURE_DIR, path)) as f:
@@ -2228,6 +2242,7 @@ class TestConfig:
         self.enable_nodepool = getattr(test, '__enable_nodepool__', False)
         self.return_data = getattr(test, '__return_data__', [])
         self.driver_config = getattr(test, '__driver_config__', {})
+        self.zuul_config = getattr(test, '__zuul_config__', {})
         self.driver = DriverTestConfig(self)
         self.changes = FakeChangeDB()
 
@@ -2632,7 +2647,9 @@ class ZuulTestCase(BaseTestCase):
                                 os.path.join(git_path, reponame))
         # Make test_root persist after ansible run for .flag test
         config.set('executor', 'trusted_rw_paths', self.test_root)
-
+        for section, section_dict in self.test_config.zuul_config.items():
+            for k, v in section_dict.items():
+                config.set(section, k, v)
         return config
 
     def setupSimpleLayout(self, config):
