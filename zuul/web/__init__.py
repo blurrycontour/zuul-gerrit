@@ -28,6 +28,7 @@ import json
 import logging
 import os
 import time
+import re
 import select
 import ssl
 import threading
@@ -1035,7 +1036,7 @@ class ZuulWebAPI(object):
                 'node_hold_expiration']):
             raise cherrypy.HTTPError(400, 'Invalid request body')
         if count < 0:
-            raise cherrypy.HTTPError(400, "Count must be greater 0")
+            raise cherrypy.HTTPError(400, "Count must be greater than 0")
 
         project_name = project.canonical_name
 
@@ -1046,6 +1047,14 @@ class ZuulWebAPI(object):
         else:
             ref_filter = ".*"
 
+        try:
+            _ = re.compile(ref_filter)
+        except re.error:
+            raise cherrypy.HTTPError(
+                400,
+                'provided "ref" or "change" argument does not translate '
+                'to a proper regular expression'
+            )
         self._autohold(tenant_name, project_name, jbody['job'], ref_filter,
                        jbody['reason'], jbody['count'],
                        jbody['node_hold_expiration'])
