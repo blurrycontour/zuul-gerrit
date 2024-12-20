@@ -19,6 +19,7 @@
         ZUUL_JOB_LOG_CONFIG: "{{ ansible_user_dir}}/logging.json"
         ZUUL_JOBDIR: "{{ ansible_user_dir}}"
         ZUUL_ANSIBLE_SPLIT_STREAMS: False
+        ZUUL_OUTPUT_MAX_BYTES: 1073741824
         PYTHONPATH: "{{ python_path }}"
       register: _success_output
 

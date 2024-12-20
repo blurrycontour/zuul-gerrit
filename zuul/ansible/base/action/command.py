@@ -55,4 +55,6 @@ class ActionModule(command.ActionModule):
                     self._task._uuid, count, log_host)
             self._task.args["zuul_ansible_split_streams"] = (
                 os.environ["ZUUL_ANSIBLE_SPLIT_STREAMS"] == "True")
+            self._task.args["zuul_output_max_bytes"] = int(
+                os.environ["ZUUL_OUTPUT_MAX_BYTES"])
         return super(ActionModule, self).run(tmp, task_vars)

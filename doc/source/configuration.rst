@@ -762,6 +762,26 @@ The following sections of ``zuul.conf`` are used by the executor:
       total real memory multiplied by 100. Buffers and cache are
       considered available in the calculation.
 
+   .. attr:: output_max_bytes
+      :default: 1073741824
+
+      .. warning:: This option is deprecated.  In the future, the
+                   default value of 1GiB is likely to become fixed and
+                   unable to be changed.  Set this option only if
+                   needed and only as long as needed to adjust
+                   existing jobs to avoid the limit.
+
+      Zuul limits the total number of bytes output via stdout or
+      stderr from a single Ansible command to this value.  If the
+      command outputs more than this number of bytes, the command
+      execution will fail.  This is to protect the executor from being
+      required to read an excessively large amount of data from an
+      ansible task result.
+
+      If a job fails due to this limit, consider adjusting the command
+      task to redirect output to a file and collecting the file
+      separately.
+
    .. attr:: hostname
       :default: hostname of the server
 
