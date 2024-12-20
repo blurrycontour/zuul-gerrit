@@ -253,6 +253,7 @@ from ansible.module_utils.common.text.converters import to_native, to_bytes, to_
 from ansible.module_utils.common.collections import is_iterable
 
 # Imports needed for Zuul things
+import io
 import re
 import subprocess
 import traceback
@@ -271,12 +272,9 @@ from ansible.module_utils.six.moves import shlex_quote
 
 LOG_STREAM_FILE = '/tmp/console-{log_uuid}.log'
 PASSWD_ARG_RE = re.compile(r'^[-]{0,2}pass[-]?(word|wd)?')
-# Lists to save stdout/stderr log lines in as we collect them
-_log_lines = []
-_stderr_log_lines = []
 
 
-class Console(object):
+class Console:
     def __init__(self, log_uuid):
         # The streamer currently will not ask us for output from
         # loops.  This flag uuid was set in the action plugin if this
@@ -312,47 +310,89 @@ class Console(object):
         self.logfile.write(outln)
 
 
-def _follow(fd, log_lines, console):
-    newline_warning = False
-    while True:
-        line = fd.readline()
-        if not line:
-            break
-        log_lines.append(line)
-        if not line[-1] != b'\n':
-            line += b'\n'
-            newline_warning = True
-        console.addLine(line)
-    if newline_warning:
-        console.addLine('[Zuul] No trailing newline\n')
+class StreamFollower:
+    def __init__(self, cmd, log_uuid, output_max_bytes):
+        self.cmd = cmd
+        self.log_uuid = log_uuid
+        self.exception = None
+        self.output_max_bytes = output_max_bytes
+        # Lists to save stdout/stderr log lines in as we collect them
+        self.log_bytes = io.BytesIO()
+        self.stderr_log_bytes = io.BytesIO()
+        self.stdout_thread = None
+        self.stderr_thread = None
+        # Total size in bytes of all log and stderr_log lines
+        self.log_size = 0
 
+    def join(self):
+        if self.exception:
+            try:
+                self.console.close()
+            except Exception:
+                pass
+            raise self.exception
+        for t in (self.stdout_thread, self.stderr_thread):
+            if t is None:
+                continue
+            t.join(10)
+            if t.is_alive():
+                with Console(self.zuul_log_id) as console:
+                    console.addLine("[Zuul] standard output/error still open "
+                                    "after child exited")
+        self.console.close()
 
-def follow(stdout, stderr, log_uuid):
-    threads = []
-    with Console(log_uuid) as console:
-        if stdout:
-            t = threading.Thread(
-                target=_follow,
-                args=(stdout, _log_lines, console)
-            )
-            t.daemon = True
-            t.start()
-            threads.append(t)
-        if stderr:
-            t = threading.Thread(
-                target=_follow,
-                args=(stderr, _stderr_log_lines, console)
-            )
-            t.daemon = True
-            t.start()
-            threads.append(t)
-        for t in threads:
-            t.join()
+    def follow(self):
+        self.console = Console(self.log_uuid)
+        self.console.open()
+        if self.cmd.stdout:
+            self.stdout_thread = threading.Thread(
+                target=self.follow_main,
+                args=(self.cmd.stdout, self.log_bytes))
+            self.stdout_thread.daemon = True
+            self.stdout_thread.start()
+        if self.cmd.stdout:
+            self.stderr_thread = threading.Thread(
+                target=self.follow_main,
+                args=(self.cmd.stderr, self.stderr_log_bytes))
+            self.stderr_thread.daemon = True
+            self.stderr_thread.start()
+
+    def follow_main(self, fd, log_bytes):
+        try:
+            self.follow_inner(fd, log_bytes)
+        except Exception as e:
+            self.exception = e
+
+    def follow_inner(self, fd):
+        newline_warning = False
+        while True:
+            line = fd.readline()
+            if not line:
+                break
+            self.log_size += len(line)
+            if self.log_size > self.output_max_bytes:
+                msg = (
+                    '[Zuul] Log output exceeded max of %s, '
+                    'terminating\n' % (self.output_max_bytes,))
+                self.console.addLine(msg)
+                try:
+                    pgid = os.getpgid(self.cmd.pid)
+                    os.killpg(pgid, signal.SIGKILL)
+                except Exception:
+                    pass
+                raise Exception(msg)
+            log_bytes.write(line)
+            if not line[-1] != b'\n':
+                line += b'\n'
+                newline_warning = True
+            self.console.addLine(line)
+        if newline_warning:
+            self.console.addLine('[Zuul] No trailing newline\n')
 
 
 # Taken from ansible/module_utils/basic.py ... forking the method for now
 # so that we can dive in and figure out how to make appropriate hook points
-def zuul_run_command(self, args, zuul_log_id, zuul_ansible_split_streams, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None,
+def zuul_run_command(self, args, zuul_log_id, zuul_ansible_split_streams, zuul_output_max_bytes, check_rc=False, close_fds=True, executable=None, data=None, binary_data=False, path_prefix=None, cwd=None,
                 use_unsafe_shell=False, prompt_regex=None, environ_update=None, umask=None, encoding='utf-8', errors='surrogate_or_strict',
                 expand_user_and_vars=True, pass_fds=None, before_communicate_callback=None, ignore_invalid_cwd=True):
     '''
@@ -544,11 +584,10 @@ def zuul_run_command(self, args, zuul_log_id, zuul_ansible_split_streams, check_
             before_communicate_callback(cmd)
 
         if self.no_log:
-            t = None
+            follower = None
         else:
-            t = threading.Thread(target=follow, args=(cmd.stdout, cmd.stderr, zuul_log_id))
-            t.daemon = True
-            t.start()
+            follower = StreamFollower(cmd, zuul_log_id, zuul_output_max_bytes)
+            follower.follow()
 
         # ZUUL: Our log thread will catch the output so don't do that here.
 
@@ -572,16 +611,12 @@ def zuul_run_command(self, args, zuul_log_id, zuul_ansible_split_streams, check_
         # 10 seconds to catch up and exit.  If it hasn't done so by
         # then, it is very likely stuck in readline() because it
         # spawed a child that is holding stdout or stderr open.
-        if t:
-            t.join(10)
-            with Console(zuul_log_id) as console:
-                if t.is_alive():
-                    console.addLine("[Zuul] standard output/error still open "
-                                    "after child exited")
+        if follower:
+            follower.join()
             # ZUUL: stdout and stderr are in the console log file
             # ZUUL: return the saved log lines so we can ship them back
-            stdout = b('').join(_log_lines)
-            stderr = b('').join(_stderr_log_lines)
+            stdout = follower.log_bytes.getvalue()
+            stderr = follower.stderr_log_bytes.getvalue()
         else:
             stdout = b('')
             stderr = b('')
@@ -596,9 +631,6 @@ def zuul_run_command(self, args, zuul_log_id, zuul_ansible_split_streams, check_
         fail_json_kwargs = dict(rc=257, stdout=b'', stderr=b'', msg=to_native(e), exception=traceback.format_exc(), cmd=self._clean_args(args))
     finally:
         with Console(zuul_log_id) as console:
-            if t and t.is_alive():
-                console.addLine("[Zuul] standard output/error still open "
-                                "after child exited")
             if fail_json_kwargs:
                 # we hit an exception and need to use the rc from
                 # fail_json_kwargs
@@ -641,6 +673,7 @@ def main():
             strip_empty_ends=dict(type='bool', default=True),
             zuul_log_id=dict(type='str'),
             zuul_ansible_split_streams=dict(type='bool'),
+            zuul_output_max_bytes=dict(type='int'),
         ),
         supports_check_mode=True,
     )
@@ -657,6 +690,7 @@ def main():
     expand_argument_vars = module.params['expand_argument_vars']
     zuul_log_id = module.params['zuul_log_id']
     zuul_ansible_split_streams = module.params["zuul_ansible_split_streams"]
+    zuul_output_max_bytes = module.params['zuul_output_max_bytes']
 
     # we promised these in 'always' ( _lines get auto-added on action plugin)
     r = {'changed': False, 'stdout': '', 'stderr': '', 'rc': None, 'cmd': None, 'start': None, 'end': None, 'delta': None, 'msg': ''}
@@ -724,7 +758,7 @@ def main():
     # actually executes command (or not ...)
     if not module.check_mode:
         r['start'] = datetime.datetime.now()
-        r['rc'], r['stdout'], r['stderr'] = zuul_run_command(module, args, zuul_log_id, zuul_ansible_split_streams, executable=executable, use_unsafe_shell=shell, encoding=None,
+        r['rc'], r['stdout'], r['stderr'] = zuul_run_command(module, args, zuul_log_id, zuul_ansible_split_streams, zuul_output_max_bytes, executable=executable, use_unsafe_shell=shell, encoding=None,
                                                                data=stdin, binary_data=(not stdin_add_newline),
                                                                expand_user_and_vars=expand_argument_vars)
         r['end'] = datetime.datetime.now()
