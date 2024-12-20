@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec117800_442c0102",
+        "filename": "zuul/executor/server.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 2806,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2024-12-20T06:11:42Z",
+      "side": 1,
+      "message": "I think this should be in a try/except block. We currently don\u0027t validate autohold requests properly. E.g. it\u0027s possible to add a autohold with an invalid regex which would make all builds fail.",
+      "revId": "7d78db3b5271292032d089e1618ad115596622cf",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
