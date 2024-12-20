@@ -33,6 +33,23 @@
       "message": "recheck\nno logs to work with",
       "revId": "200d291ac21e8c032596c1613810da0e495f5cdd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04b43b47_d08604a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2024-12-20T16:39:56Z",
+      "side": 1,
+      "message": "recheck\ntransient timeout",
+      "revId": "200d291ac21e8c032596c1613810da0e495f5cdd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
