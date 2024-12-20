@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    The autohold REST API returns HTTP error code 400 if the `ref` or
+    `change` argument cannot be turned into a valid regular expression
+    as the ref filter.
