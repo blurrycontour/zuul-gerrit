@@ -8455,6 +8455,13 @@ class TestJobOutput(AnsibleZuulTestCase):
         self.log.info(job_output)
         self.assertIn(token_stdout, job_output)
         self.assertIn(token_stderr, job_output)
+        self.assertIn("Job console starting", job_output)
+        self.assertIn("Cloning repos into workspace", job_output)
+        self.assertIn("Merging changes", job_output)
+        self.assertIn("Restoring repo states", job_output)
+        self.assertIn("Checking out repos", job_output)
+        self.assertIn("Preparing playbooks", job_output)
+        self.assertIn("Running Ansible setup", job_output)
 
     def test_job_output_missing_role(self):
         # Verify that ansible errors such as missing roles are part of the
