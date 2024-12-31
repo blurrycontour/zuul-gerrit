@@ -1423,3 +1423,15 @@ class TestGerritDriver(ZuulTestCase):
         self.assertHistory([
             dict(name='check-job', result='SUCCESS', changes='1,1'),
         ])
+
+    @simple_layout('layouts/gerrit-notify.yaml')
+    def test_notify(self):
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS'),
+        ])
+
+        self.assertEqual(A.notify, 'NONE')
