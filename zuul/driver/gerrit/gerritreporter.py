@@ -35,6 +35,7 @@ class GerritReporter(BaseReporter):
         self._create_comment = action.pop('comment', True)
         self._submit = action.pop('submit', False)
         self._checks_api = action.pop('checks-api', None)
+        self._notify = action.pop('notify', None)
         self._labels = {str(k): v for k, v in action.items()}
 
     def __repr__(self):
@@ -95,7 +96,8 @@ class GerritReporter(BaseReporter):
 
         return self.connection.review(item, change, message,
                                       self._submit, self._labels,
-                                      self._checks_api, comments,
+                                      self._checks_api, self._notify,
+                                      comments,
                                       phase1, phase2,
                                       zuul_event_id=item.event)
 
