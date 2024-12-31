@@ -3639,6 +3639,42 @@ class TestTenantScopedWebApiWithAuthRules(BaseTestWeb):
         self.assertEqual(200, req.status_code, req.text)
         self.waitUntilSettled()
 
+    def test_boolean_claim_rule(self):
+        """Test a rule for a boolean claim"""
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        A.addApproval('Approved', 1)
+
+        path = "api/tenant/%(tenant)s/project/%(project)s/enqueue"
+        enqueue_args = {'tenant': 'tenant-one',
+                        'project': 'org/project', }
+        change = {'trigger': 'gerrit',
+                  'change': '1,1',
+                  'pipeline': 'gate', }
+
+        def _test_project_enqueue_with_authz(authz, expected):
+            token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                               algorithm='HS256')
+            req = self.post_url(path % enqueue_args,
+                                headers={'Authorization': 'Bearer %s' % token},
+                                json=change)
+            self.assertEqual(expected, req.status_code, req.text)
+            self.waitUntilSettled()
+
+        valid_authz = {'iss': 'zuul_operator',
+                       'aud': 'zuul.example.com',
+                       'sub': 'zeddemore',
+                       'is_ghost': False,
+                       'exp': int(time.time()) + 3600}
+        _test_project_enqueue_with_authz(valid_authz, 200)
+
+        invalid_authz = {'iss': 'zuul_operator',
+                         'aud': 'zuul.example.com',
+                         'sub': 'zeddemore',
+                         'is_ghost': True,
+                         'exp': int(time.time()) + 3600}
+        _test_project_enqueue_with_authz(invalid_authz, 403)
+
     def test_user_actions_action_override(self):
         """Test that user with 'zuul.admin' claim does NOT get it back"""
         admin_tenants = ['tenant-zero', ]

@@ -10192,13 +10192,15 @@ class ClaimRule(AuthZRule):
     def _match_jsonpath(self, claims, tenant):
         matches = [match.value
                    for match in jsonpath_rw.parse(self.claim).find(claims)]
-        t_value = self.templated(self.value, tenant)
+        value = self.value
+        if isinstance(self.value, str):
+            value = self.templated(value, tenant)
         if len(matches) == 1:
             match = matches[0]
             if isinstance(match, list):
-                return t_value in match
-            elif isinstance(match, str):
-                return t_value == match
+                return value in match
+            elif isinstance(match, str) or isinstance(match, bool):
+                return value == match
             else:
                 # unsupported type - don't raise, but this should be notified
                 return False

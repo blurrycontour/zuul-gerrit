@@ -190,7 +190,8 @@ Zuul's authorization engine will adapt matching tests depending on the nature of
 the claim in the Authentication Token, eg:
 
 * if the claim is a JSON list, check that the condition value is in the claim
-* if the claim is a string, check that the condition value is equal to the claim's value
+* if the claim is a string or a boolean, check that the condition value is equal
+  to the claim's value
 
 The special ``zuul_uid`` claim refers to the ``uid_claim`` setting in an
 authenticator's configuration, as will be explained below. By default it refers
