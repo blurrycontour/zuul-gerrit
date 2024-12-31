@@ -1162,12 +1162,13 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         return event
 
     def review(self, item, change, message, submit, labels,
-               checks_api, file_comments, phase1, phase2,
+               notify, checks_api, file_comments, phase1, phase2,
                zuul_event_id=None):
         if self.web_server:
             return super(FakeGerritConnection, self).review(
-                item, change, message, submit, labels, checks_api,
-                file_comments, phase1, phase2, zuul_event_id)
+                item, change, message, submit, labels, notify,
+                checks_api, file_comments, phase1, phase2,
+                zuul_event_id)
         self._test_handle_review(int(change.number), message, submit,
                                  labels, phase1, phase2)
 
