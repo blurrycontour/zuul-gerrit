@@ -1119,17 +1119,17 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             self.event_queue.put(event)
 
     def review(self, item, change, message, submit, labels, checks_api,
-               file_comments, phase1, phase2, zuul_event_id=None):
+               notify, file_comments, phase1, phase2, zuul_event_id=None):
         if self.session:
             meth = self.review_http
         else:
             meth = self.review_ssh
-        return meth(item, change, message, submit, labels, checks_api,
+        return meth(item, change, message, submit, labels, checks_api, notify,
                     file_comments, phase1, phase2,
                     zuul_event_id=zuul_event_id)
 
     def review_ssh(self, item, change, message, submit, labels, checks_api,
-                   file_comments, phase1, phase2, zuul_event_id=None):
+                   notify, file_comments, phase1, phase2, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         if checks_api:
             log.error("Zuul is configured to report to the checks API, "
@@ -1137,6 +1137,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                       "in the configuration file.")
         project = change.project.name
         cmd = 'gerrit review --project %s' % project
+        if notify:
+            cmd += ' --notify %s' % shlex.quote(notify)
         if phase1:
             if message:
                 b_len = len(message.encode('utf-8'))
@@ -1206,7 +1208,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     time.sleep(x * self.submit_retry_backoff)
 
     def review_http(self, item, change, message, submit, labels,
-                    checks_api, file_comments, phase1, phase2,
+                    checks_api, notify, file_comments, phase1, phase2,
                     zuul_event_id=None):
         changeid = "%s~%s~%s" % (
             urllib.parse.quote(str(change.project), safe=''),
@@ -1220,6 +1222,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             message = ("%s... (truncated)" %
                        message[:GERRIT_HUMAN_MESSAGE_LIMIT - 20])
         data = dict(strict_labels=False)
+        if notify:
+            data['notify'] = notify
         if phase1:
             data['message'] = message
             if change.is_current_patchset:
