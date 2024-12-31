@@ -530,6 +530,16 @@ Reporter Configuration
       disable this behavior (file and line commands will still be sent
       if present).
 
+   .. attr:: notify
+
+      If this is set to a notify handling value then send
+      notifications at the specified level. If not, use the default
+      specified by the gerrit api. Some possible values include
+      ``ALL`` and ``NONE``. See the gerrit api for available options
+      and default value:
+
+      `<https://gerrit-review.googlesource.com/Documentation/rest-api-changes.html#review-input>`_
+
 A :ref:`connection<connections>` that uses the gerrit driver must be
 supplied to the trigger.
 
