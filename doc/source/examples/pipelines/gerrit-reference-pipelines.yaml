@@ -17,10 +17,12 @@
           comment: (?i)^(Patch Set [0-9]+:)?( [\w\\+-]*)*(\n\n)?\s*recheck
     success:
       gerrit:
+        notify: NONE
         # Note that gerrit keywords are case-sensitive.
         Verified: 1
     failure:
       gerrit:
+        notify: ALL
         Verified: -1
 
 - pipeline:
