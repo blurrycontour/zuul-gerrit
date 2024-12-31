@@ -53,6 +53,7 @@ class FakeGerritChange(object):
         self.source_hostname = gerrit.canonical_hostname
         self.gerrit_baseurl = gerrit.baseurl
         self.reported = 0
+        self.notify = None
         self.queried = 0
         self.patchsets = []
         self.number = number
@@ -829,7 +830,7 @@ class GerritWebServer(object):
                 tag = data.get('tag', None)
                 fake_gerrit._test_handle_review(
                     int(change.data['number']), message, False, labels,
-                    True, False, comments, tag=tag)
+                    None, True, False, comments, tag=tag)
                 self.send_response(200)
                 self.end_headers()
 
@@ -863,7 +864,7 @@ class GerritWebServer(object):
                 for change_number in changes_to_merge:
                     fake_gerrit._test_handle_review(
                         int(change_number), message, True, labels,
-                        False, True)
+                        None, False, True)
                 self.send_response(200)
                 self.end_headers()
 
@@ -1162,14 +1163,15 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         return event
 
     def review(self, item, change, message, submit, labels,
-               checks_api, file_comments, phase1, phase2,
+               checks_api, notify, file_comments, phase1, phase2,
                zuul_event_id=None):
         if self.web_server:
             return super(FakeGerritConnection, self).review(
                 item, change, message, submit, labels, checks_api,
-                file_comments, phase1, phase2, zuul_event_id)
+                notify, file_comments, phase1, phase2,
+                zuul_event_id)
         self._test_handle_review(int(change.number), message, submit,
-                                 labels, phase1, phase2)
+                                 labels, notify, phase1, phase2)
 
     def _test_get_submitted_together(self, change):
         topic = change.data.get('topic')
@@ -1194,9 +1196,12 @@ class FakeGerritConnection(gerritconnection.GerritConnection):
         return results
 
     def _test_handle_review(self, change_number, message, submit, labels,
+                            notify,
                             phase1, phase2, file_comments=None, tag=None):
         # Handle a review action from a test
         change = self.changes[change_number]
+
+        change.notify = notify
 
         # Add the approval back onto the change (ie simulate what gerrit would
         # do).
