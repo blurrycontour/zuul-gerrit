@@ -22,6 +22,7 @@ import types
 import sqlalchemy as sa
 
 import zuul
+from zuul.driver.sql.sqlreporter import URL_LENGTH_ERROR
 from zuul.lib import yamlutil
 from tests.base import (
     AnsibleZuulTestCase,
@@ -460,6 +461,44 @@ class TestSQLConnectionMysql(ZuulTestCase):
             ).fetchall()
 
             self.assertEqual(len(buildset0_builds), 5)
+
+
+class TestSQLReporterLongValues(ZuulTestCase):
+    config_file = 'zuul-sql-driver-mysql.conf'
+    tenant_config_file = 'config/sql-reporter-long-values/main.yaml'
+
+    def test_sql_results_log_url_too_long(self):
+        "Test builds with a long log url are stored in db"
+
+        def check_results():
+            # Grab the sa tables
+            connection = self.scheds.first.connections.getSqlConnection()
+            with connection.getSession() as db:
+                buildsets = list(db.getBuildsets())
+                jobs = []
+                for build in buildsets[0].builds:
+                    if build.job_name == 'project-test1':
+                        self.assertEqual(
+                            URL_LENGTH_ERROR % "log URL",
+                            build.log_url)
+                        return
+                    jobs.append(build.job_name)
+                raise Exception(
+                    'The following jobs were run: "%s"' % " ".join(jobs))
+
+        self.executor_server.hold_jobs_in_build = True
+
+        self.log.debug("Adding success FakeChange")
+        X = self.fake_gerrit.addFakeChange('org/project', 'master', 'X')
+
+        self.fake_gerrit.addEvent(X.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.orderedRelease()
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+
+        check_results()
 
 
 class TestSQLConnectionPostgres(TestSQLConnectionMysql):
