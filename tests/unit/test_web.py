@@ -1895,6 +1895,17 @@ class TestRootAuth(TestWebCapabilitiesInfo):
         self.assertEqual(expected_info,
                          info,
                          info)
+        # Re-check tenant zero to make sure that the dict mutation
+        # that happens when accessing the other tenants has not
+        # affected it (it has no tenant default realm so does not
+        # override what is in the original capabilities dict).
+        info = self.get_url("api/tenant/tenant-zero/info").json()
+        expected_info['info']['tenant'] = 'tenant-zero'
+        expected_info['info']['capabilities']['auth']['default_realm'] =\
+            'myOIDC1'
+        self.assertEqual(expected_info,
+                         info,
+                         info)
 
 
 class TestTenantInfoConfigBroken(BaseTestWeb):
