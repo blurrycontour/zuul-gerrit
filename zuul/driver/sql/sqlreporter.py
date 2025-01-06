@@ -21,9 +21,15 @@ import voluptuous as v
 
 import sqlalchemy.exc
 
+from zuul.driver.sql.sqlconnection import SQL_MAX_STRING_LENGTH
 from zuul.exceptions import MissingBuildsetError
 from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.reporter import BaseReporter
+
+
+DATA_LENGTH_ERROR = """
+%s's length exceeds DB storage capacity.
+Original value: %s"""
 
 
 class SQLReporter(BaseReporter):
@@ -186,8 +192,19 @@ class SQLReporter(BaseReporter):
 
         db_build.result = build.result
         db_build.end_time = end
-        db_build.log_url = build.log_url
         db_build.error_detail = build.error_detail
+        db_build.log_url = build.log_url
+        if build.log_url is not None:
+            if len(build.log_url) >= SQL_MAX_STRING_LENGTH:
+                db_build.log_url = None
+                if db_build.error_detail is not None:
+                    db_build.error_detail += (
+                        DATA_LENGTH_ERROR % ("log URL", build.log_url)
+                    )
+                else:
+                    db_build.error_detail = (
+                        DATA_LENGTH_ERROR % ("log URL", build.log_url)
+                    )
         db_build.final = final
         db_build.held = build.held
 
