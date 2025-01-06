@@ -41,6 +41,7 @@ PROVIDES_TABLE = 'zuul_provides'
 
 STATEMENT_TIMEOUT_RE = re.compile(r'/\* statement_timeout=(\d+) \*/')
 
+SQL_MAX_STRING_LENGTH = 255
 
 # In Postgres we can set a per-transaction (which for us is
 # effectively per-query) execution timeout by executing "SET LOCAL
@@ -687,14 +688,18 @@ class SQLConnection(BaseConnection):
         class RefModel(Base):
             __tablename__ = self.table_prefix + REF_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
-            project = sa.Column(sa.String(255), nullable=False)
-            ref = sa.Column(sa.String(255), nullable=False)
-            ref_url = sa.Column(sa.String(255), nullable=False)
+            project = sa.Column(sa.String(SQL_MAX_STRING_LENGTH),
+                                nullable=False)
+            ref = sa.Column(sa.String(SQL_MAX_STRING_LENGTH),
+                            nullable=False)
+            ref_url = sa.Column(sa.String(SQL_MAX_STRING_LENGTH),
+                                nullable=False)
             change = sa.Column(ChangeType, nullable=False)
             patchset = sa.Column(SHAType(40), nullable=False)
             oldrev = sa.Column(SHAType(40), nullable=False)
             newrev = sa.Column(SHAType(40), nullable=False)
-            branch = sa.Column(sa.String(255), nullable=False)
+            branch = sa.Column(sa.String(SQL_MAX_STRING_LENGTH),
+                               nullable=False)
 
             sa.Index(self.table_prefix + 'zuul_ref_project_idx', project)
             sa.Index(self.table_prefix + 'zuul_ref_ref_idx', ref)
@@ -710,12 +715,13 @@ class SQLConnection(BaseConnection):
         class BuildSetModel(Base):
             __tablename__ = self.table_prefix + BUILDSET_TABLE
             id = sa.Column(sa.Integer, primary_key=True)
-            pipeline = sa.Column(sa.String(255))
+            pipeline = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
             message = sa.Column(sa.TEXT())
-            tenant = sa.Column(sa.String(255))
-            result = sa.Column(sa.String(255))
+            tenant = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
+            result = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
             uuid = sa.Column(sa.String(36))
-            event_id = sa.Column(sa.String(255), nullable=True)
+            event_id = sa.Column(sa.String(SQL_MAX_STRING_LENGTH),
+                                 nullable=True)
             event_timestamp = sa.Column(sa.DateTime, nullable=True)
             first_build_start_time = sa.Column(sa.DateTime, nullable=True)
             last_build_end_time = sa.Column(sa.DateTime, nullable=True)
@@ -773,7 +779,7 @@ class SQLConnection(BaseConnection):
                       'zuul_buildset_event_buildset_id_fkey'),
             ))
             event_time = sa.Column(sa.DateTime)
-            event_type = sa.Column(sa.String(255))
+            event_type = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
             description = sa.Column(sa.TEXT())
             buildset = orm.relationship(BuildSetModel,
                                         backref=orm.backref(
@@ -790,16 +796,16 @@ class SQLConnection(BaseConnection):
                 name=self.table_prefix + 'zuul_build_buildset_id_fkey',
             ))
             uuid = sa.Column(sa.String(36))
-            job_name = sa.Column(sa.String(255))
-            result = sa.Column(sa.String(255))
+            job_name = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
+            result = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
             start_time = sa.Column(sa.DateTime)
             end_time = sa.Column(sa.DateTime)
             voting = sa.Column(sa.Boolean)
-            log_url = sa.Column(sa.String(255))
+            log_url = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
             error_detail = sa.Column(sa.TEXT())
             final = sa.Column(sa.Boolean)
             held = sa.Column(sa.Boolean)
-            nodeset = sa.Column(sa.String(255))
+            nodeset = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
             ref_id = sa.Column(sa.Integer, sa.ForeignKey(
                 self.table_prefix + REF_TABLE + ".id",
                 name=self.table_prefix + 'zuul_build_ref_id_fkey',
@@ -874,7 +880,7 @@ class SQLConnection(BaseConnection):
                 self.table_prefix + BUILD_TABLE + ".id",
                 name=self.table_prefix + 'zuul_artifact_build_id_fkey',
             ))
-            name = sa.Column(sa.String(255))
+            name = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
             url = sa.Column(sa.TEXT())
             meta = sa.Column('metadata', sa.TEXT())
             build = orm.relationship(BuildModel,
@@ -891,7 +897,7 @@ class SQLConnection(BaseConnection):
                 self.table_prefix + BUILD_TABLE + ".id",
                 name=self.table_prefix + 'zuul_provides_build_id_fkey',
             ))
-            name = sa.Column(sa.String(255))
+            name = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
             build = orm.relationship(BuildModel,
                                      backref=orm.backref(
                                          "provides",
@@ -907,7 +913,7 @@ class SQLConnection(BaseConnection):
                 name=self.table_prefix + 'zuul_build_event_build_id_fkey',
             ))
             event_time = sa.Column(sa.DateTime)
-            event_type = sa.Column(sa.String(255))
+            event_type = sa.Column(sa.String(SQL_MAX_STRING_LENGTH))
             description = sa.Column(sa.TEXT())
             build = orm.relationship(BuildModel,
                                      backref=orm.backref(
