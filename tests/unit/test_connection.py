@@ -22,6 +22,7 @@ import types
 import sqlalchemy as sa
 
 import zuul
+from zuul.driver.sql.sqlreporter import URL_LENGTH_ERROR
 from zuul.lib import yamlutil
 from tests.base import (
     AnsibleZuulTestCase,
@@ -460,6 +461,50 @@ class TestSQLConnectionMysql(ZuulTestCase):
             ).fetchall()
 
             self.assertEqual(len(buildset0_builds), 5)
+
+    def test_sql_results_log_url_too_long(self):
+        "Test builds with a long log url are stored in db"
+
+        def check_results():
+            # Grab the sa tables
+            connection = self.scheds.first.connections.getSqlConnection()
+            with connection.getSession() as db:
+                buildsets = list(db.getBuildsets())
+                jobs = []
+                for build in buildsets[0].builds:
+                    if build.job_name == 'project-merge':
+                        self.assertEqual(
+                            URL_LENGTH_ERROR % "log URL",
+                            build.log_url)
+                        return
+                    jobs.append(build.job_name)
+                raise Exception(
+                    'The following jobs were run: "%s"' % " ".join(jobs))
+
+        self.executor_server.hold_jobs_in_build = True
+
+        self.log.debug("Adding success FakeChange")
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.executor_server.returnData(
+            "project-merge", A, {
+                "zuul": {
+                    "log_url": "toolong" * 255,
+                    'artifacts': [],
+                }
+            }
+        )
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.orderedRelease()
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+
+        check_results()
+        # Looks like refs are not randomized and we might collide with
+        # other fakePatches in other tests in this class.
+        # Clean return_data to avoid this.
+        del self.executor_server.return_data[A.data['currentPatchset']['ref']]
 
 
 class TestSQLConnectionPostgres(TestSQLConnectionMysql):
