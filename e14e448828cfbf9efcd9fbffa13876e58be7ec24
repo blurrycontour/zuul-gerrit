@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2887e748_94f54c10",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37624
+      },
+      "writtenOn": "2025-01-06T19:46:42Z",
+      "side": 1,
+      "message": "Thanks @fungi@yuggoth.org - do I need to do anything else to get this merged?\n\nOne other point I thought of re:replacing flat list of labels is that the ssh command does not accept all the review input fields that the http api does. I still would love to have access to all of them as a pipeline auther, if possible, though.",
+      "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
