@@ -26,6 +26,9 @@ from zuul.lib.result_data import get_artifacts_from_result_data
 from zuul.reporter import BaseReporter
 
 
+URL_LENGTH_ERROR = "<%s's length exceeds DB storage capacity>"
+
+
 class SQLReporter(BaseReporter):
     """Sends off reports to a database."""
 
@@ -186,7 +189,12 @@ class SQLReporter(BaseReporter):
 
         db_build.result = build.result
         db_build.end_time = end
-        db_build.log_url = build.log_url
+        build_table = sqlalchemy.inspect(db.connection.zuul_build_table)
+        log_url_max_len = build_table.columns["log_url"].type.length
+        if len(build.log_url) < log_url_max_len:
+            db_build.log_url = build.log_url
+        else:
+            db_build.log_url = URL_LENGTH_ERROR % "log URL"
         db_build.error_detail = build.error_detail
         db_build.final = final
         db_build.held = build.held
