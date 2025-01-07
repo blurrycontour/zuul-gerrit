@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "ea7adc21_70994ffe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-07T17:23:10Z",
+      "side": 1,
+      "message": "Clark wrote this before I posted my message which was an attempt to avoid people spending time on something I don\u0027t think we need or want to do.  But since it\u0027s out there now; if we did want to change the structure, it would have to be something like:\n\n```\n  gerrit:\n    labels:\n      Verified: 1\n    notify: NONE\n```\n\nBecause of the point you raise in example #3.  We can handle the upgrade if we need to.\n\nBut, again, the current system is working as designed and there\u0027s no need to change it unless we get a lot more of these.",
+      "parentUuid": "31702c5f_687c07fc",
+      "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2887e748_94f54c10",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 11
