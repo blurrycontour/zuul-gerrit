@@ -478,6 +478,7 @@ a.refresh {
     height: 24px;
 }
 
+.zuul-progress div.pf-c-progress__bar::before,
 .zuul-progress-animated div.pf-c-progress__bar::before {
     border-radius: 3px;
 }
