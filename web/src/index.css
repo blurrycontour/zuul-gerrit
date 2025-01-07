@@ -370,13 +370,18 @@ a.refresh {
     width: 100%;
 }
 
-.zuul-job-list.pf-c-data-list .pf-c-data-list__item-content {
-    padding-bottom: 4px;
+.zuul-job-list.pf-c-data-list.pf-m-grid-md .pf-c-data-list__item-content {
+    --pf-c-data-list__item-content--md--PaddingBottom: 4px;
+}
+
+.zuul-job-list.pf-c-data-list.pf-m-grid-md .pf-c-data-list__item-content .pf-c-data-list__cell {
+    --pf-c-data-list__cell--PaddingTop: 4px;
+    --pf-c-data-list__cell--cell--PaddingTop: 4px;
 }
 
 .zuul-job-list .pf-c-data-list__item-row {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 4px;
+    padding-right: 4px;
 }
 
 .zuul-job-list .pf-c-data-list__item:last-child {
@@ -385,6 +390,10 @@ a.refresh {
 
 .zuul-job-list .pf-c-data-list__item:last-child .pf-c-data-list__item-content {
     padding-bottom: 0;
+}
+
+.zuul-job-list .zuul-job-name {
+    font-size: small;
 }
 
 /* Skipped jobs toggle + list */
@@ -424,6 +433,8 @@ a.refresh {
     /* Align font and padding to match the "old" label design */
     padding: .2em .6em .3em;
     border: none;
+    /* Align height to match the height of a job's progress bar */
+    height: 24px;
 }
 
 .zuul-job-result-label.pf-c-label.pf-m-green {
@@ -449,6 +460,7 @@ a.refresh {
 
 .zuul-job-result-label.pf-c-label .pf-c-label__content::before {
     border-radius: 3px;
+    border: none;
 }
 
 .zuul-job-result-label.pf-c-label .pf-c-label__content {
@@ -616,10 +628,6 @@ a.refresh {
 /* Force_break_very_long_non_hyphenated_repo_names */
 .change_project {
     word-break: break-all;
-}
-
-.zuul-job-name {
-    font-size: small;
 }
 
 .zuul-skipped-jobs-button {
