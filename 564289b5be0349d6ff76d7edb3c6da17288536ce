@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be4bfd9d_27d5d680",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 1050,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-07T18:17:19Z",
+      "side": 1,
+      "message": "Maybe note that the value will be None if no determination could be made?\n\nAlso, it is possible for a job to autohold when autohold_if_failure is False. The reason for this is we prepare the job vars before the job starts but we evaluate autoholds when the job completes. This means there is a period of time where a job can start and set autohold_if_failure to False then an autohold is added, then the job fails and is held. I don\u0027t think there is a good solution to this maybe the best thing is simply to document that possibility here?",
+      "revId": "564289b5be0349d6ff76d7edb3c6da17288536ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
