@@ -88,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0f04c85_31896cfe",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 37624
+      },
+      "writtenOn": "2025-01-07T19:15:59Z",
+      "side": 1,
+      "message": "Ah, very good point. I\u0027ve omitted the `None` from patchset++.",
+      "parentUuid": "01f3b70b_b433cdd8",
+      "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ed2d026_32173e13",
