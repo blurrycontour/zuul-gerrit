@@ -113,6 +113,9 @@ class UploadJob:
                                 self.log.debug("Acquired upload lock for %s",
                                                upload)
                 except LockException:
+                    # We may have raced another launcher; set the
+                    # event to try again.
+                    self.launcher.image_updated_event.set()
                     return
 
                 if not acquired:
@@ -253,7 +256,7 @@ class Launcher:
         self.layout_updated_event = threading.Event()
         self.layout_updated_event.set()
 
-        self.upload_added_event = threading.Event()
+        self.image_updated_event = threading.Event()
 
         self.tenant_layout_state = LayoutStateStore(
             self.zk_client, self._layoutUpdatedCallback)
@@ -261,10 +264,12 @@ class Launcher:
             self.zk_client, self.connections)
         self.local_layout_state = {}
 
-        self.image_build_registry = ImageBuildRegistry(self.zk_client)
+        self.image_build_registry = ImageBuildRegistry(
+            self.zk_client,
+            self._imageUpdatedCallback
+        )
         self.image_upload_registry = ImageUploadRegistry(
             self.zk_client,
-            self._uploadAddedCallback
         )
 
         self.launcher_thread = threading.Thread(
@@ -287,8 +292,8 @@ class Launcher:
         self.layout_updated_event.set()
         self.wake_event.set()
 
-    def _uploadAddedCallback(self):
-        self.upload_added_event.set()
+    def _imageUpdatedCallback(self):
+        self.image_updated_event.set()
         self.wake_event.set()
 
     def run(self):
@@ -311,7 +316,7 @@ class Launcher:
             if self.updateTenantProviders():
                 self.checkMissingImages()
                 self.checkMissingUploads()
-        if self.upload_added_event.is_set():
+        if self.image_updated_event.is_set():
             self.checkMissingUploads()
         self._processRequests()
         self._processNodes()
@@ -1033,7 +1038,7 @@ class Launcher:
     def checkMissingUploads(self):
         self.log.debug("Checking for missing uploads")
         uploads_by_artifact_id = collections.defaultdict(list)
-        self.upload_added_event.clear()
+        self.image_updated_event.clear()
         for upload in self.image_upload_registry.getItems():
             self.log.debug("Checking %s", upload)
             if upload.external_id:

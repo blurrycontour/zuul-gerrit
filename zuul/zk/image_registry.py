@@ -20,11 +20,11 @@ from zuul.model import ImageBuildArtifact, ImageUpload
 
 class ImageBuildRegistry(LockableZKObjectCache):
 
-    def __init__(self, zk_client):
+    def __init__(self, zk_client, updated_event=None):
         self.builds_by_image_name = collections.defaultdict(set)
         super().__init__(
             zk_client,
-            None,
+            updated_event,
             root=ImageBuildArtifact.ROOT,
             items_path=ImageBuildArtifact.IMAGES_PATH,
             locks_path=ImageBuildArtifact.LOCKS_PATH,
@@ -32,7 +32,6 @@ class ImageBuildRegistry(LockableZKObjectCache):
         )
 
     def postCacheHook(self, event, data, stat, key, obj):
-        super().postCacheHook(event, data, stat, key, obj)
         if obj is None:
             return
         exists = key in self._cached_objects
@@ -41,6 +40,7 @@ class ImageBuildRegistry(LockableZKObjectCache):
             builds.add(key)
         else:
             builds.discard(key)
+        super().postCacheHook(event, data, stat, key, obj)
 
     def getArtifactsForImage(self, image_canonical_name):
         keys = list(self.builds_by_image_name[image_canonical_name])
@@ -54,9 +54,8 @@ class ImageBuildRegistry(LockableZKObjectCache):
 
 class ImageUploadRegistry(LockableZKObjectCache):
 
-    def __init__(self, zk_client, upload_added_event=None):
+    def __init__(self, zk_client):
         self.uploads_by_image_name = collections.defaultdict(set)
-        self.upload_added_event = upload_added_event
         super().__init__(
             zk_client,
             None,
@@ -67,17 +66,15 @@ class ImageUploadRegistry(LockableZKObjectCache):
         )
 
     def postCacheHook(self, event, data, stat, key, obj):
-        super().postCacheHook(event, data, stat, key, obj)
         if obj is None:
             return
         exists = key in self._cached_objects
         uploads = self.uploads_by_image_name[obj.canonical_name]
         if exists:
             uploads.add(key)
-            if self.upload_added_event:
-                self.upload_added_event()
         else:
             uploads.discard(key)
+        super().postCacheHook(event, data, stat, key, obj)
 
     def getUploadsForImage(self, image_canonical_name):
         keys = list(self.uploads_by_image_name[image_canonical_name])
