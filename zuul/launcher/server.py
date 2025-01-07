@@ -113,6 +113,10 @@ class UploadJob:
                                 self.log.debug("Acquired upload lock for %s",
                                                upload)
                 except LockException:
+                    # We may have raced the unlock of the iba after
+                    # the upload was created; set the event to try
+                    # again.
+                    self.launcher.upload_added_event.set()
                     return
 
                 if not acquired:
