@@ -157,6 +157,24 @@
       "parentUuid": "661f7617_2b3acbd2",
       "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71d0070a_331b680b",
+        "filename": "doc/source/examples/pipelines/gerrit-reference-pipelines.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 37624
+      },
+      "writtenOn": "2025-01-07T20:15:03Z",
+      "side": 1,
+      "message": "Done. Thanks for the clarity and great review :)",
+      "parentUuid": "9d4788a0_1949f25a",
+      "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
