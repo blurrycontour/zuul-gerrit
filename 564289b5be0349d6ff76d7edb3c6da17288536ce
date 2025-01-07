@@ -16,6 +16,24 @@
       "message": "Maybe note that the value will be None if no determination could be made?\n\nAlso, it is possible for a job to autohold when autohold_if_failure is False. The reason for this is we prepare the job vars before the job starts but we evaluate autoholds when the job completes. This means there is a period of time where a job can start and set autohold_if_failure to False then an autohold is added, then the job fails and is held. I don\u0027t think there is a good solution to this maybe the best thing is simply to document that possibility here?",
       "revId": "564289b5be0349d6ff76d7edb3c6da17288536ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73427406_7722bb75",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 1050,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-07T18:41:17Z",
+      "side": 1,
+      "message": "Matthieu mentioned that they currently use the API to achieve this result.  Doing that is more reliable than this variable for the reason you mention.\n\nIn addition to the example Clark cited, there\u0027s also meeting the autohold max.  We might start 10 jobs that fail and hold 1.\n\nAlso, it\u0027s very much expected that we may autohold on non-failure states in the future; adding this variable now with this name makes future changes ambiguous if we autohold on success.\n\nThis idea is problematic, and I\u0027m not enthusiastic about it.  I would prefer you explore other approaches.",
+      "parentUuid": "be4bfd9d_27d5d680",
+      "revId": "564289b5be0349d6ff76d7edb3c6da17288536ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
