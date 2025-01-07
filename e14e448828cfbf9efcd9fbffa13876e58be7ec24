@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "31702c5f_687c07fc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-07T17:02:33Z",
+      "side": 1,
+      "message": "(Note I\u0027m not actually prescribing this I just want to brainstorm approaches and their drawbacks/benefits. I think this is similar to what fungi more briefly described but I wanted to be more explicit.)\n\nOne way to make this backward and forward compatible would be to use a different datastructure. Instead of:\n\n```\ngerrit:\n  notify: ALL\n  Verified: 1\n```\n\nYou could do something like:\n\n```\ngerrit:\n  Verified:\n    value: 1\n    notify: ALL\n```\n\nWhile still accepting the old format that uses default notification levels.\n\nThe problem with this approach is what do you do with:\n\n```\ngerrit:\n  Verified:\n    value: 1\n    notify: ALL\n  Workflow:\n    value: 1\n    notify: NONE\n```\n\nI believe we currently apply all labels associated with the result at once (which can be important to avoid race conditions). And in this example NONE and ALL are in conflict with one another.\n\nAnother options might be to try and make the string less likely to conflict. Something like `_notify: ALL` maybe?\n\nMaybe we should add a new top level dictionary that can carry all of the desired ReviewInput fields even if we only support notify to start (this would address the idea that all of those fields could be exposed eventually without needing to rearrange stuff over time and handle backward compatibility as we do). For example\n\n```\ngerrit:\n  _review_input:\n    notify: ALL\n  Verified: 1\n```",
+      "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "2887e748_94f54c10",
@@ -20,6 +37,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b32b3973_0b0b02ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-07T17:02:33Z",
+      "side": 1,
+      "message": "\u003e One other point I thought of re:replacing flat list of labels is that the ssh command does not accept all the review input fields that the http api does. I still would love to have access to all of them as a pipeline auther, if possible, though.\n\nIn general Zuul does still currently support the use of ssh without http; however, with reduced functionality. For example I believe that inline commenting is limited to configuring an http connection.\n\nI think if the intention is to expose all of the input fields then I\u0027m not sure the approach in this change is sufficient. It is simple which is nice for this specific field but once we start adding others I think this backs us into a corner of backward compatibility tech debt that might be best addressed once.",
+      "parentUuid": "2887e748_94f54c10",
+      "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "01f3b70b_b433cdd8",
         "filename": "doc/source/drivers/gerrit.rst",
         "patchSetId": 11
@@ -31,6 +66,23 @@
       "writtenOn": "2025-01-07T16:50:22Z",
       "side": 1,
       "message": "This is just a tiny bit ambiguous, relying on the distinction between \"None\" and \"NONE\" to suggest that Zuul does not supply a default.  I think it would be best to omit the \":default:\" tag here; the text below indicates that we delegate the default handling to Gerrit (which I think is appropriate; I don\u0027t think we should say \"ALL\" here).\n\n(Usually we try to keep these values to literal yaml values; sometimes we put in explanatory texts.  If you really want something here, we could have it say \":default: The Gerrit default behavior\".  But I think it\u0027s more clear to omit.)",
+      "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ed2d026_32173e13",
+        "filename": "doc/source/examples/pipelines/gerrit-reference-pipelines.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-07T17:02:33Z",
+      "side": 1,
+      "message": "I believe that these examples are meant to be directly usable by others setting up Zuul pipelines. I\u0027m not sure that a non default notification setting here is appropriate as a result.",
       "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
