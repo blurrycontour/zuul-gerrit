@@ -121,6 +121,24 @@
       "message": "I believe that these examples are meant to be directly usable by others setting up Zuul pipelines. I\u0027m not sure that a non default notification setting here is appropriate as a result.",
       "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "661f7617_2b3acbd2",
+        "filename": "doc/source/examples/pipelines/gerrit-reference-pipelines.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 37624
+      },
+      "writtenOn": "2025-01-07T19:20:37Z",
+      "side": 1,
+      "message": "I have no strong feelings on the matter. But since this gets inlined into the documentation I thought it would be helpful to demonstrate what the `notify` field would look like.\n\nThere are a variety of further examples down below without it, too. What do you think?",
+      "parentUuid": "1ed2d026_32173e13",
+      "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
