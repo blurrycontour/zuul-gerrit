@@ -16,6 +16,23 @@
       "message": "Thanks @fungi@yuggoth.org - do I need to do anything else to get this merged?\n\nOne other point I thought of re:replacing flat list of labels is that the ssh command does not accept all the review input fields that the http api does. I still would love to have access to all of them as a pipeline auther, if possible, though.",
       "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01f3b70b_b433cdd8",
+        "filename": "doc/source/drivers/gerrit.rst",
+        "patchSetId": 11
+      },
+      "lineNbr": 534,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-07T16:50:22Z",
+      "side": 1,
+      "message": "This is just a tiny bit ambiguous, relying on the distinction between \"None\" and \"NONE\" to suggest that Zuul does not supply a default.  I think it would be best to omit the \":default:\" tag here; the text below indicates that we delegate the default handling to Gerrit (which I think is appropriate; I don\u0027t think we should say \"ALL\" here).\n\n(Usually we try to keep these values to literal yaml values; sometimes we put in explanatory texts.  If you really want something here, we could have it say \":default: The Gerrit default behavior\".  But I think it\u0027s more clear to omit.)",
+      "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
