@@ -139,6 +139,24 @@
       "parentUuid": "1ed2d026_32173e13",
       "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d4788a0_1949f25a",
+        "filename": "doc/source/examples/pipelines/gerrit-reference-pipelines.yaml",
+        "patchSetId": 11
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-07T19:38:51Z",
+      "side": 1,
+      "message": "I agree with Clark we shouldn\u0027t put this in the reference pipelines (it\u0027s \"reference\" as in \"reference implementation\" not \"complete syntax reference\".  We kind of want people to start with these exact pipelines if they don\u0027t know what they\u0027re doing).\n\nIf you really want an example, feel free to put a snippet inline in the main documentation for the option.\n\nBut this option is a simple text string, it\u0027s not expected most people would use it, and it has peers like \"submit\" with existing clear examples, so I think we can live without an example.",
+      "parentUuid": "661f7617_2b3acbd2",
+      "revId": "e14e448828cfbf9efcd9fbffa13876e58be7ec24",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
