@@ -18,7 +18,9 @@
 # symbols, and is quite a bit larger).
 ARG IMAGE_FLAVOR=
 
-FROM docker.io/library/node:16-bookworm as js-builder
+# This is a mirror of:
+# FROM docker.io/library/node:16-bookworm as js-builder
+FROM quay.io/opendevmirror/node:16-bookworm as js-builder
 
 COPY web /tmp/src
 # Explicitly run the Javascript build
@@ -26,7 +28,9 @@ RUN cd /tmp/src && yarn install -d && yarn build
 
 # We need skopeo >=v1.14.0 to negotioate with newer docker; once this
 # is available in debian we can drop the custom build.
-FROM golang:1.22-bookworm as go-builder
+# This is a mirror of:
+# FROM golang:1.22-bookworm as go-builder
+FROM quay.io/opendevmirror/golang:1.22-bookworm as go-builder
 
 # Keep this in sync with zuul-jobs ensure-skopeo
 ARG SKOPEO_VERSION=v1.14.2
@@ -39,7 +43,9 @@ RUN apt-get update && \
     git checkout $SKOPEO_VERSION && \
     make bin/skopeo
 
-FROM docker.io/opendevorg/python-builder:3.11-bookworm as builder
+# This is a mirror of:
+# FROM docker.io/opendevorg/python-builder:3.11-bookworm as builder
+FROM quay.io/opendevmirror/python-builder:3.11-bookworm as builder
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Optional location of Zuul API endpoint.
@@ -69,7 +75,9 @@ RUN /output/install-from-bindep \
   && echo $OPENSHIFT_SHA /tmp/openshift-install/openshift-client.tgz | sha256sum --check \
   && tar xvfz openshift-client.tgz -C /tmp/openshift-install
 
-FROM docker.io/opendevorg/python-base:3.11-bookworm${IMAGE_FLAVOR} as zuul
+# This is a mirror of:
+# FROM docker.io/opendevorg/python-base:3.11-bookworm${IMAGE_FLAVOR} as zuul
+FROM quay.io/opendevmirror/python-base:3.11-bookworm${IMAGE_FLAVOR} as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 ARG IMAGE_FLAVOR=
 
