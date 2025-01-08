@@ -34,6 +34,24 @@
       "parentUuid": "be4bfd9d_27d5d680",
       "revId": "564289b5be0349d6ff76d7edb3c6da17288536ce",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d030f9de_5f527b8a",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 10
+      },
+      "lineNbr": 1050,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-01-08T15:17:26Z",
+      "side": 1,
+      "message": "Okay, I see now how that variable would end up being inaccurate in many cases. It\u0027s worth noting that it means that depending on when the call to the REST API is made, the REST API result is also susceptible to this issue.\n\nHow about providing instead a \"autohold_id_matches\" variable that would be a list of autoholds (their ids) that *could potentially* trigger for the current build?\n\nThis would spare our users a call to the REST API with a reasonable trade-off. The users are expected to be disciplined enough that it can be assumed from \"autohold_id_matches\" not being empty, that the job will hold eventually if the right conditions are fulfilled (failure for now, systematically eventually in the future). With a precise enough ref filter, a large enough autohold max value, and control over what jobs are being run concurrently, this can be achieved.\n\nWould that work for you?",
+      "parentUuid": "73427406_7722bb75",
+      "revId": "564289b5be0349d6ff76d7edb3c6da17288536ce",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
