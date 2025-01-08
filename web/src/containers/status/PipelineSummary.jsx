@@ -69,10 +69,10 @@ QueueItemSquare.propTypes = {
   item: PropTypes.object,
 }
 
-function QueueCard({ pipeline, queue, allQueuesExpanded, jobsExpanded }) {
+function QueueCard({ pipeline, queue, jobsExpanded }) {
   const expansionKey = `${pipeline.name}/${queue.name}`
   const expandedQueue = useSelector(state => state.statusExpansion.expandedQueue[expansionKey])
-  const isQueueExpanded = expandedQueue === undefined ? allQueuesExpanded : expandedQueue
+  const isQueueExpanded = expandedQueue === undefined ? jobsExpanded : expandedQueue
   const dispatch = useDispatch()
 
   const onQueueToggle = (isExpanded) => {
@@ -128,7 +128,6 @@ function QueueCard({ pipeline, queue, allQueuesExpanded, jobsExpanded }) {
 QueueCard.propTypes = {
   pipeline: PropTypes.object,
   queue: PropTypes.object,
-  allQueuesExpanded: PropTypes.bool,
   jobsExpanded: PropTypes.bool,
 }
 
@@ -141,9 +140,15 @@ function QueueSummary({ pipeline, showAllQueues, allQueuesExpanded, jobsExpanded
 
   return (
     changeQueues.map((queue, idx) => {
-      if (queue.name) {
-        // Visualize named queues individually
-        return (
+      if (allQueuesExpanded) {
+        // When a pipeline is expanded, we differentiate between named
+        // and unnamed queues. Named queues are visualized independently
+        // and can also be expanded individually.
+        // Unnamed queues on the other hand will still be consolidated
+        // as a single queue to simplify the visualization. This is the
+        // case for e.g. independen pipelines like check where each
+        // change is enqueued in it's own queue by design.
+        return queue.name ?
           <QueueCard
             key={`${queue.name}${queue.branch}`}
             pipeline={pipeline}
@@ -151,31 +156,34 @@ function QueueSummary({ pipeline, showAllQueues, allQueuesExpanded, jobsExpanded
             allQueuesExpanded={allQueuesExpanded}
             jobsExpanded={jobsExpanded}
           />
-        )
-      } else {
-        // For queues without a name, all heads will be consolidated
-        // into a single queue to simplify the visualization.
-        // This is the case for e.g. independent pipelines like check
-        // where each change is enqueued in it's own queue by design.
-        return (
-          allQueuesExpanded ?
-            <ChangeQueue key={idx} queue={queue} pipeline={pipeline} showTitle={false} jobsExpanded={jobsExpanded} />
-            :
-            <Flex
-              key={idx}
-              display={{ default: 'inlineFlex' }}
-              spaceItems={{ default: 'spaceItemsNone' }}
-            >
-              {queue.heads.map((head) => (
-                head.map((item) => (
-                  <FlexItem key={item.id}>
-                    <QueueItemSquareWithPopover item={item} />
-                  </FlexItem>
-                ))
-              ))}
-            </Flex>
-        )
+          :
+          <ChangeQueue
+            key={idx}
+            queue={queue}
+            pipeline={pipeline}
+            showTitle={false}
+            jobsExpanded={jobsExpanded}
+          />
       }
+      return (
+        // In the collapsed view, the heads of all queues will be consolidated
+        // into a single queue to simplify the visualization. This is done for
+        // all queues (no matter if they are named or not) to keep the size of
+        // the individual queues aligned and not break the gallery layout.
+        <Flex
+          key={idx}
+          display={{ default: 'inlineFlex' }}
+          spaceItems={{ default: 'spaceItemsNone' }}
+        >
+          {queue.heads.map((head) => (
+            head.map((item) => (
+              <FlexItem key={item.id}>
+                <QueueItemSquareWithPopover item={item} />
+              </FlexItem>
+            ))
+          ))}
+        </Flex>
+      )
     })
   )
 }
