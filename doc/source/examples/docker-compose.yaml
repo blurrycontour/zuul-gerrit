@@ -2,7 +2,9 @@ version: '2.1'
 
 services:
   gerrit:
-    image: docker.io/gerritcodereview/gerrit
+    # This is a mirror of:
+    # image: docker.io/gerritcodereview/gerrit
+    image: quay.io/opendevmirror/gerrit
     ports:
       - "8080:8080"
       - "29418:29418"
@@ -37,7 +39,9 @@ services:
     networks:
       - zuul
   zk:
-    image: docker.io/zookeeper
+    # This is a mirror of:
+    # image: docker.io/zookeeper
+    image: quay.io/opendevmirror/zookeeper
     hostname: examples_zk_1.examples_default
     volumes:
       - "./playbooks/:/var/playbooks/:z"
@@ -49,7 +53,9 @@ services:
     networks:
       - zuul
   mysql:
-    image: docker.io/mariadb
+    # This is a mirror of:
+    # image: docker.io/mariadb
+    image: quay.io/opendevmirror/mariadb
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: zuul
