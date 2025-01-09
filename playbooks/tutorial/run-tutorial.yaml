@@ -1,6 +1,9 @@
 - block:
     - name: Install git-review
-      command: python3 -m pip install git-review podman-compose==1.2.0
+      package:
+        name:
+          - git-review
+        state: present
       become: true
   when: not local
 
