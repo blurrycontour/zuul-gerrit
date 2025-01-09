@@ -46,7 +46,7 @@ Before you start, ensure that some needed packages are installed.
    sudo zypper install podman git python3
    sudo python3 -m pip install git-review podman-compose
 
-   # Ubuntu / Debian:
+   # Ubuntu (Noble or later) / Debian:
 
    sudo apt-get update
    sudo apt-get install podman git python3-pip
