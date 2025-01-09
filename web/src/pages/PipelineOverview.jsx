@@ -46,6 +46,7 @@ import {
   ToolbarStatsGroup,
   ToolbarStatsItem,
 } from '../containers/FilterToolbar'
+import { getSearchKeyFromUrl, writeSearchKeyToUrl, SortDropdown } from '../containers/SortDropdown'
 import {
   clearFilters,
   filterInputValidation,
@@ -84,10 +85,22 @@ const filterCategories = [
 ]
 
 
-function PipelineGallery({ pipelines, tenant, showAllPipelines, expandAll, isLoading, filters, onClearFilters }) {
+function PipelineGallery({ pipelines, tenant, showAllPipelines, expandAll, isLoading, filters, onClearFilters, sortKey }) {
   // Filter out empty pipelines if necessary
   if (!showAllPipelines) {
     pipelines = pipelines.filter(ppl => ppl._count > 0)
+  }
+
+  switch(sortKey) {
+    case 'name':
+      pipelines = pipelines.toSorted((p1, p2) => p1.name.localeCompare(p2.name))
+      break
+    case 'length':
+      pipelines = pipelines.toSorted((p1, p2) => p2._count - p1._count)
+      break
+    default:
+      pipelines = pipelines.toSorted()
+      break
   }
 
   return (
@@ -126,6 +139,7 @@ PipelineGallery.propTypes = {
   isLoading: PropTypes.bool,
   filters: PropTypes.object,
   onClearFilters: PropTypes.func,
+  sortKey: PropTypes.string,
 }
 
 function getPipelines(status, location) {
@@ -178,6 +192,18 @@ function PipelineOverviewPage() {
   const timezone = useSelector((state) => state.timezone)
   const dispatch = useDispatch()
 
+  const sortKeys = [
+      {key: 'none', title: 'Preset'},
+      {key: 'name', title: 'Name'},
+      {key: 'length', title: 'Length'},
+  ]
+  const [currentSortKey, setCurrentSortKey] = useState(getSearchKeyFromUrl(location, sortKeys) || sortKeys[0])
+
+  const onSortKeyChanged = (sortKey) => {
+    setCurrentSortKey(sortKey)
+    writeSearchKeyToUrl(sortKey, location, history)
+  }
+
   const onShowAllPipelinesToggle = (isChecked) => {
     setShowAllPipelines(isChecked)
     localStorage.setItem('zuul_show_all_pipelines', isChecked.toString())
@@ -190,7 +216,7 @@ function PipelineOverviewPage() {
   }
 
   const onFilterChanged = (newFilters) => {
-    handleFilterChange(newFilters, location, history)
+    handleFilterChange(newFilters, filterCategories, location, history)
     // show all pipelines when filtering, hide when not
     setShowAllPipelines(
       isFilterActive(newFilters) || localStorage.getItem('zuul_show_all_pipelines') === 'true')
@@ -263,6 +289,9 @@ function PipelineOverviewPage() {
               filterInputValidation={filterInputValidation}
             >
               <ToolbarItem>
+                <SortDropdown sortKeys={sortKeys} selectedSortKey={currentSortKey} onSortKeyChange={onSortKeyChanged}/>
+              </ToolbarItem>
+              <ToolbarItem>
                 {filterActive ?
                   <Tooltip content="Disabled when filtering">{allPipelinesSwitch}</Tooltip> :
                   allPipelinesSwitch}
@@ -327,6 +356,7 @@ function PipelineOverviewPage() {
           isLoading={isFetching}
           filters={filters}
           onClearFilters={onClearFilters}
+          sortKey={currentSortKey.key}
         />
       </PageSection>
     </>
