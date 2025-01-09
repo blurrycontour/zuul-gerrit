@@ -187,7 +187,7 @@ class BuildsetsPage extends React.Component {
     // will always be one filter selection behind the state. But as the URL
     // reflects our state this should be ok.
 
-    writeFiltersToUrl(newFilters, location, history)
+    writeFiltersToUrl(newFilters, this.filterCategories, location, history)
     let newState = {
       filters: finalFilters,
       // if filters haven't changed besides skip or limit, keep our itemCount and currentPage

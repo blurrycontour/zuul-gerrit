@@ -348,9 +348,18 @@ function getFiltersFromUrl(location, filterCategories) {
   return filters
 }
 
-function writeFiltersToUrl(filters, location, history) {
+function writeFiltersToUrl(filters, filterCategories, location, history) {
   // Build new URL parameters from the filters in state
-  const searchParams = new URLSearchParams('')
+  const searchParams = new URLSearchParams(location.search)
+
+  // first clear existing searchParams contained in the current valid
+  // filterCategories or "skip"/"limit". This is to make sure we don't remove
+  // other unrelated searchParams
+  const keys = filterCategories.map(c => c.key).concat(['skip', 'limit'])
+  for (const key of keys) {
+    searchParams.delete(key)
+  }
+
   Object.keys(filters).map((key) => {
     filters[key].forEach((value) => {
       searchParams.append(key, value)

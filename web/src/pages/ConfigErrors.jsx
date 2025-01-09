@@ -204,7 +204,7 @@ class ConfigErrorsPage extends React.Component {
     // We must update the URL parameters before the state. Otherwise, the URL
     // will always be one filter selection behind the state. But as the URL
     // reflects our state this should be ok.
-    writeFiltersToUrl(finalFilters, location, history)
+    writeFiltersToUrl(finalFilters, this.filterCategories, location, history)
     const newState = {
       filters: finalFilters,
       // if filters haven't changed besides skip or limit, keep our itemCount and currentPage
