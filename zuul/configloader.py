@@ -430,7 +430,6 @@ class ImageParser(object):
                             conf.get('description'))
         image.source_context = conf.get('_source_context')
         image.start_mark = conf.get('_start_mark')
-        image.freeze()
         return image
 
 
@@ -454,7 +453,6 @@ class FlavorParser(object):
         flavor = model.Flavor(conf['name'], conf.get('description'))
         flavor.source_context = conf.get('_source_context')
         flavor.start_mark = conf.get('_start_mark')
-        flavor.freeze()
         return flavor
 
 
@@ -484,7 +482,6 @@ class LabelParser(object):
                             conf.get('max-ready-age'))
         label.source_context = conf.get('_source_context')
         label.start_mark = conf.get('_start_mark')
-        label.freeze()
         return label
 
 
@@ -524,7 +521,6 @@ class SectionParser(object):
         section.source_context = conf.get('_source_context')
         section.start_mark = conf.get('_start_mark')
         section.config = conf
-        section.freeze()
         return section
 
 
@@ -561,7 +557,6 @@ class ProviderParser(object):
         provider_config.source_context = conf.get('_source_context')
         provider_config.start_mark = conf.get('_start_mark')
         provider_config.config = conf
-        provider_config.freeze()
         return provider_config
 
 
@@ -673,7 +668,6 @@ class NodeSetParser(object):
                                 as_list(conf_group['nodes']))
             ns.addGroup(group)
             group_names.add(conf_group['name'])
-        ns.freeze()
         return ns
 
 
@@ -699,7 +693,6 @@ class SecretParser(object):
         s.source_context = conf['_source_context']
         s.start_mark = conf['_start_mark']
         s.secret_data = conf['data']
-        s.freeze()
         return s
 
 
@@ -1233,7 +1226,6 @@ class JobParser(object):
                 re2.compile(x)
             job.failure_output = tuple(sorted(failure_output))
 
-        job.freeze()
         return job
 
     def _makeZuulRole(self, job, role):
@@ -1287,7 +1279,7 @@ class ProjectTemplateParser(object):
 
         return vs.Schema(project)
 
-    def fromYaml(self, conf, validate=True, freeze=True):
+    def fromYaml(self, conf, validate=True):
         conf = copy_safe_config(conf)
         if validate:
             self.schema(conf)
@@ -1324,8 +1316,6 @@ class ProjectTemplateParser(object):
                                 "or 'unsafe_vars' are not allowed.")
             project_template.variables = variables
 
-        if freeze:
-            project_template.freeze()
         return project_template
 
     def parseJobList(self, conf, source_context, start_mark, job_list):
@@ -1402,7 +1392,7 @@ class ProjectParser(object):
             # Parse the project as a template since they're mostly the
             # same.
             project_config = self.pcontext.project_template_parser. \
-                fromYaml(conf, validate=False, freeze=False)
+                fromYaml(conf, validate=False)
 
             project_config.name = project_name
         else:
@@ -1422,7 +1412,7 @@ class ProjectParser(object):
             # Parse the project as a template since they're mostly the
             # same.
             project_config = self.pcontext.project_template_parser.\
-                fromYaml(conf, validate=False, freeze=False)
+                fromYaml(conf, validate=False)
 
             project_config.name = project.canonical_name
 
@@ -1477,7 +1467,6 @@ class ProjectParser(object):
                                 "or 'unsafe_vars' are not allowed.")
             project_config.variables = variables
 
-        project_config.freeze()
         return project_config
 
 
@@ -1732,7 +1721,6 @@ class SemaphoreParser(object):
         semaphore = model.Semaphore(conf['name'], conf.get('max', 1))
         semaphore.source_context = conf.get('_source_context')
         semaphore.start_mark = conf.get('_start_mark')
-        semaphore.freeze()
         return semaphore
 
 
@@ -1767,7 +1755,6 @@ class QueueParser:
                             "enabled in order to use dependencies-by-topic")
         queue.source_context = conf.get('_source_context')
         queue.start_mark = conf.get('_start_mark')
-        queue.freeze()
         return queue
 
 
@@ -1821,7 +1808,6 @@ class GlobalSemaphoreParser(object):
         self.schema(conf)
         semaphore = model.Semaphore(conf['name'], conf.get('max', 1),
                                     global_scope=True)
-        semaphore.freeze()
         return semaphore
 
 
@@ -1842,7 +1828,6 @@ class ApiRootParser(object):
         self.schema(conf)
         api_root = model.ApiRoot(conf.get('authentication-realm'))
         api_root.access_rules = conf.get('access-rules', [])
-        api_root.freeze()
         return api_root
 
 
@@ -3052,7 +3037,6 @@ class TenantParser(object):
                     conf = config_project.copy()
                     name = project.canonical_name
                     conf.name = name
-                    conf.freeze()
                     parsed_config.projects.append(conf)
 
         for project in parsed_config.projects:
