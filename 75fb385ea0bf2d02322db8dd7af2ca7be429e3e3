@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "593bb711_f6de7e81",
+        "filename": "playbooks/tutorial/pre.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-09T22:06:15Z",
+      "side": 1,
+      "message": "You might want to have a step here that disables and stops the docker daemon and socket units in systemd just to avoid any confusion over what docker compose is talking to.",
+      "revId": "75fb385ea0bf2d02322db8dd7af2ca7be429e3e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ee5c09d_e1731e07",
+        "filename": "playbooks/tutorial/run-tutorial.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-09T22:06:15Z",
+      "side": 1,
+      "message": "Is this something that opendev should be using too? I guess podman will automatically use it to wrap the container processes?",
+      "revId": "75fb385ea0bf2d02322db8dd7af2ca7be429e3e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
