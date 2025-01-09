@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d94440ad_25fa7223",
+        "filename": "playbooks/tutorial/pre.yaml",
+        "patchSetId": 15
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-09T23:26:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "593bb711_f6de7e81",
+      "revId": "75fb385ea0bf2d02322db8dd7af2ca7be429e3e3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ee5c09d_e1731e07",
