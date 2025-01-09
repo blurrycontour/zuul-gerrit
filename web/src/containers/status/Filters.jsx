@@ -15,8 +15,8 @@
 import { applyFilter, isFilterActive, writeFiltersToUrl } from '../FilterToolbar'
 import { isPipelineEmpty } from './Misc'
 
-function handleFilterChange(newFilters, location, history) {
-  writeFiltersToUrl(newFilters, location, history)
+function handleFilterChange(newFilters, filterCategories, location, history) {
+  writeFiltersToUrl(newFilters, filterCategories, location, history)
 }
 
 function clearFilters(location, history, filterCategories) {
@@ -25,7 +25,7 @@ function clearFilters(location, history, filterCategories) {
     filterDict[category.key] = []
     return filterDict
   }, {})
-  handleFilterChange(filters, location, history)
+  handleFilterChange(filters, filterCategories, location, history)
 }
 
 function filterInputValidation(_, filterValue) {

@@ -200,7 +200,7 @@ function PipelineDetailsPage({
           <LevelItem>
             <FilterToolbar
               filterCategories={filterCategories}
-              onFilterChange={(newFilters) => { handleFilterChange(newFilters, location, history) }}
+              onFilterChange={(newFilters) => { handleFilterChange(newFilters, filterCategories, location, history) }}
               filters={filters}
               filterInputValidation={filterInputValidation}
             >

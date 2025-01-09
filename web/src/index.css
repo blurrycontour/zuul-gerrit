@@ -1034,3 +1034,7 @@ details.foldable[open] summary::before {
       transparent
     );
 }
+
+.sort-toolbar {
+    padding: 0 !important;
+}
