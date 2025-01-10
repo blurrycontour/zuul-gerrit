@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c6790df_c41db6d6",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 1740,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-10T13:28:13Z",
+      "side": 1,
+      "message": "Should we maybe cache the response here and invalidate when the layout is updated?",
+      "revId": "2680b6fcf07d067a9618e95881e9f98b0b487456",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
