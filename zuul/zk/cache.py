@@ -149,8 +149,6 @@ class ZuulTreeCache(abc.ABC):
             am_root = True
             root = self.root
             seen_paths = set()
-            if not self.client.exists(root):
-                exists = False
         if exists:
             seen_paths.add(root)
             event = WatchedEvent(EventType.NONE,
