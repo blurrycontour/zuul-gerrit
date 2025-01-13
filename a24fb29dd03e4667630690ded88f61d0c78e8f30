@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74ded347_8ff431e7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-13T23:24:19Z",
+      "side": 1,
+      "message": "I\u0027m concerned this could cause problems for a whitelabel setup.\n\nWould \"/\" work?  That might be more correct and also solve the issue above?",
+      "revId": "a24fb29dd03e4667630690ded88f61d0c78e8f30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
