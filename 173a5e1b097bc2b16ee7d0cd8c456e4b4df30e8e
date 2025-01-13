@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f99b873_f2d3c218",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-13T23:30:55Z",
+      "side": 1,
+      "message": "I like everything else, but I think this reduction isn\u0027t necessary and we should omit it from this change.  I think it is useful to indicate the hierarchy and to help users visually navigate the displayed data.  And it\u0027s a place where we can afford to use some more space.\n\nI just zoomed your change to 150% and the font sizes of the two things definitely do not look like what we currently have.  I see a very small but noticeably useful difference in the title of the pipeline.",
+      "revId": "173a5e1b097bc2b16ee7d0cd8c456e4b4df30e8e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
