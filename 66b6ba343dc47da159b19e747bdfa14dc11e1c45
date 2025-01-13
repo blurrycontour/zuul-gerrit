@@ -16,6 +16,24 @@
       "message": "Just wondering if would read a little better like \"reconfigured 2h ago\" instead \"2h ago reconfigured\"",
       "revId": "66b6ba343dc47da159b19e747bdfa14dc11e1c45",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9d0d149_56f04f80",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 7
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-13T23:37:45Z",
+      "side": 1,
+      "message": "I think it\u0027s worth a new patchset to do that.",
+      "parentUuid": "80643fbe_a434b497",
+      "revId": "66b6ba343dc47da159b19e747bdfa14dc11e1c45",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
