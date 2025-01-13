@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79268834_fc9e79eb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-13T23:46:59Z",
+      "side": 1,
+      "message": "This changes the behavior of the caret next to the pipeline name.\n\nCurrently it means \"expand every queue item in this pipeline\" in all cases.  With this change, it becomes context sensitive:\n\nIn gate: \"show the list of shared queues, individually collapsed\".\n\nOtherwise: \"expand every queue item in this pipeline\".\n\nThat leaves the user with the \"Expand all\" switch as the only way to see the status of every queue item in gate without many clicks (and systems with lots of shared queues would need lots of clicks).  But \"Expand all\" also expands the full jobs listing, so it may do more than what the user wants.\n\nI wonder if we should explore adding another toggle -- or maybe making the caret a three way toggle (collapsed, queue list expanded, queue items expanded).",
+      "revId": "c97e32b7a96273777a3f2021bd0dda884f868d20",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
