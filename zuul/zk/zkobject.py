@@ -97,11 +97,14 @@ class ZKContext(BaseZKContext):
         self.profile = self.profile_default
 
     def sessionIsValid(self):
-        return ((not self.lock or self.lock.is_still_valid()) and
-                (not self.stop_event or not self.stop_event.is_set()))
+        return (not self.lock or self.lock.is_still_valid())
 
     def sessionIsInvalid(self):
         return not self.sessionIsValid()
+
+    def shouldAbortRetry(self):
+        return (self.sessionIsInvalid() or
+                (self.stop_event and self.stop_event.is_set()))
 
     def updateStatsFromOtherContext(self, other):
         self.cumulative_read_time += other.cumulative_read_time
@@ -358,7 +361,7 @@ class ZKObject:
     @classmethod
     def _retry(cls, context, func, *args, max_tries=-1, **kw):
         kazoo_retry = KazooRetry(max_tries=max_tries,
-                                 interrupt=context.sessionIsInvalid,
+                                 interrupt=context.shouldAbortRetry,
                                  delay=cls._retry_interval, backoff=0,
                                  ignore_expire=False)
         try:
