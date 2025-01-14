@@ -16,6 +16,24 @@
       "message": "I\u0027m concerned this could cause problems for a whitelabel setup.\n\nWould \"/\" work?  That might be more correct and also solve the issue above?",
       "revId": "a24fb29dd03e4667630690ded88f61d0c78e8f30",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14ed8570_cc6ca0f3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-01-14T17:53:57Z",
+      "side": 1,
+      "message": "Yes, \"/\" would work as well, I have updated it in the new patch set.",
+      "parentUuid": "74ded347_8ff431e7",
+      "revId": "a24fb29dd03e4667630690ded88f61d0c78e8f30",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
