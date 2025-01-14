@@ -93,7 +93,7 @@ from zuul.zk.semaphore import SemaphoreHandler
 
 
 BUFFER_LINES_FOR_SYNTAX = 200
-OUTPUT_MAX_LINE_BYTES = 51200  # 50 MiB
+OUTPUT_MAX_LINE_BYTES = 51200  # 50 KiB
 DEFAULT_FINGER_PORT = 7900
 DEFAULT_STREAM_PORT = 19885
 BLACKLISTED_ANSIBLE_CONNECTION_TYPES = [
@@ -3146,7 +3146,7 @@ class AnsibleJob(object):
                     b''):
                 if line and line[-1:] != b'\n':
                     self.log.warning(
-                        "Ansible output exceeds max. line size of %s MiB",
+                        "Ansible output exceeds max. line size of %s KiB",
                         OUTPUT_MAX_LINE_BYTES / 1024)
                 if first:
                     # When we receive our first log line, bwrap should
