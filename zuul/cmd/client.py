@@ -1054,7 +1054,7 @@ class Client(zuul.cmd.ZuulApp):
                     zk_client, args.tenant, args.pipeline
             ) as plock:
                 zk_client.fastRecursiveDelete(path)
-                with ZKContext(zk_client, plock, None, self.log) as context:
+                with ZKContext(zk_client, plock, self.log) as context:
                     pipeline.state = PipelineState.new(
                         context, _path=path, layout_uuid=None)
                     PipelineChangeList.new(context, pipeline=pipeline)

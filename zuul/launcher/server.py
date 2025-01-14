@@ -921,7 +921,7 @@ class Launcher:
                 self.log.exception("Exception while processing command")
 
     def createZKContext(self, lock, log):
-        return ZKContext(self.zk_client, lock, self.stop_event, log)
+        return ZKContext(self.zk_client, lock, log)
 
     def updateTenantProviders(self):
         # We need to handle new and deleted tenants, so we need to

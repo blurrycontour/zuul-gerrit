@@ -305,9 +305,7 @@ class BranchCache:
         self.rlock = SessionAwareReadLock(zk_client.client, lock_path)
         self.wlock = SessionAwareWriteLock(zk_client.client, lock_path)
 
-        # TODO: standardize on a stop event for connections and add it
-        # to the context.
-        self.zk_context = ZKContext(zk_client, self.wlock, None, self.log)
+        self.zk_context = ZKContext(zk_client, self.wlock, self.log)
 
         with (self.zk_context as ctx,
               zk_locked(self.wlock)):

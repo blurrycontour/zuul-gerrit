@@ -3569,7 +3569,7 @@ class ExecutorServer(BaseMergeServer):
             self.zk_client, self.hostname, version=get_version_string())
         self.component_info.register()
         COMPONENT_REGISTRY.create(self.zk_client)
-        self.zk_context = ZKContext(self.zk_client, None, None, self.log)
+        self.zk_context = ZKContext(self.zk_client, None, self.log)
         self.monitoring_server = MonitoringServer(self.config, 'executor',
                                                   self.component_info)
         self.monitoring_server.start()
@@ -3722,7 +3722,7 @@ class ExecutorServer(BaseMergeServer):
         self.system = ZuulSystem(self.zk_client)
         self.nodepool = Nodepool(self.zk_client, self.system.system_id,
                                  self.statsd)
-        self.launcher = LauncherClient(self.zk_client, None)
+        self.launcher = LauncherClient(self.zk_client)
 
         self.result_events = PipelineResultEventQueue.createRegistry(
             self.zk_client)

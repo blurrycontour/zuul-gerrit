@@ -138,7 +138,6 @@ class BlobStore:
 
             # make a new context based on the old one
             with ZKContext(self.context.client, lock,
-                           self.context.stop_event,
                            self.context.log) as locked_context:
                 self._retry(
                     locked_context,
@@ -163,7 +162,6 @@ class BlobStore:
             ) as lock:
                 # make a new context based on the old one
                 with ZKContext(self.context.client, lock,
-                               self.context.stop_event,
                                self.context.log) as locked_context:
 
                     # Double check that it hasn't been used since we

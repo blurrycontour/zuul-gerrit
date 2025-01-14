@@ -232,7 +232,7 @@ class LauncherApi:
 
     def createZKContext(self, lock=None, log=None):
         return ZKContext(
-            self.zk_client, lock, self.stop_event, log or self.log)
+            self.zk_client, lock, log or self.log)
 
     def cleanupNodes(self):
         # TODO: This method currently just performs some basic cleanup and

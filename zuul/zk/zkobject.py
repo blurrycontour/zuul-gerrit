@@ -75,7 +75,7 @@ class BaseZKContext:
 
 
 class ZKContext(BaseZKContext):
-    def __init__(self, zk_client, lock, stop_event, log):
+    def __init__(self, zk_client, lock, log):
         super().__init__()
         if isinstance(zk_client, ZooKeeperClient):
             client = zk_client.client
@@ -83,7 +83,6 @@ class ZKContext(BaseZKContext):
             client = zk_client
         self.client = client
         self.lock = lock
-        self.stop_event = stop_event
         self.log = log
         self.cumulative_read_time = 0.0
         self.cumulative_write_time = 0.0
@@ -97,8 +96,7 @@ class ZKContext(BaseZKContext):
         self.profile = self.profile_default
 
     def sessionIsValid(self):
-        return ((not self.lock or self.lock.is_still_valid()) and
-                (not self.stop_event or not self.stop_event.is_set()))
+        return (not self.lock or self.lock.is_still_valid())
 
     def sessionIsInvalid(self):
         return not self.sessionIsValid()
@@ -133,7 +131,6 @@ class LocalZKContext(BaseZKContext):
         super().__init__()
         self.client = None
         self.lock = None
-        self.stop_event = None
         self.log = log
 
     def sessionIsValid(self):

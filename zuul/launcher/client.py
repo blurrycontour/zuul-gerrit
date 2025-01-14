@@ -35,9 +35,8 @@ class LauncherClient:
     log = logging.getLogger("zuul.LauncherClient")
     tracer = trace.get_tracer("zuul")
 
-    def __init__(self, zk_client, stop_event):
+    def __init__(self, zk_client):
         self.zk_client = zk_client
-        self.stop_event = stop_event
 
     def requestNodeset(self, item, job, priority, preferred_provider):
         log = get_annotated_logger(self.log, item.event)
@@ -149,7 +148,7 @@ class LauncherClient:
                         log.exception("Error unlocking node %s", provider_node)
 
     def createZKContext(self, lock, log):
-        return ZKContext(self.zk_client, lock, self.stop_event, log)
+        return ZKContext(self.zk_client, lock, log)
 
     def _getInitialRequestState(self, job):
         return (NodesetRequest.State.REQUESTED if job.nodeset.nodes

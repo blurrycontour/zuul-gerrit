@@ -1788,12 +1788,11 @@ class DummyShardedZKObject(DummyZKObjectMixin, ShardedZKObject):
 
 class TestZKObject(ZooKeeperBaseTestCase):
     def _test_zk_object(self, zkobject_class):
-        stop_event = threading.Event()
         self.zk_client.client.create('/zuul/pipeline', makepath=True)
         # Create a new object
         tenant_name = 'fake_tenant'
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, self.log)
             pipeline1 = zkobject_class.new(context,
                                            name=tenant_name,
                                            foo='bar')
@@ -1804,7 +1803,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Load an object from ZK (that we don't already have)
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, self.log)
             pipeline2 = zkobject_class.fromZK(context,
                                               '/zuul/pipeline/fake_tenant')
             self.assertEqual(pipeline2.foo, 'bar')
@@ -1826,8 +1825,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Update an object
         with (tenant_write_lock(self.zk_client, tenant_name) as lock,
-              ZKContext(
-                  self.zk_client, lock, stop_event, self.log) as context):
+              ZKContext(self.zk_client, lock, self.log) as context):
             ltime1 = get_ltime(pipeline1)
             pipeline1.updateAttributes(context, foo='qux')
             self.assertEqual(pipeline1.foo, 'qux')
@@ -1841,8 +1839,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Update an object using an active context
         with (tenant_write_lock(self.zk_client, tenant_name) as lock,
-              ZKContext(
-                  self.zk_client, lock, stop_event, self.log) as context):
+              ZKContext(self.zk_client, lock, self.log) as context):
             ltime1 = get_ltime(pipeline1)
             with pipeline1.activeContext(context):
                 pipeline1.foo = 'baz'
@@ -1863,14 +1860,13 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Refresh an existing object
         with (tenant_write_lock(self.zk_client, tenant_name) as lock,
-              ZKContext(
-                  self.zk_client, lock, stop_event, self.log) as context):
+              ZKContext(self.zk_client, lock, self.log) as context):
             pipeline2.refresh(context)
             self.assertEqual(pipeline2.foo, 'baz')
 
         # Delete an object
         with (tenant_write_lock(self.zk_client, tenant_name) as lock,
-             ZKContext(self.zk_client, lock, stop_event, self.log) as context):
+             ZKContext(self.zk_client, lock, self.log) as context):
             self.assertIsNotNone(self.zk_client.client.exists(
                 '/zuul/pipeline/fake_tenant'))
             pipeline2.delete(context)
@@ -1879,7 +1875,6 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
     def _test_zk_object_exception(self, zkobject_class):
         # Exercise the exception handling in the _save method
-        stop_event = threading.Event()
         self.zk_client.client.create('/zuul/pipeline', makepath=True)
         # Create a new object
         tenant_name = 'fake_tenant'
@@ -1916,8 +1911,7 @@ class TestZKObject(ZooKeeperBaseTestCase):
 
         # Fail an update
         with (tenant_write_lock(self.zk_client, tenant_name) as lock,
-              ZKContext(
-                  self.zk_client, lock, stop_event, self.log) as context):
+              ZKContext(self.zk_client, lock, self.log) as context):
             pipeline1 = zkobject_class.new(context,
                                            name=tenant_name,
                                            foo='one')
@@ -1957,12 +1951,11 @@ class TestZKObject(ZooKeeperBaseTestCase):
         size = 1024 * 1200
         foo = ''.join(rnd.choice(string.printable) for x in range(size))
 
-        stop_event = threading.Event()
         self.zk_client.client.create('/zuul/pipeline', makepath=True)
         # Create a new object
         tenant_name = 'fake_tenant'
         with tenant_write_lock(self.zk_client, tenant_name) as lock:
-            context = ZKContext(self.zk_client, lock, stop_event, self.log)
+            context = ZKContext(self.zk_client, lock, self.log)
             with testtools.ExpectedException(Exception,
                                              'ZK data size too large'):
                 pipeline1 = zkobject_class.new(context,
@@ -2050,7 +2043,7 @@ class TestBranchCache(ZooKeeperBaseTestCase):
 
         # There's a lot of exception catching in the branch cache,
         # so exercise a serialize/deserialize cycle.
-        ctx = ZKContext(self.zk_client, None, None, self.log)
+        ctx = ZKContext(self.zk_client, None, self.log)
         data = cache.cache.serialize(ctx)
         cache.cache.deserialize(data, ctx)
 
@@ -2113,7 +2106,7 @@ class TestBranchCache(ZooKeeperBaseTestCase):
 
         # There's a lot of exception catching in the branch cache,
         # so exercise a serialize/deserialize cycle.
-        ctx = ZKContext(self.zk_client, None, None, self.log)
+        ctx = ZKContext(self.zk_client, None, self.log)
         data = cache.cache.serialize(ctx)
         cache.cache.deserialize(data, ctx)
 
@@ -2207,7 +2200,6 @@ class TestBranchCache(ZooKeeperBaseTestCase):
 
 class TestConfigurationErrorList(ZooKeeperBaseTestCase):
     def test_config_error_list(self):
-        stop_event = threading.Event()
         self.zk_client.client.create('/zuul/pipeline', makepath=True)
 
         source_context = model.SourceContext(
@@ -2219,8 +2211,7 @@ class TestConfigurationErrorList(ZooKeeperBaseTestCase):
 
         # Create a new object
         with (tenant_write_lock(self.zk_client, 'test') as lock,
-              ZKContext(
-                  self.zk_client, lock, stop_event, self.log) as context):
+              ZKContext(self.zk_client, lock, self.log) as context):
             pipeline = DummyZKObject.new(context, name="test", foo="bar")
             e1 = model.ConfigurationError(
                 source_context, start_mark, "Test error1")
@@ -2251,15 +2242,13 @@ class TestBlobStore(ZooKeeperBaseTestCase):
         self.assertEqual([], keys)
 
     def test_blob_store(self):
-        stop_event = threading.Event()
         self.zk_client.client.create('/zuul/pipeline', makepath=True)
         # Create a new object
         tenant_name = 'fake_tenant'
 
         start_ltime = self.zk_client.getCurrentLtime()
         with (tenant_write_lock(self.zk_client, tenant_name) as lock,
-              ZKContext(
-                  self.zk_client, lock, stop_event, self.log) as context):
+              ZKContext(self.zk_client, lock, self.log) as context):
             bs = BlobStore(context)
             with testtools.ExpectedException(KeyError):
                 bs.get('nope')
@@ -2306,7 +2295,6 @@ class TestBlobStore(ZooKeeperBaseTestCase):
         # [2] Fail to create the lock because the lock path does not exist
         # To address this, we will retry the lock if it fails with
         # NoNodeError.  This test verifies that behavior.
-        stop_event = threading.Event()
         self.zk_client.client.create('/zuul/pipeline', makepath=True)
         # Create a new object
         tenant_name = 'fake_tenant'
@@ -2324,8 +2312,7 @@ class TestBlobStore(ZooKeeperBaseTestCase):
             deleted_event.wait()
 
         with (tenant_write_lock(self.zk_client, tenant_name) as lock,
-              ZKContext(
-                  self.zk_client, lock, stop_event, self.log) as context):
+              ZKContext(self.zk_client, lock, self.log) as context):
             bs = BlobStore(context)
 
             # Get the key
@@ -2367,7 +2354,7 @@ class TestPipelineInit(ZooKeeperBaseTestCase):
         tenant.layout = layout
         pipeline.state = model.PipelineState.create(
             pipeline, pipeline.state)
-        context = ZKContext(self.zk_client, None, None, self.log)
+        context = ZKContext(self.zk_client, None, self.log)
         pipeline.state.refresh(context)
         self.assertTrue(self.zk_client.client.exists(pipeline.state.getPath()))
         self.assertEqual(pipeline.state.layout_uuid, layout.uuid)
@@ -2383,7 +2370,7 @@ class TestPipelineInit(ZooKeeperBaseTestCase):
             pipeline, pipeline.state)
         pipeline.change_list = model.PipelineChangeList.create(
             pipeline)
-        context = ZKContext(self.zk_client, None, None, self.log)
+        context = ZKContext(self.zk_client, None, self.log)
         # We refresh the change list here purely for the side effect
         # of creating the pipeline state object with no data (the list
         # is a subpath of the state object).
@@ -2404,7 +2391,7 @@ class TestPipelineInit(ZooKeeperBaseTestCase):
             pipeline, pipeline.state)
         pipeline.change_list = model.PipelineChangeList.create(
             pipeline)
-        context = ZKContext(self.zk_client, None, None, self.log)
+        context = ZKContext(self.zk_client, None, self.log)
         pipeline.change_list.refresh(context)
         self.assertTrue(
             self.zk_client.client.exists(pipeline.change_list.getPath()))
@@ -2423,7 +2410,7 @@ class TestPipelineInit(ZooKeeperBaseTestCase):
             pipeline, pipeline.state)
         pipeline.change_list = model.PipelineChangeList.create(
             pipeline)
-        context = ZKContext(self.zk_client, None, None, self.log)
+        context = ZKContext(self.zk_client, None, self.log)
         with testtools.ExpectedException(NoNodeError):
             pipeline.change_list.refresh(context, allow_init=False)
         self.assertIsNone(
@@ -2460,7 +2447,7 @@ class TestPolymorphicZKObjectMixin(ZooKeeperBaseTestCase):
         class ChildB(Parent, subclass_id="chid-B"):
             pass
 
-        context = ZKContext(self.zk_client, None, None, self.log)
+        context = ZKContext(self.zk_client, None, self.log)
         child_a = ChildA.new(context)
 
         child_a_from_zk = Parent.fromZK(context, child_a.getPath())
@@ -2547,7 +2534,7 @@ class TestPolymorphicZKObjectMixinSharded(ZooKeeperBaseTestCase):
         class ChildB(Parent, subclass_id="chid-B"):
             pass
 
-        context = ZKContext(self.zk_client, None, None, self.log)
+        context = ZKContext(self.zk_client, None, self.log)
         child_a = ChildA.new(context)
 
         child_a_from_zk = Parent.fromZK(context, child_a.getPath())
@@ -2629,7 +2616,7 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
 
     def test_launcher(self):
         labels = ["foo", "bar"]
-        context = ZKContext(self.zk_client, None, None, self.log)
+        context = ZKContext(self.zk_client, None, self.log)
         request = model.NodesetRequest.new(
             context,
             tenant_name="tenant",

@@ -321,7 +321,7 @@ class TestBranchCacheUpgrade(BaseTestCase):
                 # 'project9':
             }
         }
-        ctx = ZKContext(self.zk_client, None, None, self.log)
+        ctx = ZKContext(self.zk_client, None, self.log)
         data = json.dumps(data, sort_keys=True).encode("utf8")
         cache.cache._save(ctx, data)
         cache.cache.refresh(ctx)

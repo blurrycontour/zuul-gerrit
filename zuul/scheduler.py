@@ -365,7 +365,7 @@ class Scheduler(threading.Thread):
             self.executor = self._executor_client_class(self.config, self)
             self.merger = self._merger_client_class(self.config, self)
             self.launcher = self._launcher_client_class(
-                self.zk_client, self.stop_event)
+                self.zk_client)
             self.nodepool = nodepool.Nodepool(
                 self.zk_client, self.system.system_id, self.statsd,
                 scheduler=True)
@@ -3301,4 +3301,4 @@ class Scheduler(threading.Thread):
                 )
 
     def createZKContext(self, lock, log):
-        return ZKContext(self.zk_client, lock, self.stop_event, log)
+        return ZKContext(self.zk_client, lock, log)

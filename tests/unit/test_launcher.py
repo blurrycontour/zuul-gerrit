@@ -639,7 +639,7 @@ class TestLauncher(LauncherBaseTestCase):
         ctx = self.createZKContext(None)
         request = self.requestNodes([n.label for n in nodeset.getNodes()])
 
-        client = LauncherClient(self.zk_client, None)
+        client = LauncherClient(self.zk_client)
         request = client.getRequest(request.uuid)
 
         self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
