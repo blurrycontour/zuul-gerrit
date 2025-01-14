@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b85272b_aa4aef23",
+        "filename": "tests/fixtures/config/job-update/git/org_project/zuul.d/existing.yaml",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-14T14:17:53Z",
+      "side": 1,
+      "message": "Seems like the same issue can be reproduced w/o match-on-config-updates.",
+      "revId": "71c9a66e0c930a74c47561699e799bfca06d64c7",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
