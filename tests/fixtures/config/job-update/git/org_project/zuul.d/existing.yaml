@@ -11,9 +11,25 @@
       - README
       - ^zuul.d/.*$
 
+- job:
+    name: no-match-on-cfg-parent
+    match-on-config-updates: false
+    files:
+      - doesnotexist
+
+- job:
+    name: no-match-on-cfg-child
+    match-on-config-updates: false
+    files:
+      - doesnotexist
+
 - project:
     name: org/project
     check:
       jobs:
         - existing-files
         - existing-irr
+        - no-match-on-cfg-parent
+        - no-match-on-cfg-child:
+            dependencies:
+              - no-match-on-cfg-parent
