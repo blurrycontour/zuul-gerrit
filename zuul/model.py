@@ -4630,9 +4630,11 @@ class JobGraph(object):
                 uuids_to_iterate.add((u, current_dependent_uuids[u]['soft']))
         return [self.getJobFromUuid(u) for u in all_dependent_uuids]
 
-    def freezeDependencies(self, log, layout=None):
+    def _freezeDependencies(self, log, layout=None):
+        job_dependencies = {}
+        job_dependents = {}
         for dependent_uuid, parents in self._dependencies.items():
-            dependencies = self.job_dependencies.setdefault(dependent_uuid, {})
+            dependencies = job_dependencies.setdefault(dependent_uuid, {})
             for parent_name, parent_soft in parents.items():
                 dependent_job = self._job_map[dependent_uuid]
                 # We typically depend on jobs with the same ref, but
@@ -4652,24 +4654,22 @@ class JobGraph(object):
                         raise JobConfigurationError(
                             "Job %s depends on %s which was not run." %
                             (dependent_job.name, parent_name))
-                    if not parent_soft and dependent_job.matches_change:
-                        # If this is a hard dependency, then tell the
-                        # parent to ignore file matchers.
-                        if not parent_job.matches_change:
-                            log.debug(
-                                "Forcing non-matching hard dependency "
-                                "%s to run for %s", parent_job, dependent_job)
-                        parent_job._set(matches_change=True)
                     dependencies[parent_job.uuid] = dict(soft=parent_soft)
-                    dependents = self.job_dependents.setdefault(
+                    dependents = job_dependents.setdefault(
                         parent_job.uuid, {})
                     dependents[dependent_uuid] = dict(soft=parent_soft)
         for dependent_uuid, parents in self._dependencies.items():
             dependent_job = self._job_map[dependent_uuid]
             # For the side effect of verifying no cycles
-            self.getParentJobsRecursively(dependent_job)
+            self._getParentJobsRecursively(job_dependencies, dependent_job)
+        return (job_dependencies, job_dependents)
 
-    def getParentJobsRecursively(self, job, skip_soft=False):
+    def freezeDependencies(self, log, layout=None):
+        self.job_dependencies, self.job_dependents = \
+            self._freezeDependencies(log, layout)
+
+    def _getParentJobsRecursively(self, job_dependencies, job,
+                                  skip_soft=False):
         all_dependency_uuids = set()
         uuids_to_iterate = set([job.uuid])
         ancestor_uuids = set()
@@ -4680,7 +4680,7 @@ class JobGraph(object):
                 raise Exception("Dependency cycle detected in job %s" %
                                 current_job.name)
             ancestor_uuids.add(current_uuid)
-            current_dependency_uuids = self.job_dependencies.get(
+            current_dependency_uuids = job_dependencies.get(
                 current_uuid, {})
             if skip_soft:
                 hard_dependency_uuids = {
@@ -4695,31 +4695,31 @@ class JobGraph(object):
             uuids_to_iterate.update(new_dependency_uuids)
         return [self.getJobFromUuid(u) for u in all_dependency_uuids]
 
+    def getParentJobsRecursively(self, job, skip_soft=False):
+        return self._getParentJobsRecursively(self.job_dependencies, job,
+                                              skip_soft)
+
     def getProjectMetadata(self, name):
         if name in self.project_metadata:
             return self.project_metadata[name]
         return None
 
     def removeNonMatchingJobs(self, log):
-        # This is similar to what we do in freezeDependencies
+        # Get a copy of the frozen dependencies as they stand now so
+        # that we can recursively find parents below.
+        job_dependencies, job_dependents = self._freezeDependencies(log)
         for dependent_uuid, parents in self._dependencies.items():
-            for parent_name, parent_soft in parents.items():
-                dependent_job = self._job_map[dependent_uuid]
-                # We typically depend on jobs with the same ref, but
-                # if we have been deduplicated, then we depend on
-                # every job-ref for the given parent job.
-                for ref in dependent_job.all_refs:
-                    parent_job = self.getJob(parent_name, ref)
-                    if parent_job is None:
-                        continue
-                    if not parent_soft and dependent_job.matches_change:
-                        # If this is a hard dependency, then tell the
-                        # parent to ignore file matchers.
-                        if not parent_job.matches_change:
-                            log.debug(
-                                "Forcing non-matching hard dependency "
-                                "%s to run for %s", parent_job, dependent_job)
-                        parent_job._set(matches_change=True)
+            dependent_job = self._job_map[dependent_uuid]
+            parents = self._getParentJobsRecursively(
+                job_dependencies, dependent_job, skip_soft=True)
+            for parent_job in parents:
+                if not dependent_job.matches_change:
+                    continue
+                if not parent_job.matches_change:
+                    log.debug(
+                        "Forcing non-matching hard dependency "
+                        "%s to run for %s", parent_job, dependent_job)
+                    parent_job._set(matches_change=True)
 
         # Afer removing duplicates and walking the dependency graph,
         # remove any jobs that we shouldn't run because of file

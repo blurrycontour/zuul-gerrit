@@ -7224,6 +7224,157 @@ class TestJobUpdateFileMatcher(ZuulTestCase):
         self.assertHistory([])
 
 
+class TestJobUpdateFileMatcherTransitive(ZuulTestCase):
+    tenant_config_file = 'config/job-update-transitive/main.yaml'
+
+    def test_job_update_transitive(self):
+        # Test that a change to the configuration of job C in the
+        # series C -> B -> A causes all 3 jobs to run.
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # None of these jobs run because no files matched (and no job
+        # was updated)
+        self.assertHistory([])
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: job3
+                vars: {foo: bar}
+            """)
+
+        file_dict = {'zuul.d/extend.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='job1', result='SUCCESS', changes='2,1'),
+            dict(name='job2', result='SUCCESS', changes='2,1'),
+            dict(name='job3', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+
+    def test_file_matcher_transitive(self):
+        # This is really a file matcher test, but it's identical in
+        # behavior to the above test so we do it here as well:
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # None of these jobs run because no files matched (and no job
+        # was updated)
+        self.assertHistory([])
+
+        file_dict = {'job3.txt': ''}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='job1', result='SUCCESS', changes='2,1'),
+            dict(name='job2', result='SUCCESS', changes='2,1'),
+            dict(name='job3', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+
+    def test_job_update_transitive2(self):
+        # Similar to test_job_update_transitive but test:
+        # job6 --(hard)--> job5 --(soft)--> job4
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # None of these jobs run because no files matched (and no job
+        # was updated)
+        self.assertHistory([])
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: job6
+                vars: {foo: bar}
+            """)
+
+        file_dict = {'zuul.d/extend.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='job5', result='SUCCESS', changes='2,1'),
+            dict(name='job6', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+
+    def test_file_matcher_transitive2(self):
+        # Similar to test_file_matcher_transitive, but test:
+        # job6 --(hard)--> job5 --(soft)--> job4
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # None of these jobs run because no files matched (and no job
+        # was updated)
+        self.assertHistory([])
+
+        file_dict = {'job6.txt': ''}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='job5', result='SUCCESS', changes='2,1'),
+            dict(name='job6', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+
+    def test_job_update_transitive3(self):
+        # Similar to test_job_update_transitive but test:
+        # job9 --(soft)--> job8 --(hard)--> job7
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # None of these jobs run because no files matched (and no job
+        # was updated)
+        self.assertHistory([])
+
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: job9
+                vars: {foo: bar}
+            """)
+
+        file_dict = {'zuul.d/extend.yaml': in_repo_conf}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='job9', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+
+    def test_file_matcher_transitive3(self):
+        # Similar to test_file_matcher_transitive, but test:
+        # job9 --(soft)--> job8 --(hard)--> job7
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        # None of these jobs run because no files matched (and no job
+        # was updated)
+        self.assertHistory([])
+
+        file_dict = {'job9.txt': ''}
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='job9', result='SUCCESS', changes='2,1'),
+        ], ordered=False)
+
+
 class TestExecutor(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
