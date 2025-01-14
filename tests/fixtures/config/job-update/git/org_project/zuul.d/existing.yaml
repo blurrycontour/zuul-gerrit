@@ -11,9 +11,30 @@
       - README
       - ^zuul.d/.*$
 
+- job:
+    name: should-not-run
+    files:
+      - doesnotexist
+
+- job:
+    name: should-not-force-dependency
+    files:
+      - doesnotexist
+
+- job:
+    name: no-match-on-cfg-standalone
+    match-on-config-updates: false
+    files:
+      - alsodoesnotexist
+
 - project:
     name: org/project
     check:
       jobs:
         - existing-files
         - existing-irr
+        - no-match-on-cfg-standalone
+        - should-not-run
+        - should-not-force-dependency:
+            dependencies:
+              - should-not-run
