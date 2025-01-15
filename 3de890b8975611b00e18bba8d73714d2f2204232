@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0926c21_b09a5842",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-15T07:53:24Z",
+      "side": 1,
+      "message": "I just did a shallow review of the JS(X) parts, so someone with more knowledge in that area should probably take another look.",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
