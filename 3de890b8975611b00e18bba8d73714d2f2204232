@@ -16,6 +16,142 @@
       "message": "I just did a shallow review of the JS(X) parts, so someone with more knowledge in that area should probably take another look.",
       "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a44c59f_4ca57c0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2025-01-15T09:06:53Z",
+      "side": 1,
+      "message": "After seeing this change I\u0027m thinking if it might make sense to implement a custom ZuulTable component that deals with all the copy-paste stuff like creating a fetching row, initializing the table structure and providing handlers for the collapse/extend behaviour :D\n\nNothing blocking from my side, mainly a few suggestions/improvements. I think we can improve the design/styling, but this might be easier once the data is available and we can play around with it.",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4509b626_726651ef",
+        "filename": "web/src/containers/provider/ImageBuildTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2025-01-15T09:06:53Z",
+      "side": 1,
+      "message": "nit: You could directly unpack the props in here:\n\n```\nfunction ImageBuildTable({ buildArtifacts, fetching }) {\n```\n\nI find that approach much clearer as you can directly see which parameters/attributes the component has and you don\u0027t have to search for the line where the props are unpacked.",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4ef51a6_f5dcfe7d",
+        "filename": "web/src/containers/provider/ImageBuildTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2025-01-15T09:06:53Z",
+      "side": 1,
+      "message": "Since the rows parameter is only used to lookup the id for the row, I think it would be clearer to provide an \"id\" parameter to the function and pass \"rows.length\"  as value. The same goes for the other \"create...Row()\" functions.",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38e86740_b5dad0db",
+        "filename": "web/src/containers/provider/ImageBuildTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2025-01-15T09:06:53Z",
+      "side": 1,
+      "message": "I\u0027m not that familiar with the data we want to show here in the end, but are we sure we want to nest a table within a table row? I think we can do that as a start but might want to come up with a nicer solution later on.",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1381c282_41da56d6",
+        "filename": "web/src/containers/provider/ImageBuildTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2025-01-15T09:06:53Z",
+      "side": 1,
+      "message": "Do we need this additional check here? Can\u0027t we just iterate over the list of buildArtifacts and in case the list is empty, no rows will be created?",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1514dc7_f50322fe",
+        "filename": "web/src/containers/provider/ImageBuildTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2025-01-15T09:06:53Z",
+      "side": 1,
+      "message": "nit: This is already done in line 125",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48d6572e_05da6dd4",
+        "filename": "web/src/containers/provider/ImageDetail.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2025-01-15T09:06:53Z",
+      "side": 1,
+      "message": "I know that I did the same in the beginning, but now I\u0027m not sure anymore if it\u0027s helpful to have a single file for every small component. This looks like a component we might want to put into the ProviderImage page file directly.",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ef627f2_4892c3c9",
+        "filename": "web/src/containers/provider/ImageUploadTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2025-01-15T09:06:53Z",
+      "side": 1,
+      "message": "We don\u0027t need to provide an id to the table row because we don\u0027t reference it anywhere (e.g. to provide some collapse/extend functionality), right?",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
