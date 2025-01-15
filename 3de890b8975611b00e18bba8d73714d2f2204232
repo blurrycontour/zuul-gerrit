@@ -52,6 +52,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c021242c_f9ecaeb8",
+        "filename": "web/src/containers/provider/ImageBuildTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-15T16:31:46Z",
+      "side": 1,
+      "message": "I like that better too, let\u0027s try to start doing that in the future.",
+      "parentUuid": "4509b626_726651ef",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f4ef51a6_f5dcfe7d",
@@ -65,6 +83,24 @@
       "writtenOn": "2025-01-15T09:06:53Z",
       "side": 1,
       "message": "Since the rows parameter is only used to lookup the id for the row, I think it would be clearer to provide an \"id\" parameter to the function and pass \"rows.length\"  as value. The same goes for the other \"create...Row()\" functions.",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2010934f_964115da",
+        "filename": "web/src/containers/provider/ImageBuildTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-15T16:31:46Z",
+      "side": 1,
+      "message": "I think the function I based this on was one that worked on pairs of rows so may have needed a bit more information.  I agree this one could change, but at the time I wanted to maintain some consistency with what we were doing elsewhere.  I don\u0027t feel strongly about it.  Just explaining.  ;)",
+      "parentUuid": "f4ef51a6_f5dcfe7d",
       "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -86,6 +122,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f11dfbeb_467a6d4b",
+        "filename": "web/src/containers/provider/ImageBuildTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-15T16:31:46Z",
+      "side": 1,
+      "message": "I do think this makes sense for what we\u0027re displaying, it doesn\u0027t look terrible, and is good for re-use, but I\u0027m open to changing it.  I agree we can revisit later.",
+      "parentUuid": "38e86740_b5dad0db",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1381c282_41da56d6",
@@ -99,6 +153,24 @@
       "writtenOn": "2025-01-15T09:06:53Z",
       "side": 1,
       "message": "Do we need this additional check here? Can\u0027t we just iterate over the list of buildArtifacts and in case the list is empty, no rows will be created?",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8aa8245f_2c91a870",
+        "filename": "web/src/containers/provider/ImageBuildTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-15T16:31:46Z",
+      "side": 1,
+      "message": "I think haveBuildArtifacts handles the undefined case.",
+      "parentUuid": "1381c282_41da56d6",
       "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -137,6 +209,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "08f71bba_7190feb0",
+        "filename": "web/src/containers/provider/ImageDetail.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-15T16:31:46Z",
+      "side": 1,
+      "message": "Yeah, you don\u0027t have to convince me to make larger files.  :)\n\nThere is actually some component re-use in the tables which is good I think. But it seems unlikely that this would ever appear anywhere but on the one page, so is a good candidate for combining them.",
+      "parentUuid": "48d6572e_05da6dd4",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ef627f2_4892c3c9",
@@ -150,6 +240,24 @@
       "writtenOn": "2025-01-15T09:06:53Z",
       "side": 1,
       "message": "We don\u0027t need to provide an id to the table row because we don\u0027t reference it anywhere (e.g. to provide some collapse/extend functionality), right?",
+      "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66e74a58_7c9cc328",
+        "filename": "web/src/containers/provider/ImageUploadTable.jsx",
+        "patchSetId": 8
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-15T16:31:46Z",
+      "side": 1,
+      "message": "Right.",
+      "parentUuid": "0ef627f2_4892c3c9",
       "revId": "3de890b8975611b00e18bba8d73714d2f2204232",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
