@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6806304f_2034053a",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 2173,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-15T13:31:43Z",
+      "side": 1,
+      "message": "nit: a set would probably perform a bit better for the needle-in-haystack check below.",
+      "revId": "80ed6bb2de76a284b5af1d4d9219307a4f51734f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
