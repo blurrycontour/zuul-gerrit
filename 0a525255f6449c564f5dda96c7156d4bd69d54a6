@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1a679d6_77533d34",
+        "filename": "zuul/zk/image_registry.py",
+        "patchSetId": 13
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-15T12:44:50Z",
+      "side": 1,
+      "message": "Was this changed so we always call `super().postCacheHook()`?\n\nnit: IMHO this was a bit more readable before, so maybe something like the following could work:\n\n```\n        if obj:\n            exists \u003d key in self._cached_objects\n            builds \u003d self.builds_by_image_name[obj.canonical_name]\n            if exists:\n                builds.add(key)\n            else:\n                builds.discard(key)\n```",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 43,
+        "endChar": 35
+      },
+      "revId": "0a525255f6449c564f5dda96c7156d4bd69d54a6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
