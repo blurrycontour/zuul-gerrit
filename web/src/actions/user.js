@@ -65,8 +65,9 @@ const fetchUserACLFail = error => ({
 })
 
 export const fetchUserACL = (tenant) => (dispatch) => {
-  dispatch(fetchUserACLRequest(tenant))
-  let apiPrefix = tenant? 'tenant/' + tenant + '/' : ''
+  dispatch(fetchUserACLRequest(tenant? tenant.name : null))
+  // tenant.name will be null if we're at the root
+  const apiPrefix = tenant && tenant.name ? tenant.apiPrefix : ''
   return API.fetchUserAuthorizations(apiPrefix)
     .then(response => dispatch(fetchUserACLSuccess(response.data)))
     .catch(error => {
