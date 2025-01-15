@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43cb7647_b2441a20",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1169,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-15T11:16:55Z",
+      "side": 1,
+      "message": "comment for reviewers: uploads are returned sorted from `getUploadsForImage()`",
+      "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56480e42_88ca37e6",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1175,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-15T11:16:55Z",
+      "side": 1,
+      "message": "Do we need to keep unvalidated uploads that are in between the two most recent validated uploads?\n\ne.g. for the following uploads (oldest to newest) `D(-) -\u003e C(v) -\u003e B(-) -\u003e A(v)` we would keep C,B,A. Does it make sense to keep B in that case?",
+      "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "476cba41_bdbc86db",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1193,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-15T11:16:55Z",
+      "side": 1,
+      "message": "I\u0027m wondering if we also need to consider uploads in `STATE_UPLOADING` here. The `UploadJob` will transition the upload to `STATE_UPLOADING`, but if e.g. the launcher crashes during the upload it seems to be stuck in that state.",
+      "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fceecc72_400602f7",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-15T11:16:55Z",
+      "side": 1,
+      "message": "I\u0027m not really a fan of free-floating global constants, especially when the namespace they are in is so broad as the `models.py`. I think we have better methods available via Enums that are already used by the `NodesetRequest` or the `ProviderNode`.",
+      "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c80e7770_40d98883",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1503,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-15T11:16:55Z",
+      "side": 1,
+      "message": "nit: I think this could be initialized to `time.time()`",
+      "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
