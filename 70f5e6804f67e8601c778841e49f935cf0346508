@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "15a8a1e0_eb35f506",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1175,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-15T14:38:11Z",
+      "side": 1,
+      "message": "My original thought was that would fall in a class of uploads that someone might want to inspect.  But I\u0027m amenable to changing that based on what we find we need when we actually start using this.  I wanted to start generous since we weren\u0027t sure, and figured we could reduce the scope if it was a problem.",
+      "parentUuid": "56480e42_88ca37e6",
+      "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "476cba41_bdbc86db",
         "filename": "zuul/launcher/server.py",
         "patchSetId": 11
@@ -48,6 +66,24 @@
       "writtenOn": "2025-01-15T11:16:55Z",
       "side": 1,
       "message": "I\u0027m wondering if we also need to consider uploads in `STATE_UPLOADING` here. The `UploadJob` will transition the upload to `STATE_UPLOADING`, but if e.g. the launcher crashes during the upload it seems to be stuck in that state.",
+      "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c011f9a_c48509bd",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1193,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-15T14:38:11Z",
+      "side": 1,
+      "message": "Yeah we can check for unlocked uploading uploads.",
+      "parentUuid": "476cba41_bdbc86db",
       "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -71,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "54bb5b78_9c3f9bd1",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-15T14:38:11Z",
+      "side": 1,
+      "message": "We can change that.",
+      "parentUuid": "fceecc72_400602f7",
+      "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c80e7770_40d98883",
         "filename": "zuul/model.py",
         "patchSetId": 11
@@ -82,6 +136,24 @@
       "writtenOn": "2025-01-15T11:16:55Z",
       "side": 1,
       "message": "nit: I think this could be initialized to `time.time()`",
+      "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4095a55_4b4929a0",
+        "filename": "zuul/model.py",
+        "patchSetId": 11
+      },
+      "lineNbr": 1503,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-15T14:38:11Z",
+      "side": 1,
+      "message": "I don\u0027t want to do that because we\u0027re also nulling the state here.",
+      "parentUuid": "c80e7770_40d98883",
       "revId": "70f5e6804f67e8601c778841e49f935cf0346508",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
