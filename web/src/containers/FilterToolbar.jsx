@@ -65,11 +65,11 @@ function ToolbarStatsItem({ name, value, tooltipContent }) {
         position="bottom"
       >
         <Label>
-          <span className="zuul-tenant-stats-item__value">
-            {value}
-          </span>
           <span className="zuul-tenant-stats-item__name">
             {name}
+          </span>
+          <span className="zuul-tenant-stats-item__value">
+            {value}
           </span>
         </Label>
       </Tooltip>

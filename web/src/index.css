@@ -99,7 +99,7 @@ a.refresh {
 
 .zuul-tenant-stats-item__value {
     font-weight: bold;
-    margin-right: 4px;
+    margin-left: 4px;
 }
 
 .zuul-tenant-stats-item__extended {
