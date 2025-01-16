@@ -50,6 +50,14 @@ settings for different connection methods follow.
    is changed while Zuul is running, all running Zuul schedulers
    should be restarted in order to see the change.
 
+.. note::
+
+   Since Gerrit 3.7 it has been possible to import projects and their
+   changes from one Gerrit server to another. Doing so may result in
+   change number collisions (change numbers that do not uniquely identify
+   a single change). Zuul's Gerrit driver is not currently expected
+   to work with non unique change numbers.
+
 Connection Configuration
 ------------------------
 
