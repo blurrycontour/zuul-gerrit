@@ -263,6 +263,8 @@ class FunctionalZuulStreamMixIn:
             # ... handling loops is a different path, and that does
             self.assertLogLineStartsWith(
                 r"""compute1 \| ok: \{'string': '\d.""", text)
+            self.assertLogLine(
+                r'fake \| skipping: Conditional result was False', text)
 
     def test_command_split_streams(self):
         job = self._run_job('command', split=True)
@@ -385,6 +387,8 @@ class FunctionalZuulStreamMixIn:
             # ... handling loops is a different path, and that does
             self.assertLogLineStartsWith(
                 r"""compute1 \| ok: \{'string': '\d.""", text)
+            self.assertLogLine(
+                r'fake \| skipping: Conditional result was False', text)
 
     def test_module_exception(self):
         job = self._run_job('module_failure_exception')
