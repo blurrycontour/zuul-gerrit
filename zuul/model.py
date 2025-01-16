@@ -9949,7 +9949,8 @@ class Capabilities(object):
                          for (k, v) in self.capabilities.items()])
 
     def copy(self):
-        return Capabilities(**self.toDict())
+        # Use a deep copy since zuul-web may modify dict entries
+        return Capabilities(**copy.deepcopy(self.toDict()))
 
     def toDict(self):
         return self.capabilities
