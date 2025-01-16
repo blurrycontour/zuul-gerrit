@@ -294,6 +294,7 @@ function PipelineOverviewPage() {
                   />
                   <ToolbarStatsItem
                     name="reconfigured"
+                    prefixName
                     value={moment_tz.utc(stats.last_reconfigured).tz(timezone).fromNow()}
                     tooltipContent={
                       <div>

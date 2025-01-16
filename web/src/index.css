@@ -101,6 +101,10 @@ a.refresh {
     font-weight: bold;
     margin-right: 4px;
 }
+.zuul-tenant-stats-item__value_prefix {
+    font-weight: bold;
+    margin-left: 4px;
+}
 
 .zuul-tenant-stats-item__extended {
     text-align: left;
