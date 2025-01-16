@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ad5470c_9420ef9f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-01-16T09:04:00Z",
+      "side": 1,
+      "message": "recheck\nunrelated error in test_launcher_image_no_validation",
+      "revId": "225995788633ad3f20e458a5a5f4e42a7250c3cd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
