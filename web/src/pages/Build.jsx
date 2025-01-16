@@ -218,7 +218,10 @@ class BuildPage extends React.Component {
           history={history}
         />
       )
-    } else if (build.manifest) {
+    // Do not render the Manifest component if we don't have a log_url (this
+    // can happen for CANCELLED builds) since the log file paths are
+    // constructed from the build.log_url. Instead show the EmptyState.
+    } else if (build.manifest && build.log_url) {
       logsTabContent = <Manifest tenant={this.props.tenant} build={build} />
     } else {
       logsTabContent = (
