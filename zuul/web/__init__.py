@@ -16,7 +16,6 @@
 import cherrypy
 import socket
 from collections import defaultdict
-from contextlib import suppress
 
 from opentelemetry import trace
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
@@ -74,7 +73,10 @@ from zuul.zk.event_queues import (
     PipelineTriggerEventQueue,
 )
 from zuul.zk.executor import ExecutorApi
-from zuul.zk.layout import LayoutStateStore
+from zuul.zk.layout import (
+    LayoutProvidersStore,
+    LayoutStateStore,
+)
 from zuul.zk.locks import tenant_read_lock
 from zuul.zk.nodepool import ZooKeeperNodepool
 from zuul.zk.system import ZuulSystem
@@ -365,6 +367,64 @@ class BuildsetConverter:
         if events:
             ret['events'] = [BuildsetEventConverter.schema()]
         return Prop('The buildset', ret)
+
+
+class ProviderConverter:
+    # A class to encapsulate the conversion of Provider objects to
+    # API output.
+    @staticmethod
+    def toDict(provider):
+        # These are the flattened versions of these objects for this
+        # provider.
+        images = [
+            {'name': x.name,
+             'canonical_name': x.canonical_name,
+             'type': x.type,
+             }
+            for x in provider.images.values()
+        ]
+        labels = [
+            {'name': x.name,
+             'canonical_name': x.canonical_name,
+             }
+            for x in provider.labels.values()
+        ]
+        flavors = [
+            {'name': x.name,
+             'canonical_name': x.canonical_name,
+             }
+            for x in provider.flavors.values()
+        ]
+        return {
+            'name': provider.name,
+            'canonical_name': provider.canonical_name,
+            'images': images,
+            'labels': labels,
+            'flavors': flavors,
+        }
+
+    @staticmethod
+    def schema():
+        return Prop('The provider', {
+            'name': str,
+            'canonical_name': str,
+            'images': [
+                {'name': str,
+                 'canonical_name': str,
+                 'type': str,
+                 }
+            ],
+            'labels': [
+                {'name': str,
+                 'canonical_name': str,
+                 }
+            ],
+            'flavors': [
+                {'name': str,
+                 'canonical_name': str,
+                 }
+            ]
+        })
 
 
 class APIError(cherrypy.HTTPError):
@@ -1668,6 +1728,22 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi_response(
+        code=200,
+        content_type='application/json',
+        description='Returns the list of providers',
+        schema=Prop('The list of providers', [ProviderConverter.schema()]),
+    )
+    @openapi_response(404, 'Tenant not found')
+    def providers(self, tenant_name, tenant, auth):
+        providers = self.zuulweb.tenant_providers[tenant_name]
+        return [ProviderConverter.toDict(p) for p in providers]
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.check_tenant_auth()
     def pipelines(self, tenant_name, tenant, auth):
         ret = []
         for pipeline, pipeline_config in tenant.layout.pipelines.items():
@@ -2396,6 +2472,8 @@ class ZuulWeb(object):
             '/freeze-job/{job_name}',
             controller=api, action='project_freeze_job'
         )
+        route_map.connect('api', '/api/tenant/{tenant_name}/providers',
+                          controller=api, action='providers')
         route_map.connect('api', '/api/tenant/{tenant_name}/pipelines',
                           controller=api, action='pipelines')
         route_map.connect('api', '/api/tenant/{tenant_name}/labels',
@@ -2496,6 +2574,10 @@ class ZuulWeb(object):
         self.authenticators = authenticators
         self.stream_manager = StreamManager(self.statsd, self.metrics)
         self.zone = get_default(self.config, 'web', 'zone')
+
+        self.tenant_providers = {}
+        self.layout_providers_store = LayoutProvidersStore(
+            self.zk_client, self.connections)
 
         self.management_events = TenantManagementEventQueue.createRegistry(
             self.zk_client)
@@ -2758,7 +2840,7 @@ class ZuulWeb(object):
                 == self.tenant_layout_state.get(tenant_name)):
             return
         self.log.debug("Reloading tenant %s", tenant_name)
-        with tenant_read_lock(self.zk_client, tenant_name, self.log):
+        with tenant_read_lock(self.zk_client, tenant_name, self.log) as tlock:
             layout_state = self.tenant_layout_state.get(tenant_name)
             layout_uuid = layout_state and layout_state.uuid
 
@@ -2767,6 +2849,9 @@ class ZuulWeb(object):
                     layout_state)
                 branch_cache_min_ltimes = (
                     layout_state.branch_cache_min_ltimes)
+                with self.createZKContext(tlock, self.log) as context:
+                    providers = list(self.layout_providers_store.get(
+                        context, tenant_name))
             else:
                 # Consider all project branch caches valid if
                 # we don't have a layout state.
@@ -2783,6 +2868,11 @@ class ZuulWeb(object):
                 branch_cache_min_ltimes=branch_cache_min_ltimes)
             if tenant is not None:
                 self.local_layout_state[tenant_name] = layout_state
+                self.tenant_providers[tenant_name] = providers
             else:
-                with suppress(KeyError):
-                    del self.local_layout_state[tenant_name]
+                self.tenant_providers.pop(tenant_name, None)
+                self.local_layout_state.pop(tenant_name, None)
+
+    def createZKContext(self, lock, log):
+        # TODO: consider adding a stop event to zuul-web
+        return ZKContext(self.zk_client, lock, None, log)
