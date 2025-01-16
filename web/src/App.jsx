@@ -93,13 +93,13 @@ class App extends React.Component {
     isTenantDropdownOpen: false,
   }
 
-  renderMenu() {
+  renderMenu(menu) {
     const { tenant } = this.props
     if (tenant.name) {
       return (
         <Nav aria-label="Nav" variant="horizontal">
           <NavList>
-            {this.menu.filter(item => item.title).map(item => (
+            {menu.filter(item => item.title).map(item => (
               <NavItem itemId={item.to} key={item.to}>
                 <NavLink
                   to={tenant.linkPrefix + item.to}
@@ -127,7 +127,7 @@ class App extends React.Component {
              user.isFetching)
   }
 
-  renderContent = () => {
+  renderContent = (menu) => {
     const { tenant, auth, user } = this.props
     const allRoutes = []
 
@@ -150,7 +150,7 @@ class App extends React.Component {
     if (auth.info.read_protected && user.scope.length<1) {
       return <AuthRequiredPage/>
     }
-    this.menu
+    menu
       // Do not include '/tenants' route in white-label setup
       .filter(item =>
         (tenant.whiteLabel && !item.globalRoute) || !tenant.whiteLabel)
@@ -233,11 +233,6 @@ class App extends React.Component {
         this.props.dispatch(fetchTenantStatusAction(tenant))
       }
     }
-  }
-
-  constructor() {
-    super()
-    this.menu = routes()
   }
 
   handleKebabDropdownToggle = (isKebabDropdownOpen) => {
@@ -392,7 +387,8 @@ class App extends React.Component {
     const { isKebabDropdownOpen } = this.state
     const { notifications, tenantStatus, tenant, info, auth } = this.props
 
-    const nav = this.renderMenu()
+    const menu = routes(auth.info)
+    const nav = this.renderMenu(menu)
 
     const kebabDropdownItems = []
     if (!info.tenant) {
@@ -515,7 +511,7 @@ class App extends React.Component {
         {notifications.length > 0 && this.renderNotifications(notifications)}
         <Page className="zuul-page" header={pageHeader} tertiaryNav={nav}>
           <ErrorBoundary>
-            {this.renderContent()}
+            {this.renderContent(menu)}
           </ErrorBoundary>
         </Page>
       </React.Fragment>

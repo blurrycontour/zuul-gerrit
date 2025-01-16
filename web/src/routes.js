@@ -17,6 +17,9 @@ import FreezeJobPage from './pages/FreezeJob'
 import ChangeStatusPage from './pages/ChangeStatus'
 import ProjectPage from './pages/Project'
 import ProjectsPage from './pages/Projects'
+import ProvidersPage from './pages/Providers'
+import ProviderPage from './pages/Provider'
+import ProviderImagePage from './pages/ProviderImage'
 import JobPage from './pages/Job'
 import JobsPage from './pages/Jobs'
 import LabelsPage from './pages/Labels'
@@ -40,133 +43,157 @@ import PipelineOverviewPage from './pages/PipelineOverview'
 // Object with a title are created in the menu.
 // Object with globalRoute are not tenant scoped.
 // Remember to update the api getHomepageUrl subDir list for route with params
-const routes = () => [
-  {
-    title: 'Status',
-    to: '/status',
-    component: PipelineOverviewPage,
-  },
-  {
-    title: 'Projects',
-    to: '/projects',
-    component: ProjectsPage
-  },
-  {
-    title: 'Jobs',
-    to: '/jobs',
-    component: JobsPage
-  },
-  {
-    title: 'Labels',
-    to: '/labels',
-    component: LabelsPage
-  },
-  {
-    title: 'Nodes',
-    to: '/nodes',
-    component: NodesPage
-  },
-  {
-    title: 'Autoholds',
-    to: '/autoholds',
-    component: AutoholdsPage
-  },
-  {
-    title: 'Semaphores',
-    to: '/semaphores',
-    component: SemaphoresPage
-  },
-  {
-    title: 'Builds',
-    to: '/builds',
-    component: BuildsPage
-  },
-  {
-    title: 'Buildsets',
-    to: '/buildsets',
-    component: BuildsetsPage
-  },
-  {
-    to: '/freeze-job',
-    component: FreezeJobPage
-  },
-  {
-    to: '/status/change/:changeId',
-    component: ChangeStatusPage
-  },
-  {
-    to: '/status/pipeline/:pipelineName',
-    component: PipelineDetailsPage,
-  },
-  {
-    to: '/stream/:buildId',
-    component: StreamPage
-  },
-  {
-    to: '/project/:projectName*',
-    component: ProjectPage
-  },
-  {
-    to: '/job/:jobName',
-    component: JobPage
-  },
-  {
-    to: '/build/:buildId',
-    component: BuildPage,
-    props: { 'activeTab': 'results' },
-  },
-  {
-    to: '/build/:buildId/artifacts',
-    component: BuildPage,
-    props: { 'activeTab': 'artifacts' },
-  },
-  {
-    to: '/build/:buildId/logs',
-    component: BuildPage,
-    props: { 'activeTab': 'logs' },
-  },
-  {
-    to: '/build/:buildId/console',
-    component: BuildPage,
-    props: { 'activeTab': 'console' },
-  },
-  {
-    to: '/build/:buildId/log/:file*',
-    component: BuildPage,
-    props: { 'activeTab': 'logs', 'logfile': true },
-  },
-  {
-    to: '/buildset/:buildsetId',
-    component: BuildsetPage
-  },
-  {
-    to: '/autohold/:requestId',
-    component: AutoholdPage
-  },
-  {
-    to: '/semaphore/:semaphoreName',
-    component: SemaphorePage
-  },
-  {
-    to: '/config-errors',
-    component: ConfigErrorsPage,
-  },
-  {
-    to: '/tenants',
-    component: TenantsPage,
-    globalRoute: true
-  },
-  {
-    to: '/openapi',
-    component: OpenApiPage,
-    noTenantPrefix: true,
-  },
-  {
-    to: '/components',
-    component: ComponentsPage,
-    noTenantPrefix: true,
-  },
-  // auth_callback is handled in App.jsx
-]
+const routes = (info) => {
+  const ret = [
+    {
+      title: 'Status',
+      to: '/status',
+      component: PipelineOverviewPage,
+    },
+    {
+      title: 'Projects',
+      to: '/projects',
+      component: ProjectsPage
+    },
+    {
+      title: 'Jobs',
+      to: '/jobs',
+      component: JobsPage
+    },
+    {
+      title: 'Labels',
+      to: '/labels',
+      component: LabelsPage
+    },
+    {
+      title: 'Nodes',
+      to: '/nodes',
+      component: NodesPage
+    },
+    {
+      title: 'Autoholds',
+      to: '/autoholds',
+      component: AutoholdsPage
+    },
+    {
+      title: 'Semaphores',
+      to: '/semaphores',
+      component: SemaphoresPage
+    },
+    {
+      title: 'Builds',
+      to: '/builds',
+      component: BuildsPage
+    },
+    {
+      title: 'Buildsets',
+      to: '/buildsets',
+      component: BuildsetsPage
+    },
+    {
+      to: '/freeze-job',
+      component: FreezeJobPage
+    },
+    {
+      to: '/status/change/:changeId',
+      component: ChangeStatusPage
+    },
+    {
+      to: '/status/pipeline/:pipelineName',
+      component: PipelineDetailsPage,
+    },
+    {
+      to: '/stream/:buildId',
+      component: StreamPage
+    },
+    {
+      to: '/project/:projectName*',
+      component: ProjectPage
+    },
+    {
+      to: '/job/:jobName',
+      component: JobPage
+    },
+    {
+      to: '/build/:buildId',
+      component: BuildPage,
+      props: { 'activeTab': 'results' },
+    },
+    {
+      to: '/build/:buildId/artifacts',
+      component: BuildPage,
+      props: { 'activeTab': 'artifacts' },
+    },
+    {
+      to: '/build/:buildId/logs',
+      component: BuildPage,
+      props: { 'activeTab': 'logs' },
+    },
+    {
+      to: '/build/:buildId/console',
+      component: BuildPage,
+      props: { 'activeTab': 'console' },
+    },
+    {
+      to: '/build/:buildId/log/:file*',
+      component: BuildPage,
+      props: { 'activeTab': 'logs', 'logfile': true },
+    },
+    {
+      to: '/buildset/:buildsetId',
+      component: BuildsetPage
+    },
+    {
+      to: '/autohold/:requestId',
+      component: AutoholdPage
+    },
+    {
+      to: '/semaphore/:semaphoreName',
+      component: SemaphorePage
+    },
+    {
+      to: '/config-errors',
+      component: ConfigErrorsPage,
+    },
+    {
+      to: '/tenants',
+      component: TenantsPage,
+      globalRoute: true
+    },
+    {
+      to: '/openapi',
+      component: OpenApiPage,
+      noTenantPrefix: true,
+    },
+    {
+      to: '/components',
+      component: ComponentsPage,
+      noTenantPrefix: true,
+    },
+    // auth_callback is handled in App.jsx
+  ]
+  if (info && info.niz) {
+    ret.push(
+      {
+        title: 'Providers',
+        to: '/providers',
+        component: ProvidersPage,
+      }
+    )
+    ret.push(
+      {
+        to: '/provider/:providerName',
+        component: ProviderPage,
+      }
+    )
+    ret.push(
+      {
+        to: '/provider/:providerName/image/:imageName',
+        component: ProviderImagePage,
+      }
+    )
+  }
+  return ret
+}
 
 export { routes }
