@@ -467,72 +467,7 @@ class Attributes(object):
         return self.__dict__
 
 
-class Freezable(object):
-    """A mix-in class so that an object can be made immutable"""
-
-    def __init__(self):
-        super(Freezable, self).__setattr__('_frozen', False)
-
-    def freeze(self):
-        """Make this object immutable"""
-        def _freezelist(l):
-            for i, v in enumerate(l):
-                if isinstance(v, Freezable):
-                    if not v._frozen:
-                        v.freeze()
-                elif isinstance(v, dict):
-                    l[i] = _freezedict(v)
-                elif isinstance(v, list):
-                    l[i] = _freezelist(v)
-            return tuple(l)
-
-        def _freezedict(d):
-            for k, v in list(d.items()):
-                if isinstance(v, Freezable):
-                    if not v._frozen:
-                        v.freeze()
-                elif isinstance(v, dict):
-                    d[k] = _freezedict(v)
-                elif isinstance(v, list):
-                    d[k] = _freezelist(v)
-            return types.MappingProxyType(d)
-
-        _freezedict(self.__dict__)
-        # Ignore return value from freezedict because __dict__ can't
-        # be a mappingproxy.
-        self._frozen = True
-
-    @staticmethod
-    def thaw(data):
-        """Thaw the supplied dictionary"""
-        def _thawlist(l):
-            l = list(l)
-            for i, v in enumerate(l):
-                if isinstance(v, (types.MappingProxyType, dict)):
-                    l[i] = _thawdict(v)
-                elif isinstance(v, (tuple, list)):
-                    l[i] = _thawlist(v)
-            return l
-
-        def _thawdict(d):
-            d = dict(d)
-            for k, v in list(d.items()):
-                if isinstance(v, (types.MappingProxyType, dict)):
-                    d[k] = _thawdict(v)
-                elif isinstance(v, (tuple, list)):
-                    d[k] = _thawlist(v)
-            return d
-
-        return _thawdict(data)
-
-    def __setattr__(self, name, value):
-        if self._frozen:
-            raise Exception("Unable to modify frozen object %s" %
-                            (repr(self),))
-        super(Freezable, self).__setattr__(name, value)
-
-
-class ConfigObject(Freezable):
+class ConfigObject:
     def __init__(self):
         super().__init__()
         self.source_context = None
@@ -1845,7 +1780,7 @@ class ProviderConfig(ConfigObject):
         return ret
 
     def flattenConfig(self, layout):
-        config = copy.deepcopy(Freezable.thaw(self.config))
+        config = copy.deepcopy(self.config)
         parent_name = self.section
         previous_section = None
         while parent_name:
@@ -1857,8 +1792,7 @@ class ProviderConfig(ConfigObject):
                 raise Exception(
                     f'The section "{previous_section.name}" references a '
                     'section in a different project.')
-            parent_config = copy.deepcopy(Freezable.thaw(
-                parent_section.config))
+            parent_config = copy.deepcopy(parent_section.config)
             config = ProviderConfig._mergeDict(parent_config, config)
             parent_name = parent_section.parent
             previous_section = parent_section
@@ -3789,8 +3723,6 @@ class Job(ConfigObject):
             # If this is a config object, it's frozen, so it's
             # safe to shallow copy.
             v = getattr(self, k)
-            if isinstance(v, (dict, types.MappingProxyType)):
-                v = Freezable.thaw(v)
             # On a frozen job, parent=None means a base job
             if v is self.BASE_JOB_MARKER:
                 v = None
@@ -3838,7 +3770,7 @@ class Job(ConfigObject):
         # Make a hash of the job configuration for determining whether
         # it has been updated.
         hasher = hashlib.sha256()
-        job_dict = Freezable.thaw(self.toDict(tenant))
+        job_dict = self.toDict(tenant)
         # Ignore changes to file matchers since they don't affect
         # the content of the job.
         for attr in ['files', 'irrelevant_files',
@@ -9056,9 +8988,7 @@ class Layout(object):
         # Return an implied semaphore with max=1
         # TODO: consider deprecating implied semaphores to avoid typo
         # config errors
-        semaphore = Semaphore(semaphore_name)
-        semaphore.freeze()
-        return semaphore
+        return Semaphore(semaphore_name)
 
     def addQueue(self, queue):
         self._addIdenticalObject('Queue', self.queues, queue)
