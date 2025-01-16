@@ -53,7 +53,7 @@ ToolbarStatsGroup.propTypes = {
   children: PropTypes.array.isRequired,
 }
 
-function ToolbarStatsItem({ name, value, tooltipContent }) {
+function ToolbarStatsItem({ name, value, tooltipContent, prefixName=false}) {
   return (
     <ToolbarItem className="zuul-tenant-stats-item">
       <Tooltip
@@ -65,12 +65,25 @@ function ToolbarStatsItem({ name, value, tooltipContent }) {
         position="bottom"
       >
         <Label>
-          <span className="zuul-tenant-stats-item__value">
-            {value}
-          </span>
-          <span className="zuul-tenant-stats-item__name">
-            {name}
-          </span>
+          {prefixName ? (
+            <>
+              <span className="zuul-tenant-stats-item__name">
+                {name}
+              </span>
+              <span className="zuul-tenant-stats-item__value_prefix">
+                {value}
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="zuul-tenant-stats-item__value">
+                {value}
+              </span>
+              <span className="zuul-tenant-stats-item__name">
+                {name}
+              </span>
+            </>
+          )}
         </Label>
       </Tooltip>
     </ToolbarItem>
@@ -81,6 +94,7 @@ ToolbarStatsItem.propTypes = {
   name: PropTypes.string.isRequired,
   value: PropTypes.string.isRequired,
   tooltipContent: PropTypes.object.isRequired,
+  prefixName: PropTypes.bool,
 }
 
 function FilterToolbar(props) {
