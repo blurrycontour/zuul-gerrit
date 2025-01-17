@@ -50,6 +50,23 @@
       "message": "recheck\nunrelated",
       "revId": "e6c71c20728ca4a557c4c0e3f43881305886794a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9836ccd5_20fae409",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 1051,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2025-01-17T14:58:27Z",
+      "side": 1,
+      "message": "That makes it hard for a job to do something accurately. In the changelog you indicate that this can be used to setup a debug environment, so could this setup be performed when the hold is actually happening? Perhaps this could be an extra playbook that the executor would perform before handing over the held node?",
+      "revId": "e6c71c20728ca4a557c4c0e3f43881305886794a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
