@@ -301,7 +301,7 @@ a.refresh {
 
 .zuul-pipeline-link {
     color: #363636;
-    font-size: var(--pf-global--FontSize--xl);
+    font-size: var(--pf-global--FontSize--lg);
 }
 
 .zuul-item-square {
