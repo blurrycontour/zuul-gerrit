@@ -182,16 +182,18 @@ class ExecutorClient(object):
             # we prevent the executor server from picking up the build so we
             # can cancel it before it will run.
             if self.executor_api.lock(build_request, blocking=False):
-                log.debug(
-                    "Canceling build %s directly because it is not locked by "
-                    "any executor",
-                    build_request,
-                )
                 # Mark the build request as complete and forward the event to
                 # the scheduler, so the executor server doesn't pick up the
                 # request. The build will be deleted from the scheduler when it
                 # picks up the BuildCompletedEvent.
                 try:
+                    if build_request.state == BuildRequest.COMPLETED:
+                        log.debug("Build request already completed; skipping")
+                        return False
+                    log.debug(
+                        "Canceling build %s directly because it is not locked"
+                        "by any executor", build_request,
+                    )
                     build_request.state = BuildRequest.COMPLETED
                     self.executor_api.update(build_request)
 
