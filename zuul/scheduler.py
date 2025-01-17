@@ -3231,6 +3231,8 @@ class Scheduler(threading.Thread):
             art_uuid, image.canonical_name, image_format, build.uuid,
             artifact_url)
         with self.createZKContext(None, self.log) as ctx:
+            # This starts with an unknown state, then
+            # createImageUploads will set it to ready.
             return ImageBuildArtifact.new(
                 ctx,
                 uuid=art_uuid,
@@ -3285,7 +3287,13 @@ class Scheduler(threading.Thread):
                         config_hash=config_hash,
                         timestamp=time.time(),
                         validated=iba.validated,
+                        _state=ImageUpload.State.PENDING,
+                        state_time=time.time(),
                     )
+                # Only mark the iba as ready once all the upload
+                # records for it have been created.
+                with iba.activeContext(ctx):
+                    iba.state = iba.State.READY
 
     def validateImageUpload(self, image_upload_uuid):
         with self.createZKContext(None, self.log) as ctx:
