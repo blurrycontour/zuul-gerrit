@@ -67,6 +67,24 @@
       "message": "That makes it hard for a job to do something accurately. In the changelog you indicate that this can be used to setup a debug environment, so could this setup be performed when the hold is actually happening? Perhaps this could be an extra playbook that the executor would perform before handing over the held node?",
       "revId": "e6c71c20728ca4a557c4c0e3f43881305886794a",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55aa0be3_859417bb",
+        "filename": "doc/source/job-content.rst",
+        "patchSetId": 12
+      },
+      "lineNbr": 1051,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-01-17T19:42:44Z",
+      "side": 1,
+      "message": "The issue is that the check is done by the executor after the playbook\u0027s execution (it\u0027s in the completeBuild method). So there are two ways we could ensure accuracy:\n\n1. Add some kind of lock on an autohold request at the beginning of a build, ensuring that the build will consume that autohold if it needs to be held\n2. Add a job property defining a playbook to run after the post playbook, in case a autohold triggers.\n\nI think 2 is much harder to implement and would probably require a spec first. 1 is not trivial and would change the behavior of autoholds a bit (all the autoholds might get locked on passing builds and prevent failures to be held).\n\nFor the issue I\u0027d like to solve, knowing the job might autohold (and doing so from the playbook instead of querying the REST API) is good enough.",
+      "parentUuid": "9836ccd5_20fae409",
+      "revId": "e6c71c20728ca4a557c4c0e3f43881305886794a",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
