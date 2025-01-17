@@ -2588,9 +2588,6 @@ class Scheduler(threading.Thread):
 
     def process_pipeline_trigger_queue(self, tenant, tenant_lock, pipeline):
         for event in self.pipeline_trigger_events[tenant.name][pipeline.name]:
-            if self._stopped:
-                return
-            self.abortIfPendingReconfig(tenant_lock)
             log = get_annotated_logger(self.log, event.zuul_event_id)
             if not isinstance(event, SupercedeEvent):
                 local_state = self.local_layout_state[tenant.name]
@@ -2618,6 +2615,9 @@ class Scheduler(threading.Thread):
                 self.pipeline_trigger_events[tenant.name][
                     pipeline.name
                 ].ack(event)
+            if self._stopped:
+                return
+            self.abortIfPendingReconfig(tenant_lock)
         self.pipeline_trigger_events[tenant.name][pipeline.name].cleanup()
 
     def _process_trigger_event(self, tenant, pipeline, event):
@@ -2725,9 +2725,6 @@ class Scheduler(threading.Thread):
         for event in self.pipeline_management_events[tenant.name][
             pipeline.name
         ]:
-            if self._stopped:
-                return
-            self.abortIfPendingReconfig(tenant_lock)
             log = get_annotated_logger(self.log, event.zuul_event_id)
             log.debug("Processing management event %s", event)
             try:
@@ -2737,6 +2734,9 @@ class Scheduler(threading.Thread):
                 self.pipeline_management_events[tenant.name][
                     pipeline.name
                 ].ack(event)
+            if self._stopped:
+                return
+            self.abortIfPendingReconfig(tenant_lock)
         self.pipeline_management_events[tenant.name][pipeline.name].cleanup()
 
     def _process_management_event(self, event):
@@ -2764,9 +2764,6 @@ class Scheduler(threading.Thread):
 
     def process_pipeline_result_queue(self, tenant, tenant_lock, pipeline):
         for event in self.pipeline_result_events[tenant.name][pipeline.name]:
-            if self._stopped:
-                return
-            self.abortIfPendingReconfig(tenant_lock)
             log = get_annotated_logger(
                 self.log,
                 event=getattr(event, "zuul_event_id", None),
@@ -2780,6 +2777,9 @@ class Scheduler(threading.Thread):
                 self.pipeline_result_events[tenant.name][
                     pipeline.name
                 ].ack(event)
+            if self._stopped:
+                return
+            self.abortIfPendingReconfig(tenant_lock)
         self.pipeline_result_events[tenant.name][pipeline.name].cleanup()
 
     def _process_result_event(self, event, pipeline):
