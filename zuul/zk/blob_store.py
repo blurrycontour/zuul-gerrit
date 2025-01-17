@@ -50,7 +50,7 @@ class BlobStore:
 
     def _retry(self, context, func, *args, max_tries=-1, **kw):
         kazoo_retry = KazooRetry(max_tries=max_tries,
-                                 interrupt=context.sessionIsInvalid,
+                                 interrupt=context.shouldAbortRetry,
                                  delay=self._retry_interval, backoff=0,
                                  ignore_expire=False)
         try:
