@@ -14,6 +14,7 @@
 // under the License.
 
 import React, { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
   Button,
@@ -30,10 +31,18 @@ import {
   TableBody,
   TableVariant,
 } from '@patternfly/react-table'
+import { fetchImages } from '../../actions/images'
+import { fetchProviders } from '../../actions/providers'
+import { addNotification, addApiError } from '../../actions/notifications'
+import { deleteImageUpload } from '../../api'
 
 function ImageUploadTable(props) {
   const { build, uploads, fetching } = props
   const [showDeleteUploadModal, setShowDeleteUploadModal] = useState(false)
+  const [pendingDeleteRow, setPendingDeleteRow] = useState(null)
+  const tenant = useSelector((state) => state.tenant)
+  const user = useSelector((state) => state.user)
+  const dispatch = useDispatch()
 
   const columns = [
     {
@@ -60,6 +69,7 @@ function ImageUploadTable(props) {
 
   function createImageUploadRow(upload) {
     return {
+      _uuid: upload.uuid,
       canDelete: build.build_tenant,
       cells: [
         {
@@ -101,15 +111,20 @@ function ImageUploadTable(props) {
   }
 
   const actionResolver = (rowData) => {
-    if (!rowData.canDelete) {
-      return []
+    if (rowData.canDelete &&
+        user.isAdmin &&
+        user.scope.indexOf(tenant.name) !== -1) {
+      return [
+        {
+          title: 'Delete upload',
+          onClick: () => {
+            setPendingDeleteRow(rowData)
+            setShowDeleteUploadModal(true)
+          }
+        },
+      ]
     }
-    return [
-       {
-         title: 'Delete upload',
-         onClick: () => {setShowDeleteUploadModal(true)}
-       },
-    ]
+    return []
   }
 
   function renderDeleteUploadModal() {
@@ -122,7 +137,25 @@ function ImageUploadTable(props) {
         onClose={() => { setShowDeleteUploadModal(false) }}
         actions={[
           <Button key="confirm" variant="primary"
-                  onClick={() => {setShowDeleteUploadModal(false) }}>
+                  onClick={() => {
+                    setShowDeleteUploadModal(false)
+                    deleteImageUpload(tenant.apiPrefix,
+                                      pendingDeleteRow._uuid
+                                     ).then(() => {
+                      dispatch(addNotification(
+                        {
+                          text: 'Delete successful.',
+                          type: 'success',
+                          status: '',
+                          url: '',
+                        }))
+                      dispatch(fetchProviders(tenant))
+                      dispatch(fetchImages(tenant))
+                    })
+                      .catch(error => {
+                        dispatch(addApiError(error))
+                      })
+                  }}>
             Confirm
           </Button>,
           <Button key="cancel" variant="link"

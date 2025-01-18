@@ -1952,14 +1952,19 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options()
+    @cherrypy.tools.handle_options(allowed_methods=['DELETE'])
     @cherrypy.tools.check_tenant_auth(require_admin=True)
     def image_build_artifact_delete(self, tenant_name, tenant, auth,
                                     artifact_id):
         iba = self.zuulweb.image_build_registry.getItem(artifact_id)
+
+        if not iba or tenant.name != iba.build_tenant_name:
+            raise cherrypy.HTTPError(
+                404, "Image build artifact not found in tenant")
+
         self.log.info(f'User {auth.uid} requesting '
                       'image-build-artifact-delete on '
-                      f'{iba}')
+                      f'{artifact_id}')
 
         # We just let the LockException propagate up if we can't lock
         # it.
@@ -1971,12 +1976,22 @@ class ZuulWebAPI(object):
 
     @cherrypy.expose
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
-    @cherrypy.tools.handle_options()
+    @cherrypy.tools.handle_options(allowed_methods=['DELETE'])
     @cherrypy.tools.check_tenant_auth(require_admin=True)
     def image_upload_delete(self, tenant_name, tenant, auth, upload_id):
         upload = self.zuulweb.image_upload_registry.getItem(upload_id)
+        if upload:
+            iba = self.zuulweb.image_build_registry.getItem(
+                upload.artifact_uuid)
+        else:
+            iba = None
+
+        if not iba or tenant.name != iba.build_tenant_name:
+            raise cherrypy.HTTPError(
+                404, "Image upload not found in tenant")
+
         self.log.info(f'User {auth.uid} requesting image-upload-delete on '
-                      f'{upload}')
+                      f'{upload_id}')
 
         # We just let the LockException propagate up if we can't lock
         # it.
@@ -2707,13 +2722,13 @@ class ZuulWeb(object):
                           '/api/tenant/{tenant_name}/'
                           'image-build-artifact/{artifact_id}',
                           controller=api,
-                          conditions=dict(method=['DELETE']),
+                          conditions=dict(method=['DELETE', 'OPTIONS']),
                           action='image_build_artifact_delete')
         route_map.connect('api',
                           '/api/tenant/{tenant_name}/'
                           'image-upload/{upload_id}',
                           controller=api,
-                          conditions=dict(method=['DELETE']),
+                          conditions=dict(method=['DELETE', 'OPTIONS']),
                           action='image_upload_delete')
         route_map.connect('api', '/api/tenant/{tenant_name}/labels',
                           controller=api, action='labels')
