@@ -329,7 +329,7 @@ class StreamFollower:
                 continue
             t.join(10)
             if t.is_alive():
-                with Console(self.zuul_log_id) as console:
+                with Console(self.log_uuid) as console:
                     console.addLine("[Zuul] standard output/error still open "
                                     "after child exited")
         self.console.close()
