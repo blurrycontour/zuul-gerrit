@@ -1533,9 +1533,12 @@ class AnsibleJob(object):
                         'BuildCloneRepo',
                         attributes={'connection': project['connection'],
                                     'project': project['name']}):
+                    esc = not self.checkout_workspace_repos
                     repo = self.workspace_merger.getRepo(
                         project['connection'],
-                        project['name'])
+                        project['name'],
+                        empty_sparse_checkout=esc,
+                    )
                 repos[project['canonical_name']] = repo
 
             # The commit ID of the original item (before merging).  Used
@@ -1806,18 +1809,25 @@ class AnsibleJob(object):
         p = args['zuul']['projects'][project['canonical_name']]
         selected_ref = p['checkout']
 
+        lines = filecomments.extractLines(fc)
+        sparse_paths = set()
+        for (filename, lineno) in lines:
+            # Gerrit has several special file names (like /COMMIT_MSG) that
+            # start with "/" and should not have mapping done on them
+            if filename[0] == "/":
+                continue
+            sparse_paths.add(os.path.dirname(filename))
+
         self.log.info("Checking out %s %s for line mapping",
                       project['canonical_name'], selected_ref)
         try:
-            repo.checkout(selected_ref)
+            repo.checkout(selected_ref, sparse_paths=list(sparse_paths))
         except Exception:
             # If checkout fails, abort
             self.log.exception("Error checking out repo for line mapping")
             warnings.append("Job %s: unable to check out repo "
                             "for file comments" % (args['zuul']['job']))
             return
-
-        lines = filecomments.extractLines(fc)
 
         new_lines = {}
         for (filename, lineno) in lines:
