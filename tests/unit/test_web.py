@@ -1590,6 +1590,62 @@ class TestWebProviders(LauncherBaseTestCase, WebMixin):
             if 'build_artifacts' not in data[1]:
                 break
 
+    @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
+    @return_data(
+        'build-debian-local-image',
+        'refs/heads/master',
+        LauncherBaseTestCase.debian_return_data,
+    )
+    @return_data(
+        'build-ubuntu-local-image',
+        'refs/heads/master',
+        LauncherBaseTestCase.ubuntu_return_data,
+    )
+    @mock.patch('zuul.driver.aws.awsendpoint.AwsProviderEndpoint.uploadImage',
+                return_value="test_external_id")
+    def test_web_image_post(self, mock_uploadImage):
+        self.waitUntilSettled()
+        self.startWebServer()
+        self.executor_server.hold_jobs_in_build = False
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+
+        resp = self.get_url('api/tenant/tenant-one/images')
+        data = resp.json()
+        self.assertEqual(4, len(data))
+        self.assertNotIn('build_artifacts', data[0])
+        self.assertEqual(1, len(data[1]['build_artifacts']))
+        self.assertEqual(1, len(data[2]['build_artifacts']))
+        self.assertEqual(1, len(data[1]['build_artifacts'][0]['uploads']))
+        self.assertEqual(1, len(data[2]['build_artifacts'][0]['uploads']))
+        # Test that unauthenticated access fails
+        resp = self.post_url(
+            "api/tenant/tenant-one/image/ubuntu-local/build"
+        )
+        self.assertEqual(401, resp.status_code, resp.text)
+        # Do it again with auth
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': int(time.time()) + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256')
+        resp = self.post_url(
+            "api/tenant/tenant-one/image/ubuntu-local/build",
+            headers={'Authorization': 'Bearer %s' % token})
+        self.assertEqual(200, resp.status_code, resp.text)
+        self.waitUntilSettled("image rebuild")
+        self.assertHistory([
+            dict(name='build-debian-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+            dict(name='build-ubuntu-local-image', result='SUCCESS'),
+        ], ordered=False)
+
 
 class TestWebStatusDisplayBranch(BaseTestWeb):
     tenant_config_file = 'config/change-queues/main.yaml'
