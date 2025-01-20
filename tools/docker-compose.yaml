@@ -3,7 +3,7 @@ version: "3"
 services:
   mysql:
     container_name: zuul-test-mysql
-    image: mysql:8.0
+    image: docker.io/library/mysql:8.0
     environment:
       - MYSQL_ROOT_PASSWORD=insecure_worker
     ports:
@@ -15,7 +15,7 @@ services:
 
   postgres:
     container_name: zuul-test-postgres
-    image: postgres
+    image: docker.io/library/postgres
     environment:
       - POSTGRES_USER=openstack_citest
       - POSTGRES_PASSWORD=openstack_citest
@@ -27,7 +27,7 @@ services:
   zookeeper:
     container_name: zuul-test-zookeeper
     user: "${USER_ID}"
-    image: zookeeper
+    image: docker.io/library/zookeeper
     environment:
       - ZOO_AUTOPURGE_PURGEINTERVAL=1
       - ZOO_LOG4J_PROP=WARN
