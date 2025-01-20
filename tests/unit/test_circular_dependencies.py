@@ -1850,6 +1850,20 @@ class TestGerritCircularDependencies(ZuulTestCase):
         ], ordered=False)
         self.assertEqual(len(self.fake_nodepool.history), 0)
 
+    @simple_layout('layouts/job-dedup-branches.yaml')
+    def test_job_deduplication_job_branches(self):
+        # Make sure that jobs with different branch matchers can still
+        # be deduplicated
+        self._test_job_deduplication()
+        self.assertHistory([
+            dict(name="project1-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+            dict(name="project2-job", result="SUCCESS", changes="2,1 1,1"),
+            # This is deduplicated
+            # dict(name="common-job", result="SUCCESS", changes="2,1 1,1"),
+        ], ordered=False)
+        self.assertEqual(len(self.fake_nodepool.history), 0)
+
     @simple_layout('layouts/job-dedup-child-jobs.yaml')
     def test_job_deduplication_child_jobs(self):
         # Test that child jobs of deduplicated parents are
