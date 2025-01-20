@@ -3123,7 +3123,8 @@ class FrozenJob(zkobject.ZKObject):
         if self.name != other.name:
             return False
         for k in self.attributes:
-            if k in ['inheritance_path', 'waiting_status', 'queued']:
+            if k in ['config_hash', 'inheritance_path', 'waiting_status',
+                     'queued']:
                 continue
             if getattr(self, k) != getattr(other, k):
                 return False
