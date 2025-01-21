@@ -480,11 +480,23 @@ class TestJob(BaseTestCase):
             job.secrets[run_idx]['encrypted_data'])
         self.assertEqual(run_secret, secret2_data)
 
+    def _make_source(self, jobname):
+        return {
+            'type': 'job',
+            'name': jobname,
+            'source_context': {
+                'project': {
+                    'canonical_name': 'git.example.com/project',
+                },
+                'branch': 'master',
+                'path': 'test',
+            }}
+
     def _test_job_override_control(self, attr, job_attr,
                                    default, default_value,
                                    inherit, inherit_value,
                                    override, override_value,
-                                   errors,
+                                   errors, variable_values,
                                    ):
         # Default behavior
         data = configloader.safe_load_yaml(default, self.context)
@@ -492,6 +504,14 @@ class TestJob(BaseTestCase):
         child = self.pcontext.job_parser.fromYaml(data[1]['job'])
         job = parent.copy()
         job.applyVariant(child, self.layout, None)
+        if variable_values:
+            # Test variable value equality
+            self.assertEqual(default_value.flattenValues(),
+                             getattr(job, job_attr).flattenValues())
+            self.assertEqual(default_value.flattenSources(None),
+                             getattr(job, job_attr).flattenSources(None))
+        # Test value equality (the above assertions are easier to
+        # debug, so test this later).
         self.assertEqual(default_value, getattr(job, job_attr))
 
         # Explicit inherit
@@ -500,6 +520,11 @@ class TestJob(BaseTestCase):
         child = self.pcontext.job_parser.fromYaml(data[1]['job'])
         job = parent.copy()
         job.applyVariant(child, self.layout, None)
+        if variable_values:
+            self.assertEqual(inherit_value.flattenValues(),
+                             getattr(job, job_attr).flattenValues())
+            self.assertEqual(inherit_value.flattenSources(None),
+                             getattr(job, job_attr).flattenSources(None))
         self.assertEqual(inherit_value, getattr(job, job_attr))
 
         # Explicit override
@@ -508,6 +533,11 @@ class TestJob(BaseTestCase):
         child = self.pcontext.job_parser.fromYaml(data[1]['job'])
         job = parent.copy()
         job.applyVariant(child, self.layout, None)
+        if variable_values:
+            self.assertEqual(override_value.flattenValues(),
+                             getattr(job, job_attr).flattenValues())
+            self.assertEqual(override_value.flattenSources(None),
+                             getattr(job, job_attr).flattenSources(None))
         self.assertEqual(override_value, getattr(job, job_attr))
 
         # Make sure we can't put the override in the wrong place
@@ -519,7 +549,8 @@ class TestJob(BaseTestCase):
     def _test_job_override_control_set(
             self, attr, job_attr=None,
             default_override=False,
-            value_factory=lambda values: {v for v in values}):
+            value_factory=lambda values: {v for v in values},
+            variable_values=False):
         if job_attr is None:
             job_attr = attr
         default = textwrap.dedent(
@@ -569,7 +600,7 @@ class TestJob(BaseTestCase):
                                         default, default_value,
                                         inherit, inherit_value,
                                         override, override_value,
-                                        errors)
+                                        errors, variable_values)
 
     def test_job_override_control_tags(self):
         self._test_job_override_control_set('tags')
@@ -613,7 +644,8 @@ class TestJob(BaseTestCase):
 
     def _test_job_override_control_dict(
             self, attr, job_attr=None,
-            default_override=False):
+            default_override=False,
+            variable_values=True):
         if job_attr is None:
             job_attr = attr
         default = textwrap.dedent(
@@ -639,7 +671,11 @@ class TestJob(BaseTestCase):
                 {attr}: !inherit
                    child: 2
             """)
-        inherit_value = {'parent': 1, 'child': 2}
+        parent_value = model.VariableValue(1, self._make_source('parent'))
+        child_value = model.VariableValue(2, self._make_source('child'))
+        inherit_value = model.VariableValue(
+            {'parent': parent_value, 'child': child_value},
+            self._make_source('parent'))
 
         override = textwrap.dedent(
             f"""
@@ -652,7 +688,9 @@ class TestJob(BaseTestCase):
                 {attr}: !override
                    child: 2
             """)
-        override_value = {'child': 2}
+        override_value = model.VariableValue(
+            {'child': child_value},
+            self._make_source('child'))
 
         if default_override:
             default_value = override_value
@@ -679,7 +717,7 @@ class TestJob(BaseTestCase):
                                         default, default_value,
                                         inherit, inherit_value,
                                         override, override_value,
-                                        errors)
+                                        errors, variable_values)
 
     def test_job_override_control_vars(self):
         self._test_job_override_control_dict(
@@ -691,7 +729,8 @@ class TestJob(BaseTestCase):
 
     def _test_job_override_control_host_dict(
             self, attr, job_attr=None,
-            default_override=False):
+            default_override=False,
+            variable_values=True):
         if job_attr is None:
             job_attr = attr
         default = textwrap.dedent(
@@ -721,8 +760,13 @@ class TestJob(BaseTestCase):
                    host:
                      child: 2
             """)
-        inherit_value = {'host': {'parent': 1, 'child': 2}}
-
+        parent_value = model.VariableValue(1, self._make_source('parent'))
+        child_value = model.VariableValue(2, self._make_source('child'))
+        host_value = model.VariableValue(
+            {'parent': parent_value, 'child': child_value},
+            self._make_source('parent'))
+        inherit_value = model.VariableValue(
+            {'host': host_value}, self._make_source('parent'))
         override = textwrap.dedent(
             f"""
             - job:
@@ -736,7 +780,11 @@ class TestJob(BaseTestCase):
                    host:
                      child: 2
             """)
-        override_value = {'host': {'child': 2}}
+        host_value = model.VariableValue(
+            {'child': child_value},
+            self._make_source('child'))
+        override_value = model.VariableValue(
+            {'host': host_value}, self._make_source('child'))
 
         if default_override:
             default_value = override_value
@@ -773,7 +821,7 @@ class TestJob(BaseTestCase):
                                         default, default_value,
                                         inherit, inherit_value,
                                         override, override_value,
-                                        errors)
+                                        errors, variable_values)
 
     def test_job_override_control_host_vars(self):
         self._test_job_override_control_host_dict(
@@ -844,7 +892,7 @@ class TestJob(BaseTestCase):
                                         default, default_value,
                                         inherit, inherit_value,
                                         override, override_value,
-                                        errors)
+                                        errors, variable_values=False)
 
     @mock.patch("zuul.model.zkobject.ZKObject._save")
     def test_image_permissions(self, save_mock):

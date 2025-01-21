@@ -1123,6 +1123,11 @@ class JobParser(object):
                 if v:
                     setattr(job, k, v)
 
+        var_source = dict(
+            type='job',
+            name=name,
+            source_context=job.source_context.toExecutorDict(),
+        )
         for (yaml_attr, job_attr, hostvars) in [
                 ('vars', 'variables', False),
                 ('extra-vars', 'extra_variables', False),
@@ -1139,7 +1144,9 @@ class JobParser(object):
                             check_varnames(hvars)
                     else:
                         check_varnames(conf_vars)
-                    setattr(job, job_attr, conf_vars)
+                    setattr(job, job_attr,
+                            model.VariableValue.construct(
+                                conf_vars, var_source))
 
         with self.pcontext.confAttr(conf, 'include-vars') as conf_include_vars:
             if isinstance(conf_include_vars, yaml.OverrideValue):
@@ -1316,7 +1323,13 @@ class ProjectTemplateParser(object):
             if set(variables.keys()).intersection(forbidden):
                 raise Exception("Variables named 'zuul', 'nodepool', "
                                 "or 'unsafe_vars' are not allowed.")
-            project_template.variables = variables
+            var_source = dict(
+                type='project-template',
+                name=project_template.name,
+                source_context=source_context.toExecutorDict(),
+            )
+            project_template.variables = model.VariableValue.construct(
+                variables, var_source)
 
         return project_template
 
@@ -1467,8 +1480,13 @@ class ProjectParser(object):
             if set(variables.keys()).intersection(forbidden):
                 raise Exception("Variables named 'zuul', 'nodepool', "
                                 "or 'unsafe_vars' are not allowed.")
-            project_config.variables = variables
-
+            var_source = dict(
+                type='project',
+                name=project_name,
+                source_context=source_context.toExecutorDict(),
+            )
+            project_config.variables = model.VariableValue.construct(
+                variables, var_source)
         return project_config
 
 
