@@ -47,7 +47,7 @@ from tests.base import (
 from tests.util import random_sha1
 
 
-class TestMultipleTenants(AnsibleZuulTestCase):
+class TestMultipleTenants(ZuulTestCase):
     # A temporary class to hold new tests while others are disabled
 
     tenant_config_file = 'config/multi-tenant/main.yaml'
