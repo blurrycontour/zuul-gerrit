@@ -1235,7 +1235,7 @@ class TestVarSquash(BaseTestCase):
         extravars = {
             'extra': 'extravar_extra',
         }
-        out = squash_variables(
+        out, sources = squash_variables(
             nodes, nodeset, jobvars, groupvars, extravars)
 
         expected = {
@@ -1252,7 +1252,7 @@ class TestVarSquash(BaseTestCase):
                 'host': 'node2_host',
                 'extra': 'extravar_extra'},
         }
-        self.assertEqual(out, expected)
+        self.assertEqual(expected, out)
 
 
 class TestExecutorFailure(ZuulTestCase):

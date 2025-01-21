@@ -2764,6 +2764,19 @@ class SourceContext(ConfigObject):
             path=self.path,
         )
 
+    def toExecutorDict(self):
+        # Render a dict for use in zuul variables on the executor
+        # TODO: Standardize on this and migrate rest api
+        return dict(
+            project=dict(
+                connection=self.project_connection_name,
+                name=self.project_name,
+                canonical_name=self.project_canonical_name,
+            ),
+            branch=self.branch,
+            path=self.path,
+        )
+
 
 class PlaybookContext(ConfigObject):
     """A reference to a playbook in the context of a project.
@@ -3095,6 +3108,7 @@ class FrozenJob(zkobject.ZKObject):
                            'parent_data',
                            'secrets',
                            'affected_projects',
+                           'variable_sources',
                            )
 
     def __init__(self):
@@ -3266,6 +3280,9 @@ class FrozenJob(zkobject.ZKObject):
         data['requires'] = frozenset(data['requires'])
         data['tags'] = frozenset(data['tags'])
 
+        # MODEL_API <= 32
+        data.setdefault('variable_sources', {})
+
         for job_data_key in self.job_data_attributes:
             job_data = data.pop(job_data_key, None)
             if job_data:
@@ -3345,6 +3362,10 @@ class FrozenJob(zkobject.ZKObject):
         return self._getJobData('_variables')
 
     @property
+    def variable_sources(self):
+        return self._getJobData('_variable_sources')
+
+    @property
     def secrets(self):
         return self._getJobData('_secrets')
 
@@ -3361,7 +3382,13 @@ class FrozenJob(zkobject.ZKObject):
         # Update variables, but give the new values priority. If more than one
         # parent job returns the same variable, the value from the later job
         # in the job graph will take precedence.
-        other_vars = other_build.result_data
+        var_source = dict(
+            type='build',
+            name=other_build.job.name,
+            build=other_build.uuid,
+        )
+        other_vars = VariableValue.construct(other_build.result_data,
+                                             var_source)
         v = parent_data
         v = Job._deepUpdate(v, other_vars)
         # To avoid running afoul of checks that jobs don't set zuul
@@ -3372,7 +3399,9 @@ class FrozenJob(zkobject.ZKObject):
         v.pop('unsafe_vars', None)
         parent_data = v
 
-        secret_other_vars = other_build.secret_result_data
+        secret_other_vars = VariableValue.construct(
+            other_build.secret_result_data,
+            var_source)
         v = secret_parent_data
         v = Job._deepUpdate(secret_other_vars, v)
         if 'zuul' in v:
@@ -3445,6 +3474,95 @@ class FrozenJob(zkobject.ZKObject):
             yield from playbooks
 
 
+class VariableValue:
+    def __init__(self, value, source=None):
+        self.value = value
+        self.source = source
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __eq__(self, other):
+        if not isinstance(other, VariableValue):
+            return False
+        if self.value != other.value:
+            return False
+        return True
+
+    __hash__ = object.__hash__
+
+    def __repr__(self):
+        return f'<VariableValue {self.value} {self.source}>'
+
+    @staticmethod
+    def _isDict(o):
+        if isinstance(o, VariableValue):
+            return VariableValue._isDict(o.value)
+        return isinstance(o, (dict, types.MappingProxyType))
+
+    def __getattr__(self, name):
+        v = self.__dict__.get(name)
+        if v is None:
+            return getattr(self.value, name)
+        return v
+
+    def __setitem__(self, key, item):
+        self.value[key] = item
+
+    def __getitem__(self, key):
+        return self.value[key]
+
+    def __contains__(self, item):
+        return item in self.value
+
+    def flattenSources(self):
+        if VariableValue._isDict(self):
+            ret = {}
+            for k, v in self.value.items():
+                if isinstance(v, VariableValue):
+                    ret[k] = v.flattenSources()
+                else:
+                    ret[k] = {'source': self.source}
+            return {'source': self.source, 'children': ret}
+        return {'source': self.source}
+
+    def flattenValues(self):
+        if VariableValue._isDict(self):
+            ret = {}
+            for k, v in self.value.items():
+                if isinstance(v, VariableValue):
+                    ret[k] = v.flattenValues()
+                else:
+                    ret[k] = v
+            return ret
+        return self.value
+
+    @classmethod
+    def construct(cls, orig, source):
+        if isinstance(orig, dict):
+            ret = {}
+            for k, v in orig.items():
+                ret[k] = cls.construct(v, source)
+            return cls(ret, source)
+        else:
+            return cls(orig, source)
+
+    @classmethod
+    def combine(cls, value_dict, source_dict):
+        ret = {}
+        for k, v in value_dict.items():
+            s = source_dict['children'].get(k)
+            if s is not None:
+                if VariableValue._isDict(v):
+                    ret[k] = cls.combine(v, s)
+                else:
+                    ret[k] = cls(v, s['source'])
+            else:
+                ret[k] = v
+        ret = cls(ret, source_dict['source'])
+        return ret
+
+
 class Job(ConfigObject):
     """A Job represents the defintion of actions to perform.
 
@@ -3488,10 +3606,10 @@ class Job(ConfigObject):
         for project in self.required_projects.values():
             d['required_projects'].append(project.toDict())
         d['semaphores'] = [s.toDict() for s in self.semaphores]
-        d['variables'] = self.variables
-        d['extra_variables'] = self.extra_variables
-        d['host_variables'] = self.host_variables
-        d['group_variables'] = self.group_variables
+        d['variables'] = self.variables.flattenValues()
+        d['extra_variables'] = self.extra_variables.flattenValues()
+        d['host_variables'] = self.host_variables.flattenValues()
+        d['group_variables'] = self.group_variables.flattenValues()
         d['final'] = self.final
         d['abstract'] = self.abstract
         d['intermediate'] = self.intermediate
@@ -3570,10 +3688,10 @@ class Job(ConfigObject):
             parent=None,
             timeout=None,
             post_timeout=None,
-            variables={},
-            extra_variables={},
-            host_variables={},
-            group_variables={},
+            variables=VariableValue({}, {}),
+            extra_variables=VariableValue({}, {}),
+            host_variables=VariableValue({}, {}),
+            group_variables=VariableValue({}, {}),
             include_vars=(),
             nodeset=Job.empty_nodeset,
             workspace=None,
@@ -3783,6 +3901,8 @@ class Job(ConfigObject):
         # Nodeset alternatives are flattened at this point
         attributes.discard('nodeset_alternatives')
         attributes.discard('nodeset_index')
+        # Handled below
+        attributes.discard('variable_sources')
         frozen_playbooks = []
         for k in attributes:
             # If this is a config object, it's frozen, so it's
@@ -3799,6 +3919,8 @@ class Job(ConfigObject):
                      for pb in v if pb.source_context]
                 frozen_playbooks.extend(v)
 
+            if isinstance(v, VariableValue):
+                v = v.flattenValues()
             kw[k] = v
 
         kw['nodeset_index'] = 0
@@ -3825,6 +3947,8 @@ class Job(ConfigObject):
         kw['ref'] = change.cache_key
         # Don't add buildset to attributes since it's not serialized
         kw['buildset'] = buildset
+        # Serialize the variable source info
+        kw['variable_sources'] = self.getVariableSources()
         # This creates the frozen job in memory but does not write it
         # to ZK yet.  We may end up combining the job with other jobs
         # before we finalize the job graph.  We will write all
@@ -4077,19 +4201,30 @@ class Job(ConfigObject):
         required_projects.update(other.required_projects)
         self.required_projects = required_projects
 
+    def getVariableSources(self):
+        ret = {}
+        for vtype in ('variables', 'extra_variables',
+                      'host_variables', 'group_variables'):
+            vdict = getattr(self, vtype)
+            ret[vtype] = vdict.flattenSources()
+        return ret
+
     @staticmethod
     def _deepUpdate(a, b):
         # Merge nested dictionaries if possible, otherwise, overwrite
         # the value in 'a' with the value in 'b'.
-
-        ret = {}
+        if isinstance(a, VariableValue):
+            ret = VariableValue({}, a.source)
+        elif isinstance(b, VariableValue):
+            ret = VariableValue({}, b.source)
+        else:
+            ret = {}
         for k, av in a.items():
             if k not in b:
                 ret[k] = av
         for k, bv in b.items():
             av = a.get(k)
-            if (isinstance(av, (dict, types.MappingProxyType)) and
-                isinstance(bv, (dict, types.MappingProxyType))):
+            if VariableValue._isDict(av) and VariableValue._isDict(bv):
                 ret[k] = Job._deepUpdate(av, bv)
             else:
                 ret[k] = bv
@@ -6486,8 +6621,8 @@ class QueueItem(zkobject.ZKObject):
             if parent_build and parent_build.result_data:
                 parent_builds_with_data[parent_job.uuid] = parent_build
 
-        parent_data = {}
-        secret_parent_data = {}
+        parent_data = VariableValue({}, {})
+        secret_parent_data = VariableValue({}, {})
         # We may have artifact data from
         # jobRequirementsReady, so we preserve it.
         # updateParentData de-duplicates it.
@@ -8343,7 +8478,7 @@ class ProjectPipelineConfig(ConfigObject):
         self.debug = False
         self.debug_messages = []
         self.fail_fast = None
-        self.variables = {}
+        self.variables = VariableValue({}, {})
 
     def addDebug(self, msg):
         self.debug_messages.append(msg)
@@ -8378,7 +8513,7 @@ class ProjectConfig(ConfigObject):
         # Pipeline name -> ProjectPipelineConfig
         self.pipelines = {}
         self.branch_matcher = None
-        self.variables = {}
+        self.variables = VariableValue({}, {})
         # These represent the values from the config file, but should
         # not be used directly; instead, use the ProjectMetadata to
         # find the computed value from across all project config

@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    The :var:`zuul.variable_sources` variable is now available to aid
+    in debugging the origin of Zuul job variables.
