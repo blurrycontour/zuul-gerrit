@@ -486,6 +486,123 @@ described above) are available:
       The git ref of the item.  This will be the full path (e.g.,
       `refs/heads/master` or `refs/changes/...`).
 
+   .. var:: variable_sources
+
+      To aid in debugging job issues, the source for every variable
+      value used in the job is recorded in this dictionary.  Because
+      variable values may themselves be dictionaries, this is a
+      complex structure described below.
+
+      .. var:: children
+
+         If the variable described by this node is a dictionary, that
+         dictionary's entries are described here.  The keys are
+         variable names, and the values are themselves recursive
+         instances of :var:`zuul.variable_sources`.
+
+      .. var:: source
+
+         A dictionary describing the source of this node's value.  The
+         entries in this dictionary vary based on the nature of the
+         source.
+
+         .. var:: type
+
+            This entry is always present, and describes the type of
+            source.  Values include:
+
+            .. value:: job
+
+               The value comes from a job definition.
+
+            .. value:: project
+
+               The value comes from a project definition.
+
+            .. value:: project-template
+
+               The value comes from a project-template definition.
+
+            .. value:: build
+
+               The value comes from a build of job dependency.
+
+            .. value:: include-vars
+
+               The value comes from a file loaded via
+               :attr:`job.include-vars`.
+
+         .. var:: name
+
+            This field is present for the following source types:
+
+            Job
+               The name of the job.
+            Project
+               The name of the project.
+            Project-Template
+               The name of the project-template.
+            Build
+               The name of the job.
+
+         .. var:: source_context
+
+            This field is present for the following source types:
+
+            Job
+               The location of the definition of the job.
+            Project
+               The location of the definition of the project.
+            Project-Template
+               The location of the definition of the project-template.
+
+            .. var:: branch
+
+               The branch where the definition is located.
+
+            .. var:: path
+
+               The path of the file containing the definition.
+
+            .. var:: project
+
+               The project where the definition is located.
+
+               .. var:: canonical_name
+
+                  The canonical name of the project.
+
+         .. var:: build
+
+            This field is present for the following source type:
+
+            Build
+               The UUID of the build.
+
+         .. var:: branch
+
+            This field is present for the following source type:
+
+            Include-Vars:
+               The branch from where the file was loaded.
+
+         .. var:: path
+
+            This field is present for the following source type:
+
+            Include-Vars:
+               The path of the file that was loaded.
+
+         .. var:: project
+
+            This field is present for the following source type:
+
+            Include-Vars:
+               The project from where the file was loaded.
+
+               .. var:: canonical_name
+
+                  The canonical name of the project.
 
 Item
 ~~~~

@@ -30,6 +30,8 @@ def validate_schema(data, schema):
 
 def get_artifacts_from_result_data(result_data, logger=None):
     ret = []
+    if hasattr(result_data, 'flattenValues'):
+        result_data = result_data.flattenValues()
     if validate_schema(result_data, artifact_schema):
         artifacts = result_data.get('zuul', {}).get(
             'artifacts', [])

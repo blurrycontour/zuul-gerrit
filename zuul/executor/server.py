@@ -908,28 +908,32 @@ def squash_variables(nodes, nodeset, jobvars, groupvars, extravars):
     """
 
     # The output dictionary, keyed by hostname.
-    ret = {}
+    ret = zuul.model.VariableValue({}, {})
 
     # Zuul runs ansible with the default hash behavior of 'replace';
     # this means we don't need to deep-merge dictionaries.
     groups = sorted(nodeset.getGroups(), key=lambda g: g.name)
     for node in nodes:
         hostname = node['name']
-        ret[hostname] = {}
+        ret[hostname] = zuul.model.VariableValue({}, {})
         # group 'all'
         ret[hostname].update(jobvars)
         # group vars
         if 'all' in groupvars:
-            ret[hostname].update(groupvars.get('all', {}))
+            ret[hostname].update(groupvars.get(
+                'all',
+                zuul.model.VariableValue({}, {})))
         for group in groups:
             if hostname in group.nodes:
-                ret[hostname].update(groupvars.get(group.name, {}))
+                ret[hostname].update(groupvars.get(
+                    group.name,
+                    zuul.model.VariableValue({}, {})))
         # host vars
         ret[hostname].update(node['host_vars'])
         # extra vars
         ret[hostname].update(extravars)
 
-    return ret
+    return ret.flattenValues(), ret.flattenSources(None)['children']
 
 
 def make_setup_inventory_dict(nodes, hostvars):
@@ -2269,7 +2273,8 @@ class AnsibleJob(object):
 
                 hosts.append(dict(
                     name=name,
-                    host_vars=host_vars,
+                    host_vars=zuul.model.VariableValue.construct(
+                        host_vars, {}),
                     host_keys=host_keys))
         return hosts
 
@@ -2824,9 +2829,12 @@ class AnsibleJob(object):
         return zuul_resources
 
     def loadIncludeVars(self):
-        parent_data = self.arguments["parent_data"]
-
-        normal_vars = parent_data.copy()
+        normal_vars = zuul.model.VariableValue.combine(
+            self.arguments["parent_data"],
+            # MODEL_API <= 32
+            self.arguments.get("parent_data_sources", {}),
+            self.arguments.get("parent_data_sources_sources", {}),
+        )
         for iv in self.job.include_vars:
             source = self.executor_server.connections.getSource(
                 iv['connection'])
@@ -2844,10 +2852,23 @@ class AnsibleJob(object):
                 path = self.checkoutTrustedProject(project, branch,
                                                    self.arguments)
             path = os.path.join(path, iv['name'])
+            var_source = dict(
+                type='include-vars',
+                project=dict(
+                    connection=project.connection_name,
+                    name=project.name,
+                    canonical_name=project.canonical_name,
+                ),
+                branch=branch,
+                path=iv['name'],
+            )
             try:
                 with open(path) as f:
                     self.log.debug("Loading vars from %s", path)
-                    new_vars = yaml.safe_load(f)
+                    new_vars = zuul.model.VariableValue.construct(
+                        yaml.safe_load(f),
+                        var_source,
+                    )
                     normal_vars = Job._deepUpdate(normal_vars, new_vars)
             except FileNotFoundError:
                 self.log.info("Vars file %s not found", path)
@@ -2855,8 +2876,14 @@ class AnsibleJob(object):
                     raise ExecutorError(
                         f"Required vars file {iv['name']} not found")
 
-        self.normal_vars = Job._deepUpdate(normal_vars,
-                                           self.job.variables)
+        # Give job vars precedence
+        job_vars = zuul.model.VariableValue.combine(
+            self.job.variables,
+            # MODEL_API <= 32
+            self.job.variable_sources.get('variables', {}),
+            self.job.variable_sources.get('_sources', {}),
+        )
+        self.normal_vars = Job._deepUpdate(normal_vars, job_vars)
 
     def prepareVars(self, args, zuul_resources):
         normal_vars = self.normal_vars.copy()
@@ -2907,6 +2934,31 @@ class AnsibleJob(object):
                        if ri.role_path is not None],
             ))
 
+        # Squash all and extra vars into localhost (it's not
+        # explicitly listed).
+        localhost = {
+            'name': 'localhost',
+            'host_vars': {},
+        }
+        host_list = self.host_list + [localhost]
+        group_variables = zuul.model.VariableValue.combine(
+            self.job.group_variables,
+            # MODEL_API <= 32
+            self.job.variable_sources.get('group_variables', {}),
+            self.job.variable_sources.get('_sources', {}),
+        )
+        extra_variables = zuul.model.VariableValue.combine(
+            self.job.extra_variables,
+            # MODEL_API <= 32
+            self.job.variable_sources.get('extra_variables', {}),
+            self.job.variable_sources.get('_sources', {}),
+        )
+        self.original_hostvars, var_sources = squash_variables(
+            host_list, self.nodeset, normal_vars,
+            group_variables, extra_variables)
+
+        zuul_vars['variable_sources'] = var_sources
+
         # The zuul vars in the debug inventory.yaml file should not
         # have any !unsafe tags, so save those before we update the
         # execution version of those.
@@ -2932,17 +2984,6 @@ class AnsibleJob(object):
                 yaml.ansible_unsafe_dump({'zuul': zuul_vars},
                                          default_flow_style=False))
 
-        # Squash all and extra vars into localhost (it's not
-        # explicitly listed).
-        localhost = {
-            'name': 'localhost',
-            'host_vars': {},
-        }
-        host_list = self.host_list + [localhost]
-        self.original_hostvars = squash_variables(
-            host_list, self.nodeset, normal_vars,
-            self.job.group_variables, self.job.extra_variables)
-
     def loadFrozenHostvars(self):
         # Read in the frozen hostvars, and remove the frozen variable
         # from the fact cache.
@@ -2964,7 +3005,7 @@ class AnsibleJob(object):
             # the playbook for this host.
             if 'host_vars' in host:
                 self.frozen_hostvars[host['name']]['nodepool'] =\
-                    host['host_vars']['nodepool']
+                    host['host_vars']['nodepool'].flattenValues()
             with open(path, 'w') as f:
                 f.write(json.dumps(facts))
 

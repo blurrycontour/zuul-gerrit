@@ -10838,6 +10838,65 @@ class TestIncludeVars(ZuulTestCase):
         # Make sure we did get returned parent data
         self.assertTrue(ivars['parent_vars'])
 
+        # The ansible variables do not appear here due to a convenient
+        # implementation quirk: all of the system variables like
+        # ansible_* and nodepool* are added in the executor with the
+        # null source, the same as the root source of the hostvars
+        # dict.  Since these children have the same source as the
+        # root, they are omitted.  It is probably okay to add them in
+        # the future if we decide that would be more clear.
+        self.assertVariableDictEqual({
+            'children': {
+                'job_var_precedence': {
+                    'source': {
+                        'name': 'same-project',
+                        'source_context': {
+                            'branch': 'master',
+                            'path': 'zuul.yaml',
+                            'project': {
+                                'canonical_name':
+                                'review.example.com/org/project1',
+                                'connection': 'gerrit',
+                                'name': 'org/project1'}},
+                        'type': 'job'}},
+                'parent_var_precedence': {
+                    'source': {'branch': 'master',
+                               'path': 'project1-vars.yaml',
+                               'project': {
+                                   'canonical_name':
+                                   'review.example.com/org/project1',
+                                   'connection': 'gerrit',
+                                   'name': 'org/project1'},
+                               'type': 'include-vars'}},
+                'parent_vars': {
+                    'source': {
+                        'build': str,
+                        'name': 'parent-job',
+                        'type': 'build'}},
+                'project1': {
+                    'source': {
+                        'branch': 'master',
+                        'path': 'project1-vars.yaml',
+                        'project': {
+                            'canonical_name':
+                            'review.example.com/org/project1',
+                            'connection': 'gerrit',
+                            'name': 'org/project1'},
+                        'type': 'include-vars'}},
+                'project_var_precedence': {
+                    'source': {
+                        'name': 'review.example.com/org/project1',
+                        'source_context': {
+                            'branch': 'master',
+                            'path': 'zuul.yaml',
+                            'project': {
+                                'canonical_name':
+                                'review.example.com/org/project1',
+                                'connection': 'gerrit',
+                                'name': 'org/project1'}},
+                        'type': 'project'}}},
+        }, ivars['zuul']['variable_sources']['controller'])
+
         inventory = self.getBuildInventory('other-project')
         ivars = inventory['all']['vars']
         self.assertTrue(ivars['project2'])

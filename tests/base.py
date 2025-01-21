@@ -810,7 +810,8 @@ class RecordingAnsibleJob(zuul.executor.server.AnsibleJob):
         hosts = super(RecordingAnsibleJob, self).getHostList(args, nodes)
         for host in hosts:
             if not host['host_vars'].get('ansible_connection'):
-                host['host_vars']['ansible_connection'] = 'local'
+                host['host_vars']['ansible_connection'] =\
+                    model.VariableValue.construct('local', {})
         return hosts
 
     def pause(self):
@@ -3629,6 +3630,28 @@ class ZuulTestCase(BaseTestCase):
             for build in self.builds:
                 self.log.error("Running build: %s" % build)
             raise
+
+    def assertVariableDictEqual(self, expected, actual):
+        """Assert that a dictionary is as described, but allow for
+        placeholder values by specifying a type.
+
+        For example, to allow any string value for "qux" while
+        asserting the literal value 'foo' for 'bar':
+
+        assertVariableDictEqual({'foo': 'bar', 'qux': str}, data)
+
+        """
+        self.assertEqual(expected.keys(), actual.keys())
+        for k in expected.keys():
+            ev = expected[k]
+            av = actual[k]
+            if isinstance(ev, dict):
+                self.assertVariableDictEqual(ev, av)
+            else:
+                if isinstance(ev, type):
+                    self.assertTrue(type(av) is ev, f'in key {k}')
+                else:
+                    self.assertEqual(ev, av, f'in key {k}')
 
     def assertHistory(self, history, ordered=True):
         """Assert that the completed builds are as described.
