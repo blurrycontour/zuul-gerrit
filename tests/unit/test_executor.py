@@ -37,6 +37,7 @@ from zuul.executor.sensors.startingbuilds import StartingBuildsSensor
 from zuul.executor.sensors.ram import RAMSensor
 from zuul.executor.server import squash_variables
 from zuul.model import NodeSet, Group
+from zuul import model
 
 
 class ExecutorReposMixin:
@@ -641,7 +642,7 @@ class TestAnsibleJob(ZuulTestCase):
         keys = job.host_list[0]['host_keys']
         self.assertEqual(keys, [])
         self.assertEqual(
-            job.host_list[0]['host_vars']['ansible_ssh_common_args'],
+            job.host_list[0]['host_vars']['ansible_ssh_common_args'].value,
             '-o StrictHostKeyChecking=false')
 
         self.executor_server.hold_jobs_in_build = False
@@ -667,7 +668,7 @@ class TestAnsibleJob(ZuulTestCase):
 
         self.assertIn('ansible_shell_type', host['host_vars'])
         self.assertEqual(
-            host['host_vars']['ansible_shell_type'],
+            host['host_vars']['ansible_shell_type'].value,
             'cmd')
 
         self.executor_server.hold_jobs_in_build = False
@@ -1198,20 +1199,23 @@ class TestExecutorExtraPackages(AnsibleZuulTestCase):
 class TestVarSquash(BaseTestCase):
     def test_squash_variables(self):
         # Test that we correctly squash job variables
+        def cons(v):
+            return model.VariableValue.construct(v, {})
+
         nodeset = NodeSet()
         nodes = [
-            {'name': 'node1', 'host_vars': {
+            {'name': 'node1', 'host_vars': cons({
                 'host': 'node1_host',
                 'extra': 'node1_extra',
-            }},
-            {'name': 'node2', 'host_vars': {
+            })},
+            {'name': 'node2', 'host_vars': cons({
                 'host': 'node2_host',
                 'extra': 'node2_extra',
-            }},
+            })},
         ]
         nodeset.addGroup(Group('group1', ['node1']))
         nodeset.addGroup(Group('group2', ['node2']))
-        groupvars = {
+        groupvars = cons({
             'group1': {
                 'host': 'group1_host',
                 'group': 'group1_group',
@@ -1225,17 +1229,18 @@ class TestVarSquash(BaseTestCase):
             'all': {
                 'all2': 'groupvar_all2',
             }
-        }
-        jobvars = {
+        })
+        jobvars = cons({
             'host': 'jobvar_host',
             'group': 'jobvar_group',
             'all': 'jobvar_all',
             'extra': 'jobvar_extra',
-        }
-        extravars = {
+        })
+
+        extravars = cons({
             'extra': 'extravar_extra',
-        }
-        out = squash_variables(
+        })
+        out, sources = squash_variables(
             nodes, nodeset, jobvars, groupvars, extravars)
 
         expected = {
@@ -1252,7 +1257,7 @@ class TestVarSquash(BaseTestCase):
                 'host': 'node2_host',
                 'extra': 'extravar_extra'},
         }
-        self.assertEqual(out, expected)
+        self.assertEqual(expected, out)
 
 
 class TestExecutorFailure(ZuulTestCase):

@@ -99,12 +99,21 @@ def construct_build_params(uuid, connections, job, item, pipeline,
 
     params = dict()
     (
-        params["parent_data"],
-        params["secret_parent_data"],
+        parent_data,
+        secret_parent_data,
         artifact_data
     ) = item.getJobParentData(job)
+    params["parent_data"] = parent_data.flattenValues()
+    params["secret_parent_data"] = secret_parent_data.flattenValues()
     if artifact_data:
         zuul_params['artifacts'] = artifact_data
+
+    sources = {}
+    params['parent_data_sources'] = parent_data.flattenSources(sources)
+    params['secret_parent_data_sources'] = secret_parent_data.flattenSources(
+        sources)
+    params['parent_data_sources_sources'
+           ] = secret_parent_data.transformSourceDict(sources)
 
     params['job_ref'] = job.getPath()
     params['items'] = merger_items
