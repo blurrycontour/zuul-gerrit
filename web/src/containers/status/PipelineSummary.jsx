@@ -69,8 +69,8 @@ QueueItemSquare.propTypes = {
   item: PropTypes.object,
 }
 
-function QueueCard({ pipeline, queue, allQueuesExpanded, jobsExpanded }) {
-  const expansionKey = `${pipeline.name}/${queue.name}`
+function QueueCard({ pipeline, tenant, queue, allQueuesExpanded, jobsExpanded }) {
+  const expansionKey = `${tenant.name}/${pipeline.name}/${queue.name}/${queue.branch}`
   const expandedQueue = useSelector(state => state.statusExpansion.expandedQueue[expansionKey])
   const isQueueExpanded = expandedQueue === undefined ? allQueuesExpanded : expandedQueue
   const dispatch = useDispatch()
@@ -127,12 +127,13 @@ function QueueCard({ pipeline, queue, allQueuesExpanded, jobsExpanded }) {
 
 QueueCard.propTypes = {
   pipeline: PropTypes.object,
+  tenant: PropTypes.object,
   queue: PropTypes.object,
   allQueuesExpanded: PropTypes.bool,
   jobsExpanded: PropTypes.bool,
 }
 
-function QueueSummary({ pipeline, showAllQueues, allQueuesExpanded, jobsExpanded }) {
+function QueueSummary({ pipeline, tenant, showAllQueues, allQueuesExpanded, jobsExpanded }) {
   let changeQueues = pipeline.change_queues
 
   if (!showAllQueues) {
@@ -147,6 +148,7 @@ function QueueSummary({ pipeline, showAllQueues, allQueuesExpanded, jobsExpanded
           <QueueCard
             key={`${queue.name}${queue.branch}`}
             pipeline={pipeline}
+            tenant={tenant}
             queue={queue}
             allQueuesExpanded={allQueuesExpanded}
             jobsExpanded={jobsExpanded}
@@ -182,6 +184,7 @@ function QueueSummary({ pipeline, showAllQueues, allQueuesExpanded, jobsExpanded
 
 QueueSummary.propTypes = {
   pipeline: PropTypes.object,
+  tenant: PropTypes.object,
   showAllQueues: PropTypes.bool,
   allQueuesExpanded: PropTypes.bool,
   jobsExpanded: PropTypes.bool,
@@ -190,7 +193,7 @@ QueueSummary.propTypes = {
 function PipelineSummary({ pipeline, tenant, showAllQueues, areAllJobsExpanded, filters }) {
   const pipelineType = pipeline.manager || 'unknown'
   const itemCount = pipeline._count
-  const expansionKey = `${pipeline.name}`
+  const expansionKey = `${tenant.name}/${pipeline.name}`
   const expandedQueue = useSelector(state => state.statusExpansion.expandedQueue[expansionKey])
   const dispatch = useDispatch()
 
@@ -244,6 +247,7 @@ function PipelineSummary({ pipeline, tenant, showAllQueues, areAllJobsExpanded, 
       <CardBody>
         <QueueSummary
           pipeline={pipeline}
+          tenant={tenant}
           showAllQueues={showAllQueues}
           allQueuesExpanded={isQueueExpanded}
           jobsExpanded={areAllJobsExpanded}
