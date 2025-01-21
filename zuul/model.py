@@ -4648,7 +4648,7 @@ class JobGraph(object):
                         raise JobConfigurationError(
                             "Job %s depends on %s which was not run." %
                             (dependent_job.name, parent_name))
-                    if not parent_soft:
+                    if not parent_soft and dependent_job.matches_change:
                         # If this is a hard dependency, then tell the
                         # parent to ignore file matchers.
                         if not parent_job.matches_change:
@@ -4708,7 +4708,7 @@ class JobGraph(object):
                     parent_job = self.getJob(parent_name, ref)
                     if parent_job is None:
                         continue
-                    if not parent_soft:
+                    if not parent_soft and dependent_job.matches_change:
                         # If this is a hard dependency, then tell the
                         # parent to ignore file matchers.
                         if not parent_job.matches_change:
