@@ -69,7 +69,7 @@ QueueItemSquare.propTypes = {
 }
 
 function QueueCard({ pipeline, queue, allQueuesExpanded, jobsExpanded }) {
-  const expansionKey = `${pipeline.name}/${queue.name}`
+  const expansionKey = `${pipeline.name}/${queue.name}/${queue.branch}`
   const expandedQueue = useSelector(state => state.statusExpansion.expandedQueue[expansionKey])
   const isQueueExpanded = expandedQueue === undefined ? allQueuesExpanded : expandedQueue
   const dispatch = useDispatch()
