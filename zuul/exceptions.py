@@ -79,6 +79,14 @@ class CapacityException(Exception):
     statsd_key = 'error.capacity'
 
 
+class TimeoutException(Exception):
+    pass
+
+
+class ConnectionTimeoutException(TimeoutException):
+    statsd_key = 'error.ssh'
+
+
 class RuntimeConfigurationException(Exception):
     pass
 
