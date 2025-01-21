@@ -16,6 +16,24 @@
       "message": "It seems like this test could be much simpler if we just get the value from the database rather than starting up the webserver for this.\n\nYou could use self.scheds.first.connections.connections[\u0027database\u0027].getBuildsets() or something similar.",
       "revId": "9ca2304d33337d62587c8d2b8310385d5e1e537f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f6899f1_b7982ff8",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 3
+      },
+      "lineNbr": 9255,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-21T06:07:29Z",
+      "side": 1,
+      "message": "Yep, that definitely simpler.",
+      "parentUuid": "c6272bf4_b031b8dd",
+      "revId": "9ca2304d33337d62587c8d2b8310385d5e1e537f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
