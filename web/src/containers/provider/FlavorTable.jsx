@@ -27,10 +27,9 @@ import {
   TableBody,
   TableVariant,
 } from '@patternfly/react-table'
-import { Link } from 'react-router-dom'
 
-function ImageTable(props) {
-  const { images, fetching, linkPrefix } = props
+function FlavorTable(props) {
+  const { flavors, fetching } = props
   const columns = [
     {
       title: 'Name',
@@ -38,13 +37,11 @@ function ImageTable(props) {
     },
   ]
 
-  function createImageRow(image) {
+  function createFlavorRow(flavor) {
     return {
       cells: [
         {
-          title: (
-            <Link to={`${linkPrefix}/${image.name}`}>{image.name}</Link>
-          ),
+          title: flavor.name,
         },
       ]
     }
@@ -69,22 +66,22 @@ function ImageTable(props) {
     return rows
   }
 
-  const haveImages = images && images.length > 0
+  const haveFlavors = flavors && flavors.length > 0
 
   let rows = []
   if (fetching) {
     rows = createFetchingRow()
     columns[0].dataLabel = ''
   } else {
-    if (haveImages) {
-      rows = images.map((image) => createImageRow(image))
+    if (haveFlavors) {
+      rows = flavors.map((flavor) => createFlavorRow(flavor))
     }
   }
 
   return (
     <>
       <Table
-        aria-label="Image Table"
+        aria-label="Flavor Table"
         variant={TableVariant.compact}
         cells={columns}
         rows={rows}
@@ -94,11 +91,11 @@ function ImageTable(props) {
         <TableBody />
       </Table>
 
-      {/* Show an empty state in case we don't have any images but are also not
+      {/* Show an empty state in case we don't have any flavors but are also not
           fetching */}
-      {!fetching && !haveImages && (
+      {!fetching && !haveFlavors && (
         <EmptyState>
-          <Title headingLevel="h1">No images found</Title>
+          <Title headingLevel="h1">No flavors found</Title>
           <EmptyStateBody>
             Nothing to display.
           </EmptyStateBody>
@@ -108,10 +105,9 @@ function ImageTable(props) {
   )
 }
 
-ImageTable.propTypes = {
-  images: PropTypes.array,
+FlavorTable.propTypes = {
+  flavors: PropTypes.array,
   fetching: PropTypes.bool.isRequired,
-  linkPrefix: PropTypes.string,
 }
 
-export default ImageTable
+export default FlavorTable

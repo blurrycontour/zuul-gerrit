@@ -551,6 +551,48 @@ class ImageConverter:
         })
 
 
+class FlavorConverter:
+    # A class to encapsulate the conversion of Flavor objects to
+    # API output.
+    @staticmethod
+    def toDict(tenant, flavor):
+        ret = {
+            'name': flavor.name,
+            'canonical_name': flavor.canonical_name,
+            'description': flavor.description,
+        }
+        return ret
+
+    @staticmethod
+    def schema():
+        return Prop('The image', {
+            'name': str,
+            'canonical_name': str,
+            'description': str,
+        })
+
+
+class LabelConverter:
+    # A class to encapsulate the conversion of Label objects to
+    # API output.
+    @staticmethod
+    def toDict(tenant, label):
+        ret = {
+            'name': label.name,
+            'canonical_name': label.canonical_name,
+            'description': label.description,
+        }
+        return ret
+
+    @staticmethod
+    def schema():
+        return Prop('The image', {
+            'name': str,
+            'canonical_name': str,
+            'description': str,
+        })
+
+
 class APIError(cherrypy.HTTPError):
     def __init__(self, code, json_doc=None, headers=None):
         self._headers = headers or {}
@@ -2034,6 +2076,24 @@ class ZuulWebAPI(object):
     @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
     @cherrypy.tools.handle_options()
     @cherrypy.tools.check_tenant_auth()
+    @openapi_response(
+        code=200,
+        content_type='application/json',
+        description='Returns the list of flavors',
+        schema=Prop('The list of flavors', [FlavorConverter.schema()]),
+    )
+    @openapi_response(404, 'Tenant not found')
+    def flavors(self, tenant_name, tenant, auth):
+        ret = []
+        for flavor in tenant.layout.flavors.values():
+            ret.append(FlavorConverter.toDict(tenant, flavor))
+        return ret
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.check_tenant_auth()
     def labels(self, tenant_name, tenant, auth):
         allowed_labels = tenant.allowed_labels or []
         disallowed_labels = tenant.disallowed_labels or []
@@ -2043,6 +2103,8 @@ class ZuulWebAPI(object):
                 launcher.supported_labels,
                 allowed_labels, disallowed_labels))
         ret = [{'name': label} for label in sorted(labels)]
+        for label in tenant.layout.labels.values():
+            ret.append(LabelConverter.toDict(tenant, label))
         return ret
 
     @cherrypy.expose
@@ -2746,6 +2808,8 @@ class ZuulWeb(object):
                           controller=api, action='pipelines')
         route_map.connect('api', '/api/tenant/{tenant_name}/images',
                           controller=api, action='images')
+        route_map.connect('api', '/api/tenant/{tenant_name}/flavors',
+                          controller=api, action='flavors')
         route_map.connect('api',
                           '/api/tenant/{tenant_name}/'
                           'image/{image_name}/build',
