@@ -933,7 +933,7 @@ def squash_variables(nodes, nodeset, jobvars, groupvars, extravars):
         # extra vars
         ret[hostname].update(extravars)
 
-    return ret.flattenValues(), ret.flattenSources()['children']
+    return ret.flattenValues(), ret.flattenSources(None)['children']
 
 
 def make_setup_inventory_dict(nodes, hostvars):
@@ -2832,6 +2832,7 @@ class AnsibleJob(object):
             self.arguments["parent_data"],
             # MODEL_API <= 32
             self.arguments.get("parent_data_sources", {}),
+            self.arguments.get("parent_data_sources_sources", {}),
         )
         for iv in self.job.include_vars:
             source = self.executor_server.connections.getSource(
@@ -2879,6 +2880,7 @@ class AnsibleJob(object):
             self.job.variables,
             # MODEL_API <= 32
             self.job.variable_sources.get('variables', {}),
+            self.job.variable_sources.get('_sources', {}),
         )
         self.normal_vars = Job._deepUpdate(normal_vars, job_vars)
 
@@ -2942,11 +2944,13 @@ class AnsibleJob(object):
             self.job.group_variables,
             # MODEL_API <= 32
             self.job.variable_sources.get('group_variables', {}),
+            self.job.variable_sources.get('_sources', {}),
         )
         extra_variables = zuul.model.VariableValue.combine(
             self.job.extra_variables,
             # MODEL_API <= 32
             self.job.variable_sources.get('extra_variables', {}),
+            self.job.variable_sources.get('_sources', {}),
         )
         self.original_hostvars, var_sources = squash_variables(
             host_list, self.nodeset, normal_vars,

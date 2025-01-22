@@ -2472,6 +2472,7 @@ class ZuulWebAPI(object):
         del params['secret_parent_data']
         params.pop('parent_data_sources', None)
         params.pop('secret_parent_data_sources', None)
+        params.pop('parent_data_sources_sources', None)
         params['job'] = job.name
         params['zuul']['buildset'] = None
         params['timeout'] = job.timeout

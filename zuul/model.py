@@ -3478,6 +3478,8 @@ class VariableValue:
     def __init__(self, value, source=None):
         self.value = value
         self.source = source
+        self._source_hash = hashlib.sha256(
+            json.dumps(source, sort_keys=True).encode("utf8")).hexdigest()
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -3515,16 +3517,29 @@ class VariableValue:
     def __contains__(self, item):
         return item in self.value
 
-    def flattenSources(self):
+    def _getSourceFromDict(self, sources):
+        if sources is None:
+            return self.source
+        if self._source_hash in sources:
+            src_id, src = sources.get(self._source_hash)
+        else:
+            src_id = len(sources) + 1
+            sources[self._source_hash] = src_id, self.source
+        return src_id
+
+    def flattenSources(self, sources):
         if VariableValue._isDict(self):
             ret = {}
             for k, v in self.value.items():
+                src = self._getSourceFromDict(sources)
                 if isinstance(v, VariableValue):
-                    ret[k] = v.flattenSources()
+                    ret[k] = v.flattenSources(sources)
                 else:
-                    ret[k] = {'source': self.source}
-            return {'source': self.source, 'children': ret}
-        return {'source': self.source}
+                    ret[k] = {'source': src}
+            src = self._getSourceFromDict(sources)
+            return {'source': src, 'children': ret}
+        src = self._getSourceFromDict(sources)
+        return {'source': src}
 
     def flattenValues(self):
         if VariableValue._isDict(self):
@@ -3548,18 +3563,20 @@ class VariableValue:
             return cls(orig, source)
 
     @classmethod
-    def combine(cls, value_dict, source_dict):
+    def combine(cls, value_dict, source_dict, sources):
         ret = {}
         for k, v in value_dict.items():
             s = source_dict['children'].get(k)
             if s is not None:
                 if VariableValue._isDict(v):
-                    ret[k] = cls.combine(v, s)
+                    ret[k] = cls.combine(v, s, sources)
                 else:
-                    ret[k] = cls(v, s['source'])
+                    src = sources[s['source']]
+                    ret[k] = cls(v, src)
             else:
                 ret[k] = v
-        ret = cls(ret, source_dict['source'])
+        src = sources[source_dict['source']]
+        ret = cls(ret, src)
         return ret
 
 
@@ -4203,10 +4220,12 @@ class Job(ConfigObject):
 
     def getVariableSources(self):
         ret = {}
+        sources = {}
         for vtype in ('variables', 'extra_variables',
                       'host_variables', 'group_variables'):
             vdict = getattr(self, vtype)
-            ret[vtype] = vdict.flattenSources()
+            ret[vtype] = vdict.flattenSources(sources)
+        ret['_sources'] = sources
         return ret
 
     @staticmethod
