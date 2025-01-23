@@ -56,6 +56,7 @@ from zuul.model import (
     EnqueueEvent,
     HoldRequest,
     PromoteEvent,
+    ProviderNode,
     QueueItem,
     SystemAttributes,
     UnparsedAbideConfig,
@@ -77,6 +78,7 @@ from zuul.zk.image_registry import (
     ImageBuildRegistry,
     ImageUploadRegistry,
 )
+from zuul.zk.launcher import LockableZKObjectCache
 from zuul.zk.layout import (
     LayoutProvidersStore,
     LayoutStateStore,
@@ -590,6 +592,41 @@ class LabelConverter:
             'name': str,
             'canonical_name': str,
             'description': str,
+        })
+
+
+class ProviderNodeConverter:
+    # A class to encapsulate the conversion of ProviderNode objects to
+    # API output.
+    @staticmethod
+    def toDict(node):
+        ret = {
+            'id': node.uuid,
+            'uuid': node.uuid,
+            'type': node.label,
+            'label': node.label,
+            'connection_type': node.connection_type,
+            'external_id': None,
+            'provider': node.provider,
+            'state': node.state,
+            'state_time': node.state_time,
+            'comment': None,
+        }
+        return ret
+
+    @staticmethod
+    def schema():
+        return Prop('The node', {
+            'id': str,
+            'uuid': str,
+            'type': str,
+            'label': str,
+            'connection_type': str,
+            'external_id': str,
+            'provider': str,
+            'state': str,
+            'state_time': str,
+            'comment': str,
         })
 
 
@@ -2130,6 +2167,13 @@ class ZuulWebAPI(object):
                         "provider", "state", "state_time", "comment"):
                 node_data[key] = getattr(node, key, None)
             ret.append(node_data)
+
+        providers = self.zuulweb.tenant_providers.get(tenant.name)
+        if providers:
+            provider_cnames = [p.canonical_name for p in providers]
+            for node in self.zuulweb.nodes_cache.getItems():
+                if node.provider in provider_cnames:
+                    ret.append(ProviderNodeConverter.toDict(node))
         return ret
 
     @cherrypy.expose
@@ -2932,6 +2976,13 @@ class ZuulWeb(object):
             self.zk_client, self.connections)
         self.image_build_registry = ImageBuildRegistry(self.zk_client)
         self.image_upload_registry = ImageUploadRegistry(self.zk_client)
+        self.nodes_cache = LockableZKObjectCache(
+            self.zk_client,
+            None,
+            root=ProviderNode.ROOT,
+            items_path=ProviderNode.NODES_PATH,
+            locks_path=ProviderNode.LOCKS_PATH,
+            zkobject_class=ProviderNode)
 
         self.management_events = TenantManagementEventQueue.createRegistry(
             self.zk_client)
@@ -3092,6 +3143,7 @@ class ZuulWeb(object):
         self.command_socket.stop()
         self.monitoring_server.stop()
         self.tracing.stop()
+        self.nodes_cache.stop()
         self.zk_client.disconnect()
 
     def join(self):
