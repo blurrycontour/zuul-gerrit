@@ -16,6 +16,23 @@
       "message": "PS 12 fixes an actual linter error that I overlooked.",
       "revId": "77707d910ddca8c753f9d6864211f51442a1acb0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d693c0cd_b80e5862",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27952
+      },
+      "writtenOn": "2025-01-23T08:44:38Z",
+      "side": 1,
+      "message": "Taking over the +2 from Jim, as the latest patchset only contained a linter fix, but no functional or visual change.",
+      "revId": "77707d910ddca8c753f9d6864211f51442a1acb0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
