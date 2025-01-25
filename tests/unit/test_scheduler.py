@@ -9375,6 +9375,67 @@ class TestSchedulerFailFast(ZuulTestCase):
             dict(name='project-test5', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    def test_fail_fast_no_cancel_completed(self):
+        """
+        Regression test to check that we are not cancelling jobs that
+        have already completed, as this would overwrite valid return data
+        (e.g. the log URL).
+        """
+        self.fake_nodepool.pause()
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.executor_server.failJob('project-test1', A)
+        self.executor_server.returnData(
+            "project-test2", A, {
+                "zuul": {
+                    "log_url": "some/log/url/",
+                },
+            }
+        )
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.executor_server.release('project-merge')
+        self.waitUntilSettled()
+        self.assertEqual(len(self.builds), 2)
+
+        # Release the failing build first so it is the first
+        # result event to be processed.
+        self.executor_server.release('project-test1')
+        for _ in iterate_timeout(10, 'project-test1 to be released'):
+            if len(self.builds) == 1:
+                break
+        # Release successful build and wait for it to be gone,
+        # so both result events are processed in the same iteration.
+        self.executor_server.release('project-test2')
+        for _ in iterate_timeout(10, 'project-test2 to be released'):
+            if len(self.builds) == 0:
+                break
+
+        self.executor_server.hold_jobs_in_build = False
+        self.fake_nodepool.unpause()
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 0)
+        self.assertEqual(A.reported, 1)
+        self.assertHistory([
+            dict(name='project-merge', result='SUCCESS', changes='1,1'),
+            dict(name='project-test1', result='FAILURE', changes='1,1'),
+            dict(name='project-test2', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+        db = self.scheds.first.connections.connections['database']
+
+        builds = db.getBuilds()
+        self.assertEqual(len(builds), 3)
+
+        # Make sure the build is reported as cancelled and that
+        # the log URL in the DB is correct.
+        build = builds[0]
+        self.assertEqual(build.result, "CANCELED")
+        self.assertEqual(build.log_url, "some/log/url/")
+
 
 class TestPipelineSupersedes(ZuulTestCase):
 
