@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "885c2182_0e74f26e",
+        "filename": "web/src/containers/SortDropdown.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-26T15:49:20Z",
+      "side": 1,
+      "message": "I think we should add a tooltop with text like \"Change the order that pipelines are displayed on the page\".  Since it\u0027s right next to a filter input that will actually filter out individual changes, I think it\u0027s important that we clarify that this affects only entire pipelines.  It should mostly be obvious, but the tooltip will help in the rare cases it isn\u0027t.",
+      "revId": "001ccf8fa2e2cca0bdaddb2d226f294df305d19f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65cad619_3d90667c",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-26T15:49:20Z",
+      "side": 1,
+      "message": "I think we should use \"Length\" instead of \"Item count\".  It seems a little more natural.\n\nI\u0027m trying to find a word or phrase other than \"Initial\" that means \"the configuration specified by the tenant admin\" but haven\u0027t come up with anything yet.  I would like to indicate that the admin-specified order is not necessarily arbitrary or random.  If we can\u0027t figure that out, \"initial\" is fine.",
+      "revId": "001ccf8fa2e2cca0bdaddb2d226f294df305d19f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
