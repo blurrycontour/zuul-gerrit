@@ -1464,6 +1464,8 @@ class AnsibleJob(object):
             key = (iv['connection'], iv['project'])
             projects.add(key)
 
+        # Subset of the repo state that is relevant for this job
+        relevant_repo_state = collections.defaultdict(dict)
         with open(self.jobdir.job_output_file, 'a') as job_output:
             self._jobOutput(job_output, "Updating git repos")
             for (connection, project) in projects:
@@ -1475,6 +1477,13 @@ class AnsibleJob(object):
                     span_context=tracing.getSpanContext(
                         trace.get_current_span()),
                 ))
+                try:
+                    project_rs = self.repo_state[connection][project]
+                except KeyError:
+                    self.log.warning("Project %s/%s not in repo state",
+                                     connection, project)
+                else:
+                    relevant_repo_state[connection][project] = project_rs
 
             for task in tasks:
                 task.wait()
@@ -1553,7 +1562,7 @@ class AnsibleJob(object):
             self._jobOutput(job_output, "Restoring repo states")
             with tracer.start_as_current_span('BuildSetRepoState'):
                 recent = self.workspace_merger.setBulkRepoState(
-                    self.repo_state,
+                    relevant_repo_state,
                     self.zuul_event_id,
                     self.executor_server.process_worker,
                 )
