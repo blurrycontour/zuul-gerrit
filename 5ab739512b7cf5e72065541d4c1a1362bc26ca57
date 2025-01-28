@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1ba2822_4ad60cbd",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1289,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-28T17:17:39Z",
+      "side": 1,
+      "message": "Could be defensive here and explicitly check for controls[\u0027final\u0027] being true. That way when we add other controls we\u0027re don\u0027t accidentally over apply rules. That said the schema should ensure that is the only value in here currently.",
+      "revId": "5ab739512b7cf5e72065541d4c1a1362bc26ca57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e10388ca_46cf38c1",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3641,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-28T17:17:39Z",
+      "side": 1,
+      "message": "Do we need to ensure that final_control is serialized via toDict above? We default to all entries being false via line 3620 so if we load a job from zookeeper we may unfinalize attributes if we don\u0027t preserve that information?",
+      "revId": "5ab739512b7cf5e72065541d4c1a1362bc26ca57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
