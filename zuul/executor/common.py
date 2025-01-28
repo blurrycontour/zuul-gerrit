@@ -161,6 +161,14 @@ def construct_build_params(uuid, connections, job, item, pipeline,
                                   job_project.override_checkout))
             projects.add(project)
             required_projects.add(project)
+
+    if job.include_vars:
+        for iv in job.include_vars:
+            source = connections.getSource(iv['connection'])
+            project = source.getProject(iv['project'])
+            params['projects'].append(make_project_dict(project))
+            projects.add(project)
+
     for change in dependent_changes:
         try:
             (_, project) = item.pipeline.tenant.getProject(

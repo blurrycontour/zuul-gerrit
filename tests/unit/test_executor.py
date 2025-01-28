@@ -491,6 +491,45 @@ class TestExecutorRepos(ZuulTestCase, ExecutorReposMixin):
         ]
         self.assertBuildStates(states, projects)
 
+    @simple_layout('layouts/repo-state-minimal.yaml')
+    def test_repo_state_minimal(self):
+        # Test that we don't restore unecessary repos
+        self.executor_server.hold_jobs_in_build = True
+
+        files = {'test.yaml': 'foo: bar'}
+        self.addCommitToRepo('org/project3', 'add vars', files)
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        build = self.getBuildByName('testjob1')
+        path = os.path.join(build.jobdir.src_root,
+                            'review.example.com', 'org', 'project1')
+        self.assertTrue(os.path.exists(path))
+        path = os.path.join(build.jobdir.src_root,
+                            'review.example.com', 'org', 'project2')
+        self.assertTrue(os.path.exists(path))
+        path = os.path.join(build.jobdir.src_root,
+                            'review.example.com', 'org', 'project3')
+        self.assertTrue(os.path.exists(path))
+
+        build = self.getBuildByName('testjob2')
+        path = os.path.join(build.jobdir.src_root,
+                            'review.example.com', 'org', 'project1')
+        self.assertTrue(os.path.exists(path))
+        path = os.path.join(build.jobdir.src_root,
+                            'review.example.com', 'org', 'project2')
+        self.assertFalse(os.path.exists(path))
+        path = os.path.join(build.jobdir.src_root,
+                            'review.example.com', 'org', 'project3')
+        self.assertFalse(os.path.exists(path))
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
     def test_repo_state_file(self):
         self.executor_server.hold_jobs_in_build = True
         A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
