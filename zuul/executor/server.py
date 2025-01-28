@@ -1526,6 +1526,8 @@ class AnsibleJob(object):
                 self.executor_server.merge_root,
                 logger=self.log,
                 scheme=self.scheme)
+            # Subset of the repo state that is relevant for this job
+            relevant_repo_state = collections.defaultdict(dict)
             repos = {}
             for project in args['projects']:
                 self.log.debug("Cloning %s/%s" % (project['connection'],
@@ -1544,6 +1546,15 @@ class AnsibleJob(object):
                         sparse_paths=sparse_paths,
                     )
                 repos[project['canonical_name']] = repo
+                try:
+                    project_rs = self.repo_state[project['connection']][
+                        project['name']]
+                except KeyError:
+                    self.log.warning("Project %s/%s not in repo state",
+                                     connection, project)
+                else:
+                    relevant_repo_state[project['connection']][
+                        project['name']] = project_rs
 
             # Early abort if abort requested
             if self.aborted:
@@ -1553,7 +1564,7 @@ class AnsibleJob(object):
             self._jobOutput(job_output, "Restoring repo states")
             with tracer.start_as_current_span('BuildSetRepoState'):
                 recent = self.workspace_merger.setBulkRepoState(
-                    self.repo_state,
+                    relevant_repo_state,
                     self.zuul_event_id,
                     self.executor_server.process_worker,
                 )
