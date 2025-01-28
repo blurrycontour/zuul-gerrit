@@ -33,6 +33,24 @@
       "message": "I think we should use \"Length\" instead of \"Item count\".  It seems a little more natural.\n\nI\u0027m trying to find a word or phrase other than \"Initial\" that means \"the configuration specified by the tenant admin\" but haven\u0027t come up with anything yet.  I would like to indicate that the admin-specified order is not necessarily arbitrary or random.  If we can\u0027t figure that out, \"initial\" is fine.",
       "revId": "001ccf8fa2e2cca0bdaddb2d226f294df305d19f",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c69a8771_485d0f87",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-28T07:21:55Z",
+      "side": 1,
+      "message": "How about \"Default\" or \"Preset\"?",
+      "parentUuid": "65cad619_3d90667c",
+      "revId": "001ccf8fa2e2cca0bdaddb2d226f294df305d19f",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
