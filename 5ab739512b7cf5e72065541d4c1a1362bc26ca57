@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "88ae7b7d_5841c1df",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1289,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-28T17:22:03Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "f1ba2822_4ad60cbd",
+      "revId": "5ab739512b7cf5e72065541d4c1a1362bc26ca57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e10388ca_46cf38c1",
         "filename": "zuul/model.py",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2025-01-28T17:17:39Z",
       "side": 1,
       "message": "Do we need to ensure that final_control is serialized via toDict above? We default to all entries being false via line 3620 so if we load a job from zookeeper we may unfinalize attributes if we don\u0027t preserve that information?",
+      "revId": "5ab739512b7cf5e72065541d4c1a1362bc26ca57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43c6a33a_6d348f31",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3641,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-28T17:22:03Z",
+      "side": 1,
+      "message": "toDict is only used for the api/web output.  We should probably consider adding it to that, but we don\u0027t have that information for override_control so I didn\u0027t add it for this.",
+      "parentUuid": "e10388ca_46cf38c1",
       "revId": "5ab739512b7cf5e72065541d4c1a1362bc26ca57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
