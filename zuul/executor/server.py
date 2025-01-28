@@ -1551,9 +1551,22 @@ class AnsibleJob(object):
                 return
 
             self._jobOutput(job_output, "Restoring repo states")
+            relevant_repo_state = collections.defaultdict(dict)
+            for project in args['projects']:
+                try:
+                    conn_rs = self.repo_state[project['connection']]
+                    prj_rs = conn_rs[project['name']]
+                except KeyError:
+                    self.log.warning("Project %s not in repo state",
+                                     project["canonical_name"])
+                    continue
+                relevant_repo_state[project['connection']][
+                    project['name']
+                ] = prj_rs
+
             with tracer.start_as_current_span('BuildSetRepoState'):
                 recent = self.workspace_merger.setBulkRepoState(
-                    self.repo_state,
+                    relevant_repo_state,
                     self.zuul_event_id,
                     self.executor_server.process_worker,
                 )
