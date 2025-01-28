@@ -36,6 +36,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "abc74f70_6517ce84",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1289,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-28T20:09:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88ae7b7d_5841c1df",
+      "revId": "5ab739512b7cf5e72065541d4c1a1362bc26ca57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e10388ca_46cf38c1",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "toDict is only used for the api/web output.  We should probably consider adding it to that, but we don\u0027t have that information for override_control so I didn\u0027t add it for this.",
       "parentUuid": "e10388ca_46cf38c1",
+      "revId": "5ab739512b7cf5e72065541d4c1a1362bc26ca57",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97650eca_eebd288f",
+        "filename": "zuul/model.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 3641,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-01-28T20:09:33Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "43c6a33a_6d348f31",
       "revId": "5ab739512b7cf5e72065541d4c1a1362bc26ca57",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
