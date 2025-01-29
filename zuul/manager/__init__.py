@@ -668,6 +668,8 @@ class PipelineManager(metaclass=ABCMeta):
             (change.project.connection_name not in self.pipeline.connections)):
             log.debug("Change %s is not from a connection known to %s ",
                       change, self.pipeline)
+            warnings.append(f"Change {change} is not from "
+                            f"a connection known to {self.pipeline}")
             return False
 
         try:
@@ -681,6 +683,8 @@ class PipelineManager(metaclass=ABCMeta):
                 log.debug("Unable to find change queue for "
                           "change %s in project %s" %
                           (change, change.project))
+                warnings.append(f"Unable to find change queue for "
+                                f"change {change} in project {change.project}")
                 return False
 
             cycle = []
@@ -704,11 +708,17 @@ class PipelineManager(metaclass=ABCMeta):
                             log.debug("Change %s does not match pipeline "
                                       "requirement %s because %s",
                                       cycle_change, f, str(match_result))
+                            warnings.append(f"Change {cycle_change} "
+                                            f"does not match pipeline "
+                                            f"requirement {f} "
+                                            f"because {str(match_result)}")
                             return False
 
             if not self.areChangesReadyToBeEnqueued(cycle, event):
                 log.debug("Cycle %s is not ready to be enqueued, ignoring" %
                           cycle)
+                warnings.append(f"Cycle {cycle} is not ready to be enqueued, "
+                                f"ignoring")
                 return False
 
             if len(cycle) > 1:
@@ -717,11 +727,10 @@ class PipelineManager(metaclass=ABCMeta):
                         log.info("Not enqueueing change %s since the project "
                                  "does not allow circular dependencies",
                                  cycle_change)
-                        warnings = ["Dependency cycle detected and project "
-                                    f"{cycle_change.project.name} "
-                                    "doesn't allow circular dependencies"]
-                        self._reportNonEnqueuedItem(
-                            change_queue, change, event, warnings)
+                        warnings.append(f"Dependency cycle "
+                                        f"detected and project "
+                                        f"{cycle_change.project.name} "
+                                        "doesn't allow circular dependencies")
                         return False
 
             if not (reason := self.checkPipelineWithinLimits(cycle, history)):
@@ -729,17 +738,10 @@ class PipelineManager(metaclass=ABCMeta):
                          "pipeline not within limits: %s",
                          change, reason)
                 warnings.append(
-                    f"Unable to enqueue change: {reason}"
+                    f"Unable to enqueue {change}: {reason}"
                 )
-                if not history:
-                    # Only report if we are the originating change;
-                    # otherwise we're being called from
-                    # enqueueChangesAhead.
-                    self._reportNonEnqueuedItem(
-                        change_queue, change, event, warnings[-1:])
                 return False
 
-            warnings = []
             if not self.enqueueChangesAhead(
                     cycle, event, quiet,
                     ignore_requirements,
@@ -747,9 +749,7 @@ class PipelineManager(metaclass=ABCMeta):
                     dependency_graph=dependency_graph,
                     warnings=warnings):
                 log.debug("Failed to enqueue changes ahead of %s" % change)
-                if warnings:
-                    self._reportNonEnqueuedItem(change_queue, change,
-                                                event, warnings)
+                warnings.append(f"Failed to enqueue changes ahead of {change}")
                 return False
 
             log.debug("History after enqueuing changes ahead: %s", history)
@@ -801,36 +801,45 @@ class PipelineManager(metaclass=ABCMeta):
             self.dequeueSupercededItems(item)
             return True
 
-    def _reportNonEnqueuedItem(self, change_queue, change, event, warnings):
+    def reportNonEnqueuedItem(self, change, event, warnings,
+                                change_queue=None):
         # Enqueue an item which otherwise can not be enqueued in order
         # to report a message to the user.
-        actions = self.pipeline.failure_actions
-        ci = change_queue.enqueueChanges([change], event)
-        try:
-            for w in warnings:
-                ci.warning(w)
-            ci.setReportedResult('FAILURE')
-
-            # Only report the item if the project is in the current
-            # pipeline. Otherwise the change could be spammed by
-            # reports from unrelated pipelines.
+        if warnings == []:
+            return
+        with self.getChangeQueue(change, event, change_queue) as change_queue:
+            if not change_queue:
+                self.log.error("Unable to find change queue for "
+                          "change %s in project %s" %
+                          (change, change.project))
+                return
+            actions = self.pipeline.failure_actions
+            ci = change_queue.enqueueChanges([change], event)
             try:
-                if self.pipeline.tenant.layout.getProjectPipelineConfig(
-                        ci, change):
-                    self.sendReport(actions, ci)
-            except model.TemplateNotFoundError:
-                # This error is not unreasonable under the
-                # circumstances; assume that a change to add a project
-                # template is in a dequeued cycle.
-                pass
-        finally:
-            # Ensure that the item is dequeued in any case. Otherwise we
-            # might leak items caused by this temporary enqueue.
-            self.dequeueItem(ci)
-        # We don't use reportNormalBuildsetEnd here because we want to
-        # report even with no jobs.
-        self.sql.reportBuildsetEnd(ci.current_build_set,
-                                   'failure', final=True)
+                for w in warnings:
+                    ci.warning(w)
+                ci.setReportedResult('FAILURE')
+
+                # Only report the item if the project is in the current
+                # pipeline. Otherwise the change could be spammed by
+                # reports from unrelated pipelines.
+                try:
+                    if self.pipeline.tenant.layout.getProjectPipelineConfig(
+                            ci, change):
+                        self.sendReport(actions, ci)
+                except model.TemplateNotFoundError:
+                    # This error is not unreasonable under the
+                    # circumstances; assume that a change to add a project
+                    # template is in a dequeued cycle.
+                    pass
+            finally:
+                # Ensure that the item is dequeued in any case. Otherwise we
+                # might leak items caused by this temporary enqueue.
+                self.dequeueItem(ci)
+            # We don't use reportNormalBuildsetEnd here because we want to
+            # report even with no jobs.
+            self.sql.reportBuildsetEnd(ci.current_build_set,
+                                       'failure', final=True)
 
     def cycleForChange(self, change, dependency_graph, event, debug=True):
         if debug:
