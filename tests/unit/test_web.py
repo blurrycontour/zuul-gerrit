@@ -1237,11 +1237,11 @@ class TestWeb(BaseTestWeb):
             'zuul': {
                 '_inheritance_path': [
                     '<Job base branches: None source: '
-                    'common-config/zuul.yaml@master#53>',
+                    'common-config/zuul.yaml@master#56>',
                     '<Job project-test1 branches: None source: '
-                    'common-config/zuul.yaml@master#66>',
+                    'common-config/zuul.yaml@master#69>',
                     '<Job project-test1 branches: None source: '
-                    'common-config/zuul.yaml@master#138>'],
+                    'common-config/zuul.yaml@master#141>'],
                 'build': '00000000000000000000000000000000',
                 'buildset': None,
                 'branch': 'master',
