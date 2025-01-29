@@ -1320,6 +1320,9 @@ class TestScheduler(ZuulTestCase):
         A.setDependsOn(M1, 1)
         M1.setDependsOn(M2, 1)
 
+        # change C would not be enqueued because the gate
+        # pipeline requires dependent changes to have
+        # Approved label set to 1
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
 
         self.waitUntilSettled()
@@ -1331,6 +1334,8 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
 
+        # change C get an extra message because it
+        # failed to enqueue in the first event
         self.waitUntilSettled()
         self.assertEqual(M2.queried, 0)
         self.assertEqual(A.data['status'], 'MERGED')
@@ -1338,7 +1343,8 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 2)
-        self.assertEqual(C.reported, 2)
+        self.assertEqual(C.reported, 3)
+        self.assertIn('Failed to enqueue', C.messages[0])
 
     def test_needed_changes_enqueue(self):
         "Test that a needed change is enqueued ahead"
@@ -1418,13 +1424,14 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(G.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 2)
-        self.assertEqual(C.reported, 2)
+        self.assertEqual(C.reported, 3)
         self.assertEqual(D.reported, 2)
         self.assertEqual(E.reported, 2)
         self.assertEqual(F.reported, 2)
         self.assertEqual(G.reported, 2)
         self.assertEqual(self.history[6].changes,
                          '1,1 2,1 3,1 4,1 5,1 6,1 7,1')
+        self.assertIn('Failed to enqueue', C.messages[0])
 
     def test_source_cache(self):
         "Test that the source cache operates correctly"
