@@ -722,10 +722,12 @@ class TestPagureToGerritCRD(ZuulTestCase):
             A.getPullRequestCommentedEvent(":thumbsup:"))
         self.waitUntilSettled()
 
+        # change A will get a nonEnqueue message from first event
         self.assertTrue(A.is_merged)
         self.assertEqual(B.data['status'], 'MERGED')
-        self.assertEqual(len(A.comments), 4)
+        self.assertEqual(len(A.comments), 5)
         self.assertEqual(B.reported, 2)
+        self.assertIn('Failed to enqueue changes ahead of', A.comments[0])
 
         changes = self.getJobFromHistory(
             'project-merge', 'pagure/project2').changes
@@ -793,6 +795,7 @@ class TestGerritToPagureCRD(ZuulTestCase):
         A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
             A.subject, B.url)
 
+        # change A is not enqueud since change B cannot be merged
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
@@ -813,8 +816,9 @@ class TestGerritToPagureCRD(ZuulTestCase):
         self.assertEqual(AM2.queried, 0)
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertTrue(B.is_merged)
-        self.assertEqual(A.reported, 2)
+        self.assertEqual(A.reported, 3)
         self.assertEqual(len(B.comments), 3)
+        self.assertIn('Failed to enqueue changes ahead of', A.comments[0])
 
         changes = self.getJobFromHistory(
             'project-merge', 'gerrit/project1').changes
@@ -884,10 +888,12 @@ class TestPagureToGithubCRD(ZuulTestCase):
             A.getPullRequestCommentedEvent(":thumbsup:"))
         self.waitUntilSettled()
 
+        # change A will get a nonEnqueue message from first event
         self.assertTrue(A.is_merged)
         self.assertTrue(B.is_merged)
-        self.assertEqual(len(A.comments), 4)
+        self.assertEqual(len(A.comments), 5)
         self.assertEqual(len(B.comments), 2)
+        self.assertIn('Failed to enqueue changes ahead of', A.comments[0])
 
         changes = self.getJobFromHistory(
             'project-merge', 'pagure/project2').changes
@@ -944,6 +950,7 @@ class TestGithubToPagureCRD(ZuulTestCase):
         # A Depends-On: B
         A.editBody('Depends-On: %s\n' % B.url)
 
+        # change A is not enqueud since change B cannot be merged
         event = A.addLabel('approved')
         self.fake_github.emitEvent(event)
         self.waitUntilSettled()
@@ -965,8 +972,9 @@ class TestGithubToPagureCRD(ZuulTestCase):
 
         self.assertTrue(A.is_merged)
         self.assertTrue(B.is_merged)
-        self.assertEqual(len(A.comments), 2)
+        self.assertEqual(len(A.comments), 3)
         self.assertEqual(len(B.comments), 3)
+        self.assertIn('Failed to enqueue changes ahead of', A.comments[0])
 
         changes = self.getJobFromHistory(
             'project-merge', 'github/project1').changes
@@ -980,6 +988,7 @@ class TestGithubToPagureCRD(ZuulTestCase):
             'pagure/project2', 'master', 'B')
 
         # A Depends-On: B
+        # change A is not enqueud since change B cannot be merged
         self.executor_server.hold_jobs_in_build = True
         self.fake_github.emitEvent(A.editBody('Depends-On: %s\n' % B.url))
         self.waitUntilSettled()
@@ -992,8 +1001,9 @@ class TestGithubToPagureCRD(ZuulTestCase):
 
         self.assertFalse(A.is_merged)
         self.assertFalse(B.is_merged)
-        self.assertEqual(len(A.comments), 1)
+        self.assertEqual(len(A.comments), 2)
         self.assertEqual(len(B.comments), 0)
+        self.assertIn('Failed to enqueue changes ahead of', A.comments[0])
 
         changes = self.getJobFromHistory(
             'project-merge', 'github/project1').changes

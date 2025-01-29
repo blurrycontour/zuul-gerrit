@@ -1240,7 +1240,7 @@ class TestGithubDriver(ZuulTestCase):
 
         self.executor_server.hold_jobs_in_build = True
         # Since the required status 'something/check' is not fulfilled,
-        # no job is expected
+        # no job is expected, change A will get an nonEnqueue message
         self.assertEqual(0, len(self.builds))
         self.assertEqual(0, len(self.history))
 
@@ -1270,11 +1270,16 @@ class TestGithubDriver(ZuulTestCase):
             dict(name='project-test1', result='ABORTED'),
             dict(name='project-test2', result='ABORTED'),
         ], ordered=False)
-        self.assertEqual(1, len(A.comments))
+        self.assertEqual(2, len(A.comments))
         self.assertFalse(A.is_merged)
+
+        # First comment is nonEqueue warning since requirement is
+        # no fulfilled before job run. Second comment is dequeue message
+        # since requirement is un-fulfilled during job run.
+        self.assertIn('is not ready to be enqueued, ignoring', A.comments[0])
         self.assertIn('This change is unable to merge '
                       'due to a missing merge requirement.',
-                      A.comments[0])
+                      A.comments[1])
 
     # This test case verifies that no reconfiguration happens if a branch was
     # deleted that didn't contain configuration.
@@ -1408,6 +1413,9 @@ class TestGithubDriver(ZuulTestCase):
             'master', contexts=['tenant-one/check', 'tenant-one/gate'])
 
         A = self.fake_github.openFakePullRequest('org/project', 'master', 'A')
+
+        # change A would not be enqueue now because `tenant-one/check`
+        # has not been set
         self.fake_github.emitEvent(A.getPullRequestOpenedEvent())
         self.waitUntilSettled()
 
@@ -1419,12 +1427,14 @@ class TestGithubDriver(ZuulTestCase):
         self.waitUntilSettled()
 
         # the change should have entered the gate
-        self.assertEqual(2, len(self.history))
+        self.assertEqual(3, len(self.history))
 
+        # First comment should be the nonEqueue message from the first event
         # Merge should have failed because cherry-pick is not supported
-        self.assertEqual(2, len(A.comments))
+        self.assertEqual(3, len(A.comments))
         self.assertFalse(A.is_merged)
-        self.assertEquals(A.comments[1],
+        self.assertIn('is not ready to be enqueued, ignoring', A.comments[0])
+        self.assertEquals(A.comments[2],
                           'Merge mode cherry-pick not supported by Github')
 
     @simple_layout('layouts/gate-github-rebase.yaml', driver='github')
