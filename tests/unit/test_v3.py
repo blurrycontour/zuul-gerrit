@@ -10493,7 +10493,10 @@ class TestPipelineLimits(ZuulTestCase):
         ], ordered=False)
         self.assertEqual(A.reported, 1)
         self.assertEqual(B.reported, 1)
-        self.assertIn('Unable to enqueue change: 2 changes to enqueue '
+
+        B_repr = '<Change 0x%x %s %s,%s>' % (id(B), B.project.name, 
+                                             B.number, B.patchset)
+        self.assertIn(f"Unable to enqueue {B_repr}: 2 changes to enqueue "
                       'greater than pipeline max of 1', B.messages[0])
 
     def test_pipeline_max_changes_current_check(self):
@@ -10520,7 +10523,9 @@ class TestPipelineLimits(ZuulTestCase):
         ], ordered=False)
         self.assertEqual(A.reported, 1)
         self.assertEqual(B.reported, 1)
-        self.assertIn('Unable to enqueue change: 1 additional changes would '
+        B_repr = '<Change 0x%x %s %s,%s>' % (id(B), B.project.name, 
+                                             B.number, B.patchset)
+        self.assertIn(f"Unable to enqueue {B_repr}: 1 additional changes would "
                       'exceed pipeline max of 1 under current conditions',
                       B.messages[0])
 
@@ -10556,7 +10561,9 @@ class TestPipelineLimits(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 0)
         self.assertEqual(C.reported, 1)
-        self.assertIn('Unable to enqueue change: 2 changes to enqueue '
+        C_repr = '<Change 0x%x %s %s,%s>' % (id(C), C.project.name, 
+                                             C.number, C.patchset)
+        self.assertIn(f"Unable to enqueue {C_repr}: 2 changes to enqueue "
                       'greater than pipeline max of 1', C.messages[0])
 
 

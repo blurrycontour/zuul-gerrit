@@ -225,9 +225,12 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                             changes_needed.append(needed_change)
                             abort = True
                     if not needed_change.is_current_patchset:
-                        log.debug("  Needed change is not "
-                                  "the current patchset")
+                        msg = f"Needed change {needed_change} is not " \
+                              f"the current patchset"
+                        log.debug("  " + msg)
                         changes_needed.append(needed_change)
+                        if warnings is not None:
+                            warnings.append(msg)
                         abort = True
                     if needed_change in changes:
                         log.debug("  Needed change is in cycle")
@@ -246,10 +249,12 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                         continue
                     else:
                         # The needed change can't be merged.
-                        log.debug("  Change %s is needed "
-                                  "but can not be merged",
-                                  needed_change)
+                        msg = f"Change {needed_change} is needed " \
+                              f"but can not be merged"
+                        log.debug("  " + msg)
                         changes_needed.append(needed_change)
+                        if warnings is not None:
+                            warnings.append(msg)
                         abort = True
         return abort, changes_needed
 
