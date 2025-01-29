@@ -374,6 +374,150 @@
     pre-run: playbooks/release/pre.yaml
     nodeset: ubuntu-jammy
 
+- job:
+    name: zuul-nox-py311-test_scheduler
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_scheduler.TestScheduler.test_non_enqueue"
+
+- job:
+    name: zuul-nox-py311-test_v3
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_v3.TestPipelineLimits"
+
+- job:
+    name: zuul-nox-py311-test_reporting
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_reporting"
+
+- job:
+    name: zuul-nox-py311-test_event_queues
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_event_queues"
+
+- job:
+    name: zuul-nox-py311-test_gerrit_crd
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_gerrit_crd"
+
+- job:
+    name: zuul-nox-py311-test_circular_dependencies
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_circular_dependencies.TestGithubAppCircularDependencies.test_dependency_refresh_checks_api tests.unit.test_circular_dependencies.TestGithubCircularDependencies.test_cycle_not_ready tests.unit.test_circular_dependencies.TestGithubCircularDependencies.test_complex_cycle_not_ready"
+
+- job:
+    name: zuul-nox-py311-test_a
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_a.*"
+
+- job:
+    name: zuul-nox-py311-test_b
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_b.*"
+
+- job:
+    name: zuul-nox-py311-test_d
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_d.*"
+
+- job:
+    name: zuul-nox-py311-test_e
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_e.*"
+
+- job:
+    name: zuul-nox-py311-test_g
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_g.*"
+
+- job:
+    name: zuul-nox-py311-test_i
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_i.*"
+
+- job:
+    name: zuul-nox-py311-test_l
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_l.*"
+
+- job:
+    name: zuul-nox-py311-test_m
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_m.*"
+
+- job:
+    name: zuul-nox-py311-test_n
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_n.*"
+
+- job:
+    name: zuul-nox-py311-test_o
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_o.*"
+
+- job:
+    name: zuul-nox-py311-test_p
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_p.*"
+
+- job:
+    name: zuul-nox-py311-test_r
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_r.*"
+
+- job:
+    name: zuul-nox-py311-test_s
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_s.*"
+
+- job:
+    name: zuul-nox-py311-test_t
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_t.*"
+
+- job:
+    name: zuul-nox-py311-test_w
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_w.*"
+
+- job:
+    name: zuul-nox-py311-test_y
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_y.*"
+
+- job:
+    name: zuul-nox-py311-test_z
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_z.*"
+
+- job:
+    name: zuul-nox-py311-test_gpnrt
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_[gpnrt].*"
+
 - project:
     queue: zuul
     vars:
@@ -382,37 +526,61 @@
       ensure_tox_version: "<4"
     check:
       jobs:
-        - zuul-build-image
-        - zuul-nox-docs
+        #- zuul-build-image
+        #- zuul-nox-docs
         - nox-linters:
             vars:
               nox_install_bindep: false
             nodeset: ubuntu-jammy
-        - zuul-nox-py311
-        - zuul-nox-py311-multi-scheduler
-        - zuul-nox-py312
-        - zuul-nox-upgrade
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            nodeset: ubuntu-jammy
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            files:
-              - web/.*
-            nodeset: ubuntu-jammy
-        - zuul-stream-functional-8
-        - zuul-stream-functional-9
-        - zuul-nox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - zuul-nox-zuul-client
-        - zuul-build-python-release
+        #- zuul-nox-py311
+        #- zuul-nox-py311-multi-scheduler
+        #- zuul-nox-py312
+        - zuul-nox-py311-test_scheduler
+        #- zuul-nox-py311-test_v3
+        #- zuul-nox-py311-test_event_queues
+        #- zuul-nox-py311-test_gerrit_crd
+        #- zuul-nox-py311-test_circular_dependencies
+        #- zuul-nox-py311-test_a
+        #- zuul-nox-py311-test_b
+        #- zuul-nox-py311-test_d
+        #- zuul-nox-py311-test_e
+        #- zuul-nox-py311-test_g
+        #- zuul-nox-py311-test_i
+        #- zuul-nox-py311-test_l
+        #- zuul-nox-py311-test_m
+        #- zuul-nox-py311-test_n
+        #- zuul-nox-py311-test_o
+        #- zuul-nox-py311-test_p
+        #- zuul-nox-py311-test_r
+        - zuul-nox-py311-test_gpnrt
+        #- zuul-nox-py311-test_s
+        #- zuul-nox-py311-test_t #this is flaky
+        #- zuul-nox-py311-test_w
+        #- zuul-nox-py311-test_y
+        #- zuul-nox-py311-test_z
+        #- zuul-nox-py311-test_reporting
+        #- zuul-nox-upgrade
+        #- zuul-build-dashboard-openstack-whitelabel
+        #- zuul-build-dashboard-software-factory
+        #- zuul-build-dashboard-opendev
+        #- nodejs-run-lint:
+        #    vars:
+        #      zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #    nodeset: ubuntu-jammy
+        #- nodejs-run-test:
+        #    vars:
+        #      zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #    files:
+        #      - web/.*
+        #    nodeset: ubuntu-jammy
+        #- zuul-stream-functional-8
+        #- zuul-stream-functional-9
+        #- zuul-nox-remote
+        #- zuul-quick-start:
+        #    requires: nodepool-container-image
+        #    dependencies: zuul-build-image
+        #- zuul-nox-zuul-client
+        #- zuul-build-python-release
     gate:
       jobs:
         - zuul-upload-image

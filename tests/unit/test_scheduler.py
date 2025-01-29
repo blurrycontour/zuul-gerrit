@@ -28,7 +28,7 @@ from collections import namedtuple
 from unittest import mock, skip
 from uuid import uuid4
 from kazoo.exceptions import NoNodeError
-from testtools.matchers import StartsWith
+from testtools.matchers import StartsWith, MatchesRegex
 
 import git
 import fixtures
@@ -1320,6 +1320,9 @@ class TestScheduler(ZuulTestCase):
         A.setDependsOn(M1, 1)
         M1.setDependsOn(M2, 1)
 
+        # change C would not be enqueued because the gate
+        # pipeline requires dependent changes to have
+        # Approved label set to 1
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
 
         self.waitUntilSettled()
@@ -1331,6 +1334,8 @@ class TestScheduler(ZuulTestCase):
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
 
+        # change C get an extra message because it
+        # failed to enqueue in the first event
         self.waitUntilSettled()
         self.assertEqual(M2.queried, 0)
         self.assertEqual(A.data['status'], 'MERGED')
@@ -1338,7 +1343,8 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(C.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 2)
-        self.assertEqual(C.reported, 2)
+        self.assertEqual(C.reported, 3)
+        self.assertIn('Failed to enqueue', C.messages[0])
 
     def test_needed_changes_enqueue(self):
         "Test that a needed change is enqueued ahead"
@@ -1418,13 +1424,62 @@ class TestScheduler(ZuulTestCase):
         self.assertEqual(G.data['status'], 'MERGED')
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 2)
-        self.assertEqual(C.reported, 2)
+        self.assertEqual(C.reported, 3)
         self.assertEqual(D.reported, 2)
         self.assertEqual(E.reported, 2)
         self.assertEqual(F.reported, 2)
         self.assertEqual(G.reported, 2)
         self.assertEqual(self.history[6].changes,
                          '1,1 2,1 3,1 4,1 5,1 6,1 7,1')
+        self.assertIn('Failed to enqueue', C.messages[0])
+
+    def test_non_enqueue:
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        D = self.fake_gerrit.addFakeChange('org/project', 'master', 'D')
+        E = self.fake_gerrit.addFakeChange('org/project', 'master', 'E')
+        F = self.fake_gerrit.addFakeChange('org/project', 'master', 'F')
+        G = self.fake_gerrit.addFakeChange('org/project', 'master', 'G')
+        A.setDependsOn(B, 1)
+        B.setDependsOn(D, 1)
+        C.setDependsOn(B, 1)
+        D.setDependsOn(C, 1)
+        D.setDependsOn(E, 1)
+        E.setDependsOn(F, 1)
+
+        # A -> B --> D -> E -> F   change B, C, D formed a circular
+        #       \   /              dependency
+        #         C
+
+        # set change F to WIP, so request to enqueu A would fail
+        # because change F violates the pipeline requirement on wip
+        F.setWorkInProgress(True)
+
+        # Trigger the event in check pipeline, should not enqueue
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertEqual(A.reported, 1)
+        self.assertEqual(B.reported, 0)
+        self.assertEqual(C.reported, 0)
+        self.assertEqual(D.reported, 0)
+        self.assertEqual(E.reported, 0)
+        self.assertEqual(F.reported, 0)
+        self.assertEqual(G.reported, 0)
+        self.assertThat(A.messages[0], MatchesRegex(
+                        r'.*Unable to enqueue <Change 0x[0-9a-z]+ '
+                        r'org/project 1,1>: 2 changes to enqueue greater '
+                        r'than pipeline max of 1'
+                        r'\s+Failed to enqueue '
+                        r'changes ahead of <Change 0x[0-9a-z]+ '
+                        r'org/project 5,1>.*'
+                        r'\s+Failed to enqueue '
+                        r'changes ahead of <Change 0x[0-9a-z]+ '
+                        r'org/project 4,1>.*'
+                        r'\s+Failed to enqueue '
+                        r'changes ahead of <Change 0x[0-9a-z]+ '
+                        r'org/project 1,1>.*', re.DOTALL))
 
     def test_source_cache(self):
         "Test that the source cache operates correctly"
