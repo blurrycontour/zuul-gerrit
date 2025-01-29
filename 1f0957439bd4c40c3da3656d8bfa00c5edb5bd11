@@ -16,6 +16,24 @@
       "message": "In the `actions/users.js` file we did this change the other way around switching from `tenant` to `tenant.name`: https://review.opendev.org/c/zuul/zuul/+/939406/1/web/src/actions/user.js#68. Does that mean that in here the `tenant` argument is already the tenant name and this never worked as expected?\n\nThe same applies to the next line as well, just with the shorthand if-condition.",
       "revId": "1f0957439bd4c40c3da3656d8bfa00c5edb5bd11",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdfcbfd0_a5af4d02",
+        "filename": "web/src/containers/auth/Auth.jsx",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-29T21:52:30Z",
+      "side": 1,
+      "message": "fetchUserACL used to accept a tenant name string, now it accepts a tenant object and dereferences it.\n\nThis method calls fetchUserACL.  It used to pass a tenant name string, now it passes a tenant object.\n\nThe part of fetchUserACL that uses the tenant name still works exactly as before because of the new deferencing.  But now that it has the tenant object, it can also access the apiPrefix.  That is the fix in this change.",
+      "parentUuid": "14f1b5d5_3d956b3b",
+      "revId": "1f0957439bd4c40c3da3656d8bfa00c5edb5bd11",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
