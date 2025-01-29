@@ -55,6 +55,9 @@ class TestGerritLegacyCRD(ZuulTestCase):
         A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
             A.subject, B.data['id'])
 
+        # change A would not be enqueued because the gate
+        # pipeline requires dependent changes to have
+        # Approved label set to 1
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
@@ -77,12 +80,15 @@ class TestGerritLegacyCRD(ZuulTestCase):
         self.executor_server.release()
         self.waitUntilSettled()
 
+        # change A get an extra message because it
+        # failed to enqueue in the first event
         self.assertEqual(AM2.queried, 0)
         self.assertEqual(BM2.queried, 0)
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
-        self.assertEqual(A.reported, 2)
+        self.assertEqual(A.reported, 3)
         self.assertEqual(B.reported, 2)
+        self.assertIn('Failed to enqueue', A.messages[0])
 
         changes = self.getJobFromHistory(
             'project-merge', 'org/project1').changes
@@ -246,8 +252,9 @@ class TestGerritLegacyCRD(ZuulTestCase):
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertEqual(B.data['status'], 'MERGED')
-        self.assertEqual(A.reported, 2)
+        self.assertEqual(A.reported, 3)
         self.assertEqual(B.reported, 2)
+        self.assertIn('Failed to enqueue', A.messages[0])
 
         changes = self.getJobFromHistory(
             'project-merge', 'org/project1').changes
