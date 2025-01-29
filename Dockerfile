@@ -19,11 +19,12 @@
 ARG IMAGE_FLAVOR=
 
 # This is a mirror of:
-# FROM docker.io/library/node:16-bookworm as js-builder
-FROM quay.io/opendevmirror/node:16-bookworm as js-builder
+# FROM docker.io/library/node:23-bookworm as js-builder
+FROM quay.io/opendevmirror/node:23-bookworm as js-builder
 
 COPY web /tmp/src
 # Explicitly run the Javascript build
+ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN cd /tmp/src && yarn install -d && yarn build
 
 # We need skopeo >=v1.14.0 to negotioate with newer docker; once this

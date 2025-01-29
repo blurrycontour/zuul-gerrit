@@ -24,9 +24,8 @@ if type apt-get; then
     $SUDO apt-get update
     $SUDO apt-get install -y apt-transport-https curl gnupg2
     # Install recent NodeJS repo
-    curl -sS https://deb.nodesource.com/gpgkey/nodesource.gpg.key | $SUDO apt-key add -
-    echo "deb https://deb.nodesource.com/node_16.x focal main" | $SUDO tee /etc/apt/sources.list.d/nodesource.list
-    # Install yarn repo
+    curl -sS https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | $SUDO apt-key add -
+    echo "deb https://deb.nodesource.com/node_23.x nodistro main" | $SUDO tee /etc/apt/sources.list.d/nodesource.list
     curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | $SUDO apt-key add -
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | $SUDO tee /etc/apt/sources.list.d/yarn.list
     $SUDO apt-get update
@@ -38,7 +37,9 @@ elif type yum; then
     $SUDO $(dirname $0)/install-js-repos-rpm.sh
     $SUDO yum -y install nodejs yarn
 elif type zypper; then
-    $SUDO zypper install -y nodejs10 npm10
+    # openSUSE might not package the latest upstream nodejs, so we just install
+    # the most recent that is available
+    $SUDO zypper install -y nodejs npm
     $SUDO npm install yarn
 elif type brew; then
     brew install nodejs yarn

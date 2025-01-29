@@ -4,6 +4,10 @@
     - set-zuul-log-path-fact
     - js-package-manager
   environment:
+    # TODO: remove after upgrading js dependencies
+    # node >= 18 is incompatible with webpack versions < 5.61
+    # cf. https://github.com/webpack/webpack/issues/17805
+    NODE_OPTIONS: --openssl-legacy-provider
     REACT_APP_ZUUL_API: "{% if zuul_api_url is defined %}{{ zuul_api_url }}/api/{% endif %}"
     PUBLIC_URL: './'
     # NOTE: using "./" is not enough to support html5 links, even with

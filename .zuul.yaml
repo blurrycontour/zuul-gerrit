@@ -173,6 +173,7 @@
       javascript_content_dir: "build"
       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
       create_tarball_directory: build
+      node_version: 23
     run: playbooks/dashboard/run.yaml
     nodeset: ubuntu-jammy
 
@@ -374,6 +375,34 @@
     pre-run: playbooks/release/pre.yaml
     nodeset: ubuntu-jammy
 
+- job:
+    name: zuul-nodejs-run-lint
+    parent: nodejs-run-lint
+    vars:
+      zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+      node_version: 23
+      js_build_env_vars:
+        # TODO: remove after upgrading js dependencies
+        # node >= 18 is incompatible with webpack versions < 5.61
+        # cf. https://github.com/webpack/webpack/issues/17805
+        NODE_OPTIONS: --openssl-legacy-provider
+    nodeset: ubuntu-jammy
+
+- job:
+    name: zuul-nodejs-run-test
+    parent: nodejs-run-test
+    vars:
+      zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+      node_version: 23
+      js_build_env_vars:
+        # TODO: remove after upgrading js dependencies
+        # node >= 18 is incompatible with webpack versions < 5.61
+        # cf. https://github.com/webpack/webpack/issues/17805
+        NODE_OPTIONS: --openssl-legacy-provider
+    files:
+      - web/.*
+    nodeset: ubuntu-jammy
+
 - project:
     queue: zuul
     vars:
@@ -395,16 +424,8 @@
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
         - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            nodeset: ubuntu-jammy
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            files:
-              - web/.*
-            nodeset: ubuntu-jammy
+        - zuul-nodejs-run-lint
+        - zuul-nodejs-run-test
         - zuul-stream-functional-8
         - zuul-stream-functional-9
         - zuul-nox-remote
@@ -425,16 +446,8 @@
         - zuul-nox-py312
         - zuul-nox-upgrade
         - zuul-build-dashboard
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            nodeset: ubuntu-jammy
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            files:
-              - web/.*
-            nodeset: ubuntu-jammy
+        - zuul-nodejs-run-lint
+        - zuul-nodejs-run-test
         - zuul-stream-functional-8
         - zuul-stream-functional-9
         - zuul-nox-remote
