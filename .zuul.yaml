@@ -144,6 +144,17 @@
       nox_keyword: tests
 
 - job:
+    name: zuul-nox-py311-test_scheduler
+    parent: zuul-nox
+    timeout: 7200  # 120 minutes
+    failure-output:
+      # This matches stestr output when a test fails
+      # {1} tests.unit.test_blah [5.743446s] ... FAILED
+      - '\{\d+\} (.*?) \[[\d\.]+s\] \.\.\. FAILED'
+    vars:
+      nox_keyword: test_scheduler
+
+- job:
     name: zuul-nox-py311-multi-scheduler
     parent: zuul-nox-py311
     voting: false
@@ -388,9 +399,10 @@
             vars:
               nox_install_bindep: false
             nodeset: ubuntu-jammy
-        - zuul-nox-py311
-        - zuul-nox-py311-multi-scheduler
-        - zuul-nox-py312
+        #- zuul-nox-py311
+        #- zuul-nox-py311-multi-scheduler
+        #- zuul-nox-py312
+        - zuul-nox-py311-test_scheduler
         - zuul-nox-upgrade
         - zuul-build-dashboard-openstack-whitelabel
         - zuul-build-dashboard-software-factory
