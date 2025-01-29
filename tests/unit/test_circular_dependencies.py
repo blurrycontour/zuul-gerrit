@@ -20,6 +20,7 @@ import re
 import textwrap
 import threading
 import json
+from testtools.matchers import MatchesRegex
 
 from zuul.model import PromoteEvent
 import zuul.scheduler
@@ -4320,9 +4321,18 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.fake_github.emitEvent(A.addLabel("approved"))
         self.waitUntilSettled()
 
-        self.assertEqual(len(A.comments), 0)
+        # change A receives the nonEqueue message of change C
+        # because it is the originating change
+        # change A in SCC with change C, so change C is not
+        # checked recursively inside enqueueChangesAhead
+        self.assertEqual(len(A.comments), 1)
         self.assertEqual(len(B.comments), 0)
         self.assertEqual(len(C.comments), 0)
+        self.assertThat(A.comments[0], MatchesRegex(
+                        r'.*Change <Change 0x[0-9a-z]+ '
+                        r'gh/project1 3,[0-9a-z]+>does not match '
+                        r'pipeline requirement.*', re.DOTALL))
+        self.assertNotIn('Failed to enqueue changes ahead of', A.comments[0])
         self.assertFalse(A.is_merged)
         self.assertFalse(B.is_merged)
         self.assertFalse(C.is_merged)
@@ -4331,8 +4341,8 @@ class TestGithubCircularDependencies(ZuulTestCase):
         A = self.fake_github.openFakePullRequest("gh/project", "master", "A")
         B = self.fake_github.openFakePullRequest("gh/project1", "master", "B")
         C = self.fake_github.openFakePullRequest("gh/project1", "master", "C")
-        X = self.fake_github.openFakePullRequest("gh/project1", "master", "C")
-        Y = self.fake_github.openFakePullRequest("gh/project1", "master", "C")
+        X = self.fake_github.openFakePullRequest("gh/project1", "master", "X")
+        Y = self.fake_github.openFakePullRequest("gh/project1", "master", "Y")
         A.addReview('derp', 'APPROVED')
         A.addLabel("approved")
         B.addReview('derp', 'APPROVED')
@@ -4366,11 +4376,18 @@ class TestGithubCircularDependencies(ZuulTestCase):
         self.fake_github.emitEvent(X.addLabel("approved"))
         self.waitUntilSettled()
 
+        # change X not in SCC with change C, so change C is
+        # checked recursively inside enqueueChangesAhead
         self.assertEqual(len(A.comments), 0)
         self.assertEqual(len(B.comments), 0)
         self.assertEqual(len(C.comments), 0)
-        self.assertEqual(len(X.comments), 0)
+        self.assertEqual(len(X.comments), 1)
         self.assertEqual(len(Y.comments), 0)
+        self.assertThat(X.comments[0], MatchesRegex(
+                        r'.*Change <Change 0x[0-9a-z]+ '
+                        r'gh/project1 3,[0-9a-z]+>does not match '
+                        r'pipeline requirement.*', re.DOTALL))
+        self.assertIn('Failed to enqueue changes ahead of', X.comments[0])
         self.assertFalse(A.is_merged)
         self.assertFalse(B.is_merged)
         self.assertFalse(C.is_merged)
@@ -4598,11 +4615,15 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
         self.waitUntilSettled()
 
         # Validate that the Github check-run was cancelled and a new
-        # one restarted.
+        # one restarted. The gate pipeline would get triggered with
+        # edited event, but it would send a nonEnqueu message.
         check_runs = self.fake_github.getCommitChecks("gh/project", A.head_sha)
-        self.assertEqual(len(check_runs), 2)
-        self.assertEqual(check_runs[0]["status"], "in_progress")
-        self.assertEqual(check_runs[1]["status"], "completed")
+        self.assertEqual(len(check_runs), 3)
+        # We are not sure if the gate pipeline or the check pipeline would
+        # process first, only one of the check_runs would be in_progress
+        self.assertEqual([check_runs[0]["status"],
+                         check_runs[1]["status"]].count("in_progress"), 1)
+        self.assertEqual(check_runs[2]["status"], "completed")
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -4620,15 +4641,18 @@ class TestGithubAppCircularDependencies(ZuulGithubAppTestCase):
                  changes=f"{B.number},{B.head_sha} {A.number},{A.head_sha}",
                  ref="refs/pull/2/head"),
         ], ordered=False)
-        # Verify that since we are issuing two check runs, they both
-        # complete.
+        # Verify that all check runs are completed.
         check_runs = self.fake_github.getCommitChecks("gh/project", A.head_sha)
         self.assertEqual(len(check_runs), 2)
         check_run = check_runs[0]
         self.assertEqual(check_run["status"], "completed")
         check_run = check_runs[1]
         self.assertEqual(check_run["status"], "completed")
-        self.assertNotEqual(check_runs[0]["id"], check_runs[1]["id"])
+        check_run = check_runs[2]
+        self.assertEqual(check_run["status"], "completed")
+        self.assertEqual(set([check_runs[0]["id"],
+                             check_runs[1]["id"],
+                             check_runs[2]["id"]]), 3)
 
         check_runs = self.fake_github.getCommitChecks("gh/project", B.head_sha)
         self.assertEqual(len(check_runs), 2)
