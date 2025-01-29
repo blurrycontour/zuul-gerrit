@@ -368,12 +368,6 @@
     pre-run: playbooks/release/pre.yaml
     nodeset: ubuntu-jammy
 
-- job:
-    name: zuul-release-python
-    parent: opendev-release-python
-    pre-run: playbooks/release/pre.yaml
-    nodeset: ubuntu-jammy
-
 - project:
     queue: zuul
     vars:
