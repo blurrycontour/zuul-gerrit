@@ -16,6 +16,24 @@
       "message": "Not sure what inspect is doing, but the column size is static, so perhaps we should pull its value from the sqlconnection module instead?",
       "revId": "aeca4fbcf607f04847308add0d0d6221f945d7fa",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a70a4fab_26fd3432",
+        "filename": "zuul/driver/sql/sqlreporter.py",
+        "patchSetId": 10
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-01-29T11:24:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6293fc20_d0569675",
+      "revId": "aeca4fbcf607f04847308add0d0d6221f945d7fa",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
