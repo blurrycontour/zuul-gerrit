@@ -1991,11 +1991,16 @@ class Scheduler(threading.Thread):
 
             for item in items_to_enqueue:
                 for item_change in item.changes:
+                    warnings = []
                     pipeline.manager.addChange(
                         item_change, item.event,
                         enqueue_time=item.enqueue_time,
                         quiet=True,
-                        ignore_requirements=True)
+                        ignore_requirements=True,
+                        warnings=warnings)
+                    pipeline.manager.reportNonEnqueuedItem(
+                        item_change, item.event,
+                        warnings)
             # Regardless, move this shared change queue to the head.
             pipeline.promoteQueue(change_queue)
 
@@ -2057,7 +2062,12 @@ class Scheduler(threading.Thread):
                 f'Change {change} does not belong to project "{project.name}"')
         self.log.debug("Event %s for change %s was directly assigned "
                        "to pipeline %s", event, change, self)
-        pipeline.manager.addChange(change, event, ignore_requirements=True)
+        warnings = []
+        pipeline.manager.addChange(change, event, ignore_requirements=True,
+                                    warnings=warnings)
+        # Only report nonEnqueuedWarnings
+        # if we are the originating change
+        pipeline.manager.reportNonEnqueuedItem(change, event, warnings)
 
     def _doSupercedeEvent(self, event):
         tenant = self.abide.tenants[event.tenant_name]
@@ -2646,7 +2656,11 @@ class Scheduler(threading.Thread):
             pipeline.manager.refreshDeps(change, event)
 
         if pipeline.manager.eventMatches(event, change):
-            pipeline.manager.addChange(change, event)
+            warnings = []
+            pipeline.manager.addChange(change, event, warnings=warnings)
+            # Only report nonEnqueuedWarnings
+            # if we are the originating change
+            pipeline.manager.reportNonEnqueuedItem(change, event, warnings)
 
     def process_tenant_management_queue(self, tenant):
         try:
