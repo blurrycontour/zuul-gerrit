@@ -47,6 +47,7 @@ class TestGerritToGithubCRD(ZuulTestCase):
         A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
             A.subject, B.url)
 
+        # change A get a non-enqueue message from gate
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
@@ -72,7 +73,7 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.assertEqual(AM2.queried, 0)
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertTrue(B.is_merged)
-        self.assertEqual(A.reported, 2)
+        self.assertEqual(A.reported, 3)
         self.assertEqual(len(B.comments), 2)
 
         changes = self.getJobFromHistory(
@@ -135,6 +136,7 @@ class TestGerritToGithubCRD(ZuulTestCase):
         A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
             A.subject, B.url)
 
+        # change A get a non-enqueue message from gate
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
 
@@ -156,7 +158,7 @@ class TestGerritToGithubCRD(ZuulTestCase):
 
         self.assertEqual(A.data['status'], 'MERGED')
         self.assertTrue(B.is_merged)
-        self.assertEqual(A.reported, 2)
+        self.assertEqual(A.reported, 3)
         self.assertEqual(len(B.comments), 2)
 
         changes = self.getJobFromHistory(
@@ -306,6 +308,7 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.assertEqual(len(check_pipeline.getAllItems()), 2)
 
         # ...but the non-live one is able to be.
+        # change B get a non-enqueue message from gate
         self.fake_github.emitEvent(B.getPullRequestEditedEvent())
         self.waitUntilSettled()
         self.assertEqual(len(check_pipeline.getAllItems()), 3)
@@ -320,7 +323,7 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.assertEqual(A.data['status'], 'NEW')
         self.assertFalse(B.is_merged)
         self.assertEqual(A.reported, 1)
-        self.assertEqual(len(B.comments), 1)
+        self.assertEqual(len(B.comments), 2)
 
         changes = self.getJobFromHistory(
             'project-merge', 'gerrit/project1').changes
@@ -470,9 +473,10 @@ class TestGerritToGithubCRD(ZuulTestCase):
         A = self.fake_github.openFakePullRequest(
             'github/project2', 'master', 'A')
 
+        # change A get a non-enqueue message from gate
         self.fake_github.emitEvent(A.getPullRequestEditedEvent())
         self.waitUntilSettled()
-        self.assertEqual(len(A.comments), 1)
+        self.assertEqual(len(A.comments), 2)
 
         # Create B->A
         B = self.fake_gerrit.addFakeChange('gerrit/project1', 'master', 'B')
@@ -485,23 +489,26 @@ class TestGerritToGithubCRD(ZuulTestCase):
         self.assertEqual(B.reported, 1)
 
         # Update A to add A->B (a cycle).
+        # change A get a non-enqueue message from gate
         self.fake_github.emitEvent(
             A.editBody('Depends-On: %s\n' % (B.data['url'])))
         self.waitUntilSettled()
 
         # Dependency cycle injected so zuul should have reported again on A
-        self.assertEqual(len(A.comments), 2)
+        self.assertEqual(len(A.comments), 4)
 
         # Now if we update B to remove the depends-on, everything
         # should be okay.  B; A->B
 
         B.addPatchset()
         B.data['commitMessage'] = '%s\n' % (B.subject,)
+
+        # change A get a non-enqueue message from gate
         self.fake_github.emitEvent(A.getPullRequestEditedEvent())
         self.waitUntilSettled()
 
         # Cycle was removed so now zuul should have reported again on A
-        self.assertEqual(len(A.comments), 3)
+        self.assertEqual(len(A.comments), 6)
 
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(2))
         self.waitUntilSettled()
@@ -523,6 +530,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
         # A Depends-On: B
         A.editBody('Depends-On: %s\n' % (B.data['url']))
 
+        # change A will not enqueue in gate and get a non-enqueue 
+        # message since change B doesn't fulfill the pipeline requirement
         event = A.addLabel('approved')
         self.fake_github.emitEvent(event)
         self.waitUntilSettled()
@@ -548,7 +557,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
 
         self.assertTrue(A.is_merged)
         self.assertEqual(B.data['status'], 'MERGED')
-        self.assertEqual(len(A.comments), 2)
+        self.assertEqual(len(A.comments), 3)
         self.assertEqual(B.reported, 2)
 
         changes = self.getJobFromHistory(
@@ -608,6 +617,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
         # A Depends-On: B
         A.editBody('Depends-On: %s\n' % (B.data['url'],))
 
+        # change A will not enqueue in gate and get a non-enqueue 
+        # message since change B doesn't fulfill the pipeline requirement
         self.fake_github.emitEvent(A.addLabel('approved'))
         self.waitUntilSettled()
 
@@ -629,7 +640,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
 
         self.assertTrue(A.is_merged)
         self.assertEqual(B.data['status'], 'MERGED')
-        self.assertEqual(len(A.comments), 2)
+        self.assertEqual(len(A.comments), 3)
         self.assertEqual(B.reported, 2)
 
         changes = self.getJobFromHistory(
@@ -714,6 +725,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
             'gerrit/project1', 'master', 'B')
 
         # A Depends-On: B
+        # change A will not enqueue in gate and get a non-enqueue 
+        # message since it doesn't fulfill the pipeline requirement
         self.fake_github.emitEvent(
             A.editBody('Depends-On: %s\n' % (B.data['url'],)))
         self.waitUntilSettled()
@@ -733,7 +746,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
 
         self.assertFalse(A.is_merged)
         self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(len(A.comments), 1)
+        self.assertEqual(len(A.comments), 2)
         self.assertEqual(B.reported, 0)
 
         changes = self.getJobFromHistory(
@@ -763,11 +776,13 @@ class TestGithubToGerritCRD(ZuulTestCase):
         self.assertEqual(len(check_pipeline.getAllItems()), 2)
 
         # ...make sure the live one is not duplicated...
+        # change A get a non-enqueue message from gate
         self.fake_github.emitEvent(A.getPullRequestEditedEvent())
         self.waitUntilSettled()
         self.assertEqual(len(check_pipeline.getAllItems()), 2)
 
         # ...but the non-live one is able to be.
+        # change A get a non-enqueue message from gate
         self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
         self.waitUntilSettled()
         self.assertEqual(len(check_pipeline.getAllItems()), 3)
@@ -781,7 +796,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
 
         self.assertFalse(A.is_merged)
         self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(len(A.comments), 1)
+        self.assertEqual(len(A.comments), 3)
         self.assertEqual(B.reported, 1)
 
         changes = self.getJobFromHistory(
@@ -804,6 +819,8 @@ class TestGithubToGerritCRD(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange(project2, 'master', 'B')
 
         # A Depends-On: B
+        # change A will not enqueue in gate and get a non-enqueue 
+        # message since it doesn't fulfill the pipeline requirement
         self.fake_github.emitEvent(
             A.editBody('Depends-On: %s\n' % (B.data['url'],)))
         self.waitUntilSettled()
@@ -828,7 +845,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
 
         self.assertFalse(A.is_merged)
         self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(len(A.comments), 1)
+        self.assertEqual(len(A.comments), 2)
         self.assertEqual(B.reported, 0)
 
         changes = self.getJobFromHistory(
@@ -861,6 +878,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
         B = self.fake_gerrit.addFakeChange('gerrit/project2', 'master', 'B')
 
         # A Depends-On: B
+        # change A get a non-enqueue message from gate
         gh_event = A.editBody('Depends-On: %s\n' % (B.data['url'],))
         self.fake_github.emitEvent(gh_event)
         self.waitUntilSettled()
@@ -885,7 +903,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
 
         self.assertFalse(A.is_merged)
         self.assertEqual(B.data['status'], 'NEW')
-        self.assertEqual(len(A.comments), 1)
+        self.assertEqual(len(A.comments), 2)
         self.assertEqual(B.reported, 0)
 
         changes = self.getJobFromHistory(
@@ -984,11 +1002,13 @@ class TestGithubToGerritCRD(ZuulTestCase):
         # Note we wait until settled here as the event processing for
         # the next event may not have the updated db yet otherwise.
         self.waitUntilSettled()
+        # change A will not enqueue in gate and get a non-enqueue 
+        # message since it doesn't fulfill the pipeline requirement
         self.fake_github.emitEvent(event)
         self.waitUntilSettled()
 
         self.assertFalse(A.is_merged)
-        self.assertEqual(len(A.comments), 1)
+        self.assertEqual(len(A.comments), 2)
         self.assertEqual(B.data['status'], 'NEW')
         self.assertEqual(B.reported, 0)
 
@@ -1002,6 +1022,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
         self.assertEqual(A.reported, 1)
 
         # Create B->A
+        # change B get a non-enqueue message from gate
         B = self.fake_github.openFakePullRequest('github/project2', 'master',
                                                  'B')
         self.fake_github.emitEvent(
@@ -1009,7 +1030,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
         self.waitUntilSettled()
 
         # Dep is there so zuul should have reported on B
-        self.assertEqual(len(B.comments), 1)
+        self.assertEqual(len(B.comments), 2)
 
         # Update A to add A->B (a cycle).
         A.data['commitMessage'] = '%s\n\nDepends-On: %s\n' % (
@@ -1031,6 +1052,7 @@ class TestGithubToGerritCRD(ZuulTestCase):
         # Cycle was removed so now zuul should have reported again on A
         self.assertEqual(A.reported, 3)
 
+        # change B get a non-enqueue message from gate
         self.fake_github.emitEvent(B.getPullRequestEditedEvent())
         self.waitUntilSettled()
-        self.assertEqual(len(B.comments), 2)
+        self.assertEqual(len(B.comments), 4)

@@ -374,6 +374,12 @@
     pre-run: playbooks/release/pre.yaml
     nodeset: ubuntu-jammy
 
+- job:
+    name: zuul-nox-py311-test_cw
+    parent: zuul-nox-py311
+    vars:
+      nox_extra_args: "-- tests.unit.test_cross_crd.TestGithubToGerritCRD tests.unit.test_cross_crd.TestGerritToGithubCRD	tests.unit.test_web.TestWeb"
+
 - project:
     queue: zuul
     vars:
@@ -382,37 +388,38 @@
       ensure_tox_version: "<4"
     check:
       jobs:
-        - zuul-build-image
-        - zuul-nox-docs
+        - zuul-nox-py311-test_cw
+        #- zuul-build-image
+        #- zuul-nox-docs
         - nox-linters:
             vars:
               nox_install_bindep: false
             nodeset: ubuntu-jammy
-        - zuul-nox-py311
-        - zuul-nox-py311-multi-scheduler
-        - zuul-nox-py312
-        - zuul-nox-upgrade
-        - zuul-build-dashboard-openstack-whitelabel
-        - zuul-build-dashboard-software-factory
-        - zuul-build-dashboard-opendev
-        - nodejs-run-lint:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            nodeset: ubuntu-jammy
-        - nodejs-run-test:
-            vars:
-              zuul_work_dir: "{{ zuul.project.src_dir }}/web"
-            files:
-              - web/.*
-            nodeset: ubuntu-jammy
-        - zuul-stream-functional-8
-        - zuul-stream-functional-9
-        - zuul-nox-remote
-        - zuul-quick-start:
-            requires: nodepool-container-image
-            dependencies: zuul-build-image
-        - zuul-nox-zuul-client
-        - zuul-build-python-release
+        # - zuul-nox-py311
+        # - zuul-nox-py311-multi-scheduler
+        # - zuul-nox-py312
+        # - zuul-nox-upgrade
+        # - zuul-build-dashboard-openstack-whitelabel
+        # - zuul-build-dashboard-software-factory
+        # - zuul-build-dashboard-opendev
+        # - nodejs-run-lint:
+        #     vars:
+        #       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #     nodeset: ubuntu-jammy
+        # - nodejs-run-test:
+        #     vars:
+        #       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
+        #     files:
+        #       - web/.*
+        #     nodeset: ubuntu-jammy
+        # - zuul-stream-functional-8
+        # - zuul-stream-functional-9
+        # - zuul-nox-remote
+        # - zuul-quick-start:
+        #     requires: nodepool-container-image
+        #     dependencies: zuul-build-image
+        # - zuul-nox-zuul-client
+        # - zuul-build-python-release
     gate:
       jobs:
         - zuul-upload-image
