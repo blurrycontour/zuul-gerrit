@@ -26,6 +26,7 @@ from time import sleep
 from unittest import mock, skip, skipIf
 from zuul.lib import yamlutil
 from zuul.scheduler import PendingReconfiguration
+from testtools.matchers import MatchesRegex
 
 import fixtures
 import git
@@ -10491,10 +10492,20 @@ class TestPipelineLimits(ZuulTestCase):
             dict(name='project-test1', result='SUCCESS', changes='1,1'),
             dict(name='project-test2', result='SUCCESS', changes='1,1'),
         ], ordered=False)
+
+        # change A would not get a nonEnqueue message because it is
+        # not an originating change
+        # change B would report the nonEqneue message of change A
+        # since it depends on A and is the originating change
         self.assertEqual(A.reported, 1)
         self.assertEqual(B.reported, 1)
-        self.assertIn('Unable to enqueue change: 2 changes to enqueue '
-                      'greater than pipeline max of 1', B.messages[0])
+
+        self.assertThat(B.messages[0], MatchesRegex(
+                        r'.*Unable to enqueue <Change 0x[0-9a-z]+ '
+                        r'org/project 1,1>: 2 changes to enqueue greater '
+                        r'than pipeline max of 1\s+Failed to enqueue '
+                        r'changes ahead of <Change 0x[0-9a-z]+ '
+                        r'org/project 2,1>.*', re.DOTALL))
 
     def test_pipeline_max_changes_current_check(self):
         # Max-changes is 1, so this is allowed
@@ -10520,9 +10531,14 @@ class TestPipelineLimits(ZuulTestCase):
         ], ordered=False)
         self.assertEqual(A.reported, 1)
         self.assertEqual(B.reported, 1)
-        self.assertIn('Unable to enqueue change: 1 additional changes would '
-                      'exceed pipeline max of 1 under current conditions',
-                      B.messages[0])
+
+        # change A gets enqueued into the pipeline
+        # change B would report a nonEqneue message
+        self.assertThat(B.messages[0], MatchesRegex(
+                        r'.*Unable to enqueue <Change 0x[0-9a-z]+ '
+                        r'org/project 2,1>: 1 additional changes '
+                        r'would exceed pipeline max of 1 under '
+                        r'current conditions.*', re.DOTALL))
 
     def test_pipeline_max_changes_gate(self):
         # Max-changes is 1, so this is allowed
@@ -10556,8 +10572,12 @@ class TestPipelineLimits(ZuulTestCase):
         self.assertEqual(A.reported, 2)
         self.assertEqual(B.reported, 0)
         self.assertEqual(C.reported, 1)
-        self.assertIn('Unable to enqueue change: 2 changes to enqueue '
-                      'greater than pipeline max of 1', C.messages[0])
+        self.assertThat(C.messages[0], MatchesRegex(
+                        r'.*Unable to enqueue <Change 0x[0-9a-z]+ '
+                        r'org/project 2,1>: 2 changes to enqueue greater '
+                        r'than pipeline max of 1\s+Failed to enqueue '
+                        r'changes ahead of <Change 0x[0-9a-z]+ '
+                        r'org/project 3,1>.*', re.DOTALL))
 
 
 class TestBlobStorePipelineProcessing(ZuulTestCase):

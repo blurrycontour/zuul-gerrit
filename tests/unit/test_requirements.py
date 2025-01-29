@@ -399,8 +399,15 @@ class TestRequirementsReject(ZuulTestCase):
 
     tenant_config_file = 'config/requirements/reject/main.yaml'
 
-    def _test_require_reject(self, project, job):
+    def _test_require_reject(self, project, job, reqtype):
         "Test no approval matches a reject param"
+
+        # Unfulfilment of pipeline requirements will enqueue
+        # an empty failed build to report nonEnqueue message
+        # and zuul will vote -1 on failure with username jenkins
+        # We need to reset jenkins votes after a nonqueue event
+        # when testing pipeline_requirements.
+
         A = self.fake_gerrit.addFakeChange(project, 'master', 'A')
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 0)
@@ -423,12 +430,17 @@ class TestRequirementsReject(ZuulTestCase):
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
+        # Reset jenkins to positive if testing pipeline requirements
+        if reqtype == 'pipeline':
+            A.addApproval('Verified', 1, username='jenkins')
 
         # Future approvals should do nothing
         comment = A.addApproval('Verified', 1, username='reviewer_c')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
         self.assertEqual(len(self.history), 1)
+        if reqtype == 'pipeline':
+            A.addApproval('Verified', 1, username='jenkins')
 
         # Change/update negative vote should queue
         comment = A.addApproval('Verified', 1, username='reviewer_b')
@@ -446,11 +458,13 @@ class TestRequirementsReject(ZuulTestCase):
 
     def test_pipeline_require_reject(self):
         "Test pipeline requirement: rejections absent"
-        return self._test_require_reject('org/project1', 'project1-job')
+        return self._test_require_reject('org/project1', 'project1-job',
+                                         'pipeline')
 
     def test_trigger_require_reject(self):
         "Test trigger requirement: rejections absent"
-        return self._test_require_reject('org/project2', 'project2-job')
+        return self._test_require_reject('org/project2', 'project2-job',
+                                         'trigger')
 
     def test_pipeline_requirement_reject_unrelated(self):
         "Test if reject is obeyed if another unrelated approval is present"

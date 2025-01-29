@@ -1,6 +1,9 @@
 - pipeline:
     name: check
     manager: independent
+    require:
+      gerrit:
+        wip: false
     trigger:
       gerrit:
         - event: patchset-created
