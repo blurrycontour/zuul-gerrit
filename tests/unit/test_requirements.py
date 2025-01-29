@@ -431,6 +431,7 @@ class TestRequirementsReject(ZuulTestCase):
         self.assertEqual(len(self.history), 1)
 
         # Change/update negative vote should queue
+        comment = A.addApproval('Verified', 1, username='jenkins')
         comment = A.addApproval('Verified', 1, username='reviewer_b')
         self.fake_gerrit.addEvent(comment)
         self.waitUntilSettled()
