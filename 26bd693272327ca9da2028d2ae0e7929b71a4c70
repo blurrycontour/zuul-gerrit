@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87d74184_e1cfd9ab",
+        "filename": "web/src/pages/PipelineOverview.jsx",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-30T00:10:05Z",
+      "side": 1,
+      "message": "This is what\u0027s causing problems in node\u003c20; toSorted isn\u0027t present.  You could fix that by making a copy (maybe an empty filter in an else clause for line 90, or an explicit [...pipelines]) and then calling .sort() on the copy.",
+      "revId": "26bd693272327ca9da2028d2ae0e7929b71a4c70",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
