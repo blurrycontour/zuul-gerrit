@@ -21,6 +21,7 @@ from unittest import mock
 from zuul import model
 from zuul.launcher.client import LauncherClient
 
+import fixtures
 import responses
 import testtools
 from kazoo.exceptions import NoNodeError
@@ -127,6 +128,8 @@ class LauncherBaseTestCase(ZuulTestCase):
         self.mock_aws.start()
         # Must start responses after mock_aws
         self.useFixture(ImageMocksFixture())
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.launcher.server.NodescanRequest.FAKE', True))
         self.s3 = boto3.resource('s3', region_name='us-west-2')
         self.s3.create_bucket(
             Bucket='zuul',
@@ -424,10 +427,20 @@ class TestLauncher(LauncherBaseTestCase):
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_jobs_executed(self):
+        self.executor_server.hold_jobs_in_build = True
+
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
+
+        nodes = self.launcher.api.nodes_cache.getItems()
+        self.assertNotEqual(nodes[0].host_keys, [])
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
         self.assertEqual(self.getJobFromHistory('check-job').result,
                          'SUCCESS')
         self.assertEqual(A.data['status'], 'MERGED')
@@ -834,7 +847,9 @@ class TestMinReadyLauncher(LauncherBaseTestCase):
             if len(in_use_nodes) == 2:
                 break
 
-        self.executor_server.hold_jobs_in_build = True
+        self.assertNotEqual(nodes[0].host_keys, [])
+
+        self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
         self.waitUntilSettled()
 

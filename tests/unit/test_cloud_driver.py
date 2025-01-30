@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import fixtures
 import testtools
 from kazoo.exceptions import NoNodeError
 
@@ -28,6 +29,11 @@ class BaseCloudDriverTest(ZuulTestCase):
     cloud_test_connection_type = 'ssh'
     cloud_test_image_format = ''
     cloud_test_provider_name = ''
+
+    def setUp(self):
+        self.useFixture(fixtures.MonkeyPatch(
+            'zuul.launcher.server.NodescanRequest.FAKE', True))
+        super().setUp()
 
     def _getEndpoint(self):
         # Use the launcher provider so that we're using the same ttl
