@@ -56,34 +56,6 @@ import { EmptyBox } from '../containers/Errors'
 import { countPipelineItems } from '../containers/status/Misc'
 import { useDocumentVisibility, useInterval } from '../Hooks'
 
-const filterCategories = [
-  {
-    key: 'change',
-    title: 'Change',
-    placeholder: 'Filter by Change...',
-    type: 'fuzzy-search',
-  },
-  {
-    key: 'project',
-    title: 'Project',
-    placeholder: 'Filter by Project...',
-    type: 'fuzzy-search',
-  },
-  {
-    key: 'queue',
-    title: 'Queue',
-    placeholder: 'Filter by Queue...',
-    type: 'fuzzy-search',
-  },
-  {
-    key: 'pipeline',
-    title: 'Pipeline',
-    placeholder: 'Filter by Pipeline...',
-    type: 'fuzzy-search',
-  },
-]
-
-
 function PipelineGallery({ pipelines, tenant, showAllPipelines, expandAll, isLoading, filters, onClearFilters }) {
   // Filter out empty pipelines if necessary
   if (!showAllPipelines) {
@@ -97,6 +69,7 @@ function PipelineGallery({ pipelines, tenant, showAllPipelines, expandAll, isLoa
         minWidths={{
           sm: '400px',
         }}
+        className="zuul-pipeline-galery"
       >
         {pipelines.map(pipeline => (
           <GalleryItem key={pipeline.name}>
@@ -128,7 +101,7 @@ PipelineGallery.propTypes = {
   onClearFilters: PropTypes.func,
 }
 
-function getPipelines(status, location) {
+function getPipelines(status, location, filterCategories) {
   let pipelines = []
   let stats = {}
   if (status) {
@@ -155,6 +128,43 @@ function getPipelines(status, location) {
 }
 
 function PipelineOverviewPage() {
+  const status = useSelector((state) => state.status.status)
+
+  const filterCategories = [
+    {
+      key: 'change',
+      title: 'Change',
+      placeholder: 'Filter by Change...',
+      type: 'search',
+      fuzzy: true,
+    },
+    {
+      key: 'project',
+      title: 'Project',
+      placeholder: 'Filter by Project...',
+      type: 'search',
+      fuzzy: true,
+    },
+    {
+      key: 'queue',
+      title: 'Queue',
+      placeholder: 'Filter by Queue...',
+      type: 'select',
+      // the last filter part makes sure we only provide options for queues
+      // which have a non-empty name
+      options: status ? status.pipelines.map(p => p.change_queues).flat().map(q => q.name).filter(n => n) : [],
+      fuzzy: true,
+    },
+    {
+      key: 'pipeline',
+      title: 'Pipeline',
+      placeholder: 'Filter by Pipeline...',
+      type: 'select',
+      options: status ? status.pipelines.map(p => p.name) : [],
+      fuzzy: true,
+    },
+  ]
+
   const location = useLocation()
   const history = useHistory()
   const filters = getFiltersFromUrl(location, filterCategories)
@@ -168,8 +178,7 @@ function PipelineOverviewPage() {
 
   const isDocumentVisible = useDocumentVisibility()
 
-  const status = useSelector((state) => state.status.status)
-  const { pipelines, stats } = useMemo(() => getPipelines(status, location), [status, location])
+  const { pipelines, stats } = useMemo(() => getPipelines(status, location, filterCategories), [status, location, filterCategories])
 
   const isFetching = useSelector((state) => state.status.isFetching)
   const tenant = useSelector((state) => state.tenant)

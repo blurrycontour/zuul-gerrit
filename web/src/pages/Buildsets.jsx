@@ -42,25 +42,29 @@ class BuildsetsPage extends React.Component {
         key: 'project',
         title: 'Project',
         placeholder: 'Filter by Project...',
-        type: 'fuzzy-search',
+        type: 'search',
+        fuzzy: true,
       },
       {
         key: 'branch',
         title: 'Branch',
         placeholder: 'Filter by Branch...',
-        type: 'fuzzy-search',
+        type: 'search',
+        fuzzy: true,
       },
       {
         key: 'pipeline',
         title: 'Pipeline',
         placeholder: 'Filter by Pipeline...',
-        type: 'fuzzy-search',
+        type: 'search',
+        fuzzy: true,
       },
       {
         key: 'change',
         title: 'Change',
         placeholder: 'Filter by Change...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'result',
@@ -75,13 +79,15 @@ class BuildsetsPage extends React.Component {
           'DEQUEUED',
           'CONFIG_ERROR',
           'NO_JOBS',
-        ]
+        ],
+        fuzzy: false,
       },
       {
         key: 'uuid',
         title: 'Buildset',
         placeholder: 'Filter by Buildset UUID...',
         type: 'search',
+        fuzzy: false,
       },
     ]
 

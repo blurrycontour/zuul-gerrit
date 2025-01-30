@@ -63,24 +63,30 @@ import {
   clearFilters,
 } from '../containers/status/Filters'
 
-const filterCategories = [
+const filterCategories = (pipeline) => [
   {
     key: 'project',
     title: 'Project',
     placeholder: 'Filter by Project...',
-    type: 'fuzzy-search',
+    type: 'search',
+    fuzzy: true,
   },
   {
     key: 'change',
     title: 'Change',
     placeholder: 'Filter by Change...',
-    type: 'fuzzy-search',
+    type: 'search',
+    fuzzy: true,
   },
   {
     key: 'queue',
     title: 'Queue',
     placeholder: 'Filter by Queue...',
-    type: 'fuzzy-search',
+    type: 'select',
+    // the last filter part makes sure we only provide options for queues
+    // which have a non-empty name
+    options: pipeline ? pipeline.change_queues.flat().map(q => q.name).filter(n => n): [],
+    fuzzy: true,
   }
 ]
 
@@ -141,7 +147,7 @@ function PipelineDetailsPage({
 
   const location = useLocation()
   const history = useHistory()
-  const filters = getFiltersFromUrl(location, filterCategories)
+  const filters = getFiltersFromUrl(location, filterCategories(pipeline))
   const dispatch = useDispatch()
 
   const updateData = useCallback((tenant) => {
@@ -199,7 +205,7 @@ function PipelineDetailsPage({
         <Level>
           <LevelItem>
             <FilterToolbar
-              filterCategories={filterCategories}
+              filterCategories={filterCategories(pipeline)}
               onFilterChange={(newFilters) => { handleFilterChange(newFilters, location, history) }}
               filters={filters}
               filterInputValidation={filterInputValidation}
@@ -280,7 +286,7 @@ function PipelineDetailsPage({
             title="No items found"
             icon={StreamIcon}
             action="Clear all filters"
-            onAction={() => clearFilters(location, history, filterCategories)}
+            onAction={() => clearFilters(location, history, filterCategories(pipeline))}
           >
             No items match this filter criteria. Remove some filters or
             clear all to show results.
@@ -305,13 +311,13 @@ PipelineDetailsPage.propTypes = {
 function mapStateToProps(state, ownProps) {
   let pipeline = null
   if (state.status.status) {
-    const filters = getFiltersFromUrl(ownProps.location, filterCategories)
+    const filters = getFiltersFromUrl(ownProps.location, filterCategories(null))
     // we need to work on a copy of the state..pipelines, because when mutating
     // the original, we couldn't reset or change the filters without reloading
     // from the backend first.
     const pipelines = global.structuredClone(state.status.status.pipelines)
     // Filter the state for this specific pipeline
-    pipeline = filterPipelines(pipelines, filters, filterCategories, false)
+    pipeline = filterPipelines(pipelines, filters, filterCategories(null), false)
       .find((p) => p.name === ownProps.match.params.pipelineName) || null
     pipeline = countPipelineItems(pipeline)
   }

@@ -54,24 +54,28 @@ class ConfigErrorsPage extends React.Component {
         title: 'Project',
         placeholder: 'Filter by project...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'branch',
         title: 'Branch',
         placeholder: 'Filter by branch...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'severity',
         title: 'Severity',
         placeholder: 'Filter by severity...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'name',
         title: 'Name',
         placeholder: 'Filter by name...',
         type: 'search',
+        fuzzy: false,
       },
     ]
 

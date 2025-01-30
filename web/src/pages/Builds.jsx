@@ -43,31 +43,36 @@ class BuildsPage extends React.Component {
         key: 'job_name',
         title: 'Job',
         placeholder: 'Filter by Job...',
-        type: 'fuzzy-search',
+        type: 'search',
+        fuzzy: true,
       },
       {
         key: 'project',
         title: 'Project',
         placeholder: 'Filter by Project...',
-        type: 'fuzzy-search',
+        type: 'search',
+        fuzzy: true,
       },
       {
         key: 'branch',
         title: 'Branch',
         placeholder: 'Filter by Branch...',
-        type: 'fuzzy-search',
+        type: 'search',
+        fuzzy: true,
       },
       {
         key: 'pipeline',
         title: 'Pipeline',
         placeholder: 'Filter by Pipeline...',
-        type: 'fuzzy-search',
+        type: 'search',
+        fuzzy: true,
       },
       {
         key: 'change',
         title: 'Change',
         placeholder: 'Filter by Change...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'result',
@@ -96,12 +101,14 @@ class BuildsPage extends React.Component {
           'LOST',
           'EXCEPTION',
           'NO_HANDLE'],
+        fuzzy: false,
       },
       {
         key: 'uuid',
         title: 'Build',
         placeholder: 'Filter by Build UUID...',
         type: 'search',
+        fuzzy: false,
       },
       {
         key: 'held',
@@ -112,7 +119,8 @@ class BuildsPage extends React.Component {
           'All',
           'Held Builds Only',
           'Non Held Builds Only',
-        ]
+        ],
+        fuzzy: false,
       },
       {
         key: 'voting',
@@ -123,7 +131,8 @@ class BuildsPage extends React.Component {
           'All',
           'Voting Only',
           'Non-Voting Only',
-        ]
+        ],
+        fuzzy: false,
       },
     ]
 

@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
@@ -89,6 +89,8 @@ function FilterToolbar(props) {
     props.filterCategories[0].title
   )
   const [inputValue, setInputValue] = useState('')
+
+  const fuzzySearchTooltipRef = useRef()
 
   function handleCategoryToggle(isOpen) {
     setIsCategoryDropdownOpen(isOpen)
@@ -195,7 +197,6 @@ function FilterToolbar(props) {
           isOpen={isCategoryDropdownOpen}
           dropdownItems={filterCategories.filter(
             (category) => (category.type === 'search' ||
-              category.type === 'fuzzy-search' ||
               category.type === 'select' ||
               category.type === 'ternary' ||
               category.type === 'checkbox')
@@ -222,32 +223,8 @@ function FilterToolbar(props) {
             value={inputValue}
             placeholder={category.placeholder}
             onKeyDown={(event) => handleInputSend(event, category)}
+            ref={category.fuzzy ? fuzzySearchTooltipRef : null}
           />
-          <Button
-            variant={ButtonVariant.control}
-            aria-label="search button for search input"
-            onClick={(event) => handleInputSend(event, category)}
-          >
-            <SearchIcon />
-          </Button>
-        </InputGroup>
-      )
-    } else if (category.type === 'fuzzy-search') {
-      return (
-        <InputGroup>
-          <Tooltip
-            content="Wildcard search with * placeholders">
-            <TextInput
-              name={`${category.key}-input`}
-              id={`${category.key}-input`}
-              type="search"
-              aria-label={`${category.key} filter`}
-              onChange={handleInputChange}
-              value={inputValue}
-              placeholder={category.placeholder}
-              onKeyDown={(event) => handleInputSend(event, category)}
-            />
-          </Tooltip>
           <Button
             variant={ButtonVariant.control}
             aria-label="search button for search input"
@@ -260,11 +237,15 @@ function FilterToolbar(props) {
     } else if (category.type === 'select') {
       return (
         <InputGroup>
-          <FilterSelect
-            onFilterChange={onFilterChange}
-            filters={filters}
-            category={category}
-          />
+          {/* enclosing the FilterSelect with a div because setting the
+              tooltip ref on the FilterSelect does not work */}
+          <div ref={category.fuzzy ? fuzzySearchTooltipRef : null}>
+            <FilterSelect
+              onFilterChange={onFilterChange}
+              filters={filters}
+              category={category}
+            />
+          </div>
         </InputGroup>
       )
     } else if (category.type === 'ternary') {
@@ -304,6 +285,10 @@ function FilterToolbar(props) {
             categoryName={category.title}
             showToolbarItem={currentCategory === category.title}
           >
+            <Tooltip
+              reference={fuzzySearchTooltipRef}
+              content="Wildcard search with * placeholders"
+            />
             {renderFilterInput(category, filters)}
           </ToolbarFilter>
         ))}

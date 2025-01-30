@@ -142,7 +142,7 @@ function filterPipelines(pipelines, filters, filterCategories, truncateEmpty) {
   // by going over the valid FILTER_CATEGORIES
   for (const category of filterCategories) {
     const key = category['key']
-    const fuzzy = category['type'] === 'fuzzy-search'
+    const fuzzy = category['fuzzy']
     const filter = filters[key]
     if (filter.length === 0) {
       continue
