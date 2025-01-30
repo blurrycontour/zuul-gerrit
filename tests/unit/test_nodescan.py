@@ -128,9 +128,11 @@ class TestNodescanWorker(BaseTestCase):
             interface_ip='198.51.100.1',
             connection_port=22,
             connection_type='ssh',
+            host_key_checking=True,
+            boot_timeout=300,
         )
         worker.start()
-        request = NodescanRequest(node, True, 300, self.log)
+        request = NodescanRequest(node, self.log)
         worker.addRequest(request)
         for _ in iterate_timeout(30, 'waiting for nodescan'):
             if request.complete:
@@ -156,9 +158,11 @@ class TestNodescanWorker(BaseTestCase):
             interface_ip='198.51.100.1',
             connection_port=22,
             connection_type='ssh',
+            host_key_checking=True,
+            boot_timeout=1,
         )
         worker.start()
-        request = NodescanRequest(node, True, 1, self.log)
+        request = NodescanRequest(node, self.log)
         worker.addRequest(request)
         for _ in iterate_timeout(30, 'waiting for nodescan'):
             if request.complete:
@@ -185,9 +189,11 @@ class TestNodescanWorker(BaseTestCase):
             interface_ip='198.51.100.1',
             connection_port=22,
             connection_type='ssh',
+            host_key_checking=True,
+            boot_timeout=1,
         )
         worker.start()
-        request = NodescanRequest(node, True, 1, self.log)
+        request = NodescanRequest(node, self.log)
         worker.addRequest(request)
         for _ in iterate_timeout(30, 'waiting for nodescan'):
             if request.complete:
@@ -215,9 +221,11 @@ class TestNodescanWorker(BaseTestCase):
             interface_ip='198.51.100.1',
             connection_port=22,
             connection_type='ssh',
+            host_key_checking=True,
+            boot_timeout=1,
         )
         worker.start()
-        request = NodescanRequest(node, True, 1, self.log)
+        request = NodescanRequest(node, self.log)
         worker.addRequest(request)
         for _ in iterate_timeout(30, 'waiting for nodescan'):
             if request.complete:
@@ -252,16 +260,20 @@ class TestNodescanWorker(BaseTestCase):
             interface_ip='198.51.100.1',
             connection_port=22,
             connection_type='ssh',
+            host_key_checking=True,
+            boot_timeout=300,
         )
         node2 = DummyProviderNode()
         node2._set(
             interface_ip='198.51.100.2',
             connection_port=22,
             connection_type='ssh',
+            host_key_checking=True,
+            boot_timeout=300,
         )
 
-        request1 = NodescanRequest(node1, True, 300, self.log)
-        request2 = NodescanRequest(node2, True, 300, self.log)
+        request1 = NodescanRequest(node1, self.log)
+        request2 = NodescanRequest(node2, self.log)
         worker.addRequest(request1)
         worker.addRequest(request2)
         worker.start()

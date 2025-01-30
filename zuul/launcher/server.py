@@ -1,5 +1,5 @@
 # Copyright 2024 BMW Group
-# Copyright 2024 Acme Gating, LLC
+# Copyright 2024-2025 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -267,11 +267,11 @@ class NodescanRequest:
     # For unit testing
     FAKE = False
 
-    def __init__(self, node, host_key_checking, timeout, log):
+    def __init__(self, node, log):
         self.state = self.START
         self.node = node
-        self.host_key_checking = host_key_checking
-        self.timeout = timeout
+        self.host_key_checking = node.host_key_checking
+        self.timeout = node.boot_timeout
         self.log = log
         self.complete = False
         self.keys = []
@@ -605,6 +605,9 @@ class NodescanWorker:
         except ValueError:
             pass
 
+    def length(self):
+        return len(self._active_requests) + len(self._pending_requests)
+
     def registerDescriptor(self, fd):
         """Register the fd with the poll object"""
         # Oneshot means that once it triggers, it will automatically
@@ -734,6 +737,7 @@ class Launcher:
             self._imageUpdatedCallback
         )
 
+        self.nodescan_worker = NodescanWorker()
         self.launcher_thread = threading.Thread(
             target=self.run,
             name="Launcher",
@@ -940,6 +944,8 @@ class Launcher:
             label=label.name,
             label_config_hash=label.config_hash,
             max_ready_age=label.max_ready_age,
+            host_key_checking=label.host_key_checking,
+            boot_timeout=label.boot_timeout,
             request_id=request.uuid,
             zuul_event_id=request.zuul_event_id,
             connection_name=provider.connection_name,
@@ -1108,15 +1114,46 @@ class Launcher:
                 if not node.create_state_machine.complete:
                     self.wake_event.set()
                     return
-                self._updateNodeFromInstance(node, instance)
-                node.setState(node.State.READY)
-                self.wake_event.set()
-                log.debug("Marking node %s as %s", node, node.state)
+                # Note this method has the side effect of updating
+                # node info from the instance.
+                if self._checkNodescanRequest(node, instance):
+                    node.setState(node.State.READY)
+                    self.wake_event.set()
+                    log.debug("Marking node %s as %s", node, node.state)
             node.releaseLock(ctx)
+
+    def _checkNodescanRequest(self, node, instance):
+        if node.nodescan_request is None:
+            # We just finished the create state machine, update with
+            # new info.
+            self._updateNodeFromInstance(node, instance)
+            node.nodescan_request = NodescanRequest(node, self.log)
+            self.nodescan_worker.addRequest(node.nodescan_request)
+            self.log.debug(
+                "Submitted nodescan request for %s queue length %s",
+                node.interface_ip,
+                self.nodescan_worker.length())
+        if not node.nodescan_request.complete:
+            return False
+        try:
+            keys = node.nodescan_request.result()
+        except Exception as e:
+            if isinstance(e, exceptions.ConnectionTimeoutException):
+                self.log.warning("Error scanning keys: %s", str(e))
+            else:
+                self.log.exception("Exception scanning keys:")
+            raise exceptions.LaunchKeyscanException(
+                "Can't scan key for %s" % (node,))
+        if keys:
+            node.host_keys = keys
+        return True
 
     def _cleanupNode(self, node, log):
         with self.createZKContext(node._lock, self.log) as ctx:
             with node.activeContext(ctx):
+                self.nodescan_worker.removeRequest(node.nodescan_request)
+                node.nodescan_request = None
+
                 if not node.delete_state_machine:
                     log.debug("Cleaning up node %s", node)
                     provider = self._getProviderForNode(
@@ -1162,6 +1199,7 @@ class Launcher:
             node_uuid = uuid.uuid4().hex
             # We don't pass a provider here as the node should not
             # be directly associated with a tenant or provider.
+            image = provider.images[label.image]
             tags = provider.getNodeTags(
                 self.system.system_id, label, node_uuid)
             node_class = provider.driver.getProviderNodeClass()
@@ -1172,12 +1210,17 @@ class Launcher:
                     label=label.name,
                     label_config_hash=label.config_hash,
                     max_ready_age=label.max_ready_age,
+                    host_key_checking=label.host_key_checking,
+                    boot_timeout=label.boot_timeout,
                     request_id=None,
                     connection_name=provider.connection_name,
                     zuul_event_id=uuid.uuid4().hex,
                     tenant_name=None,
                     provider=None,
                     tags=tags,
+                    # Set any node attributes we already know here
+                    connection_port=image.connection_port,
+                    connection_type=image.connection_type,
                 )
                 self.log.debug("Created min-ready node %s via provider %s",
                                node, provider)
@@ -1355,6 +1398,9 @@ class Launcher:
         self.command_thread.daemon = True
         self.command_thread.start()
 
+        self.log.debug("Starting nodescan worker")
+        self.nodescan_worker.start()
+
         self.log.debug("Starting launcher thread")
         self.launcher_thread.start()
 
@@ -1368,6 +1414,7 @@ class Launcher:
         self.connections.stop()
         self.upload_executor.shutdown()
         self.endpoint_upload_executor.shutdown()
+        self.nodescan_worker.stop()
         # Endpoints are stopped by drivers
         self.log.debug("Stopped launcher")
 
@@ -1380,6 +1427,7 @@ class Launcher:
         self.api.stop()
         self.zk_client.disconnect()
         self.tracing.stop()
+        self.nodescan_worker.join()
         self.log.debug("Joined launcher")
 
     def runCommand(self):
