@@ -377,7 +377,7 @@ class NodescanRequest:
         try:
             self.sock.connect(self.sockaddr)
         except BlockingIOError:
-            self.state = self.CONNECTING_INIT
+            pass
         self.connect_start_time = time.monotonic()
         self.worker.registerDescriptor(self.sock)
 
@@ -419,6 +419,7 @@ class NodescanRequest:
                 else:
                     self.init_connection_attempts += 1
                     self._connect()
+                    self.state = self.CONNECTING_INIT
 
         if self.state == self.CONNECTING_INIT:
             if not socket_ready:
@@ -465,6 +466,7 @@ class NodescanRequest:
                 self.state = self.START
                 self._checkTimeout()
                 self._connect()
+                self.state = self.CONNECTING_INIT
                 return
             # This is our first successful connection.  Now that
             # we've done it, start again specifying the first key
@@ -477,13 +479,24 @@ class NodescanRequest:
         if self.state == self.CONNECTING_KEY:
             if not socket_ready:
                 self._checkTimeout()
+                # If we're still here, then don't let any individual
+                # connection attempt last more than 10 seconds:
+                if time.monotonic() - self.connect_start_time >= 10:
+                    # Restart the connection attempt for this key (not
+                    # the whole series).
+                    self.key_connection_failures += 1
+                    self._close()
+                    self._connect()
+                    self.state = self.CONNECTING_KEY
                 return
             eno = self.sock.getsockopt(socket.SOL_SOCKET, socket.SO_ERROR)
             if eno:
                 self.log.error(
                     f"Error {eno} connecting to {self.ip} on port {self.port}")
                 self.key_connection_failures += 1
-                self._nextKey()
+                self._close()
+                self._connect()
+                self.state = self.CONNECTING_KEY
                 return
             self._start()
             self.state = self.NEGOTIATING_KEY
