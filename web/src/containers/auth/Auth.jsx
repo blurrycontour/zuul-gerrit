@@ -109,8 +109,8 @@ class AuthContainer extends React.Component {
     this.props.userManager.events.addUserLoaded(this.onUserLoaded)
 
     if (user.data) {
-      console.log('Refreshing ACL', user.tenant, tenant.name)
-      this.props.dispatch(fetchUserACL(tenant? tenant.name : null))
+      console.log('Refreshing ACL', user.tenant, tenant)
+      this.props.dispatch(fetchUserACL(tenant))
     }
   }
 
@@ -124,8 +124,8 @@ class AuthContainer extends React.Component {
 
     // Make sure the token is current and the tenant is up to date.
     if (user.data && user.tenant !== tenant.name) {
-      console.log('Refreshing ACL', user.tenant, tenant.name)
-      this.props.dispatch(fetchUserACL(tenant? tenant.name : null))
+      console.log('Refreshing ACL', user.tenant, tenant)
+      this.props.dispatch(fetchUserACL(tenant))
     }
   }
 
