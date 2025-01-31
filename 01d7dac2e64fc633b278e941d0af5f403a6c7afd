@@ -22,6 +22,24 @@
       },
       "revId": "01d7dac2e64fc633b278e941d0af5f403a6c7afd",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcb37fc7_f416744f",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 608,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-01-31T15:30:39Z",
+      "side": 1,
+      "message": "Yeah.  This is copied from nodepool though (not sure why it\u0027s not in the first change) so was easiest to leave it and the references as-is.",
+      "parentUuid": "5c8744a2_52a07c95",
+      "revId": "01d7dac2e64fc633b278e941d0af5f403a6c7afd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
