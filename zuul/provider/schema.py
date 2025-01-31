@@ -34,11 +34,13 @@ base_label = vs.Schema({
     Optional('tags', default=dict): {str: str},
     Optional('min_ready', default=0): int,
     Optional('max_ready_age', default=0): int,
+    Optional('boot-timeout', default=300): int,
 })
 
 # Label attributes that are common to any kind of ssh-based driver.
 ssh_label = vs.Schema({
     Optional('key-name'): Nullable(str),
+    Optional('host-key-checking', default=True): bool,
 })
 
 # Images
