@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c8744a2_52a07c95",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 608,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-01-31T11:15:17Z",
+      "side": 1,
+      "message": "nit: maybe `queue_length` is a better name, as it\u0027s not immediately clear what the length of a nodescan worker would be.",
+      "range": {
+        "startLine": 608,
+        "startChar": 8,
+        "endLine": 608,
+        "endChar": 14
+      },
+      "revId": "01d7dac2e64fc633b278e941d0af5f403a6c7afd",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
