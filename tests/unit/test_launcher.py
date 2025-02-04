@@ -448,6 +448,26 @@ class TestLauncher(LauncherBaseTestCase):
         self.assertEqual(self.getJobFromHistory('check-job').node,
                          'debian-normal')
 
+    @simple_layout('layouts/nodepool-empty-nodeset.yaml', enable_nodepool=True)
+    def test_empty_nodeset(self):
+        self.executor_server.hold_jobs_in_build = True
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        A.addApproval('Code-Review', 2)
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(self.getJobFromHistory('check-job').result,
+                         'SUCCESS')
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(self.getJobFromHistory('check-job').node,
+                         None)
+
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_launcher_failover(self):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')

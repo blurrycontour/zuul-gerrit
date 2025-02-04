@@ -1193,7 +1193,7 @@ class PipelineManager(metaclass=ABCMeta):
         if req.fulfilled and not req.labels:
             # Short circuit empty node request
             nodeset_info = model.NodesetInfo()
-            build_set.setNodesetInfo(job, nodeset_info)
+            build_set.setJobNodeSetInfo(job, nodeset_info)
         else:
             job.setWaitingStatus(f'nodeset request: {req.uuid}')
 
