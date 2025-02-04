@@ -1042,6 +1042,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                  if k.startswith('refs/heads/') and
                  GerritConnection._checkRefFormat(k)]
         branch_infos = [BranchInfo(h, present=True) for h in heads]
+        self.log.debug("Fetched %s branches for %s", len(heads), project)
         return BranchFlag.PRESENT, branch_infos
 
     def _fetchProjectDefaultBranch(self, project):
