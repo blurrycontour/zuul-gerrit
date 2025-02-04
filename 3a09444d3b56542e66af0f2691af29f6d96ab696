@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "046adf80_7abfbb9f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 16
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2025-02-04T17:31:36Z",
+      "side": 1,
+      "message": "Would you remember what was the issues with podman-compose in OpenDev?",
+      "revId": "3a09444d3b56542e66af0f2691af29f6d96ab696",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
