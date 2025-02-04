@@ -41,6 +41,7 @@ opentelemetry-sdk>=1.25.0
 opentelemetry-exporter-otlp-proto-grpc>=1.25.0
 opentelemetry-exporter-otlp-proto-http>=1.25.0
 confluent-kafka
+boto3
 google-cloud-pubsub
 # For openstack driver
 openstacksdk>=0.103.0,!=2.0.0
@@ -48,10 +49,7 @@ rackspaceauth
 # For openshift driver
 openshift
 # For AWS driver
-# Max versions temporarily added due to "Too many open files" errors in tests.
-boto3>=1.20.0,<1.36.11
-botocore<1.36.11
-moto<5.0.28
+boto3>=1.20.0
 # For gcloud driver
 google-api-python-client
 # For ibmvpc driver
