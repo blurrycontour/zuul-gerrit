@@ -1473,3 +1473,15 @@ class TestExecutorWorkspaceCheckout(ZuulTestCase, ExecutorReposMixin):
         for f, expected in file_checks.items():
             exists = os.path.exists(os.path.join(path, f))
             self.assertEqual(expected, exists, f)
+
+    def test_workspace_checkout_multi_include_vars(self):
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(
+                name='test-workspace-checkout-multi-include-vars',
+                result='SUCCESS'
+            ),
+        ], ordered=False)

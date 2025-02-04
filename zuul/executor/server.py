@@ -2321,6 +2321,7 @@ class AnsibleJob(object):
         for iv in self.job.include_vars:
             # For each include-vars, add the contining dir
             key = (iv['connection'], iv['project'])
+            paths = self.repo_sparse_paths[key]
             ivpath = os.path.dirname(iv['name'])
             # Remove any / at the start and add one at the end.
             ivpath = ivpath.lstrip('/') + '/'
