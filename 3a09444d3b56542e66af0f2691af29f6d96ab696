@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "28c8e982_0d8ddb80",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 16
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-04T21:00:39Z",
+      "side": 1,
+      "message": "It\u0027s been a while, and I don\u0027t. but perhaps Clark does.",
+      "parentUuid": "046adf80_7abfbb9f",
+      "revId": "3a09444d3b56542e66af0f2691af29f6d96ab696",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59f12500_cd79ea64",
@@ -35,6 +53,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b173ec4_c2f84ca5",
+        "filename": "doc/source/tutorials/quick-start.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-04T21:00:39Z",
+      "side": 1,
+      "message": "Yes.  oops.",
+      "parentUuid": "59f12500_cd79ea64",
+      "revId": "3a09444d3b56542e66af0f2691af29f6d96ab696",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a564ddcd_ef808935",
@@ -48,6 +84,24 @@
       "writtenOn": "2025-02-04T17:36:15Z",
       "side": 1,
       "message": "I guess this is no longer running rootless containers, I think that\u0027s fine for the CI, but perhaps that\u0027s something to consider for the end user?",
+      "revId": "3a09444d3b56542e66af0f2691af29f6d96ab696",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8205e403_47dc98e5",
+        "filename": "playbooks/tutorial/admin.yaml",
+        "patchSetId": 16
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-04T21:00:39Z",
+      "side": 1,
+      "message": "It is indeed something users should consider, but I don\u0027t think it\u0027s something that we\u0027ve considered in-scope for the tutorial; there\u0027s probably plenty of other places where folks can learn about container runtime options.\n\nNote that we don\u0027t advocate one way or another in the actual documentation or anything we tell a user to run.  We do choose to use podman in CI in order to get speculative containers, but this should work with any docker-compatible backend.  I think it may even work with a systemd user socket, so this may work with rootless podman.  I haven\u0027t tested that, and that\u0027s not something we\u0027re aiming for in opendev either (I think in opendev, some of the remaining issues we had with podman were when running rootless).",
+      "parentUuid": "a564ddcd_ef808935",
       "revId": "3a09444d3b56542e66af0f2691af29f6d96ab696",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
