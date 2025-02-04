@@ -16,6 +16,40 @@
       "message": "Would you remember what was the issues with podman-compose in OpenDev?",
       "revId": "3a09444d3b56542e66af0f2691af29f6d96ab696",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59f12500_cd79ea64",
+        "filename": "doc/source/tutorials/quick-start.rst",
+        "patchSetId": 16
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2025-02-04T17:36:15Z",
+      "side": 1,
+      "message": "Shouldn\u0027t this be changed too?",
+      "revId": "3a09444d3b56542e66af0f2691af29f6d96ab696",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a564ddcd_ef808935",
+        "filename": "playbooks/tutorial/admin.yaml",
+        "patchSetId": 16
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2025-02-04T17:36:15Z",
+      "side": 1,
+      "message": "I guess this is no longer running rootless containers, I think that\u0027s fine for the CI, but perhaps that\u0027s something to consider for the end user?",
+      "revId": "3a09444d3b56542e66af0f2691af29f6d96ab696",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
