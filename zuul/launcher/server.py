@@ -1120,6 +1120,9 @@ class Launcher:
                     node.setState(node.State.READY)
                     self.wake_event.set()
                     log.debug("Marking node %s as %s", node, node.state)
+                else:
+                    self.wake_event.set()
+                    return
             node.releaseLock(ctx)
 
     def _checkNodescanRequest(self, node, instance):
