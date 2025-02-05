@@ -142,6 +142,7 @@
       - '\{\d+\} (.*?) \[[\d\.]+s\] \.\.\. FAILED'
     vars:
       nox_keyword: tests
+    nodeset: niz-debian-bullseye-16GB
 
 - job:
     name: zuul-nox-py311-multi-scheduler
@@ -387,7 +388,7 @@
         - nox-linters:
             vars:
               nox_install_bindep: false
-            nodeset: ubuntu-jammy
+            nodeset: niz-debian-bullseye-4GB
         - zuul-nox-py311
         - zuul-nox-py311-multi-scheduler
         - zuul-nox-py312
@@ -420,7 +421,7 @@
         - nox-linters:
             vars:
               nox_install_bindep: false
-            nodeset: ubuntu-jammy
+            nodeset: niz-debian-bullseye-4GB
         - zuul-nox-py311
         - zuul-nox-py312
         - zuul-nox-upgrade
