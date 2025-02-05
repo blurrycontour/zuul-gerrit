@@ -77,6 +77,16 @@
       python_version: "3.11"
 
 - job:
+    name: zuul-nox-linters
+    parent: nox-linters
+    vars:
+      nox_install_bindep: false
+    nodeset:
+      nodes:
+        name: ubuntu-jammy
+        label: niz-ubuntu-jammy-4GB
+
+- job:
     name: zuul-nox-remote
     parent: nox
     nodeset: ubuntu-jammy
@@ -142,6 +152,10 @@
       - '\{\d+\} (.*?) \[[\d\.]+s\] \.\.\. FAILED'
     vars:
       nox_keyword: tests
+    nodeset:
+      nodes:
+        name: ubuntu-jammy
+        label: niz-ubuntu-jammy-16GB
 
 - job:
     name: zuul-nox-py311-multi-scheduler
@@ -156,7 +170,10 @@
     # This could probably use some refactoring to have a base unittest job
     # that isn't python version specific.
     parent: zuul-nox-py311
-    nodeset: ubuntu-noble
+    nodeset:
+      nodes:
+        name: ubuntu-noble
+        label: niz-ubuntu-noble-16GB
     vars:
       nox_force_python: "3.12"
       python_version: "3.12"
@@ -384,10 +401,7 @@
       jobs:
         - zuul-build-image
         - zuul-nox-docs
-        - nox-linters:
-            vars:
-              nox_install_bindep: false
-            nodeset: ubuntu-jammy
+        - zuul-nox-linters
         - zuul-nox-py311
         - zuul-nox-py311-multi-scheduler
         - zuul-nox-py312
@@ -417,10 +431,7 @@
       jobs:
         - zuul-upload-image
         - zuul-nox-docs
-        - nox-linters:
-            vars:
-              nox_install_bindep: false
-            nodeset: ubuntu-jammy
+        - zuul-nox-linters
         - zuul-nox-py311
         - zuul-nox-py312
         - zuul-nox-upgrade
