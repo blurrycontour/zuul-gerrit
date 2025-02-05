@@ -586,6 +586,19 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if hasattr(self, 'gitlab_event_connector'):
             self._stop_event_connector()
 
+    def getCPUStats(self, threads):
+        tids = []
+        if self.gitlab_event_connector:
+            tids.append(self.gitlab_event_connector.native_id)
+        user_time = 0.0
+        system_time = 0.0
+        for tid in tids:
+            thd = threads.get(tid)
+            if thd:
+                user_time += thd.user_time
+                system_time += thd.system_time
+        return {'connection': {'user': user_time, 'system': system_time}}
+
     def getWebController(self, zuul_web):
         return GitlabWebController(zuul_web, self)
 

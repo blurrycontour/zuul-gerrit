@@ -71,6 +71,19 @@ class GitConnection(ZKChangeCacheMixin, BaseConnection):
         })
         return d
 
+    def getCPUStats(self, threads):
+        tids = []
+        if self.watcher_thread:
+            tids += [t.native_id for t in self.watcher_thread.getThreads()]
+        user_time = 0.0
+        system_time = 0.0
+        for tid in tids:
+            thd = threads.get(tid)
+            if thd:
+                user_time += thd.user_time
+                system_time += thd.system_time
+        return {'connection': {'user': user_time, 'system': system_time}}
+
     def getProject(self, name):
         return self.projects.get(name)
 

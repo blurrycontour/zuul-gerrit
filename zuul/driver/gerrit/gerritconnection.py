@@ -1666,6 +1666,25 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.stopRefWatcherThread()
         self.stopEventConnector()
 
+    def getCPUStats(self, threads):
+        tids = []
+        if self.gerrit_event_connector:
+            tids.append(self.gerrit_event_connector.native_id)
+        if self.event_thread:
+            tids += [t.native_id for t in self.event_thread.getThreads()]
+        if self.poller_thread:
+            tids += [t.native_id for t in self.poller_thread.getThreads()]
+        if self.ref_watcher_thread:
+            tids += [t.native_id for t in self.ref_watcher_thread.getThreads()]
+        user_time = 0.0
+        system_time = 0.0
+        for tid in tids:
+            thd = threads.get(tid)
+            if thd:
+                user_time += thd.user_time
+                system_time += thd.system_time
+        return {'connection': {'user': user_time, 'system': system_time}}
+
     def getEventQueue(self):
         return getattr(self, "event_queue", None)
 

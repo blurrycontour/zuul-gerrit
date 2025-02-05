@@ -118,3 +118,6 @@ class GerritChecksPoller(threading.Thread):
         self._stopped = True
         self._stop_event.set()
         self.poller_election.cancel()
+
+    def getThreads(self):
+        return [self]

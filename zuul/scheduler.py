@@ -33,6 +33,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from kazoo.exceptions import NotEmptyError
 from opentelemetry import trace
+import psutil
 
 from zuul import configloader, exceptions
 from zuul.launcher.client import LauncherClient
@@ -234,6 +235,7 @@ class Scheduler(threading.Thread):
         self.wait_for_init = wait_for_init
         self.hostname = socket.getfqdn()
         self.tracing = tracing.Tracing(config)
+        self.last_cpu_stat = defaultdict(lambda: 0.0)
         self.primed_event = threading.Event()
         # Wake up the main run loop
         self.wake_event = threading.Event()
@@ -632,6 +634,48 @@ class Scheduler(threading.Thread):
                                   uncompressed_size)
 
         self.nodepool.emitStatsTotals(self.abide)
+        try:
+            self.emitCPUStats()
+        except Exception:
+            self.log.exception("Error processing cpu stats:")
+
+    def _emitOneCPUStat(self, key, value):
+        last = self.last_cpu_stat[key]
+        self.last_cpu_stat[key] = value
+        delta = value - last
+        self.statsd.incr(key, delta)
+
+    def emitCPUStats(self):
+        if not self.statsd:
+            return
+        proc = psutil.Process()
+        times = proc.cpu_times()
+        threads = {t.id: t for t in proc.threads()}
+        # The following could be used to measure cpu use for the main
+        # thread and layout update thread, however, the configloader
+        # does quite a bit of cpu work in these using ephemeral
+        # threadpoolexecutors, therefore much cpu time would be
+        # unaccounted-for.
+        # threads[self.layout_update_thread.native_id]
+        # threads[self.native_id]
+
+        self._emitOneCPUStat(
+            f"zuul.scheduler.server.{self.hostname}.user_time",
+            times.user)
+        self._emitOneCPUStat(
+            f"zuul.scheduler.server.{self.hostname}.system_time",
+            times.system)
+        for connection in self.connections.connections.values():
+            connection_stats = connection.getCPUStats(threads)
+            if not connection_stats:
+                continue
+            base = (f"zuul.scheduler.server.{self.hostname}."
+                    f"connection.{connection.connection_name}")
+            for key, key_stats in connection_stats.items():
+                self._emitOneCPUStat(f"{base}.{key}.user_time",
+                                     key_stats['user'])
+                self._emitOneCPUStat(f"{base}.{key}.system_time",
+                                     key_stats['system'])
 
     def startCleanup(self):
         # Run the first cleanup immediately after the first

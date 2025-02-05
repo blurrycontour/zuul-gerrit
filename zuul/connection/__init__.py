@@ -76,6 +76,32 @@ class BaseConnection(object, metaclass=abc.ABCMeta):
     def onStop(self):
         pass
 
+    def getCPUStats(self, threads):
+        """Get CPU stats for this connection
+
+        Returns a dictionary in the form:
+
+           {key: {"user": float, "system": float}}
+
+        Any number of keys may be supplied in order to characterize
+        sub-operations of the connection.  Typically only one is
+        present, the key "connection" to aggregate all threads used by
+        the connection.  The "user" and "system" entries are
+        cumulative aggregate CPU time of those respective categories.
+
+        This method is provided a dictionary of {thread_id: Thread}
+        objects of all threads associated with the process so that a
+        single lookup from psutil can be shared by multiple
+        connections.  This method should use its knowledge of its own
+        driver implementation to examine only the relevant input
+        threads to produce the output.
+
+        :param dict threads: A dictionary of thread_id: psutil.Thread objects
+        :returns: A dict representing cpu resources used by the connection or None
+
+        """
+        return None
+
     def registerScheduler(self, sched) -> None:
         self.sched = sched
 

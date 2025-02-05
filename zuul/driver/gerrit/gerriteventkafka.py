@@ -67,6 +67,9 @@ class GerritKafkaEventListener:
         if self._thread:
             self._thread.join()
 
+    def getThreads(self):
+        return [self._thread]
+
     def _run(self):
         self.log.info("Connecting to kafka at %s",
                       self.kafka_config['bootstrap.servers'])

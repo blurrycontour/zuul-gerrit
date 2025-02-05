@@ -126,3 +126,6 @@ class GerritSSHEventListener(threading.Thread):
         self._stopped = True
         self._stop_event.set()
         self.watcher_election.cancel()
+
+    def getThreads(self):
+        return [self]
