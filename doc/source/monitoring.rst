@@ -795,6 +795,34 @@ These metrics are emitted by the Zuul :ref:`scheduler`:
       performance metric of how long the SQL query takes; it is not
       the estimated time value itself.
 
+   .. stat:: server.<hostname>
+
+      Holds metrics related to a specific scheduler server.
+
+      .. stat:: user_time
+         :type: counter
+
+         The number of seconds spent in user mode.
+
+      .. stat:: system_time
+         :type: counter
+
+         The number of seconds spent in system mode.
+
+      .. stat:: connection.<connection name>.connection
+
+         Holds stats related to a specific connection.
+
+         .. stat:: user_time
+            :type: counter
+
+            The number of seconds spent in user mode.
+
+         .. stat:: system_time
+            :type: counter
+
+            The number of seconds spent in system mode.
+
 .. stat:: zuul.web
 
    Holds metrics related to the Zuul web component.

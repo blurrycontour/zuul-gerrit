@@ -63,6 +63,9 @@ class GerritGcloudPubsubEventListener:
         if self._thread:
             self._thread.join()
 
+    def getThreads(self):
+        return [self._thread]
+
     def callback(self, message):
         data = json.loads(message.data)
         self.log.info("Received data from gcloud: \n%s" %

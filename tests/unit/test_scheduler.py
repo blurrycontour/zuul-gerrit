@@ -534,6 +534,20 @@ class TestScheduler(ZuulTestCase):
         for build in self.history:
             self.assertTrue(build.parameters['zuul']['voting'])
 
+        sched_key = 'zuul.scheduler.server.%s' % (
+            self.scheds.first.sched.hostname.replace(
+                '.', '_'))
+        self.assertReportedStat(f'{sched_key}.user_time',
+                                kind='c')
+        self.assertReportedStat(f'{sched_key}.system_time',
+                                kind='c')
+        self.assertReportedStat(
+            f'{sched_key}.connection.gerrit.connection.user_time',
+            kind='c')
+        self.assertReportedStat(
+            f'{sched_key}.connection.gerrit.connection.system_time',
+            kind='c')
+
     def test_zk_profile(self):
         command_socket = self.scheds.first.sched.config.get(
             'scheduler', 'command_socket')

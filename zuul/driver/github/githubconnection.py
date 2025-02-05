@@ -1445,6 +1445,22 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if hasattr(self, 'github_event_connector'):
             self._stop_event_connector()
 
+    def getCPUStats(self, threads):
+        tids = []
+        if self.github_event_connector:
+            tids.append(
+                self.github_event_connector._event_dispatcher.native_id)
+            tids += [t.native_id for t in
+                     self.github_event_connector._thread_pool._threads]
+        user_time = 0.0
+        system_time = 0.0
+        for tid in tids:
+            thd = threads.get(tid)
+            if thd:
+                user_time += thd.user_time
+                system_time += thd.system_time
+        return {'connection': {'user': user_time, 'system': system_time}}
+
     def _start_event_connector(self):
         self.github_event_connector = self._event_connector_class(self)
         self.github_event_connector.start()

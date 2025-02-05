@@ -99,6 +99,9 @@ class GerritAWSKinesisEventListener:
         for thread in self._threads:
             thread.join()
 
+    def getThreads(self):
+        return self._threads
+
     def _run(self, shard_id):
         self.log.info("Starting shard consumer for shard %s",
                       shard_id)
