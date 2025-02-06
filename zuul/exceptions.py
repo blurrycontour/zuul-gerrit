@@ -91,6 +91,10 @@ class RuntimeConfigurationException(Exception):
     pass
 
 
+class AlgorithmNotSupportedException(Exception):
+    pass
+
+
 # Authentication Exceptions
 class AuthTokenException(Exception):
     defaultMsg = 'Unknown Error'
