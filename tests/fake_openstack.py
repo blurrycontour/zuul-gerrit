@@ -176,16 +176,16 @@ class FakeOpenstackConnection:
         if self.cloud._fake_needs_floating_ip:
             addresses = dict(
                 public=[],
-                private=[dict(version=4, addr='fake')]
+                private=[dict(version=4, addr='198.51.100.1')]
             )
-            interface_ip = 'fake'
+            interface_ip = '198.51.100.1'
         else:
             addresses = dict(
-                public=[dict(version=4, addr='fake'),
-                        dict(version=6, addr='fake_v6')],
-                private=[dict(version=4, addr='fake')]
+                public=[dict(version=4, addr='198.51.100.1'),
+                        dict(version=6, addr='2001:db8::1')],
+                private=[dict(version=4, addr='198.51.100.1')]
             )
-            interface_ip = 'fake'
+            interface_ip = '198.51.100.1'
 
         args = dict(
             id=uuid.uuid4().hex,

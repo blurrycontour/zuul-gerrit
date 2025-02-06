@@ -57,6 +57,7 @@
     name: openstack-base
     abstract: true
     connection: openstack
+    host-key-checking: false
     boot-timeout: 120
     launch-timeout: 600
     launch-attempts: 2

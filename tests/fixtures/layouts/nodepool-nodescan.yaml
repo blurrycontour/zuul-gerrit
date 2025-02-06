@@ -91,37 +91,84 @@
 - flavor:
     name: normal
 
+- flavor:
+    name: large
+
+- flavor:
+    name: dedicated
+
+- flavor:
+    name: invalid
+
 - label:
     name: debian-normal
     image: debian
     flavor: normal
 
+- label:
+    name: debian-large
+    image: debian
+    flavor: large
+
+- label:
+    name: debian-dedicated
+    image: debian
+    flavor: dedicated
+
+- label:
+    name: debian-invalid
+    image: debian
+    flavor: invalid
+
 - section:
-    name: openstack-base
+    name: aws-base
     abstract: true
-    connection: openstack
-    host-key-checking: false
-    boot-timeout: 120
+    connection: aws
+    host-key-checking: true
+    boot-timeout: 1
     launch-timeout: 600
     launch-attempts: 2
+    object-storage:
+      bucket-name: zuul
     # TODO
     # key-name: zuul
     flavors:
       - name: normal
-        flavor-name: Fake Flavor
+        instance-type: t3.medium
+        volume-type: gp3
+        volume-size: 40
+        iops: 500
+        throughput: 200
+      - name: large
+        instance-type: t3.large
+      - name: dedicated
+        instance-type: t3.large
+        dedicated-host: True
+      - name: invalid
+        instance-type: invalid
     images:
       - name: debian
-        image-id: fake-image
-    networks:
-      - fake-network
+        image-id: ami-1e749f67
 
 - section:
-    name: openstack
-    parent: openstack-base
+    name: aws-us-east-1
+    parent: aws-base
+    region: us-east-1
 
 - provider:
-    name: openstack-main
-    section: openstack
+    name: aws-us-east-1-main
+    section: aws-us-east-1
     labels:
       - name: debian-normal
+        key-name: zuul
+        volume-type: gp3
+        volume-size: 40
+        # Change iops and omit throughput to test label overriding the
+        # flavor
+        iops: 1000
+      - name: debian-large
+        key-name: zuul
+      - name: debian-dedicated
+        key-name: zuul
+      - name: debian-invalid
         key-name: zuul
