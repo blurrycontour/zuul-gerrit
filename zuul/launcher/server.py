@@ -960,7 +960,6 @@ class Launcher:
         return node
 
     def _checkRequest(self, request, log):
-        log.debug("Checking request %s", request)
         requested_nodes = [self.api.getProviderNode(p)
                            for p in request.nodes]
 
@@ -1105,7 +1104,6 @@ class Launcher:
                         node, image_external_id, log)
 
                 old_state = node.create_state_machine.state
-                log.debug("Checking node %s", node)
                 instance = node.create_state_machine.advance()
                 new_state = node.create_state_machine.state
                 if old_state != new_state:
@@ -1165,7 +1163,6 @@ class Launcher:
                         node, log)
 
                 old_state = node.delete_state_machine.state
-                log.debug("Checking node %s cleanup", node)
 
                 now = time.time()
                 if (now - node.delete_state_machine.start_time >
