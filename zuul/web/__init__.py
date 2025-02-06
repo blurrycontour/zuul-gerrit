@@ -603,7 +603,8 @@ class ProviderNodeConverter:
         ret = {
             'id': node.uuid,
             'uuid': node.uuid,
-            'type': node.label,
+            # TODO: remove Nodepool backwards-compat type
+            'type': [node.label],
             'label': node.label,
             'connection_type': node.connection_type,
             'external_id': None,
@@ -619,7 +620,8 @@ class ProviderNodeConverter:
         return Prop('The node', {
             'id': str,
             'uuid': str,
-            'type': str,
+            # TODO: remove Nodepool backwards-compat type
+            'type': [str],
             'label': str,
             'connection_type': str,
             'external_id': str,
