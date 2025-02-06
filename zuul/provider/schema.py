@@ -34,7 +34,6 @@ base_label = vs.Schema({
     Optional('tags', default=dict): {str: str},
     Optional('min_ready', default=0): int,
     Optional('max_ready_age', default=0): int,
-    Optional('boot-timeout', default=300): int,
 })
 
 # Label attributes that are common to any kind of ssh-based driver.
@@ -54,6 +53,7 @@ common_image = vs.Schema({
     Optional('connection-port'): Nullable(int),
     Optional('python-path'): Nullable(str),
     Optional('shell-type'): Nullable(str),
+    Optional('boot-timeout', default=300): int,
 })
 
 # The image attributes that, in addition to those above, can appear in
