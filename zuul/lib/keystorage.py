@@ -22,6 +22,7 @@ import cachetools
 import kazoo
 import paramiko
 
+from zuul.exceptions import AlgorithmNotSupportedException
 from zuul.lib import encryption, strings
 from zuul.zk import ZooKeeperBase
 
@@ -36,6 +37,9 @@ class KeyStorage(ZooKeeperBase):
     PROJECT_PATH = PREFIX_PATH + "/{}"
     SECRETS_PATH = PROJECT_PATH + "/secrets"
     SSH_PATH = PROJECT_PATH + "/ssh"
+
+    # /keystorage-oidc/algorithm
+    OIDC_PATH = "/keystorage-oidc/{}"
 
     def __init__(self, zookeeper_client, password, backup=None):
         super().__init__(zookeeper_client)
@@ -260,3 +264,136 @@ class KeyStorage(ZooKeeperBase):
         except kazoo.exceptions.NoNodeError:
             # Already deleted
             pass
+
+    def rotateOidcSigningKeys(self, algorithm, rotation_interval, max_ttl):
+        """
+        Rotate the OIDC signing keys.
+        This method is to be called periodically to rotate the OIDC
+        signing keys. It creates a new key and/or remove the older
+        keys when necessary.
+        """
+
+        self.log.debug("Rotating OIDC signing keys, algorithm: %s,"
+                       "rotation_interval: %s, max_ttl: %s",
+                       algorithm, rotation_interval, max_ttl)
+        key_data = self._loadOidcSigningKeys(algorithm)
+
+        if not key_data:
+            self._createAndStoreOidcSigningKeys(algorithm)
+        else:
+            update_required = False
+
+            # Check if there are old keys needs to be deleted
+            # Here also need to handle the corner case when max_ttl
+            # is bigger than rotation_interval. In this case, multiple
+            # valid keys can exist at the same time. In either case,
+            # find the last key whose created time is smaller than the
+            # current time - max_ttl, then all tokens signed by the
+            # keys before it should be expired and we can remove them.
+            older_than = int(time.time()) - max_ttl
+            for index in range(len(key_data["keys"]) - 1, -1, -1):
+                key = key_data["keys"][index]
+                if key["created"] < older_than and index > 0:
+                    self.log.debug("Removing old OIDC keys")
+                    key_data["keys"] = key_data["keys"][index:]
+                    update_required = True
+                    break
+
+            # Check if latest key is outdated and create a new one
+            latest_key = key_data["keys"][-1]
+            age_seconds = int(time.time()) - latest_key["created"]
+            if age_seconds > rotation_interval:
+                self.log.debug("Generating new OIDC key")
+                keyDict = self._generateOidcSigningKeyDict(
+                    algorithm, latest_key["version"] + 1)
+                key_data["keys"].append(keyDict)
+                update_required = True
+
+            if update_required:
+                self.log.debug("Number of keys: %s", len(key_data["keys"]))
+                self._updateOidcSigningKeyData(algorithm, key_data)
+
+    def getOidcSigningKeyData(self, algorithm):
+        """Return the key data of an algorithm of OIDC singing keys"""
+        oidc_signing_keys = self._loadOidcSigningKeys(algorithm)
+
+        if not oidc_signing_keys:
+            self._createAndStoreOidcSigningKeys(algorithm)
+            oidc_signing_keys = self._loadOidcSigningKeys(algorithm)
+
+        return oidc_signing_keys
+
+    def getLatestOidcSigningKeys(self, algorithm):
+        """Return the latest key pair of an algorithm of OIDC singing keys"""
+        signing_key_data = self.getOidcSigningKeyData(algorithm=algorithm)
+        pem_private_key = \
+            signing_key_data["keys"][-1]["private_key"].encode("utf-8")
+
+        private_key, public_key = encryption.deserialize_rsa_keypair(
+            pem_private_key, self.password_bytes)
+
+        return private_key, public_key
+
+    def deleteOidcSigningKeys(self, algorithm):
+        """Delete the complete internal data structure"""
+        key_path = self._getOidcSigningKeysPath(algorithm)
+        with suppress(kazoo.exceptions.NoNodeError):
+            self.kazoo_client.delete(key_path)
+
+    def _getOidcSigningKeysPath(self, algorithm):
+        key_path = self.OIDC_PATH.format(algorithm)
+        return key_path
+
+    def _createAndStoreOidcSigningKeys(self, algorithm):
+        """Create new OIDC signing keys for the algorithmand"""
+
+        self.log.debug(
+            "Creating OIDC signing keys for algorithm: %s", algorithm)
+        keyDict = self._generateOidcSigningKeyDict(algorithm)
+        if keyDict:
+            keydata = {
+                "schema": 1,
+                "keys": [keyDict]
+            }
+            try:
+                self._saveOidcSigningKeys(algorithm, keydata)
+            except kazoo.exceptions.NodeExistsError:
+                # Race condition between multiple schedulers
+                # creating the same secrets key, do nothing
+                pass
+
+    def _updateOidcSigningKeyData(self, algorithm, keydata):
+        """Update the complete internal data structure"""
+        key_path = self._getOidcSigningKeysPath(algorithm)
+        data = json.dumps(keydata, sort_keys=True).encode("utf-8")
+        self.kazoo_client.set(key_path, value=data)
+
+    def _generateOidcSigningKeyDict(self, algorithm, version=0):
+        """Generate a new key and return the internal data structure"""
+        if algorithm == "RS256":
+            private_key, public_key = encryption.generate_rsa_keypair()
+            pem_private_key = encryption.serialize_rsa_private_key(
+                private_key, self.password_bytes)
+            return {
+                "version": version,
+                "created": int(time.time()),
+                "private_key": pem_private_key.decode("utf-8"),
+            }
+        else:
+            raise AlgorithmNotSupportedException(
+                f"Algorithm {algorithm} is not supported")
+
+    def _loadOidcSigningKeys(self, algorithm):
+        """Return the complete internal data structure"""
+        key_path = self._getOidcSigningKeysPath(algorithm)
+        try:
+            data, _ = self.kazoo_client.get(key_path)
+            return json.loads(data)
+        except kazoo.exceptions.NoNodeError:
+            return None
+
+    def _saveOidcSigningKeys(self, algorithm, keydata):
+        """Store the complete internal data structure"""
+        key_path = self._getOidcSigningKeysPath(algorithm)
+        data = json.dumps(keydata, sort_keys=True).encode("utf-8")
+        self.kazoo_client.create(key_path, value=data, makepath=True)
