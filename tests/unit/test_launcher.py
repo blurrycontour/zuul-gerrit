@@ -41,12 +41,12 @@ from tests.base import (
 class ImageMocksFixture(ResponsesFixture):
     def __init__(self):
         super().__init__()
-        raw_body = "test raw image"
+        raw_body = b'(\xb5/\xfd\x04Xy\x00\x00test raw image\n\xde\x9d\x9c\xfb'
         qcow2_body = "test qcow2 image"
         self.requests_mock.add_passthru("http://localhost")
         self.requests_mock.add(
             responses.GET,
-            'http://example.com/image.raw',
+            'http://example.com/image.raw.zst',
             body=raw_body)
         self.requests_mock.add(
             responses.GET,
@@ -54,7 +54,7 @@ class ImageMocksFixture(ResponsesFixture):
             body=qcow2_body)
         self.requests_mock.add(
             responses.HEAD,
-            'http://example.com/image.raw',
+            'http://example.com/image.raw.zst',
             headers={'content-length': str(len(raw_body))})
         self.requests_mock.add(
             responses.HEAD,
@@ -70,7 +70,7 @@ class LauncherBaseTestCase(ZuulTestCase):
             'artifacts': [
                 {
                     'name': 'raw image',
-                    'url': 'http://example.com/image.raw',
+                    'url': 'http://example.com/image.raw.zst',
                     'metadata': {
                         'type': 'zuul_image',
                         'image_name': 'debian-local',
@@ -99,7 +99,7 @@ class LauncherBaseTestCase(ZuulTestCase):
             'artifacts': [
                 {
                     'name': 'raw image',
-                    'url': 'http://example.com/image.raw',
+                    'url': 'http://example.com/image.raw.zst',
                     'metadata': {
                         'type': 'zuul_image',
                         'image_name': 'ubuntu-local',
@@ -402,7 +402,7 @@ class TestLauncher(LauncherBaseTestCase):
                 name=image.name,
                 canonical_name=image.canonical_name,
                 project_canonical_name=image.project_canonical_name,
-                url='http://example.com/image.raw',
+                url='http://example.com/image.raw.zst',
                 timestamp=time.time(),
             )
             with iba.locked(self.zk_client):

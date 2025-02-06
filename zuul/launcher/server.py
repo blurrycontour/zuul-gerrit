@@ -1683,7 +1683,9 @@ class Launcher:
                     f.write(chunk)
 
     def downloadArtifact(self, image_build_artifact):
+        ext = image_build_artifact.url.split('.')[-1]
         path = os.path.join(self.temp_dir, image_build_artifact.uuid)
+        path = f'{path}.{ext}'
         self.log.info("Downloading artifact %s into %s",
                       image_build_artifact, path)
         futures = []
