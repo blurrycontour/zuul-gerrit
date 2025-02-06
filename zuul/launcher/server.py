@@ -923,9 +923,10 @@ class Launcher:
                 raise NodesetRequestError(
                     f"No provider found for label {label_name}")
 
-            log.debug("Candidate providers: %s", candidate_providers)
             # TODO: make provider selection more sophisticated
             provider = random.choice(candidate_providers)
+            log.debug("Selected provider %s from candidate providers: %s",
+                      provider, candidate_providers)
             label = provider.labels[label_name]
             label_providers.append((label, provider))
         return label_providers
