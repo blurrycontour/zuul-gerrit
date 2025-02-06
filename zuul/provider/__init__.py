@@ -74,8 +74,11 @@ class BaseProviderFlavor(CNameMixin, metaclass=abc.ABCMeta):
 
 
 class BaseProviderLabel(CNameMixin, metaclass=abc.ABCMeta):
-    inheritable_schema = assemble()
+    inheritable_schema = assemble(
+        provider_schema.common_label,
+    )
     schema = assemble(
+        provider_schema.common_label,
         provider_schema.base_label,
     )
     image_flavor_inheritable_schema = assemble()
@@ -185,7 +188,6 @@ class BaseProviderSchema(metaclass=abc.ABCMeta):
             Optional('abstract', default=False): Nullable(bool),
             Optional('parent'): Nullable(str),
             Required('connection'): str,
-            Optional('boot-timeout'): Nullable(int),
             Optional('launch-timeout'): Nullable(int),
             Optional('launch-attempts', default=3): int,
         })
