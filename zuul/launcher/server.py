@@ -1114,7 +1114,7 @@ class Launcher:
                     return
                 # Note this method has the side effect of updating
                 # node info from the instance.
-                if self._checkNodescanRequest(node, instance):
+                if self._checkNodescanRequest(node, instance, log):
                     node.setState(node.State.READY)
                     self.wake_event.set()
                     log.debug("Marking node %s as %s", node, node.state)
@@ -1123,14 +1123,14 @@ class Launcher:
                     return
             node.releaseLock(ctx)
 
-    def _checkNodescanRequest(self, node, instance):
+    def _checkNodescanRequest(self, node, instance, log):
         if node.nodescan_request is None:
             # We just finished the create state machine, update with
             # new info.
             self._updateNodeFromInstance(node, instance)
-            node.nodescan_request = NodescanRequest(node, self.log)
+            node.nodescan_request = NodescanRequest(node, log)
             self.nodescan_worker.addRequest(node.nodescan_request)
-            self.log.debug(
+            log.debug(
                 "Submitted nodescan request for %s queue length %s",
                 node.interface_ip,
                 self.nodescan_worker.length())
@@ -1140,9 +1140,9 @@ class Launcher:
             keys = node.nodescan_request.result()
         except Exception as e:
             if isinstance(e, exceptions.ConnectionTimeoutException):
-                self.log.warning("Error scanning keys: %s", str(e))
+                log.warning("Error scanning keys: %s", str(e))
             else:
-                self.log.exception("Exception scanning keys:")
+                log.exception("Exception scanning keys:")
             raise exceptions.LaunchKeyscanException(
                 "Can't scan key for %s" % (node,))
         if keys:
