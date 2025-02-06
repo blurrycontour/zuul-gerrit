@@ -21,7 +21,6 @@ from unittest import mock
 from zuul import model
 from zuul.launcher.client import LauncherClient
 
-import fixtures
 import responses
 import testtools
 from kazoo.exceptions import NoNodeError
@@ -35,6 +34,11 @@ from tests.base import (
     simple_layout,
     return_data,
     ResponsesFixture,
+)
+from tests.fake_nodescan import (
+    FakeSocket,
+    FakePoll,
+    FakeTransport,
 )
 
 
@@ -128,8 +132,6 @@ class LauncherBaseTestCase(ZuulTestCase):
         self.mock_aws.start()
         # Must start responses after mock_aws
         self.useFixture(ImageMocksFixture())
-        self.useFixture(fixtures.MonkeyPatch(
-            'zuul.launcher.server.NodescanRequest.FAKE', True))
         self.s3 = boto3.resource('s3', region_name='us-west-2')
         self.s3.create_bucket(
             Bucket='zuul',
@@ -435,7 +437,7 @@ class TestLauncher(LauncherBaseTestCase):
         self.waitUntilSettled()
 
         nodes = self.launcher.api.nodes_cache.getItems()
-        self.assertNotEqual(nodes[0].host_keys, [])
+        self.assertEqual(nodes[0].host_keys, [])
 
         self.executor_server.hold_jobs_in_build = False
         self.executor_server.release()
@@ -753,6 +755,64 @@ class TestLauncher(LauncherBaseTestCase):
                     pnode.refresh(ctx)
                 except NoNodeError:
                     break
+
+    @simple_layout('layouts/nodepool-nodescan.yaml', enable_nodepool=True)
+    @okay_tracebacks('_checkNodescanRequest')
+    @mock.patch('paramiko.transport.Transport')
+    @mock.patch('socket.socket')
+    @mock.patch('select.epoll')
+    def test_nodescan_failure(self, mock_epoll, mock_socket, mock_transport):
+        # Test a nodescan failure
+        fake_socket = FakeSocket()
+        mock_socket.return_value = fake_socket
+        mock_epoll.return_value = FakePoll()
+        mock_transport.return_value = FakeTransport(_fail=True)
+
+        ctx = self.createZKContext(None)
+        request = self.requestNodes(["debian-normal"], timeout=30)
+        self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
+        provider_nodes = request.provider_nodes[0]
+        self.assertEqual(len(provider_nodes), 2)
+        self.assertEqual(len(request.nodes), 1)
+        self.assertEqual(provider_nodes[-1], request.nodes[-1])
+
+        provider_nodes = []
+        for node_id in request.nodes:
+            provider_nodes.append(model.ProviderNode.fromZK(
+                ctx, path=model.ProviderNode._getPath(node_id)))
+
+        request.delete(ctx)
+        self.waitUntilSettled()
+
+        for pnode in provider_nodes:
+            for _ in iterate_timeout(60, "node to be deleted"):
+                try:
+                    pnode.refresh(ctx)
+                except NoNodeError:
+                    break
+
+    @simple_layout('layouts/nodepool-nodescan.yaml', enable_nodepool=True)
+    @okay_tracebacks('_checkNodescanRequest')
+    @mock.patch('paramiko.transport.Transport')
+    @mock.patch('socket.socket')
+    @mock.patch('select.epoll')
+    def test_nodescan_success(self, mock_epoll, mock_socket, mock_transport):
+        # Test a normal launch with a nodescan
+        fake_socket = FakeSocket()
+        mock_socket.return_value = fake_socket
+        mock_epoll.return_value = FakePoll()
+        mock_transport.return_value = FakeTransport()
+
+        ctx = self.createZKContext(None)
+        request = self.requestNodes(["debian-normal"])
+        self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
+        provider_nodes = request.provider_nodes[0]
+        self.assertEqual(len(provider_nodes), 1)
+        self.assertEqual(len(request.nodes), 1)
+
+        node = model.ProviderNode.fromZK(
+            ctx, path=model.ProviderNode._getPath(request.nodes[0]))
+        self.assertEqual(['fake key fake base64'], node.host_keys)
 
     @simple_layout('layouts/nodepool-image.yaml', enable_nodepool=True)
     @return_data(
