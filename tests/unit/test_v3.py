@@ -20,10 +20,12 @@ import os
 import sys
 import textwrap
 import threading
+import time
 import gc
 import re
 from time import sleep
 from unittest import mock, skip, skipIf
+from zuul.exceptions import AlgorithmNotSupportedException
 from zuul.lib import yamlutil
 from zuul.scheduler import PendingReconfiguration
 
@@ -33,6 +35,7 @@ import paramiko
 
 import zuul.configloader
 from zuul.lib import yamlutil as yaml
+from zuul.lib import encryption
 from zuul.model import MergeRequest, SEVERITY_WARNING
 from zuul.zk.blob_store import BlobStore
 
@@ -5464,6 +5467,137 @@ class TestProjectKeys(ZuulTestCase):
 
         # Make sure it's the right length
         self.assertEqual(2048, ssh_key.get_bits())
+
+    def test_oidc_rs256_get_latest_signing_keys(self):
+        # Test the getLatestOidcSigningKeys method should return
+        # private and public keys correctly
+        keystore = self.scheds.first.sched.keystore
+        private_secrets_key, public_secrets_key = (
+            keystore.getLatestOidcSigningKeys("RS256")
+        )
+
+        # Make sure it's the right length
+        self.assertEqual(4096, private_secrets_key.key_size)
+
+    def test_oidc_unsupported_algorithm(self):
+        # Test that unknown algorithms would
+        # raise UnsupportedAlgorithmError
+        keystore = self.scheds.first.sched.keystore
+
+        self.assertRaises(
+            AlgorithmNotSupportedException,
+            lambda: keystore.getOidcSigningKeyData("UNKNOWN_ALG")
+        )
+
+        self.assertRaises(
+            AlgorithmNotSupportedException,
+            lambda: keystore.getLatestOidcSigningKeys("UNKNOWN_ALG")
+        )
+
+    def test_oidc_rs256_key_deletion(self):
+        self._test_oidc_key_deletion("RS256")
+
+    def _test_oidc_key_deletion(self, algorithm):
+        # Test that we can delete all OIDC keys
+        keystore = self.scheds.first.sched.keystore
+
+        # Calling getOidcSigningKeyData() should create keys
+        keystore.getOidcSigningKeyData(algorithm)
+
+        # Keys should also be in zk
+        test_keys1 = keystore.loadProjectsSecretsKeys(
+            "oidc", algorithm)
+        self.assertEqual(len(test_keys1["keys"]), 1)
+
+        # Delete the keys
+        keystore.deleteOidcSigningKeys(algorithm)
+
+        # Keys should be gone
+        test_keys2 = keystore.loadProjectsSecretsKeys(
+            "oidc", algorithm)
+        self.assertIsNone(test_keys2)
+
+    def test_oidc_rs256_key_generation(self):
+        self._test_oidc_key_generation("RS256")
+
+    def _test_oidc_key_generation(self, algorithm):
+        # Test that we can generate initial OIDC keys
+        keystore = self.scheds.first.sched.keystore
+
+        # initially there should be no keys
+        test_keys1 = keystore.loadProjectsSecretsKeys(
+            "oidc", algorithm)
+        self.assertIsNone(test_keys1)
+
+        # Calling getOidcSigningKeyData() should return keys
+        test_keys2 = keystore.getOidcSigningKeyData(algorithm)
+        self.assertEqual(len(test_keys2["keys"]), 1)
+        # Keys should also be in zk
+        test_keys3 = keystore.loadProjectsSecretsKeys(
+            "oidc", algorithm)
+        self.assertEqual(len(test_keys3["keys"]), 1)
+        # And they should be equal
+        self.assertEqual(test_keys2, test_keys3)
+
+        # Calling getOidcSigningKeyData() again should return
+        # the same keys
+        test_keys4 = keystore.getOidcSigningKeyData(algorithm)
+        self.assertEqual(test_keys2, test_keys4)
+
+    def test_oidc_rs256_key_rotation(self):
+        self._test_oidc_key_rotation("RS256")
+
+    def _test_oidc_key_rotation(self, algorithm):
+        # Test that we can rotate OIDC keys
+        keystore = self.scheds.first.sched.keystore
+        rotation_interval = 3600
+        max_ttl = 2
+
+        # Store the initial key with created older
+        # than rotation_interval
+        private_key, _ = encryption.generate_rsa_keypair()
+        pem_private_key = encryption.serialize_rsa_private_key(
+            private_key)
+
+        version = 0
+        created = int(time.time()) - rotation_interval - 1
+        keystore._storeSecretsKey(
+            "oidc", algorithm, pem_private_key, version, created)
+
+        # Check loaded key should be the initial key
+        test_keys1 = keystore.loadProjectsSecretsKeys(
+            "oidc", algorithm)
+        self.assertEqual(len(test_keys1["keys"]), 1)
+        self.assertEqual(
+            test_keys1["keys"][0]["private_key"].encode("utf-8"),
+            pem_private_key)
+        self.assertEqual(test_keys1["keys"][0]["version"], version)
+        self.assertEqual(test_keys1["keys"][0]["created"], created)
+
+        # Call keystore.rotateOidcSigningKeys() should append a new key
+        keystore.rotateOidcSigningKeys(algorithm, rotation_interval, max_ttl)
+        test_keys2 = keystore.getOidcSigningKeyData(algorithm)
+        self.assertEqual(len(test_keys2["keys"]), 2)
+        self.assertEqual(
+            test_keys2["keys"][0]["private_key"].encode("utf-8"),
+            pem_private_key)
+        self.assertNotEqual(
+            test_keys2["keys"][1]["private_key"].encode("utf-8"),
+            pem_private_key)
+        self.assertEqual(test_keys2["keys"][1]["version"], version + 1)
+        self.assertGreaterEqual(
+            test_keys2["keys"][1]["created"],
+            created + rotation_interval)
+
+        # Wait for a bit more than max_ttl and do rotation again,
+        # the old key should be removed
+        time.sleep(max_ttl + 1)
+        keystore.rotateOidcSigningKeys(algorithm, rotation_interval, max_ttl)
+        test_keys3 = keystore.getOidcSigningKeyData(algorithm)
+        self.assertEqual(len(test_keys3["keys"]), 1)
+        self.assertEqual(
+            test_keys3["keys"][0]["private_key"],
+            test_keys2["keys"][1]["private_key"])
 
 
 class TestValidateAllBroken(ZuulTestCase):
