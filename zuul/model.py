@@ -1612,6 +1612,15 @@ class Image(ConfigObject):
             'description': self.description,
         }
 
+    def toConfig(self):
+        return {
+            'project_canonical_name': self.project_canonical_name,
+            'name': self.name,
+            'branch': self.branch,
+            'type': self.type,
+            'description': self.description,
+        }
+
 
 class Flavor(ConfigObject):
     """A node flavor.
@@ -1645,6 +1654,14 @@ class Flavor(ConfigObject):
                 self.description == other.description)
 
     def toDict(self):
+        sc = self.source_context
+        return {
+            'project_canonical_name': sc.project_canonical_name,
+            'name': self.name,
+            'description': self.description,
+        }
+
+    def toConfig(self):
         sc = self.source_context
         return {
             'project_canonical_name': sc.project_canonical_name,
@@ -1703,6 +1720,18 @@ class Label(ConfigObject):
             'description': self.description,
             'min_ready': self.min_ready,
             'max_ready_age': self.max_ready_age,
+        }
+
+    def toConfig(self):
+        sc = self.source_context
+        return {
+            'project_canonical_name': sc.project_canonical_name,
+            'name': self.name,
+            'image': self.image,
+            'flavor': self.flavor,
+            'description': self.description,
+            'min-ready': self.min_ready,
+            'max-ready-age': self.max_ready_age,
         }
 
     def validateReferences(self, layout):
@@ -1860,7 +1889,7 @@ class ProviderConfig(ConfigObject):
         image_hashes = {}
         for image in config.get('images', []):
             layout_image = self._dropNone(
-                layout.images[image['name']].toDict())
+                layout.images[image['name']].toConfig())
             image.update(ProviderConfig._mergeDict(layout_image, image))
             # This is used for identifying unique image configurations
             # across multiple providers.
@@ -1870,14 +1899,14 @@ class ProviderConfig(ConfigObject):
         flavor_hashes = {}
         for flavor in config.get('flavors', []):
             layout_flavor = self._dropNone(
-                layout.flavors[flavor['name']].toDict())
+                layout.flavors[flavor['name']].toConfig())
             flavor.update(ProviderConfig._mergeDict(layout_flavor, flavor))
             flavor['config_hash'] = hashlib.sha256(
                 json.dumps(flavor, sort_keys=True).encode("utf8")).hexdigest()
             flavor_hashes[flavor['name']] = flavor['config_hash']
         for label in config.get('labels', []):
             layout_label = self._dropNone(
-                layout.labels[label['name']].toDict())
+                layout.labels[label['name']].toConfig())
             label.update(ProviderConfig._mergeDict(layout_label, label))
             try:
                 label['config_hash'] = self._getLabelConfigHash(
