@@ -3877,7 +3877,8 @@ class ZuulTestCase(BaseTestCase):
         path = os.path.join(self.test_root, "changes.data")
         self.test_config.changes.load(path)
 
-    def requestNodes(self, labels, tenant="tenant-one", pipeline="check"):
+    def requestNodes(self, labels, tenant="tenant-one", pipeline="check",
+                     timeout=10):
         result_queue = PipelineResultEventQueue(
             self.zk_client, tenant, pipeline)
 
@@ -3899,7 +3900,7 @@ class ZuulTestCase(BaseTestCase):
                     span_info=None,
                 )
                 for _ in iterate_timeout(
-                        10, "nodeset request to be fulfilled"):
+                        timeout, "nodeset request to be fulfilled"):
                     result_events = list(result_queue)
                     if result_events:
                         for event in result_events:
