@@ -264,8 +264,6 @@ class NodescanRequest:
     CONNECTING_KEY = 'connecting key'
     NEGOTIATING_KEY = 'negotiating key'
     COMPLETE = 'complete'
-    # For unit testing
-    FAKE = False
 
     def __init__(self, node, log):
         self.state = self.START
@@ -282,10 +280,9 @@ class NodescanRequest:
             self.gather_hostkeys = False
         self.ip = node.interface_ip
         self.port = node.connection_port
-        if 'fake' not in self.ip and not self.FAKE:
-            addrinfo = socket.getaddrinfo(self.ip, self.port)[0]
-            self.family = addrinfo[0]
-            self.sockaddr = addrinfo[4]
+        addrinfo = socket.getaddrinfo(self.ip, self.port)[0]
+        self.family = addrinfo[0]
+        self.sockaddr = addrinfo[4]
         self.sock = None
         self.transport = None
         self.event = None
@@ -412,14 +409,9 @@ class NodescanRequest:
             if not self.host_key_checking:
                 self.state = self.COMPLETE
             else:
-                if 'fake' in self.ip or self.FAKE:
-                    if self.gather_hostkeys:
-                        self.keys = ['ssh-rsa FAKEKEY']
-                    self.state = self.COMPLETE
-                else:
-                    self.init_connection_attempts += 1
-                    self._connect()
-                    self.state = self.CONNECTING_INIT
+                self.init_connection_attempts += 1
+                self._connect()
+                self.state = self.CONNECTING_INIT
 
         if self.state == self.CONNECTING_INIT:
             if not socket_ready:
@@ -1024,7 +1016,6 @@ class Launcher:
                         with node.activeContext(ctx):
                             node.setState(state)
                         self.wake_event.set()
-
             # Deallocate ready node w/o a request for re-use
             if (node.request_id and not request
                     and node.state == node.State.READY):

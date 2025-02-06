@@ -124,7 +124,8 @@
     name: aws-base
     abstract: true
     connection: aws
-    boot-timeout: 120
+    host-key-checking: false
+    boot-timeout: 300
     launch-timeout: 600
     launch-attempts: 2
     object-storage:

@@ -22,6 +22,13 @@ from zuul.lib.voluputil import Required, Optional, Nullable
 
 # Labels
 
+# The label attributes which can appear either in the main body of the
+# section stanza, or in a section/provider label, or in a standalone
+# label.
+common_label = vs.Schema({
+    Optional('boot-timeout', default=300): int,
+})
+
 # The label attributes that can appear in a section/provider label or
 # a standalone label (but not in the section body).
 base_label = vs.Schema({
@@ -34,7 +41,6 @@ base_label = vs.Schema({
     Optional('tags', default=dict): {str: str},
     Optional('min-ready', default=0): int,
     Optional('max-ready-age', default=0): int,
-    Optional('boot-timeout', default=300): int,
 })
 
 # Label attributes that are common to any kind of ssh-based driver.
