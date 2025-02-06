@@ -156,6 +156,7 @@
     launch-timeout: 600
     object-storage:
       bucket-name: zuul
+    key-name: zuul
     flavors:
       - name: normal
         instance-type: t3.medium
@@ -177,6 +178,4 @@
     section: aws-us-east-1
     labels:
       - name: debian-normal
-        key-name: zuul
       - name: debian-local-normal
-        key-name: zuul

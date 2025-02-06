@@ -130,8 +130,7 @@
     launch-attempts: 2
     object-storage:
       bucket-name: zuul
-    # TODO
-    # key-name: zuul
+    key-name: zuul
     flavors:
       - name: normal
         instance-type: t3.medium
@@ -156,10 +155,6 @@
     section: aws-us-east-1
     labels:
       - name: debian-normal
-        key-name: zuul
       - name: debian-large
-        key-name: zuul
       - name: debian-dedicated
-        key-name: zuul
       - name: debian-invalid
-        key-name: zuul
