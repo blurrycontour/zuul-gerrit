@@ -130,8 +130,7 @@
     launch-attempts: 2
     object-storage:
       bucket-name: zuul
-    # TODO
-    # key-name: zuul
+    key-name: zuul
     flavors:
       - name: normal
         instance-type: t3.medium
@@ -160,15 +159,11 @@
     section: aws-us-east-1
     labels:
       - name: debian-normal
-        key-name: zuul
         volume-type: gp3
         volume-size: 40
         # Change iops and omit throughput to test label overriding the
         # flavor
         iops: 1000
       - name: debian-large
-        key-name: zuul
       - name: debian-dedicated
-        key-name: zuul
       - name: debian-invalid
-        key-name: zuul
