@@ -1498,6 +1498,8 @@ class TestSystemConfigCache(ZooKeeperBaseTestCase):
             "web_root": "/web/root",
             "web_status_url": "/web/status",
             "websocket_url": "/web/socket",
+            "oidc_signing_key_rotation_interval": 3600,
+            "oidc_supported_signing_algorithms": ["RS256", "ES256"],
         })
         self.config_cache.set(uac, attrs)
 
