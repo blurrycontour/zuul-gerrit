@@ -48,6 +48,7 @@ from zuul.exceptions import (
     DuplicateNodeError,
     GlobalSemaphoreNotFoundError,
     LabelForbiddenError,
+    MaxOIDCTTLError,
     MaxTimeoutError,
     MultipleProjectConfigurations,
     NodeFromGroupNotFoundError,
@@ -677,12 +678,21 @@ class SecretParser(object):
         self.pcontext = pcontext
         self.schema = self.getSchema()
 
+    def _check_missing_attribute(self, secret):
+        # It would be complex to use voluptuous validator to check
+        # "required and exclusive attributes", so we use custom validator.
+        if 'data' not in secret and 'oidc' not in secret:
+            raise vs.Invalid("Either 'data' or 'oidc' must be present.")
+        return secret
+
     def getSchema(self):
-        secret = {vs.Required('name'): str,
-                  vs.Required('data'): dict,
-                  '_source_context': model.SourceContext,
-                  '_start_mark': model.ZuulMark,
-                  }
+        secret = vs.All({
+            vs.Required('name'): str,
+            vs.Exclusive('data', 'secret_type'): dict,
+            vs.Exclusive('oidc', 'secret_type'): dict,
+            '_source_context': model.SourceContext,
+            '_start_mark': model.ZuulMark,
+        }, self._check_missing_attribute)
 
         return vs.Schema(secret)
 
@@ -692,7 +702,14 @@ class SecretParser(object):
         s = model.Secret(conf['name'], conf['_source_context'])
         s.source_context = conf['_source_context']
         s.start_mark = conf['_start_mark']
-        s.secret_data = conf['data']
+
+        if 'data' in conf:
+            s.secret_data = conf['data']
+        elif 'oidc' in conf:
+            s.secret_oidc = conf['oidc']
+            if (conf['oidc'].get('ttl') and
+                int(conf['oidc']['ttl']) > self.pcontext.tenant.max_oidc_ttl):
+                raise MaxOIDCTTLError(s, self.pcontext.tenant)
         return s
 
 
@@ -2003,6 +2020,7 @@ class TenantParser(object):
                   'max-dependencies': int,
                   'max-nodes-per-job': int,
                   'max-job-timeout': int,
+                  'max-oidc-ttl': int,
                   'source': self.validateTenantSources(),
                   'exclude-unprotected-branches': bool,
                   'exclude-locked-branches': bool,
@@ -2045,6 +2063,8 @@ class TenantParser(object):
             tenant.max_nodes_per_job = conf['max-nodes-per-job']
         if conf.get('max-job-timeout') is not None:
             tenant.max_job_timeout = int(conf['max-job-timeout'])
+        if conf.get('max-oidc-ttl') is not None:
+            tenant.max_oidc_ttl = int(conf['max-oidc-ttl'])
         if conf.get('exclude-unprotected-branches') is not None:
             tenant.exclude_unprotected_branches = \
                 conf['exclude-unprotected-branches']
