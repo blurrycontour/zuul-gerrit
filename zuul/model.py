@@ -2597,6 +2597,9 @@ class Secret(ConfigObject):
         # is named 'secret_data' to make it easy to search for and
         # spot where it is directly used.
         self.secret_data = {}
+        # This attribute stores the oidc token configuration for the
+        # oidc secrets. Mutually exclusive with secret_data.
+        self.secret_oidc = {}
 
     def __ne__(self, other):
         return not self.__eq__(other)
@@ -2605,7 +2608,8 @@ class Secret(ConfigObject):
         if not isinstance(other, Secret):
             return False
         return (self.name == other.name and
-                self.secret_data == other.secret_data)
+                self.secret_data == other.secret_data and
+                self.secret_oidc == other.secret_oidc)
 
     def __repr__(self):
         return '<Secret %s>' % (self.name,)
@@ -2638,6 +2642,9 @@ class Secret(ConfigObject):
         return r
 
     def serialize(self):
+        # TODO: Both secret_data and secret_oidc needs to be serialized, but
+        # this must be changed together with the corresponding deserialize
+        # in executor.
         return yaml.encrypted_dump(self.secret_data, default_flow_style=False)
 
 
@@ -9576,6 +9583,7 @@ class Tenant(object):
         self.name = name
         self.max_nodes_per_job = 5
         self.max_job_timeout = 10800
+        self.max_oidc_ttl = 10800
         self.max_changes_per_pipeline = None
         self.max_dependencies = None
         self.exclude_unprotected_branches = False
