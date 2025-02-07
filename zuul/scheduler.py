@@ -217,7 +217,7 @@ class Scheduler(threading.Thread):
 
     _stats_interval = 30
     _semaphore_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
-    _general_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
+    _general_cleanup_interval = IntervalTrigger(minutes=3, jitter=5)
     _build_request_cleanup_interval = IntervalTrigger(seconds=60, jitter=5)
     _merge_request_cleanup_interval = IntervalTrigger(seconds=60, jitter=5)
     _connection_cleanup_interval = IntervalTrigger(minutes=5, jitter=10)
@@ -734,6 +734,7 @@ class Scheduler(threading.Thread):
         self.log.debug("Starting general cleanup")
         if self.general_cleanup_lock.acquire(blocking=False):
             try:
+                self._runOidcSigningKeyRotation()
                 self._runConfigCacheCleanup()
                 self._runExecutorApiCleanup()
                 self._runMergerApiCleanup()
@@ -748,6 +749,32 @@ class Scheduler(threading.Thread):
         # This has its own locking
         self._runNodeRequestCleanup()
         self.log.debug("Finished general cleanup")
+
+    def _runOidcSigningKeyRotation(self):
+        try:
+            self.log.debug("Running OIDC signing keys rotation")
+
+            supported_signing_algorithms = [
+                alg.strip() for alg
+                in self.globals.oidc_supported_signing_algorithms.split(',')
+            ]
+            rotation_interval = int(
+                self.globals.oidc_signing_key_rotation_interval)
+            # Get the max_ttl over all the tenants
+            max_ttl = max(t.max_oidc_ttl for t in self.abide.tenants.values())
+
+            for algorithm in supported_signing_algorithms:
+                try:
+                    self.keystore.rotateOidcSigningKeys(
+                        algorithm, rotation_interval, max_ttl)
+                except exceptions.AlgorithmNotSupportedException:
+                    self.log.warning(
+                        "OIDC signing algorithm '%s' is not supported!",
+                        algorithm)
+
+            self.log.debug("Finished OIDC signing keys rotation")
+        except Exception:
+            self.log.exception("Error in OIDC signing keys rotation:")
 
     def _runConfigCacheCleanup(self):
         try:
