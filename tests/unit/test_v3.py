@@ -7218,6 +7218,71 @@ class TestMaxTimeout(ZuulTestCase):
                          "B should not fail because of timeout limit")
 
 
+class TestOIDCConfiguration(ZuulTestCase):
+    tenant_config_file = 'config/multi-tenant/main.yaml'
+
+    def test_max_ttl_reached(self):
+        # Test that the secret oidc ttl is within the tenant max-oidc-ttl
+        in_repo_conf = textwrap.dedent(
+            """
+            - secret:
+                name: my-oidc
+                oidc:
+                  ttl: 400
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        # max-oidc-ttl for tenant-one is 300
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertIn('The secret "my-oidc" exceeds tenant max-oidc-ttl',
+                      A.messages[0], "A should fail because of ttl limit")
+
+        # max-oidc-ttl for tenant-two is the default 600
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertNotIn("exceeds tenant max-oidc-ttl", B.messages[0],
+                         "B should not fail because of ttl limit")
+
+    def test_mutual_exclusive(self):
+        # Test that `oidc` and `data` should be mutually exclusive
+        in_repo_conf = textwrap.dedent(
+            """
+            - secret:
+                name: my-oidc
+                oidc: {}
+                data: {}
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertIn('two or more values in the same group'
+                      ' of exclusion \'secret_type\'',
+                      A.messages[0],
+                      "A should fail because of mutual exclusive")
+
+    def test_required(self):
+        # Test that one of `oidc` and `data` must be present
+        in_repo_conf = textwrap.dedent(
+            """
+            - secret:
+                name: my-oidc
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertIn('Either \'data\' or \'oidc\' must be present',
+                      A.messages[0],
+                      "A should fail because both are missing")
+
+
 class TestAllowedConnection(AnsibleZuulTestCase):
     config_file = 'zuul-connections-gerrit-and-github.conf'
     tenant_config_file = 'config/multi-tenant/main.yaml'
