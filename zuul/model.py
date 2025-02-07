@@ -8508,6 +8508,12 @@ class SystemAttributes:
     all schedulers and will be synchronized via Zookeeper.
     """
 
+    _default_oidc_signing_key_rotation_interval = 60 * 60 * 24 * 7  # 1 week
+    # TODO: When more algorithms are supported, this should be
+    # fallback to all supported algorithms
+    _default_oidc_supported_signing_algorithms = ['RS256']
+    _default_oidc_default_signing_algorithm = "RS256"
+
     def __init__(self):
         self.use_relative_priority = False
         self.max_hold_expiration = 0
@@ -8517,6 +8523,9 @@ class SystemAttributes:
         # TODO: Deprecated, remove after version 12
         self.web_status_url = ""
         self.websocket_url = None
+        self.oidc_signing_key_rotation_interval = None
+        self.oidc_supported_signing_algorithms = None
+        self.oidc_default_signing_algorithm = None
 
     def __eq__(self, other):
         if not isinstance(other, self.__class__):
@@ -8528,7 +8537,14 @@ class SystemAttributes:
             and self.default_ansible_version == other.default_ansible_version
             and self.web_root == other.web_root
             and self.web_status_url == other.web_status_url
-            and self.websocket_url == other.websocket_url)
+            and self.websocket_url == other.websocket_url
+            and (self.oidc_signing_key_rotation_interval ==
+                 other.oidc_signing_key_rotation_interval)
+            and (self.oidc_supported_signing_algorithms ==
+                 other.oidc_supported_signing_algorithms)
+            and (self.oidc_default_signing_algorithm ==
+                 other.oidc_default_signing_algorithm))
+
 
     @classmethod
     def fromConfig(cls, config):
@@ -8567,6 +8583,20 @@ class SystemAttributes:
 
         self.web_status_url = get_default(config, 'web', 'status_url', '')
         self.websocket_url = get_default(config, 'web', 'websocket_url', None)
+        self.oidc_signing_key_rotation_interval = int(get_default(
+            config, 'oidc', 'signing_key_rotation_interval',
+            self._default_oidc_signing_key_rotation_interval))
+
+        oidc_signing_algorithms_config = get_default(
+            config, 'oidc', 'supported_signing_algorithms', None)
+        self.oidc_supported_signing_algorithms = [
+            alg.strip() for alg in oidc_signing_algorithms_config.split(',')
+        ] if oidc_signing_algorithms_config else \
+            self._default_oidc_supported_signing_algorithms
+
+        self.oidc_default_signing_algorithm = get_default(
+            config, 'oidc', 'default_signing_algorithm',
+            self._default_oidc_default_signing_algorithm)
 
     def toDict(self):
         return {
@@ -8577,6 +8607,12 @@ class SystemAttributes:
             "web_root": self.web_root,
             "web_status_url": self.web_status_url,
             "websocket_url": self.websocket_url,
+            "oidc_signing_key_rotation_interval":
+                self.oidc_signing_key_rotation_interval,
+            "oidc_supported_signing_algorithms":
+                self.oidc_supported_signing_algorithms,
+            "oidc_default_signing_algorithm":
+                self.oidc_default_signing_algorithm,
         }
 
     @classmethod
@@ -8589,6 +8625,17 @@ class SystemAttributes:
         sys_attrs.web_root = data["web_root"]
         sys_attrs.web_status_url = data["web_status_url"]
         sys_attrs.websocket_url = data["websocket_url"]
+        # For the newly added system attributes, we need to use get()
+        # method to avoid KeyError in scheduler prime() method.
+        sys_attrs.oidc_signing_key_rotation_interval = data.get(
+            "oidc_signing_key_rotation_interval",
+            cls._default_oidc_signing_key_rotation_interval)
+        sys_attrs.oidc_supported_signing_algorithms = data.get(
+            "oidc_supported_signing_algorithms",
+            cls._default_oidc_supported_signing_algorithms)
+        sys_attrs.oidc_default_signing_algorithm = data.get(
+            "oidc_default_signing_algorithm",
+            cls._default_oidc_default_signing_algorithm)
         return sys_attrs
 
 
@@ -9605,6 +9652,7 @@ class Tenant(object):
         self.name = name
         self.max_nodes_per_job = 5
         self.max_job_timeout = 10800
+        self.max_oidc_ttl = 10800
         self.max_changes_per_pipeline = None
         self.max_dependencies = None
         self.exclude_unprotected_branches = False
