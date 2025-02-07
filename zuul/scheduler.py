@@ -734,6 +734,7 @@ class Scheduler(threading.Thread):
         self.log.debug("Starting general cleanup")
         if self.general_cleanup_lock.acquire(blocking=False):
             try:
+                self._runOidcSigningKeyRotation()
                 self._runConfigCacheCleanup()
                 self._runExecutorApiCleanup()
                 self._runMergerApiCleanup()
@@ -748,6 +749,28 @@ class Scheduler(threading.Thread):
         # This has its own locking
         self._runNodeRequestCleanup()
         self.log.debug("Finished general cleanup")
+
+    def _runOidcSigningKeyRotation(self):
+        try:
+            self.log.debug("Running OIDC signing keys rotation")
+
+            # Get the max_ttl over all the tenants
+            max_ttl = max(t.max_oidc_ttl for t in self.abide.tenants.values())
+            for algorithm in self.globals.oidc_supported_signing_algorithms:
+                try:
+                    self.keystore.rotateOidcSigningKeys(
+                        algorithm,
+                        self.globals.oidc_signing_key_rotation_interval,
+                        max_ttl
+                    )
+                except exceptions.AlgorithmNotSupportedException:
+                    self.log.warning(
+                        "OIDC signing algorithm '%s' is not supported!",
+                        algorithm)
+
+            self.log.debug("Finished OIDC signing keys rotation")
+        except Exception:
+            self.log.exception("Error in OIDC signing keys rotation:")
 
     def _runConfigCacheCleanup(self):
         try:
