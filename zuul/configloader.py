@@ -2017,6 +2017,7 @@ class TenantParser(object):
                   'max-dependencies': int,
                   'max-nodes-per-job': int,
                   'max-job-timeout': int,
+                  'max-oidc-ttl': int,
                   'source': self.validateTenantSources(),
                   'exclude-unprotected-branches': bool,
                   'exclude-locked-branches': bool,
@@ -2059,6 +2060,8 @@ class TenantParser(object):
             tenant.max_nodes_per_job = conf['max-nodes-per-job']
         if conf.get('max-job-timeout') is not None:
             tenant.max_job_timeout = int(conf['max-job-timeout'])
+        if conf.get('max-oidc-ttl') is not None:
+            tenant.max_oidc_ttl = int(conf['max-oidc-ttl'])
         if conf.get('exclude-unprotected-branches') is not None:
             tenant.exclude_unprotected_branches = \
                 conf['exclude-unprotected-branches']
