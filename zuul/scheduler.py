@@ -216,6 +216,7 @@ class Scheduler(threading.Thread):
     tracer = trace.get_tracer("zuul")
 
     _stats_interval = 30
+    _default_oidc_key_rotation_interval = 60 * 60 * 24 * 7  # 1 week
     _semaphore_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
     _general_cleanup_interval = IntervalTrigger(minutes=60, jitter=60)
     _build_request_cleanup_interval = IntervalTrigger(seconds=60, jitter=5)
@@ -734,6 +735,7 @@ class Scheduler(threading.Thread):
         self.log.debug("Starting general cleanup")
         if self.general_cleanup_lock.acquire(blocking=False):
             try:
+                self._runOidcSigningKeyRotation()
                 self._runConfigCacheCleanup()
                 self._runExecutorApiCleanup()
                 self._runMergerApiCleanup()
@@ -748,6 +750,31 @@ class Scheduler(threading.Thread):
         # This has its own locking
         self._runNodeRequestCleanup()
         self.log.debug("Finished general cleanup")
+
+    def _runOidcSigningKeyRotation(self):
+        try:
+            self.log.debug("Running OIDC signing keys rotation")
+
+            supported_algorithms = self.config.get(
+                'oidc', 'supported_algorithms', fallback='RS256'
+            ).split(',')
+            # Get the rotation interval from the config, or use the default
+            rotation_interval = self.config.get(
+                'oidc', 'signing_key_rotation_interval',
+                fallback=self._default_oidc_key_rotation_interval)
+            # Get the max_ttl over all the tenants
+            max_ttl = max(
+                self.abide.tenants.values(),
+                key=lambda t: t.max_oidc_ttl
+            ).max_oidc_ttl
+
+            for algorithm in supported_algorithms:
+                self.keystore.rotateOidcSigningKeys(
+                    algorithm, rotation_interval, max_ttl)
+
+            self.log.debug("Finished OIDC signing keys rotation")
+        except Exception:
+            self.log.exception("Error in OIDC signing keys rotation:")
 
     def _runConfigCacheCleanup(self):
         try:
