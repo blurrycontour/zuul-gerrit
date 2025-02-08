@@ -16,6 +16,23 @@
       "message": "Hi! Adding you @jim@acmegating.com and @fungi@yuggoth.org as reviewers since you answered me some questions about Zuul development in the Matrix room :)\n\nApart from the passing unit test I added, I\u0027ve been using this change in my homelab deployment successfully.",
       "revId": "ff7bc6cd67c313b8ff8999c6df068dfce4ae657d",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20726d1b_341b8276",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 37345
+      },
+      "writtenOn": "2025-02-08T12:50:37Z",
+      "side": 1,
+      "message": "@fungi@yuggoth.org should we wait for the review from @jim@acmegating.com or submit? In the latter case, I don\u0027t have permission to set the Workflow label to +1, so I\u0027d need your help!\n\nThanks!",
+      "revId": "ff7bc6cd67c313b8ff8999c6df068dfce4ae657d",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
