@@ -185,10 +185,13 @@ class Streamer:
             # error for us, just bail
             return
 
-        # If we were asked to stop during the connection attempt, return
-        # now.
+        # If we were asked to stop during the connection attempt, and
+        # the grace time has expired return now.  If we are stopped
+        # for a skipped task, then there will be no grace time set, so
+        # this should return immediately.
         if self.stopped:
-            return
+            if time.monotonic() >= (self.stop_ts + self.stop_grace):
+                return
 
         # Find out what version we are running against
         s.send(f'v:{LOG_STREAM_VERSION}\n'.encode('utf-8'))
