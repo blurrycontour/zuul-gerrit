@@ -2353,7 +2353,7 @@ class ZuulTestCase(BaseTestCase):
                     dir=os.environ.get("ZUUL_TEST_ROOT", None))
         else:
             tmp_root = os.environ.get("ZUUL_TEST_ROOT", '/tmp')
-        self.test_root = os.path.join(tmp_root, "zuul-test")
+        self.test_root = os.path.join(tmp_root, "zt")
         self.upstream_root = os.path.join(self.test_root, "upstream")
         self.merger_src_root = os.path.join(self.test_root, "merger-git")
         self.executor_src_root = os.path.join(self.test_root, "executor-git")
