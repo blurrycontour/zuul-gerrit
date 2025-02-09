@@ -66,6 +66,7 @@
     name: aws-base
     abstract: true
     connection: aws
+    host-key-checking: false
     boot-timeout: 120
     launch-timeout: 600
     launch-attempts: 2
