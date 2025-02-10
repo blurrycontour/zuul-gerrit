@@ -4003,7 +4003,7 @@ class Job(ConfigObject):
 
         for dependency in self.dependencies:
             layout.getJob(dependency.name)
-        for pb in self.pre_run + self.run + self.post_run + self.cleanup_run:
+        for pb in self.all_playbooks:
             pb.validateReferences(layout)
 
     def assertImagePermissions(self, image_build_name, config_object, layout):
@@ -4320,7 +4320,7 @@ class Job(ConfigObject):
             self.failure_output = tuple(sorted(failure_output))
 
         pb_semaphores = set()
-        for pb in self.run + self.pre_run + self.post_run + self.cleanup_run:
+        for pb in self.all_playbooks:
             pb_semaphores.update([x['name'] for x in pb.frozen_semaphores])
         common = (set([x.name for x in self.semaphores]) &
                   pb_semaphores)
@@ -4397,6 +4397,12 @@ class Job(ConfigObject):
             return True
 
         return False
+
+    @property
+    def all_playbooks(self):
+        for k in ('pre_run', 'run', 'post_run', 'cleanup_run'):
+            playbooks = getattr(self, k)
+            yield from playbooks
 
 
 class JobIncludeVars(ConfigObject):
@@ -7100,6 +7106,30 @@ class QueueItem(zkobject.ZKObject):
 
     def updatesJobConfig(self, job, change, layout):
         log = self.annotateLogger(self.log)
+
+        if hasattr(change, 'files'):
+            files = {c for c in change.files if c != '/COMMIT_MSG'}
+        else:
+            files = set()
+        project_cn = change.project.canonical_name
+
+        for iv in job.include_vars:
+            if iv.project_canonical_name in (project_cn, None):
+                # Either the include-vars explicitly matches this
+                # change's project, or we are instructed to look in
+                # the Zuul project, which is this change's project.
+                if iv.name in files:
+                    log.debug("Include-vars %s is altered in this change",
+                              iv.name)
+                    return True
+
+        for pb in job.all_playbooks:
+            if pb.source_context.project_canonical_name == project_cn:
+                if pb.path in files:
+                    log.debug("Playbook %s is altered in this change",
+                              pb.path)
+                    return True
+
         layout_ahead = None
         if self.pipeline.manager:
             layout_ahead = self.pipeline.manager.getFallbackLayout(self)

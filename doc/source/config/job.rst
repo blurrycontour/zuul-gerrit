@@ -1263,10 +1263,12 @@ Here is an example of two job definitions:
       :default: true
 
       If this is set to ``true`` (the default), then the job's file
-      matchers are ignored if a change alters the job's configuration.
-      This means that changes to jobs with file matchers will be
-      self-testing without requiring that the file matchers include
-      the Zuul configuration file defining the job.
+      matchers are ignored if a change alters the job's configuration,
+      any of its playbooks, or any of its :attr:`job.include-vars`
+      files.  This means that changes to jobs with file matchers will
+      be self-testing without requiring that the file matchers include
+      the Zuul configuration file defining the job or other referenced
+      files.
 
    .. attr:: deduplicate
       :default: auto

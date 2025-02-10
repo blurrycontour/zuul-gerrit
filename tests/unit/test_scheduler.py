@@ -7223,6 +7223,42 @@ class TestJobUpdateFileMatcher(ZuulTestCase):
         self.waitUntilSettled()
         self.assertHistory([])
 
+    def test_include_vars_update(self):
+        "Test matchers are overridden with an include-vars update"
+        in_repo_conf = textwrap.dedent(
+            """
+            foo: baz
+            """)
+        file_dict = {'vars.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='existing-files', result='SUCCESS', changes='1,1'),
+            dict(name='existing-irr', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
+    def test_playbook_update(self):
+        "Test matchers are overridden with a playbook update"
+        in_repo_conf = textwrap.dedent(
+            """
+            # Noop change
+            - hosts: all
+              tasks: []
+            """)
+        file_dict = {'playbook.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='existing-files', result='SUCCESS', changes='1,1'),
+            dict(name='existing-irr', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
+
 
 class TestJobUpdateFileMatcherTransitive(ZuulTestCase):
     tenant_config_file = 'config/job-update-transitive/main.yaml'
