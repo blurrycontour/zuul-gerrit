@@ -415,6 +415,12 @@ configuration. Some examples of tenant definitions are:
 
       The maximum timeout for jobs. A value of '-1' value removes the limit.
 
+   .. attr:: max-oidc-ttl
+      :default: 600
+
+      The maximum value that can be configured for the ``ttl`` attribute
+      of an OIDC secret in this tenant. It must be a positive integer.
+
    .. attr:: exclude-unprotected-branches
       :default: false
 
