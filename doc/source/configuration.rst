@@ -208,6 +208,27 @@ Database
       if you rely on external databases which are not under your control.
       The default is to have no prefix.
 
+OIDC
+~~~~
+
+.. attr:: oidc
+
+   This optional section of ``zuul.conf``, if present, will overwrite the
+   default configuration of Zuul as OIDC Identity Provider.
+
+   .. attr:: supported_algorithms
+      :default: RS256
+
+      A list of supported algorithms, separated by ``,``, that Zuul supports
+      for signing the JWT tokens.
+      Valid algorithms are: ``RS256``.
+
+   .. attr:: signing_key_rotation_interval
+      :default: 604800
+
+      The rotation interval in seconds for the signing key. The default is
+      7 days.
+
 .. _scheduler:
 
 Scheduler
