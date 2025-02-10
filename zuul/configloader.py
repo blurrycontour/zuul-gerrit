@@ -363,6 +363,7 @@ def copy_safe_config(conf):
     (e.g., pragma)).
 
     """
+    return conf
     ret = copy.deepcopy(conf)
     for key in (
             '_source_context',
