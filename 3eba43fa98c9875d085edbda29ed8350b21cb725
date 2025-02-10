@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7adc6670_2bc71c4e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-10T21:58:15Z",
+      "side": 1,
+      "message": "In the specification when we said /keystorage/oidc, I think we may not have fully appreciated that the element after /keystorage is a connection name.  Roughly speaking (it\u0027s a bit more complex than this) it\u0027s /keystorage/$connection/$project/$type-of-key.\n\nThat means it\u0027s easy to add new types of keys, and we could do that here, except these keys are not associated with a project or even a connection.\n\nIf we were to design the keystore hierarchy today, we would probably do something like /keystorage/connection/$connection/... so that we can have non-connection keys.\n\nAssuming that we don\u0027t want to do a migration for this (it seems excessive to me), then we can either go with what we wrote in the spec, or we can do a parallel hierarchy, like \"/keystorage-oidc/$algorithm\".\n\nI think if we stick with \"/keystorage/oidc\", then we should consider that it is actually somewhat likely for someone to create a connection named \"oidc\".  If we go this route, we should probably use \"_oidc\" instead of \"oidc\" to reduce the chance of collisions, and then add a check in the configuration loader to raise an exception if someone creates a connection named \"_oidc\".\n\nBut if we use \"/keystorage-oidc\" then we don\u0027t have to worry about that.  The keystorage class is fairly flexible about its paths, so I think that would not be a very large change.  Later on, I think we should use a treecache in order to ensure the web components have the latest keys automatically, and this would work well with that.\n\nThe main difference is that if we use a different root path, we will not automatically export and import these keys from backups.  That is actually probably the right thing to do, since if someone restored an old backup of keys, they might break a running system.  In a disaster recovery scenario, we would not expect jobs started with keys on the \"old\" system to be running, therefore we don\u0027t need their keys.\n\nI tend to prefer the second option, /keystorage-oidc.",
+      "revId": "3eba43fa98c9875d085edbda29ed8350b21cb725",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
