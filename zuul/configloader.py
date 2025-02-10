@@ -15,7 +15,6 @@
 import collections
 from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import copy
 import io
 import logging
 import math
@@ -349,30 +348,6 @@ def ansible_vars_dict(value):
         ansible_var_name(key)
 
 
-def copy_safe_config(conf):
-    """Return a deep copy of a config dictionary.
-
-    This lets us assign values of a config dictionary to configuration
-    objects, even if those values are nested dictionaries.  This way
-    we can safely freeze the configuration object (the process of
-    which mutates dictionaries) without mutating the original
-    configuration.
-
-    Meanwhile, this does retain the original context information as a
-    single object (some behaviors rely on mutating the source context
-    (e.g., pragma)).
-
-    """
-    ret = copy.deepcopy(conf)
-    for key in (
-            '_source_context',
-            '_start_mark',
-    ):
-        if key in conf:
-            ret[key] = conf[key]
-    return ret
-
-
 class PragmaParser(object):
     pragma = {
         'implied-branch-matchers': bool,
@@ -388,7 +363,6 @@ class PragmaParser(object):
         self.pcontext = pcontext
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
         bm = conf.get('implied-branch-matchers')
 
@@ -423,7 +397,6 @@ class ImageParser(object):
         self.pcontext = pcontext
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
 
         image = model.Image(conf['name'], conf['type'],
@@ -447,7 +420,6 @@ class FlavorParser(object):
         self.pcontext = pcontext
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
 
         flavor = model.Flavor(conf['name'], conf.get('description'))
@@ -474,7 +446,6 @@ class LabelParser(object):
         self.pcontext = pcontext
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
 
         label = model.Label(conf['name'], conf['image'], conf['flavor'],
@@ -505,7 +476,6 @@ class SectionParser(object):
         self.pcontext = pcontext
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
 
         # Mutate these into the expected form
@@ -540,7 +510,6 @@ class ProviderParser(object):
         self.pcontext = pcontext
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
 
         if 'flavor' in conf:
@@ -600,7 +569,6 @@ class NodeSetParser(object):
         return vs.Schema(nodeset)
 
     def fromYaml(self, conf, anonymous=False):
-        conf = copy_safe_config(conf)
         if anonymous:
             self.anon_schema(conf)
             self.anonymous = True
@@ -687,7 +655,6 @@ class SecretParser(object):
         return vs.Schema(secret)
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
         s = model.Secret(conf['name'], conf['_source_context'])
         s.source_context = conf['_source_context']
@@ -849,7 +816,6 @@ class JobParser(object):
 
     def fromYaml(self, conf,
                  project_pipeline=False, name=None, validate=True):
-        conf = copy_safe_config(conf)
         if validate:
             self.schema(conf)
 
@@ -1282,7 +1248,6 @@ class ProjectTemplateParser(object):
         return vs.Schema(project)
 
     def fromYaml(self, conf, validate=True):
-        conf = copy_safe_config(conf)
         if validate:
             self.schema(conf)
         source_context = conf['_source_context']
@@ -1373,7 +1338,6 @@ class ProjectParser(object):
         return vs.Schema(project)
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
 
         project_name = conf.get('name')
@@ -1562,7 +1526,6 @@ class PipelineParser(object):
         return vs.Schema(pipeline)
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
         pipeline = model.Pipeline(conf['name'], self.pcontext.tenant)
         pipeline.source_context = conf['_source_context']
@@ -1718,7 +1681,6 @@ class SemaphoreParser(object):
         return vs.Schema(semaphore)
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
         semaphore = model.Semaphore(conf['name'], conf.get('max', 1))
         semaphore.source_context = conf.get('_source_context')
@@ -1743,7 +1705,6 @@ class QueueParser:
         return vs.Schema(queue)
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
         queue = model.Queue(
             conf['name'],
@@ -1772,7 +1733,6 @@ class AuthorizationRuleParser(object):
         return vs.Schema(authRule)
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
         a = model.AuthZRuleTree(conf['name'])
 
@@ -1806,7 +1766,6 @@ class GlobalSemaphoreParser(object):
         return vs.Schema(semaphore)
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
         semaphore = model.Semaphore(conf['name'], conf.get('max', 1),
                                     global_scope=True)
@@ -1826,7 +1785,6 @@ class ApiRootParser(object):
         return vs.Schema(api_root)
 
     def fromYaml(self, conf):
-        conf = copy_safe_config(conf)
         self.schema(conf)
         api_root = model.ApiRoot(conf.get('authentication-realm'))
         api_root.access_rules = conf.get('access-rules', [])
