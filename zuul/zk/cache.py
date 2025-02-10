@@ -43,15 +43,27 @@ class CacheSyncSentinel:
 
 
 class ZuulTreeCache(abc.ABC):
-    '''
-    Use watchers to keep a cache of local objects up to date.
-    '''
-
     log = logging.getLogger("zuul.zk.ZooKeeper")
     event_log = logging.getLogger("zuul.zk.cache.event")
     qsize_warning_threshold = 1024
 
-    def __init__(self, zk_client, root):
+    def __init__(self, zk_client, root, async_worker=True):
+        """Use watchers to keep a cache of local objects up to date.
+
+        Typically this is used with async worker threads so that we
+        release the kazoo callback resources as quickly as possible.
+        This prevents large and active trees from starving other
+        threads.
+
+        In case the tree is small and rarely changed, async_worker may
+        be set to False in order to avoid incurring the overhead of
+        starting two extra threads.
+
+        :param ZookeeperClient zk_client: The Zuul ZookeeperClient object
+        :param str root: The root of the cache
+        :param bool async_worker: Whether to start async worker threads
+
+        """
         self.zk_client = zk_client
         self.client = zk_client.client
         self.root = root
@@ -68,6 +80,7 @@ class ZuulTreeCache(abc.ABC):
         self._playback_queue = queue.Queue()
         self._event_worker = None
         self._playback_worker = None
+        self._async_worker = async_worker
 
         self.client.add_listener(self._sessionListener)
         self._start()
@@ -85,7 +98,10 @@ class ZuulTreeCache(abc.ABC):
             self.client.handler.short_spawn(self._start)
 
     def _cacheListener(self, event):
-        self._event_queue.put(event)
+        if self._async_worker:
+            self._event_queue.put(event)
+        else:
+            self._handleCacheEvent(event)
 
     def _start(self):
         with self._init_lock:
@@ -104,23 +120,26 @@ class ZuulTreeCache(abc.ABC):
             # session aren't valid.
             self._event_queue = queue.Queue()
             # Prepare (but don't start) the new worker.
-            self._event_worker = threading.Thread(
-                target=self._eventWorker)
-            self._event_worker.daemon = True
+            if self._async_worker:
+                self._event_worker = threading.Thread(
+                    target=self._eventWorker)
+                self._event_worker.daemon = True
 
             if self._playback_worker:
                 self._playback_worker.join()
             self._playback_queue = queue.Queue()
-            self._playback_worker = threading.Thread(
-                target=self._playbackWorker)
-            self._playback_worker.daemon = True
+            if self._async_worker:
+                self._playback_worker = threading.Thread(
+                    target=self._playbackWorker)
+                self._playback_worker.daemon = True
 
             # Clear the stop flag and start the workers now that we
             # are sure that both have stopped and we have cleared the
             # queues.
             self._stop_workers = False
-            self._event_worker.start()
-            self._playback_worker.start()
+            if self._async_worker:
+                self._event_worker.start()
+                self._playback_worker.start()
 
             try:
                 self.client.add_watch(
@@ -227,7 +246,10 @@ class ZuulTreeCache(abc.ABC):
             future = self.client.get_async(event.path)
         else:
             future = None
-        self._playback_queue.put((event, future, key))
+        if self._async_worker:
+            self._playback_queue.put((event, future, key))
+        else:
+            self._handlePlayback(event, future, key)
 
     def _playbackWorker(self):
         while not (self._stopped or self._stop_workers):

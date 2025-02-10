@@ -90,12 +90,13 @@ class TestTreeCache(BaseTestCase):
                 if found:
                     return
 
-    def test_tree_cache(self):
+    def _test_tree_cache(self, async_worker):
         client = self.zk_client.client
         data = b'{}'
         client.create('/test', data)
         client.create('/test/foo', data)
-        cache = SimpleTreeCache(self.zk_client, "/test")
+        cache = SimpleTreeCache(self.zk_client, "/test",
+                                async_worker=async_worker)
         self.waitForCache(cache, {
             '/test/foo': {},
         })
@@ -129,6 +130,12 @@ class TestTreeCache(BaseTestCase):
         self.waitForCache(cache, {
             '/test/foo': {},
         })
+
+    def test_tree_cache_async(self):
+        self._test_tree_cache(async_worker=True)
+
+    def test_tree_cache_sync(self):
+        self._test_tree_cache(async_worker=False)
 
     def test_tree_cache_root(self):
         client = self.zk_client.client
