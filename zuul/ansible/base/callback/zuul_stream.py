@@ -158,6 +158,7 @@ class Streamer:
                 s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 30)
                 s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 30)
                 s.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPCNT, 9)
+                self.connected = True
                 return s
             except socket.timeout:
                 if not self.stopped:
@@ -176,7 +177,6 @@ class Streamer:
                 logger_retries += 1
                 time.sleep(0.1)
                 continue
-        self.connected = True
 
     def _read_log(self):
         s = self._read_log_connect()
