@@ -309,6 +309,45 @@ class TestKeyOperations(ZuulTestCase):
             data.get('/keystorage/gerrit/org'))
 
 
+class TestOIDCSigningKeyOperation(ZuulTestCase):
+    tenant_config_file = 'config/single-tenant/main.yaml'
+
+    def test_delete_oidc_signing_keys(self):
+        algorithm = "RS256"
+        keystore = self.scheds.first.sched.keystore
+
+        # Makesure keys are created by calling getLatestOidcSigningKeys()
+        keystore.getLatestOidcSigningKeys(algorithm)
+
+        # Check that the keys are there
+        test_keys1 = keystore._loadOidcSigningKeys(algorithm)
+        self.assertEqual(len(test_keys1["keys"]), 1)
+
+        # Config and exeute the delete command
+        config_file = os.path.join(self.test_root, 'zuul.conf')
+        with open(config_file, 'w') as f:
+            self.config.write(f)
+
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul-admin'),
+             '-c', config_file,
+             'delete-oidc-signing-keys',
+             algorithm,
+             ],
+            stdout=subprocess.PIPE)
+        out, _ = p.communicate()
+        self.log.debug(out.decode('utf8'))
+        self.assertEqual(p.returncode, 0)
+
+        # Keys should be gone
+        test_keys2 = keystore._loadOidcSigningKeys(algorithm)
+        self.assertIsNone(test_keys2)
+
+        # New keys are auto generated when calling getLatestOidcSigningKeys()
+        private_key, public_key = keystore.getLatestOidcSigningKeys(algorithm)
+        self.assertEqual(4096, private_key.key_size)
+
+
 class TestOfflineZKOperations(ZuulTestCase):
     tenant_config_file = 'config/single-tenant/main.yaml'
 
