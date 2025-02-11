@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12a9d022_02de41ed",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-11T12:43:05Z",
+      "side": 1,
+      "message": "Was there a reason that the `password` configurations are checked for those operations? From what I understand it is not needed for those operations, so I removed them. But I may be wrong, comments are welcome.",
+      "revId": "0a7e61b39fe41f60c7bca8518e6cc714f5d28d8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
