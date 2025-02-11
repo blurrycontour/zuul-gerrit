@@ -476,6 +476,20 @@ class Client(zuul.cmd.ZuulApp):
                                      help='project name')
         cmd_delete_keys.set_defaults(func=self.delete_keys)
 
+        cmd_delete_oidc_signing_keys = subparsers.add_parser(
+            'delete-oidc-signing-keys',
+            help='delete OIDC signing keys',
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            description=textwrap.dedent('''\
+            Delete the OIDC signing keys of an algorithm
+            '''))
+        cmd_delete_oidc_signing_keys.set_defaults(
+            command='delete-oidc-signing-keys')
+        cmd_delete_oidc_signing_keys.add_argument(
+            'algorithm', type=str, help='algorithm name')
+        cmd_delete_oidc_signing_keys.set_defaults(
+            func=self.delete_oidc_signing_keys)
+
         # ZK Maintenance
         cmd_delete_state = subparsers.add_parser(
             'delete-state',
@@ -942,11 +956,8 @@ class Client(zuul.cmd.ZuulApp):
 
         zk_client = ZooKeeperClient.fromConfig(self.config)
         zk_client.connect()
-        try:
-            password = self.config["keystore"]["password"]
-        except KeyError:
-            raise RuntimeError("No key store password configured!")
-        keystore = KeyStorage(zk_client, password=password)
+        # Password is not required for exporting keys
+        keystore = KeyStorage(zk_client, password="")
         export = keystore.exportKeys()
         with open(os.open(self.args.path,
                           os.O_CREAT | os.O_WRONLY, 0o600), 'w') as f:
@@ -958,11 +969,8 @@ class Client(zuul.cmd.ZuulApp):
 
         zk_client = ZooKeeperClient.fromConfig(self.config)
         zk_client.connect()
-        try:
-            password = self.config["keystore"]["password"]
-        except KeyError:
-            raise RuntimeError("No key store password configured!")
-        keystore = KeyStorage(zk_client, password=password)
+        # Password is not required for importing keys
+        keystore = KeyStorage(zk_client, password="")
         with open(self.args.path, 'r') as f:
             import_data = json.load(f)
         keystore.importKeys(import_data, self.args.force)
@@ -973,11 +981,8 @@ class Client(zuul.cmd.ZuulApp):
 
         zk_client = ZooKeeperClient.fromConfig(self.config)
         zk_client.connect()
-        try:
-            password = self.config["keystore"]["password"]
-        except KeyError:
-            raise RuntimeError("No key store password configured!")
-        keystore = KeyStorage(zk_client, password=password)
+        # Password is not required for copying keys
+        keystore = KeyStorage(zk_client, password="")
         args = self.args
         # Load
         ssh = keystore.loadProjectSSHKeys(args.src_connection,
@@ -999,17 +1004,26 @@ class Client(zuul.cmd.ZuulApp):
 
         zk_client = ZooKeeperClient.fromConfig(self.config)
         zk_client.connect()
-        try:
-            password = self.config["keystore"]["password"]
-        except KeyError:
-            raise RuntimeError("No key store password configured!")
-        keystore = KeyStorage(zk_client, password=password)
+        # Password is not required for deleting keys
+        keystore = KeyStorage(zk_client, password="")
         args = self.args
         keystore.deleteProjectSSHKeys(args.connection, args.project)
         keystore.deleteProjectsSecretsKeys(args.connection, args.project)
         keystore.deleteProjectDir(args.connection, args.project)
         self.log.info("Delete keys from %s %s",
                       args.connection, args.project)
+        sys.exit(0)
+
+    def delete_oidc_signing_keys(self):
+        logging.basicConfig(level=logging.INFO)
+
+        zk_client = ZooKeeperClient.fromConfig(self.config)
+        zk_client.connect()
+        # Password is not required for deleting keys
+        keystore = KeyStorage(zk_client, password="")
+        algorithm = self.args.algorithm
+        keystore.deleteOidcSigningKeys(algorithm)
+        self.log.info("Delete OIDC signing keys for %s", algorithm)
         sys.exit(0)
 
     def delete_state(self):
