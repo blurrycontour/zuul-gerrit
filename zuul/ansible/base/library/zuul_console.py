@@ -151,7 +151,7 @@ class Server(object):
         bitmask = (select.POLLIN | select.POLLERR |
                    select.POLLHUP | select.POLLNVAL)
         poll.register(conn, bitmask)
-        buffer = b''
+        buff = b''
         ret = None
         start = time.time()
         while True:
@@ -161,13 +161,16 @@ class Server(object):
                 raise Exception("Timeout while waiting for input")
             for fd, event in poll.poll(timeout):
                 if event & select.POLLIN:
-                    buffer += conn.recv(self.MAX_REQUEST_LEN)
+                    chunk = conn.recv(self.MAX_REQUEST_LEN)
+                    if not chunk:
+                        raise Exception("Remote side closed connection")
+                    buff += chunk
                 else:
                     raise Exception("Received error event")
-            if len(buffer) >= self.MAX_REQUEST_LEN:
+            if len(buff) >= self.MAX_REQUEST_LEN:
                 raise Exception("Request too long")
             try:
-                ret = buffer.decode('utf-8')
+                ret = buff.decode('utf-8')
                 x = ret.find('\n')
                 if x > 0:
                     return ret[:x].strip()
