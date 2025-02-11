@@ -171,6 +171,8 @@ class Server(object):
                 x = ret.find('\n')
                 if x > 0:
                     return ret[:x].strip()
+                else:
+                    raise Exception("Remote side closed connection")
             except UnicodeDecodeError:
                 pass
 
