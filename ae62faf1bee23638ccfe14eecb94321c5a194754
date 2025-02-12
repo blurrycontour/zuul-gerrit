@@ -16,6 +16,74 @@
       "message": "recheck",
       "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bd1a728_a8e48661",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 5580,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-12T23:09:15Z",
+      "side": 1,
+      "message": "This might be the place to check that getLatest...() returns the correct key.  And it should return a different value than what we got after fetching test_keys1, if we add a call to getLatest...() there as well.",
+      "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05f4c1f4_211dda09",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-12T23:09:15Z",
+      "side": 1,
+      "message": "I\u0027m not sure if this comment is just a nitpick about style, or if it saves sufficient complexity to perhaps help us avoid bugs (either now or in the future).  Here it is:\n\nI think you can replace lines 294-300 with one line:\n\n  key_data[\"keys\"] \u003d [k for k in key_data[\"keys\"] if k[\"created\"] \u003e\u003d older_than]\n\n(well, indentation is going to mean that needs to be two lines, folded, but at least it\u0027s one simple statement).\n\nI think that may be worth doing because it eliminates a lot of complexity with index position math, and it also separates this section from the one after.  What I mean by that is that in this section, as written, we keep the oldest key around, just so that we can reference it later.  But we may not need to actually store it, and it seems strange to treat it differently -- either the TTL is correct or not.\n\nAnyway, the only thing we need to do to keep the next section working is to move line 303 (latest_key \u003d key_data[\"keys\"][-1]) to the top of this section (like line 293).\n\nWe need to do something about the update_required.  What if we just ignored update_required for key removal, and only write new data when we create a new key?  Under normal conditions, we probably won\u0027t be removing more keys than we add, for obvious reasons.  So it\u0027s probably good enough to just write the new key set whenever we create a new one, even if it means old ones are kept around slightly longer than necessary.  I think that means we can get rid of update_required entirely.\n\nAfter having written this comment out and thought about it, I do think that removing the special case for the last key is the most substantial part of the change that I\u0027m proposing, and I think it alone makes it worth doing.  The simplicity of using the list comprehension is good for simplifying the code and reducing risk of bugs, but probably not necessary on its own.  But still, I think taken all together it\u0027s a good change.",
+      "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4b51caf_2bc13ddf",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-12T23:09:15Z",
+      "side": 1,
+      "message": "Getting rid of update_required means we can remove lines 310 and 312 and leave the indentiation on the lines below.",
+      "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "027f0ec0_0ea27e1c",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-12T23:09:15Z",
+      "side": 1,
+      "message": "Should this be -1?  If so, do we need a unit test with multiple keys to catch this sort of bug?",
+      "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
