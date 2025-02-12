@@ -15,12 +15,14 @@
 # under the License.
 
 import collections
+import concurrent.futures
 import copy
 import datetime
 import enum
 import itertools
 import json
 import logging
+import os
 import paramiko
 import pprint
 import re
@@ -215,12 +217,22 @@ class GerritEventConnector(threading.Thread):
         self.connection = connection
         self.event_queue = connection.event_queue
         self._stopped = False
+        self._events_in_progress = set()
         self._connector_wake_event = threading.Event()
+        self._event_dispatcher = threading.Thread(
+            name='GerritEventDispatcher', target=self.run_event_dispatcher,
+            daemon=True)
+        self._thread_pool = concurrent.futures.ThreadPoolExecutor(
+            max_workers=min(32, (os.cpu_count() or 1) * 4))
+        self._event_forward_queue = collections.deque()
 
     def stop(self):
         self._stopped = True
         self._connector_wake_event.set()
         self.event_queue.election.cancel()
+        self._event_dispatcher.join()
+
+        self._thread_pool.shutdown()
 
     def _onNewEvent(self):
         self._connector_wake_event.set()
