@@ -50,6 +50,40 @@
       "message": "recheck",
       "revId": "9bff611de77db705290cad5a0ae4df94fe592db4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf35f24b_f446b850",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-12T23:27:57Z",
+      "side": 1,
+      "message": "Why are we calling this method... shouldn\u0027t we be calling getLatestOidcSigningKeys instead?  That seems like a better end-to-end test.",
+      "revId": "9bff611de77db705290cad5a0ae4df94fe592db4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0d5a3df_14ddf819",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-12T23:27:57Z",
+      "side": 1,
+      "message": "May be worth calling get...() again here just to verify that it\u0027s left in a state where we can auto-create a new key.",
+      "revId": "9bff611de77db705290cad5a0ae4df94fe592db4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
