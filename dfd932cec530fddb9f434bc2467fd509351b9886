@@ -16,6 +16,57 @@
       "message": "recheck",
       "revId": "dfd932cec530fddb9f434bc2467fd509351b9886",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a8b194b_08088641",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 9586,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-12T23:23:05Z",
+      "side": 1,
+      "message": "I\u0027m not sure the default max ttl should be so small.  Perhaps 10800 (3 hours) to match the default max-job-timeout would make sense?",
+      "revId": "dfd932cec530fddb9f434bc2467fd509351b9886",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f219480_916bf57e",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 760,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-12T23:23:05Z",
+      "side": 1,
+      "message": "-1: I think this was \"supported_signing_algorithms\" in the spec.\n\nJust a note that in the future, we should remember to change fallback to include the other supported algorithms (all the algorithms should be supported by default).",
+      "revId": "dfd932cec530fddb9f434bc2467fd509351b9886",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f4f9273_ea0b8a5d",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 771,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-12T23:23:05Z",
+      "side": 1,
+      "message": "Nit: possibly more idiomatic as: max(t.max_oidc_ttl for t in self.abide.tenants.values())",
+      "revId": "dfd932cec530fddb9f434bc2467fd509351b9886",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
