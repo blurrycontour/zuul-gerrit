@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75a00c89_3fcc90ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 12898
+      },
+      "writtenOn": "2025-02-12T23:58:43Z",
+      "side": 1,
+      "message": "For CentOS-Stream-{9,10}\n\n```\n[root@8e1d4516bca7 /]# history \n    1  dnf makecache --refresh\n    2  dnf -y install dnf-plugins-core\n    3  dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo\n    4  dnf install podman git python3 docker-compose-plugin\n    5  history \n```\n\nI will work though the full quickstart to see if there are any other gotchas",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 34
+      },
+      "revId": "112c43e620015b24bc8c2dfc4090964facd61fb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cc5ab5d_30bb0ed3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 12898
+      },
+      "writtenOn": "2025-02-12T23:58:43Z",
+      "side": 1,
+      "message": "FWIW This should work on CentOS 9 and 10",
+      "revId": "112c43e620015b24bc8c2dfc4090964facd61fb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
