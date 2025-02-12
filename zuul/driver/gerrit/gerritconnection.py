@@ -39,7 +39,10 @@ from opentelemetry import trace
 
 from zuul import version as zuul_version
 from zuul.connection import (
-    BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
+    BaseConnection,
+    BaseThreadPoolEventConnector,
+    ZKBranchCacheMixin,
+    ZKChangeCacheMixin,
 )
 from zuul.driver.gerrit.auth import FormAuth
 from zuul.driver.gerrit.gcloudauth import GCloudAuth
@@ -193,7 +196,7 @@ class QueryHistory:
         self.queries[query][key] = change
 
 
-class GerritEventConnector(threading.Thread):
+class GerritEventConnector(BaseThreadPoolEventConnector):
     """Move events from Gerrit to the scheduler."""
 
     IGNORED_EVENTS = (
@@ -206,80 +209,42 @@ class GerritEventConnector(threading.Thread):
     )
 
     log = logging.getLogger("zuul.GerritEventConnector")
+
+    def _getEventProcessor(self, event):
+        return GerritEventProcessor(self, event).run
+
+
+class GerritEventProcessor:
     tracer = trace.get_tracer("zuul")
     delay = 10.0
 
-    def __init__(self, connection):
-        super(GerritEventConnector, self).__init__()
-        self.daemon = True
-        self.connection = connection
-        self.event_queue = connection.event_queue
-        self._stopped = False
-        self._connector_wake_event = threading.Event()
-
-    def stop(self):
-        self._stopped = True
-        self._connector_wake_event.set()
-        self.event_queue.election.cancel()
-
-    def _onNewEvent(self):
-        self._connector_wake_event.set()
-        # Stop the data watch in case the connector was stopped
-        return not self._stopped
+    def __init__(self, connector, connection_event):
+        self.connector = connector
+        self.connection = connector.connection
+        self.connection_event = connection_event
+        self.event_span = tracing.restoreSpanContext(
+            self.connection_event.get("span_context"))
+        logger = logging.getLogger("zuul.GerritEventProcessor")
+        self.zuul_event_id = connection_event["zuul_event_id"]
+        self.log = get_annotated_logger(logger, self.zuul_event_id)
 
     def run(self):
-        # Wait for the scheduler to prime its config so that we have
-        # the full tenant list before we start moving events.
-        self.connection.sched.primed_event.wait()
-        if self._stopped:
+        if self.connector._stopped:
             return
-        self.event_queue.registerEventWatch(self._onNewEvent)
-        while not self._stopped:
-            try:
-                self.event_queue.election.run(self._run)
-            except Exception:
-                self.log.exception("Exception moving Gerrit event:")
-                time.sleep(1)
 
-    def _run(self):
-        self.log.info("Won connection event queue election for %s",
-                      self.connection.connection_name)
-        while not self._stopped and self.event_queue.election.is_still_valid():
-            qlen = len(self.event_queue)
-            if qlen:
-                self.log.debug("Connection event queue length for %s: %s",
-                               self.connection.connection_name, qlen)
-            for event in self.event_queue:
-                event_span = tracing.restoreSpanContext(
-                    event.get("span_context"))
-                attributes = {"rel": "GerritEvent"}
-                link = trace.Link(event_span.get_span_context(),
-                                  attributes=attributes)
-                with self.tracer.start_as_current_span(
-                        "GerritEventProcessing", links=[link]):
-                    try:
-                        self._handleEvent(event)
-                    except GerritEventProcessingException as e:
-                        self.log.warning("Skipping event due to %s", e)
-                    finally:
-                        self.event_queue.ack(event)
-                if self._stopped:
-                    return
-            self._connector_wake_event.wait(10)
-            self._connector_wake_event.clear()
-        self.log.info("Terminating connection event queue processing for %s",
-                      self.connection.connection_name)
+        attributes = {"rel": "GerritEvent"}
+        link = trace.Link(self.event_span.get_span_context(),
+                          attributes=attributes)
+        with self.tracer.start_as_current_span(
+                "GerritEventProcessing", links=[link]):
+            try:
+                return self._handleEvent(self.connection_event)
+            except GerritEventProcessingException as e:
+                self.log.warning("Skipping event due to %s", e)
 
     def _handleEvent(self, connection_event):
         timestamp = connection_event["timestamp"]
         data = connection_event["payload"]
-        if "zuul_event_id" in connection_event:
-            zuul_event_id = connection_event["zuul_event_id"]
-        else:
-            # TODO: This is for backwards compat; Remove after 7.0.0
-            zuul_event_id = str(uuid4().hex)
-
-        log = get_annotated_logger(self.log, zuul_event_id)
         now = time.time()
         delay = max((timestamp + self.delay) - now, 0.0)
         # Gerrit can produce inconsistent data immediately after an
@@ -289,24 +254,24 @@ class GerritEventConnector(threading.Thread):
         # only need to delay for the first event.  In essence, Zuul
         # should always be a constant number of seconds behind Gerrit.
 
-        log.debug("Handling event received %ss ago, delaying %ss",
-                  now - timestamp, delay)
+        self.log.debug("Handling event received %ss ago, delaying %ss",
+                       now - timestamp, delay)
         time.sleep(delay)
 
         # In order to perform connection hygene actions like those
         # below, the preFilter method must pass relevant events
         # through to get to this point.
         event = GerritTriggerEvent.fromGerritEventDict(
-            data, timestamp, self.connection, zuul_event_id)
+            data, timestamp, self.connection, self.zuul_event_id)
         if event.default_branch_changed:
             self.log.debug('Updating default branch for %s to %s',
                            event.project_name, event.branch)
             self.connection._branch_cache.setProjectDefaultBranch(
                 event.project_name, event.branch)
         if event._accountfield_unknown:
-            log.warning("Received unrecognized event type '%s' "
-                        "from Gerrit. Can not get account information." %
-                        (event.type,))
+            self.log.warning("Received unrecognized event type '%s' "
+                             "from Gerrit. Can not get account information." %
+                             (event.type,))
         if event._branch_ref_update:
             self.connection.clearConnectionCacheOnBranchEvent(event)
 
@@ -314,10 +279,8 @@ class GerritEventConnector(threading.Thread):
         if (change and change.patchset and
             event.change_number and event.patch_number is None):
             event.patch_number = str(change.patchset)
-        self.connection.logEvent(event)
-        self.connection.sched.addTriggerEvent(
-            self.connection.driver_name, event
-        )
+
+        return [event], self.connection_event
 
     def _getChange(self, event, connection_event_ltime):
         # Grab the change if we are managing the project or if it exists in the
@@ -1745,4 +1708,3 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
     def stopEventConnector(self):
         if self.gerrit_event_connector:
             self.gerrit_event_connector.stop()
-            self.gerrit_event_connector.join()
