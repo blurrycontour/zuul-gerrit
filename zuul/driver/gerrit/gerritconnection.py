@@ -90,6 +90,10 @@ class HTTPBadRequestException(Exception):
     pass
 
 
+class HTTPNotFoundException(Exception):
+    message = "Received response 404"
+
+
 class GerritEventProcessingException(Exception):
     pass
 
@@ -556,6 +560,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.iolog.debug('Received: %s %s' % (r.status_code, r.text,))
         if r.status_code == 409:
             raise HTTPConflictException()
+        elif r.status_code == 404:
+            raise HTTPNotFoundException()
         elif r.status_code != 200:
             raise Exception("Received response %s" % (r.status_code,))
         ret = None
@@ -852,8 +858,6 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     dep not in needed_by_changes):
                     git_needed_by_changes.append(dep_key.reference)
                     needed_by_changes.add(dep_key.reference)
-            except GerritEventProcessingException:
-                raise
             except Exception:
                 log.exception("Failed to get git-needed change %s,%s",
                               dep_num, dep_ps)
@@ -879,8 +883,6 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     and dep not in needed_by_changes):
                     compat_needed_by_changes.append(dep_key.reference)
                     needed_by_changes.add(dep_key.reference)
-            except GerritEventProcessingException:
-                raise
             except Exception:
                 log.exception("Failed to get commit-needed change %s,%s",
                               dep_num, dep_ps)
@@ -1344,6 +1346,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     data = self.queryChangeSSH(number, event=event)
                     return GerritChangeData(GerritChangeData.SSH, data,
                                             zuul_query_ltime=zuul_query_ltime)
+            except HTTPNotFoundException as e:
+                # do not retry on 404 results, instead skip further event
+                # processing since we can't load a corresponding change
+                raise GerritEventProcessingException(
+                    f"Did not find change for number {number}", e)
             except Exception:
                 self.log.exception("Failed to query change.")
                 if attempt < max_attempts:
