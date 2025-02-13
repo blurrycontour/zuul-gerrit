@@ -94,6 +94,10 @@ class HTTPBadRequestException(Exception):
     pass
 
 
+class HTTPNotFoundException(Exception):
+    pass
+
+
 class GerritEventProcessingException(Exception):
     pass
 
@@ -639,6 +643,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         self.iolog.debug('Received: %s %s' % (r.status_code, r.text,))
         if r.status_code == 409:
             raise HTTPConflictException()
+        elif r.status_code == 404:
+            raise HTTPNotFoundException()
         elif r.status_code != 200:
             raise Exception("Received response %s" % (r.status_code,))
         ret = None
@@ -980,10 +986,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     dep not in needed_by_changes):
                     git_needed_by_changes.append(dep_key.reference)
                     needed_by_changes.add(dep_key.reference)
-            except GerritEventProcessingException:
-                raise
             except ChangeNetworkConflict:
                 raise
+            # We ignore GerritEventProcessingExceptions (e.g. when exceeding
+            # max_dependencies) here because they are not important on the
+            # "needed_by" side of the dependency chain. Those are already
+            # checked for on the "needs" side.
             except Exception:
                 log.exception("Failed to get git-needed change %s,%s",
                               dep_num, dep_ps)
@@ -1010,10 +1018,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     and dep not in needed_by_changes):
                     compat_needed_by_changes.append(dep_key.reference)
                     needed_by_changes.add(dep_key.reference)
-            except GerritEventProcessingException:
-                raise
             except ChangeNetworkConflict:
                 raise
+            # We ignore GerritEventProcessingExceptions (e.g. when exceeding
+            # max_dependencies) here because they are not important on the
+            # "needed_by" side of the dependency chain. Those are already
+            # checked for on the "needs" side.
             except Exception:
                 log.exception("Failed to get commit-needed change %s,%s",
                               dep_num, dep_ps)
@@ -1487,6 +1497,11 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                             zuul_query_ltime=zuul_query_ltime)
                     self.change_network_manager.updateQueryResult(number, ret)
                     return ret
+                except HTTPNotFoundException as e:
+                    # do not retry on 404 results, instead skip further event
+                    # processing since we can't load a corresponding change
+                    raise GerritEventProcessingException(
+                        f"Did not find change for number {number}") from e
                 except Exception:
                     if attempt >= 2:
                         raise
