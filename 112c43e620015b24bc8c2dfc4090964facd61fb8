@@ -24,6 +24,30 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3ea823b_3397d05e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 12898
+      },
+      "writtenOn": "2025-02-13T08:02:09Z",
+      "side": 1,
+      "message": "```\ndnf install dnf-plugins-core\ndnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo\ndnf install git docker-compose-plugin python3 podman docker-ce-cli\n\npython3 -m venv /opt/git-review\n/opt/git-review/bin/pip3 install git-review\nln -sf /opt/git-review/bin/git-review /usr/local/bin/\n\n\nsed -i~orig \u0027s,\\(ListenStream\u003d%t\\)/podman/podman.sock,\\1/docker.sock,\u0027 /usr/lib/systemd/system/podman.socket\nsystemctl daemon-reload\nsystemctl enable --now podman.socket\necho \"FROM scratch\" | docker buildx build - || true \n```\n\nIs what I needed to do to get:\n\n```\ngit clone https://opendev.org/zuul/zuul\ncd zuul/doc/source/examples\ndocker compose -p zuul-tutorial up\n```\n\nto work.",
+      "parentUuid": "75a00c89_3fcc90ee",
+      "range": {
+        "startLine": 36,
+        "startChar": 0,
+        "endLine": 38,
+        "endChar": 34
+      },
+      "revId": "112c43e620015b24bc8c2dfc4090964facd61fb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "3cc5ab5d_30bb0ed3",
