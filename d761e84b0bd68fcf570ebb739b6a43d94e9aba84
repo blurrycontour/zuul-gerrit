@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e682c391_31069438",
+        "filename": "zuul/zk/cache.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-13T14:36:57Z",
+      "side": 1,
+      "message": "Here the `obj` is assumed to be an object of `ZKObject`, can we release this constraint, e.g. if it is not a object of `ZKObject`, always do update?\n\nSo that in the cases where `ZKObject` is not needed, we do not need to create one just in order to use the cache? For example, in the current use case of `KeyStorage`, would it be more light weighted to just cache the raw dict object instead of creating a new `ZKObject`?",
+      "revId": "d761e84b0bd68fcf570ebb739b6a43d94e9aba84",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
