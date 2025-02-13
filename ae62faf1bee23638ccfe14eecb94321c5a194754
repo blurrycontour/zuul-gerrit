@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98247215_558bf823",
+        "filename": "tests/unit/test_v3.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 5580,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-13T09:38:13Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0bd1a728_a8e48661",
+      "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "05f4c1f4_211dda09",
@@ -48,6 +66,24 @@
       "writtenOn": "2025-02-12T23:09:15Z",
       "side": 1,
       "message": "I\u0027m not sure if this comment is just a nitpick about style, or if it saves sufficient complexity to perhaps help us avoid bugs (either now or in the future).  Here it is:\n\nI think you can replace lines 294-300 with one line:\n\n  key_data[\"keys\"] \u003d [k for k in key_data[\"keys\"] if k[\"created\"] \u003e\u003d older_than]\n\n(well, indentation is going to mean that needs to be two lines, folded, but at least it\u0027s one simple statement).\n\nI think that may be worth doing because it eliminates a lot of complexity with index position math, and it also separates this section from the one after.  What I mean by that is that in this section, as written, we keep the oldest key around, just so that we can reference it later.  But we may not need to actually store it, and it seems strange to treat it differently -- either the TTL is correct or not.\n\nAnyway, the only thing we need to do to keep the next section working is to move line 303 (latest_key \u003d key_data[\"keys\"][-1]) to the top of this section (like line 293).\n\nWe need to do something about the update_required.  What if we just ignored update_required for key removal, and only write new data when we create a new key?  Under normal conditions, we probably won\u0027t be removing more keys than we add, for obvious reasons.  So it\u0027s probably good enough to just write the new key set whenever we create a new one, even if it means old ones are kept around slightly longer than necessary.  I think that means we can get rid of update_required entirely.\n\nAfter having written this comment out and thought about it, I do think that removing the special case for the last key is the most substantial part of the change that I\u0027m proposing, and I think it alone makes it worth doing.  The simplicity of using the list comprehension is good for simplifying the code and reducing risk of bugs, but probably not necessary on its own.  But still, I think taken all together it\u0027s a good change.",
+      "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e331bcd7_8223440b",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-13T09:38:13Z",
+      "side": 1,
+      "message": "Actually the purpose of keeping the \"last key whose created time is smaller than the current time - max_ttl\" is not because we need to reference it later, but because there still could be valid tokens signed by it out there at this time point. \n\nI think the condition for a key_x to be deleted is: if there exists any newer key_y that key_y[\"created\"] \u003c (current - max_ttl). This makes sure the last token signed by key_x (could be right before key_y is created) is expired.\n\nE.g.\n\nAssume max_ttl\u003d5, reotation_interval\u003d100, this function is called every 1 time unit and the first key is created at time 0, i.e. `key_data[\"keys\"][\"created\"]\u003d0`.\n\nWhen this function is called at time 6:\n`older_than` would be 6-5\u003d1\n\n`key_data[\"keys\"] \u003d [k for k in key_data[\"keys\"] if k[\"created\"] \u003e\u003d older_than]` would cause key_data[\"keys\"] empty which would remove that key. But there could be tokens singed by that key at time 2, 3, 4, 5 which are still valid, so we should not remove that key.\n\n\nAt the beginning, I thought about only check the last key, but in the corner case when max_ttl \u003e rotation_interval, check the last key is not enough, because there could be still valid tokens signed with multiple previous keys there.\n\n\n\nSo that\u0027s the reason I need to find the \"last key whose created time is smaller than the current time - max_ttl\", and remove keys older than that.\n\nAnd regarding removing `update_required`, which means \"remove when we add\": for the reason I mentioned above, it would cause the old key to be kept unnecessary long, as long as almost the `rotation_interval`. In the same example above, the key[0] would be deleted at time 200, while it acutally can be deleted at time 106.",
+      "parentUuid": "05f4c1f4_211dda09",
       "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -71,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4aa67214_22236d18",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-13T09:38:13Z",
+      "side": 1,
+      "message": "Depends on the discussion in the comment above.",
+      "parentUuid": "e4b51caf_2bc13ddf",
+      "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "027f0ec0_0ea27e1c",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 6
@@ -82,6 +136,24 @@
       "writtenOn": "2025-02-12T23:09:15Z",
       "side": 1,
       "message": "Should this be -1?  If so, do we need a unit test with multiple keys to catch this sort of bug?",
+      "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a029a2ea_396061a8",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-13T09:38:13Z",
+      "side": 1,
+      "message": "That\u0027s right, I will fix and add it in unit test.",
+      "parentUuid": "027f0ec0_0ea27e1c",
       "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
