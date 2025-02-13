@@ -69,6 +69,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2edf60fc_d534d6fd",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-13T08:57:41Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "cf35f24b_f446b850",
+      "revId": "9bff611de77db705290cad5a0ae4df94fe592db4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a0d5a3df_14ddf819",
@@ -82,6 +100,24 @@
       "writtenOn": "2025-02-12T23:27:57Z",
       "side": 1,
       "message": "May be worth calling get...() again here just to verify that it\u0027s left in a state where we can auto-create a new key.",
+      "revId": "9bff611de77db705290cad5a0ae4df94fe592db4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4248d13_edefce74",
+        "filename": "tests/unit/test_client.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-13T08:57:41Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a0d5a3df_14ddf819",
       "revId": "9bff611de77db705290cad5a0ae4df94fe592db4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
