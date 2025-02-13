@@ -35,6 +35,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "28f2fbff_0c652d85",
+        "filename": "zuul/model.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 9586,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-13T08:33:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2a8b194b_08088641",
+      "revId": "dfd932cec530fddb9f434bc2467fd509351b9886",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f219480_916bf57e",
@@ -52,6 +70,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80fa96a6_95692a70",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 760,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-13T08:33:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3f219480_916bf57e",
+      "revId": "dfd932cec530fddb9f434bc2467fd509351b9886",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f4f9273_ea0b8a5d",
@@ -65,6 +101,24 @@
       "writtenOn": "2025-02-12T23:23:05Z",
       "side": 1,
       "message": "Nit: possibly more idiomatic as: max(t.max_oidc_ttl for t in self.abide.tenants.values())",
+      "revId": "dfd932cec530fddb9f434bc2467fd509351b9886",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "953eb411_d1f60c71",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 771,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-13T08:33:35Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9f4f9273_ea0b8a5d",
       "revId": "dfd932cec530fddb9f434bc2467fd509351b9886",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
