@@ -412,6 +412,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                                   default_gitweb_url_template)
         self.gitweb_url_template = url_template
 
+        self._change_update_lock = {}
         self.projects = {}
         self.gerrit_event_connector = None
         self.source = driver.getSource(self)
@@ -742,37 +743,58 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             if history_change:
                 log.debug("Change %s is in history", change)
                 return history_change
-
-        log.info("Updating %s", change)
-        data = self.queryChange(change.number, event=event)
-
-        # Do a local update without updating the cache so that we can
-        # reference this change when we recurse for dependencies.
-        change.update(data, {}, self)
-
-        # Get the dependencies for this change, and recursively update
-        # dependent changes (recursively calling this method).
-        if not change.is_merged:
-            extra = self._updateChangeDependencies(
-                log, key, change, data, event, history)
         else:
-            extra = {}
+            history = QueryHistory()
+            history.add(history.Query.CHANGE, change)
 
-        # Actually update this change in the change cache.
-        def _update_change(c):
-            return c.update(data, extra, self)
+        # This can be called multi-threaded during event
+        # preprocessing. In order to avoid data races perform locking
+        # by cached key. Try to acquire the lock non-blocking at first.
+        # If the lock is already taken we're currently updating the very
+        # same chnange right now and would likely get the same data again.
+        lock = self._change_update_lock.setdefault(key, threading.Lock())
+        if lock.acquire(blocking=False):
+            try:
+                log.info("Updating %s", change)
+                data = self.queryChange(change.number, event=event)
 
-        change = self._change_cache.updateChangeWithRetry(
-            key, change, _update_change, allow_key_update=allow_key_update)
+                # Do a local update without updating the cache so that we can
+                # reference this change when we recurse for dependencies.
+                change.update(data, {}, self)
 
+                # Get the dependencies for this change, and recursively update
+                # dependent changes (recursively calling this method).
+                if not change.is_merged:
+                    extra = self._updateChangeDependencies(
+                        log, key, change, data, event, history)
+                else:
+                    extra = {}
+
+                # Actually update this change in the change cache.
+                def _update_change(c):
+                    return c.update(data, extra, self)
+
+                change = self._change_cache.updateChangeWithRetry(
+                    key, change, _update_change,
+                    allow_key_update=allow_key_update)
+            finally:
+                # We need to remove the lock here again so we don't leak
+                # them.
+                del self._change_update_lock[key]
+                lock.release()
+        else:
+            # We didn't get the lock so we don't need to update the same
+            # change again, but to be correct we should at least wait until
+            # the other thread is done updating the change.
+            log.debug("Change %s is currently being updated, "
+                      "waiting for it to finish", change)
+            with lock:
+                change = self._change_cache.get(key)
+                log.debug('Finished updating change %s', change)
         return change
 
     def _updateChangeDependencies(self, log, key, change, data, event,
                                   history):
-        if history is None:
-            history = QueryHistory()
-        history.add(history.Query.CHANGE, change)
-
         needs_changes = set()
         git_needs_changes = []
         if data.depends_on is not None:
