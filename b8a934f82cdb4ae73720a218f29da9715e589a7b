@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a32dc32_fc92b9d9",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-14T14:03:49Z",
+      "side": 1,
+      "message": "Isn\u0027t the intention also to prevent concurrent modification of the same change object by different threads? Letting `future` here continue despite intersecting/conflicting change networks would allow that IIUC.",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60dd9578_bc158c97",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-14T14:03:49Z",
+      "side": 1,
+      "message": "I think with that we might also do less queries than before, e.g. when there are multiple events for the same change arriving in quick succession. It looks like so far we\u0027ve always refreshed the change unconditionally (unless I missed something).",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9007b47c_9fd973df",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-14T14:03:49Z",
+      "side": 1,
+      "message": "Do we need to reset the network future here? Just wondering if it might already have some query results that could be reused by other futures so it could make sense to keep the instance around.\n\nPart of the cached query data could be unique to this particular change network, so queries could potentially be executed multiple times.\n\n\nE.g given the following two networks:\n- A -\u003e B -\u003e X -\u003e ...\n- C -\u003e D -\u003e X -\u003e ...\n\nIt looks like we\u0027d throw away cached query data for C and D when a conflict for X on that network is detected and need to re-query those changes.",
+      "range": {
+        "startLine": 753,
+        "startChar": 20,
+        "endLine": 754,
+        "endChar": 41
+      },
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee8fe91e_0c1c1fc8",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1469,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-14T14:03:49Z",
+      "side": 1,
+      "message": "I\u0027m not quite sure I understand how we\u0027d reach here when we already check the `zuul_query_ltime`of the change in line 900.\n\nCan this be the case when we have queried the change, but unwound the query due to a conflicting update? I guess in that case it would be useful to keep the `ChangeNetworkFuture` instance the same as suggested on line 754 so we could make use of cached queries.",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7cee28bd_4b0b723b",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1492,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-14T14:03:49Z",
+      "side": 1,
+      "message": "This line has a bug that\u0027s addressed by https://review.opendev.org/c/zuul/zuul/+/941626",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
