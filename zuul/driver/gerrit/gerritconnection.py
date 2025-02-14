@@ -114,7 +114,6 @@ class ChangeNetworkFuture:
     def __init__(self, min_ltime):
         self.changes = set()
         self.event = threading.Event()
-        self.timestamp = time.monotonic()
         self.query_results = {}
         # We will not accept cached data older than this time
         self.min_ltime = min_ltime
@@ -203,12 +202,9 @@ class ChangeNetworkManager:
                 if f is future:
                     continue
                 if future.changes.intersection(f.changes):
-                    if future.timestamp < f.timestamp:
-                        # Let the winner benefit from any queries the
-                        # loser has performed.
-                        future.mergeQueryResults(f)
-                        continue
-                    # The thread asking to proceed is newer
+                    # The first thread to request permission for a
+                    # change always succeeds, second or later threads
+                    # connected to the same network always lose.
                     if future in self.futures:
                         self.futures.remove(future)
                     # Let the winner benefit from any queries the
