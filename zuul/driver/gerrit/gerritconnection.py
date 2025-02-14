@@ -1328,7 +1328,8 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         return data, related, files
 
     def queryChange(self, number, event=None):
-        for attempt in range(3):
+        max_attempts = 3
+        for attempt in range(1, max_attempts + 1):
             # Get a query ltime -- any events before this point should be
             # included in our change data.
             zuul_query_ltime = self.sched.zk_client.getCurrentLtime()
@@ -1344,11 +1345,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     return GerritChangeData(GerritChangeData.SSH, data,
                                             zuul_query_ltime=zuul_query_ltime)
             except Exception:
-                if attempt >= 3:
-                    raise
-                # The internet is a flaky place try again.
                 self.log.exception("Failed to query change.")
-                time.sleep(1)
+                if attempt < max_attempts:
+                    time.sleep(1)
+                else:
+                    raise
+        raise AssertionError("Expected code to be unreachable")
 
     def simpleQuerySSH(self, query, event=None):
         def _query_chunk(query, event):
