@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ddb2bb8a_d246d318",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-14T15:36:32Z",
+      "side": 1,
+      "message": "I think you\u0027re suggesting that rather than allowing the oldest network to continue, we should allow the first network that encountered the conflicting change to continue.  Therefore, you suggest this method should always let \"f\" win and never let \"future\" win.\n\nThat may be a reasonable strategy too.\n\nI think in practice the current approach is not an issue because we don\u0027t start writing changes to the cache until we reach the first leaf node of the tree, which would tend to mean that the newer network is unlikely to have written any changes.\n\nMoreover, while I think it\u0027s good to avoid duplicate ZK writes, I don\u0027t think it\u0027s strictly necessary; they should end up writing the same data.\n\nBut still, I think we should try your idea -- it may indeed save some ZK writes and possibly keep things simpler.  I\u0027ll make the switch in a followup so we can evaluate it on its own.",
+      "parentUuid": "3a32dc32_fc92b9d9",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "60dd9578_bc158c97",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2025-02-14T14:03:49Z",
       "side": 1,
       "message": "I think with that we might also do less queries than before, e.g. when there are multiple events for the same change arriving in quick succession. It looks like so far we\u0027ve always refreshed the change unconditionally (unless I missed something).",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30821cb0_866646a3",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-14T15:36:32Z",
+      "side": 1,
+      "message": "The single-threaded algorithm would not have refreshed the change in that case because:\n\n1) we handle events one at a time\n2) we delay at least 10 seconds after the real event time before we do any processing\n3) just above this in lines 434-436, we check if the change was updated after our connection event time\n\nThat means the first event (at t\u003d0) will delay 10 seconds, update the change (at t\u003d10), and write the current ltime on the change.\n\nThe second event (assuming it arrives within 10 seconds, let\u0027s say 1 second, t\u003d1) will delay 0 additional seconds, see that the change\u0027s ltime is after it\u0027s event ltime, and will skip this block.\n\nThis new change where we push the connection ltime down to other methods is necessary because we no longer guarantee #1 in the list above, so we have to check whether the change is updated in the cache more often during the rest of the process.",
+      "parentUuid": "60dd9578_bc158c97",
       "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -60,6 +96,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2b1a3814_2f5531ac",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-14T15:36:32Z",
+      "side": 1,
+      "message": "When the collision is detected, the manager will merge the query cache of the loser into the winner (see mergeQueryResults), so we no longer need to keep the network around.\n\nAssuming the networks are stable throughout the process (we can\u0027t guarantee that, things can change in gerrit, but we also can\u0027t really do anything about that since we can\u0027t lock gerrit during the process), then the winning network should keep accumulating all of the losers.\n\nBut I think you may have meant specifically for this thread -- as in, should we keep the network around for this thread so it doesn\u0027t need to repeat any queries.\n\nIn practice, once the network loses, it should wait until the winner finishes, and then it should have nothing left to do.  Its first call to _updateChange should immediately detect that the change cache is up to date, and it will exit the whole process.\n\nNow, if the min_ltime of the winning network is not sufficient for this thread\u0027s event, then it may need to perform queries again.\n\nPerhaps that\u0027s a good reason to do as you suggest (or at least copy over the query cache).  If we do that, we should probably do something where all the networks share the same query cache object.  Then any threads that decide they still need to do work would all have the latest version of every query already performed.\n\nLet\u0027s look into this as a followup too.",
+      "parentUuid": "9007b47c_9fd973df",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ee8fe91e_0c1c1fc8",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
@@ -77,6 +131,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c6a1b917_cf9b06f3",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1469,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-14T15:36:32Z",
+      "side": 1,
+      "message": "Because we may be the winning thread in a conflict, and the query cache from the losing thread was merged with our query cache, but the losing thread never wrote the change to zk because it didn\u0027t get all the way to a leaf node of the network.\n\nSo, yes, it does relate to that case, but as mentioned in the other reply, we do merge the caches of the networks, so in the typical case (all events able to be satisfied by the oldest ltime) we will benefit from that cache.",
+      "parentUuid": "ee8fe91e_0c1c1fc8",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7cee28bd_4b0b723b",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
@@ -88,6 +160,24 @@
       "writtenOn": "2025-02-14T14:03:49Z",
       "side": 1,
       "message": "This line has a bug that\u0027s addressed by https://review.opendev.org/c/zuul/zuul/+/941626",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c8adfda_1916a244",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1492,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-14T15:36:32Z",
+      "side": 1,
+      "message": "Ack.",
+      "parentUuid": "7cee28bd_4b0b723b",
       "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
