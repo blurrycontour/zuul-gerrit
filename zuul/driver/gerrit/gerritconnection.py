@@ -1,6 +1,6 @@
 # Copyright 2011 OpenStack, LLC.
 # Copyright 2012 Hewlett-Packard Development Company, L.P.
-# Copyright 2023-2024 Acme Gating, LLC
+# Copyright 2023-2025 Acme Gating, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -31,6 +31,7 @@ import threading
 import time
 import urllib
 import urllib.parse
+import weakref
 
 from typing import Dict, List
 from uuid import uuid4
@@ -106,6 +107,128 @@ class GerritChangeCache(AbstractChangeCache):
         "Branch": Branch,
         "GerritChange": GerritChange,
     }
+
+
+class ChangeNetworkFuture:
+    """A set of changes related by dependencies"""
+    def __init__(self, min_ltime):
+        self.changes = set()
+        self.event = threading.Event()
+        self.timestamp = time.monotonic()
+        self.query_results = {}
+        # We will not accept cached data older than this time
+        self.min_ltime = min_ltime
+
+    def add(self, change_key):
+        self.changes.add(change_key)
+
+    def setComplete(self):
+        self.event.set()
+
+    def wait(self):
+        self.event.wait()
+
+    def hasNumber(self, number):
+        for change_key in self.changes:
+            if number == change_key.stable_id:
+                return True
+        return False
+
+    def addQueryResult(self, number, data):
+        existing = self.query_results.get(number)
+        existing_time = existing and existing.zuul_query_ltime or 0
+        if existing_time < data.zuul_query_ltime:
+            self.query_results[number] = data
+
+    def getQueryResult(self, number):
+        data = self.query_results.get(number)
+        return data
+
+    def mergeQueryResults(self, future):
+        for (number, data) in future.query_results.items():
+            if number not in self.query_results:
+                self.query_results[number] = data
+            else:
+                own_data = self.query_results[number]
+                if own_data.zuul_query_ltime < data.zuul_query_ltime:
+                    self.query_results[number] = data
+
+
+class ChangeNetworkConflict(Exception):
+    """Raised when two threads are found to be walking the same change graph.
+
+    The associated ChangeNetworkFuture is the winner of the conflict
+    and the caller should wait for it.
+
+    """
+
+    def __init__(self, future):
+        self.future = future
+
+    def wait(self):
+        return self.future.wait()
+
+
+class ChangeNetworkManager:
+    """Prevent collisions between multiple threads querying changes"""
+
+    def __init__(self):
+        self.lock = threading.Lock()
+        self.futures = []
+        self.query_locks = weakref.WeakValueDictionary()
+
+    def getQueryLock(self, number):
+        # TODO: verify that WeakValueDictionary.setdefault is atomic;
+        # if so, we can remove this internal locking call.
+        with self.lock:
+            return self.query_locks.setdefault(number, threading.Lock())
+
+    def getQueryResult(self, number):
+        with self.lock:
+            for f in self.futures:
+                if f.hasNumber(number):
+                    data = f.getQueryResult(number)
+                    if data:
+                        return data
+
+    def updateQueryResult(self, number, data):
+        with self.lock:
+            for f in self.futures:
+                if f.hasNumber(number):
+                    f.addQueryResult(number, data)
+
+    def permissionToProceed(self, future):
+        with self.lock:
+            for f in self.futures:
+                if f is future:
+                    continue
+                if future.changes.intersection(f.changes):
+                    if future.timestamp < f.timestamp:
+                        # Let the winner benefit from any queries the
+                        # loser has performed.
+                        future.mergeQueryResults(f)
+                        continue
+                    # The thread asking to proceed is newer
+                    if future in self.futures:
+                        self.futures.remove(future)
+                    # Let the winner benefit from any queries the
+                    # loser has performed.
+                    f.mergeQueryResults(future)
+                    raise ChangeNetworkConflict(f)
+            # No conflicts
+            if future not in self.futures:
+                self.futures.append(future)
+        return True
+
+    def setComplete(self, future):
+        if future is None:
+            return
+        with self.lock:
+            try:
+                self.futures.remove(future)
+            except ValueError:
+                pass
+            future.setComplete()
 
 
 class GerritChangeData(object):
@@ -324,7 +447,8 @@ class GerritEventProcessor:
                 # gerrit multiple times.
                 change = self.connection._getChange(
                     change_key, refresh=True, event=event,
-                    allow_key_update=True)
+                    allow_key_update=True, change=change,
+                    update_if_older_than=connection_event_ltime)
         return change
 
 
@@ -412,6 +536,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                                                   default_gitweb_url_template)
         self.gitweb_url_template = url_template
 
+        self.change_network_manager = ChangeNetworkManager()
         self.projects = {}
         self.gerrit_event_connector = None
         self.source = driver.getSource(self)
@@ -591,9 +716,15 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                     f"Change {change} has too many dependencies")
 
     def _getChange(self, change_key, refresh=False, history=None,
-                   event=None, allow_key_update=False):
+                   network_future=None, event=None,
+                   allow_key_update=False, change=None,
+                   update_if_older_than=None):
         # Ensure number and patchset are str
-        change = self._change_cache.get(change_key)
+        if change is None:
+            # We may be called from the event handler which has
+            # already gotten a change from the cache but thinks it may
+            # need to be updated.
+            change = self._change_cache.get(change_key)
         self._checkMaxDependencies(change, history)
         if change and not refresh:
             return change
@@ -604,9 +735,30 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             change = GerritChange(None)
             change.number = change_key.stable_id
             change.patchset = change_key.revision
-        self._checkMaxDependencies(change, history)
-        return self._updateChange(change_key, change, event, history,
-                                  allow_key_update)
+            self._checkMaxDependencies(change, history)
+        network_start = network_future is None
+        while True:
+            if network_future is None:
+                network_future = ChangeNetworkFuture(update_if_older_than)
+            network_future.add(change_key)
+            try:
+                self.change_network_manager.permissionToProceed(network_future)
+                return self._updateChange(change_key, change, event, history,
+                                          network_future, allow_key_update)
+            except ChangeNetworkConflict as e:
+                if network_start:
+                    # This is the top of the stack.  We wait for the
+                    # future and try again.
+                    e.wait()
+                    self.change_network_manager.setComplete(network_future)
+                    network_future = None
+                    change = self._change_cache.get(change_key) or change
+                    continue
+                else:
+                    raise
+            finally:
+                if network_start:
+                    self.change_network_manager.setComplete(network_future)
 
     def _getTag(self, change_key, refresh=False, event=None):
         tag = change_key.stable_id
@@ -717,7 +869,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 records.append(result)
         return [(x.number, x.current_patchset) for x in records]
 
-    def _updateChange(self, key, change, event, history,
+    def _updateChange(self, key, change, event, history, network_future,
                       allow_key_update=False):
         log = get_annotated_logger(self.log, event)
 
@@ -743,9 +895,17 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 log.debug("Change %s is in history", change)
                 return history_change
 
-        log.info("Updating %s", change)
-        data = self.queryChange(change.number, event=event)
+        if (network_future.min_ltime and
+            change.zuul_query_ltime and
+            change.zuul_query_ltime > network_future.min_ltime):
+            # The change was updated in another thread while we were
+            # processing this change network.
+            log.debug("Change %s is up to date", change)
+            return change
 
+        log.info("Updating %s", change)
+        data = self.queryChange(change.number, event=event,
+                                min_ltime=network_future.min_ltime)
         # Do a local update without updating the cache so that we can
         # reference this change when we recurse for dependencies.
         change.update(data, {}, self)
@@ -754,7 +914,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         # dependent changes (recursively calling this method).
         if not change.is_merged:
             extra = self._updateChangeDependencies(
-                log, key, change, data, event, history)
+                log, key, change, data, event, history, network_future)
         else:
             extra = {}
 
@@ -768,7 +928,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         return change
 
     def _updateChangeDependencies(self, log, key, change, data, event,
-                                  history):
+                                  history, network_future):
         if history is None:
             history = QueryHistory()
         history.add(history.Query.CHANGE, change)
@@ -782,10 +942,12 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             dep_key = ChangeKey(self.connection_name, None,
                                 'GerritChange', str(dep_num), str(dep_ps))
             dep = self._getChange(dep_key, history=history,
+                                  network_future=network_future,
                                   event=event)
             # This is a git commit dependency. So we only ignore it if it is
             # already merged. So even if it is "ABANDONED", we should not
             # ignore it.
+
             if (not dep.is_merged) and dep not in needs_changes:
                 git_needs_changes.append(dep_key.reference)
                 needs_changes.add(dep_key.reference)
@@ -798,6 +960,7 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             dep_key = ChangeKey(self.connection_name, None,
                                 'GerritChange', str(dep_num), str(dep_ps))
             dep = self._getChange(dep_key, history=history,
+                                  network_future=network_future,
                                   event=event)
             if dep.open and dep not in needs_changes:
                 compat_needs_changes.append(dep_key.reference)
@@ -812,12 +975,15 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 dep_key = ChangeKey(self.connection_name, None,
                                     'GerritChange', str(dep_num), str(dep_ps))
                 dep = self._getChange(dep_key, history=history,
+                                      network_future=network_future,
                                       event=event)
                 if (dep.open and dep.is_current_patchset and
                     dep not in needed_by_changes):
                     git_needed_by_changes.append(dep_key.reference)
                     needed_by_changes.add(dep_key.reference)
             except GerritEventProcessingException:
+                raise
+            except ChangeNetworkConflict:
                 raise
             except Exception:
                 log.exception("Failed to get git-needed change %s,%s",
@@ -839,12 +1005,15 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 refresh = not history.getByKey(history.Query.CHANGE, dep_key)
                 dep = self._getChange(
                     dep_key, refresh=refresh, history=history,
+                    network_future=network_future,
                     event=event)
                 if (dep.open and dep.is_current_patchset
                     and dep not in needed_by_changes):
                     compat_needed_by_changes.append(dep_key.reference)
                     needed_by_changes.add(dep_key.reference)
             except GerritEventProcessingException:
+                raise
+            except ChangeNetworkConflict:
                 raise
             except Exception:
                 log.exception("Failed to get commit-needed change %s,%s",
@@ -1292,28 +1461,38 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         files = self.get(files_query)
         return data, related, files
 
-    def queryChange(self, number, event=None):
-        for attempt in range(3):
-            # Get a query ltime -- any events before this point should be
-            # included in our change data.
-            zuul_query_ltime = self.sched.zk_client.getCurrentLtime()
-            try:
-                if self.session:
-                    data, related, files = self.queryChangeHTTP(
-                        number, event=event)
-                    return GerritChangeData(GerritChangeData.HTTP,
-                                            data, related, files,
-                                            zuul_query_ltime=zuul_query_ltime)
-                else:
-                    data = self.queryChangeSSH(number, event=event)
-                    return GerritChangeData(GerritChangeData.SSH, data,
-                                            zuul_query_ltime=zuul_query_ltime)
-            except Exception:
-                if attempt >= 3:
-                    raise
-                # The internet is a flaky place try again.
-                self.log.exception("Failed to query change.")
-                time.sleep(1)
+    def queryChange(self, number, event=None, min_ltime=None):
+        lock = self.change_network_manager.getQueryLock(number)
+        with lock:
+            if min_ltime:
+                data = self.change_network_manager.getQueryResult(number)
+                if data and data.zuul_query_ltime > min_ltime:
+                    return data
+
+            for attempt in range(3):
+                # Get a query ltime -- any events before this point should be
+                # included in our change data.
+                zuul_query_ltime = self.sched.zk_client.getCurrentLtime()
+                try:
+                    if self.session:
+                        data, related, files = self.queryChangeHTTP(
+                            number, event=event)
+                        ret = GerritChangeData(
+                            GerritChangeData.HTTP,
+                            data, related, files,
+                            zuul_query_ltime=zuul_query_ltime)
+                    else:
+                        data = self.queryChangeSSH(number, event=event)
+                        ret = GerritChangeData(
+                            GerritChangeData.SSH, data,
+                            zuul_query_ltime=zuul_query_ltime)
+                    self.change_network_manager.updateQueryResult(number, ret)
+                    return ret
+                except Exception:
+                    if attempt >= 2:
+                        raise
+                    # The internet is a flaky place try again.
+                    time.sleep(1)
 
     def simpleQuerySSH(self, query, event=None):
         def _query_chunk(query, event):
