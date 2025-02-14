@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "898870e5_715e6508",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-14T16:15:14Z",
+      "side": 1,
+      "message": "I\u0027m less concerned about ZK writes and rather about having potentially multiple change objects for the same change around. We had a similar issue with the Github driver in the beginning until we added locking around the change update.",
+      "parentUuid": "ddb2bb8a_d246d318",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "60dd9578_bc158c97",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "The single-threaded algorithm would not have refreshed the change in that case because:\n\n1) we handle events one at a time\n2) we delay at least 10 seconds after the real event time before we do any processing\n3) just above this in lines 434-436, we check if the change was updated after our connection event time\n\nThat means the first event (at t\u003d0) will delay 10 seconds, update the change (at t\u003d10), and write the current ltime on the change.\n\nThe second event (assuming it arrives within 10 seconds, let\u0027s say 1 second, t\u003d1) will delay 0 additional seconds, see that the change\u0027s ltime is after it\u0027s event ltime, and will skip this block.\n\nThis new change where we push the connection ltime down to other methods is necessary because we no longer guarantee #1 in the list above, so we have to check whether the change is updated in the cache more often during the rest of the process.",
       "parentUuid": "60dd9578_bc158c97",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5d73bcc_c9b219b0",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 451,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-14T16:15:14Z",
+      "side": 1,
+      "message": "Makes sense. I missed that check above.",
+      "parentUuid": "30821cb0_866646a3",
       "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -114,6 +150,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "22d90007_77ef34af",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-14T16:15:14Z",
+      "side": 1,
+      "message": "I think for my example we\u0027d still need to update/query changes C, D once more as they don\u0027t show up in the change network of A even if that already happened before we detected a conflict.",
+      "parentUuid": "2b1a3814_2f5531ac",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ee8fe91e_0c1c1fc8",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
@@ -143,6 +197,24 @@
       "side": 1,
       "message": "Because we may be the winning thread in a conflict, and the query cache from the losing thread was merged with our query cache, but the losing thread never wrote the change to zk because it didn\u0027t get all the way to a leaf node of the network.\n\nSo, yes, it does relate to that case, but as mentioned in the other reply, we do merge the caches of the networks, so in the typical case (all events able to be satisfied by the oldest ltime) we will benefit from that cache.",
       "parentUuid": "ee8fe91e_0c1c1fc8",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "410fed14_50e2b30c",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1469,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-14T16:15:14Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c6a1b917_cf9b06f3",
       "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
