@@ -220,6 +220,48 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f047ed1a_78799814",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-14T16:42:14Z",
+      "side": 1,
+      "message": "Oh, you\u0027re right, in order to handle URL-based depends-on processing of divergent networks, yes, we would also need 941684.",
+      "parentUuid": "b746b12a_be4f0d9b",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f326440_55f980b3",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-14T16:42:14Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9007b47c_9fd973df",
+      "range": {
+        "startLine": 753,
+        "startChar": 20,
+        "endLine": 754,
+        "endChar": 41
+      },
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee8fe91e_0c1c1fc8",
