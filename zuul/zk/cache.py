@@ -413,3 +413,35 @@ class ZuulTreeCache(abc.ABC):
         :param Zstat stat: The zstat of the znode.
         """
         pass
+
+
+class SimpleTreeCacheObject:
+    def __init__(self, key, data, zstat):
+        self.key = key
+        self.data = json.loads(data)
+        self._zstat = zstat
+        self.path = '/'.join(key)
+
+    def _updateFromRaw(self, data, zstat, context=None):
+        self.data = json.loads(data)
+        self._zstat = zstat
+
+
+class SimpleTreeCache(ZuulTreeCache):
+    """
+    A simple implementation of ZuulTreeCache that cache the dict
+    from ZooKeeper directly, and use the parts of the path as the key.
+    """
+    def objectFromRaw(self, key, data, zstat):
+        return SimpleTreeCacheObject(key, data, zstat)
+
+    def updateFromRaw(self, obj, key, data, zstat):
+        obj._updateFromRaw(data, zstat, None)
+
+    def parsePath(self, path):
+        return tuple(path.split('/'))
+
+    def getCachedData(self, path):
+        self.ensureReady()
+        return getattr(
+            self._cached_objects.get(self.parsePath(path)), "data", None)
