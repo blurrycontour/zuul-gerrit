@@ -168,6 +168,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "57827ed2_9a0b233e",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 754,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-14T16:24:00Z",
+      "side": 1,
+      "message": "I understand your example as this:\n\nThread 1 queries A, B, X.\nThread 2 queries C, D, X.\n\nThese happen almost simultaneously, so thread 2 asks for permission to query X just after thread 1 was granted permission.  When thread 2 asks for permission for X, it loses.\n\nAt that point, we use mergeQueryResults to copy the query cache from thread/network 2 to thread/network 1.  So thread 1 now has [A, B, X, C, D] in its query cache.\n\nOnce network 1 proceeds past X and starts working on, let\u0027s say D is the next one it queries, then it will find that D is already in its query cache and doesn\u0027t need to query it.",
+      "parentUuid": "22d90007_77ef34af",
+      "revId": "b8a934f82cdb4ae73720a218f29da9715e589a7b",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ee8fe91e_0c1c1fc8",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 1
