@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f1a60075_e74d8d81",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-15T00:36:15Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand this last sentence; can you elaborate?",
+      "revId": "3c6ae20dc9ed54943c666d521b060b8bde2f4fbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f299d702_8a366063",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
