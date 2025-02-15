@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f299d702_8a366063",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1344,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-15T00:35:46Z",
+      "side": 1,
+      "message": "I think we can just use make_regex here and we don\u0027t need the \"else\"",
+      "revId": "3c6ae20dc9ed54943c666d521b060b8bde2f4fbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e9e75b9_22e29d2b",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1358,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-15T00:35:46Z",
+      "side": 1,
+      "message": "We might want to add a new regex attr to project_config instead of doing the tuple thing.",
+      "revId": "3c6ae20dc9ed54943c666d521b060b8bde2f4fbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0fec041_d681eb7f",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 9327,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-15T00:35:46Z",
+      "side": 1,
+      "message": "And once we always use max_regex above, we should be able to drop this completely.",
+      "revId": "3c6ae20dc9ed54943c666d521b060b8bde2f4fbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
