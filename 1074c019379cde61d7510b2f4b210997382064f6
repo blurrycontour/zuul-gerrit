@@ -16,6 +16,23 @@
       "message": "Need to write some tests for this. This issue should be reproducible simply by making a change to an environment variable in a job config file, then gating and seeing what the post build job outputs:\n\n- job:\n    name: testjob\n    description: Test build\n    vars:\n      my_message: \"This is fun 1\" \u003c- update from 1 to 2",
       "revId": "1074c019379cde61d7510b2f4b210997382064f6",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03ec75a1_c6f7c477",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-15T00:01:55Z",
+      "side": 1,
+      "message": "Just a quick note from a partial review:\n\nI think this could run past the end of the first list (as in, the second iteration could be longer than the first and then we would run the events in the original order).  We could fix that by saving the results of the iteration and using that for both loops.  Bonus, that\u0027s more efficient (this iterator is actually pretty expensive, it causes a lot of zk traffic).",
+      "revId": "1074c019379cde61d7510b2f4b210997382064f6",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
