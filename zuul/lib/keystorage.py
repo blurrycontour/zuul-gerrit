@@ -25,6 +25,7 @@ import paramiko
 from zuul.exceptions import AlgorithmNotSupportedException
 from zuul.lib import encryption, strings
 from zuul.zk import ZooKeeperBase
+from zuul.zk.cache import SimpleTreeCache
 
 RSA_KEY_SIZE = 2048
 
@@ -38,13 +39,16 @@ class KeyStorage(ZooKeeperBase):
     SECRETS_PATH = PROJECT_PATH + "/secrets"
     SSH_PATH = PROJECT_PATH + "/ssh"
 
+    OIDC_ROOT_PATH = "/keystorage-oidc"
     # /keystorage-oidc/algorithm
-    OIDC_PATH = "/keystorage-oidc/{}"
+    OIDC_PATH = OIDC_ROOT_PATH + "/{}"
 
     def __init__(self, zookeeper_client, password, backup=None):
         super().__init__(zookeeper_client)
         self.password = password
         self.password_bytes = password.encode("utf-8")
+        self.oidcSigingKeyCache = SimpleTreeCache(
+            self.client, self.OIDC_ROOT_PATH, async_worker=True)
 
     def _walk(self, root):
         ret = []
