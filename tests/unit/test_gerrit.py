@@ -30,7 +30,9 @@ from tests.base import (
 )
 from zuul.lib import strings
 from zuul.driver.gerrit import GerritDriver
-from zuul.driver.gerrit.gerritconnection import GerritConnection
+from zuul.driver.gerrit.gerritconnection import (
+    GerritConnection,
+)
 
 import paramiko
 import testtools
@@ -1116,6 +1118,34 @@ class TestGerritConnection(ZuulTestCase):
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
         self.waitUntilSettled()
         self.assertHistory([])
+
+    def test_ref_updated_reconfig(self):
+        # Gerrit emits change-merged events after ref-updated events for the
+        # change; make sure that job configuration changes take effect
+        # for post pipelines that trigger off of ref-updated.
+        in_repo_conf = textwrap.dedent(
+            """
+            - job:
+                name: new-post-job
+                parent: project-post
+            - project:
+                post:
+                  jobs:
+                    - new-post-job
+            """)
+
+        file_dict = {'zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A',
+                                           files=file_dict)
+        A.setMerged()
+        self.fake_gerrit.addEvent(A.getRefUpdatedEvent())
+        self.fake_gerrit.addEvent(A.getChangeMergedEvent())
+        self.waitUntilSettled()
+        self.assertHistory([
+            dict(name='project-post', result='SUCCESS'),
+            # TODO: fix the event arrival order so this job runs
+            # dict(name='new-post-job', result='SUCCESS'),
+        ])
 
 
 class TestGerritConnectionPreFilter(ZuulTestCase):
