@@ -368,7 +368,7 @@ class FakeGerritChange(object):
     def getChangeMergedEvent(self):
         event = {"submitter": {"name": "Jenkins",
                                "username": "jenkins"},
-                 "newRev": "29ed3b5f8f750a225c5be70235230e3a6ccb04d9",
+                 "newRev": self.patchsets[-1]['revision'],
                  "patchSet": self.patchsets[-1],
                  "change": self.data,
                  "type": "change-merged",
