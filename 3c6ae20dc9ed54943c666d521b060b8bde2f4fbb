@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7e790234_efdf05ae",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2025-02-17T17:17:24Z",
+      "side": 1,
+      "message": "zuul.project.name vs. zuul.project.canonical_name\n\nAt least when I was testing this a while back, it seems that both the shorter name and longer name were included in the list of projects the regex ran against but if you didn\u0027t take that into account with your regex for negation it would still include a project that you didn\u0027t intend to include.",
+      "parentUuid": "f1a60075_e74d8d81",
+      "revId": "3c6ae20dc9ed54943c666d521b060b8bde2f4fbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f299d702_8a366063",
         "filename": "zuul/configloader.py",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2025-02-15T00:35:46Z",
       "side": 1,
       "message": "I think we can just use make_regex here and we don\u0027t need the \"else\"",
+      "revId": "3c6ae20dc9ed54943c666d521b060b8bde2f4fbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd843a3f_25825abb",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1344,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2025-02-17T17:17:24Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f299d702_8a366063",
       "revId": "3c6ae20dc9ed54943c666d521b060b8bde2f4fbb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -52,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c647484a_b22455b0",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 1358,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2025-02-17T17:17:24Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4e9e75b9_22e29d2b",
+      "revId": "3c6ae20dc9ed54943c666d521b060b8bde2f4fbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0fec041_d681eb7f",
@@ -65,6 +119,24 @@
       "writtenOn": "2025-02-15T00:35:46Z",
       "side": 1,
       "message": "And once we always use max_regex above, we should be able to drop this completely.",
+      "revId": "3c6ae20dc9ed54943c666d521b060b8bde2f4fbb",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb9c4a45_96b5ae85",
+        "filename": "zuul/model.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 9327,
+      "author": {
+        "id": 34899
+      },
+      "writtenOn": "2025-02-17T17:17:24Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e0fec041_d681eb7f",
       "revId": "3c6ae20dc9ed54943c666d521b060b8bde2f4fbb",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
