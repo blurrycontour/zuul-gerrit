@@ -157,7 +157,7 @@ class GerritSource(BaseSource):
     def useDependenciesByTopic(self):
         return bool(self.connection.submit_whole_topic)
 
-    def getChangesByTopic(self, topic, changes=None, history=None):
+    def getChangesByTopic(self, topic, event=None, changes=None, history=None):
         if not topic:
             return []
 
@@ -178,7 +178,7 @@ class GerritSource(BaseSource):
             if change_key in changes:
                 continue
 
-            change = self.connection._getChange(change_key)
+            change = self.connection._getChange(change_key, event=event)
             changes[change_key] = change
 
         # Convert to list here because the recursive call can mutate
@@ -188,10 +188,11 @@ class GerritSource(BaseSource):
                 change_key = ChangeKey.fromReference(git_change_ref)
                 if change_key in changes:
                     continue
-                git_change = self.getChange(change_key)
+                git_change = self.getChange(change_key, event=event)
                 if not git_change.topic or git_change.topic in history:
                     continue
-                self.getChangesByTopic(git_change.topic, changes, history)
+                self.getChangesByTopic(
+                    git_change.topic, event, changes, history)
         return list(changes.values())
 
     def getCachedChanges(self):

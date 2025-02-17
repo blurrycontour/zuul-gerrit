@@ -139,7 +139,7 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         """
         return False
 
-    def getChangesByTopic(self, topic):
+    def getChangesByTopic(self, topic, event=None):
         """Return changes in the same topic.
 
         This should return changes under the same topic, as well as
