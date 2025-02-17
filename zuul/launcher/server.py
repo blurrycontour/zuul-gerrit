@@ -1684,20 +1684,38 @@ class Launcher:
             size = int(resp.headers['content-length'])
         with open(path, 'wb') as f:
             f.truncate(size)
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            for start in range(0, size, DOWNLOAD_CHUNK_SIZE):
-                end = start + DOWNLOAD_CHUNK_SIZE - 1
-                futures.append(executor.submit(self._downloadArtifactChunk,
-                                               image_build_artifact.url,
-                                               start, end, path))
-            for future in concurrent.futures.as_completed(futures):
-                future.result()
+        try:
+            with ThreadPoolExecutor(max_workers=5) as executor:
+                for start in range(0, size, DOWNLOAD_CHUNK_SIZE):
+                    end = start + DOWNLOAD_CHUNK_SIZE - 1
+                    futures.append(executor.submit(self._downloadArtifactChunk,
+                                                   image_build_artifact.url,
+                                                   start, end, path))
+                for future in concurrent.futures.as_completed(futures):
+                    future.result()
+        except Exception:
+            # If we encountered a problem, delete the file so it isn't
+            # orphaned.
+            if os.path.exists(path):
+                os.unlink(path)
+                self.log.info("Deleted %s", path)
+            raise
         self.log.debug("Downloaded %s bytes to %s", size, path)
         if path.endswith('.zst'):
-            subprocess.run(["zstd", "-dq", path],
-                           cwd=self.temp_dir, check=True, capture_output=True)
-            path = path[:-len('.zst')]
-            self.log.debug("Decompressed image to %s", path)
+            orig_path = path
+            try:
+                subprocess.run(["zstd", "-dq", path],
+                               cwd=self.temp_dir, check=True,
+                               capture_output=True)
+                path = path[:-len('.zst')]
+                self.log.debug("Decompressed image to %s", path)
+            finally:
+                # Regardless of whether the decompression succeeded,
+                # delete the original.  If it did succeed, the
+                # original may already be gone.
+                if os.path.exists(orig_path):
+                    os.unlink(orig_path)
+                    self.log.info("Deleted %s", orig_path)
         return path
 
     def getImageExternalId(self, node, provider):
