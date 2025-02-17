@@ -1501,9 +1501,6 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             return change
         project = self.source.getProject(change_key.project_name)
         if not change:
-            if not event:
-                self.log.error("Change %s not found in cache and no event",
-                               change_key)
             change = PullRequest(project.name)
             change.project = project
             change.number = number
@@ -1551,9 +1548,6 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 self._change_cache.updateChangeWithRetry(
                     change_key, change, lambda c: None)
             return change
-        if not event:
-            self.log.error("Change %s not found in cache and no event",
-                           change_key)
         project = self.source.getProject(change_key.project_name)
         change = Tag(project)
         change.tag = tag
@@ -1578,9 +1572,6 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 self._change_cache.updateChangeWithRetry(
                     change_key, change, lambda c: None)
             return change
-        if not event:
-            self.log.error("Change %s not found in cache and no event",
-                           change_key)
         project = self.source.getProject(change_key.project_name)
         change = Branch(project)
         change.branch = branch
@@ -1603,9 +1594,6 @@ class GithubConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 self._change_cache.updateChangeWithRetry(
                     change_key, change, lambda c: None)
             return change
-        if not event:
-            self.log.error("Change %s not found in cache and no event",
-                           change_key)
         project = self.source.getProject(change_key.project_name)
         change = Ref(project)
         change.ref = change_key.stable_id

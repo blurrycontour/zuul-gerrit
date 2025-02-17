@@ -1114,7 +1114,8 @@ class PipelineManager(metaclass=ABCMeta):
             query_cache_key = (change.project.connection_name, change.topic)
             cache_entry = query_cache.topic_queries.get(query_cache_key)
             if cache_entry is None:
-                changes_by_topic = source.getChangesByTopic(change.topic)
+                changes_by_topic = source.getChangesByTopic(
+                    change.topic, event)
                 cache_entry = QueryCacheEntry(
                     self.sched.zk_client.getCurrentLtime(),
                     changes_by_topic)
