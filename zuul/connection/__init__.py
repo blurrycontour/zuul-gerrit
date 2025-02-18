@@ -658,11 +658,16 @@ class BaseThreadPoolEventConnector:
         # This is the first half of the event dispatcher.  It reads
         # events from the webhook event queue and passes them to a
         # concurrent executor for pre-processing.
-        for event in self.event_queue:
+        try:
+            event_id_offset = max(
+                self.event_queue.eventIdFromAckRef(r)
+                for r in self._events_in_progress)
+        except ValueError:
+            event_id_offset = None
+
+        for event in self.event_queue.iter(event_id_offset):
             if self._stopped:
                 break
-            if event.ack_ref in self._events_in_progress:
-                continue
 
             processor = self._getEventProcessor(event)
             future = self._thread_pool.submit(processor)

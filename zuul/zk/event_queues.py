@@ -244,6 +244,10 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
         if not self._remove(event.ack_ref.path, event.ack_ref.version):
             self.log.warning("Event %s was already acknowledged", event)
 
+    def eventIdFromAckRef(self, ack_ref):
+        _, _, event_id = ack_ref.path.rpartition("/")
+        return event_id
+
     def _put(self, data, updater=None):
         # Event data can be large, so we want to shard it.  But events
         # also need to be atomic (we don't want an event listener to
@@ -327,7 +331,7 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
         updater.postRun(result[1])
         return result[0]
 
-    def _iterEvents(self):
+    def _iterEvents(self, event_id_offset=None):
         try:
             # We need to sort this ourself, since Kazoo doesn't guarantee any
             # ordering of the returned children.
@@ -336,6 +340,8 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             return
 
         for event_id in events:
+            if event_id_offset and event_id <= event_id_offset:
+                continue
             path = "/".join((self.event_root, event_id))
 
             # Load the event metadata
@@ -927,18 +933,15 @@ class ConnectionEventQueue(ZooKeeperEventQueue):
                   self.event_root, data)
         self._put({'event_data': data})
 
-    def __iter__(self):
-        for data, ack_ref, zstat in self._iterEvents():
-            if not data:
-                self.log.warning("Malformed event found: %s", data)
-                self._remove(ack_ref.path)
-                continue
-            # TODO: We can assume event_data exists after 4.6.1 is released
-            event = model.ConnectionEvent.fromDict(
-                data.get('event_data', data))
+    def iter(self, event_id_offset=None):
+        for data, ack_ref, zstat in self._iterEvents(event_id_offset):
+            event = model.ConnectionEvent.fromDict(data['event_data'])
             event.ack_ref = ack_ref
             event.zuul_event_ltime = zstat.creation_transaction_id
             yield event
+
+    def __iter__(self):
+        yield from self.iter()
 
 
 class EventReceiverElection(SessionAwareElection):

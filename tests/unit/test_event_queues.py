@@ -723,3 +723,27 @@ class TestConnectionEventQueue(EventQueueBaseTestCase):
         for _ in iterate_timeout(5, "event set"):
             if event.is_set():
                 break
+
+    def test_event_offset(self):
+        queue = event_queues.ConnectionEventQueue(self.zk_client, "dummy")
+        self.assertEqual(len(queue), 0)
+        self.assertFalse(queue.hasEvents())
+
+        payload = {"message": "hello world!"}
+        queue.put(payload)
+        queue.put(payload)
+
+        events = list(queue)
+        self.assertEqual(len(events), 2)
+
+        skipped_event = events[0]
+        offset = queue.eventIdFromAckRef(skipped_event.ack_ref)
+        for event in queue.iter(offset):
+            self.assertNotEqual(event.ack_ref, skipped_event.ack_ref)
+            queue.ack(event)
+
+        self.assertEqual(len(queue), 1)
+        for event in queue.iter():
+            self.assertEqual(event.ack_ref, skipped_event.ack_ref)
+            queue.ack(event)
+        self.assertEqual(len(queue), 0)
