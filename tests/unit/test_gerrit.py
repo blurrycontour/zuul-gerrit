@@ -15,6 +15,7 @@
 
 import os
 import threading
+import time
 import textwrap
 from unittest import mock
 
@@ -32,6 +33,7 @@ from zuul.lib import strings
 from zuul.driver.gerrit import GerritDriver
 from zuul.driver.gerrit.gerritconnection import (
     GerritConnection,
+    PeekQueue,
 )
 
 import paramiko
@@ -1143,8 +1145,7 @@ class TestGerritConnection(ZuulTestCase):
         self.waitUntilSettled()
         self.assertHistory([
             dict(name='project-post', result='SUCCESS'),
-            # TODO: fix the event arrival order so this job runs
-            # dict(name='new-post-job', result='SUCCESS'),
+            dict(name='new-post-job', result='SUCCESS'),
         ])
 
 
@@ -1603,3 +1604,171 @@ class TestGerritCherryPickWeb(ZuulTestCase):
             dict(name='check-job', result='SUCCESS', changes='1,2'),
             dict(name='check-job', result='SUCCESS', changes='1,2 2,1'),
         ])
+
+
+class TestGerritPeekQueue(BaseTestCase):
+    def make_ref_updated_event(self, ref, newrev, ltime):
+        e = zuul.model.ConnectionEvent({
+            "timestamp": time.time(),
+            "payload": {
+                "refUpdate": {
+                    "oldRev": "old",
+                    "newRev": newrev,
+                    "refName": ref,
+                    "project": "org/project"
+                },
+                "type": "ref-updated",
+            }
+        })
+        e.zuul_event_ltime = ltime
+        return e
+
+    def make_change_merged_event(self, number, newrev, ltime):
+        e = zuul.model.ConnectionEvent({
+            "timestamp": time.time(),
+            "payload": {
+                "newRev": newrev,
+                "patchSet": {
+                    "number": 1,
+                },
+                "change": {
+                    "project": "org/project",
+                    "branch": "master",
+                    "number": number,
+                },
+                "type": "change-merged",
+            }
+        })
+        e.zuul_event_ltime = ltime
+        return e
+
+    def test_peek_queue(self):
+        handled = []
+
+        def handler(x):
+            handled.append(x)
+
+        q = PeekQueue(handler)
+
+        # Check noop
+        q.run()
+        self.assertEqual([], handled)
+
+        # Check all at once (even though this shouldn't happen
+        orig = [
+            self.make_ref_updated_event('refs/heads/master', 'new1', 1),
+            self.make_ref_updated_event('refs/meta/foo', 'foo', 2),
+            self.make_change_merged_event(1, 'new1', 3),
+        ]
+        [q.append(x) for x in orig]
+        q.run()
+        expected = [orig[2], orig[0], orig[1]]
+        self.assertEqual(expected, handled)
+        self.assertEqual(1, handled[0].zuul_event_ltime)
+        self.assertEqual(1, handled[1].zuul_event_ltime)
+        self.assertEqual(2, handled[2].zuul_event_ltime)
+
+        # Check one at a time (typical case)
+        handled.clear()
+        orig = [
+            self.make_ref_updated_event('refs/heads/master', 'new1', 1),
+            self.make_ref_updated_event('refs/meta/foo', 'foo', 2),
+            self.make_change_merged_event(1, 'new1', 3),
+        ]
+        q.append(orig[0])
+        q.run()
+        self.assertEqual([], handled)
+
+        q.append(orig[1])
+        q.run()
+        self.assertEqual([], handled)
+
+        q.append(orig[2])
+        q.run()
+        expected = [orig[2], orig[0], orig[1]]
+        self.assertEqual(expected, handled)
+        self.assertEqual(1, handled[0].zuul_event_ltime)
+        self.assertEqual(1, handled[1].zuul_event_ltime)
+        self.assertEqual(2, handled[2].zuul_event_ltime)
+
+        # Check that other events arrive immediately
+        handled.clear()
+
+        q.append(orig[1])
+        q.run()
+        expected = [orig[1]]
+        self.assertEqual(expected, handled)
+
+        # Check missing change-merged event
+        handled.clear()
+        orig = [
+            self.make_ref_updated_event('refs/heads/master', 'new1', 1),
+            self.make_ref_updated_event('refs/meta/foo', 'foo', 2),
+        ]
+        q.append(orig[0])
+        q.run()
+        self.assertEqual([], handled)
+
+        q.append(orig[1])
+        q.run()
+        self.assertEqual([], handled)
+
+        # This is what the loop will acutally do
+        q.run()
+        q.run(end=True)
+        expected = [orig[0], orig[1]]
+        self.assertEqual(expected, handled)
+        self.assertEqual(1, handled[0].zuul_event_ltime)
+        self.assertEqual(2, handled[1].zuul_event_ltime)
+
+        # Check if Gerrit changes the event order; it doesn't do this
+        # today, but we want to defend against that.
+        handled.clear()
+        orig = [
+            self.make_change_merged_event(1, 'new1', 1),
+            self.make_ref_updated_event('refs/heads/master', 'new1', 2),
+            self.make_ref_updated_event('refs/meta/foo', 'foo', 3),
+        ]
+        q.append(orig[0])
+        q.run()
+        expected = [orig[0]]
+        self.assertEqual(expected, handled)
+
+        q.append(orig[1])
+        q.run()
+        expected = [orig[0], orig[1]]
+        self.assertEqual(expected, handled)
+
+        q.append(orig[2])
+        q.run()
+        expected = [orig[0], orig[1], orig[2]]
+        self.assertEqual(expected, handled)
+        self.assertEqual(1, handled[0].zuul_event_ltime)
+        self.assertEqual(2, handled[1].zuul_event_ltime)
+        self.assertEqual(3, handled[2].zuul_event_ltime)
+
+    def test_peek_queue_busy_timeout(self):
+        # Our last line of defense on a busy system is the extra 10
+        # second timeout -- if we see an event that's 10 seconds later
+        # than the event we're waiting for, then we'll give up.  If we
+        # exhaust the event queue in zookeeper though, we'll give up
+        # earlier; that's tested in the normal test_peek_queue test.
+        handled = []
+
+        def handler(x):
+            handled.append(x)
+
+        q = PeekQueue(handler)
+
+        orig = [
+            self.make_ref_updated_event('refs/heads/master', 'new1', 1),
+        ]
+        [q.append(x) for x in orig]
+        q.run()
+        expected = []
+        self.assertEqual(expected, handled)
+
+        q.timeout = 0
+        q.run()
+        expected = [orig[0]]
+        self.assertEqual(expected, handled)
