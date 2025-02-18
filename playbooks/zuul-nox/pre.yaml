@@ -4,3 +4,11 @@
     - run-dstat
     - role: ensure-zookeeper
       zookeeper_use_tls: true
+
+  pre_tasks:
+    - name: Debug "too many open files", show limit
+      shell: ulimit -n
+    - name: Debug "too many open files", set limit
+      shell: ulimit -n 1024
+    - name: Debug "too many open files", show limit again
+      shell: ulimit -n
