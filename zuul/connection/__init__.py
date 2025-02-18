@@ -368,7 +368,9 @@ class ZKBranchCacheMixin:
             self._branch_cache.setProjectBranches(
                 project.name, valid_flags, branch_infos)
 
-        return sorted(bi.name for bi in branch_infos)
+        branches = [b.name for b in self._filterProjectBranches(
+                    branch_infos, exclude_unprotected, exclude_locked)]
+        return sorted(branches)
 
     def getProjectMergeModes(self, project, tenant, min_ltime=-1):
         """Get the merge modes for the given project.
