@@ -2761,7 +2761,7 @@ class ZuulTestCase(BaseTestCase):
 
         password = self.config.get("keystore", "password")
         keystore = zuul.lib.keystorage.KeyStorage(
-            self.zk_client, password=password)
+            self.zk_client, password=password, oidc_cached=False)
         import_keys = {}
         import_data = {'keys': import_keys}
 
