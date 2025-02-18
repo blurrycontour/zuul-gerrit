@@ -325,6 +325,85 @@ class QueryHistory:
         self.queries[query][key] = change
 
 
+class PeekQueue:
+    def __init__(self, handler):
+        self.queue = collections.deque()
+        self.handler = handler
+
+    def append(self, event):
+        self.queue.append(event)
+
+    def run(self, end=False):
+        if not self.queue:
+            return
+
+        # Attempt to match ref-updated events with change-merged
+        # events.
+        ref_updates = {}
+        new_event_list = collections.deque()
+        for event in self.queue:
+            data = event["payload"]
+            kind = data.get('type')
+            refupdate = data.get('refUpdate', {})
+            ref = refupdate.get('refName')
+            inserted = False
+            if (kind == 'ref-updated' and
+                ((not ref.startswith('refs/')) or
+                 ref.startswith('refs/heads/'))):
+                # This is a ref-updated event for a branch, we
+                # want to find its change-merged event.
+                newrev = refupdate.get('newRev')
+                ref_updates[newrev] = event
+            elif kind == 'change-merged':
+                newrev = data.get('newRev')
+                if newrev in ref_updates:
+                    # This is a change-merged event that matches a
+                    # ref-updated event we're interested in.
+                    other_event = ref_updates.pop(newrev)
+                    idx = new_event_list.index(other_event)
+                    # Put our event immediately before the ref-updated event
+                    new_event_list.insert(idx, event)
+                    # Give both events the same earlier ltime so that
+                    # we don't have ltime going backwards.
+                    event.zuul_event_ltime = other_event.zuul_event_ltime
+                    inserted = True
+            if not inserted:
+                new_event_list.append(event)
+
+        while new_event_list:
+            event = new_event_list.popleft()
+            data = event["payload"]
+            kind = data.get('type')
+            ok = False
+            if kind == 'ref-updated':
+                refupdate = data.get('refUpdate')
+                newrev = refupdate.get('newRev')
+                if newrev in ref_updates:
+                    # We're waiting on data for this one
+                    if end:
+                        # It's been more than 10 seconds (gerrit
+                        # event delay) since we saw the
+                        # ref-updated event, and we're at the end
+                        # of the list of events in zk, so it's
+                        # probably not going to show up.  Release
+                        # it.
+                        ok = True
+                    # Otherwise, we're still waiting
+                else:
+                    # Not a branch ref-update
+                    ok = True
+            else:
+                # Not a ref-update at all
+                ok = True
+            if not ok:
+                # if we're still waiting for an event, don't send
+                # any more so that we preserve the order.
+                return
+
+            self.queue.remove(event)
+            self.handler(event)
+
+
 class GerritEventConnector(BaseThreadPoolEventConnector):
     """Move events from Gerrit to the scheduler."""
 
@@ -339,8 +418,67 @@ class GerritEventConnector(BaseThreadPoolEventConnector):
 
     log = logging.getLogger("zuul.GerritEventConnector")
 
+    def __init__(self, connection):
+        super().__init__(connection)
+        self._peek_queue = PeekQueue(self._peekQueueHandler)
+
     def _getEventProcessor(self, event):
         return GerritEventProcessor(self, event).run
+
+    def _calculateDelay(self, connection_event):
+        timestamp = connection_event["timestamp"]
+        now = time.time()
+        delay = max((timestamp + GerritEventProcessor.delay) - now, 0.0)
+        # Gerrit can produce inconsistent data immediately after an
+        # event, So ensure that we do not deliver the event to Zuul
+        # until at least a certain amount of time has passed.  Note
+        # that if we receive several events in succession, we will
+        # only need to delay for the first event.  In essence, Zuul
+        # should always be a constant number of seconds behind Gerrit.
+
+        self.log.debug("Handling event received %ss ago, delaying %ss",
+                       now - timestamp, delay)
+        time.sleep(delay)
+        return delay
+
+    def _dispatchEvents(self):
+        # This is the first half of the event dispatcher.  It reads
+        # events from the webhook event queue and passes them to a
+        # concurrent executor for pre-processing.
+
+        # This overrides the superclass in order to add the peek queue.
+        try:
+            event_id_offset = max(
+                self.event_queue.eventIdFromAckRef(r)
+                for r in list(self._events_in_progress) +
+                list(self._peek_queue.queue))
+        except ValueError:
+            event_id_offset = None
+
+        self._peek_queue.run()
+
+        for event in self.event_queue.iter(event_id_offset):
+            if self._stopped:
+                break
+
+            delay = self._calculateDelay(event)
+            if delay:
+                return delay
+
+            self._peek_queue.append(event)
+            self._peek_queue.run()
+        self._peek_queue.run(end=True)
+
+    def _peekQueueHandler(self, event):
+        # Called when the peek queue has decided an event should be processed
+        processor = self._getEventProcessor(event)
+        future = self._thread_pool.submit(processor)
+
+        # Events are acknowledged in the event forwarder
+        # loop after pre-processing. This way we can
+        # ensure that no events are lost.
+        self._events_in_progress.add(event.ack_ref)
+        self._event_forward_queue.append(future)
 
 
 class GerritEventProcessor:
@@ -377,25 +515,13 @@ class GerritEventProcessor:
     def _handleEvent(self, connection_event):
         timestamp = connection_event["timestamp"]
         data = connection_event["payload"]
-        now = time.time()
-        delay = max((timestamp + self.delay) - now, 0.0)
-        # Gerrit can produce inconsistent data immediately after an
-        # event, So ensure that we do not deliver the event to Zuul
-        # until at least a certain amount of time has passed.  Note
-        # that if we receive several events in succession, we will
-        # only need to delay for the first event.  In essence, Zuul
-        # should always be a constant number of seconds behind Gerrit.
-
-        self.log.debug("Handling event received %ss ago, delaying %ss",
-                       now - timestamp, delay)
-        time.sleep(delay)
+        event = GerritTriggerEvent.fromGerritEventDict(
+            data, timestamp, self.connection, self.zuul_event_id)
         min_change_ltime = self.zk_client.getCurrentLtime()
 
         # In order to perform connection hygene actions like those
         # below, the preFilter method must pass relevant events
         # through to get to this point.
-        event = GerritTriggerEvent.fromGerritEventDict(
-            data, timestamp, self.connection, self.zuul_event_id)
         if event.default_branch_changed:
             self.log.debug('Updating default branch for %s to %s',
                            event.project_name, event.branch)
