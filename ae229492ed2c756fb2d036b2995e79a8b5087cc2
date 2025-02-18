@@ -16,6 +16,24 @@
       "message": "This code processes the incoming event queue in order and always acks each event that it sees before moving on to the next one.\n\nThe replacement code (which is currently used in github) has two loops that spin in a semi-related manner.  With the new code, we can end up iterating over the incoming event loop multiple times while we wait for the threadpool to process those events.  In other words:\n\n* 4 events arrive and are immediately dispatched to the threadpool executors.  They are now operating at max capacity.\n* The executors are very busy performing long queries and will take a while to return.\n* A 5th event arrives; the base class will iterate over all 5 events, ignoring the first 4 and then processing the 5th.\n\nThat all works, but we deserialize the first 4 events again from ZK each time.\n\nI think we should make this more efficient before we fully commit to it.  We can probably do one of two things:\n* Have the event queue iterator take an argument of event ids to skip.  This is easy and solves most of the problem.  The only \"extra\" work we will do is a possibly unecessary zk child list.\n* Add a childwatch to the event queue so that it always knows what the events are.  We could even have a blocking version of a producer.  This could be a little more efficient but more complex.",
       "revId": "ae229492ed2c756fb2d036b2995e79a8b5087cc2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6979f414_49048d8d",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-18T08:04:18Z",
+      "side": 0,
+      "message": "Good point. I implemented the first option (ID offset) in https://review.opendev.org/c/zuul/zuul/+/942059",
+      "parentUuid": "13986c01_dd2fa0e0",
+      "revId": "ae229492ed2c756fb2d036b2995e79a8b5087cc2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
