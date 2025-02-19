@@ -12,10 +12,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
-
 from zuul.zk import ZooKeeperClient
-from zuul.zk.cache import ZuulTreeCache
+from zuul.zk.cache import SimpleTreeCache
 from zuul.zk.components import (
     ComponentRegistry,
     COMPONENT_REGISTRY
@@ -27,29 +25,6 @@ from tests.base import (
 )
 
 from kazoo.protocol.states import KazooState
-
-
-class SimpleTreeCacheObject:
-    def __init__(self, key, data, zstat):
-        self.key = key
-        self.data = json.loads(data)
-        self._zstat = zstat
-        self.path = '/'.join(key)
-
-    def _updateFromRaw(self, data, zstat, context=None):
-        self.data = json.loads(data)
-        self._zstat = zstat
-
-
-class SimpleTreeCache(ZuulTreeCache):
-    def objectFromRaw(self, key, data, zstat):
-        return SimpleTreeCacheObject(key, data, zstat)
-
-    def updateFromRaw(self, obj, key, data, zstat):
-        obj._updateFromRaw(data, zstat, None)
-
-    def parsePath(self, path):
-        return tuple(path.split('/'))
 
 
 class TestTreeCache(BaseTestCase):
