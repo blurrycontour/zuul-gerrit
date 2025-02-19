@@ -41,6 +41,9 @@ RESULT_EVENT_TYPE_MAP = {
     "FilesChangesCompletedEvent": model.FilesChangesCompletedEvent,
     "MergeCompletedEvent": model.MergeCompletedEvent,
     "NodesProvisionedEvent": model.NodesProvisionedEvent,
+    # MODEL_API <= 32
+    # Kept for backward compatibility; semaphore release events
+    # are now processed in the management event queue.
     "SemaphoreReleaseEvent": model.SemaphoreReleaseEvent,
 }
 
@@ -49,6 +52,7 @@ MANAGEMENT_EVENT_TYPE_MAP = {
     "EnqueueEvent": model.EnqueueEvent,
     "PromoteEvent": model.PromoteEvent,
     "ReconfigureEvent": model.ReconfigureEvent,
+    "SemaphoreReleaseEvent": model.SemaphoreReleaseEvent,
     "TenantReconfigureEvent": model.TenantReconfigureEvent,
     "PipelinePostConfigEvent": model.PipelinePostConfigEvent,
     "PipelineSemaphoreReleaseEvent": model.PipelineSemaphoreReleaseEvent,
