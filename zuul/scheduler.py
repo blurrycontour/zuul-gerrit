@@ -2084,8 +2084,7 @@ class Scheduler(threading.Thread):
                         pipeline.manager.removeItem(item)
                         return
 
-    def _doSemaphoreReleaseEvent(self, event, pipeline):
-        tenant = pipeline.tenant
+    def _doSemaphoreReleaseEvent(self, event, tenant):
         semaphore = tenant.layout.getSemaphore(
             self.abide, event.semaphore_name)
         if semaphore.global_scope:
@@ -2095,11 +2094,6 @@ class Scheduler(threading.Thread):
             tenants = [tenant]
         for tenant in tenants:
             for pipeline_name in tenant.layout.pipelines.keys():
-                if (tenant.name == pipeline.tenant.name and
-                    pipeline_name == pipeline.name):
-                    # This pipeline is already awake because it is
-                    # where this event originated.
-                    continue
                 event = PipelineSemaphoreReleaseEvent()
                 self.pipeline_management_events[
                     tenant.name][pipeline_name].put(
@@ -2675,6 +2669,8 @@ class Scheduler(threading.Thread):
                     self._doTenantReconfigureEvent(event)
                 elif isinstance(event, (PromoteEvent, ChangeManagementEvent)):
                     event_forwarded = self._forward_management_event(event)
+                elif isinstance(event, SemaphoreReleaseEvent):
+                    self._doSemaphoreReleaseEvent(event, tenant)
                 else:
                     self.log.error("Unable to handle event %s for tenant %s",
                                    event, tenant.name)
@@ -2798,7 +2794,10 @@ class Scheduler(threading.Thread):
         elif isinstance(event, NodesProvisionedEvent):
             self._doNodesProvisionedEvent(event, pipeline)
         elif isinstance(event, SemaphoreReleaseEvent):
-            self._doSemaphoreReleaseEvent(event, pipeline)
+            # MODEL_API <= 32
+            # Kept for backward compatibility; semaphore release events
+            # are now processed in the management event queue.
+            self._doSemaphoreReleaseEvent(event, pipeline.tenant)
         else:
             self.log.error("Unable to handle event %s", event)
 
@@ -3208,8 +3207,11 @@ class Scheduler(threading.Thread):
             # Release the semaphore in any case
             pipeline = buildset.item.pipeline
             tenant = pipeline.tenant
-            event_queue = self.pipeline_result_events[
-                tenant.name][pipeline.name]
+            if COMPONENT_REGISTRY.model_api >= 33:
+                event_queue = self.management_events[tenant.name]
+            else:
+                event_queue = self.pipeline_result_events[
+                    tenant.name][pipeline.name]
             tenant.semaphore_handler.release(event_queue, item, job)
 
     # Image related methods
