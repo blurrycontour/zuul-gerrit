@@ -7868,7 +7868,7 @@ class ResultEvent(AbstractEvent):
         pass
 
 
-class SemaphoreReleaseEvent(ResultEvent):
+class SemaphoreReleaseEvent(ManagementEvent):
     """Enqueued after a semaphore has been released in order
     to trigger a processing run.
 
