@@ -1259,10 +1259,13 @@ class PipelineManager(metaclass=ABCMeta):
                     # If we hit an exception we don't have a build in the
                     # current item so a potentially aquired semaphore must be
                     # released as it won't be released on dequeue of the item.
-                    tenant = item.pipeline.tenant
                     pipeline = build_set.item.pipeline
-                    event_queue = self.sched.pipeline_result_events[
-                        tenant.name][pipeline.name]
+                    tenant = pipeline.tenant
+                    if COMPONENT_REGISTRY.model_api >= 33:
+                        event_queue = self.sched.management_events[tenant.name]
+                    else:
+                        event_queue = self.sched.pipeline_result_events[
+                            tenant.name][pipeline.name]
                     tenant.semaphore_handler.release(event_queue, item, job)
                 except Exception:
                     log.exception("Exception while releasing semaphore")
@@ -2126,8 +2129,12 @@ class PipelineManager(metaclass=ABCMeta):
 
         log.debug("Build %s of %s completed", build, item)
 
-        event_queue = self.sched.pipeline_result_events[
-            item.pipeline.tenant.name][item.pipeline.name]
+        pipeline = item.pipeline
+        if COMPONENT_REGISTRY.model_api >= 33:
+            event_queue = self.sched.management_events[pipeline.tenant.name]
+        else:
+            event_queue = self.sched.pipeline_result_events[
+                pipeline.tenant.name][pipeline.name]
         item.pipeline.tenant.semaphore_handler.release(
             event_queue, item, build.job)
 
@@ -2283,8 +2290,11 @@ class PipelineManager(metaclass=ABCMeta):
             self._resumeBuilds(build_set)
             pipeline = build_set.item.pipeline
             tenant = pipeline.tenant
-            event_queue = self.sched.pipeline_result_events[
-                tenant.name][pipeline.name]
+            if COMPONENT_REGISTRY.model_api >= 33:
+                event_queue = self.sched.management_events[tenant.name]
+            else:
+                event_queue = self.sched.pipeline_result_events[
+                    tenant.name][pipeline.name]
             tenant.semaphore_handler.release(
                 event_queue, build_set.item, job)
 

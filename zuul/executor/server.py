@@ -82,7 +82,10 @@ from zuul.model import (
 import zuul.model
 from zuul.nodepool import Nodepool
 from zuul.version import get_version_string
-from zuul.zk.event_queues import PipelineResultEventQueue
+from zuul.zk.event_queues import (
+    PipelineResultEventQueue,
+    TenantManagementEventQueue,
+)
 from zuul.zk.blob_store import BlobStore
 from zuul.zk.components import ExecutorComponent, COMPONENT_REGISTRY
 from zuul.zk.exceptions import JobRequestNotFound
@@ -3636,9 +3639,13 @@ class AnsibleJob(object):
             self.RESULT_MAP[result], code))
 
         if acquired_semaphores:
-            event_queue = self.executor_server.result_events[
-                self.build_request.tenant_name][
-                    self.build_request.pipeline_name]
+            if COMPONENT_REGISTRY.model_api >= 33:
+                event_queue = self.executor_server.result_events[
+                    self.build_request.tenant_name][
+                        self.build_request.pipeline_name]
+            else:
+                event_queue = self.executor_server.management_events[
+                    self.build_request.tenant_name]
             self.executor_server.semaphore_handler.releaseFromInfo(
                 self.log, event_queue, playbook.semaphores, semaphore_handle)
 
@@ -3843,6 +3850,8 @@ class ExecutorServer(BaseMergeServer):
                                  self.statsd)
         self.launcher = LauncherClient(self.zk_client, None)
 
+        self.management_events = TenantManagementEventQueue.createRegistry(
+            self.zk_client)
         self.result_events = PipelineResultEventQueue.createRegistry(
             self.zk_client)
         self.build_worker = threading.Thread(
