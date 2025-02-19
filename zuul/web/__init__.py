@@ -2657,6 +2657,8 @@ class StreamManager(object):
         self.poll = select.poll()
         self.bitmask = (select.POLLIN | select.POLLERR |
                         select.POLLHUP | select.POLLNVAL)
+        # Remember to close all pipes on __del__ to prevent leaks in
+        # tests.
         self.wake_read, self.wake_write = os.pipe()
         self.poll.register(self.wake_read, self.bitmask)
         self.poll_lock = threading.Lock()
