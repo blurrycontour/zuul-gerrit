@@ -183,12 +183,12 @@ class SemaphoreHandler(ZooKeeperSimpleBase):
     def releaseFromInfo(self, log, event_queue, infos, handle, quiet=False):
         for info in infos:
             self._release_one(log, info, handle, quiet)
-            if event_queue:
+            if event_queue is not None:
                 # If a scheduler has been provided (which it is except
                 # in the case of a rollback from acquire in this
                 # class), broadcast an event to trigger pipeline runs.
                 event = SemaphoreReleaseEvent(info['name'])
-                event_queue.put(event)
+                event_queue.put(event, needs_result=False)
 
     def _release_one(self, log, info, handle, quiet=False):
         while True:

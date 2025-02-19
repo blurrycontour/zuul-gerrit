@@ -7868,7 +7868,7 @@ class ResultEvent(AbstractEvent):
         pass
 
 
-class SemaphoreReleaseEvent(ResultEvent):
+class SemaphoreReleaseEvent(ManagementEvent):
     """Enqueued after a semaphore has been released in order
     to trigger a processing run.
 
@@ -7878,6 +7878,7 @@ class SemaphoreReleaseEvent(ResultEvent):
     """
 
     def __init__(self, semaphore_name):
+        super().__init__()
         self.semaphore_name = semaphore_name
 
     def toDict(self):
