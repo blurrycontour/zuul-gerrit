@@ -14,6 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import base64
 import os
 import urllib.parse
 import socket
@@ -4324,3 +4325,83 @@ class TestWebApiAccessRules(BaseTestWeb):
             info = resp.json()
             self.assertTrue(
                 info['info']['capabilities']['auth']['read_protected'])
+
+
+class TestWebOIDCEndpoints(BaseTestWeb):
+    tenant_config_file = 'config/multi-tenant/main.yaml'
+
+    def test_global_webroot(self):
+        """
+        Test that OIDC endpoinds accessed from the global webroot
+        should return correct content
+        """
+        self._test_oidc_endpoints(None, 'https://zuul.example.com')
+        # If tenant config does not specify webroot,
+        # it should default to global webroot
+        self._test_oidc_endpoints('tenant-two', 'https://zuul.example.com')
+        # If tenant does exist, it should default to global webroot
+        self._test_oidc_endpoints(
+            'tenant-not-exist', 'https://zuul.example.com')
+
+    def test_tenant_webroot(self):
+        """
+        Test tht OIDC endpoints accessed from the tenant webroot
+        should return correct content
+        """
+        self._test_oidc_endpoints(
+            "tenant-one", 'https://tenant-one.example.com')
+    
+    def test_multiple_jwt_keys(self):
+        """
+        Test multiple keys returned in jwks endpoint
+        """
+        keystore = self.web.web.keystore
+        # Make sure the fist signning key is created
+        keystore.getLatestOidcSigningKeys(algorithm="RS256")
+        # call the rotateOidcSigningKeys method to create the second key
+        time.sleep(2)
+        keystore.rotateOidcSigningKeys(algorithm="RS256", rotation_interval=1, max_ttl=100)
+
+        # Wait for the cache to sync
+        for _ in iterate_timeout(10, 'cache to sync'):
+            test_keys = keystore.getOidcSigningKeyData(algorithm="RS256")
+            if len(test_keys["keys"]) == 2:
+                break
+        
+        jwks_data = self.get_url(f'oidc/.well-known/jwks').json()
+        self.assertEqual(len(jwks_data["keys"]), 2)
+        for idx, key in enumerate(jwks_data["keys"]):
+            self._validate_oidc_key(key, expected_version=f'RS256-{idx}')
+
+    def _test_oidc_endpoints(self, tenant_name, expected_webroot):
+        well_known_url = 'oidc/.well-known'
+        if tenant_name:
+            well_known_url = f'oidc/{tenant_name}/.well-known'
+
+        # Test that the openid-configuration content is correct
+        config_data = self.get_url(
+            f'{well_known_url}/openid-configuration').json()
+        self.assertEqual(config_data['issuer'], expected_webroot)
+        self.assertEqual(config_data['jwks_uri'],
+                         f'{expected_webroot}/oidc/.well-known/jwks')
+        self.assertEqual(config_data['claims_supported'],
+                         ['aud', 'iat', 'iss', 'name', 'sub', 'custom'])
+        self.assertEqual(config_data['response_types_supported'], ['id_token'])
+        self.assertEqual(config_data['id_token_signing_alg_values_supported'],
+                         ['RS256'])
+        self.assertEqual(config_data['subject_types_supported'], ['public'])
+
+        # Test that the jwks content is correct
+        jwks_data = self.get_url(f'{well_known_url}/jwks').json()
+        self.assertEqual(len(jwks_data["keys"]), 1)
+        key = jwks_data["keys"][0]
+        self._validate_oidc_key(key)
+    
+    def _validate_oidc_key(self, key, expected_version='RS256-0'):
+        self.assertEqual(key['kty'], 'RSA')
+        self.assertEqual(key['alg'], 'RS256')
+        self.assertEqual(key['kid'], expected_version)
+        self.assertEqual(key['e'], 'AQAB')
+        pub_key_base64 = key['n'] + '=' * (4 - len(key['n']) % 4)
+        pub_key = base64.urlsafe_b64decode(pub_key_base64)
+        self.assertEqual(len(pub_key), 512)
