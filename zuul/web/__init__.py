@@ -20,6 +20,7 @@ from collections import defaultdict
 from opentelemetry import trace
 from ws4py.server.cherrypyserver import WebSocketPlugin, WebSocketTool
 from ws4py.websocket import WebSocket
+import base64
 import codecs
 import copy
 from datetime import datetime
@@ -1114,6 +1115,92 @@ class LogStreamer(object):
         else:
             self.zuulweb.stream_manager.unregisterStreamer(self)
             return self.websocket.logClose(1000, "Remote error")
+
+
+class ZuulWebOIDC(object):
+    def __init__(self, zuulweb):
+        self.zuulweb = zuulweb
+        self.keystore = zuulweb.keystore
+
+    @cherrypy.expose
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def global_openid_configuration(self):
+        return self.tenant_openid_configuration()
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def tenant_openid_configuration(self, tenant_name=None):
+        # If tenant_name is None or does not exist,
+        # fallback to the global web_root
+        web_root = self.zuulweb.abide.tenants.get(
+            tenant_name, self.zuulweb.globals
+        ).web_root.split("/t/")[0].rstrip("/")
+
+        return {
+            "issuer": web_root,
+            "jwks_uri": f"{web_root}/oidc/.well-known/jwks",
+            "claims_supported": [
+                "aud", "iat", "iss", "name", "sub", "custom"
+            ],
+            "response_types_supported": ["id_token"],
+            "id_token_signing_alg_values_supported": (
+                self._get_supported_algorithms()),
+            "subject_types_supported": ["public"]
+        }
+
+    @cherrypy.expose
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def global_jwks(self):
+        return self.tenant_jwks()
+
+    @cherrypy.expose
+    @cherrypy.tools.save_params()
+    @cherrypy.tools.handle_options()
+    @cherrypy.tools.json_out(content_type='application/json; charset=utf-8')
+    def tenant_jwks(self, tenant_name=None):
+        jwks_keys = []
+        for algorithm in self._get_supported_algorithms():
+            signing_key_data = self.keystore.getOidcSigningKeyData(
+                algorithm=algorithm)
+            for key in signing_key_data["keys"]:
+                pem_private_key = key["private_key"].encode("utf-8")
+                _, public_key = encryption.deserialize_rsa_keypair(
+                    pem_private_key, self.keystore.password_bytes)
+                public_numbers = public_key.public_numbers()
+
+                jwks_keys.append({
+                    # For now we only support RS256 and ES256 public keys
+                    "kty": "RSA" if algorithm == "RS256" else "EC",
+                    "alg": algorithm,
+                    "use": "sig",
+                    # algorithm-version uniquelly identifies the key
+                    "kid": f"{algorithm}-{key['version']}",
+                    "n": self._encode_jwk_int(public_numbers.n),
+                    "e": self._encode_jwk_int(public_numbers.e),
+                })
+
+        return {
+            "keys": jwks_keys
+        }
+
+    def _get_supported_algorithms(self):
+        # TODO: When more algorithms are supported, this should be
+        # fallback to all supported algorithms
+        return [
+            alg.strip() for alg in self.zuulweb.config.get(
+                'oidc', 'supported_signing_algorithms', fallback='RS256'
+            ).split(',')
+        ]
+
+    def _encode_jwk_int(self, number):
+        return base64.urlsafe_b64encode(
+            number.to_bytes(
+                (number.bit_length() + 7) // 8, 'big')
+        ).decode('utf-8').rstrip('=')
 
 
 class ZuulWebAPI(object):
@@ -2759,7 +2846,7 @@ class ZuulWeb(object):
     tracer = trace.get_tracer("zuul")
 
     @staticmethod
-    def generateRouteMap(api, include_auth):
+    def generateRouteMap(api, oidc, include_auth):
         route_map = cherrypy.dispatch.RoutesDispatcher()
         route_map.connect('api', '/api',
                           controller=api, action='index')
@@ -2906,6 +2993,19 @@ class ZuulWeb(object):
                           controller=api, action='config_errors')
         route_map.connect('api', '/api/tenant/{tenant_name}/tenant-status',
                           controller=api, action='tenant_status')
+        # whitelabel webroot access
+        route_map.connect('oidc', '/{tenant_name}/.well-known/jwks',
+                          controller=oidc, action='tenant_jwks')
+        route_map.connect(
+            'oidc', '/{tenant_name}/.well-known/openid-configuration',
+            controller=oidc, action='tenant_openid_configuration')
+        # global webroot access
+        route_map.connect('oidc', '/.well-known/jwks',
+                          controller=oidc, action='global_jwks')
+        route_map.connect(
+            'oidc', '/.well-known/openid-configuration',
+            controller=oidc, action='global_openid_configuration')
+
         return route_map
 
     def __init__(self,
@@ -3030,9 +3130,10 @@ class ZuulWeb(object):
             self.config, 'fingergw', 'tls_verify_hostnames', default=True)
 
         api = ZuulWebAPI(self)
+        oidc = ZuulWebOIDC(self)
         self.api = api
         route_map = self.generateRouteMap(
-            api, bool(self.authenticators.authenticators))
+            api, oidc, bool(self.authenticators.authenticators))
         # Add fallthrough routes at the end for the static html/js files
         route_map.connect(
             'root_static', '/{path:.*}',
@@ -3062,8 +3163,11 @@ class ZuulWeb(object):
             },
         })
 
-        app = cherrypy.tree.mount(api, '/', config=conf)
-        app.log = ZuulCherrypyLogManager(appid=app.log.appid)
+        api_app = cherrypy.tree.mount(api, '/', config=conf)
+        api_app.log = ZuulCherrypyLogManager(appid=api_app.log.appid)
+
+        oidc_app = cherrypy.tree.mount(oidc, '/oidc', config=conf)
+        oidc_app.log = ZuulCherrypyLogManager(appid=oidc_app.log.appid)
 
     @property
     def port(self):
