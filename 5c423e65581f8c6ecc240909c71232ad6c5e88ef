@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b0aeca16_6f1c0108",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-20T10:16:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa9e1a45_852bfbec",
+      "revId": "5c423e65581f8c6ecc240909c71232ad6c5e88ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21e2e8d5_4c140d17",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-02-20T06:42:31Z",
       "side": 1,
       "message": "nit: you could do a `GerritEventProcessingException from e` to preserve the traceback in a better way than to pass it to the constructor.",
+      "revId": "5c423e65581f8c6ecc240909c71232ad6c5e88ef",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1d4c761_ec96fc27",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 1353,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-20T10:16:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "21e2e8d5_4c140d17",
       "revId": "5c423e65581f8c6ecc240909c71232ad6c5e88ef",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }

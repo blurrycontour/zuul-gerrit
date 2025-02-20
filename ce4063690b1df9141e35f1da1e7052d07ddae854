@@ -16,6 +16,24 @@
       "message": "As discussed out-of-band, we should add a comment here on why we are ignoring the `GerritEventProcessingException` here and in line 884",
       "revId": "ce4063690b1df9141e35f1da1e7052d07ddae854",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5b5fa83_2194250c",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 855,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-20T10:16:10Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "77c8345a_96cf2431",
+      "revId": "ce4063690b1df9141e35f1da1e7052d07ddae854",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
