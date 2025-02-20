@@ -61,3 +61,5 @@ ibm-vpc
 ibm-platform-services
 ibm-cos-sdk>=2.11.0
 mmh3
+# For generating jwks in zuul-web
+Authlib
