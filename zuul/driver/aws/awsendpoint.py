@@ -45,9 +45,9 @@ from zuul.driver.aws.util import tag_dict_to_list, tag_list_to_dict
 from zuul.driver.util import (
     ImageUploader,
     LazyExecutorTTLCache,
-    QuotaInformation,
     RateLimiter,
 )
+from zuul.model import QuotaInformation
 from zuul.provider import (
     BaseProviderEndpoint,
     statemachine
@@ -148,7 +148,7 @@ class AwsCreateStateMachine(statemachine.StateMachine):
             "image_external_id", image_external_id)
 
         # Restore local objects
-        self.quota = self.endpoint.getQuotaForLabel(
+        self.node.quota = self.endpoint.getQuotaForLabel(
             self.label, self.flavor)
 
         if self.state in (
@@ -252,7 +252,7 @@ class AwsCreateStateMachine(statemachine.StateMachine):
         if self.state == self.COMPLETE:
             self.complete = True
             return AwsInstance(self.endpoint.region, self.instance,
-                               self.host, self.quota)
+                               self.host, self.node.quota)
 
 
 class EbsSnapshotUploader(ImageUploader):

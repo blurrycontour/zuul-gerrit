@@ -49,6 +49,10 @@ class OpenstackInstance(statemachine.Instance):
     def getQuotaInformation(self):
         return self.quota
 
+    @property
+    def external_id(self):
+        return f'server={self.openstack_server_id}'
+
 
 class OpenstackResource(statemachine.Resource):
     TYPE_HOST = 'host'

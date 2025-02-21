@@ -258,6 +258,23 @@ class FakeOpenstackConnection:
         floating_ip['port_id'] = 'fake'
         server['addresses']['public'].append(floating_ip._fake_toDict())
 
+    def get_compute_limits(self):
+        return FakeOpenstackObject(
+            max_total_cores=self.cloud.max_cores,
+            max_total_instances=self.cloud.max_instances,
+            max_total_ram_size=self.cloud.max_ram,
+            total_cores_used=4 * len(self.cloud.servers),
+            total_instances_used=len(self.cloud.servers),
+            total_ram_used=8192 * len(self.cloud.servers),
+        )
+
+    def get_volume_limits(self):
+        return FakeOpenstackObject(
+            absolute=dict(
+                maxTotalVolumes=self.cloud.max_volumes,
+                maxTotalVolumeGigabytes=self.cloud.max_volume_gb,
+            ))
+
 
 class FakeOpenstackProviderEndpoint(OpenstackProviderEndpoint):
     def _getClient(self):

@@ -29,6 +29,7 @@ import threading
 import time
 import uuid
 
+import cachetools
 import mmh3
 import paramiko
 import requests
@@ -658,6 +659,7 @@ class Launcher:
     # Max. time the main event loop is allowed to sleep
     MAX_SLEEP = 1
     DELETE_TIMEOUT = 600
+    MAX_QUOTA_AGE = 5 * 60  # How long to keep the quota information cached
 
     def __init__(self, config, connections):
         self._running = True
@@ -668,6 +670,9 @@ class Launcher:
         # Only endpoints corresponding to connections handled by this
         # launcher
         self.endpoints = {}
+
+        self._provider_quota_cache = cachetools.TTLCache(
+            maxsize=8192, ttl=self.MAX_QUOTA_AGE)
 
         self.tracing = tracing.Tracing(self.config)
         self.zk_client = ZooKeeperClient.fromConfig(self.config)
@@ -906,8 +911,11 @@ class Launcher:
 
         label_providers = []
         for i, label_name in enumerate(request.labels):
+            # Get a list of candidate providers along with their
+            # approximate quota usage.
             candidate_providers = [
-                p for p in providers
+                (p, self.getQuotaPercentage(p))
+                for p in providers
                 if p.hasLabel(label_name)
                 and provider_failures[p.canonical_name] < p.launch_attempts
             ]
@@ -916,7 +924,13 @@ class Launcher:
                     f"No provider found for label {label_name}")
 
             # TODO: make provider selection more sophisticated
-            provider = random.choice(candidate_providers)
+            # Start by randomizing them
+            random.shuffle(candidate_providers)
+            # Then sort by quota used; providers under quota will
+            # still be randomized with other providers within 10% of
+            # the same quota usage values.
+            candidate_providers.sort(key=lambda x: x[1])
+            provider = candidate_providers[0][0]
             log.debug("Selected provider %s from candidate providers: %s",
                       provider, candidate_providers)
             label = provider.labels[label_name]
@@ -959,7 +973,7 @@ class Launcher:
         requested_nodes = []
         for i, node_id in enumerate(request.nodes):
             node = self.api.getProviderNode(node_id)
-            if node.state == node.State.FAILED:
+            if node.state in (node.State.FAILED, node.State.TEMPFAILED):
                 label_providers = self._selectProviders(request, log)
                 label, provider = label_providers[i]
                 log.info("Retrying request with provider %s", provider)
@@ -1009,6 +1023,13 @@ class Launcher:
                     and node.state in node.CREATE_STATES):
                 try:
                     self._checkNode(node, log)
+                except exceptions.QuotaException as e:
+                    state = node.State.TEMPFAILED
+                    log.info("Marking node %s as %s due to %s", node, state, e)
+                    with self.createZKContext(node._lock, self.log) as ctx:
+                        with node.activeContext(ctx):
+                            node.setState(state)
+                        self.wake_event.set()
                 except Exception:
                     state = node.State.FAILED
                     log.exception("Marking node %s as %s", node, state)
@@ -1086,6 +1107,7 @@ class Launcher:
         # TODO: check timeout
         with self.createZKContext(node._lock, self.log) as ctx:
             with node.activeContext(ctx):
+                provider = None
                 if not node.create_state_machine:
                     log.debug("Building node %s", node)
                     provider = self._getProviderForNode(node)
@@ -1096,6 +1118,15 @@ class Launcher:
                         node, image_external_id, log)
 
                 old_state = node.create_state_machine.state
+                if old_state == node.create_state_machine.START:
+                    provider = provider or self._getProviderForNode(node)
+                    if not self.doesProviderHaveQuotaForNode(
+                            provider, node, log):
+                        # Consider this provider paused, don't attempt
+                        # to create the node until we think we have
+                        # quota.
+                        self.wake_event.set()
+                        return
                 instance = node.create_state_machine.advance()
                 new_state = node.create_state_machine.state
                 if old_state != new_state:
@@ -1339,8 +1370,7 @@ class Launcher:
 
         # If we did not know the resource information before
         # launching, update it now.
-        # TODO:
-        # node.resources = instance.getQuotaInformation().get_resources()
+        node.quota = instance.getQuotaInformation()
 
         # Optionally, if the node has updated values that we set from
         # the image attributes earlier, set those.
@@ -1738,3 +1768,77 @@ class Launcher:
         # Uploads are already sorted by timestamp
         image_upload = valid_uploads[-1]
         return image_upload.external_id
+
+    def getQuotaUsed(self, provider):
+        used = model.QuotaInformation()
+        for node in self.api.getProviderNodes():
+            if (provider.canonical_name == node.provider and
+                node.state in node.ALLOCATED_STATES):
+                used.add(node.quota)
+        return used
+
+    def getUnmanagedQuotaUsed(self, provider):
+        used = model.QuotaInformation()
+
+        node_ids = self.api.nodes_cache.getKeys()
+        endpoint = provider.getEndpoint()
+        system_id = self.system.system_id
+        for instance in endpoint.listInstances():
+            meta = instance.metadata
+            if (meta.get('zuul_system_id') != system_id or
+                meta.get('zuul_node_uuid') in node_ids):
+                continue
+            qi = instance.getQuotaInformation()
+            used.add(qi)
+        return used
+
+    def getProviderQuota(self, provider):
+        val = self._provider_quota_cache.get(provider.canonical_name)
+        if val:
+            return val
+
+        # This is initialized with the full tenant quota and later becomes
+        # the quota available for nodepool.
+        quota = provider.getQuotaLimits()
+        self.log.debug("Provider quota for %s: %s",
+                       provider.name, quota)
+
+        unmanaged = self.getUnmanagedQuotaUsed(provider)
+        self.log.debug("Provider unmaneged quota used for %s: %s",
+                       provider.name, quota)
+
+        # Subtract the unmanaged quota usage from nodepool_max
+        # to get the quota available for us.
+        quota.subtract(unmanaged)
+        self._provider_quota_cache[provider.canonical_name] = quota
+        return quota
+
+    def getQuotaPercentage(self, provider):
+        # This is cached and updated every 5 minutes
+        total = self.getProviderQuota(provider).copy()
+        # This is continuously updated in the background
+        used = self.api.nodes_cache.getQuota(provider)
+        pct = 0.0
+        for resource in total.quota.keys():
+            used_r = used.quota.get(resource, used.default)
+            total_r = total.quota[resource]
+            pct = max(used_r / total_r, pct)
+        if pct < 1.0:
+            # If we are below 100% usage, lose precion so that we only
+            # consider 10% gradiations.  This may help us avoid
+            # thundering heards by allowing some randomization among
+            # launchers that are within 10% of each other.
+
+            # Over 100% use the exact value so that we always assign
+            # to the launcher with the smallest backlog.
+            pct = round(pct, 1)
+        return pct
+
+    def doesProviderHaveQuotaForNode(self, provider, node, log):
+        total = self.getProviderQuota(provider).copy()
+        self.log.debug("Provider quota before Zuul: %s", total)
+        total.subtract(self.getQuotaUsed(provider))
+        self.log.debug("Provider quota including Zuul: %s", total)
+        total.subtract(node.quota)
+        self.log.debug("Node required quota: %s", node.quota)
+        return total.nonNegative()
