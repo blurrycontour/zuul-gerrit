@@ -33,6 +33,24 @@
       "message": "This is where we we care about the order?",
       "revId": "38507d40d714e7ba510cb2fee59e10de4fe637b0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6db07f77_8559dbb2",
+        "filename": "tests/unit/test_scheduler.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 9442,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-21T22:18:18Z",
+      "side": 1,
+      "message": "Yes and it\u0027s actually the order that the scheduler processes the result events.  If it processes the second event first, then it gets reported to the db as SUCCESS and the check on the next line fails.  We want the first event to be processed first, so that the second one is reported as canceled.",
+      "parentUuid": "9612f674_82d3f038",
+      "revId": "38507d40d714e7ba510cb2fee59e10de4fe637b0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
