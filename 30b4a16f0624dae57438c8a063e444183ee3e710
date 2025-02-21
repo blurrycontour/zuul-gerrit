@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "066964d1_974e46df",
+        "filename": "zuul/zk/launcher.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-21T10:23:54Z",
+      "side": 1,
+      "message": "From the test failures it looks like we also need to check for `obj is not None` here:\n\n```\nTraceback (most recent call last):\n  File \"/home/zuul/src/opendev.org/zuul/zuul/zuul/zk/cache.py\", line 254, in _playbackWorker\n    self._handlePlayback(event, future, key)\n  File \"/home/zuul/src/opendev.org/zuul/zuul/zuul/zk/cache.py\", line 321, in _handlePlayback\n    self.postCacheHook(event, data, stat, key, obj)\n  File \"/home/zuul/src/opendev.org/zuul/zuul/zuul/zk/launcher.py\", line 140, in postCacheHook\n    if obj.state not in obj.ALLOCATED_STATES:\n       ^^^^^^^^^\nAttributeError: \u0027NoneType\u0027 object has no attribute \u0027state\u0027\n```",
+      "revId": "30b4a16f0624dae57438c8a063e444183ee3e710",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
