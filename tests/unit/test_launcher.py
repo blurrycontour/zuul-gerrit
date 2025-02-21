@@ -13,11 +13,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import math
 import textwrap
 import time
 from collections import defaultdict
 from unittest import mock
 
+from zuul import exceptions
 from zuul import model
 from zuul.launcher.client import LauncherClient
 
@@ -764,6 +766,24 @@ class TestLauncher(LauncherBaseTestCase):
                     pnode.refresh(ctx)
                 except NoNodeError:
                     break
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    @mock.patch(
+        'zuul.driver.aws.awsendpoint.AwsProviderEndpoint._createInstance',
+        side_effect=exceptions.QuotaException)
+    @mock.patch('zuul.driver.aws.awsprovider.AwsProvider.getQuotaLimits',
+                return_value=model.QuotaInformation(default=math.inf))
+    def test_quota_failure(self, mock_create, mock_limits):
+        # This tests an unexpected quota error.
+        # The request should never be fulfilled
+        with testtools.ExpectedException(Exception):
+            self.requestNodes(["debian-normal"])
+
+        # We should have tried to build at least one node that was
+        # marked as tempfail.
+        nodes = self.launcher.api.nodes_cache.getItems()
+        self.assertTrue(len(nodes) > 1)
+        self.assertEqual(model.ProviderNode.State.TEMPFAILED, nodes[0].state)
 
     @simple_layout('layouts/nodepool-nodescan.yaml', enable_nodepool=True)
     @okay_tracebacks('_checkNodescanRequest')

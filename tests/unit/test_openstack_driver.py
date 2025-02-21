@@ -28,6 +28,7 @@ from tests.base import (
     ZuulTestCase,
     simple_layout,
     return_data,
+    driver_config,
 )
 from tests.unit.test_launcher import ImageMocksFixture
 from tests.unit.test_cloud_driver import BaseCloudDriverTest
@@ -68,6 +69,17 @@ class BaseOpenstackDriverTest(ZuulTestCase):
             needs_floating_ip=self.openstack_needs_floating_ip,
             auto_attach_floating_ip=self.openstack_auto_attach_floating_ip,
         )
+        self.fake_cloud.max_instances =\
+            self.test_config.driver.openstack.get('max_instances', 100)
+        self.fake_cloud.max_cores =\
+            self.test_config.driver.openstack.get('max_cores', 100)
+        self.fake_cloud.max_ram =\
+            self.test_config.driver.openstack.get('max_ram', 1000000)
+        self.fake_cloud.max_volumes =\
+            self.test_config.driver.openstack.get('max_volumes', 100)
+        self.fake_cloud.max_volume_gb =\
+            self.test_config.driver.openstack.get('max_volume_gb', 100)
+
         self.patch(OpenstackDriver, '_endpoint_class',
                    FakeOpenstackProviderEndpoint)
         self.patch(FakeOpenstackProviderEndpoint,
@@ -89,6 +101,11 @@ class TestOpenstackDriver(BaseOpenstackDriverTest, BaseCloudDriverTest):
     @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
     def test_openstack_node_lifecycle(self):
         self._test_node_lifecycle('debian-normal')
+
+    @simple_layout('layouts/openstack/nodepool.yaml', enable_nodepool=True)
+    @driver_config('openstack', max_cores=4)
+    def test_openstack_quota(self):
+        self._test_quota('debian-normal')
 
     @simple_layout('layouts/openstack/nodepool-image.yaml',
                    enable_nodepool=True)
