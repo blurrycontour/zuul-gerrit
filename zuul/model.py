@@ -147,6 +147,62 @@ def filter_severity(error_list, errors=True, warnings=True):
             )]
 
 
+class QuotaInformation:
+    def __init__(self, default=0, **kw):
+        '''
+        Initializes the quota information with some values. None values will
+        be initialized with default which will be typically 0 or math.inf
+        indicating an infinite limit.
+
+        :param default: The default value to use for any attribute not supplied
+                        (usually 0 or math.inf).
+        '''
+        self.quota = {}
+        for k, v in kw.items():
+            self.quota[k] = v
+        self.default = default
+
+    def __eq__(self, other):
+        return (isinstance(other, QuotaInformation) and
+                self.default == other.default and
+                self.quota == other.quota)
+
+    def _get_default(self, value, default):
+        return value if value is not None else default
+
+    def _add_subtract(self, other, add=True):
+        for resource in other.quota.keys():
+            self.quota.setdefault(resource, self.default)
+        for resource in self.quota.keys():
+            other_value = other.quota.get(resource, other.default)
+            if add:
+                self.quota[resource] += other_value
+            else:
+                self.quota[resource] -= other_value
+
+    def copy(self):
+        return QuotaInformation(self.default, **self.quota)
+
+    def subtract(self, other):
+        self._add_subtract(other, add=False)
+
+    def add(self, other):
+        self._add_subtract(other, True)
+
+    def nonNegative(self):
+        for resource, value in self.quota.items():
+            if value < 0:
+                return False
+        return True
+
+    def getResources(self):
+        '''Return resources value to register in ZK node'''
+        return self.quota
+
+    def __str__(self):
+        return str(self.quota)
+
+
 class QueryCacheEntry:
     def __init__(self, ltime, results):
         self.ltime = ltime
@@ -2455,10 +2511,21 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
         BUILDING = "building"
         READY = "ready"
         FAILED = "failed"
+        TEMPFAILED = "tempfailed"
         IN_USE = "in-use"
         USED = "used"
         OUTDATED = "outdated"
         HOLD = "hold"
+
+    # States where quota counts
+    ALLOCATED_STATES = (
+        State.BUILDING,
+        State.READY,
+        State.IN_USE,
+        State.USED,
+        State.OUTDATED,
+        State.HOLD,
+    )
 
     FINAL_STATES = (
         State.READY,
@@ -2515,10 +2582,10 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             region=None,
             username=None,
             hold_expiration=None,
-            resources=None,
             attributes={},
             tenant_name=None,
             host_keys=[],
+            quota=QuotaInformation(),
             # Attributes that are not serialized
             is_locked=False,
             create_state_machine=None,
@@ -2543,6 +2610,12 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
     def getLockPath(self):
         return f"{self.ROOT}/{self.LOCKS_PATH}/{self.uuid}"
 
+    def deserialize(self, raw, context, extra=None):
+        data = super().deserialize(raw, context)
+        resources = data.get('quota') or {}
+        data['quota'] = QuotaInformation(**resources)
+        return data
+
     def serialize(self, context):
         if self.create_state_machine:
             self._set(create_state=self.create_state_machine.toDict())
@@ -2562,6 +2635,7 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             connection_name=self.connection_name,
             create_state=self.create_state,
             delete_state=self.delete_state,
+            quota=self.quota.getResources(),
             **self.getNodeData(),
             **self.getDriverData(),
         )
@@ -2584,6 +2658,8 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
         return dict()
 
     def getNodeData(self):
+        # This gets stored on the ProviderNode object, but also copied
+        # to the Node object for use by the executor.
         return dict(
             attributes=self.attributes,
             az=self.az,
@@ -2602,7 +2678,7 @@ class ProviderNode(zkobject.PolymorphicZKObjectMixin,
             public_ipv4=self.public_ipv4,
             public_ipv6=self.public_ipv6,
             region=self.region,
-            resources=self.resources,
+            resources=None,
             slot=self.slot,
             tenant_name=self.tenant_name,
             username=self.username,

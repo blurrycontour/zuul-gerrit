@@ -20,7 +20,6 @@ import urllib.parse
 
 from zuul.lib.voluputil import Required, Optional, Nullable, assemble
 from zuul import model
-from zuul.driver.util import QuotaInformation
 from zuul.zk import zkobject
 import zuul.provider.schema as provider_schema
 
@@ -470,7 +469,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
         :returns: A :py:class:`QuotaInformation` object.
 
         """
-        return QuotaInformation(default=math.inf)
+        return model.QuotaInformation(default=math.inf)
 
     def getQuotaForLabel(self, label):
         """Return information about the quota used for a label
@@ -484,7 +483,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
 
         :returns: A :py:class:`QuotaInformation` object.
         """
-        return QuotaInformation(instances=1)
+        return model.QuotaInformation(instances=1)
 
     def getAZs(self):
         """Return a list of availability zones for this provider

@@ -246,7 +246,7 @@ def driver_config(driver, **kw):
         if driver_dict is None:
             driver_dict = {}
             test.__driver_config__ = driver_dict
-        driver_dict[driver] == kw
+        driver_dict[driver] = kw
         return test
     return decorator
 
@@ -3877,6 +3877,14 @@ class ZuulTestCase(BaseTestCase):
         path = os.path.join(self.test_root, "changes.data")
         self.test_config.changes.load(path)
 
+    def waitForNodeRequest(self, request, timeout=10):
+        with self.createZKContext(None) as ctx:
+            for _ in iterate_timeout(
+                    timeout, "nodeset request to be fulfilled"):
+                request.refresh(ctx)
+                if request.state == model.NodesetRequest.State.FULFILLED:
+                    return
+
     def requestNodes(self, labels, tenant="tenant-one", pipeline="check",
                      timeout=10):
         result_queue = PipelineResultEventQueue(
@@ -3899,14 +3907,17 @@ class ZuulTestCase(BaseTestCase):
                     zuul_event_id=uuid.uuid4().hex,
                     span_info=None,
                 )
-                for _ in iterate_timeout(
-                        timeout, "nodeset request to be fulfilled"):
-                    result_events = list(result_queue)
-                    if result_events:
-                        for event in result_events:
-                            # Remove event(s) from queue
-                            result_queue.ack(event)
-                        break
+                if timeout:
+                    for _ in iterate_timeout(
+                            timeout, "nodeset request to be fulfilled"):
+                        result_events = list(result_queue)
+                        if result_events:
+                            for event in result_events:
+                                # Remove event(s) from queue
+                                result_queue.ack(event)
+                            break
+                else:
+                    return request
 
             self.assertEqual(len(result_events), 1)
             for event in result_queue:

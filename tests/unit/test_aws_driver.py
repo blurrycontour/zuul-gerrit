@@ -30,6 +30,7 @@ from tests.base import (
     iterate_timeout,
     simple_layout,
     return_data,
+    driver_config,
 )
 from tests.unit.test_launcher import ImageMocksFixture
 from tests.unit.test_cloud_driver import BaseCloudDriverTest
@@ -170,6 +171,13 @@ class TestAwsDriver(BaseCloudDriverTest):
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     def test_aws_node_lifecycle(self):
         self._test_node_lifecycle('debian-normal')
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    @driver_config('aws', ec2_quotas={
+        'L-1216C47A': 2,
+    })
+    def test_aws_quota(self):
+        self._test_quota('debian-normal')
 
     @simple_layout('layouts/aws/nodepool-image-snapshot.yaml',
                    enable_nodepool=True)

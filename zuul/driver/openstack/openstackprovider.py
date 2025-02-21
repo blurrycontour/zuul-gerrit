@@ -13,7 +13,6 @@
 # under the License.
 
 import logging
-import math
 
 import zuul.provider.schema as provider_schema
 from zuul.lib.voluputil import (
@@ -26,7 +25,6 @@ from zuul.driver.openstack.openstackendpoint import (
     OpenstackCreateStateMachine,
     OpenstackDeleteStateMachine,
 )
-from zuul.driver.util import QuotaInformation
 from zuul.provider import (
     BaseProvider,
     BaseProviderFlavor,
@@ -233,9 +231,7 @@ class OpenstackProvider(BaseProvider, subclass_id='openstack'):
         pass
 
     def getQuotaLimits(self):
-        # TODO: implement
-        args = dict(default=math.inf)
-        return QuotaInformation(**args)
+        return self.endpoint.getQuotaLimits()
 
     def getQuotaForLabel(self, label):
         flavor = self.flavors[label.flavor]
