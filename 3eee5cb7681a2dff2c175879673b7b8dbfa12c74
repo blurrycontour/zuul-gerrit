@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01d44f49_b315d8c1",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-21T13:03:22Z",
+      "side": 1,
+      "message": "I\u0027m wondering if the signing algo and the key rotation interval should maybe be part of the `SystemAttributes`?\n\nIf there could be issues if those settings are different on multiple schedulers, the we should save/get this from the system attributes.",
+      "revId": "3eee5cb7681a2dff2c175879673b7b8dbfa12c74",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
