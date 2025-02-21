@@ -1083,10 +1083,11 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
             not supplied, all builds will be released.
 
         """
+        released = []
         builds = self.running_builds[:]
         if len(builds) == 0:
             self.log.debug('No running builds to release')
-            return
+            return []
 
         self.log.debug("Releasing build %s %s (%s)" % (
             regex, change, len(builds)))
@@ -1095,12 +1096,14 @@ class RecordingExecutorServer(zuul.executor.server.ExecutorServer):
                 (not change or build.change == change)):
                 self.log.debug("Releasing build %s" %
                                (build.parameters['zuul']['build']))
+                released.append(build)
                 build.release()
             else:
                 self.log.debug("Not releasing build %s" %
                                (build.parameters['zuul']['build']))
         self.log.debug("Done releasing builds %s (%s)" %
                        (regex, len(builds)))
+        return released
 
     def executeJob(self, build_request, params):
         build = FakeBuild(self, build_request, params)
