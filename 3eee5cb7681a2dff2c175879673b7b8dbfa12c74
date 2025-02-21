@@ -16,6 +16,24 @@
       "message": "I\u0027m wondering if the signing algo and the key rotation interval should maybe be part of the `SystemAttributes`?\n\nIf there could be issues if those settings are different on multiple schedulers, the we should save/get this from the system attributes.",
       "revId": "3eee5cb7681a2dff2c175879673b7b8dbfa12c74",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f24b722_cfccf22c",
+        "filename": "zuul/scheduler.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-21T14:16:39Z",
+      "side": 1,
+      "message": "Good point.\n\nFor different configurations among the schedulers, it should be actually ok:\n- If the `supported_signing_algorithms` are configured differently on different schedulers, each scheduler would check and rotate the signing keys of the algorithms configured on that scheduler, and in the end the union of the all algorithms would be checked for rotation hourly. \n- If the \u0027signing_key_rotation_interval\u0027 are configured differently on different schedulers, for each algorithm, the smallest \u0027signing_key_rotation_interval\u0027 configured on the same scheduler would have the final effect, i.e. it would be rotated as soon as possible.\n\n\nHow ever, if zuul-web have a different configuration than the scheduler, there would be problems:\n- When the `supported_signing_algorithms` in zuul-web is not configured in zuul-scheduler, those missing algorithms would not be rotated.\n- When other way round, the public signing keys for the algorithms missed on zuul-web configuration would not be available in /jwks endpoint, and the tokens signed by that algorithm can not be validated.\n\nSo I think yes, we should move them to `SystemAttributes` to make sure they are consistent across the components.",
+      "parentUuid": "01d44f49_b315d8c1",
+      "revId": "3eee5cb7681a2dff2c175879673b7b8dbfa12c74",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
