@@ -3,6 +3,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "95a6ca45_ba89c8f5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-21T11:12:57Z",
+      "side": 1,
+      "message": "Just brainstorming a bit here:\n\nWith launcher\u0027s being independent we might always run into some starvation when we are close to quota. I think this is the trade-off we made by allowing multiple launchers to serve the same provider.\n\nHowever, I\u0027m wondering if we need a way to request a node, but tell the provider that it should continue trying instead of temfailing.\nWe\u0027d then need to make sure that when a provider is at quota we don\u0027t fulfill any further requests during that node iteration for that particular provider.",
+      "revId": "30b4a16f0624dae57438c8a063e444183ee3e710",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e566e16e_5edbad97",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-21T11:12:57Z",
+      "side": 1,
+      "message": "Maybe we should remove tempfailed nodes from the list of provider nodes. Or only keep the last one in case we have multiple entries for the same label provider.\n\nThe only reason we keep them is to narrow down the selection of provider we consider for a retry. Since tempfailed nodes are not relevant for that use-case, we don\u0027t need to keep track of all previous attempts that ran into quota limits.",
+      "revId": "30b4a16f0624dae57438c8a063e444183ee3e710",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "066964d1_974e46df",
         "filename": "zuul/zk/launcher.py",
         "patchSetId": 2
