@@ -164,9 +164,6 @@ class ChangeNetworkConflict(Exception):
     def __init__(self, future):
         self.future = future
 
-    def wait(self):
-        return self.future.wait()
-
 
 class ChangeNetworkManager:
     """Prevent collisions between multiple threads querying changes"""
@@ -745,9 +742,15 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 if network_start:
                     # This is the top of the stack.  We wait for the
                     # future and try again.
-                    e.wait()
+                    e.future.wait()
                     self.change_network_manager.setComplete(network_future)
-                    network_future = None
+                    # Start a new future but copy over the query cache
+                    # results from the winner.  In case we decide that
+                    # the winning network did not update our change(s)
+                    # recently enough, we may still be able to benefit
+                    # from some of the previously run queries.
+                    network_future = ChangeNetworkFuture(update_if_older_than)
+                    network_future.query_results = e.future.query_results
                     change = self._change_cache.get(change_key) or change
                     continue
                 else:
