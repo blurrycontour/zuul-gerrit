@@ -17,7 +17,6 @@ import collections
 import concurrent.futures
 import datetime
 import logging
-import os
 import hmac
 import hashlib
 import threading
@@ -43,7 +42,10 @@ from github3.session import AppInstallationTokenAuth
 from opentelemetry import trace
 
 from zuul.connection import (
-    BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
+    BaseConnection,
+    BaseThreadPoolEventConnector,
+    ZKBranchCacheMixin,
+    ZKChangeCacheMixin,
 )
 from zuul.driver.github.graphql import GraphQLClient
 from zuul.lib import tracing
@@ -810,138 +812,17 @@ class GithubEventProcessor(object):
         return body.get('sender').get('login')
 
 
-class GithubEventConnector:
+class GithubEventConnector(BaseThreadPoolEventConnector):
     """Move events from GitHub into the scheduler"""
 
     log = logging.getLogger("zuul.GithubEventConnector")
 
-    def __init__(self, connection):
-        self.connection = connection
-        self.event_queue = connection.event_queue
-        self._stopped = False
-        self._events_in_progress = set()
-        self._dispatcher_wake_event = threading.Event()
-        self._event_dispatcher = threading.Thread(
-            name='GithubEventDispatcher', target=self.run_event_dispatcher,
-            daemon=True)
-        self._thread_pool = concurrent.futures.ThreadPoolExecutor(
-            max_workers=min(32, (os.cpu_count() or 1) * 4))
-        self._event_forward_queue = collections.deque()
-
-    def stop(self):
-        self._stopped = True
-        self._dispatcher_wake_event.set()
-        self.event_queue.election.cancel()
-        self._event_dispatcher.join()
-
-        self._thread_pool.shutdown()
-
-    def start(self):
-        self._event_dispatcher.start()
-
-    def _onNewEvent(self):
-        self._dispatcher_wake_event.set()
-        # Stop the data watch in case the connector was stopped
-        return not self._stopped
-
-    def run_event_dispatcher(self):
-        # Wait for the scheduler to prime its config so that we have
-        # the full tenant list before we start moving events.
-        self.connection.sched.primed_event.wait()
-        if self._stopped:
-            return
-        self.event_queue.registerEventWatch(self._onNewEvent)
-        # Set the wake event so we get an initial run
-        self._dispatcher_wake_event.set()
-        while not self._stopped:
-            try:
-                self.event_queue.election.run(self._dispatchEventsMain)
-            except Exception:
-                self.log.exception("Exception handling GitHub event:")
-            # In case we caught an exception with events in progress,
-            # reset these in case we run the loop again.
-            self._events_in_progress = set()
-            self._event_forward_queue = collections.deque()
-
-    def _dispatchEventsMain(self):
-        while True:
-            # We can start processing events as long as we're running;
-            # if we are stopping, then we need to continue this loop
-            # until previously processed events are completed but not
-            # start processing any new events.
-            if self._dispatcher_wake_event.is_set() and not self._stopped:
-                self._dispatcher_wake_event.clear()
-                self._dispatchEvents()
-
-            # Now process the futures from this or any previous
-            # iterations of the loop.
-            if len(self._event_forward_queue):
-                self._forwardEvents()
-
-            # If there are no futures, we can sleep until there are
-            # new events (or stop altogether); otherwise we need to
-            # continue processing futures.
-            if not len(self._event_forward_queue):
-                if self._stopped:
-                    return
-                self._dispatcher_wake_event.wait(10)
-            else:
-                # Sleep a small amount of time to give the futures
-                # time to complete.
-                self._dispatcher_wake_event.wait(0.1)
-
-    def _dispatchEvents(self):
-        # This is the first half of the event dispatcher.  It reads
-        # events from the webhook event queue and passes them to a
-        # concurrent executor for pre-processing.
-        for event in self.event_queue:
-            if self._stopped:
-                break
-            if event.ack_ref in self._events_in_progress:
-                continue
-            etuple = self._eventAsTuple(event)
-            log = get_annotated_logger(self.log, etuple.delivery)
-            log.debug("Github Webhook Received")
-            log.debug("X-Github-Event: %s", etuple.event_type)
-            processor = GithubEventProcessor(self, etuple, event)
-            future = self._thread_pool.submit(processor.run)
-
-            # Events are acknowledged in the event forwarder loop after
-            # pre-processing. This way we can ensure that no events are
-            # lost.
-            self._events_in_progress.add(event.ack_ref)
-            self._event_forward_queue.append(future)
-
-    def _forwardEvents(self):
-        # This is the second half of the event dispatcher.  It
-        # collects pre-processed events from the concurrent executor
-        # and forwards them to the scheduler queues.
-        while True:
-            try:
-                if not len(self._event_forward_queue):
-                    return
-                # Peek at the next event and see if it's done or if we
-                # need to wait for the next loop iteration.
-                if not self._event_forward_queue[0].done():
-                    return
-                future = self._event_forward_queue.popleft()
-                events, connection_event = future.result()
-                try:
-                    for event in events:
-                        self.connection.logEvent(event)
-                        if isinstance(event, DequeueEvent):
-                            self.connection.sched.addChangeManagementEvent(
-                                event)
-                        else:
-                            self.connection.sched.addTriggerEvent(
-                                self.connection.driver_name, event
-                            )
-                finally:
-                    # Ack event in Zookeeper
-                    self.event_queue.ack(connection_event)
-                    self._events_in_progress.remove(connection_event.ack_ref)
-            except Exception:
-                self.log.exception("Exception moving GitHub event:")
+    def _getEventProcessor(self, event):
+        etuple = self._eventAsTuple(event)
+        log = get_annotated_logger(self.log, etuple.delivery)
+        log.debug("Github Webhook Received")
+        log.debug("X-Github-Event: %s", etuple.event_type)
+        return GithubEventProcessor(self, etuple, event).run
 
     @staticmethod
     def _eventAsTuple(event):
