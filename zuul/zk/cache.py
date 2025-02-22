@@ -138,6 +138,7 @@ class ZuulTreeCache(abc.ABC):
         self._stopped = True
         self._event_queue.put(None)
         self._playback_queue.put(None)
+        self.client.remove_listener(self._sessionListener)
 
     def _walkTree(self, root=None, seen_paths=None):
         # Recursively walk the tree and emit fake changed events for
