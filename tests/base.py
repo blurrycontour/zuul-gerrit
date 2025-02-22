@@ -2434,7 +2434,7 @@ class ZuulTestCase(BaseTestCase):
 
         gerritsource.GerritSource.replication_timeout = 1.5
         gerritsource.GerritSource.replication_retry_interval = 0.5
-        gerritconnection.GerritEventConnector.delay = 0.0
+        gerritconnection.GerritEventProcessor.delay = 0.0
 
         if self.load_change_db:
             self.loadChangeDB()

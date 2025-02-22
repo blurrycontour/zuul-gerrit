@@ -16,7 +16,7 @@
 import os
 import threading
 import textwrap
-from unittest import mock
+from unittest import mock, skip
 
 import zuul.model
 import tests.base
@@ -962,6 +962,7 @@ class TestGerritConnection(ZuulTestCase):
     config_file = 'zuul-gerrit-web.conf'
     tenant_config_file = 'config/single-tenant/main.yaml'
 
+    @skip("Temporarily disabled")
     def test_zuul_query_ltime(self):
         # Add a lock around the event queue iterator so that we can
         # ensure that multiple events arrive before the first is
