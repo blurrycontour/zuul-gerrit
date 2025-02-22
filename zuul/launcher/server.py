@@ -327,6 +327,7 @@ class NodescanRequest:
                        self.key_connection_failures,
                        self.key_negotiation_failures,
                        dt)
+        self.worker = None
 
     def result(self):
         """Return the resulting keys, or raise an exception"""
@@ -553,8 +554,7 @@ class NodescanWorker:
     MAX_REQUESTS = 100
 
     def __init__(self):
-        # Remember to close all pipes on __del__ to prevent leaks in
-        # tests.
+        # Remember to close all pipes to prevent leaks in tests.
         self.wake_read, self.wake_write = os.pipe()
         fcntl.fcntl(self.wake_read, fcntl.F_SETFL, os.O_NONBLOCK)
         self._running = False
@@ -562,10 +562,6 @@ class NodescanWorker:
         self._pending_requests = []
         self.poll = select.epoll()
         self.poll.register(self.wake_read, select.EPOLLIN)
-
-    def __del__(self):
-        os.close(self.wake_read)
-        os.close(self.wake_write)
 
     def start(self):
         self._running = True
@@ -578,6 +574,8 @@ class NodescanWorker:
 
     def join(self):
         self.thread.join()
+        os.close(self.wake_read)
+        os.close(self.wake_write)
 
     def addRequest(self, request):
         """Submit a nodescan request"""
