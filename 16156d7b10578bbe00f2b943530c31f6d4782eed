@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f9e6e46_d9caa461",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-22T18:21:15Z",
+      "side": 1,
+      "message": "Two things: this has a typo, and it should not be camel case.  It should be:\n\nself.oidc_signing_key_cache",
+      "revId": "16156d7b10578bbe00f2b943530c31f6d4782eed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b375528_d2e715c4",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-22T18:21:15Z",
+      "side": 1,
+      "message": "The TreeCache always needs to be stopped.  Either this class needs a close() method that is then called from every component that instantiates it, or it needs a __del__ method:\n\n```\ndef __del__(self):\n      self.oic_signing_key_cache.stop()\n```\n\nWe\u0027ll need that change along with the other changes I\u0027ve made in  https://review.opendev.org/c/zuul/zuul/+/942519",
+      "revId": "16156d7b10578bbe00f2b943530c31f6d4782eed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
