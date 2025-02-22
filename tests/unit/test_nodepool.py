@@ -56,6 +56,9 @@ class TestNodepoolBase(BaseTestCase):
         COMPONENT_REGISTRY.registry = Dummy()
         COMPONENT_REGISTRY.registry.model_api = MODEL_API
 
+        if self.statsd:
+            self.statsd.stop()
+            self.statsd.join()
         self.statsd = None
         self.setupZK()
 
