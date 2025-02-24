@@ -33,6 +33,24 @@
       "message": "The TreeCache always needs to be stopped.  Either this class needs a close() method that is then called from every component that instantiates it, or it needs a __del__ method:\n\n```\ndef __del__(self):\n      self.oic_signing_key_cache.stop()\n```\n\nWe\u0027ll need that change along with the other changes I\u0027ve made in  https://review.opendev.org/c/zuul/zuul/+/942519",
       "revId": "16156d7b10578bbe00f2b943530c31f6d4782eed",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5893257_82e898fa",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-24T13:31:24Z",
+      "side": 1,
+      "message": "I have added the `__del__()` method and included both changes below in Patchset3, but both zuul-box-py311/312 still fails with a lot of \"Too many open files\" in logs.\n\n942162: Fix unit test fd leak | https://review.opendev.org/c/zuul/zuul/+/942162\n942519: Shut down fake statsd in TestNodepoolBase | https://review.opendev.org/c/zuul/zuul/+/942519",
+      "parentUuid": "9b375528_d2e715c4",
+      "revId": "16156d7b10578bbe00f2b943530c31f6d4782eed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
