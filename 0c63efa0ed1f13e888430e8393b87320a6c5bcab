@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74884224_d08da8c7",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 8594,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-24T08:37:37Z",
+      "side": 1,
+      "message": "Should we maybe do the `str.split(\",\")` here and store this as a list of signing algos?",
+      "revId": "0c63efa0ed1f13e888430e8393b87320a6c5bcab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
