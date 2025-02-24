@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "471fbff1_804a3ff5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-24T05:56:21Z",
+      "side": 1,
+      "message": "PS4 resolved a merge conflict",
+      "revId": "6d5296c6a317c641c8cca1ea6b557d0d09a64227",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
