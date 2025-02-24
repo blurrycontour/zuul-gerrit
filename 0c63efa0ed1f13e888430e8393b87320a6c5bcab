@@ -16,6 +16,24 @@
       "message": "Should we maybe do the `str.split(\",\")` here and store this as a list of signing algos?",
       "revId": "0c63efa0ed1f13e888430e8393b87320a6c5bcab",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e7e0de0_37e45768",
+        "filename": "zuul/model.py",
+        "patchSetId": 12
+      },
+      "lineNbr": 8594,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-24T12:24:14Z",
+      "side": 1,
+      "message": "Yes, it makes sense. Updated in the new patch.",
+      "parentUuid": "74884224_d08da8c7",
+      "revId": "0c63efa0ed1f13e888430e8393b87320a6c5bcab",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
