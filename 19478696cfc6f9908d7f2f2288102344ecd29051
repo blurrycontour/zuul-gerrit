@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6055c99b_d8204224",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-25T14:35:22Z",
+      "side": 1,
+      "message": "Patchset 18 further removed changes that is not necessary in the scope of this change.",
+      "revId": "19478696cfc6f9908d7f2f2288102344ecd29051",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
