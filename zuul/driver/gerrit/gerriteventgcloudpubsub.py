@@ -12,13 +12,14 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import google.api_core.exceptions
 from google.oauth2 import service_account
 from google.cloud import pubsub_v1
 import logging
 import pprint
 import threading
+
+from zuul.lib.jsonutil import json_loadb
 
 
 class GerritGcloudPubsubEventListener:
@@ -34,7 +35,7 @@ class GerritGcloudPubsubEventListener:
         self.kwargs = {}
         if key:
             with open(key) as keyfile:
-                info = json.load(keyfile)
+                info = json_loadb(keyfile)
                 credentials = service_account.Credentials.\
                     from_service_account_info(info)
                 self.kwargs['credentials'] = credentials
@@ -64,7 +65,7 @@ class GerritGcloudPubsubEventListener:
             self._thread.join()
 
     def callback(self, message):
-        data = json.loads(message.data)
+        data = json_loadb(message.data)
         self.log.info("Received data from gcloud: \n%s" %
                       pprint.pformat(data))
         self.gerrit_connection.addEvent(data)

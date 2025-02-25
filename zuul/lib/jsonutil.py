@@ -15,21 +15,60 @@ import types
 
 import zuul.model
 
+import msgspec
+
+
+class JSONDecodeError(ValueError):
+    pass
+
 
 class ZuulJSONEncoder(json.JSONEncoder):
     def default(self, o):
-        if isinstance(o, types.MappingProxyType):
-            d = dict(o)
-            # Always remove SafeLoader left-over
-            d.pop('_source_context', None)
-            d.pop('_start_mark', None)
-            return d
-        elif (
-                isinstance(o, zuul.model.SourceContext) or
-                isinstance(o, zuul.model.ZuulMark)):
-            return {}
-        return json.JSONEncoder.default(self, o)
+        try:
+            _zuul_encoder(o)
+        except NotImplementedError:
+            return json.JSONEncoder.default(self, o)
 
 
-def json_dumps(obj, **kw):
-    return json.dumps(obj, cls=ZuulJSONEncoder, **kw)
+def _zuul_encoder(o):
+    if isinstance(o, types.MappingProxyType):
+        d = dict(o)
+        # Always remove SafeLoader left-over
+        d.pop('_source_context', None)
+        d.pop('_start_mark', None)
+        return d
+    elif (
+            isinstance(o, zuul.model.SourceContext) or
+            isinstance(o, zuul.model.ZuulMark)):
+        return {}
+    elif isinstance(o, str):
+        return str(o)
+    elif isinstance(o, int):
+        return int(o)
+    raise NotImplementedError(type(o))
+
+
+_default_encoder = msgspec.json.Encoder(
+    decimal_format="number",
+    enc_hook=_zuul_encoder
+)
+
+_deterministic_encoder = msgspec.json.Encoder(
+    order="deterministic",
+    decimal_format="number",
+    enc_hook=_zuul_encoder
+)
+
+
+def json_dumpb(obj, sort_keys=False):
+    if sort_keys:
+        return _deterministic_encoder.encode(obj)
+    else:
+        return _default_encoder.encode(obj)
+
+
+def json_loadb(data):
+    try:
+        return msgspec.json.decode(data)
+    except msgspec.DecodeError as exc:
+        raise JSONDecodeError from exc

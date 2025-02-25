@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import socket
 import sys
@@ -27,6 +26,7 @@ from kazoo.retry import KazooRetry
 
 from zuul.lib import commandsocket
 from zuul.lib.config import get_default
+from zuul.lib.jsonutil import json_dumpb
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib import tracing
 from zuul.merger import merger
@@ -377,7 +377,7 @@ class BaseMergeServer(metaclass=ABCMeta):
         if result is None:
             result = {}
 
-        payload = json.dumps(result, sort_keys=True)
+        payload = json_dumpb(result)
         self.log.debug("Completed %s job %s: payload size: %s",
                        merge_request.job_type, merge_request.uuid,
                        sys.getsizeof(payload))

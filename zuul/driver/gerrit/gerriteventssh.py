@@ -14,7 +14,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import paramiko
 import pprint
@@ -22,6 +21,7 @@ import select
 import threading
 import time
 
+from zuul.lib.jsonutil import json_loadb
 from zuul.zk.event_queues import EventReceiverElection
 
 
@@ -48,7 +48,7 @@ class GerritSSHEventListener(threading.Thread):
     def _read(self, fd):
         while True:
             l = fd.readline()
-            data = json.loads(l)
+            data = json_loadb(l)
             self.log.debug("Received data from Gerrit event stream: \n%s" %
                            pprint.pformat(data))
             self.gerrit_connection.addEvent(data)

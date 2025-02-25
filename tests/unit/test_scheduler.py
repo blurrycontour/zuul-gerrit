@@ -6444,6 +6444,7 @@ For CI problems and help debugging, contact ci@example.org"""
         (trusted, project1) = tenant.getProject('org/project1')
         event = zuul.model.TriggerEvent()
         event.zuul_event_ltime = self.zk_client.getCurrentLtime()
+        event.connection_name = 'gerrit'
         self.scheds.first.sched.reconfigureTenant(
             self.scheds.first.sched.abide.tenants['tenant-one'],
             project1, event)

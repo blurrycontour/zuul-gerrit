@@ -12,13 +12,13 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import boto3
 import logging
 import pprint
 import threading
 import time
 
+from zuul.lib.jsonutil import json_loadb
 from zuul.zk.event_queues import EventReceiverElection, EventCheckpoint
 
 # Kinesis sort of looks like Kafka, but has some important differences:
@@ -169,7 +169,7 @@ class GerritAWSKinesisEventListener:
 
             for record in response['Records']:
                 sequence_no = record['SequenceNumber']
-                data = json.loads(record['Data'].decode('utf8'))
+                data = json_loadb(record['Data'])
                 self.log.info("Received data from kinesis: \n%s" %
                               pprint.pformat(data))
                 self.gerrit_connection.addEvent(data)
