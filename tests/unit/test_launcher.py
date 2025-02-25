@@ -690,10 +690,9 @@ class TestLauncher(LauncherBaseTestCase):
         ctx = self.createZKContext(None)
         request = self.requestNodes(["debian-invalid"])
         self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
-        provider_nodes = request.provider_nodes[0]
-        self.assertEqual(len(provider_nodes), 2)
+        provider_node_data = request.provider_node_data[0]
+        self.assertEqual(len(provider_node_data['failed_providers']), 1)
         self.assertEqual(len(request.nodes), 1)
-        self.assertEqual(provider_nodes[-1], request.nodes[-1])
 
         provider_nodes = []
         for node_id in request.nodes:
@@ -720,10 +719,9 @@ class TestLauncher(LauncherBaseTestCase):
         ctx = self.createZKContext(None)
         request = self.requestNodes(["debian-normal"])
         self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
-        provider_nodes = request.provider_nodes[0]
-        self.assertEqual(len(provider_nodes), 2)
+        provider_node_data = request.provider_node_data[0]
+        self.assertEqual(len(provider_node_data['failed_providers']), 1)
         self.assertEqual(len(request.nodes), 1)
-        self.assertEqual(provider_nodes[-1], request.nodes[-1])
 
         provider_nodes = []
         for node_id in request.nodes:
@@ -755,10 +753,9 @@ class TestLauncher(LauncherBaseTestCase):
         ctx = self.createZKContext(None)
         request = self.requestNodes(["debian-normal"])
         self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
-        provider_nodes = request.provider_nodes[0]
-        self.assertEqual(len(provider_nodes), 2)
+        provider_node_data = request.provider_node_data[0]
+        self.assertEqual(len(provider_node_data['failed_providers']), 1)
         self.assertEqual(len(request.nodes), 1)
-        self.assertEqual(provider_nodes[-1], request.nodes[-1])
 
         provider_nodes = []
         for node_id in request.nodes:
@@ -806,10 +803,9 @@ class TestLauncher(LauncherBaseTestCase):
         ctx = self.createZKContext(None)
         request = self.requestNodes(["debian-normal"], timeout=30)
         self.assertEqual(request.state, model.NodesetRequest.State.FAILED)
-        provider_nodes = request.provider_nodes[0]
-        self.assertEqual(len(provider_nodes), 2)
+        provider_node_data = request.provider_node_data[0]
+        self.assertEqual(len(provider_node_data['failed_providers']), 1)
         self.assertEqual(len(request.nodes), 1)
-        self.assertEqual(provider_nodes[-1], request.nodes[-1])
 
         provider_nodes = []
         for node_id in request.nodes:
@@ -841,8 +837,8 @@ class TestLauncher(LauncherBaseTestCase):
         ctx = self.createZKContext(None)
         request = self.requestNodes(["debian-normal"])
         self.assertEqual(request.state, model.NodesetRequest.State.FULFILLED)
-        provider_nodes = request.provider_nodes[0]
-        self.assertEqual(len(provider_nodes), 1)
+        provider_node_data = request.provider_node_data[0]
+        self.assertEqual(len(provider_node_data['failed_providers']), 0)
         self.assertEqual(len(request.nodes), 1)
 
         node = model.ProviderNode.fromZK(
