@@ -16,7 +16,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import socket
 import sys
@@ -40,6 +39,7 @@ from zuul.lib import commandsocket
 from zuul.lib.ansible import AnsibleManager
 from zuul.lib.config import get_default
 from zuul.lib.keystorage import KeyStorage
+from zuul.lib.jsonutil import JSONDecodeError
 from zuul.lib.logutil import get_annotated_logger
 from zuul.lib.monitoring import MonitoringServer
 from zuul.lib.queue import NamedQueue
@@ -2439,7 +2439,7 @@ class Scheduler(threading.Thread):
                     # criteria.
                     try:
                         pipeline.change_list.refresh(ctx, allow_init=False)
-                    except json.JSONDecodeError:
+                    except JSONDecodeError:
                         self.log.warning(
                             "Unable to refresh pipeline change list for %s",
                             pipeline.name)

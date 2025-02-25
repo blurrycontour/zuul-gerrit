@@ -1132,6 +1132,7 @@ class TestGerritConnectionPreFilter(ZuulTestCase):
         (trusted, project1) = tenant.getProject('org/project2')
         event = zuul.model.TriggerEvent()
         event.zuul_event_ltime = -1
+        event.connection_name = 'gerrit'
         self.scheds.first.sched.reconfigureTenant(
             self.scheds.first.sched.abide.tenants['tenant-two'],
             project1, event)

@@ -14,7 +14,6 @@
 # under the License.
 
 import abc
-import json
 import logging
 import queue
 import threading
@@ -28,6 +27,7 @@ from kazoo.protocol.states import (
     KazooState,
 )
 
+from zuul.lib.jsonutil import json_loadb
 from zuul.zk.vendor.states import AddWatchMode
 
 
@@ -73,7 +73,7 @@ class ZuulTreeCache(abc.ABC):
         self._start()
 
     def _bytesToDict(self, data):
-        return json.loads(data.decode('utf8'))
+        return json_loadb(data)
 
     def _sessionListener(self, state):
         if state == KazooState.LOST:

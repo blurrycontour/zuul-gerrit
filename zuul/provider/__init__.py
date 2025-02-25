@@ -13,11 +13,11 @@
 # under the License.
 
 import abc
-import json
 import math
 import threading
 import urllib.parse
 
+from zuul.lib.jsonutil import json_dumpb
 from zuul.lib.voluputil import Required, Optional, Nullable, assemble
 from zuul import model
 from zuul.driver.util import QuotaInformation
@@ -293,7 +293,7 @@ class BaseProvider(zkobject.PolymorphicZKObjectMixin,
             config=self.config,
             connection_name=self.connection.connection_name,
         )
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     @property
     def tenant_scoped_name(self):

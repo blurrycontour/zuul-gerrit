@@ -16,7 +16,6 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 import abc
 import contextlib
-import json
 import logging
 import sys
 import time
@@ -32,6 +31,7 @@ from kazoo.exceptions import (
 )
 from kazoo.retry import KazooRetry
 
+from zuul.lib.jsonutil import json_loadb
 from zuul.zk import sharding
 from zuul.zk import ZooKeeperClient
 from zuul.zk.exceptions import LockException
@@ -188,7 +188,7 @@ class ZKObject:
         """
         if isinstance(data, dict):
             return data
-        return json.loads(data.decode('utf-8'))
+        return json_loadb(data)
 
     # These methods are public and shouldn't need to be overridden
     def updateAttributes(self, context, **kw):

@@ -456,7 +456,7 @@ class TestScaleOutScheduler(ZuulTestCase):
             dict(name='project-test2', result='SUCCESS', changes='1,1 2,1'),
         ], ordered=False)
 
-    @okay_tracebacks('Unterminated string starting at')
+    @okay_tracebacks('JSONDecodeError')
     def test_pipeline_summary(self):
         # Test that we can deal with a truncated pipeline summary
         self.executor_server.hold_jobs_in_build = True

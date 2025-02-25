@@ -17,8 +17,8 @@ import copy
 import time
 import urllib.parse
 import dateutil.parser
-import json
 
+from zuul.lib.jsonutil import json_dumpb
 from zuul.model import EventFilter, RefFilter
 from zuul.model import Change, TriggerEvent, FalseWithReason
 from zuul.driver.util import time_to_seconds, to_list, make_regex
@@ -433,7 +433,7 @@ class GerritEventFilter(EventFilter):
         self.scheme = scheme
         self.ignore_deletes = ignore_deletes
 
-        self._hash = hash(json.dumps(self.toDict(), sort_keys=True))
+        self._hash = hash(json_dumpb(self.toDict(), sort_keys=True))
 
     def __hash__(self):
         return self._hash

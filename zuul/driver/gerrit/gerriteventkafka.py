@@ -12,11 +12,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import confluent_kafka as kafka
 import logging
 import pprint
 import threading
+
+from zuul.lib.jsonutil import json_loadb
 
 # With multiple Kafka partitions, events could arrive out of order.
 # Similar to webhooks, we accept that and don't do anything to
@@ -89,7 +90,7 @@ class GerritKafkaEventListener:
                     else:
                         raise kafka.KafkaException(msg.error())
                 else:
-                    data = json.loads(msg.value().decode('utf8'))
+                    data = json_loadb(msg.value())
                     self.log.info("Received data from kafka: \n%s" %
                                   pprint.pformat(data))
                     self.gerrit_connection.addEvent(data)
