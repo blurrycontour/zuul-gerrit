@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 from collections.abc import MutableMapping
 from contextlib import suppress
 from functools import total_ordering
@@ -23,6 +22,7 @@ import zlib
 
 from kazoo.exceptions import NoNodeError
 
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.zk import sharding, ZooKeeperBase, ZooKeeperSimpleBase
 from zuul.provider import BaseProvider
 
@@ -137,12 +137,12 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
 
         return LayoutState.fromDict({
             "ltime": zstat.last_modified_transaction_id,
-            **json.loads(data)
+            **json_loadb(data)
         })
 
     def __setitem__(self, tenant_name, state):
         path = f"{self.layout_root}/{tenant_name}"
-        data = json.dumps(state.toDict(), sort_keys=True).encode("utf-8")
+        data = json_dumpb(state.toDict(), sort_keys=True)
         if self.kazoo_client.exists(path):
             zstat = self.kazoo_client.set(path, data)
         else:
@@ -179,13 +179,13 @@ class LayoutStateStore(ZooKeeperBase, MutableMapping):
             return None
 
         try:
-            return json.loads(data)['min_ltimes']
+            return json_loadb(data)['min_ltimes']
         except Exception:
             return None
 
     def setMinLtimes(self, layout_state, min_ltimes):
         data = dict(min_ltimes=min_ltimes)
-        encoded_data = json.dumps(data).encode("utf-8")
+        encoded_data = json_dumpb(data)
 
         path = f"{self.layout_data_root}/{layout_state.uuid}"
         with sharding.BufferedShardWriter(

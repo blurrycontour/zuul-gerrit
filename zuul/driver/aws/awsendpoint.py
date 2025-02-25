@@ -19,7 +19,6 @@ import copy
 import functools
 import hashlib
 import uuid
-import json
 import logging
 import math
 import queue
@@ -48,6 +47,7 @@ from zuul.driver.util import (
     QuotaInformation,
     RateLimiter,
 )
+from zuul.lib.jsonutil import json_dumpb
 from zuul.provider import (
     BaseProviderEndpoint,
     statemachine
@@ -1257,7 +1257,7 @@ class AwsProviderEndpoint(BaseProviderEndpoint):
         # Normally we would decorate this method, but our cache key is
         # complex, so we serialize it to JSON and manage the cache
         # ourselves.
-        cache_key = json.dumps(image_filters)
+        cache_key = json_dumpb(image_filters)
         val = self.image_id_by_filter_cache.get(cache_key)
         if val:
             return val

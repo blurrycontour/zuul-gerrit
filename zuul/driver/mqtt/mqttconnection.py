@@ -13,12 +13,12 @@
 # under the License.
 
 import logging
-import json
 
 import paho.mqtt.client as mqtt
 
 from zuul.connection import BaseConnection
 from zuul.exceptions import ConfigurationError
+from zuul.lib.jsonutil import json_dumpb
 from zuul.lib.logutil import get_annotated_logger
 
 
@@ -94,7 +94,7 @@ class MQTTConnection(BaseConnection):
             log.warning("MQTT reporter (%s) is disabled", self)
             return
         try:
-            self.client.publish(topic, payload=json.dumps(message), qos=qos)
+            self.client.publish(topic, payload=json_dumpb(message), qos=qos)
         except Exception:
             log.exception(
                 "Could not publish message to topic '%s' via mqtt", topic)

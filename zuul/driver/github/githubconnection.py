@@ -21,11 +21,9 @@ import hmac
 import hashlib
 import threading
 import time
-import json
 from collections import OrderedDict, defaultdict
 from collections.abc import Mapping
 from itertools import chain
-from json.decoder import JSONDecodeError
 from typing import Optional
 
 import cherrypy
@@ -50,6 +48,7 @@ from zuul.connection import (
 from zuul.driver.github.graphql import GraphQLClient
 from zuul.lib import tracing
 from zuul.web.handler import BaseWebController
+from zuul.lib.jsonutil import JSONDecodeError, json_loadb
 from zuul.lib.logutil import get_annotated_logger
 from zuul import model
 from zuul.model import Ref, Branch, Tag, Project
@@ -144,7 +143,7 @@ class GithubRequestLogger:
         fields['size'] = len(response.content)
         fields['duration'] = int(response.elapsed.microseconds / 1000)
         if response.url.endswith('/graphql'):
-            body = json.loads(response.request.body)
+            body = json_loadb(response.request.body)
             for key, value in body.get('variables', {}).items():
                 fields[key] = value
         info = ', '.join(['%s: %s' % (key, value)
@@ -235,7 +234,7 @@ class GithubRateLimitHandler:
 
         # Decode the body and check if we hit the rate limit.
         try:
-            body = json.loads(response.content)
+            body = json_loadb(response.content)
             message = body.get('message', '')
 
             # Catch rate limit and abuse detection responses. Every other 403
@@ -759,7 +758,7 @@ class GithubEventProcessor(object):
     def _check_run_action_to_event(self, check_run, project):
         # Extract necessary values from the check's external id to dequeue
         # the corresponding change in Zuul
-        dequeue_attrs = json.loads(check_run["external_id"])
+        dequeue_attrs = json_loadb(check_run["external_id"])
         # The dequeue operations needs the change in format
         # <pr_number>,<commit_sha>
         change = "{},{}".format(dequeue_attrs["change"], check_run["head_sha"])
@@ -2610,7 +2609,7 @@ class GithubWebController(BaseWebController):
         self._validate_signature(body, headers)
         # We cannot send the raw body through zookeeper, so it's easy to just
         # encode it as json, after decoding it as utf-8
-        json_body = json.loads(body.decode('utf-8'))
+        json_body = json_loadb(body)
 
         data = {
             'headers': headers,
