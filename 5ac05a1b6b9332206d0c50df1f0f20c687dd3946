@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f04a5124_c25f04b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-25T13:04:16Z",
+      "side": 1,
+      "message": "Patchset 15 add `oidc.default_signing_algorithm` to `SystemAttributes`",
+      "revId": "5ac05a1b6b9332206d0c50df1f0f20c687dd3946",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
