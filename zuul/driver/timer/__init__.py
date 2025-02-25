@@ -15,7 +15,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import threading
 import time
@@ -31,6 +30,7 @@ from zuul.driver.timer import timertrigger
 from zuul.driver.timer import timermodel
 from zuul.driver.timer.timermodel import TimerTriggerEvent
 from zuul.driver.timer.crontrigger import ZuulCronTrigger
+from zuul.lib.jsonutil import json_dumpb
 from zuul.lib.logutil import get_annotated_logger
 from zuul.zk.election import SessionAwareElection
 
@@ -182,7 +182,7 @@ class TimerDriver(Driver, TriggerInterface):
                             project=project_name,
                             branch=branch,
                         )
-                        prng_seed = json.dumps(prng_init, sort_keys=True)
+                        prng_seed = json_dumpb(prng_init, sort_keys=True)
                         prng = random.Random(prng_seed)
                         job_jitter = prng.uniform(0, jitter)
                     else:

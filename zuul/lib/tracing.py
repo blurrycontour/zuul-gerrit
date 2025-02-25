@@ -77,7 +77,7 @@ def getSpanInfo(span, include_attributes=False):
         'name': span.name,
         'trace_id': context.trace_id,
         'span_id': context.span_id,
-        'trace_flags': context.trace_flags,
+        'trace_flags': int(context.trace_flags),
         'start_time': span.start_time,
         'parent': parent_context,
     }
@@ -197,7 +197,7 @@ def getSpanContext(span):
     return {
         'trace_id': context.trace_id,
         'span_id': context.span_id,
-        'trace_flags': context.trace_flags,
+        'trace_flags': int(context.trace_flags),
     }
 
 

@@ -27,6 +27,7 @@ from collections.abc import Iterable
 from kazoo.exceptions import BadVersionError, NodeExistsError, NoNodeError
 
 from zuul import model
+from zuul.lib.jsonutil import JSONDecodeError, json_dumpb, json_loadb
 from zuul.zk import sharding, ZooKeeperSimpleBase
 from zuul.zk.exceptions import ZuulZooKeeperException
 from zuul.zk.vendor.watchers import ExistingDataWatch
@@ -84,6 +85,8 @@ class ChangeKey:
             revision=revision,
         )
 
+        # FIXME(swest): make this work with json_dumpb
+        # self.reference = json_dumpb(reference, sort_keys=True)
         self.reference = json.dumps(reference, sort_keys=True)
         msg = self.reference.encode('utf8')
         self._hash = hashlib.sha256(msg).hexdigest()
@@ -102,6 +105,8 @@ class ChangeKey:
 
     @classmethod
     def fromReference(cls, data):
+        # FIXME(swest): make this work with json_loadb
+        # data = json_loadb(data)
         data = json.loads(data)
         return cls(data['connection_name'], data['project_name'],
                    data['change_type'], data['stable_id'], data['revision'])
@@ -224,7 +229,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
         self._get(key, data_uuid, zstat)
 
     def _loadKey(self, data):
-        data = json.loads(data.decode("utf8"))
+        data = json_loadb(data)
         key = ChangeKey.fromReference(data['key_reference'])
         return key, data['data_uuid']
 
@@ -343,8 +348,8 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
             self.kazoo_client.delete(cache_path, zstat.version)
             return None
         try:
-            data = json.loads(raw_data)
-        except json.JSONDecodeError:
+            data = json_loadb(raw_data)
+        except JSONDecodeError:
             cache_path = self._cachePath(key._hash)
             self.log.error("Removing cache key %s with corrupt data node "
                            "uuid %s data %s len %s",
@@ -374,7 +379,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
     def set(self, key, change, version=-1):
         data = self._dataFromChange(change)
-        raw_data = json.dumps(data, sort_keys=True).encode("utf8")
+        raw_data = json_dumpb(data, sort_keys=True)
 
         compressed_size = 0
         uncompressed_size = 0
@@ -388,7 +393,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
 
         # Add the change_key info here mostly for debugging since the
         # hash is non-reversible.
-        cache_data = json.dumps(dict(
+        cache_data = json_dumpb(dict(
             data_uuid=data_uuid,
             key_reference=key.reference,
         ), sort_keys=True)
@@ -401,7 +406,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                         key, data_uuid, len(raw_data))
                     _, zstat = self.kazoo_client.create(
                         cache_path,
-                        cache_data.encode("utf8"),
+                        cache_data,
                         include_data=True)
                 else:
                     # Sanity check that we only have a single change instance
@@ -416,7 +421,7 @@ class AbstractChangeCache(ZooKeeperSimpleBase, Iterable, abc.ABC):
                         "Update cache key %s with data uuid %s len %s",
                         key, data_uuid, len(raw_data))
                     zstat = self.kazoo_client.set(
-                        cache_path, cache_data.encode("utf8"), version)
+                        cache_path, cache_data, version)
             except (BadVersionError, NodeExistsError, NoNodeError) as exc:
                 raise ConcurrentUpdateError from exc
 

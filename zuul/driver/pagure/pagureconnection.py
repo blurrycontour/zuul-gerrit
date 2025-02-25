@@ -18,7 +18,6 @@ import hashlib
 import threading
 import time
 import re
-import json
 import requests
 import cherrypy
 import voluptuous as v
@@ -28,6 +27,7 @@ from opentelemetry import trace
 from zuul.connection import (
     BaseConnection, ZKChangeCacheMixin, ZKBranchCacheMixin
 )
+from zuul.lib.jsonutil import json_loadb
 from zuul.lib.logutil import get_annotated_logger
 from zuul.web.handler import BaseWebController
 from zuul.model import Ref, Branch, Tag
@@ -912,7 +912,7 @@ class PagureWebController(BaseWebController):
             self.log.info(
                 "Payload origin IP address whitelisted. Skip verify")
 
-        json_payload = json.loads(body.decode('utf-8'))
+        json_payload = json_loadb(body)
         data = {
             'payload': json_payload,
             'span_context': tracing.getSpanContext(trace.get_current_span()),

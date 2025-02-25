@@ -13,12 +13,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 from urllib.parse import quote_plus, unquote
 
 from kazoo.exceptions import BadVersionError, NoNodeError
 
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import SemaphoreReleaseEvent
 from zuul.zk import ZooKeeperSimpleBase
@@ -27,11 +27,11 @@ from zuul.zk import ZooKeeperSimpleBase
 def holdersFromData(data):
     if not data:
         return []
-    return json.loads(data.decode("utf8"))
+    return json_loadb(data)
 
 
 def holdersToData(holders):
-    return json.dumps(holders, sort_keys=True).encode("utf8")
+    return json_dumpb(holders, sort_keys=True)
 
 
 class SemaphoreHandler(ZooKeeperSimpleBase):

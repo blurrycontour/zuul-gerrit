@@ -11,12 +11,12 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-import json
 import logging
 import uuid
 
 from kazoo.exceptions import NoNodeError, NodeExistsError
 
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.zk import ZooKeeperBase
 
 
@@ -39,11 +39,11 @@ class ZuulSystem(ZooKeeperBase):
             data, stat = self.kazoo_client.get(SYSTEM_ROOT)
         except NoNodeError:
             system_id = uuid.uuid4().hex
-            data = json.dumps({'system_id': system_id},
-                              sort_keys=True).encode('utf8')
+            data = json_dumpb({'system_id': system_id},
+                              sort_keys=True)
             try:
                 self.kazoo_client.create(SYSTEM_ROOT, data)
             except NodeExistsError:
                 data, stat = self.kazoo_client.get(SYSTEM_ROOT)
 
-        self.system_id = json.loads(data.decode('utf8'))['system_id']
+        self.system_id = json_loadb(data)['system_id']
