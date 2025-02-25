@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3776ea9f_514d7b33",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1316,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2025-02-25T18:54:04Z",
+      "side": 1,
+      "message": "nit: would be nice if the compilation result was not discarded, but I don\u0027t think we can serialize it in ZooKeeper.",
+      "revId": "83d3c8178c08f89dc7c37c5625fb1f1de0af8c40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "498f8b14_541cd976",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1321,
+      "author": {
+        "id": 9311
+      },
+      "writtenOn": "2025-02-25T18:54:04Z",
+      "side": 1,
+      "message": "Perhaps this should say `\"argument is not a valid regular expression: %s\", err)`",
+      "revId": "83d3c8178c08f89dc7c37c5625fb1f1de0af8c40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
