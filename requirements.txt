@@ -40,6 +40,7 @@ psycopg2-binary
 # TODO: remove googleapis-common-protos; rc1 pre-release is messing up depsolver
 googleapis-common-protos<1.67.0
 opentelemetry-sdk>=1.25.0
+grpcio==1.69.0
 opentelemetry-exporter-otlp-proto-grpc>=1.25.0
 opentelemetry-exporter-otlp-proto-http>=1.25.0
 confluent-kafka
