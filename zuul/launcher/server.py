@@ -976,6 +976,7 @@ class Launcher:
         node = node_class.new(
             ctx,
             uuid=node_uuid,
+            min_request_version=request.getZKVersion() + 1,
             label=label.name,
             label_config_hash=label.config_hash,
             max_ready_age=label.max_ready_age,
@@ -1247,7 +1248,20 @@ class Launcher:
                 self.wake_event.set()
                 return
 
-            if not self.api.getNodesetRequest(node.request_id):
+            request = self.api.getNodesetRequest(node.request_id)
+            request_up_to_date = False
+            if request is not None:
+                request_version = request.getZKVersion()
+                if request_version is not None:
+                    if request_version >= node.min_request_version:
+                        request_up_to_date = True
+            if (request is None or
+                (request_up_to_date and
+                 node.uuid not in request.nodes)):
+                # We can clean up the node if:
+                # The request is gone
+                # The request exists and our copy is sufficiently new and:
+                #   The request no longer references this node
                 log.debug("Removing provider node %s", node)
                 node.delete(ctx)
                 node.releaseLock(ctx)
