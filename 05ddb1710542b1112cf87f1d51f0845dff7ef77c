@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b31d65be_6b275a19",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-02-25T15:28:49Z",
+      "side": 1,
+      "message": "recheck\nunrelated error on test_aws_diskimage_snapshot",
+      "revId": "05ddb1710542b1112cf87f1d51f0845dff7ef77c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
