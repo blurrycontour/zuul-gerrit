@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc52820e_0acaf94e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-25T13:08:11Z",
+      "side": 1,
+      "message": "Patchset 16,17 removed unnecessary changes that is not in scope of this change.",
+      "revId": "9b9d517a56598555d16230325d82d6fdc9b505ed",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
