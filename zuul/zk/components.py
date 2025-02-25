@@ -12,7 +12,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 import sys
-import json
 import logging
 import threading
 from collections import defaultdict
@@ -21,6 +20,7 @@ from kazoo.exceptions import NoNodeError
 from kazoo.protocol.states import EventType
 
 from zuul.zk import ZooKeeperBase
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.model_api import MODEL_API
 
 
@@ -113,7 +113,7 @@ class BaseComponent(ZooKeeperBase):
                 return
 
             # Update the ZooKeeper node
-            content = json.dumps(self.content, sort_keys=True).encode("utf-8")
+            content = json_dumpb(self.content, sort_keys=True)
             try:
                 self.kazoo_client.set(self.path, content)
             except NoNodeError:
@@ -126,7 +126,7 @@ class BaseComponent(ZooKeeperBase):
             self.log.info("Registering component in ZooKeeper %s", path)
             self.path = self.kazoo_client.create(
                 path,
-                json.dumps(self.content, sort_keys=True).encode("utf-8"),
+                json_dumpb(self.content, sort_keys=True),
                 makepath=True,
                 ephemeral=True,
                 sequence=True,
@@ -290,7 +290,7 @@ class ComponentRegistry(ZooKeeperBase):
 
             # Perform an in-place update of the cached component (if any)
             component = self._cached_components.get(kind, {}).get(hostname)
-            d = json.loads(data.decode("utf-8"))
+            d = json_loadb(data)
 
             self.log.info(
                 "Component %s %s updated: %s",

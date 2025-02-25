@@ -13,7 +13,6 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import json
 import logging
 import time
 from contextlib import suppress
@@ -24,7 +23,7 @@ from kazoo.exceptions import LockTimeout, NoNodeError
 from kazoo.protocol.states import EventType, ZnodeStat
 from kazoo.client import TransactionRequest
 
-from zuul.lib.jsonutil import json_dumps
+from zuul.lib.jsonutil import json_dumpb, json_loadb
 from zuul.lib.logutil import get_annotated_logger
 from zuul.model import JobRequest
 from zuul.zk import ZooKeeperSimpleBase, sharding
@@ -619,12 +618,11 @@ class JobRequestQueue(ZooKeeperSimpleBase):
 
     @staticmethod
     def _bytesToDict(data):
-        return json.loads(data.decode("utf-8"))
+        return json_loadb(data)
 
     @staticmethod
     def _dictToBytes(data):
-        # The custom json_dumps() will also serialize MappingProxyType objects
-        return json_dumps(data, sort_keys=True).encode("utf-8")
+        return json_dumpb(data, sort_keys=True)
 
     def _getParamsPath(self, uuid):
         return '/'.join([self.PARAM_ROOT, uuid])

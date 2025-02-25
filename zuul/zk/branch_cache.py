@@ -17,7 +17,6 @@
 import collections
 from enum import IntFlag
 import logging
-import json
 
 from zuul.zk.zkobject import ZKContext, ShardedZKObject
 from zuul.zk.locks import (
@@ -26,6 +25,7 @@ from zuul.zk.locks import (
     locked as zk_locked
 )
 from zuul import model
+from zuul.lib.jsonutil import json_dumpb
 from zuul.zk.components import COMPONENT_REGISTRY
 
 from kazoo.exceptions import NoNodeError
@@ -186,7 +186,7 @@ class BranchCacheZKObject(ShardedZKObject):
             data = self.serialize_old()
         else:
             data = self.serialize_new()
-        return json.dumps(data, sort_keys=True).encode("utf8")
+        return json_dumpb(data, sort_keys=True)
 
     def serialize_new(self):
         return {

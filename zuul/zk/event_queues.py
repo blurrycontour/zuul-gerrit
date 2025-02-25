@@ -14,7 +14,6 @@
 
 import enum
 import functools
-import json
 import logging
 import threading
 import time
@@ -29,6 +28,7 @@ from kazoo.protocol.states import EventType
 
 from zuul import model
 from zuul.lib.collections import DefaultKeyDict
+from zuul.lib.jsonutil import JSONDecodeError, json_dumpb, json_loadb
 from zuul.lib.logutil import get_annotated_logger
 from zuul.zk import ZooKeeperSimpleBase, sharding
 from zuul.zk.election import SessionAwareElection
@@ -292,18 +292,17 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
         if updater:
             # If we are in a transaction, leave enough room to share.
             size_limit /= 2
-        encoded_data = json.dumps(data, sort_keys=True).encode("utf-8")
+        encoded_data = json_dumpb(data, sort_keys=True)
         if (len(encoded_data) > size_limit
             and 'event_data' in data):
             # Get a unique data node
             data_id = str(uuid.uuid4())
             data_root = f'{self.data_root}/{data_id}'
-            side_channel_data = json.dumps(data['event_data'],
-                                           sort_keys=True).encode("utf-8")
+            side_channel_data = json_dumpb(data['event_data'], sort_keys=True)
             data = data.copy()
             del data['event_data']
             data['event_data_path'] = data_root
-            encoded_data = json.dumps(data, sort_keys=True).encode("utf-8")
+            encoded_data = json_dumpb(data, sort_keys=True)
 
             with sharding.BufferedShardWriter(
                     self.kazoo_client, data_root) as stream:
@@ -347,8 +346,8 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             # Load the event metadata
             data, zstat = self.kazoo_client.get(path)
             try:
-                event = json.loads(data)
-            except json.JSONDecodeError as e:
+                event = json_loadb(data)
+            except JSONDecodeError as e:
                 self.log.error("Malformed event data in %s: %s", path, e)
                 self._remove(path)
                 continue
@@ -369,8 +368,8 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
                     continue
 
                 try:
-                    event_data = json.loads(side_channel_data)
-                except json.JSONDecodeError:
+                    event_data = json_loadb(side_channel_data)
+                except JSONDecodeError:
                     self.log.exception("Malformed side channel "
                                        "event data in %s",
                                        side_channel_path)
@@ -387,9 +386,9 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             side_channel_path = None
             data, zstat = self.kazoo_client.get(path)
             try:
-                event = json.loads(data)
+                event = json_loadb(data)
                 side_channel_path = event.get('event_data_path')
-            except json.JSONDecodeError:
+            except JSONDecodeError:
                 pass
 
             if side_channel_path:
@@ -427,8 +426,8 @@ class ZooKeeperEventQueue(ZooKeeperSimpleBase, Iterable):
             path = "/".join((self.event_root, event_id))
             data, zstat = self.kazoo_client.get(path)
             try:
-                event = json.loads(data)
-            except json.JSONDecodeError:
+                event = json_loadb(data)
+            except JSONDecodeError:
                 self.log.exception("Malformed event data in %s", path)
                 self._remove(path)
                 continue
@@ -492,8 +491,8 @@ class EventResultFuture(ZooKeeperSimpleBase):
         try:
             try:
                 data = self._read()
-                self.data = json.loads(data.decode("utf-8"))
-            except json.JSONDecodeError:
+                self.data = json_loadb(data)
+            except JSONDecodeError:
                 self.log.exception(
                     "Malformed result data in %s", self._result_path
                 )
@@ -525,7 +524,7 @@ class JobResultFuture(EventResultFuture):
 
     def _read(self):
         result_node = self.kazoo_client.get(self._result_path)[0]
-        result = json.loads(result_node)
+        result = json_loadb(result_node)
         self._result_data_path = result['result_data_path']
         with sharding.BufferedShardReader(
                 self.kazoo_client, self._result_data_path) as stream:
@@ -658,7 +657,7 @@ class ManagementEventQueue(ZooKeeperEventQueue):
         try:
             self.kazoo_client.set(
                 event.result_ref,
-                json.dumps(result_data, sort_keys=True).encode("utf-8"),
+                json_dumpb(result_data, sort_keys=True),
             )
         except NoNodeError:
             self.log.warning(f"No result node found for {event}; "
@@ -834,15 +833,14 @@ class TenantTriggerEventQueue(TriggerEventQueue):
         self.metadata = {}
 
     def _setQueueMetadata(self):
-        encoded_data = json.dumps(
-            self.metadata, sort_keys=True).encode("utf-8")
+        encoded_data = json_dumpb(self.metadata, sort_keys=True)
         self.kazoo_client.set(self.queue_root, encoded_data)
 
     def refreshMetadata(self):
         data, zstat = self.kazoo_client.get(self.queue_root)
         try:
-            self.metadata = json.loads(data)
-        except json.JSONDecodeError:
+            self.metadata = json_loadb(data)
+        except JSONDecodeError:
             self.metadata = {}
 
     @property
@@ -983,7 +981,7 @@ class EventCheckpoint(ZooKeeperSimpleBase):
             return None
 
         try:
-            data = json.loads(data.decode("utf-8"))
+            data = json_loadb(data)
         except Exception:
             self.stat = None
             return None
@@ -1000,7 +998,7 @@ class EventCheckpoint(ZooKeeperSimpleBase):
         """
 
         data = {'checkpoint': checkpoint}
-        data = json.dumps(data, sort_keys=True).encode("utf-8")
+        data = json_dumpb(data, sort_keys=True)
         version = -1
         if self.stat:
             version = self.stat.version
