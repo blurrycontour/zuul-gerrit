@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3ca28e8_748cac66",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-25T12:47:56Z",
+      "side": 1,
+      "message": "Patchset 14 removed some changes that is not necessary in the scope of this change.",
+      "revId": "9b841171adb48276ca0c3548696359c261cef2b9",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
