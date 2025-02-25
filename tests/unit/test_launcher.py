@@ -784,9 +784,12 @@ class TestLauncher(LauncherBaseTestCase):
 
         # We should have tried to build at least one node that was
         # marked as tempfail.
-        nodes = self.launcher.api.nodes_cache.getItems()
-        self.assertTrue(len(nodes) > 1)
-        self.assertEqual(model.ProviderNode.State.TEMPFAILED, nodes[0].state)
+        requests = self.launcher.api.requests_cache.getItems()
+        request = requests[0]
+        self.assertTrue(isinstance(request.provider_node_data[0]['uuid'], str))
+        # We can't assert anything about the node itself because it
+        # will have been deleted, but we have asserted there was at
+        # least an attempt.
 
     @simple_layout('layouts/nodepool-nodescan.yaml', enable_nodepool=True)
     @okay_tracebacks('_checkNodescanRequest')
