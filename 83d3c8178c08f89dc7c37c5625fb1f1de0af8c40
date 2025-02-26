@@ -18,6 +18,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1be3c931_80583e88",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1316,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-02-26T08:32:22Z",
+      "side": 1,
+      "message": "we could pickle the compiled regex then base64 encode it to store it as a string. But is it worth it over recompiling an usually short filter when needed?",
+      "parentUuid": "3776ea9f_514d7b33",
+      "revId": "83d3c8178c08f89dc7c37c5625fb1f1de0af8c40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "498f8b14_541cd976",
@@ -31,6 +49,24 @@
       "writtenOn": "2025-02-25T18:54:04Z",
       "side": 1,
       "message": "Perhaps this should say `\"argument is not a valid regular expression: %s\", err)`",
+      "revId": "83d3c8178c08f89dc7c37c5625fb1f1de0af8c40",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06d6bb5f_56a0a3ce",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1321,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-02-26T08:32:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "498f8b14_541cd976",
       "revId": "83d3c8178c08f89dc7c37c5625fb1f1de0af8c40",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
