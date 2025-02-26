@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7418287_9879be4c",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 893,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-26T14:30:52Z",
+      "side": 1,
+      "message": "Do we already have a test covering the provider selection algorithm? If not, it might be worth adding one to make sure we are not breaking it in the future.",
+      "revId": "2b2f91ec723797cae0376859c4bbc50e24789f80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
