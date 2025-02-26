@@ -36,6 +36,7 @@ from tests.base import (
     okay_tracebacks,
     simple_layout,
     return_data,
+    driver_config,
     ResponsesFixture,
 )
 from tests.fake_nodescan import (
@@ -141,6 +142,7 @@ class LauncherBaseTestCase(ZuulTestCase):
     }
 
     def setUp(self):
+        self.initTestConfig()
         self.mock_aws.start()
         # Must start responses after mock_aws
         self.useFixture(ImageMocksFixture())
@@ -151,8 +153,12 @@ class LauncherBaseTestCase(ZuulTestCase):
         self.addCleanup(self.mock_aws.stop)
         self.patch(zuul.driver.aws.awsendpoint, 'CACHE_TTL', 1)
 
+        quotas = {}
+        quotas.update(self.test_config.driver.aws.get(
+            'ec2_quotas', {}))
+
         def getQuotaLimits(self):
-            return model.QuotaInformation(default=math.inf)
+            return model.QuotaInformation(default=math.inf, **quotas)
         self.patch(zuul.driver.aws.awsprovider.AwsProvider,
                    'getQuotaLimits',
                    getQuotaLimits)
@@ -790,6 +796,33 @@ class TestLauncher(LauncherBaseTestCase):
         # We can't assert anything about the node itself because it
         # will have been deleted, but we have asserted there was at
         # least an attempt.
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    @driver_config('aws', ec2_quotas={
+        'L-1216C47A': 6,
+    })
+    def test_quota_starvation(self):
+        self.patch(zuul.launcher.server.Launcher,
+                   'SERIALIZED_QUOTA_THRESHOLD', 0.1)
+        nodeset1 = model.NodeSet()
+        nodeset1.addNode(model.Node("node", 'debian-normal'))
+
+        nodeset2 = model.NodeSet()
+        nodeset2.addNode(model.Node("node", 'debian-normal'))
+
+        nodeset3 = model.NodeSet()
+        nodeset3.addNode(model.Node("node", 'debian-normal'))
+
+        ctx = self.createZKContext(None)
+        request1 = self.requestNodes([n.label for n in nodeset1.getNodes()])
+        request2 = self.requestNodes(
+            [n.label for n in nodeset2.getNodes()],
+            timeout=None)
+        request3 = self.requestNodes(
+            [n.label for n in nodeset3.getNodes()],
+            timeout=None)
+        import time
+        time.sleep(10)
 
     @simple_layout('layouts/nodepool-nodescan.yaml', enable_nodepool=True)
     @okay_tracebacks('_checkNodescanRequest')
