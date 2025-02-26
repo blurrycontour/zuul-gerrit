@@ -16,6 +16,24 @@
       "message": "Do we already have a test covering the provider selection algorithm? If not, it might be worth adding one to make sure we are not breaking it in the future.",
       "revId": "2b2f91ec723797cae0376859c4bbc50e24789f80",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faa9955d_4504287b",
+        "filename": "zuul/launcher/server.py",
+        "patchSetId": 1
+      },
+      "lineNbr": 893,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-26T15:33:44Z",
+      "side": 1,
+      "message": "No test with multiple providers.  I agree, a focused unit test on this would be a good idea now that it\u0027s getting more complex.",
+      "parentUuid": "f7418287_9879be4c",
+      "revId": "2b2f91ec723797cae0376859c4bbc50e24789f80",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
