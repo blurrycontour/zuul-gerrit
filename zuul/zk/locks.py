@@ -101,6 +101,22 @@ class SessionAwareMixin:
             raise Exception("Watch not started")
         return name in self._zuul_seen_contender_names
 
+    # This is a kazoo recipe bugfix included here for convenience, but
+    # otherwise is not required for the main purpose of this class.
+    # https://github.com/python-zk/kazoo/issues/732
+    def _best_effort_cleanup(self):
+        self._retry(
+            self._inner_best_effort_cleanup,
+        )
+
+    def _inner_best_effort_cleanup(self):
+        node = self.node or self._find_node()
+        if node:
+            try:
+                self._delete_node(node)
+            except NoNodeError:
+                pass
+
 
 class SessionAwareLock(SessionAwareMixin, Lock):
     pass
