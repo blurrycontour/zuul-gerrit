@@ -267,6 +267,19 @@ class LauncherApi:
                     yield node
                 break
 
+    def getPrecedingProviderNodes(self, node):
+        # Return the node immediately ahead of this node in the global
+        # (non-launcher-specific) queue for this provider.
+        preceding_node = None
+        for candidate_node in self.nodes_cache.getItems():
+            if candidate_node.provider != node.provider:
+                continue
+            if candidate_node.uuid == node.uuid:
+                return preceding_node
+            preceding_node = candidate_node
+        # This shouldn't happen but if it does, it's not concerning.
+        return None
+
     def getProviderNode(self, node_id):
         return self.nodes_cache.getItem(node_id)
 

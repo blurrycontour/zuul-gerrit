@@ -37,6 +37,7 @@ from zuul import exceptions, model
 from zuul.lib import commandsocket, tracing
 from zuul.lib.collections import DefaultKeyDict
 from zuul.lib.config import get_default
+from zuul.provider.statemachine import StateMachine
 from zuul.zk.image_registry import (
     ImageBuildRegistry,
     ImageUploadRegistry,
@@ -658,7 +659,11 @@ class Launcher:
     # Max. time the main event loop is allowed to sleep
     MAX_SLEEP = 1
     DELETE_TIMEOUT = 600
-    MAX_QUOTA_AGE = 5 * 60  # How long to keep the quota information cached
+    # How long to keep the quota information cached
+    MAX_QUOTA_AGE = 5 * 60
+    # After this level of quota usage, we will switch to serialized
+    # request handling to attempt to avoid starvation.
+    SERALIZED_QUOTA_THRESHOLD = 0.95
 
     def __init__(self, config, connections):
         self._running = True
@@ -901,7 +906,7 @@ class Launcher:
         random.shuffle(providers)
 
         # Sort that list by quota
-        providers.sort(key=lambda p: self.getQuotaPercentage(p))
+        providers.sort(key=lambda p: self.getQuotaPercentage(p, coarse=True))
 
         # A list of providers that could work for all labels in the request
         providers_for_all_labels = set(providers)
@@ -1167,8 +1172,28 @@ class Launcher:
                         # Consider this provider paused, don't attempt
                         # to create the node until we think we have
                         # quota.
+                        log.debug("Delaying node %s creation "
+                                  "due to quota limit", node)
                         self.wake_event.set()
                         return
+                    # Attempt to avoid starvation by switching to a
+                    # serialized mode when we are near quota.  If we
+                    # are above 95% quota, only start the state
+                    # machine for a node if the node ahead of us in
+                    # the global (not per-launcher) queue has started.
+                    if (self.getQuotaPercentage(provider) >=
+                        self.SERALIZED_QUOTA_THRESHOLD):
+                        preceding_node = self.api.getPrecedingProviderNode(
+                            node)
+                        # Check whether the state machine has started
+                        if (preceding_node.create_state.get('state') !=
+                            StateMachine.START):
+                            log.debug("Delaying node %s creation "
+                                      "to yield to node %s", node,
+                                      preceding_node)
+                        self.wake_event.set()
+                        return
+
                 instance = node.create_state_machine.advance()
                 new_state = node.create_state_machine.state
                 if old_state != new_state:
@@ -1874,7 +1899,7 @@ class Launcher:
         self._provider_quota_cache[provider.canonical_name] = quota
         return quota
 
-    def getQuotaPercentage(self, provider):
+    def getQuotaPercentage(self, provider, coarse=False):
         # This is cached and updated every 5 minutes
         total = self.getProviderQuota(provider).copy()
         # This is continuously updated in the background
@@ -1884,7 +1909,7 @@ class Launcher:
             used_r = used.quota.get(resource, used.default)
             total_r = total.quota[resource]
             pct = max(used_r / total_r, pct)
-        if pct < 1.0:
+        if coarse and pct < 1.0:
             # If we are below 100% usage, lose precision so that we only
             # consider 10% gradiations.  This may help us avoid
             # thundering herds by allowing some randomization among
