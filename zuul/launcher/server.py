@@ -1173,6 +1173,12 @@ class Launcher:
                 if old_state != new_state:
                     log.debug("Node %s advanced from %s to %s",
                               node, old_state, new_state)
+                if (new_state != node.create_state_machine.START and
+                    node.state == node.State.REQUESTED):
+                    # Set state to building so that we start counting
+                    # quota.
+                    node.setState(node.State.BUILDING)
+
                 if not node.create_state_machine.complete:
                     self.wake_event.set()
                     return
@@ -1865,9 +1871,9 @@ class Launcher:
             total_r = total.quota[resource]
             pct = max(used_r / total_r, pct)
         if pct < 1.0:
-            # If we are below 100% usage, lose precion so that we only
+            # If we are below 100% usage, lose precision so that we only
             # consider 10% gradiations.  This may help us avoid
-            # thundering heards by allowing some randomization among
+            # thundering herds by allowing some randomization among
             # launchers that are within 10% of each other.
 
             # Over 100% use the exact value so that we always assign
