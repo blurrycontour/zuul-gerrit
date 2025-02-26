@@ -322,7 +322,6 @@ class ZuulTreeCache(abc.ABC):
         obj = None
         if data:
             # Perform an in-place update of the cached object if possible
-
             obj = self._cached_objects.get(key)
             if obj:
                 # Don't update to older data
