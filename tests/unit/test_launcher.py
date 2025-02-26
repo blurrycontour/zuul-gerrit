@@ -31,12 +31,13 @@ from moto import mock_aws
 import boto3
 
 from tests.base import (
+    ResponsesFixture,
     ZuulTestCase,
+    driver_config,
     iterate_timeout,
     okay_tracebacks,
-    simple_layout,
     return_data,
-    ResponsesFixture,
+    simple_layout,
 )
 from tests.fake_nodescan import (
     FakeSocket,
@@ -141,6 +142,7 @@ class LauncherBaseTestCase(ZuulTestCase):
     }
 
     def setUp(self):
+        self.initTestConfig()
         self.mock_aws.start()
         # Must start responses after mock_aws
         self.useFixture(ImageMocksFixture())
@@ -151,12 +153,23 @@ class LauncherBaseTestCase(ZuulTestCase):
         self.addCleanup(self.mock_aws.stop)
         self.patch(zuul.driver.aws.awsendpoint, 'CACHE_TTL', 1)
 
+        quotas = {}
+        quotas.update(self.test_config.driver.test_launcher.get(
+            'quotas', {}))
+
         def getQuotaLimits(self):
-            return model.QuotaInformation(default=math.inf)
+            return model.QuotaInformation(default=math.inf, **quotas)
         self.patch(zuul.driver.aws.awsprovider.AwsProvider,
                    'getQuotaLimits',
                    getQuotaLimits)
         super().setUp()
+
+    def getNodes(self, request):
+        nodes = []
+        for node in self.launcher.api.nodes_cache.getItems():
+            if node.request_id == request.uuid:
+                nodes.append(node)
+        return nodes
 
     def _nodes_by_label(self):
         nodes = self.launcher.api.nodes_cache.getItems()
@@ -790,6 +803,56 @@ class TestLauncher(LauncherBaseTestCase):
         # We can't assert anything about the node itself because it
         # will have been deleted, but we have asserted there was at
         # least an attempt.
+
+    @simple_layout('layouts/nodepool-multi-provider.yaml',
+                   enable_nodepool=True)
+    @driver_config('test_launcher', quotas={
+        'instances': 2,
+    })
+    def test_provider_selection_spread(self):
+        # Test that we spread quota use out among multiple providers
+        self.waitUntilSettled()
+
+        request1 = self.requestNodes(["debian-normal"])
+        nodes1 = self.getNodes(request1)
+        self.assertEqual(1, len(nodes1))
+
+        request2 = self.requestNodes(["debian-normal"])
+        nodes2 = self.getNodes(request2)
+        self.assertEqual(1, len(nodes2))
+
+        self.assertNotEqual(nodes1[0].provider, nodes2[0].provider)
+
+    @simple_layout('layouts/nodepool-multi-provider.yaml',
+                   enable_nodepool=True)
+    @driver_config('test_launcher', quotas={
+        'instances': 3,
+    })
+    def test_provider_selection_locality(self):
+        # Test that we use the same provider for multiple nodes within
+        # a request if possible.
+        self.waitUntilSettled()
+
+        request1 = self.requestNodes(["debian-normal", "debian-normal"])
+        nodes1 = self.getNodes(request1)
+        self.assertEqual(2, len(nodes1))
+
+        # These can be served from either provider; both should be
+        # assigned to the same one.
+        self.assertEqual(nodes1[0].provider, nodes1[1].provider)
+
+        request2 = self.requestNodes(["debian-large", "debian-small"])
+        nodes2 = self.getNodes(request2)
+        self.assertEqual(2, len(nodes2))
+
+        # These are served by different providers, so they should be
+        # different.
+        self.assertNotEqual(nodes2[0].provider, nodes2[1].provider)
+        # Sanity check since we know the actual providers.
+        self.assertEqual('review.example.com%2Forg%2Fcommon-config/'
+                         'aws-us-west-1-main', nodes2[0].provider)
+        self.assertEqual('review.example.com%2Forg%2Fcommon-config/'
+                         'aws-us-east-1-main', nodes2[1].provider)
 
     @simple_layout('layouts/nodepool-nodescan.yaml', enable_nodepool=True)
     @okay_tracebacks('_checkNodescanRequest')
