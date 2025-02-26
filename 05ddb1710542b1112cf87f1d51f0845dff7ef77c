@@ -50,6 +50,24 @@
       "message": "Shouldn\u0027t this use the zuul_event_id when it is provided?",
       "revId": "05ddb1710542b1112cf87f1d51f0845dff7ef77c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6127b261_c4c7d7f5",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 3438,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-02-26T08:24:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e53cde9_fe832b5d",
+      "revId": "05ddb1710542b1112cf87f1d51f0845dff7ef77c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
