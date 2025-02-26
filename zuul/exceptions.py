@@ -248,6 +248,17 @@ class MaxTimeoutError(ConfigurationSyntaxError):
         super(MaxTimeoutError, self).__init__(message)
 
 
+class MaxOIDCTTLError(ConfigurationSyntaxError):
+    zuul_error_name = 'Max OIDC TTL Exceeded'
+
+    def __init__(self, secret, tenant):
+        message = textwrap.dedent("""\
+        The oidc secret "{secret}" exceeds tenant max-oidc-ttl {max_ttl}.""")
+        message = textwrap.fill(message.format(
+            secret=secret.name, max_ttl=tenant.max_oidc_ttl))
+        super(MaxOIDCTTLError, self).__init__(message)
+
+
 class DuplicateGroupError(ConfigurationSyntaxError):
     zuul_error_name = 'Duplicate Nodeset Group'
 

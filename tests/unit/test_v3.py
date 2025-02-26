@@ -13,6 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import base64
 import io
 import json
 import logging
@@ -7233,6 +7234,91 @@ class TestMaxTimeout(ZuulTestCase):
                          "B should not fail because of timeout limit")
 
 
+class TestOIDCConfiguration(ZuulTestCase):
+    tenant_config_file = 'config/multi-tenant/main.yaml'
+
+    def test_max_ttl_reached(self):
+        # Test that the secret oidc ttl is within the tenant max-oidc-ttl
+        in_repo_conf = textwrap.dedent(
+            """
+            - secret:
+                name: my-oidc
+                oidc:
+                  ttl: 400
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        # max-oidc-ttl for tenant-one is 300, it should cause error
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertIn('The oidc secret "my-oidc" exceeds tenant max-oidc-ttl',
+                      A.messages[0], "A should fail because of ttl limit")
+        # max-oidc-ttl for tenant-two is the default 600,
+        # which should not cause error
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertNotIn("exceeds tenant max-oidc-ttl", B.messages[0],
+                         "B should not fail because of ttl limit")
+
+    def test_mutual_exclusive(self):
+        # Test that `oidc` and `data` should be mutually exclusive
+        in_repo_conf = textwrap.dedent(
+            """
+            - secret:
+                name: my-oidc
+                oidc: {}
+                data: {}
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertIn('two or more values in the same group'
+                      ' of exclusion \'secret_type\'',
+                      A.messages[0],
+                      "A should fail because of mutual exclusive")
+
+    def test_required(self):
+        # Test that one of `oidc` and `data` must be present
+        in_repo_conf = textwrap.dedent(
+            """
+            - secret:
+                name: my-oidc
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertIn('Either \'data\' or \'oidc\' must be present',
+                      A.messages[0],
+                      "A should fail because both are missing")
+
+    def test_unsupported_algorithm(self):
+        # Test that if the secret oidc algorithm is not supported,
+        # there should be an error message
+        in_repo_conf = textwrap.dedent(
+            """
+            - secret:
+                name: my-oidc
+                oidc:
+                  algorithm: XX256
+            """)
+        file_dict = {'.zuul.yaml': in_repo_conf}
+
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertIn("Algorithm 'XX256' is not supported",
+                      A.messages[0],
+                      "A should fail because of unsupported algorithm")
+
+
 class TestAllowedConnection(AnsibleZuulTestCase):
     config_file = 'zuul-connections-gerrit-and-github.conf'
     tenant_config_file = 'config/multi-tenant/main.yaml'
@@ -7811,6 +7897,97 @@ class TestSecrets(ZuulTestCase):
 
             self.scheds.first.sched._runBlobStoreCleanup()
             self.assertEqual(len(bs), 0)
+
+    def test_oidc_single(self):
+        # Test that oidc token is generated correctly when there is
+        # a single oidc secret defined.
+
+        self._test_oidc_job_success(
+            "zuul-oidc-single.yaml", "project2-oidc-secret")
+
+        secrets = self._getSecrets(
+            'project2-oidc-secret', 'playbooks'
+        )[0]
+        self.assertEqual(len(secrets), 1)
+        for secret_name, secret_content in secrets.items():
+            self._validate_oidc_token(secret_name, secret_content.value)
+
+    def test_oidc_multi(self):
+        # Test that oidc token is generated correctly when there are
+        # multiple oidc secrets defined.
+
+        self._test_oidc_job_success(
+            "zuul-oidc-multi.yaml", "project2-oidc-secret")
+
+        secrets = self._getSecrets(
+            'project2-oidc-secret', 'playbooks'
+        )[0]
+        self.assertEqual(len(secrets), 3)
+        for secret_name, secret_content in secrets.items():
+            self._validate_oidc_token(secret_name, secret_content.value)
+
+    def test_oidc_mix(self):
+        # Test that oidc token is generated correctly when there are
+        # both oidc and normal secrets defined.
+
+        self._test_oidc_job_success(
+            "zuul-oidc-mix.yaml", "project2-oidc-secret")
+
+        secrets = self._getSecrets(
+            'project2-oidc-secret', 'playbooks'
+        )[0]
+        self.assertEqual(len(secrets), 4)
+
+        # Validate normal secrets
+        self.assertEqual(
+            secrets['project2_secret'],
+            {'username': 'test-username', 'password': 'test-password'}
+        )
+        # Remove the normal secret from the dict and validate the oidc tokens
+        del secrets['project2_secret']
+        for secret_name, secret_content in secrets.items():
+            self._validate_oidc_token(secret_name, secret_content.value)
+
+    def _test_oidc_job_success(self, zuul_config_file_name, job_name):
+        with open(os.path.join(FIXTURE_DIR,
+                               'config/secrets/git/',
+                               f'org_project2/{zuul_config_file_name}')) as f:
+            config = f.read()
+        file_dict = {'zuul.yaml': config}
+
+        A = self.fake_gerrit.addFakeChange('org/project2', 'master', 'A',
+                                           files=file_dict)
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+        self.assertEqual(A.reported, 1, "A should report success")
+        self.assertHistory([
+            dict(name=job_name, result='SUCCESS', changes='1,1'),
+        ])
+
+    def _validate_oidc_token(self, oidc_name, oidc_token):
+        header_base64, payload_base64, signature_base64 = oidc_token.split('.')
+        header = json.loads(base64.b64decode(header_base64 + '==').decode())
+        payload = json.loads(base64.b64decode(payload_base64 + '==').decode())
+        self.assertEqual(header['alg'], 'RS256')
+        self.assertEqual(header['kid'], 'RS256-0')
+        self.assertEqual(header['typ'], 'JWT')
+        self.assertEqual(payload['iss'], 'https://zuul.example.com')
+        self.assertEqual(
+            payload['sub'],
+            'secret:tenant-one/review.example.com'
+            f'/org/project2/{oidc_name}'
+        )
+        self.assertEqual(payload['build-uuid'], self.history[0].uuid)
+        self.assertEqual(payload['job-name'], 'project2-oidc-secret')
+        self.assertEqual(
+            payload['playbook'],
+            'review.example.com/org/project2/playbooks/secret.yaml'
+        )
+        self.assertEqual(payload['pipeline'], 'check')
+        self.assertEqual(payload['tenant'], 'tenant-one')
+        self.assertEqual(payload['aud'], 'sts.amazonaws.com')
+        self.assertEqual(payload['my_claim'], 'my_claim_value')
+        self.assertEqual(payload['exp'] - payload['iat'], 300)
 
 
 class TestSecretInheritance(ZuulTestCase):
