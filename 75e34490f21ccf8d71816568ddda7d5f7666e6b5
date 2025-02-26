@@ -33,6 +33,24 @@
       "message": "Is it a TODO?",
       "revId": "75e34490f21ccf8d71816568ddda7d5f7666e6b5",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3b3325f_7f2c23fc",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-02-26T12:54:51Z",
+      "side": 1,
+      "message": "Well the OCD in me finds it odd to have to declare an SQL-related constant in a module strictly dealing with ansible, but ultimately I can live with that.\n\nI guess it\u0027s more a FYI than a TODO so I\u0027ll remove that prefix.",
+      "parentUuid": "940c6ad4_2a515aef",
+      "revId": "75e34490f21ccf8d71816568ddda7d5f7666e6b5",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
