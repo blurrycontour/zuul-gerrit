@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ff7c3cb_7072abb9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-27T18:30:54Z",
+      "side": 1,
+      "message": "You probably meant \"significant\".  Or \"non-trivial\" or \"not-insignificant\".  :)  Anyway, the meanining is obvious; no need to fix.\n\nIt\u0027s probably only slow with lots of pipelines (or lots of tenants+pipelines if it\u0027s a global semaphore).  I wonder if we could keep track of which pipelines are waiting for which semaphores (maybe a treecache?) and distribute the events only to those pipelines.",
+      "revId": "521fa57ce883bf8cbfa84ad0afa1cd8a4ad4ee3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
