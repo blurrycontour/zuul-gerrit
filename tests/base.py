@@ -246,7 +246,7 @@ def driver_config(driver, **kw):
         if driver_dict is None:
             driver_dict = {}
             test.__driver_config__ = driver_dict
-        driver_dict[driver] == kw
+        driver_dict[driver] = kw
         return test
     return decorator
 
@@ -382,6 +382,7 @@ class GithubDriverMock(GithubDriver):
                  additional_event_queues, git_url_with_auth):
         super(GithubDriverMock, self).__init__()
         self.registry = registry
+        self.test_config = test_config
         self.changes = test_config.changes
         self.config = config
         self.upstream_root = upstream_root

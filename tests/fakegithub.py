@@ -1291,8 +1291,17 @@ class FakeGithubClient(object):
 
     def addProject(self, project):
         owner, proj = project.name.split('/')
-        self._data.repos[(owner, proj)] = FakeRepository(
+        repo = FakeRepository(
             project.name, self._data)
+        self._data.repos[(owner, proj)] = repo
+        github_config =\
+            self._data.fake_github_connection.driver.test_config.driver.github
+        if bprs := github_config.get('branch_protection_rules', {}
+                                     ).get(project.name, {}):
+            for branch, rule_configs in bprs.items():
+                for rule_config in rule_configs:
+                    rule = repo._set_branch_protection(
+                        branch, protected=True, **rule_config)
 
     def addProjectByName(self, project_name):
         owner, proj = project_name.split('/')
@@ -1523,7 +1532,8 @@ class FakeGithubConnection(githubconnection.GithubConnection):
     client_manager_class = FakeGithubClientManager
 
     def __init__(self, driver, connection_name, connection_config,
-                 changes_db=None, upstream_root=None, git_url_with_auth=False):
+                 changes_db=None, upstream_root=None,
+                 git_url_with_auth=False):
         super(FakeGithubConnection, self).__init__(driver, connection_name,
                                                    connection_config)
         self.connection_name = connection_name
