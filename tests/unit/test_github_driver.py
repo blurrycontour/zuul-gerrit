@@ -43,6 +43,7 @@ from tests.base import (
     BaseTestCase,
     ZuulGithubAppTestCase,
     ZuulTestCase,
+    driver_config,
     iterate_timeout,
     okay_tracebacks,
     simple_layout,
@@ -2071,6 +2072,57 @@ class TestGithubLockedBranches(ZuulTestCase):
         self.assertIn('master', tpc1.parsed_branch_config.keys())
         self.assertEqual(0, len(tpc2.parsed_branch_config.keys()))
         self.assertEqual(0, len(tpc3.parsed_branch_config.keys()))
+
+    @driver_config('github', branch_protection_rules={
+        'org/project2': {
+            'master': [
+                {'locked': True},
+            ]
+        }
+    })
+    def test_exclude_locked_branches_startup(self):
+        # Make sure that we exclude locked branches on startup as well
+        # (this exercises a different code path in the branch cache).
+        tenant = self.scheds.first.sched.abide.tenants\
+            .get('tenant-one')
+
+        project1 = list(tenant.untrusted_projects)[0]
+        project2 = list(tenant.untrusted_projects)[1]
+        project3 = list(tenant.untrusted_projects)[2]
+
+        tpc1 = tenant.project_configs[project1.canonical_name]
+        tpc2 = tenant.project_configs[project2.canonical_name]
+        tpc3 = tenant.project_configs[project3.canonical_name]
+
+        # project 1 should have parsed master
+        self.assertIn('master', tpc1.parsed_branch_config.keys())
+        # project 1 should not have a master branch because it's locked
+        self.assertEqual(0, len(tpc2.parsed_branch_config.keys()))
+        # project 3 should not because it excludes unprotected
+        self.assertEqual(0, len(tpc3.parsed_branch_config.keys()))
+
+
+class TestGithubLockedBranchesValidation(ZuulTestCase):
+    config_file = 'zuul-github-driver.conf'
+    tenant_config_file = 'config/locked-branches/main.yaml'
+    scheduler_count = 1
+    validate_tenants = ['tenant-one']
+
+    @driver_config('github', branch_protection_rules={
+        'org/project2': {
+            'master': [
+                {'locked': True},
+            ]
+        }
+    })
+    def test_exclude_locked_branches_validation(self):
+        self.assertEqual(2, len(self.merge_job_history['cat']))
+        projects = {
+            x.payload['project']
+            for x in self.merge_job_history['cat']
+        }
+        self.assertEqual({'org/common-config', 'org/project1'},
+                         projects)
 
 
 class TestGithubWebhook(ZuulTestCase):
