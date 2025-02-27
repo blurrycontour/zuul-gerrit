@@ -337,6 +337,7 @@ class GerritEventProcessor:
     def __init__(self, connector, connection_event):
         self.connector = connector
         self.connection = connector.connection
+        self.zk_client = self.connection.sched.zk_client
         self.connection_event = connection_event
         self.event_span = tracing.restoreSpanContext(
             self.connection_event.get("span_context"))
@@ -375,6 +376,7 @@ class GerritEventProcessor:
         self.log.debug("Handling event received %ss ago, delaying %ss",
                        now - timestamp, delay)
         time.sleep(delay)
+        min_change_ltime = self.zk_client.getCurrentLtime()
 
         # In order to perform connection hygene actions like those
         # below, the preFilter method must pass relevant events
@@ -393,14 +395,14 @@ class GerritEventProcessor:
         if event._branch_ref_update:
             self.connection.clearConnectionCacheOnBranchEvent(event)
 
-        change = self._getChange(event, connection_event.zuul_event_ltime)
+        change = self._getChange(event, min_change_ltime)
         if (change and change.patchset and
             event.change_number and event.patch_number is None):
             event.patch_number = str(change.patchset)
 
         return [event]
 
-    def _getChange(self, event, connection_event_ltime):
+    def _getChange(self, event, min_change_ltime):
         # Grab the change if we are managing the project or if it exists in the
         # cache as it may be a dependency
         change = None
@@ -425,7 +427,7 @@ class GerritEventProcessor:
                 # query ltime for the cache entry; if it's after the
                 # event ltime, we don't need to refresh.
                 if (change.zuul_query_ltime and
-                    change.zuul_query_ltime > connection_event_ltime):
+                    change.zuul_query_ltime > min_change_ltime):
                     refresh = False
 
             if refresh:
@@ -441,7 +443,7 @@ class GerritEventProcessor:
                 change = self.connection._getChange(
                     change_key, refresh=True, event=event,
                     allow_key_update=True, change=change,
-                    update_if_older_than=connection_event_ltime)
+                    update_if_older_than=min_change_ltime)
         return change
 
 
