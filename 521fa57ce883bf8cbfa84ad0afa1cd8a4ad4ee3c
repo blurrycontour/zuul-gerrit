@@ -16,6 +16,24 @@
       "message": "You probably meant \"significant\".  Or \"non-trivial\" or \"not-insignificant\".  :)  Anyway, the meanining is obvious; no need to fix.\n\nIt\u0027s probably only slow with lots of pipelines (or lots of tenants+pipelines if it\u0027s a global semaphore).  I wonder if we could keep track of which pipelines are waiting for which semaphores (maybe a treecache?) and distribute the events only to those pipelines.",
       "revId": "521fa57ce883bf8cbfa84ad0afa1cd8a4ad4ee3c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb0bce29_01f0c075",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-28T11:16:16Z",
+      "side": 1,
+      "message": "Yep, that should be \"significant\", otherwise there is point to have this change.\n\nThe idea to use a tree cache to check whether there are any pipelines waiting on a semaphore sound interesting, but maybe there would also be a way to know exactly which pipeline should receive the event (semaphore acquire priority). Usually when you have a semaphore in one pipeline it tends to stay there as long as there are other items waiting on the same semaphore.\n\nThe issue we observed was more due to a lot of semaphore release events leading to each one being send to all pipelines. This is also the reason for https://review.opendev.org/c/zuul/zuul/+/942191",
+      "parentUuid": "6ff7c3cb_7072abb9",
+      "revId": "521fa57ce883bf8cbfa84ad0afa1cd8a4ad4ee3c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
