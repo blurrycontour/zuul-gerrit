@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "73f12a02_c5f773fd",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1143,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-28T14:36:46Z",
+      "side": 1,
+      "message": "Some unit test in zuul-scheduler fails because of `None` value of `web_root`. So I added the None checks in both zuul-scheduler and zuul-web to be on the safe side.",
+      "parentUuid": "4762bede_2fe20627",
+      "revId": "de82e9cb2eddbd1c78f2857485866ebf36e89714",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "22c9c5b8_a72d2874",
         "filename": "zuul/web/__init__.py",
         "patchSetId": 9
