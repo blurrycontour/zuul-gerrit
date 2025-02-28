@@ -33,6 +33,40 @@
       "message": "recheck",
       "revId": "de82e9cb2eddbd1c78f2857485866ebf36e89714",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4762bede_2fe20627",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1143,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-28T14:00:06Z",
+      "side": 1,
+      "message": "`web.root` is a mandatory setting, so I don\u0027t think we need to account for that: https://zuul-ci.org/docs/zuul/latest/configuration.html#attr-web.root",
+      "revId": "de82e9cb2eddbd1c78f2857485866ebf36e89714",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22c9c5b8_a72d2874",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1178,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-28T14:00:06Z",
+      "side": 1,
+      "message": "Do we want to pull in a library to deal with the JWK stuff? E.g. authlib https://docs.authlib.org/en/latest/jose/jwk.html\n\nI think that would at least give use some validation especially since this is security related.",
+      "revId": "de82e9cb2eddbd1c78f2857485866ebf36e89714",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
