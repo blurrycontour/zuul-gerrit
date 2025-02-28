@@ -19,6 +19,7 @@ openssl-devel [compile test platform:rpm]
 # is an error.
 libressl-dev [compile test platform:apk]
 postgresql-dev [compile test platform:apk]
+librdkafka-dev [compile test]
 libssl3 [platform:debian-bookworm]
 libssl1.1 [platform:debian platform:ubuntu-bionic !platform:debian-bookworm]
 libssl1.0.0 [platform:ubuntu-xenial]
