@@ -140,9 +140,10 @@ class NodeCache(LockableZKObjectCache):
             # Add the new value first so if another thread races these
             # two operations, it sees us go over quota and not under.
             if new_quota is not None:
-                self._provider_quota[obj.provider].add(obj.quota)
+                self._provider_quota[obj.provider].add(new_quota)
             if old_quota is not None:
                 self._provider_quota[obj.provider].subtract(old_quota)
+            self._cached_quota[key] = new_quota
         super().postCacheHook(event, data, stat, key, obj)
 
     def getQuota(self, provider):

@@ -31,7 +31,12 @@ import testtools
 
 from zuul import model
 from zuul.lib import yamlutil as yaml
-from zuul.model import BuildRequest, HoldRequest, MergeRequest
+from zuul.model import (
+    BuildRequest,
+    HoldRequest,
+    MergeRequest,
+    QuotaInformation,
+)
 from zuul.zk import ZooKeeperClient
 from zuul.zk.blob_store import BlobStore
 from zuul.zk.branch_cache import BranchCache, BranchFlag, BranchInfo
@@ -2829,4 +2834,44 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
             self.api.cleanupNodes()
             provider_nodes = self.api.getProviderNodes()
             if not provider_nodes:
+                break
+
+    def test_node_quota_cache(self):
+        context = ZKContext(self.zk_client, None, None, self.log)
+
+        class Dummy:
+            pass
+
+        provider = Dummy()
+        provider.canonical_name = 'provider'
+
+        quota = QuotaInformation(instances=1)
+        node_class = DummyAProviderNode
+
+        node1 = node_class.new(
+            context, request_id='1', uuid='1', quota=quota, label='foo',
+            provider='provider', state=node_class.State.BUILDING)
+        for _ in iterate_timeout(10, "cache to sync"):
+            used = self.api.nodes_cache.getQuota(provider)
+            if used.quota.get('instances') == 1:
+                break
+
+        node2 = node_class.new(
+            context, request_id='2', uuid='2', quota=quota, label='foo',
+            provider='provider', state=node_class.State.BUILDING)
+        for _ in iterate_timeout(10, "cache to sync"):
+            used = self.api.nodes_cache.getQuota(provider)
+            if used.quota.get('instances') == 2:
+                break
+
+        node1.delete(context)
+        for _ in iterate_timeout(10, "cache to sync"):
+            used = self.api.nodes_cache.getQuota(provider)
+            if used.quota.get('instances') == 1:
+                break
+
+        node2.delete(context)
+        for _ in iterate_timeout(10, "cache to sync"):
+            used = self.api.nodes_cache.getQuota(provider)
+            if used.quota.get('instances') == 0:
                 break
