@@ -2752,10 +2752,10 @@ class TestLauncherApi(ZooKeeperBaseTestCase):
                 break
 
         # Accept and update the nodeset request
-        request.updateAttributes(
-            context,
-            state=model.NodesetRequest.State.ACCEPTED,
-            provider_nodes=[[n.uuid] for n in provider_nodes])
+        with request.activeContext(context):
+            for n in provider_nodes:
+                request.addProviderNode(n)
+            request.state = model.NodesetRequest.State.ACCEPTED
 
         # "Fulfill" requested provider nodes
         for node in self.api.getMatchingProviderNodes():

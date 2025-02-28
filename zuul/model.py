@@ -2451,10 +2451,8 @@ class NodesetRequest(zkobject.LockableZKObject):
             request_time=time.time(),
             zuul_event_id="",
             span_info=None,
-            # A list of list with the attempted provider nodes. The last
-            # item in the contained lists is the current attempt. E.g.
-            # [[label-A-failed, label-A-building], [label-b-ready], ...]
-            provider_nodes=[],
+            # A dict of info about the node we have assigned to each label
+            provider_node_data=[],
             # Attributes that are not serialized
             lock=None,
             is_locked=False,
@@ -2462,13 +2460,33 @@ class NodesetRequest(zkobject.LockableZKObject):
             _lscores=None,
         )
 
+    def addProviderNode(self, provider_node):
+        self.provider_node_data.append(dict(
+            uuid=provider_node.uuid,
+            failed_providers=[],
+        ))
+
+    def updateProviderNode(self, index,
+                           uuid=None,
+                           add_failed_provider=None):
+        data = self.provider_node_data[index]
+        if uuid is not None:
+            data['uuid'] = uuid
+        if add_failed_provider is not None:
+            data['failed_providers'].append(add_failed_provider)
+
+    def getProviderNodeData(self, index):
+        if index < len(self.provider_node_data):
+            return self.provider_node_data[index]
+        return None
+
     @property
     def fulfilled(self):
         return self.state == self.State.FULFILLED
 
     @property
     def nodes(self):
-        return [n[-1] for n in self.provider_nodes]
+        return [n['uuid'] for n in self.provider_node_data]
 
     @property
     def created_time(self):
@@ -2494,7 +2512,7 @@ class NodesetRequest(zkobject.LockableZKObject):
             request_time=self.request_time,
             zuul_event_id=self.zuul_event_id,
             span_info=self.span_info,
-            provider_nodes=self.provider_nodes,
+            provider_node_data=self.provider_node_data,
         )
         return json.dumps(data, sort_keys=True).encode("utf-8")
 
