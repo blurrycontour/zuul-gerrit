@@ -12,6 +12,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import collections
 import json
 import logging
 import threading
@@ -20,7 +21,7 @@ from operator import attrgetter
 import mmh3
 from kazoo.exceptions import NoNodeError
 
-from zuul.model import NodesetRequest, ProviderNode
+from zuul.model import NodesetRequest, ProviderNode, QuotaInformation
 from zuul.zk.cache import ZuulTreeCache
 from zuul.zk.zkobject import ZKContext
 
@@ -110,6 +111,43 @@ class LockableZKObjectCache(ZuulTreeCache):
         self.ensureReady()
         return list(self._cached_objects.values())
 
+    def getKeys(self):
+        self.ensureReady()
+        return set(self._cached_objects.keys())
+
+
+class NodeCache(LockableZKObjectCache):
+    def __init__(self, *args, **kw):
+        # Key -> quota, for each cached object
+        self._cached_quota = {}
+        # Provider canonical name -> quota, for each provider
+        self._provider_quota = collections.defaultdict(
+            lambda: QuotaInformation())
+        super().__init__(*args, **kw)
+
+    def postCacheHook(self, event, data, stat, key, obj):
+        # Have we previously added quota for this object?
+        old_quota = self._cached_quota.get(key)
+        if key in self._cached_objects:
+            new_quota = obj.quota
+        else:
+            new_quota = None
+        # Now that we've established whether we should count the quota
+        # based on object presence, take node state into account.
+        if obj is None or obj.state not in obj.ALLOCATED_STATES:
+            new_quota = None
+        if new_quota != old_quota:
+            # Add the new value first so if another thread races these
+            # two operations, it sees us go over quota and not under.
+            if new_quota is not None:
+                self._provider_quota[obj.provider].add(obj.quota)
+            if old_quota is not None:
+                self._provider_quota[obj.provider].subtract(old_quota)
+        super().postCacheHook(event, data, stat, key, obj)
+
+    def getQuota(self, provider):
+        return self._provider_quota[provider.canonical_name]
+
 
 class LauncherApi:
     log = logging.getLogger("zuul.LauncherApi")
@@ -127,7 +165,7 @@ class LauncherApi:
             items_path=NodesetRequest.REQUESTS_PATH,
             locks_path=NodesetRequest.LOCKS_PATH,
             zkobject_class=NodesetRequest)
-        self.nodes_cache = LockableZKObjectCache(
+        self.nodes_cache = NodeCache(
             self.zk_client,
             self.event_callback,
             root=ProviderNode.ROOT,

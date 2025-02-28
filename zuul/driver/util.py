@@ -51,54 +51,6 @@ def to_list(item):
     return [item]
 
 
-class QuotaInformation:
-    def __init__(self, default=0, **kw):
-        '''
-        Initializes the quota information with some values. None values will
-        be initialized with default which will be typically 0 or math.inf
-        indicating an infinite limit.
-
-        :param default: The default value to use for any attribute not supplied
-                        (usually 0 or math.inf).
-        '''
-        self.quota = {}
-        for k, v in kw.items():
-            self.quota[k] = v
-        self.default = default
-
-    def _get_default(self, value, default):
-        return value if value is not None else default
-
-    def _add_subtract(self, other, add=True):
-        for resource in other.quota.keys():
-            self.quota.setdefault(resource, self.default)
-        for resource in self.quota.keys():
-            other_value = other.quota.get(resource, other.default)
-            if add:
-                self.quota[resource] += other_value
-            else:
-                self.quota[resource] -= other_value
-
-    def subtract(self, other):
-        self._add_subtract(other, add=False)
-
-    def add(self, other):
-        self._add_subtract(other, True)
-
-    def nonNegative(self):
-        for resource, value in self.quota.items():
-            if value < 0:
-                return False
-        return True
-
-    def getResources(self):
-        '''Return resources value to register in ZK node'''
-        return self.quota
-
-    def __str__(self):
-        return str(self.quota)
-
-
 class RateLimitInstance:
     def __init__(self, limiter, logger, msg):
         self.limiter = limiter

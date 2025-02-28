@@ -13,12 +13,15 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+import math
 import textwrap
 import time
 from collections import defaultdict
 from unittest import mock
 
+from zuul import exceptions
 from zuul import model
+import zuul.driver.aws.awsendpoint
 from zuul.launcher.client import LauncherClient
 
 import responses
@@ -146,6 +149,13 @@ class LauncherBaseTestCase(ZuulTestCase):
             Bucket='zuul',
             CreateBucketConfiguration={'LocationConstraint': 'us-west-2'})
         self.addCleanup(self.mock_aws.stop)
+        self.patch(zuul.driver.aws.awsendpoint, 'CACHE_TTL', 1)
+
+        def getQuotaLimits(self):
+            return model.QuotaInformation(default=math.inf)
+        self.patch(zuul.driver.aws.awsprovider.AwsProvider,
+                   'getQuotaLimits',
+                   getQuotaLimits)
         super().setUp()
 
     def _nodes_by_label(self):
@@ -764,6 +774,22 @@ class TestLauncher(LauncherBaseTestCase):
                     pnode.refresh(ctx)
                 except NoNodeError:
                     break
+
+    @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
+    @mock.patch(
+        'zuul.driver.aws.awsendpoint.AwsProviderEndpoint._createInstance',
+        side_effect=exceptions.QuotaException)
+    def test_quota_failure(self, mock_create):
+        # This tests an unexpected quota error.
+        # The request should never be fulfilled
+        with testtools.ExpectedException(Exception):
+            self.requestNodes(["debian-normal"])
+
+        # We should have tried to build at least one node that was
+        # marked as tempfail.
+        nodes = self.launcher.api.nodes_cache.getItems()
+        self.assertTrue(len(nodes) > 1)
+        self.assertEqual(model.ProviderNode.State.TEMPFAILED, nodes[0].state)
 
     @simple_layout('layouts/nodepool-nodescan.yaml', enable_nodepool=True)
     @okay_tracebacks('_checkNodescanRequest')

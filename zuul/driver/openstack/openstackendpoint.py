@@ -34,10 +34,10 @@ from zuul.driver.openstack.openstackmodel import (
 )
 from zuul.driver.util import (
     LazyExecutorTTLCache,
-    QuotaInformation,
     RateLimiter,
     Timer,
 )
+from zuul.model import QuotaInformation
 from zuul.provider import (
     BaseProviderEndpoint,
     statemachine
@@ -261,7 +261,7 @@ class OpenstackCreateStateMachine(statemachine.StateMachine):
             flavor_name=flavor.flavor_name,
             # min_ram=self.label.min_ram,
         )
-        self.quota = quota_from_flavor(self.os_flavor, label=self.label)
+        self.node.quota = quota_from_flavor(self.os_flavor, label=self.label)
         self.node.openstack_server_id = None
 
     def _handleServerFault(self):
@@ -375,7 +375,7 @@ class OpenstackCreateStateMachine(statemachine.StateMachine):
 
         if self.state == self.COMPLETE:
             self.complete = True
-            return self.endpoint._getInstance(self.server, self.quota)
+            return self.endpoint._getInstance(self.server, self.node.quota)
 
 
 class OpenstackProviderEndpoint(BaseProviderEndpoint):

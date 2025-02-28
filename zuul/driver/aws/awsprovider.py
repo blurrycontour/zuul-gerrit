@@ -31,7 +31,7 @@ from zuul.driver.aws.const import (
     ON_DEMAND,
     VOLUME_QUOTA_CODES,
 )
-from zuul.driver.util import QuotaInformation
+from zuul.model import QuotaInformation
 from zuul.provider import (
     BaseProvider,
     BaseProviderFlavor,
@@ -260,16 +260,16 @@ class AwsProvider(BaseProvider, subclass_id='aws'):
         volume_types = set()
         ec2_quotas = self.endpoint._listEC2Quotas()
         ebs_quotas = self.endpoint._listEBSQuotas()
-        for label in self.labels.values():
-            if label.dedicated_host:
-                host_types.add(label.instance_type)
+        for flavor in self.flavors.values():
+            if flavor.dedicated_host:
+                host_types.add(flavor.instance_type)
             else:
-                if label.instance_type not in instance_types:
-                    instance_types[label.instance_type] = set()
-                instance_types[label.instance_type].add(
-                    SPOT if label.use_spot else ON_DEMAND)
-            if label.volume_type:
-                volume_types.add(label.volume_type)
+                if flavor.instance_type not in instance_types:
+                    instance_types[flavor.instance_type] = set()
+                instance_types[flavor.instance_type].add(
+                    SPOT if flavor.market_type == 'spot' else ON_DEMAND)
+            if flavor.volume_type:
+                volume_types.add(flavor.volume_type)
         args = dict(default=math.inf)
         for instance_type in instance_types:
             for market_type_option in instance_types[instance_type]:

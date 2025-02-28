@@ -80,7 +80,9 @@ class BaseCloudDriverTest(ZuulTestCase):
             self.assertTrue(pnode.hasLock())
             self._assertProviderNodeAttributes(pnode)
 
-        self.assertGreater(len(list(endpoint.listInstances())), 0)
+        for _ in iterate_timeout(10, "instances to appear"):
+            if len(list(endpoint.listInstances())) > 0:
+                break
         client.useNodeset(nodeset)
         self.waitUntilSettled()
 
@@ -102,6 +104,71 @@ class BaseCloudDriverTest(ZuulTestCase):
                     pnode.refresh(ctx)
                 except NoNodeError:
                     break
+
+        # Iterate here because the aws driver (at least) performs
+        # delayed async deletes.
+        for _ in iterate_timeout(60, "instances to be deleted"):
+            if len(list(endpoint.listInstances())) == 0:
+                break
+
+    def _test_quota(self, label):
+        for _ in iterate_timeout(
+                30, "scheduler and launcher to have the same layout"):
+            if (self.scheds.first.sched.local_layout_state.get("tenant-one") ==
+                self.launcher.local_layout_state.get("tenant-one")):
+                break
+        endpoint = self._getEndpoint()
+        nodeset1 = model.NodeSet()
+        nodeset1.addNode(model.Node("node", label))
+
+        nodeset2 = model.NodeSet()
+        nodeset2.addNode(model.Node("node", label))
+
+        ctx = self.createZKContext(None)
+        request1 = self.requestNodes([n.label for n in nodeset1.getNodes()])
+        request2 = self.requestNodes(
+            [n.label for n in nodeset2.getNodes()],
+            timeout=None)
+
+        client = LauncherClient(self.zk_client, None)
+        request1 = client.getRequest(request1.uuid)
+
+        self.assertEqual(request1.state, model.NodesetRequest.State.FULFILLED)
+        self.assertEqual(len(request1.nodes), 1)
+
+        client.acceptNodeset(request1, nodeset1)
+        client.useNodeset(nodeset1)
+
+        # We should still be waiting on request2.
+
+        # TODO: This is potentially racy (but only producing
+        # false-negatives) and also slow. We should find a way to
+        # determine if the launcher had paused a provider.
+        with testtools.ExpectedException(Exception):
+            self.waitForNodeRequest(request2, 10)
+        request2 = client.getRequest(request2.uuid)
+        self.assertEqual(request2.state, model.NodesetRequest.State.ACCEPTED)
+
+        client.returnNodeset(nodeset1)
+        self.waitUntilSettled()
+
+        for node in nodeset1.getNodes():
+            pnode = node._provider_node
+            for _ in iterate_timeout(60, "node to be deleted"):
+                try:
+                    pnode.refresh(ctx)
+                except NoNodeError:
+                    break
+
+        self.waitForNodeRequest(request2, 10)
+        request2 = client.getRequest(request2.uuid)
+        self.assertEqual(request2.state, model.NodesetRequest.State.FULFILLED)
+        self.assertEqual(len(request2.nodes), 1)
+
+        client.acceptNodeset(request2, nodeset2)
+        client.useNodeset(nodeset2)
+        client.returnNodeset(nodeset2)
+        self.waitUntilSettled()
 
         # Iterate here because the aws driver (at least) performs
         # delayed async deletes.
