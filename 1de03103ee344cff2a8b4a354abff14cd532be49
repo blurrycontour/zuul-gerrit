@@ -50,6 +50,40 @@
       "message": "recheck",
       "revId": "1de03103ee344cff2a8b4a354abff14cd532be49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "283b46f9_f35092a0",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-28T13:57:09Z",
+      "side": 1,
+      "message": "Seen the JSON/dict handling here I\u0027m wondering if we might want to use a ZKObject or at least some lean classes for the data structures that we store in ZK.",
+      "revId": "1de03103ee344cff2a8b4a354abff14cd532be49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71323df8_35519124",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-02-28T13:57:09Z",
+      "side": 1,
+      "message": "variable names should be snake-case",
+      "revId": "1de03103ee344cff2a8b4a354abff14cd532be49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
