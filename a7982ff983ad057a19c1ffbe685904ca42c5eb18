@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff77aba8_445968d1",
+        "filename": "bindep.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-02-28T16:08:54Z",
+      "side": 1,
+      "message": "If you mark this as a [compile test] dep then I think it won\u0027t be included in the final container images.",
+      "revId": "a7982ff983ad057a19c1ffbe685904ca42c5eb18",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
