@@ -50,6 +50,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "ad07d12e_738f6634",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 17
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-02-28T15:27:13Z",
+      "side": 1,
+      "message": "Thanks!  For the other platforms, I didn\u0027t do the thing where we have docker compose on the frontend and the podman service on the backend for simplicity.  So the test is slightly different than the instructions (which will just have users using docker, unless they change it themselves), but I think that\u0027s for the best.\n\nI edited your instructions slightly to remove the podman backend parts and added that as a followup change.",
+      "parentUuid": "75a00c89_3fcc90ee",
+      "revId": "112c43e620015b24bc8c2dfc4090964facd61fb8",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "3cc5ab5d_30bb0ed3",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 17
