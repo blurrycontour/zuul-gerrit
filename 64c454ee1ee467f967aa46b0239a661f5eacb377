@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88170e94_fb813f2f",
+        "filename": "requirements.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-02-28T16:07:59Z",
+      "side": 0,
+      "message": "I think we should only remove the version pin not the dependency? Zuul has a direct dependency on kafka libs as part of the gerrit kafka event stream support?",
+      "revId": "64c454ee1ee467f967aa46b0239a661f5eacb377",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
