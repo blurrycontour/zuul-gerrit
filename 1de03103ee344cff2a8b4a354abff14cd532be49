@@ -84,6 +84,24 @@
       "message": "variable names should be snake-case",
       "revId": "1de03103ee344cff2a8b4a354abff14cd532be49",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1f030b8_5931b26d",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-02-28T14:17:03Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "71323df8_35519124",
+      "revId": "1de03103ee344cff2a8b4a354abff14cd532be49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
