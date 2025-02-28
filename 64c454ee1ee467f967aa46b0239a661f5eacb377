@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c9aa017_b8184f13",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-02-28T16:06:50Z",
+      "side": 1,
+      "message": "Double checking the package on pypi they have not published any wheels yet. The 2.8.0 release does have wheels. I\u0027m not sure if this is a change in their approach to publication but a followup might require adding deps to build the wheels if they don\u0027t intend on publishing them anymore.",
+      "revId": "64c454ee1ee467f967aa46b0239a661f5eacb377",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
