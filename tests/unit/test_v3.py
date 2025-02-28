@@ -10995,3 +10995,38 @@ class TestIncludeVars(ZuulTestCase):
                  ref='refs/tags/foo'),
             dict(name='other-project', result='SUCCESS', ref='refs/tags/foo'),
         ], ordered=False)
+
+
+class TestAttributeControl(ZuulTestCase):
+    @simple_layout('layouts/final-control.yaml')
+    def test_final_control(self):
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        for attr in [
+                'requires',
+                'provides',
+                'tags',
+                'files',
+                'irrelevant-files',
+                'required-projects',
+                'vars',
+                'extra-vars',
+                'host-vars',
+                'group-vars',
+                'include-vars',
+                'dependencies',
+                'failure-output',
+        ]:
+            content = "- project: {check: {jobs: [test-%s]}}" % (attr,)
+            file_dict = {'zuul.yaml': content}
+            B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B',
+                                               files=file_dict)
+            self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+            self.waitUntilSettled()
+            self.assertIn('Unable to modify job', B.messages[0])
+
+        self.assertHistory([
+            dict(name='final-job', result='SUCCESS'),
+        ], ordered=False)

@@ -18,7 +18,9 @@ starting with very basic jobs which describe characteristics that all
 jobs on the system should have, progressing through stages of
 specialization before arriving at a particular job.  A job may inherit
 from any other job in any project (however, if the other job is marked
-as :attr:`job.final`, jobs may not inherit from it).
+as :attr:`job.final`, jobs may not inherit from it, and if any of its
+attributes are marked as final with :attr:`job.attribute-control`,
+those attributes may not be changed).
 
 Generally, if an attribute is set on a child job, it will override (or
 completely replace) attributes on the parent.  This is always true for
@@ -69,7 +71,8 @@ These may have different selection criteria which indicate to Zuul
 that, for instance, the job should behave differently on a different
 git branch.  Unlike inheritance, all job variants must be defined in
 the same project.  Some attributes of jobs marked :attr:`job.final`
-may not be overridden.
+may not be overridden.  Individual attributes marked as final with
+with :attr:`job.attribute-control` may not be overridden.
 
 When Zuul decides to run a job, it performs a process known as
 freezing the job.  Because any number of job variants may be
@@ -221,6 +224,40 @@ Here is an example of two job definitions:
       to accidentally inherit from the base job `foo` instead of
       choosing one of the two variants, `foo` could be marked as
       ``intermediate``.
+
+   .. attr:: attribute-control
+
+      Individual attributes may be set to final so that any attempt to
+      set them by child jobs or variants will result in an error.
+
+      This is a dictionary where each key is a job attribute; the
+      value is another dictionary with ``final: true`` to set the
+      attribute final.
+
+      For example, to set the required-projects list fo final:
+
+      .. code-block:: yaml
+
+         - job:
+             attribute-control:
+               required-projects:
+                 final: true
+
+      The following attributes are supported:
+
+        * requires
+        * provides
+        * tags
+        * files
+        * irrelevant-files
+        * required-projects
+        * vars
+        * extra-vars
+        * host-vars
+        * group-vars
+        * include-vars
+        * dependencies
+        * failure-output
 
    .. attr:: success-message
       :default: SUCCESS
