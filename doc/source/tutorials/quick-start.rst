@@ -31,6 +31,16 @@ Before you start, ensure that some needed packages are installed.
 
 .. code-block:: shell
 
+   # CentOS-Stream-9 / -10
+
+   dnf install dnf-plugins-core
+   dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+   dnf install git docker-compose-plugin python3 docker-ce docker-ce-cli
+
+   python3 -m venv /opt/git-review
+   /opt/git-review/bin/pip3 install git-review
+   ln -sf /opt/git-review/bin/git-review /usr/local/bin/
+
    # Fedora:
 
    sudo dnf install git git-review docker-compose
