@@ -1949,21 +1949,20 @@ class ZuulWebAPI(object):
         ibr = self.zuulweb.image_build_registry
         iur = self.zuulweb.image_upload_registry
         for provider in providers:
+            build_artifacts = []
+            uploads = []
             for image in provider.images.values():
                 if image.type == 'zuul':
-                    uploads = [
+                    uploads.extend([
                         u for u in iur.getUploadsForImage(image.canonical_name)
                         if provider.canonical_name in u.providers
-                    ]
+                    ])
                     artifact_uuids = set([u.artifact_uuid for u in uploads])
-                    build_artifacts = [
+                    build_artifacts.extend([
                         b for b in ibr.getArtifactsForImage(
                             image.canonical_name)
                         if b.uuid in artifact_uuids
-                    ]
-                else:
-                    build_artifacts = []
-                    uploads = []
+                    ])
             ret.append(ProviderConverter.toDict(
                 tenant, provider, build_artifacts, uploads))
         return ret
