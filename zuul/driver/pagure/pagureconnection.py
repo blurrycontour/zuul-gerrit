@@ -639,17 +639,12 @@ class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
             return change
         project = self.source.getProject(change_key.project_name)
         if not change:
-            if not event:
-                self.log.error("Change %s not found in cache and no event",
-                               change_key)
-            if event:
-                url = event.change_url
             change = PullRequest(project.name)
             change.project = project
             change.number = number
             # patchset is the tips commit of the PR
             change.patchset = change_key.revision
-            change.url = url or self.getPullUrl(project.name, number)
+            change.url = self.getPullUrl(project.name, number)
             change.uris = [
                 '%s/%s/pull/%s' % (self.baseurl, project.name, number),
             ]
@@ -673,9 +668,6 @@ class PagureConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 self._change_cache.updateChangeWithRetry(
                     change_key, change, lambda: None)
             return change
-        if not event:
-            self.log.error("Change %s not found in cache and no event",
-                           change_key)
         project = self.source.getProject(change_key.project_name)
         if change_key.change_type == 'Tag':
             change = Tag(project)

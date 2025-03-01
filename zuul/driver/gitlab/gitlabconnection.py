@@ -712,9 +712,6 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 self._change_cache.updateChangeWithRetry(
                     change_key, change, lambda c: None)
             return change
-        if not event:
-            self.log.error("Change %s not found in cache and no event",
-                           change_key)
         project = self.source.getProject(change_key.project_name)
         if change_key.change_type == 'Tag':
             change = Tag(project)

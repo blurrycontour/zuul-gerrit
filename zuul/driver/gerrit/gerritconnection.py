@@ -722,9 +722,6 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         if change and not refresh:
             return change
         if not change:
-            if not event:
-                self.log.error("Change %s not found in cache and no event",
-                               change_key)
             change = GerritChange(None)
             change.number = change_key.stable_id
             change.patchset = change_key.revision
@@ -767,9 +764,6 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 self._change_cache.updateChangeWithRetry(
                     change_key, change, lambda c: None)
             return change
-        if not event:
-            self.log.error("Change %s not found in cache and no event",
-                           change_key)
         project = self.source.getProject(change_key.project_name)
         change = Tag(project)
         change.tag = tag
@@ -791,9 +785,6 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 self._change_cache.updateChangeWithRetry(
                     change_key, change, lambda c: None)
             return change
-        if not event:
-            self.log.error("Change %s not found in cache and no event",
-                           change_key)
         project = self.source.getProject(change_key.project_name)
         change = Branch(project)
         change.branch = branch
@@ -814,9 +805,6 @@ class GerritConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
                 self._change_cache.updateChangeWithRetry(
                     change_key, change, lambda c: None)
             return change
-        if not event:
-            self.log.error("Change %s not found in cache and no event",
-                           change_key)
         project = self.source.getProject(change_key.project_name)
         change = Ref(project)
         change.ref = change_key.stable_id
