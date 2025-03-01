@@ -223,7 +223,7 @@
     post-run: playbooks/tutorial/post.yaml
     required-projects:
       - zuul/zuul
-    nodeset: ubuntu-jammy
+    nodeset: ubuntu-noble
 
 # Image building jobs
 - secret:
