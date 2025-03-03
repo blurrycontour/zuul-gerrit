@@ -1850,11 +1850,10 @@ class Launcher:
         system_id = self.system.system_id
         for instance in endpoint.listInstances():
             meta = instance.metadata
-            if (meta.get('zuul_system_id') != system_id or
+            if (meta.get('zuul_system_id') == system_id and
                 meta.get('zuul_node_uuid') in node_ids):
                 continue
-            qi = instance.getQuotaInformation()
-            used.add(qi)
+            used.add(instance.getQuotaInformation())
         return used
 
     def getProviderQuota(self, provider):
