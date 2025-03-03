@@ -33,6 +33,23 @@
       "message": "recheck",
       "revId": "09599505c2f98e3abd1e2c250d3c7d6363ad420e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4032291e_cd349af3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-03-03T09:53:21Z",
+      "side": 1,
+      "message": "recheck\nunrelated error (kazoo connection lost error) + timeout",
+      "revId": "09599505c2f98e3abd1e2c250d3c7d6363ad420e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
