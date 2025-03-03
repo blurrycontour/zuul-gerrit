@@ -1869,8 +1869,8 @@ class Launcher:
                        provider.name, quota)
 
         unmanaged = self.getUnmanagedQuotaUsed(provider)
-        self.log.debug("Provider unmaneged quota used for %s: %s",
-                       provider.name, quota)
+        self.log.debug("Provider unmanaged quota used for %s: %s",
+                       provider.name, unmanaged)
 
         # Subtract the unmanaged quota usage from nodepool_max
         # to get the quota available for us.
@@ -1901,9 +1901,9 @@ class Launcher:
 
     def doesProviderHaveQuotaForNode(self, provider, node, log):
         total = self.getProviderQuota(provider).copy()
-        self.log.debug("Provider quota before Zuul: %s", total)
+        log.debug("Provider quota before Zuul: %s", total)
         total.subtract(self.getQuotaUsed(provider))
-        self.log.debug("Provider quota including Zuul: %s", total)
+        log.debug("Provider quota including Zuul: %s", total)
         total.subtract(node.quota)
-        self.log.debug("Node required quota: %s", node.quota)
+        log.debug("Node required quota: %s", node.quota)
         return total.nonNegative()
