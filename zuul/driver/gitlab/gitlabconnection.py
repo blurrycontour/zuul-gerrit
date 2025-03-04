@@ -742,7 +742,7 @@ class GitlabConnection(ZKChangeCacheMixin, ZKBranchCacheMixin, BaseConnection):
         change.ref = "refs/merge-requests/%s/head" % change.number
         change.branch = change.mr['target_branch']
         change.is_current_patchset = (change.mr['sha'] == change.patchset)
-        change.commit_id = event.patch_number
+        change.commit_id = change.mr['sha']
         diff_refs = change.mr.get("diff_refs", {})
         if diff_refs:
             change.base_sha = diff_refs.get('base_sha')
