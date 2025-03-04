@@ -30,6 +30,7 @@ from tests.base import (
 )
 from zuul.zk import ZooKeeperClient
 from zuul.zk.branch_cache import BranchCache, BranchFlag
+from zuul.zk.locks import management_queue_lock
 from zuul.zk.zkobject import ZKContext
 from tests.unit.test_zk import DummyConnection
 
@@ -420,3 +421,42 @@ class TestBranchCacheUpgrade(BaseTestCase):
             for branch_name in cache_project.branches.keys():
                 if branch_name not in project['branches']:
                     raise Exception(f"Unexpected branch {branch_name}")
+
+
+class TestSemaphoreReleaseUpgrade(ZuulTestCase):
+    tenant_config_file = 'config/global-semaphores/main.yaml'
+
+    @model_version(32)
+    def test_model_32(self):
+        # This tests that a job finishing in one tenant will correctly
+        # start a job in another tenant waiting on the semaphore.
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project1', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        B = self.fake_gerrit.addFakeChange('org/project2', 'master', 'B')
+        self.fake_gerrit.addEvent(B.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([])
+        self.assertBuilds([
+            dict(name='test-global-semaphore', changes='1,1'),
+        ])
+
+        # Block tenant management event queues so we know that the
+        # semaphore release events are dispatched via the pipeline
+        # trigger event queue.
+        with (management_queue_lock(self.zk_client, "tenant-one"),
+              management_queue_lock(self.zk_client, "tenant-two")):
+
+            self.executor_server.hold_jobs_in_build = False
+            self.executor_server.release()
+            self.waitUntilSettled()
+
+            self.assertHistory([
+                dict(name='test-global-semaphore',
+                     result='SUCCESS', changes='1,1'),
+                dict(name='test-global-semaphore',
+                     result='SUCCESS', changes='2,1'),
+            ], ordered=False)

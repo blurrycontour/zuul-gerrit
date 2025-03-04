@@ -233,3 +233,10 @@ Version 32
 :Prior Zuul version: 11.1.0
 :Description: Add topic query timestamp.
               Affects schedulers.
+
+Version 33
+----------
+:Prior Zuul version: 11.2.0
+:Description: Send SemaphoreReleaseEvents to the tenant management event queue
+              instead of the pipeline trigger event queue.
+              Affects schedulers and executors.
