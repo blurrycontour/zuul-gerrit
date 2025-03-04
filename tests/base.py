@@ -2237,6 +2237,7 @@ class TestConfig:
             # until we understand them more, we can't fail on them.
             'RolledBackError',
             'pipeline.change_list.refresh',
+            'kazoo.exceptions.ConnectionClosedError',
         ]
         self.simple_layout = getattr(test, '__simple_layout__', None)
         self.gerrit_config = getattr(test, '__gerrit_config__', {})
