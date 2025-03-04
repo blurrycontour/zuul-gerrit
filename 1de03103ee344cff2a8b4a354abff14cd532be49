@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a4cfe21b_be067976",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-03-04T10:45:22Z",
+      "side": 1,
+      "message": "I think we can use ZKObject to utilize the common operations utilized there and this refactoring can be done in a separate change on top of it.",
+      "parentUuid": "283b46f9_f35092a0",
+      "revId": "1de03103ee344cff2a8b4a354abff14cd532be49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "71323df8_35519124",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 14
