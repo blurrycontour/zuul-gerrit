@@ -67,6 +67,24 @@
       "message": "I see that there is also `item.zuul_event_id`, so I\u0027m not sure we can simply replace a `zuul_event_id` with a `item.event`, isn\u0027t that going to cause confusion?",
       "revId": "09599505c2f98e3abd1e2c250d3c7d6363ad420e",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94a422ed_438748dc",
+        "filename": "zuul/configloader.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 3440,
+      "author": {
+        "id": 7186
+      },
+      "writtenOn": "2025-03-04T10:54:41Z",
+      "side": 1,
+      "message": "This is handled in https://opendev.org/zuul/zuul/src/branch/master/zuul/lib/logutil.py#L19 - if the event argument has a zuul_event_id attribute it uses it, otherwise it uses the event itself.\n\nSo I think this can be marked as resolved.",
+      "parentUuid": "1ec2d293_314cbd5c",
+      "revId": "09599505c2f98e3abd1e2c250d3c7d6363ad420e",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
