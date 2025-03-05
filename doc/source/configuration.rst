@@ -242,15 +242,6 @@ The following sections of ``zuul.conf`` are used by the scheduler:
       See :attr:`tenant.web-root` for additional options for
       whitelabeled tenant configuration.
 
-   .. attr:: status_url
-
-      .. warning:: This is deprecate and only used for the also deprecated
-                   ``status_url`` replacement field available in pipeline
-                   reporter messages.
-
-      URL that will be posted in Zuul comments made to changes when
-      starting jobs for a change.
-
 .. attr:: keystore
 
    .. _keystore-password:

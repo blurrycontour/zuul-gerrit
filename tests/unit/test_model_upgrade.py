@@ -28,6 +28,7 @@ from tests.base import (
     model_version,
     ZOOKEEPER_SESSION_TIMEOUT,
 )
+from zuul import model
 from zuul.zk import ZooKeeperClient
 from zuul.zk.branch_cache import BranchCache, BranchFlag
 from zuul.zk.locks import management_queue_lock
@@ -64,6 +65,34 @@ class TestModelUpgrade(ZuulTestCase):
         for _ in iterate_timeout(30, "model api to update"):
             if component_registry.model_api == 1:
                 break
+
+    @model_version(33)
+    def test_model_upgrade_33_34(self):
+
+        attrs = model.SystemAttributes.fromDict({
+            "use_relative_priority": True,
+            "max_hold_expiration": 7200,
+            "default_hold_expiration": 3600,
+            "default_ansible_version": "X",
+            "web_root": "/web/root",
+            "websocket_url": "/web/socket",
+            "web_status_url": "ignored",
+        })
+
+        attr_dict = attrs.toDict()
+        self.assertIn("web_status_url", attr_dict)
+        self.assertEqual(attr_dict["web_status_url"], "")
+
+        # Upgrade our component
+        self.model_test_component_info.model_api = 34
+
+        component_registry = ComponentRegistry(self.zk_client)
+        for _ in iterate_timeout(30, "model api to update"):
+            if component_registry.model_api == 34:
+                break
+
+        attr_dict = attrs.toDict()
+        self.assertNotIn("web_status_url", attr_dict)
 
 
 class TestModelUpgradeGerritCircularDependencies(ZuulTestCase):
