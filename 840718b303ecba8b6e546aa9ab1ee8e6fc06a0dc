@@ -50,6 +50,23 @@
       "message": "Oh, sorry I did not check the open reviews before working on that issue. However now looking at both I\u0027m not sure we need the implementation done in 889431 as this current one could be just enough. The `change.mr[\u0027sha\u0027]` should always be available according to the doc https://docs.gitlab.com/api/merge_requests/#response (and we use it the line above w/o any safeties). Only `diff_refs` is async as mentioned here https://docs.gitlab.com/api/merge_requests/#troubleshooting\n\nLet me know wdyt, I\u0027m fine with both.",
       "revId": "840718b303ecba8b6e546aa9ab1ee8e6fc06a0dc",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74281723_9d07aa4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2025-03-05T12:20:15Z",
+      "side": 1,
+      "message": "recheck",
+      "revId": "840718b303ecba8b6e546aa9ab1ee8e6fc06a0dc",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
