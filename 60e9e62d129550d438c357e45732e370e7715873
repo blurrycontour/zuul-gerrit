@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aaaefc00_cade6101",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6889
+      },
+      "writtenOn": "2025-03-05T09:15:22Z",
+      "side": 1,
+      "message": "I\u0027m fine with this implementation (another one is here https://review.opendev.org/c/zuul/zuul/+/943325). Recently our users faced that issue. Let\u0027s see if we can land this one or the other.",
+      "revId": "60e9e62d129550d438c357e45732e370e7715873",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
