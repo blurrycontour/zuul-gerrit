@@ -286,7 +286,7 @@ pods that need them.
       manage_ansible: false
     web:
       count: 1
-      status_url: https://zuul.example.org
+      root: https://zuul.example.org
     fingergw:
       count: 1
     scheduler:

@@ -240,3 +240,9 @@ Version 33
 :Description: Send SemaphoreReleaseEvents to the tenant management event queue
               instead of the pipeline trigger event queue.
               Affects schedulers and executors.
+
+Version 34
+----------
+:Prior Zuul version: 11.3.0
+:Description: Don't store deprecated web ``status_url`` in system attributes anymore.
+              Affects schedulers and web.
