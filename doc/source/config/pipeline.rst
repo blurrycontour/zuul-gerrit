@@ -215,13 +215,6 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
         Deprecated: information about the change
       changes
         Deprecated: information about the change
-      status_url
-        Deprecated: the configured web ui status page root
-
-      .. warning:: The replacement fields ``change``, ``changes``, and
-                   ``status_url`` are deprecated.  Use ``item_url``,
-                   which is automatically the best URL for information
-                   about the item instead.
 
    .. attr:: enqueue-message
 
@@ -237,13 +230,6 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
         Deprecated: information about the change
       changes
         Deprecated: information about the change
-      status_url
-        Deprecated: the configured web ui status page root
-
-      .. warning:: The replacement fields ``change``, ``changes``, and
-                   ``status_url`` are deprecated.  Use ``item_url``,
-                   which is automatically the best URL for information
-                   about the item instead.
 
    .. attr:: merge-conflict-message
       :default: Merge failed.
@@ -266,13 +252,6 @@ success, the pipeline reports back to Gerrit with ``Verified`` vote of
         Deprecated: information about the change
       changes
         Deprecated: information about the change
-      status_url
-        Deprecated: the configured web ui status page root
-
-      .. warning:: The replacement fields ``change``, ``changes``, and
-                   ``status_url`` are deprecated.  Use ``item_url``,
-                   which is automatically the best URL for information
-                   about the item instead.
 
    .. attr:: dequeue-message
       :default: Build canceled.
