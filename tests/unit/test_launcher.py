@@ -14,6 +14,7 @@
 # under the License.
 
 import math
+import os
 import textwrap
 import time
 from collections import defaultdict
@@ -26,6 +27,7 @@ from zuul.launcher.client import LauncherClient
 
 import responses
 import testtools
+import yaml
 from kazoo.exceptions import NoNodeError
 from moto import mock_aws
 import boto3
@@ -784,6 +786,42 @@ class TestLauncher(LauncherBaseTestCase):
                     pnode.refresh(ctx)
                 except NoNodeError:
                     break
+
+    @simple_layout('layouts/launcher-nodeset-fallback.yaml',
+                   enable_nodepool=True)
+    @okay_tracebacks('_getQuotaForInstanceType')
+    def test_nodeset_fallback(self):
+        # Test that nodeset fallback works
+        self.executor_server.hold_jobs_in_build = True
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        job = tenant.layout.getJob('check-job')
+        alts = job.flattenNodesetAlternatives(tenant.layout)
+        self.assertEqual(2, len(alts))
+        self.assertEqual('debian-invalid', alts[0].nodes[('node',)].label)
+        self.assertEqual('debian-normal', alts[1].nodes[('node',)].label)
+
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        build = self.getBuildByName('check-job')
+        inv_path = os.path.join(build.jobdir.root, 'ansible', 'inventory.yaml')
+        with open(inv_path, 'r') as f:
+            inventory = yaml.safe_load(f)
+        label = inventory['all']['hosts']['node']['nodepool']['label']
+        self.assertEqual('debian-normal', label)
+
+        self.executor_server.hold_jobs_in_build = False
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'NEW')
+        self.assertEqual(A.reported, 1)
+        self.assertNotIn('NODE_FAILURE', A.messages[0])
+        self.assertHistory([
+            dict(name='check-job', result='SUCCESS', changes='1,1'),
+        ], ordered=False)
 
     @simple_layout('layouts/nodepool.yaml', enable_nodepool=True)
     @mock.patch(

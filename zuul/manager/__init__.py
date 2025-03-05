@@ -1162,8 +1162,7 @@ class PipelineManager(metaclass=ABCMeta):
         log.debug("Falling back to Nodepool due to missing labels: %s", labels)
         return True
 
-    def _makeNodepoolRequest(self, log, build_set, job, relative_priority,
-                             alternative=0):
+    def _makeNodepoolRequest(self, log, build_set, job, relative_priority):
         provider = self._getPausedParentProvider(build_set, job)
         priority = self._calculateNodeRequestPriority(build_set, job)
         tenant_name = build_set.item.pipeline.tenant.name
@@ -1183,7 +1182,7 @@ class PipelineManager(metaclass=ABCMeta):
         else:
             job.setWaitingStatus(f'node request: {req.id}')
 
-    def _makeLauncherRequest(self, log, build_set, job, alternative=0):
+    def _makeLauncherRequest(self, log, build_set, job, relative_priority):
         provider = self._getPausedParentProvider(build_set, job)
         priority = self._calculateNodeRequestPriority(build_set, job)
         item = build_set.item
@@ -2267,8 +2266,12 @@ class PipelineManager(metaclass=ABCMeta):
                 build_set.item.getChangeForJob(job))
         else:
             relative_priority = 0
-        log = build_set.item.annotateLogger(self.log)
-        self._makeNodepoolRequest(log, build_set, job, relative_priority)
+        if self._useNodepoolFallback(log, job):
+            self._makeNodepoolRequest(
+                log, build_set, job, relative_priority)
+        else:
+            self._makeLauncherRequest(
+                log, build_set, job, relative_priority)
         return True
 
     def onNodesProvisioned(self, request, nodeset_info, build_set):
