@@ -382,6 +382,7 @@ class GithubDriverMock(GithubDriver):
                  additional_event_queues, git_url_with_auth):
         super(GithubDriverMock, self).__init__()
         self.registry = registry
+        self.test_config = test_config
         self.changes = test_config.changes
         self.config = config
         self.upstream_root = upstream_root
