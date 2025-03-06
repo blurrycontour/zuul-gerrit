@@ -85,6 +85,24 @@
       "message": "Do we want to pull in a library to deal with the JWK stuff? E.g. authlib https://docs.authlib.org/en/latest/jose/jwk.html\n\nI think that would at least give use some validation especially since this is security related.",
       "revId": "de82e9cb2eddbd1c78f2857485866ebf36e89714",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8459e05b_a473e921",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1178,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-03-06T08:41:14Z",
+      "side": 1,
+      "message": "I think that make sense, it would also simplify the code. I updated the code in the new Patchset.",
+      "parentUuid": "22c9c5b8_a72d2874",
+      "revId": "de82e9cb2eddbd1c78f2857485866ebf36e89714",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
