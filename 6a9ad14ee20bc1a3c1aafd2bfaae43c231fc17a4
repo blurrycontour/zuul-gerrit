@@ -16,6 +16,125 @@
       "message": "recheck",
       "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10462a0f_eed9c2c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T02:38:33Z",
+      "side": 1,
+      "message": "There seems to be a bit of nuance to this change so I ended up writing a number of questions and suggestions. Let me know what you think",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85e2190e_abe0162b",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1143,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T02:38:33Z",
+      "side": 1,
+      "message": "GerritEventConnector\u0027s _calculateDelay refers to GerritEventProcessor.delay not GerritEventConnector.delay. I\u0027m not sure this attribute update is shortening the delay in a meaningful way.",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35ef965e_8a8ac59d",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1683,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T02:38:33Z",
+      "side": 1,
+      "message": "It took me a little bit to understand why we don\u0027t process the refs/meta/foo event immediately. The reason is we short circuit in the peek list if we have an outstanding ref ahead of anything else.\n\nWould it make sense to have a test case for refs/meta/foo arriving first to show that we would process it immediately in that case?",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc861de6_002875b1",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T02:38:33Z",
+      "side": 1,
+      "message": "What is with the `not ref.startswith(\u0027refs/\u0027)` check here? Aren\u0027t branches always refs/heads/foo?",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68a1214a_94f55a96",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T02:38:33Z",
+      "side": 1,
+      "message": "If we wanted to be defensive against changing Gerrit behavior (they could theoretically flip the order one day). We might want to do something like\n\n```\nevent.zuul_event_ltime \u003d min(event.zuul_event_ltime, other_event.zuul_event_ltime)\nother.zuul_event_ltime \u003d min(event.zuul_event_ltime, other_event.zuul_event_ltime)\n```\n\nI guess we would also need to insert the change-merged event into new_event_list if newrev is not in ref_updates and have the ref-updated block do similar things to change-merged handling. That is probably not worth over complicating in this particular change but might make a good follow up? Then zuul can enforce the order it wants regardless of what Gerrit does over time.",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddf00336_81de77f9",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T02:38:33Z",
+      "side": 1,
+      "message": "Nit, in the case of Gerrit we\u0027re relying on ssh events stream not a webhook right?",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5db4828_8ea99a6a",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T02:38:33Z",
+      "side": 1,
+      "message": "The first ever time this gets called on zuul startup it will be a complete noop since nothing has been appended to the queue. However, we may have exited _dispatchEvents() previously without emptying the queue so we need to call this here to preprocess the existing queue before adding additional events to the queue below?\n\nAt least that is my intuition, but we always call run() after append() below so every event should trigger a round of reprocessing in the loop below. Why is this call here on line 458 necessary?",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
