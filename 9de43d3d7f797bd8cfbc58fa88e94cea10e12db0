@@ -1,6 +1,29 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "574b6236_3bf79e99",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T01:45:15Z",
+      "side": 1,
+      "message": "This is a great sentence in a commit message.",
+      "range": {
+        "startLine": 24,
+        "startChar": 60,
+        "endLine": 27,
+        "endChar": 1
+      },
+      "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "6686f28a_b3514bb0",
@@ -14,6 +37,57 @@
       "writtenOn": "2025-03-06T01:19:18Z",
       "side": 1,
       "message": "recheck",
+      "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa5ab3dc_e6402854",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T01:45:15Z",
+      "side": 1,
+      "message": "One note about why I think CI is failing. Another about a potentially confusing scenario if looking at the change data directly that may warrant additional commenting. I think the change overall is sound though.",
+      "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44f2a8a6_828a8e16",
+        "filename": "tests/fakegerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T01:45:15Z",
+      "side": 1,
+      "message": "The upgrade test job is failing on `AttributeError: \u0027FakeGerritChange\u0027 object has no attribute \u0027cherry_pick\u0027` I think the use of self.cherry_pick here and below may need to check `if hasattr(self, \u0027cherry_pick\u0027) and self.cherry_pick:` or similar to make that happy.",
+      "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6beabce9_b92c7b84",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1061,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-06T01:45:15Z",
+      "side": 1,
+      "message": "The call to update_change() here would end up updating the current patchet value in the http case to match the new merged state, but wouldn\u0027t do so in the ssh case? I don\u0027t know that that is worth an edit to the comment above. But it might be confusing from a data perspective if inspecting the data directly because the patchset value in the key wouldn\u0027t match the patchset value within the change value itself?",
       "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
