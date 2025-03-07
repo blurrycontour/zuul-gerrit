@@ -117,6 +117,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "49404c10_f2c529ed",
+        "filename": "tests/fakegerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-07T23:31:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0e68264_d1a602e5",
+      "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6beabce9_b92c7b84",
@@ -184,6 +202,24 @@
       "side": 1,
       "message": "Got it.  A thing to keep in mind is that both query methods (http and ssh) get information about all patchsets.  Since the existing GerritChange object passed into this method has, let\u0027s say, GerritChange.patchset\u003d3, then the GerritChange.update() method will know not to overwrite information such as the commit sha with a different revision.  They will, however, flip the is_current_patchset bit if they see that there is a patchset 4.\n\nIn other words, I think we can say that we don\u0027t have the data corruption problem you are concerned about.\n\nWhat I\u0027m trying to say in the comment is basically \"we\u0027re going to lie and say that patchset 3 is merged even if we know there is a patchset 4 and that was the actual one that was merged; and the reason it\u0027s okay to lie about that is because the only time that would matter is in the case where we\u0027re using ssh queries and the cherry-pick mode, because queries for *other* changes (not this one) can\u0027t tell that there was a cherry-picked patchset 4 of their dependency (this change), so we need to lie and say that patchset 3 was merged (because otherwise we would do a gate reset).\"\n\nTo put all that another way: the update method will not update this change with wrong data no matter how the query happened (with the exception of the small lie about whether this patchset was merged).  And the only time the difference between ssh and http queries matters is when other changes are pointing at this one with a git dependency (see line 290).",
       "parentUuid": "76366daa_dcecee1e",
+      "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "704b4047_5a88e8e1",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1061,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-07T23:31:47Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9d45011a_96e241b4",
       "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }

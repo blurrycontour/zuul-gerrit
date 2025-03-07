@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b309d5ae_8eb1eeb2",
+        "filename": "tests/fakegerrit.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-07T23:31:47Z",
+      "side": 1,
+      "message": "The upgrade job now complains with `AttributeError: \u0027super\u0027 object has no attribute \u0027__setstate__\u0027`. Looking at https://docs.python.org/3/library/pickle.html#pickle-state I think instead you need to do `self.__dict__.update(state)`. Seems that by default state is a dict that is passed in?\n\nUsing this approach of modifying the object on unpickle makes sense to me if we can make it work simply because it keeps the actual logic of looking up the cherry pick value simpler later.",
+      "revId": "975976feb515d34f7ca40ad1f5118cea8ff90636",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
