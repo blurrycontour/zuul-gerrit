@@ -261,6 +261,24 @@
       "parentUuid": "a5db4828_8ea99a6a",
       "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7fedfa5_39aa5970",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-07T16:00:19Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "fcde77eb_ac1b90ca",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
