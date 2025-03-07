@@ -52,6 +52,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "280ab88e_46c3a79a",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1143,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-07T01:34:38Z",
+      "side": 1,
+      "message": "Good point; though it\u0027s actually lengthening it since the tests shorten it.  It\u0027s probably not necessary though since we know the next event will be the one we\u0027re looking for.  I\u0027ll just remove it.",
+      "parentUuid": "85e2190e_abe0162b",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35ef965e_8a8ac59d",
@@ -69,6 +87,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74b63d1a_8393a341",
+        "filename": "tests/unit/test_gerrit.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 1683,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-07T01:34:38Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "35ef965e_8a8ac59d",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc861de6_002875b1",
@@ -82,6 +118,24 @@
       "writtenOn": "2025-03-06T02:38:33Z",
       "side": 1,
       "message": "What is with the `not ref.startswith(\u0027refs/\u0027)` check here? Aren\u0027t branches always refs/heads/foo?",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e732f47_d56e82e6",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-07T01:34:38Z",
+      "side": 1,
+      "message": "Certain old versions of gerrit just used \"foo\" instead of \"refs/heads/foo\" for branches.  I think they are *well* obsolete at this point, but we still have those checks everywhere else so we should have them here too until we declare we remove support for them globally.",
+      "parentUuid": "bc861de6_002875b1",
       "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
@@ -121,6 +175,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b00ad3b_b5469572",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-07T01:34:38Z",
+      "side": 1,
+      "message": "I agree that test is a good idea, I\u0027ll implement.",
+      "parentUuid": "e823ae33_8040cd6f",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ddf00336_81de77f9",
@@ -138,6 +210,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "034b83bc_c483b9d8",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-07T01:34:38Z",
+      "side": 1,
+      "message": "Yeah, I think this is copy-pasta from the new abstract event dispatcher, which itself was copy-pasta from the github driver.  Should probably change it both places but I agree it\u0027s not required since the meaning is clear.",
+      "parentUuid": "ddf00336_81de77f9",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5db4828_8ea99a6a",
@@ -151,6 +241,24 @@
       "writtenOn": "2025-03-06T02:38:33Z",
       "side": 1,
       "message": "The first ever time this gets called on zuul startup it will be a complete noop since nothing has been appended to the queue. However, we may have exited _dispatchEvents() previously without emptying the queue so we need to call this here to preprocess the existing queue before adding additional events to the queue below?\n\nAt least that is my intuition, but we always call run() after append() below so every event should trigger a round of reprocessing in the loop below. Why is this call here on line 458 necessary?",
+      "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcde77eb_ac1b90ca",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 4
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-07T01:34:38Z",
+      "side": 1,
+      "message": "I think this was an attempt to avoid starvation in the case that we never exhaust the zookeeper event list (ie, the system is busy enough that we\u0027re always getting events that cause us to delay).  But that won\u0027t work because we\u0027re waiting for end\u003dtrue.\n\nI\u0027ve removed this and added a timeout instead,  I think that should handle that case.",
+      "parentUuid": "a5db4828_8ea99a6a",
       "revId": "6a9ad14ee20bc1a3c1aafd2bfaae43c231fc17a4",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
