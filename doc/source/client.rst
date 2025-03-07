@@ -48,11 +48,19 @@ Example::
     zuul-admin create-auth-token --auth-config zuul-operator --user alice --tenant tenantA --expires-in 1800
 
 The return value is the value of the ``Authorization`` header the user must set
-when querying a protected endpoint on Zuul's REST API.
+when querying a protected endpoint on Zuul's REST API. The meta information of
+the token will be printed when "--print-meta-info" is specified.
 
 Example::
 
-    bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbWFuYWdlc2Yuc2ZyZG90ZXN0aW5zdGFuY2Uub3JnIiwienV1bC50ZW5hbnRzIjp7ImxvY2FsIjoiKiJ9LCJleHAiOjE1Mzc0MTcxOTguMzc3NTQ0fQ.DLbKx1J84wV4Vm7sv3zw9Bw9-WuIka7WkPQxGDAHz7s
+    Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NDEzNTAzMTksImV4cCI6MTc0MTM1MjExOSwiaXNzIjoienV1bF9vcGVyYXRvciIsImF1ZCI6Inp1dWwuZXhhbXBsZS5jb20iLCJzdWIiOiJhbGljZSIsInp1dWwiOnsiYWRtaW4iOlsidGVuYW50QSJdfX0.cW3U5LEFJS0TM-EDELZS9_hhbxdw-xObLwvDQKL55fM
+    ---------------- Meta Info ----------------
+    Tenant:         tenantA
+    User:           alice
+    Generated At:   2025-03-07 12:25:19 UTC
+    Expired At:     2025-03-07 12:55:19 UTC
+    SHA1 Checksum:  f52018044a209ce7eed5e587c41cc8b360af891d
+    -------------------------------------------
 
 .. _export-keys:
 

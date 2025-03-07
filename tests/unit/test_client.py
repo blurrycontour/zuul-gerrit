@@ -153,14 +153,17 @@ class TestWebTokenClient(BaseClientTestCase):
              'create-auth-token',
              '--auth-conf', 'zuul_operator',
              '--user', 'marshmallow_man',
-             '--tenant', 'tenant_one', ],
+             '--tenant', 'tenant_one',
+             '--claim', 'claim1:value1',
+             '--claim', 'claim2:value2',
+             '--print-meta-info', ],
             stdout=subprocess.PIPE)
         now = time.time()
         out, _ = p.communicate()
         self.assertEqual(p.returncode, 0, 'The command must exit 0')
         self.assertTrue(out.startswith(b"Bearer "), out)
-        # there is a trailing carriage return in the output
-        token = jwt.decode(out[len("Bearer "):-1],
+        # Get the token from the first line of the output
+        token = jwt.decode(out.split(b'\n')[0][len("Bearer "):],
                            key=self.config.get(
                                'auth zuul_operator',
                                'secret'),
@@ -173,11 +176,17 @@ class TestWebTokenClient(BaseClientTestCase):
         self.assertEqual('marshmallow_man', token.get('sub'))
         self.assertEqual('zuul_operator', token.get('iss'))
         self.assertEqual('zuul.example.com', token.get('aud'))
+        self.assertEqual('value1', token.get('claim1'))
+        self.assertEqual('value2', token.get('claim2'))
         admin_tenants = token.get('zuul', {}).get('admin', [])
         self.assertTrue('tenant_one' in admin_tenants, admin_tenants)
         # allow one minute for the process to run
         self.assertTrue(580 <= int(token['exp']) - now < 660,
                         (token['exp'], now))
+
+        # Get the meta info from the second line of the output
+        meta_info_header = out.split(b'\n')[1]
+        self.assertIn("Meta Info", meta_info_header.decode('utf-8'))
 
 
 class TestKeyOperations(ZuulTestCase):
