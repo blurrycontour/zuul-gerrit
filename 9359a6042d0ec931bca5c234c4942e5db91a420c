@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2841111a_68647a9c",
+        "filename": "tests/fakegerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-07T00:18:59Z",
+      "side": 1,
+      "message": "This is super weird because it\u0027s ancient unit test code... but parents and parent are very different.  Note that we\u0027re not setting parents to [parents[0]] which is sort of what you\u0027re describing.  Instead parent is always a single sha.\n\nIn other words, this code is:\n\nIf the test gave us multiple parents, then use that.  If the test gave us a single parent or none, then make a list from the single sha we set above.\n\nIf parents is a list of one item, it\u0027s not a sha, it\u0027s a ref name.  If it\u0027s more than one item, it\u0027s shas.\n\nThat\u0027s really silly, but like I said, it\u0027s unit test cruft.  The whole thing needs a refactor.  It\u0027s straining a bit.",
+      "parentUuid": "eb4a6f4c_5d7a01a5",
+      "revId": "9359a6042d0ec931bca5c234c4942e5db91a420c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d081982c_944becfc",
         "filename": "tests/fakegerrit.py",
         "patchSetId": 5
@@ -103,6 +121,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b690f3b_43ec3db1",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1426,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-07T00:18:59Z",
+      "side": 1,
+      "message": "Exactly.",
+      "parentUuid": "14fe4fd9_fb3aab95",
+      "revId": "9359a6042d0ec931bca5c234c4942e5db91a420c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64c655bc_172dbfee",
@@ -116,6 +152,24 @@
       "writtenOn": "2025-03-06T01:18:32Z",
       "side": 1,
       "message": "Defaulting to None here should avoid the need for a new storage API version.",
+      "revId": "9359a6042d0ec931bca5c234c4942e5db91a420c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6aadc5a0_691541f7",
+        "filename": "zuul/model.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 7212,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-07T00:18:59Z",
+      "side": 1,
+      "message": "Yep.",
+      "parentUuid": "64c655bc_172dbfee",
       "revId": "9359a6042d0ec931bca5c234c4942e5db91a420c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
