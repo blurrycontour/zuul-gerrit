@@ -19,6 +19,7 @@ import babel.dates
 import datetime
 import dateutil.parser
 import dateutil.tz
+import hashlib
 import json
 import jwt
 import logging
@@ -402,6 +403,18 @@ class Client(zuul.cmd.ZuulApp):
             type=int,
             default=600,
             required=False)
+        cmd_create_auth_token.add_argument(
+            '--claim',
+            help=('Custom claim in format claim:value. It can '
+                  'be used multiple times to add multiple claims.'),
+            action="extend",
+            type=lambda x: tuple(x.split(':')),
+            nargs='*',
+            default=[])
+        cmd_create_auth_token.add_argument(
+            '--print-meta-info',
+            action='store_true',
+            help="When specified, the meta info of the token will be printed")
         cmd_create_auth_token.set_defaults(func=self.create_auth_token)
 
         # Key storage
@@ -740,13 +753,20 @@ class Client(zuul.cmd.ZuulApp):
                   % self.args.auth_config)
             sys.exit(1)
         now = int(time.time())
+        exp = now + self.args.expires_in
         token = {'iat': now,
-                 'exp': now + self.args.expires_in,
+                 'exp': exp,
                  'iss': get_default(self.config, auth_section, 'issuer_id'),
                  'aud': get_default(self.config, auth_section, 'client_id'),
                  'sub': self.args.user,
                  'zuul': {'admin': [self.args.tenant, ]},
                 }
+
+        # Add custom claims, allow to overwrite default claims
+        # when it is required.
+        for k, v in self.args.claim:
+            token[k] = v
+
         driver = get_default(
             self.config, auth_section, 'driver')
         if driver == 'HS256':
@@ -768,6 +788,17 @@ class Client(zuul.cmd.ZuulApp):
                                     key=key,
                                     algorithm=driver)
             print("Bearer %s" % auth_token)
+            if self.args.print_meta_info:
+                print("---------------- Meta Info ----------------")
+                print("Tenant:\t\t%s" % self.args.tenant)
+                print("User:\t\t%s" % self.args.user)
+                print("Generated At:\t%s" % time.strftime(
+                    "%Y-%m-%d %H:%M:%S UTC", time.gmtime(now)))
+                print("Expired At:\t%s" % time.strftime(
+                    "%Y-%m-%d %H:%M:%S UTC", time.gmtime(exp)))
+                print("SHA1 Checksum:\t%s" % hashlib.sha1(
+                    auth_token.encode("utf-8")).hexdigest())
+                print("-------------------------------------------")
             err_code = 0
         except Exception as e:
             print("Error when generating Auth Token")
