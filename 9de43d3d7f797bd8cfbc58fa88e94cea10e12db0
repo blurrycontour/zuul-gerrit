@@ -77,6 +77,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f0e68264_d1a602e5",
+        "filename": "tests/fakegerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 599,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-07T00:24:55Z",
+      "side": 1,
+      "message": "Okay I think I fixed this during the unpickle; let\u0027s see if the upgrade job likes it.",
+      "parentUuid": "44f2a8a6_828a8e16",
+      "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6beabce9_b92c7b84",
         "filename": "zuul/driver/gerrit/gerritconnection.py",
         "patchSetId": 5
