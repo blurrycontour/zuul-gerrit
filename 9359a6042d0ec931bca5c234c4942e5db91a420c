@@ -87,6 +87,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "daf836b9_17e14900",
+        "filename": "tests/fakegerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-07T15:49:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2841111a_68647a9c",
+      "revId": "9359a6042d0ec931bca5c234c4942e5db91a420c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d081982c_944becfc",
@@ -100,6 +118,24 @@
       "writtenOn": "2025-03-06T01:18:32Z",
       "side": 1,
       "message": "See above comment. I think this condition is correct.",
+      "revId": "9359a6042d0ec931bca5c234c4942e5db91a420c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0db94e73_f8d5df50",
+        "filename": "tests/fakegerrit.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 648,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-07T15:49:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d081982c_944becfc",
       "revId": "9359a6042d0ec931bca5c234c4942e5db91a420c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
