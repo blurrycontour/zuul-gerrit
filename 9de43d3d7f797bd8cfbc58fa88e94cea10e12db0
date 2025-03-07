@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "eebd6cfc_727ff98b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-07T00:48:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "574b6236_3bf79e99",
+      "range": {
+        "startLine": 24,
+        "startChar": 60,
+        "endLine": 27,
+        "endChar": 1
+      },
+      "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "6686f28a_b3514bb0",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 5
@@ -124,6 +148,24 @@
       "side": 1,
       "message": "I don\u0027t think I understand the question.  It might help if you could be more explicit about which attribute you mean by \"the current patchset value\"?\n\nI don\u0027t believe we will ever update GerritChange.patchset to point to a different value than the key (if they key has a patchset).  The only time we set that value is if it is unset, so we will not update the change for a key where patchset\u003d1 to say it\u0027s patchset 2.  The only things we will change are which patchsets dependencies point to (the main part of this change) and whether the patchset is current with GerritChange.is_current_patchset.  That last one might be wrong in the ssh case but is not important in the cases that it is.",
       "parentUuid": "6beabce9_b92c7b84",
+      "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76366daa_dcecee1e",
+        "filename": "zuul/driver/gerrit/gerritconnection.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 1061,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-07T00:48:46Z",
+      "side": 1,
+      "message": "On line 1045 we query the change by number only so should get back up to date info from Gerrit rather than the cache (I think). This means the data in there would be up to date including new patchset values. But then on line 1054 we construct a ChangeKey using the preexisting change object which has not been updated yet so the ChangeKey (key) passed into updateChangeWithRetry() wouldn\u0027t match the data that we update into change via _update_change? Basically we\u0027d have a change key with old patchset info and change data with new patchset info in it matched up to each other?\n\nIts possible I\u0027m misreading that code and the new comment block just above.",
+      "parentUuid": "87e7caa8_226cccaf",
       "revId": "9de43d3d7f797bd8cfbc58fa88e94cea10e12db0",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
