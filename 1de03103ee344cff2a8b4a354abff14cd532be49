@@ -89,6 +89,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4a145ef9_7ff48ca5",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 14
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-08T03:48:03Z",
+      "side": 1,
+      "message": "Would the next change in the stack where you use the TreeCache be a good place to switch to ZKObject?",
+      "parentUuid": "a4cfe21b_be067976",
+      "revId": "1de03103ee344cff2a8b4a354abff14cd532be49",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "71323df8_35519124",
         "filename": "zuul/lib/keystorage.py",
         "patchSetId": 14
