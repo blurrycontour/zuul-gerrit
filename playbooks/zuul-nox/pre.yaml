@@ -1,5 +1,6 @@
 - hosts: all
   roles:
+    - configure-swap
     - ensure-dstat-graph
     - run-dstat
     - role: ensure-zookeeper
