@@ -16,6 +16,24 @@
       "message": "Was there a reason that the `password` configurations are checked for those operations? From what I understand it is not needed for those operations, so I removed them. But I may be wrong, comments are welcome.",
       "revId": "0a7e61b39fe41f60c7bca8518e6cc714f5d28d8c",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7abd606e_a20c7f1a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-08T03:53:02Z",
+      "side": 1,
+      "message": "Can you split that out into a separate change?  The reason the password is required is because we never thought it would make sense to do anything with a keystore without having the password.  Perhaps it does make sense, and perhaps the best way to do that is to pass in a fake password that is the empty string.  But I\u0027d really like to evaluate that on its own; it doesn\u0027t seem to be required for this change.\n\n(I might have ideas like: perhaps when we don\u0027t supply a password we should use \"None\" or a sentinel object so that we can explicitly check that any time we actually use the password and crash instead of accidentally encrypting a key with a blank password.)",
+      "parentUuid": "12a9d022_02de41ed",
+      "revId": "0a7e61b39fe41f60c7bca8518e6cc714f5d28d8c",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
