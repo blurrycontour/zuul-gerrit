@@ -16,6 +16,23 @@
       "message": "recheck",
       "revId": "4aaf0ad37fcdf8ba19a99c3f8e0d11ef67f9a1e2",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c7da985_c03a580c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 15
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-08T03:44:11Z",
+      "side": 1,
+      "message": "LGTM, will +2 after the rest of the stack is ready.",
+      "revId": "4aaf0ad37fcdf8ba19a99c3f8e0d11ef67f9a1e2",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }

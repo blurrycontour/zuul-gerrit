@@ -88,6 +88,24 @@
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9ce731a_b03326b6",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-08T03:44:11Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e331bcd7_8223440b",
+      "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4b51caf_2bc13ddf",
@@ -119,6 +137,24 @@
       "side": 1,
       "message": "Depends on the discussion in the comment above.",
       "parentUuid": "e4b51caf_2bc13ddf",
+      "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84585d17_bed85072",
+        "filename": "zuul/lib/keystorage.py",
+        "patchSetId": 6
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-08T03:44:11Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "4aa67214_22236d18",
       "revId": "ae62faf1bee23638ccfe14eecb94321c5a194754",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
