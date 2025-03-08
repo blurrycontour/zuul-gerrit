@@ -103,6 +103,24 @@
       "parentUuid": "22c9c5b8_a72d2874",
       "revId": "de82e9cb2eddbd1c78f2857485866ebf36e89714",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "298c8153_2a2c15b1",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1178,
+      "author": {
+        "id": 1
+      },
+      "writtenOn": "2025-03-08T04:15:30Z",
+      "side": 1,
+      "message": "We already have pyjwt as a dependency, can we use that instead?\n\nhttps://pyjwt.readthedocs.io/en/stable/api.html#jwt.PyJWK",
+      "parentUuid": "8459e05b_a473e921",
+      "revId": "de82e9cb2eddbd1c78f2857485866ebf36e89714",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
