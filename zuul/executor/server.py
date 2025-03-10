@@ -4222,15 +4222,15 @@ class ExecutorServer(BaseMergeServer):
         # Fulfill the resume/cancel requests after our internal calls
         # to aid the test suite in avoiding races.
         if build_event == JobRequestEvent.CANCELED:
-            self.stopJob(build_request)
-            try:
-                self.executor_api.fulfillCancel(build_request)
-            except NoNodeError:
-                self.log.warning("Unable to fulfill cancel request, "
-                                 "build request may have been removed")
+            if self.stopJob(build_request):
+                try:
+                    self.executor_api.fulfillCancel(build_request)
+                except NoNodeError:
+                    self.log.warning("Unable to fulfill cancel request, "
+                                     "build request may have been removed")
         elif build_event == JobRequestEvent.RESUMED:
-            self.resumeJob(build_request)
-            self.executor_api.fulfillResume(build_request)
+            if self.resumeJob(build_request):
+                self.executor_api.fulfillResume(build_request)
         elif build_event == JobRequestEvent.DELETED:
             self.stopJob(build_request)
 
@@ -4381,7 +4381,7 @@ class ExecutorServer(BaseMergeServer):
         log = get_annotated_logger(
             self.log, build_request.event_id, build=build_request.uuid)
         log.debug("Resume job")
-        self.resumeJobByUnique(
+        return self.resumeJobByUnique(
             build_request.uuid, build_request.event_id
         )
 
@@ -4389,29 +4389,31 @@ class ExecutorServer(BaseMergeServer):
         log = get_annotated_logger(
             self.log, build_request.event_id, build=build_request.uuid)
         log.debug("Stop job")
-        self.stopJobByUnique(build_request.uuid, build_request.event_id)
+        return self.stopJobByUnique(build_request.uuid, build_request.event_id)
 
     def resumeJobByUnique(self, unique, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         job_worker = self.job_workers.get(unique)
         if not job_worker:
             log.debug("Unable to find worker for job %s", unique)
-            return
+            return False
         try:
             job_worker.resume()
         except Exception:
             log.exception("Exception sending resume command to worker:")
+        return True
 
     def stopJobByUnique(self, unique, reason=None, zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         job_worker = self.job_workers.get(unique)
         if not job_worker:
             log.debug("Unable to find worker for job %s", unique)
-            return
+            return False
         try:
             job_worker.stop(reason)
         except Exception:
             log.exception("Exception sending stop command to worker:")
+        return True
 
     def _handleExpiredHoldRequest(self, request):
         '''
