@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec891c86_c6d35b29",
+        "filename": "tests/fakegerrit.py",
+        "patchSetId": 7
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-10T23:50:52Z",
+      "side": 1,
+      "message": "I think this should be hasattr instead of getattr. getattr expects the attribute to be present and raises if it isn\u0027t.",
+      "range": {
+        "startLine": 112,
+        "startChar": 15,
+        "endLine": 112,
+        "endChar": 18
+      },
+      "revId": "05d238e2c67c55ab895a030d991369743a5e0268",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    }
+  ]
+}
