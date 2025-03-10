@@ -50,6 +50,23 @@
       "message": "recheck as the depends on has merged",
       "revId": "2c9ea69ec05000fe76aa4ac6680bf1ee6e035413",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b9348da_aaa80b86",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 4146
+      },
+      "writtenOn": "2025-03-10T23:48:16Z",
+      "side": 1,
+      "message": "recheck got 502 bad gateway from quay.io pulling the zk image",
+      "revId": "2c9ea69ec05000fe76aa4ac6680bf1ee6e035413",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
