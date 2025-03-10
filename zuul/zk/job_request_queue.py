@@ -20,7 +20,7 @@ from contextlib import suppress
 from enum import Enum
 import zlib
 
-from kazoo.exceptions import LockTimeout, NoNodeError
+from kazoo.exceptions import LockTimeout, NoNodeError, NodeExistsError
 from kazoo.protocol.states import EventType, ZnodeStat
 from kazoo.client import TransactionRequest
 
@@ -402,10 +402,18 @@ class JobRequestQueue:
     # We use child nodes here so that we don't need to lock the
     # request node.
     def requestResume(self, request):
-        self.kazoo_client.ensure_path(f"{request.path}/resume")
+        try:
+            self.kazoo_client.create(f"{request.path}/resume")
+        except (NoNodeError, NodeExistsError):
+            # znode is either gone or already exists
+            pass
 
     def requestCancel(self, request):
-        self.kazoo_client.ensure_path(f"{request.path}/cancel")
+        try:
+            self.kazoo_client.create(f"{request.path}/cancel")
+        except (NoNodeError, NodeExistsError):
+            # znode is either gone or already exists
+            pass
 
     def fulfillResume(self, request):
         self.kazoo_client.delete(f"{request.path}/resume")
