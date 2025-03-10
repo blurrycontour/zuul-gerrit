@@ -790,6 +790,7 @@ class TestLauncher(LauncherBaseTestCase):
         'zuul.driver.aws.awsendpoint.AwsProviderEndpoint._createInstance',
         side_effect=exceptions.QuotaException)
     def test_quota_failure(self, mock_create):
+        ctx = self.createZKContext(None)
         # This tests an unexpected quota error.
         # The request should never be fulfilled
         with testtools.ExpectedException(Exception):
@@ -803,6 +804,13 @@ class TestLauncher(LauncherBaseTestCase):
         # We can't assert anything about the node itself because it
         # will have been deleted, but we have asserted there was at
         # least an attempt.
+
+        # Now explicitly delete the request to avoid exceptions in the
+        # launcher caused by request processing attempting to relaunch the
+        # node during launcher shutdown. The clean no exceptions in logs
+        # check for unittests fails otherwise.
+        request.delete(ctx)
+        self.waitUntilSettled()
 
     @simple_layout('layouts/nodepool-multi-provider.yaml',
                    enable_nodepool=True)
