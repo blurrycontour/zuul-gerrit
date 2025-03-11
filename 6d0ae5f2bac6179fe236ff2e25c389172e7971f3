@@ -37,6 +37,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d6456a7f_3421778a",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-03-11T14:00:07Z",
+      "side": 1,
+      "message": "I\u0027m not sure I understand the `get()` here. If we execute a job the tenant will be available. If the intention was to fall back on the global `web_root` this should be already considered as `tenant.web_root` is either the global or the whitelabel `web_root`.\n\nThe following should be enough:\n\n```python\nweb_root \u003d self.sched.abide.tenants[pipeline.tenant.name].web_root\n```",
+      "range": {
+        "startLine": 70,
+        "startChar": 8,
+        "endLine": 71,
+        "endChar": 62
+      },
+      "revId": "6d0ae5f2bac6179fe236ff2e25c389172e7971f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7752461c_4de63609",
         "filename": "zuul/executor/client.py",
         "patchSetId": 5
@@ -48,6 +71,24 @@
       "writtenOn": "2025-03-08T04:33:38Z",
       "side": 1,
       "message": "This should be in executor/common.py and should not be in the zuul hierarchy.  That would make it visible to users, and there is no need for that.\n\n(That\u0027s assuming that we don\u0027t just want to put a SystemAttributes object in the executor.  That might be a good idea too.  I\u0027d like Simon\u0027s thoughts on that.)",
+      "revId": "6d0ae5f2bac6179fe236ff2e25c389172e7971f3",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5bc5ce8_29c27cf1",
+        "filename": "zuul/executor/client.py",
+        "patchSetId": 5
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 27582
+      },
+      "writtenOn": "2025-03-11T14:00:07Z",
+      "side": 1,
+      "message": "In any case we\u0027d need at least to pass the tenant (whitelabel) `web_root` via the build params, as we don\u0027t have a layout on the executors.\nSo if we have to forward that anyways via the build params, we can also just pass the global or whitelabel `web_root` her directly w/o needing the system attributes on executors.\n\nOne point re. the name: Since we need the zuu-web root URL here (w/o the `/t/{tenant_name}` I\u0027d maybe change the name to make it clear that this is NOT the tenant `web_root` but rather the .",
+      "parentUuid": "7752461c_4de63609",
       "revId": "6d0ae5f2bac6179fe236ff2e25c389172e7971f3",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     },
