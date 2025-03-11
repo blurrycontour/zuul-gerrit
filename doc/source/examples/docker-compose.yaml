@@ -122,18 +122,6 @@ services:
     command: "sh -c '/var/playbooks/wait-to-start-certs.sh && exec zuul-executor -f'"
     networks:
       - zuul
-  node:
-    build:
-      dockerfile: node-Dockerfile
-      context: ./
-      args:
-        http_proxy: "${http_proxy}"
-        https_proxy: "${http_proxy}"
-        no_proxy: "${no_proxy},gerrit"
-    volumes:
-      - "nodessh:/root/.ssh:z"
-    networks:
-      - zuul
   launcher:
     image: quay.io/zuul-ci/nodepool-launcher
     volumes:
@@ -159,6 +147,31 @@ services:
       - "logs:/usr/local/apache2/htdocs:z"
     networks:
       - zuul
+  node-ubuntu-jammy:
+    build:
+      dockerfile: ubuntu-jammy-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    volumes:
+      - "nodessh:/root/.ssh:z"
+    networks:
+      - zuul
+  node-ubuntu-noble:
+    build:
+      dockerfile: ubuntu-noble-Dockerfile
+      context: ./
+      args:
+        http_proxy: "${http_proxy}"
+        https_proxy: "${http_proxy}"
+        no_proxy: "${no_proxy},gerrit"
+    volumes:
+      - "nodessh:/root/.ssh:z"
+    networks:
+      - zuul
+
 
 volumes:
   sshkey:

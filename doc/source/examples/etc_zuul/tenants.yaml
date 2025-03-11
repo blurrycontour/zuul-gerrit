@@ -1,5 +1,5 @@
 - tenant:
-    name: example-tenant
+    name: milky-way
     source:
       gerrit:
         config-projects:
@@ -7,6 +7,7 @@
         untrusted-projects:
           - test1
           - test2
+          - lambda
       opendev.org:
         untrusted-projects:
           - zuul/zuul-jobs:
