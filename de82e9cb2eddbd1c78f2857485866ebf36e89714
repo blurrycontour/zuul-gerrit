@@ -121,6 +121,24 @@
       "parentUuid": "8459e05b_a473e921",
       "revId": "de82e9cb2eddbd1c78f2857485866ebf36e89714",
       "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "feb4f494_64654eb0",
+        "filename": "zuul/web/__init__.py",
+        "patchSetId": 9
+      },
+      "lineNbr": 1178,
+      "author": {
+        "id": 33134
+      },
+      "writtenOn": "2025-03-11T12:58:55Z",
+      "side": 1,
+      "message": "I double checked the pyjwt lib, it serves as a client for loading jwk data from jwks endpoinds, not for generating jwks content itself. So I think we can not use it here.",
+      "parentUuid": "298c8153_2a2c15b1",
+      "revId": "de82e9cb2eddbd1c78f2857485866ebf36e89714",
+      "serverId": "4a232e18-c5a9-48ee-94c0-e04e7cca6543"
     }
   ]
 }
